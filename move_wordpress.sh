@@ -1,9 +1,9 @@
 #!/bin/bash
 
-for i in *.rst
+for i in *.md
 do
     echo $i
-    date=$(head -10 $i | grep "^:date:" | awk '{print $2}')
+    date=$(head -10 $i | grep "^Date:" | awk '{print $2}')
     year=$(echo $date | awk -F \- '{print $1}')
     month=$(echo $date | awk -F \- '{print $2}')
     dir="${year}/${month}"
