@@ -33,20 +33,20 @@ DEFAULT_PAGINATION = 10
 DEFAULT_CATEGORY = "Misc"
 
 #FILENAME_METADATA = '(?P<date>\d{4}/\d{2}/\d{2})-(?P<slug>.*)'
-PATH_METADATA = '(?P<date>\d{4}/\d{2}/\d{2})-(?P<slug>.*)'
+#PATH_METADATA = '(?P<date>\d{4}/\d{2}/\d{2})-(?P<slug>.*)'
 
 IGNORE_FILES = ['.#*']
 
 # PATH = 'content/'
 PAGE_DIR = 'pages'
 PAGE_EXCLUDES = []
-ARTICLE_DIR = ''
+ARTICLE_DIR = 'content'
 ARTICLE_EXCLUDES = ['pages',]
 STATIC_PATHS = ['images', 'GFX']
 
 # URL settings
-ARTICLE_URL = '{slug}.html'
-ARTICLE_SAVE_AS = ARTICLE_URL
+ARTICLE_URL = '{date:%Y}/{date:%m}/{slug}/'
+ARTICLE_SAVE_AS = '{date:%Y}/{date:%m}/{slug}/index.html'
 PAGE_URL = 'pages/{slug}.html'
 PAGE_SAVE_AS = PAGE_URL
 CATEGORY_URL = 'category/{slug}.html'
