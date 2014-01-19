@@ -1,6 +1,10 @@
 from fabric.api import *
 import fabric.contrib.project as project
 import os
+import re
+import datetime
+
+from pelicanconf import ARTICLE_DIR, DEFAULT_CATEGORY, AUTHOR
 
 # Local path configuration (can be absolute or relative to fabfile)
 env.deploy_path = 'output'
@@ -59,26 +63,63 @@ def publish():
         delete=True
     )
 
+def _make_slug(title):
+    """ make a slug from the given title """
+    slug = title.lower()
+    slug = re.sub('\s+', '-', slug)
+    slug = re.sub(r'[^A-Za-z0-9_-]', '', slug)
+    return slug
+
+def _prompt_title():
+    """ prompt for a post title """
+    confirm = 'no'
+    while not re.match(r'(y|Y|yes|Yes|YES)', confirm):
+        title = prompt("Post Title:")
+        print("")
+        print("Post Title: '%s'" % title)
+        print("Slug: '%s'" % _make_slug(title))
+        print("")
+        confirm = prompt("Is this correct? [y|N]", default='no')
+    return title
+
 def post():
     """ write a post """
-    # prompt for slug/title
-    # figure out the date
-    # make date directories if they dont exist
-    # make a string for the filename
-    # make a string for the metadata, plugging in what we already have, and make it a draft
-    """
-My super title
+    title = _prompt_title()
+    dt = datetime.datetime.now()
+    dname = os.path.join(ARTICLE_DIR, dt.strftime('%Y'), dt.strftime('%m'))
+    if not os.path.exists(dname):
+        os.makedirs(dname)
+    slug = _make_slug(title)
+    fname = "%s.html" % slug
+    fpath = os.path.join(dname, fname)
+    datestr = dt.strftime('%Y-%m-%d %H:%M')
+    metadata = """
+{title}
 ##############
 
-:date: 2010-10-03 10:20
-:tags: thats, awesome
-:category: yeah
-:slug: my-super-post
-:author: Alexis Metaireau
-:summary: Short version for index and feeds
+:date: {datestr}
+:tags: 
+:category: {defaultcat}
+:slug: {slug}
+:author: {author}
+:summary: <<<<< summary goes here >>>>>>>
 :status: draft
 
-content (start with link to rst syntax docs)
-    """
-    # write metadata string to file
-    # using exec(), open the file with EDITOR, or print message if not defined
+content (written in MarkDown - http://daringfireball.net/projects/markdown/syntax )
+    """.format(title=title,
+               datestr=datestr,
+               defaultcat=DEFAULT_CATEGORY,
+               slug=slug,
+               author=AUTHOR)
+    with open(fpath, 'w') as fh:
+        fh.write(metadata)
+        # need to flush and fsync before an exec
+        fh.flush()
+        os.fsync(fh.fileno())
+    if os.environ.get('EDITOR') is None:
+        print("EDITOR not defined. Your post is started at: %s" % fpath)
+    else:
+        editor = os.environ.get('EDITOR')
+        print("Replacing fab process with: %s %s" % (editor, os.path.abspath(fpath)))
+        # replace our process with the editor...
+        os.execlp(editor, os.path.basename(editor), os.path.abspath(fpath))
