@@ -84,3 +84,4 @@ TAG_CLOUD_MAX_ITEMS = 50
 # TODO - http://pelicanthemes.com/
 
 PLUGINS = []
+# TODO - https://github.com/getpelican/pelican-plugins
