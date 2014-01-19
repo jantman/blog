@@ -58,3 +58,13 @@ def publish():
         local_dir=DEPLOY_PATH.rstrip('/') + '/',
         delete=True
     )
+
+def post():
+    """ write a post """
+    # prompt for slug/title
+    # figure out the date
+    # make date directories if they dont exist
+    # make a string for the filename
+    # make a string for the metadata, plugging in what we already have, and make it a draft
+    # write metadata string to file
+    # using exec(), open the file with EDITOR, or print message if not defined
