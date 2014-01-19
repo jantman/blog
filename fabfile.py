@@ -66,5 +66,19 @@ def post():
     # make date directories if they dont exist
     # make a string for the filename
     # make a string for the metadata, plugging in what we already have, and make it a draft
+    """
+My super title
+##############
+
+:date: 2010-10-03 10:20
+:tags: thats, awesome
+:category: yeah
+:slug: my-super-post
+:author: Alexis Metaireau
+:summary: Short version for index and feeds
+:status: draft
+
+content (start with link to rst syntax docs)
+    """
     # write metadata string to file
     # using exec(), open the file with EDITOR, or print message if not defined
