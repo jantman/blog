@@ -81,6 +81,6 @@ TAG_CLOUD_STEPS = 5
 TAG_CLOUD_MAX_ITEMS = 50
 # See http://docs.getpelican.com/en/3.3.0/settings.html#tag-cloud
 
-
+# TODO - http://pelicanthemes.com/
 
 PLUGINS = []
