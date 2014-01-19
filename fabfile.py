@@ -82,6 +82,10 @@ def _prompt_title():
         confirm = prompt("Is this correct? [y|N]", default='no')
     return title
 
+def drafts():
+    """ list drafts """
+    local('grep -rl -e "^Status: draft" -e "^:status: draft" content/ | grep -v "~$"')
+
 def post():
     """ write a post """
     title = _prompt_title()
