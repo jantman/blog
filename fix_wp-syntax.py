@@ -27,22 +27,41 @@ import os
 import sys
 import re
 
+from pygments import lexers
+
 files = sys.argv[1:]
 
 """
 translation of GeSHi identifiers to Pygments identifiers,
-for identifiers not supported by both
+for GeSHi identifiers not supported by Pygments
 """
-geshi_to_pygments = {}
+overrides = {}
 
-def translate_identifier(i):
+def translate_identifier(lexers, overrides, i):
     """
     Translate a wp-syntax/GeSHi language identifier to
     a Pygments identifier.
     """
-    return geshi_to_pygments.get(i, i)
+    if i in lexers:
+        return lexers[i]
+    if i in overrides:
+        return overrides[i]
+    sys.stderr.write("Unknown lexer, leaving as-is: %s" % i)
+    return i
+
+def get_lexers_list():
+    """ get a list of all pygments lexers """
+    d = {}
+    ls = lexers.get_all_lexers()
+    for l in ls:
+        d[l[0]] = l[0]
+        for n in l[1]:
+            d[n] = l[0]
+    return d
 
 lang_re = re.compile(r'^~~~~ {lang="([^"]+)"')
+
+lexers = get_lexers_list()
 
 for f in files:
     content = ""
@@ -52,7 +71,7 @@ for f in files:
         for line in fh:
             m = lang_re.match(line)
             if m is not None:
-                content = content + "        " + ":::" + translate_identifier(m.group(1)) + "\n"
+                content = content + "        " + ":::" + translate_identifier(lexers, overrides, m.group(1)) + "\n"
                 inpre = True
                 count = count + 1
             elif inpre and line.strip() == "~~~~":

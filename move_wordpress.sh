@@ -1,12 +1,13 @@
-#!/bin/bash
+#!/bin/bash -xe
 
-for i in *.md
+for i in content/*.md
 do
-    echo $i
     date=$(head -10 $i | grep "^Date:" | awk '{print $2}')
     year=$(echo $date | awk -F \- '{print $1}')
     month=$(echo $date | awk -F \- '{print $2}')
-    dir="${year}/${month}"
+    dir="content/${year}/${month}"
     [[ -e $dir ]] || mkdir -p $dir
+
+    ./fix_wp-syntax.py $i
     mv $i $dir/
 done
