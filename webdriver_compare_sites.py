@@ -1,16 +1,32 @@
 #!/usr/bin/env python
+"""
+Script using selenium/webdriver (pip install selenium) to automate
+using two Firefox windows to compare identical paths on two different
+domains - specifically, to compare your local Pelican paths running
+on localhost to the WordPress installation they came from.
+
+This uses a dict that's written on every change (so you can safely
+Ctrl+C) to automate keeping track of which paths have been seen,
+and which need further review.
+
+"""
 
 from selenium import webdriver
 from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver import remote
 
+import anyjson
+
 import time
 import os
+import optparse
+import sys
+import re
 
-os.environ['DISPLAY'] = ":0"
-
-browser = webdriver.Firefox() # Get local session of firefox
+# help when running through screen
+if 'DISPLAY' not in os.environ:
+    os.environ['DISPLAY'] = ":0"
 
 def loadPages(browser, windows, one, two):
     """
@@ -22,11 +38,140 @@ def loadPages(browser, windows, one, two):
     browser.get(two)
     return True
 
-browser.get("http://www.google.com")
+def check_path(path, pdict, old, new, browser, windows):
+    """
+    Interactively check a path
+    """
+    pdict['seen'] = True
+    one = old + path
+    two = new + path
+    loadPages(browser, windows, one, two)
+    # prompt for status
+    resp = ""
+    while resp not in ['s', 'r', 'o']:
+        resp = raw_input("Page Decision: [s=skip, r=review, o=ok] ").strip()
+    if resp == 'r':
+        pdict['review'] = True
+        note = raw_input("Notes: ").strip()
+        if note != "":
+            pdict['note'] = note
+    elif resp == 's':
+        pdict['seen'] = False
+    return pdict
 
-temp = browser.find_element_by_tag_name('body')
-temp.send_keys(Keys.CONTROL, 'n')
+def get_all_paths(dname):
+    """
+    Get all paths under dname that map to WP post URLs;
+    i.e. all directories that contain "index.html"
 
-windows = browser.window_handles
+    Don't include generated pages, only posts.
 
-loadPages(browser, windows, 'http://localhost/blog/output/index.html', 'http://localhost/blog/output/2013/01/fedora-linux-and-osx-dual-boot-on-mid-2010-62-15-macbook-pro-laptop/')
+    :rtype: list of paths
+    """
+    paths = []
+    for root, subdirs, files in os.walk(dname):
+        for f in files:
+            if f == "index.html":
+                path = os.path.join(root, f)
+                if path.startswith(dname):
+                    path = path[len(dname):]
+                path = os.path.dirname(path) + '/'
+                path = re.sub('/+', '/', path)
+                paths.append(path)
+    return paths
+
+def make_path_dict(paths):
+    """
+    Make a path_dict with the right keys
+    """
+    pdict = {}
+    elem = {'seen': False, 'review': False, 'note': ""}
+    for p in paths:
+        pdict[p] = elem
+    return pdict
+
+def parse_opts(argv):
+    """
+    Parse command-line options.
+
+    :param argv: sys.argv or similar list
+    :rtype: optparse.Values
+    """
+    parser = optparse.OptionParser()
+
+    parser.add_option('-o', '--old', dest='old', action='store', type='string',
+                      help='old path prefix, i.e. "http://blog.example.com"')
+
+    parser.add_option('-n', '--new', dest='new', action='store', type='string', default='http://localhost:8000',
+                      help='new path prefix, default: http://localhost:8000')
+
+    parser.add_option('-d', '--output-dir', dest='htmldir', action='store', type='string', default='output',
+                      help='Pelican output directory, default: output')
+
+    parser.add_option('-s', '--savefile', dest='savefile', action='store', type='string', default='webdriver_compare.json',
+                      help='path to JSON savefile, default: webdriver_compare.json')
+
+    parser.add_option('-v', '--verbose', dest='verbose', action='store_true', default=False,
+                      help='verbose output')
+
+    options, args = parser.parse_args(argv)
+
+    if not options.old or not options.new:
+        sys.stderr.write("ERROR: you must specify -o|--old and -n|--new\n")
+        sys.exit(1)
+
+    return options
+
+def main():
+    """
+    Main method
+    """
+    opts = parse_opts(sys.argv[1:])
+
+    path_dict = {}
+
+    if opts.savefile and os.path.exists(opts.savefile):
+        # read the savefile instead of parsing URLs
+        try:
+            with open(opts.savefile, 'r') as fh:
+                path_dict = anyjson.deserialize(fh.read())
+        except ValueError:
+            sys.stderr.write("ERROR: could not deserialize JSON savefile %s\n" % opts.savefile)
+            return False
+    else:
+        paths = get_all_paths(opts.htmldir)
+        path_dict = make_path_dict(paths)
+        if opts.verbose:
+            print("+ Found %d paths" % len(path_dict))
+        with open(opts.savefile, "w") as fh:
+            fh.write(anyjson.serialize(path_dict))
+            fh.flush()
+            os.fsync(fh.fileno())
+    # we now have path_dict
+
+    # setup the WebDriver stuff
+    browser = webdriver.Firefox() # Get local session of firefox
+
+    # open another window, which requires a loaded document/page
+    browser.get("http://www.google.com")
+    temp = browser.find_element_by_tag_name('body')
+    temp.send_keys(Keys.CONTROL, 'n')
+    windows = browser.window_handles
+
+    for p in path_dict:
+        if path_dict[p]['seen'] is True and path_dict[p]['review'] is False:
+            continue
+        if path_dict[p]['review'] is True:
+            print("Reopening %s for review" % p)
+            if path_dict[p]['note'] != "":
+                print("\tPrevious Note: %s" % path_dict[p]['note'])
+        path_dict[p] = check_path(p, path_dict[p], opts.old, opts.new, browser, windows)
+        # write the JSON out and flush
+        with open(opts.savefile, "w") as fh:
+            fh.write(anyjson.serialize(path_dict))
+            fh.flush()
+            os.fsync(fh.fileno())
+    print("Print a report about the paths...")
+
+if __name__ == "__main__":
+    main()
