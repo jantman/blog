@@ -90,27 +90,24 @@ def post():
     if not os.path.exists(dname):
         os.makedirs(dname)
     slug = _make_slug(title)
-    fname = "%s.html" % slug
+    fname = "%s.md" % slug
     fpath = os.path.join(dname, fname)
     datestr = dt.strftime('%Y-%m-%d %H:%M')
-    metadata = """
-{title}
-##############
-
-:date: {datestr}
-:tags: 
-:category: {defaultcat}
-:slug: {slug}
-:author: {author}
-:summary: <<<<< summary goes here >>>>>>>
-:status: draft
+    metadata = """Title: {title}
+Date: {datestr}
+Author: {author}
+Category: {defaultcat}
+Tags: 
+Slug: {slug}
+Summary: <<<<< summary goes here >>>>>>>
+Status: draft
 
 content (written in MarkDown - http://daringfireball.net/projects/markdown/syntax )
-    """.format(title=title,
-               datestr=datestr,
-               defaultcat=DEFAULT_CATEGORY,
-               slug=slug,
-               author=AUTHOR)
+""".format(title=title,
+           datestr=datestr,
+           defaultcat=DEFAULT_CATEGORY,
+           slug=slug,
+           author=AUTHOR)
     with open(fpath, 'w') as fh:
         fh.write(metadata)
         # need to flush and fsync before an exec
