@@ -59,6 +59,7 @@ TAGS_SAVE_AS = TAGS_URL
 WITH_FUTURE_DATES = True # draft status for anything with future date
 
 TYPOGRIFY = True
+MD_EXTENSIONS = ['codehilite(guess_lang=False)', 'fenced_code', 'toc']
 
 # Uncomment following line if you want document-relative URLs when developing
 RELATIVE_URLS = True
