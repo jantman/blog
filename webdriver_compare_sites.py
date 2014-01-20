@@ -90,6 +90,18 @@ def make_path_dict(paths):
         pdict[p] = elem
     return pdict
 
+def print_report(json_path, url_base):
+    """
+    Print a report on the json savefile contents
+    """
+    with open(json_path, 'r') as fh:
+        j = anyjson.deserialize(fh.read())
+    for path in j:
+        if j[path]['review'] is True:
+            print(url_base + path)
+            if j[path]['note'].strip() != "":
+                print("\t%s" % j[path]['note'])
+
 def parse_opts(argv):
     """
     Parse command-line options.
@@ -114,6 +126,9 @@ def parse_opts(argv):
     parser.add_option('-v', '--verbose', dest='verbose', action='store_true', default=False,
                       help='verbose output')
 
+    parser.add_option('-r', '--report', dest='report', action='store_true', default=False,
+                      help='dont run, but report on savefile')
+
     options, args = parser.parse_args(argv)
 
     if not options.old or not options.new:
@@ -129,6 +144,13 @@ def main():
     opts = parse_opts(sys.argv[1:])
 
     path_dict = {}
+
+    if opts.report:
+        if not os.path.exists(opts.savefile):
+            sys.stderr.write("ERROR: savefile %s does not exist." % opts.savefile)
+            sys.exit(1)
+        print_report(opts.savefile, opts.new)
+        sys.exit(0)
 
     if opts.savefile and os.path.exists(opts.savefile):
         # read the savefile instead of parsing URLs
