@@ -86,9 +86,33 @@ def drafts():
     """ list drafts """
     local('grep -rl -e "^Status: draft" -e "^:status: draft" content/ | grep -v "~$"')
 
+def _prompt_category(cats):
+    """ prompt for a category selection """
+    print("\n\nSelect a Category:\n==================")
+    for c in xrange(0, len(cats)):
+        print("%d) %s" % (c, cats[c]))
+    print("")
+    confirm = 'no'
+    while not re.match(r'(y|Y|yes|Yes|YES)', confirm):
+        category = prompt("Category (number or free text):")
+        print("")
+        if re.match(r'[0-9]+', category):
+            foo = int(category)
+            if foo in xrange(0, len(cats)):
+                category = cats[foo]
+            else:
+                print("Invalid number.")
+                continue
+        print("Category: '%s'" % category)
+        print("")
+        confirm = prompt("Is this correct? [y|N]", default='no')
+    return category
+
 def post():
     """ write a post """
+    cats = _get_categories()
     title = _prompt_title()
+    category = _prompt_category(cats)
     dt = datetime.datetime.now()
     dname = os.path.join(ARTICLE_DIR, dt.strftime('%Y'), dt.strftime('%m'))
     if not os.path.exists(dname):
@@ -100,7 +124,7 @@ def post():
     metadata = """Title: {title}
 Date: {datestr}
 Author: {author}
-Category: {defaultcat}
+Category: {category}
 Tags: 
 Slug: {slug}
 Summary: <<<<< summary goes here >>>>>>>
@@ -109,7 +133,7 @@ Status: draft
 content (written in MarkDown - http://daringfireball.net/projects/markdown/syntax )
 """.format(title=title,
            datestr=datestr,
-           defaultcat=DEFAULT_CATEGORY,
+           category=category,
            slug=slug,
            author=AUTHOR)
     with open(fpath, 'w') as fh:
@@ -125,6 +149,19 @@ content (written in MarkDown - http://daringfireball.net/projects/markdown/synta
         # replace our process with the editor...
         os.execlp(editor, os.path.basename(editor), os.path.abspath(fpath))
 
+def _get_categories():
+    """ return a list of all categories in current posts """
+    lines = local('grep -rh "^Category: " %s/ | sort | uniq' % ARTICLE_DIR, capture=True)
+    cats = []
+    cat_re = re.compile(r'^Category: (.+)$')
+    for l in str(lines).split("\n"):
+        m = cat_re.match(l)
+        if not m:
+            continue
+        cats.append(m.group(1))
+    return cats
+
 def categories():
     """ show all current blog post categories """
-    local('grep -rh "^Category: " content/ | sort | uniq')
+    for c in _get_categories():
+        print c
