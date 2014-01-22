@@ -17,7 +17,7 @@ as a weird and meaningless block like:
     ~~~~
 
 This script takes file path(s) as arguments, and converts this junk
-into proper syntax hilighting markup. It CHANGES FILES IN-PLACE.
+into proper MarkDown notation. It CHANGES FILES IN-PLACE.
 
 REQUIREMENTS:
 
@@ -59,7 +59,7 @@ def get_lexers_list():
             d[n] = l[0]
     return d
 
-lang_re = re.compile(r'^~~~~ {lang="([^"]+)"')
+lang_re = re.compile(r'^~~~~ {lang="([^"]+)"}$')
 
 lexers = get_lexers_list()
 
@@ -71,16 +71,12 @@ for f in files:
         for line in fh:
             m = lang_re.match(line)
             if m is not None:
-                content = content + "        " + ":::" + translate_identifier(lexers, overrides, m.group(1)) + "\n"
+                line = ("~~~~{.%s}\n" % translate_identifier(lexers, overrides, m.group(1)))
                 inpre = True
                 count = count + 1
             elif inpre and line.strip() == "~~~~":
                 inpre = False
-                content = content + "\n"
-            elif inpre:
-                content = content + "        " + line
-            else:
-                content = content + line
+            content = content + line
     with open(f, "w") as fh:
         fh.write(content)
         fh.flush()
