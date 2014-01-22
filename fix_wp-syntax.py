@@ -35,18 +35,23 @@ files = sys.argv[1:]
 translation of GeSHi identifiers to Pygments identifiers,
 for GeSHi identifiers not supported by Pygments
 """
-overrides = {}
+overrides = {'none': 'text', 'lisp': 'common-lisp', 'html4strict': 'html'}
+overrides['xorg'] = 'text'
+overrides['nagios'] = 'text'
 
-def translate_identifier(lexers, overrides, i):
+def translate_identifier(lexers, overrides, i, fname=None):
     """
     Translate a wp-syntax/GeSHi language identifier to
     a Pygments identifier.
     """
     if i in lexers:
-        return lexers[i]
+        return lexers[i].lower()
     if i in overrides:
         return overrides[i]
     sys.stderr.write("Unknown lexer, leaving as-is: %s" % i)
+    if fname is not None:
+        sys.stderr.write(" in file %s" % fname)
+    sys.stderr.write("\n")
     return i
 
 def get_lexers_list():
@@ -71,7 +76,7 @@ for f in files:
         for line in fh:
             m = lang_re.match(line)
             if m is not None:
-                line = ("~~~~{.%s}\n" % translate_identifier(lexers, overrides, m.group(1)))
+                line = ("~~~~{.%s}\n" % translate_identifier(lexers, overrides, m.group(1), fname=f))
                 inpre = True
                 count = count + 1
             elif inpre and line.strip() == "~~~~":
