@@ -8,6 +8,6 @@ do
     dir="content/${year}/${month}"
     [[ -e $dir ]] || mkdir -p $dir
 
-    ./fix_wp-syntax.py $i
+    ./wp_import_fixup.py $i
     mv $i $dir/
 done
