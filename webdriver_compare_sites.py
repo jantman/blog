@@ -48,10 +48,15 @@ def check_path(path, pdict, old, new, browser, windows):
     loadPages(browser, windows, one, two)
     # prompt for status
     resp = ""
-    while resp not in ['s', 'r', 'o']:
-        resp = raw_input("Page Decision: [s=skip, r=review, o=ok] ").strip()
+    while resp not in ['s', 'r', 'o', 'm']:
+        resp = raw_input("Page Decision: [s=skip, r=review, o=ok, m=markup fix] ").strip()
     if resp == 'r':
         pdict['review'] = True
+        note = raw_input("Notes: ").strip()
+        if note != "":
+            pdict['note'] = note
+    if resp == 'm':
+        pdict['markup'] = True
         note = raw_input("Notes: ").strip()
         if note != "":
             pdict['note'] = note
@@ -85,7 +90,7 @@ def make_path_dict(paths):
     Make a path_dict with the right keys
     """
     pdict = {}
-    elem = {'seen': False, 'review': False, 'note': ""}
+    elem = {'seen': False, 'review': False, 'note': "", 'markup': False}
     for p in paths:
         pdict[p] = elem
     return pdict
@@ -97,8 +102,13 @@ def print_report(json_path, url_base):
     with open(json_path, 'r') as fh:
         j = anyjson.deserialize(fh.read())
     for path in j:
+        s = ""
         if j[path]['review'] is True:
-            print(url_base + path)
+            s = " review"
+        if j[path]['markup'] is True:
+            s = s + " markup"
+        if s != "":
+            print("%s\t%s%s" % (s, url_base, path))
             if j[path]['note'].strip() != "":
                 print("\t%s" % j[path]['note'])
 
