@@ -121,7 +121,10 @@ for f in files:
     with open(f, "r") as fh:
         for line in fh:
             m = cat_re.match(line)
-            line = ("Category: %s" % translate_category(m.group(1).strip()))
+            if m is not None:
+                line = ("Category: %s\n" % translate_category(m.group(1).strip()))
+                content = content + line
+                continue
             m = lang_re.match(line)
             if m is not None:
                 line = ("~~~~{.%s}\n" % translate_identifier(lexers, overrides, m.group(1), fname=f))
