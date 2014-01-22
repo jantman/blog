@@ -39,6 +39,45 @@ overrides = {'none': 'text', 'lisp': 'common-lisp', 'html4strict': 'html'}
 overrides['xorg'] = 'text'
 overrides['nagios'] = 'text'
 
+"""
+Mapping of WP categories to new blog categories, for any that change.
+"""
+categories = {}
+categories['android'] = 'Android'
+categories['EMS, Non-Technical Commentary'] = 'Miscellaneous'
+categories['EMS, Personal'] = 'Miscellaneous'
+categories['EMS, Projects'] = 'Miscellaneous'
+categories['Higher Education'] = 'Miscellaneous'
+categories['Higher Education, Ideas and Rants'] = 'Miscellaneous'
+categories['History'] = 'Miscellaneous'
+categories['Ideas and Rants'] = 'Ideas and Rants'
+categories['Ideas and Rants, Miscellaneous Geek Stuff, Non-Technical Commentary'] = 'Miscellaneous'
+categories['Ideas and Rants, Projects, Reviews'] = 'Ideas and Rants'
+categories['Interesting Links and Resources'] = 'Links'
+categories['Interesting Links and Resources, SysAdmin'] = 'Links'
+categories['Miscellaneous Geek Stuff'] = 'Miscellaneous'
+categories['Miscellaneous Geek Stuff, SysAdmin'] = 'SysAdmin'
+categories['Miscellaneous Geek Stuff, Uncategorized'] = 'Miscellaneous'
+categories['Non-Technical Commentary'] = 'Miscellaneous'
+categories['opensource'] = 'Miscellaneous'
+categories['Personal'] = 'Miscellaneous'
+categories['Personal, Projects'] = 'Projects'
+categories['PHP EMS Tools'] = 'Projects'
+categories['PHPsa, Projects'] = 'Projects'
+categories['Projects'] = 'Projects'
+categories['Projects, Reviews'] = 'Projects'
+categories['Projects, Reviews, Uncategorized'] = 'Projects'
+categories['Projects, SysAdmin, Uncategorized'] = 'Projects'
+categories['Projects, Tech HowTos'] = 'Tech HowTos'
+categories['Puppet'] = 'Puppet'
+categories['Puppet, SysAdmin'] = 'Puppet'
+categories['Reviews'] = 'Reviews'
+categories['SysAdmin, Tech HowTos'] = 'Tech HowTos'
+categories['SysAdmin, Uncategorized'] = 'SysAdmin'
+categories['Tech News'] = 'Miscellaneous'
+categories['Uncategorized'] = 'Miscellaneous'
+categories['Vehicles'] = 'Miscellaneous'
+
 def translate_identifier(lexers, overrides, i, fname=None):
     """
     Translate a wp-syntax/GeSHi language identifier to
@@ -64,7 +103,14 @@ def get_lexers_list():
             d[n] = l[0]
     return d
 
+def translate_category(i):
+    """ translate a category name """
+    if i in categories:
+        return categories[i]
+    return i
+
 lang_re = re.compile(r'^~~~~ {lang="([^"]+)"}$')
+cat_re = re.compile(r'^Category: (.+)$')
 
 lexers = get_lexers_list()
 
@@ -74,6 +120,8 @@ for f in files:
     count = 0
     with open(f, "r") as fh:
         for line in fh:
+            m = cat_re.match(line)
+            line = ("Category: %s" % translate_category(m.group(1).strip()))
             m = lang_re.match(line)
             if m is not None:
                 line = ("~~~~{.%s}\n" % translate_identifier(lexers, overrides, m.group(1), fname=f))
