@@ -124,3 +124,7 @@ content (written in MarkDown - http://daringfireball.net/projects/markdown/synta
         print("Replacing fab process with: %s %s" % (editor, os.path.abspath(fpath)))
         # replace our process with the editor...
         os.execlp(editor, os.path.basename(editor), os.path.abspath(fpath))
+
+def categories():
+    """ show all current blog post categories """
+    local('grep -rh "^Category: " content/ | sort | uniq')
