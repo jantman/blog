@@ -2,39 +2,32 @@
 # -*- coding: utf-8 -*- #
 from __future__ import unicode_literals
 
+#
+# Overall site-wide settings
+#
 AUTHOR = u'Jason Antman'
 SITENAME = u"Jason Antman's Blog"
+SITESUBTITLE = u"Subtitle here"
+#DISQUS_SITENAME = None
+#GOOGLE_ANALYTICS = 'UA-XXXX-YYYY'
 SITEURL = '' # TODO
+
+# Uncomment following line if you want document-relative URLs when developing
+RELATIVE_URLS = True
 
 TIMEZONE = 'America/New_York'
 DEFAULT_DATE_FORMAT = '%a %d %B %Y'
 
 DEFAULT_LANG = u'en'
 
-# Feed generation is usually not desired when developing
-FEED_ALL_ATOM = None # TODO
-CATEGORY_FEED_ATOM = None # TODO
-TRANSLATION_FEED_ATOM = None # TODO
-
-# Blogroll TODO
-LINKS =  (('Pelican', 'http://getpelican.com/'),
-          ('Python.org', 'http://python.org/'),
-          ('Jinja2', 'http://jinja.pocoo.org/'),
-          ('You can modify those links in your config file', '#'),)
-
-# Social widget TODO
-SOCIAL = (('You can add links in your config file', '#'),
-          ('Another social link', '#'),)
-
 DEFAULT_PAGINATION = 10
-
 # PAGINATION_PATTERNS - TODO
 
 DEFAULT_CATEGORY = "Miscellaneous"
 
-#FILENAME_METADATA = '(?P<date>\d{4}/\d{2}/\d{2})-(?P<slug>.*)'
-#PATH_METADATA = '(?P<date>\d{4}/\d{2}/\d{2})-(?P<slug>.*)'
-
+#
+# Content / Files
+#
 IGNORE_FILES = ['.#*']
 
 # PATH = 'content/'
@@ -61,10 +54,11 @@ WITH_FUTURE_DATES = True # draft status for anything with future date
 TYPOGRIFY = True
 MD_EXTENSIONS = ['codehilite(guess_lang=False)', 'fenced_code', 'toc']
 
-# Uncomment following line if you want document-relative URLs when developing
-RELATIVE_URLS = True
-
-# Feed Settings
+#
+# Feeds
+#
+FEED_ALL_ATOM = None # TODO
+CATEGORY_FEED_ATOM = None # TODO
 """
 # TODO - update feedburner? see http://docs.getpelican.com/en/3.3.0/settings.html#feedburner
 FEED_DOMAIN = None # TODO - should be SITEURL
@@ -78,11 +72,38 @@ TAG_FEED_ATOM = 'feeds/%s.atom.xml'
 TAG_FEED_RSS = 'feeds/%s.rss.xml'
 """
 
-TAG_CLOUD_STEPS = 5
-TAG_CLOUD_MAX_ITEMS = 50
-# See http://docs.getpelican.com/en/3.3.0/settings.html#tag-cloud
 
+#
+# Theme and Display Settings
+#
 THEME = 'themes/pelican-bootstrap3'
 
+DISPLAY_CATEGORIES_ON_MENU = True
+
+TAG_CLOUD_STEPS = 5
+TAG_CLOUD_MAX_ITEMS = 25
+
+#MENUITEMS = None
+# list of tuples (Title, URL) to displat at beginning of main menu
+
+#
+# Links, Social, etc.
+#
+
+LINKS =  (('Pelican', 'http://getpelican.com/'),
+          ('Python.org', 'http://python.org/'),
+          ('Jinja2', 'http://jinja.pocoo.org/'),
+          ('You can modify those links in your config file', '#'),)
+
+SOCIAL = (('You can add links in your config file', '#'),
+          ('Another social link', '#'),)
+
+GITHUB_URL = 'https://github.com/jantman'
+
+TWITTER_USERNAME = 'j_antman'
+
+#
+# Plugins
+#
 PLUGINS = []
 # TODO - https://github.com/getpelican/pelican-plugins
