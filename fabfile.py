@@ -4,7 +4,7 @@ import os
 import re
 import datetime
 
-from pelicanconf import ARTICLE_DIR, DEFAULT_CATEGORY, AUTHOR
+from pelicanconf import ARTICLE_DIR, DEFAULT_CATEGORY, AUTHOR, OUTPUT_PATH
 
 # Local path configuration (can be absolute or relative to fabfile)
 env.deploy_path = 'output'
@@ -51,6 +51,16 @@ def reserve():
 def preview():
     """ pelican with publishconf.py """
     local('pelican -s publishconf.py')
+
+def publish():
+    """ rebuild and publish to GH pages """
+    resp = prompt("This will clean, build, and push to GH pages. Ok? [yes|No]")
+    if not re.match(r'(y|Y|yes|Yes|YES)', resp):
+        return False
+    clean()
+    build()
+    local("ghp-import %s" % OUTPUT_PATH)
+    local("git push origin gh-pages")
 
 def _make_slug(title):
     """ make a slug from the given title """
