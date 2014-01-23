@@ -101,16 +101,30 @@ def print_report(json_path, url_base):
     """
     with open(json_path, 'r') as fh:
         j = anyjson.deserialize(fh.read())
+    seen = 0
+    review = 0
+    markup = 0
     for path in j:
         s = ""
+        if j[path]['seen'] is True:
+            seen = seen + 1
         if j[path]['review'] is True:
             s = " review"
+            review = review + 1
         if j[path]['markup'] is True:
             s = s + " markup"
+            markup = markup + 1
         if s != "":
             print("%s\t%s%s" % (s, url_base, path))
             if j[path]['note'].strip() != "":
                 print("\t%s" % j[path]['note'])
+    print("==============================")
+    print("Seen:   %d" % seen)
+    print("Review: %d" % review)
+    print("Markup: %d" % markup)
+    print("Unseen: %d" % len(j) - seen)
+    print("=================")
+    print("Total: %d" % len(j))
 
 def parse_opts(argv):
     """
