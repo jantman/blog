@@ -122,7 +122,7 @@ def print_report(json_path, url_base):
     print("Seen:   %d" % seen)
     print("Review: %d" % review)
     print("Markup: %d" % markup)
-    print("Unseen: %d" % len(j) - seen)
+    print("Unseen: %d" % (len(j) - seen))
     print("=================")
     print("Total: %d" % len(j))
 
