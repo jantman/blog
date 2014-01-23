@@ -28,6 +28,8 @@ DEFAULT_CATEGORY = "Miscellaneous"
 #
 # Content / Files
 #
+OUTPUT_PATH = 'output/'
+
 IGNORE_FILES = ['.#*']
 
 # PATH = 'content/'
