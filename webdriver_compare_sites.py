@@ -211,12 +211,15 @@ def main():
             print("Reopening %s for review" % p)
             if path_dict[p]['note'] != "":
                 print("\tPrevious Note: %s" % path_dict[p]['note'])
+        oldp = path_dict[p]
         path_dict[p] = check_path(p, path_dict[p], opts.old, opts.new, browser, windows)
         # write the JSON out and flush
-        with open(opts.savefile, "w") as fh:
-            fh.write(anyjson.serialize(path_dict))
-            fh.flush()
-            os.fsync(fh.fileno())
+        if oldp != path_dict[p]:
+            with open(opts.savefile, "w") as fh:
+                fh.write(anyjson.serialize(path_dict))
+                fh.flush()
+                os.fsync(fh.fileno())
+            print("+ Wrote JSON save file")
     print("Print a report about the paths...")
 
 if __name__ == "__main__":
