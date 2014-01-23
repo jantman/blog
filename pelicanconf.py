@@ -35,7 +35,7 @@ PAGE_DIR = 'pages'
 PAGE_EXCLUDES = []
 ARTICLE_DIR = 'content'
 ARTICLE_EXCLUDES = ['pages',]
-STATIC_PATHS = ['images', 'GFX']
+STATIC_PATHS = ['images', 'GFX', 'favicon.ico']
 
 # URL settings
 ARTICLE_URL = '{date:%Y}/{date:%m}/{slug}/'
