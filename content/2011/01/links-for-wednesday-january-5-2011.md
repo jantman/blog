@@ -1,7 +1,7 @@
 Title: Links for Wednesday, January 5, 2011
 Date: 2011-01-05 11:55
 Author: admin
-Category: Links
+Category: Miscellaneous
 Slug: links-for-wednesday-january-5-2011
 
 -   [Big media fails to turn ISPs into copyright cops | Media Maverick -

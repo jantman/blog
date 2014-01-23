@@ -1,7 +1,7 @@
 Title: Practical PHP and MySQL
 Date: 2008-06-26 14:29
 Author: admin
-Category: Reviews
+Category: Miscellaneous
 Tags: books, linux, PHP, programming, rutgers
 Slug: practical-php-and-mysql
 

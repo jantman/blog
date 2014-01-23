@@ -1,7 +1,7 @@
 Title: Firefox QR Code Generator
 Date: 2012-01-10 23:06
 Author: admin
-Category: Links
+Category: Miscellaneous
 Tags: barcode, firefox, mobile, Mozilla, qr code
 Slug: firefox-qr-code-generator
 

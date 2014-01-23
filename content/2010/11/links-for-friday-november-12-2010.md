@@ -1,7 +1,7 @@
 Title: Links for Friday, November 12, 2010
 Date: 2010-11-12 11:55
 Author: admin
-Category: Links
+Category: Miscellaneous
 Slug: links-for-friday-november-12-2010
 
 -   [How will we know when the Internet is dead?][]

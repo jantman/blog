@@ -1,7 +1,7 @@
 Title: Asus eeePC Update
 Date: 2008-02-04 19:12
 Author: admin
-Category: Reviews
+Category: Miscellaneous
 Tags: eeepc, linux
 Slug: asus-eeepc-update
 

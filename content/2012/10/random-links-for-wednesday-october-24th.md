@@ -1,7 +1,7 @@
 Title: Random Links for Wednesday, October 24th
 Date: 2012-10-24 12:01
 Author: admin
-Category: Links
+Category: Miscellaneous
 Tags: appliancization, cooling, datacenter, google, healthcare, legal, links, malware, pacemaker, patents, radio, SDR, security
 Slug: random-links-for-wednesday-october-24th
 

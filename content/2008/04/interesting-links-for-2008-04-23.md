@@ -1,7 +1,7 @@
 Title: Interesting Links for 2008-04-23
 Date: 2008-04-24 05:01
 Author: admin
-Category: Links
+Category: Miscellaneous
 Slug: interesting-links-for-2008-04-23
 
 -   [Bad Company: EMI Says You Can't Store Your Music Files Online][]

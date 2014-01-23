@@ -1,7 +1,7 @@
 Title: Interesting Links for 2008-03-27
 Date: 2008-03-28 05:00
 Author: admin
-Category: Links
+Category: Miscellaneous
 Slug: interesting-links-for-2008-03-27
 
 -   [Red Hat must lead wider development effort, CEO Whitehurst says -

@@ -1,7 +1,7 @@
 Title: Android 2.0.1 update
 Date: 2009-12-10 19:52
 Author: admin
-Category: Android
+Category: Miscellaneous
 Tags: android, droid, google, motorola, verizon
 Slug: android-2-0-1-update
 

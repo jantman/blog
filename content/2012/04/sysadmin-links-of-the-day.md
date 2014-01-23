@@ -1,7 +1,7 @@
 Title: SysAdmin Links of The Day
 Date: 2012-04-24 21:18
 Author: admin
-Category: Links
+Category: Miscellaneous
 Tags: azure, failure, microsoft, sysadmin
 Slug: sysadmin-links-of-the-day
 

@@ -1,7 +1,7 @@
 Title: Updated Android App List
 Date: 2010-08-15 13:19
 Author: admin
-Category: Android
+Category: Miscellaneous
 Tags: android, droid
 Slug: updated-android-app-list
 

@@ -1,7 +1,7 @@
 Title: My Android Apps
 Date: 2010-02-28 12:39
 Author: admin
-Category: Android
+Category: Miscellaneous
 Tags: android, apps, droid
 Slug: my-android-apps
 

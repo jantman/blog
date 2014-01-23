@@ -1,7 +1,7 @@
 Title: Weekend of Code (Android)
 Date: 2009-11-12 01:35
 Author: admin
-Category: Android
+Category: Miscellaneous
 Tags: android, google
 Slug: weekend-of-code-android
 

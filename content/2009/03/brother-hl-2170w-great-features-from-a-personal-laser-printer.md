@@ -1,7 +1,7 @@
 Title: Brother HL-2170W - great features from a personal laser printer
 Date: 2009-03-18 21:29
 Author: admin
-Category: Reviews
+Category: Miscellaneous
 Tags: printer, review
 Slug: brother-hl-2170w-great-features-from-a-personal-laser-printer
 

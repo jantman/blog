@@ -1,7 +1,7 @@
 Title: Interesting Links for Tuesday, January 26th 2010
 Date: 2010-01-26 11:15
 Author: admin
-Category: Links
+Category: Miscellaneous
 Slug: interesting-links-for-tuesday-january-26th-2010
 
 **Interesting Links for Tuesday, January 26^th^ 2010**

@@ -1,7 +1,7 @@
 Title: Interesting Links for 2008-05-12
 Date: 2008-05-13 05:01
 Author: admin
-Category: Links
+Category: Miscellaneous
 Slug: interesting-links-for-2008-05-12
 
 -   [Pew Research Center: Few in China Complain About Internet

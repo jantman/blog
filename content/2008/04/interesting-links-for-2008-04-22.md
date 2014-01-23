@@ -1,7 +1,7 @@
 Title: Interesting Links for 2008-04-22
 Date: 2008-04-23 05:01
 Author: admin
-Category: Links
+Category: Miscellaneous
 Slug: interesting-links-for-2008-04-22
 
 -   [Groklaw - Microsoft Office 2007 Fails OOXML Conformance Tests, Alex

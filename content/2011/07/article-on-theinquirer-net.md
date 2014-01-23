@@ -1,7 +1,7 @@
 Title: Article on theInquirer.net
 Date: 2011-07-11 15:55
 Author: admin
-Category: Links
+Category: Miscellaneous
 Tags: citibank, linux, me
 Slug: article-on-theinquirer-net
 

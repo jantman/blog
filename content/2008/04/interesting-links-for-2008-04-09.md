@@ -1,7 +1,7 @@
 Title: Interesting Links for 2008-04-09
 Date: 2008-04-10 05:00
 Author: admin
-Category: Links
+Category: Miscellaneous
 Slug: interesting-links-for-2008-04-09
 
 -   [mod\_auth\_mysql Usage / Documentation][]

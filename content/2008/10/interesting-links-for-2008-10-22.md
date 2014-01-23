@@ -1,7 +1,7 @@
 Title: Interesting Links for 2008-10-22
 Date: 2008-10-23 05:00
 Author: admin
-Category: Links
+Category: Miscellaneous
 Slug: interesting-links-for-2008-10-22
 
 -   [the life of a sysadmin.][]

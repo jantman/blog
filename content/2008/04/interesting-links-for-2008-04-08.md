@@ -1,7 +1,7 @@
 Title: Interesting Links for 2008-04-08
 Date: 2008-04-09 05:00
 Author: admin
-Category: Links
+Category: Miscellaneous
 Slug: interesting-links-for-2008-04-08
 
 -   [Red Hat News | Red Hat Asks Federal Court To Limit Patents On

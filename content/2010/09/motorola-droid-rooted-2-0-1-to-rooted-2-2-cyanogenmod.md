@@ -1,7 +1,7 @@
 Title: Motorola Droid: Rooted 2.0.1 to Rooted 2.2 (CyanogenMod)
 Date: 2010-09-04 16:50
 Author: admin
-Category: Android
+Category: Miscellaneous
 Tags: android, cyanogen, cyanogenmod, droid, root
 Slug: motorola-droid-rooted-2-0-1-to-rooted-2-2-cyanogenmod
 

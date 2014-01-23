@@ -1,7 +1,7 @@
 Title: A Collection of Great Links on Monitoring, SysAdmin, Scaling, etc.
 Date: 2012-04-21 10:24
 Author: admin
-Category: Links
+Category: Miscellaneous
 Tags: amqp, etsy, facebook, limoncelli, links, mongodb, monitoring, monitoringsucks, netflix, sensu
 Slug: a-collection-of-great-links-on-monitoring-sysadmin-scaling-etc
 

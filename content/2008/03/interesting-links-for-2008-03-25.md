@@ -1,7 +1,7 @@
 Title: Interesting Links for 2008-03-25
 Date: 2008-03-26 14:10
 Author: admin
-Category: Links
+Category: Miscellaneous
 Slug: interesting-links-for-2008-03-25
 
 -   [Groklaw - More OOXML BRM Messiness: A Delegate from Brazil

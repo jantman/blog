@@ -1,7 +1,7 @@
 Title: Petit for Log Analysis
 Date: 2012-02-21 11:57
 Author: admin
-Category: Links
+Category: Miscellaneous
 Tags: analysis, log, logging, petit, syslog
 Slug: petit-for-log-analysis
 

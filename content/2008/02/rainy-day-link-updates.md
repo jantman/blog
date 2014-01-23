@@ -1,7 +1,7 @@
 Title: Rainy Day Link Updates
 Date: 2008-02-13 13:27
 Author: admin
-Category: Links
+Category: Miscellaneous
 Tags: birthday, innotek, multi-threading, opensource, ssh, sun, virtualbox
 Slug: rainy-day-link-updates
 

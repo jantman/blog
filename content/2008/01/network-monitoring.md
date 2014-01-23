@@ -1,7 +1,7 @@
 Title: Network Monitoring
 Date: 2008-01-29 03:06
 Author: admin
-Category: Reviews
+Category: Miscellaneous
 Slug: network-monitoring
 
 I was reading [Ben Rockwood's blog][] before (as I do every day, thanks

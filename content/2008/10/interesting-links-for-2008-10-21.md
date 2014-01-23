@@ -1,7 +1,7 @@
 Title: Interesting Links for 2008-10-21
 Date: 2008-10-22 05:00
 Author: admin
-Category: Links
+Category: Miscellaneous
 Slug: interesting-links-for-2008-10-21
 
 -   [Microsoft: We're all 'mixed source' companies | Beyond Binary - A

@@ -1,7 +1,7 @@
 Title: Interesting Links for 2008-07-09
 Date: 2008-07-10 05:00
 Author: admin
-Category: Links
+Category: Miscellaneous
 Slug: interesting-links-for-2008-07-09
 
 -   [Flickr Photo Download: Comparison of file systems - Wikipedia

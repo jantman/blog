@@ -1,7 +1,7 @@
 Title: Acer X233Hbid Review
 Date: 2009-05-18 17:27
 Author: admin
-Category: Reviews
+Category: Miscellaneous
 Tags: acer, cant fix stupid, monitor, review
 Slug: acer-x233hbid-review
 

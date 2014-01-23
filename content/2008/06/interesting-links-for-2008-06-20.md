@@ -1,7 +1,7 @@
 Title: Interesting Links for 2008-06-20
 Date: 2008-06-21 05:02
 Author: admin
-Category: Links
+Category: Miscellaneous
 Slug: interesting-links-for-2008-06-20
 
 -   [Firefox 3 mentioned on the Colbert Report][]

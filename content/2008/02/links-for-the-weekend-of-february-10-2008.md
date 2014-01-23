@@ -1,7 +1,7 @@
 Title: Links for the weekend of February 10, 2008
 Date: 2008-02-10 23:07
 Author: admin
-Category: Links
+Category: Miscellaneous
 Tags: antitrust, microsoft, msooxml, opensolaris, p2p, privacy, riaa, rights, ruslug
 Slug: links-for-the-weekend-of-february-10-2008
 

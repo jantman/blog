@@ -1,7 +1,7 @@
 Title: Links for Tuesday, February 23, 2010
 Date: 2010-02-23 11:55
 Author: admin
-Category: Links
+Category: Miscellaneous
 Slug: links-for-tuesday-february-23-2010
 
 -   [ACTA "internet enforcement" chapter leaks Boing Boing][]

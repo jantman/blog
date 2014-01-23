@@ -1,7 +1,7 @@
 Title: Brother HL2170W DHCP Problems
 Date: 2009-04-11 11:53
 Author: admin
-Category: Reviews
+Category: Miscellaneous
 Tags: dhcp, hl2170w, printer, vlan
 Slug: brother-hl2170w-dhcp-problems
 

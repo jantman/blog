@@ -1,7 +1,7 @@
 Title: Interesting Links for 2008-03-26
 Date: 2008-03-27 05:00
 Author: admin
-Category: Links
+Category: Miscellaneous
 Slug: interesting-links-for-2008-03-26
 
 -   [Groklaw - Cuba Votes No to OOXML - Says It Did So in September, Too

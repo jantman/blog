@@ -1,7 +1,7 @@
 Title: Links, Update on next month
 Date: 2007-12-25 19:42
 Author: admin
-Category: Links
+Category: Miscellaneous
 Tags: 700p, palm, sunblade, treo, verizon
 Slug: links-update-on-next-month
 

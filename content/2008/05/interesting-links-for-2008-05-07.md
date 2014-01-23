@@ -1,7 +1,7 @@
 Title: Interesting Links for 2008-05-07
 Date: 2008-05-08 05:01
 Author: admin
-Category: Links
+Category: Miscellaneous
 Slug: interesting-links-for-2008-05-07
 
 -   [Crystal Networking » Blog Archive » Setting up EVDO in Linux][]

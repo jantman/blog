@@ -1,7 +1,7 @@
 Title: Instagram - Scaling a Startup
 Date: 2012-04-24 19:31
 Author: admin
-Category: Links
+Category: Miscellaneous
 Tags: dogslow, facebook, high scalability, instagram, node2dm, pgfouine, puppet, scaling, statsd
 Slug: instagram-scaling-a-startup
 

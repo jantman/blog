@@ -1,7 +1,7 @@
 Title: Android links - maps, dial a phone number
 Date: 2009-11-22 10:25
 Author: admin
-Category: Android
+Category: Miscellaneous
 Tags: android, google, html
 Slug: android-links-maps-dial-a-phone-number
 

@@ -1,7 +1,7 @@
 Title: Book Comments: The Future of the Internet and How to Stop It, by Jonathan Zittrain
 Date: 2009-12-03 17:34
 Author: admin
-Category: Reviews
+Category: Miscellaneous
 Tags: book, freedom, internet
 Slug: book-comments-the-future-of-the-internet-and-how-to-stop-it-by-jonathan-zittrain
 

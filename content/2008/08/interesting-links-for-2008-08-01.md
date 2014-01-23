@@ -1,7 +1,7 @@
 Title: Interesting Links for 2008-08-01
 Date: 2008-08-02 05:00
 Author: admin
-Category: Links
+Category: Miscellaneous
 Slug: interesting-links-for-2008-08-01
 
 -   [Last In - First Out: The crud moved up the stack][]

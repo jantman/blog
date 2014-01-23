@@ -1,7 +1,7 @@
 Title: Links for Tuesday, March 2, 2010
 Date: 2010-03-02 11:49
 Author: admin
-Category: Links
+Category: Miscellaneous
 Slug: links-for-tuesday-march-2-2010
 
 -   [Chris's Wiki :: blog/solaris/SunDown][]
