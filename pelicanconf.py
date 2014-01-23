@@ -30,7 +30,7 @@ DEFAULT_PAGINATION = 10
 
 # PAGINATION_PATTERNS - TODO
 
-DEFAULT_CATEGORY = "Miscellaneous Geek Stuff"
+DEFAULT_CATEGORY = "Miscellaneous"
 
 #FILENAME_METADATA = '(?P<date>\d{4}/\d{2}/\d{2})-(?P<slug>.*)'
 #PATH_METADATA = '(?P<date>\d{4}/\d{2}/\d{2})-(?P<slug>.*)'
