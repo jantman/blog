@@ -21,47 +21,36 @@ env.cloudfiles_container = 'my_cloudfiles_container'
 
 
 def clean():
+    """ remove DEPLOY_PATH if it exists, then recreate """
     if os.path.isdir(DEPLOY_PATH):
         local('rm -rf {deploy_path}'.format(**env))
         local('mkdir {deploy_path}'.format(**env))
 
 def build():
+    """ run pelican to build output """
     local('pelican -s pelicanconf.py')
 
 def rebuild():
+    """ clean and build """
     clean()
     build()
 
 def regenerate():
+    """ pelican -r ; regenerate whenever a file changes """
     local('pelican -r -s pelicanconf.py')
 
 def serve():
+    """ SimpleHTTPServer """
     local('cd {deploy_path} && python -m SimpleHTTPServer'.format(**env))
 
 def reserve():
+    """ build and serve """
     build()
     serve()
 
 def preview():
+    """ pelican with publishconf.py """
     local('pelican -s publishconf.py')
-
-def cf_upload():
-    rebuild()
-    local('cd {deploy_path} && '
-          'swift -v -A https://auth.api.rackspacecloud.com/v1.0 '
-          '-U {cloudfiles_username} '
-          '-K {cloudfiles_api_key} '
-          'upload -c {cloudfiles_container} .'.format(**env))
-
-@hosts(production)
-def publish():
-    local('pelican -s publishconf.py')
-    project.rsync_project(
-        remote_dir=dest_path,
-        exclude=".DS_Store",
-        local_dir=DEPLOY_PATH.rstrip('/') + '/',
-        delete=True
-    )
 
 def _make_slug(title):
     """ make a slug from the given title """
