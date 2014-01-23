@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:og="http://ogp.me/ns#"
+      xmlns:fb="https://www.facebook.com/2008/fbml">
+<head>
+    <title>Parsing Nagios status.dat in PHP</title>
+    <!-- Using the latest rendering mode for IE -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Open Graph tags -->
+
+            <meta property="og:type" content="article"/>
+            <meta property="og:title" content="Parsing Nagios status.dat in PHP"/>
+            <meta property="og:url" content="/2010/02/parsing-nagios-status-dat-in-php/"/>
+            <meta property="og:description" content="If you’re just looking for the script or PHP module, you can get them at: http://github.com/jantman/php-nagios-xml. A while ago (back in late 2008), I wrote a PHP script that parses the Nagios status.dat file into an associative array. My original use was to output ..."/>
+
+    <!-- Bootstrap -->
+        <link rel="stylesheet" href="/theme/css/bootstrap.min.css" type="text/css"/>
+    <link href="/theme/css/font-awesome.min.css" rel="stylesheet">
+    <link href="/theme/css/pygments.css" rel="stylesheet">
+        <link href="/theme/css/typogrify.css" rel="stylesheet">
+    <link rel="stylesheet" href="/theme/css/style.css" type="text/css"/>
+    <!-- JavaScript plugins (requires jQuery) -->
+    <script src="http://code.jquery.com/jquery.js"></script>
+
+        <link href="/feeds/all.atom.xml" type="application/atom+xml" rel="alternate"
+              title="Jason Antman's Blog ATOM Feed"/>
+
+</head>
+<body>
+<nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="" class="navbar-brand">Jason Antman's Blog</a>
+        </div>
+        <div class="collapse navbar-collapse navbar-ex1-collapse">
+            <ul class="nav navbar-nav">
+                         <li><a href="/pages/about.html">
+                             About
+                          </a></li>
+                        <li >
+                            <a href="/category/ideas-and-rants.html">Ideas and rants</a>
+                        </li>
+                        <li >
+                            <a href="/category/miscellaneous.html">Miscellaneous</a>
+                        </li>
+                        <li class="active">
+                            <a href="/category/monitoring.html">Monitoring</a>
+                        </li>
+                        <li >
+                            <a href="/category/projects.html">Projects</a>
+                        </li>
+                        <li >
+                            <a href="/category/puppet.html">Puppet</a>
+                        </li>
+                        <li >
+                            <a href="/category/sysadmin.html">Sysadmin</a>
+                        </li>
+                        <li >
+                            <a href="/category/tech-howtos.html">Tech howtos</a>
+                        </li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="/archives.html"><i class="icon-th-list"></i>Archives</a></li>
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+</nav>
+<!-- /.navbar -->
+<div class="container">
+    <div class="row">
+        <div class="col-lg-9">
+    <section id="content">
+        <article>
+            <header class="page-header">
+                <h1>
+                    <a href="/2010/02/parsing-nagios-status-dat-in-php/"
+                       rel="bookmark"
+                       title="Permalink to Parsing Nagios status.dat in PHP">
+                        Parsing Nagios status.dat in&nbsp;<span class="caps">PHP</span>
+                    </a>
+                </h1>
+            </header>
+            <div class="entry-content">
+                <div class="panel">
+                    <div class="panel-body">
+<footer class="post-info">
+    <span class="label label-default">Date</span>
+    <span class="published">
+        <i class="icon-calendar"></i>Sun 21 February 2010
+    </span>
+
+
+
+<span class="label label-default">Tags</span>
+	<a href="/tag/nagios.html">Nagios</a>
+        /
+	<a href="/tag/php.html">PHP</a>
+        /
+	<a href="/tag/xml.html">xml</a>
+</footer><!-- /.post-info -->                    </div>
+                </div>
+                <p><strong>If you&#8217;re just looking for the script or <span class="caps">PHP</span> module</strong>, you can get
+them at: <a href="http://github.com/jantman/php-nagios-xml">http://github.com/jantman/php-nagios-xml</a>.</p>
+<p>A while ago (back in late 2008), I wrote a <span class="caps">PHP</span> script that parses the
+Nagios status.dat file into an associative array. My original use was to
+output <span class="caps">XML</span> which was then read by another script on another server and
+used for a small custom <span class="caps">GUI</span>. It&#8217;s a very simple <span class="caps">PHP</span> script that just
+takes the path of the status.dat file (which, obviously, must be
+readable by the user running the&nbsp;script).</p>
+<p>At that time, I was using Nagios v2. Since then, I&#8217;ve moved to Nagios
+v3, and have updated the script to include the ability to parse v3
+status.dat files, as well as a function to detect the version of a
+status file. I also refactored the code so that the parsing functions
+are all contained in a single file (statusXML.php.inc) which is safe to
+include in other scripts. The actual statusXML.php file now just
+includes examples of how to call all of the functions and output <span class="caps">XML</span>
+(though it is equally useful to output the serialized array, or use it&nbsp;directly).</p>
+<p>Since I posted my script online, two people have been kind enough to
+send back their&nbsp;modifications:</p>
+<ul>
+<li><a href="http://www.krzywanski.net/">Artur Krzywański</a> modified the original (<a href="https://github.com/jantman/php-nagios-xml/blob/9926602ef4868a898661b6ea0f430ff8ccba4dd3/parseNagiosXML.php">r4</a>) version of
+    <a href="https://github.com/jantman/php-nagios-xml/blob/master/statusXML.php">statusXML.php</a> to allow selection of the keys to be&nbsp;returned.</li>
+<li>Whitham D. Reeve <span class="caps">II</span> of <a href="http://www.gci.com">General Communication, Inc.</a>, who needed
+    higher performance for a very large status file, rewrote my script
+    in C as a <span class="caps">PHP</span>&nbsp;module.</li>
+</ul>
+<p>Both of these generous contributions have been included in my <a href="https://github.com/jantman/php-nagios-xml">Github
+repository</a> as of the current commit. Unfortunately, due to my delay
+in putting my Nagios3 code into svn, both of these contributions are
+<strong>Nagios v2</strong>&nbsp;only.</p>
+<p>As time permits, I plan on merging Artur&#8217;s changes into the current
+version of statusXML.php.inc. Unfortunately, C isn&#8217;t one of my strong
+points, but I plan on also updating Whitham&#8217;s <span class="caps">PHP</span> module code to work
+with Nagios3 as soon as&nbsp;possible.</p>
+<p>Stay tuned for updates, and thanks to both gentlemen for contributing
+their work. I&#8217;m always interested in hearing how people are using my
+code, and how they are making it&nbsp;better.</p>
+<p><strong>Also:</strong> While I added this project to <a href="http://exchange.nagios.org/">Nagios Exchange</a>, and plan on
+adding it to <a href="http://www.monitoringexchange.org/">Monitoring Exchange</a>, I don&#8217;t always keep those sites up
+to date (I can&#8217;t access Nagios Exchange right now, and who knows if I&#8217;ll
+have time to update it tomorrow). I <em>strongly</em> recommend directly
+checking out from Git at
+<a href="https://github.com/jantman/php-nagios-xml">https://github.com/jantman/php-nagios-xml</a>.</p>
+            </div>
+            <!-- /.entry-content -->
+        </article>
+    </section>
+
+        </div>
+        <div class="col-lg-3 well well-sm" id="sidebar">
+
+<aside>
+    <section>
+        <ul class="list-group list-group-flush">
+                <li class="list-group-item"><h4><i class="icon-home icon-large"></i>Social</h4></li>
+                    <li class="list-group-item"><a href="#"><i
+                            class="icon-You can add links in your config file-sign icon-large"></i>You can add links in your config file
+                    </a></li>
+                    <li class="list-group-item"><a href="#"><i
+                            class="icon-Another social link-sign icon-large"></i>Another social link
+                    </a></li>
+
+
+
+                <li class="list-group-item"><a href="/tags.html"><h4><i class="icon-tags icon-large"></i>Tags</h4></a></li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/android.html">
+                                android
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/google.html">
+                                google
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/nagios.html">
+                                Nagios
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/php.html">
+                                PHP
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/sysadmin.html">
+                                sysadmin
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/linux.html">
+                                linux
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/perl.html">
+                                perl
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/logging.html">
+                                logging
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/puppet.html">
+                                puppet
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/bind.html">
+                                bind
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/monitoring.html">
+                                monitoring
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/dns.html">
+                                dns
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/droid.html">
+                                droid
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/firefox.html">
+                                firefox
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/mediawiki.html">
+                                mediawiki
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/mac.html">
+                                mac
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/microsoft.html">
+                                microsoft
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/syslog.html">
+                                syslog
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/wordpress.html">
+                                wordpress
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/rpm.html">
+                                rpm
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/security.html">
+                                security
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/blog.html">
+                                blog
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/sun.html">
+                                sun
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/ems.html">
+                                EMS
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/apache.html">
+                                apache
+                            </a>
+                        </li>
+        </ul>
+    </section>
+</aside>        </div>
+    </div>
+</div>
+<footer>
+    <div class="container">
+        <hr>
+        <p class="pull-right"><i class="icon-arrow-up"></i> <a href="#">Back to top</a></p>
+
+
+        <p>&copy; 2014 Jason Antman &middot; Powered by <a href="https://github.com/DandyDev/pelican-bootstrap3" target="_blank">pelican-bootstrap3</a>,
+            <a href="http://docs.getpelican.com/" target="_blank">Pelican</a>,
+            <a href="http://getbootstrap.com" target="_blank">Bootstrap</a></p>
+    </div>
+</footer>
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="/theme/js/bootstrap.min.js"></script>
+
+<!-- Enable responsive features in IE8 with Respond.js (https://github.com/scottjehl/Respond) -->
+<script src="/theme/js/respond.min.js"></script>
+
+
+</body>
+</html>

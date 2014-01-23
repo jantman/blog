@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:og="http://ogp.me/ns#"
+      xmlns:fb="https://www.facebook.com/2008/fbml">
+<head>
+    <title>The Death of a Disk</title>
+    <!-- Using the latest rendering mode for IE -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Open Graph tags -->
+
+            <meta property="og:type" content="article"/>
+            <meta property="og:title" content="The Death of a Disk"/>
+            <meta property="og:url" content="/2007/09/the-death-of-a-disk/"/>
+            <meta property="og:description" content="A few months ago, a disk on my Compaq Proliant ML370 went down. The machine has 6 Ultra3 Wide SCSI 15k RPM drives, 18 Gb each, in a RAID 0+1, so I figured that between such a configuration and weekly complete tape backups, I’d be pretty much set ..."/>
+
+    <!-- Bootstrap -->
+        <link rel="stylesheet" href="/theme/css/bootstrap.min.css" type="text/css"/>
+    <link href="/theme/css/font-awesome.min.css" rel="stylesheet">
+    <link href="/theme/css/pygments.css" rel="stylesheet">
+        <link href="/theme/css/typogrify.css" rel="stylesheet">
+    <link rel="stylesheet" href="/theme/css/style.css" type="text/css"/>
+    <!-- JavaScript plugins (requires jQuery) -->
+    <script src="http://code.jquery.com/jquery.js"></script>
+
+        <link href="/feeds/all.atom.xml" type="application/atom+xml" rel="alternate"
+              title="Jason Antman's Blog ATOM Feed"/>
+
+</head>
+<body>
+<nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="" class="navbar-brand">Jason Antman's Blog</a>
+        </div>
+        <div class="collapse navbar-collapse navbar-ex1-collapse">
+            <ul class="nav navbar-nav">
+                         <li><a href="/pages/about.html">
+                             About
+                          </a></li>
+                        <li >
+                            <a href="/category/ideas-and-rants.html">Ideas and rants</a>
+                        </li>
+                        <li class="active">
+                            <a href="/category/miscellaneous.html">Miscellaneous</a>
+                        </li>
+                        <li >
+                            <a href="/category/monitoring.html">Monitoring</a>
+                        </li>
+                        <li >
+                            <a href="/category/projects.html">Projects</a>
+                        </li>
+                        <li >
+                            <a href="/category/puppet.html">Puppet</a>
+                        </li>
+                        <li >
+                            <a href="/category/sysadmin.html">Sysadmin</a>
+                        </li>
+                        <li >
+                            <a href="/category/tech-howtos.html">Tech howtos</a>
+                        </li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="/archives.html"><i class="icon-th-list"></i>Archives</a></li>
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+</nav>
+<!-- /.navbar -->
+<div class="container">
+    <div class="row">
+        <div class="col-lg-9">
+    <section id="content">
+        <article>
+            <header class="page-header">
+                <h1>
+                    <a href="/2007/09/the-death-of-a-disk/"
+                       rel="bookmark"
+                       title="Permalink to The Death of a Disk">
+                        The Death of a&nbsp;Disk
+                    </a>
+                </h1>
+            </header>
+            <div class="entry-content">
+                <div class="panel">
+                    <div class="panel-body">
+<footer class="post-info">
+    <span class="label label-default">Date</span>
+    <span class="published">
+        <i class="icon-calendar"></i>Fri 07 September 2007
+    </span>
+
+
+
+</footer><!-- /.post-info -->                    </div>
+                </div>
+                <p>A few months ago, a disk on my Compaq Proliant <span class="caps">ML370</span> went down. The
+machine has 6 Ultra3 Wide <span class="caps">SCSI</span> 15k <span class="caps">RPM</span> drives, 18 Gb each, in a <span class="caps">RAID</span>
+0+1, so I figured that between such a configuration and weekly complete
+tape backups, I&#8217;d be pretty much set. At least for a &#8220;home&#8221; user. I
+powered down the system (eek! downtime!), feeling lucky that it didn&#8217;t
+host any critical services. At a loss for a spare drive, and hoping that
+the decade-old <span class="caps">SCSI</span> controller was just having a bad morning, I let the
+system sit for a few hours and then powered up. It rebuilt any lost data
+and came back&nbsp;fine.</p>
+<p>Unfortunately, a week ago, the same problem happened. The good news is
+that there wasn&#8217;t much important &#8220;data&#8221; on the disk. The bad news is
+that the disk was the root partition, and that I lost *both* mirrored
+drives in a 42 minute window. The system is now down indefinitely,
+pending my winning the lottery and getting the money for two 15k <span class="caps">SCSI</span>&nbsp;disks.</p>
+<p>Now, I originally wasn&#8217;t too worried. The system is mainly used for
+storing unimportant data. However, I quickly remembered three facts
+about&nbsp;<span class="caps">STOR1</span>:</p>
+<ol>
+<li>My two and *only* tape drives are hooked up to this&nbsp;box.</li>
+<li>This box is my <span class="caps">CVS</span> server, so now not only are my nightly builds
+    stopped, but I don&#8217;t have <span class="caps">CVS</span>&nbsp;access.</li>
+<li>The To-Do list item stating &#8220;fix <span class="caps">STOR1</span> backup script and re-enable
+    cron job&#8221; should have been a higher&nbsp;priority.</li>
+</ol>
+<p>So, in the future, you will not only read about data recovery operations
+using a LiveCD, bare metal recovery of the system, but you can also
+expect my <a href="http://wiki.jasonantman.com">wiki</a> to include a page on implementation of&nbsp;Bacula.</p>
+            </div>
+            <!-- /.entry-content -->
+        </article>
+    </section>
+
+        </div>
+        <div class="col-lg-3 well well-sm" id="sidebar">
+
+<aside>
+    <section>
+        <ul class="list-group list-group-flush">
+                <li class="list-group-item"><h4><i class="icon-home icon-large"></i>Social</h4></li>
+                    <li class="list-group-item"><a href="#"><i
+                            class="icon-You can add links in your config file-sign icon-large"></i>You can add links in your config file
+                    </a></li>
+                    <li class="list-group-item"><a href="#"><i
+                            class="icon-Another social link-sign icon-large"></i>Another social link
+                    </a></li>
+
+
+
+                <li class="list-group-item"><a href="/tags.html"><h4><i class="icon-tags icon-large"></i>Tags</h4></a></li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/android.html">
+                                android
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/google.html">
+                                google
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/nagios.html">
+                                Nagios
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/php.html">
+                                PHP
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/sysadmin.html">
+                                sysadmin
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/linux.html">
+                                linux
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/perl.html">
+                                perl
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/logging.html">
+                                logging
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/puppet.html">
+                                puppet
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/bind.html">
+                                bind
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/monitoring.html">
+                                monitoring
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/dns.html">
+                                dns
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/droid.html">
+                                droid
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/firefox.html">
+                                firefox
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/mediawiki.html">
+                                mediawiki
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/mac.html">
+                                mac
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/microsoft.html">
+                                microsoft
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/syslog.html">
+                                syslog
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/wordpress.html">
+                                wordpress
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/rpm.html">
+                                rpm
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/security.html">
+                                security
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/blog.html">
+                                blog
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/sun.html">
+                                sun
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/ems.html">
+                                EMS
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/apache.html">
+                                apache
+                            </a>
+                        </li>
+        </ul>
+    </section>
+</aside>        </div>
+    </div>
+</div>
+<footer>
+    <div class="container">
+        <hr>
+        <p class="pull-right"><i class="icon-arrow-up"></i> <a href="#">Back to top</a></p>
+
+
+        <p>&copy; 2014 Jason Antman &middot; Powered by <a href="https://github.com/DandyDev/pelican-bootstrap3" target="_blank">pelican-bootstrap3</a>,
+            <a href="http://docs.getpelican.com/" target="_blank">Pelican</a>,
+            <a href="http://getbootstrap.com" target="_blank">Bootstrap</a></p>
+    </div>
+</footer>
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="/theme/js/bootstrap.min.js"></script>
+
+<!-- Enable responsive features in IE8 with Respond.js (https://github.com/scottjehl/Respond) -->
+<script src="/theme/js/respond.min.js"></script>
+
+
+</body>
+</html>

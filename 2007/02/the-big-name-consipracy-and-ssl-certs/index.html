@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:og="http://ogp.me/ns#"
+      xmlns:fb="https://www.facebook.com/2008/fbml">
+<head>
+    <title>The Big Name consipracy - and SSL certs</title>
+    <!-- Using the latest rendering mode for IE -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Open Graph tags -->
+
+            <meta property="og:type" content="article"/>
+            <meta property="og:title" content="The Big Name consipracy - and SSL certs"/>
+            <meta property="og:url" content="/2007/02/the-big-name-consipracy-and-ssl-certs/"/>
+            <meta property="og:description" content="So I decided to setup SSL on my Apache server. After looking around for ages, it seems that the answer to SSL Certs is that I need to buy one. There doesn’t seem to be any CA out there who will provide free certs that are accepted by most ..."/>
+
+    <!-- Bootstrap -->
+        <link rel="stylesheet" href="/theme/css/bootstrap.min.css" type="text/css"/>
+    <link href="/theme/css/font-awesome.min.css" rel="stylesheet">
+    <link href="/theme/css/pygments.css" rel="stylesheet">
+        <link href="/theme/css/typogrify.css" rel="stylesheet">
+    <link rel="stylesheet" href="/theme/css/style.css" type="text/css"/>
+    <!-- JavaScript plugins (requires jQuery) -->
+    <script src="http://code.jquery.com/jquery.js"></script>
+
+        <link href="/feeds/all.atom.xml" type="application/atom+xml" rel="alternate"
+              title="Jason Antman's Blog ATOM Feed"/>
+
+</head>
+<body>
+<nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="" class="navbar-brand">Jason Antman's Blog</a>
+        </div>
+        <div class="collapse navbar-collapse navbar-ex1-collapse">
+            <ul class="nav navbar-nav">
+                         <li><a href="/pages/about.html">
+                             About
+                          </a></li>
+                        <li class="active">
+                            <a href="/category/ideas-and-rants.html">Ideas and rants</a>
+                        </li>
+                        <li >
+                            <a href="/category/miscellaneous.html">Miscellaneous</a>
+                        </li>
+                        <li >
+                            <a href="/category/monitoring.html">Monitoring</a>
+                        </li>
+                        <li >
+                            <a href="/category/projects.html">Projects</a>
+                        </li>
+                        <li >
+                            <a href="/category/puppet.html">Puppet</a>
+                        </li>
+                        <li >
+                            <a href="/category/sysadmin.html">Sysadmin</a>
+                        </li>
+                        <li >
+                            <a href="/category/tech-howtos.html">Tech howtos</a>
+                        </li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="/archives.html"><i class="icon-th-list"></i>Archives</a></li>
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+</nav>
+<!-- /.navbar -->
+<div class="container">
+    <div class="row">
+        <div class="col-lg-9">
+    <section id="content">
+        <article>
+            <header class="page-header">
+                <h1>
+                    <a href="/2007/02/the-big-name-consipracy-and-ssl-certs/"
+                       rel="bookmark"
+                       title="Permalink to The Big Name consipracy - and SSL certs">
+                        The Big Name consipracy - and <span class="caps">SSL</span>&nbsp;certs
+                    </a>
+                </h1>
+            </header>
+            <div class="entry-content">
+                <div class="panel">
+                    <div class="panel-body">
+<footer class="post-info">
+    <span class="label label-default">Date</span>
+    <span class="published">
+        <i class="icon-calendar"></i>Tue 06 February 2007
+    </span>
+
+
+
+</footer><!-- /.post-info -->                    </div>
+                </div>
+                <p>So I decided to setup <span class="caps">SSL</span> on my Apache server. After looking around for
+ages, it seems that the answer to <span class="caps">SSL</span> Certs is that I need to buy one.
+There doesn&#8217;t seem to be any <span class="caps">CA</span> out there who will provide free certs
+that are accepted by most&nbsp;browsers.</p>
+<p>So, this brings me into one of my favorite diatribes. The &#8220;Big Name&#8221;
+Conspiracy, as I like to call&nbsp;it.</p>
+<p>Many many years ago, leading computer researchers began to connect their
+systems into a worldwide (or at least nationwide) network. The admin of
+each machine was trusted. There was a hosts.txt file distributed. Then
+computers came to the home, and with them, serial modems and
+connectivity. In the brief time before the &#8216;net turned into a wasteland,
+it was free. Free as in if you had a phone line, the hardware, and the
+knowledge, you could setup your own <span class="caps">BBS</span> or other&nbsp;server.</p>
+<p>Skip forward to 2007. I pay exorbitant rates (well, about $40/month) for
+a residential fiber-optic connection. A few people I know can&#8217;t view my
+web site. Why? Because Verizon, my <span class="caps">ISP</span>, blocks incoming traffic on port
+80 so that I can&#8217;t run a server. And they won&#8217;t give me a static <span class="caps">IP</span>, so
+I can&#8217;t run a server. Thankfully, the folks at DynDNS.org are fighting
+for us, and they give me free <span class="caps">DNS</span>, which I can even forward my domain
+name to. To get around Verizon, I forward <span class="caps">HTTP</span> traffic to a high-number
+unused port. Well, what do you know, a number of corporate Internet
+filters block all web traffic going to ports other than the&nbsp;defaults.</p>
+<p>I wanted to send mail from a Linux machine. So, I configured Postfix and
+sent mail. Worked perfectly to a few addresses, but <span class="caps">AOL</span>, Verizon,
+Hotmail, Gmail, big companies - forget it. Rejected. Why? Because I have
+a dynamic <span class="caps">IP</span>, and my domain name doesn&#8217;t reverse-validate, so I must not
+be a legitimate user. There&#8217;s no way around it. Try sending mail from
+you@yourdomain.dyndns.org - I have yet to find a mailserver that will
+accept&nbsp;it.</p>
+<p>What happened to the community environment of the &#8216;net? Yes, I know,
+it&#8217;s all in the name of &#8220;bettering&#8221; the &#8216;net, reducing spam, etc. But I
+have yet to find anyone who will whitelist my dynamic&nbsp;<span class="caps">IP</span>.</p>
+<p>Maybe I&#8217;m just obtuse. Or angry. But it seems to me that there is a
+&#8220;conspiracy&#8221;, perhaps unspoken, among the Big Names out there to
+centralize the Internet, to prevent [I]people[/I] from&nbsp;participating.</p>
+<p>I know I&#8217;m not the only person who has noticed this. While there are
+many people and companies out there valiantly fighting for freedom on
+the Internet, it seems that the majority of big companies, ISPs, hosting
+providers, etc. want the &#8216;net to be a one-way medium: content is
+provided by those who can pay for leased lines and <span class="caps">IP</span> blocks, and
+everyone else looks at&nbsp;it.</p>
+<p>Running a group of servers - web, <span class="caps">SMTP</span>, <span class="caps">IMAP</span>, etc. - on a dynamic <span class="caps">IP</span>, I
+am acutely aware of exactly how much modern Internet technology relies
+on the fact that anyone who&#8217;s [I]providing[/I] the content has a static
+<span class="caps">IP</span> - and can pay the cost associated with&nbsp;it.</p>
+<p>Getting back to the <span class="caps">SSL</span> cert, why isn&#8217;t there a reputable authority who
+provides free certificates? I have unlimited free long distance calls, I
+would be more than willing to call the <span class="caps">DNS</span> contact number for every
+applicant to&nbsp;validate.</p>
+<p>And why hasn&#8217;t anyone developed a method of making a dynamic <span class="caps">IP</span> &#8220;look&#8221;
+static to the rest of the world - surely <span class="caps">IANA</span> should set aside a massive
+block of IPv6 for this, if not&nbsp;IPv4.</p>
+            </div>
+            <!-- /.entry-content -->
+        </article>
+    </section>
+
+        </div>
+        <div class="col-lg-3 well well-sm" id="sidebar">
+
+<aside>
+    <section>
+        <ul class="list-group list-group-flush">
+                <li class="list-group-item"><h4><i class="icon-home icon-large"></i>Social</h4></li>
+                    <li class="list-group-item"><a href="#"><i
+                            class="icon-You can add links in your config file-sign icon-large"></i>You can add links in your config file
+                    </a></li>
+                    <li class="list-group-item"><a href="#"><i
+                            class="icon-Another social link-sign icon-large"></i>Another social link
+                    </a></li>
+
+
+
+                <li class="list-group-item"><a href="/tags.html"><h4><i class="icon-tags icon-large"></i>Tags</h4></a></li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/android.html">
+                                android
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/google.html">
+                                google
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/nagios.html">
+                                Nagios
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/php.html">
+                                PHP
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/sysadmin.html">
+                                sysadmin
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/linux.html">
+                                linux
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/perl.html">
+                                perl
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/logging.html">
+                                logging
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/puppet.html">
+                                puppet
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/bind.html">
+                                bind
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/monitoring.html">
+                                monitoring
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/dns.html">
+                                dns
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/droid.html">
+                                droid
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/firefox.html">
+                                firefox
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/mediawiki.html">
+                                mediawiki
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/mac.html">
+                                mac
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/microsoft.html">
+                                microsoft
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/syslog.html">
+                                syslog
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/wordpress.html">
+                                wordpress
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/rpm.html">
+                                rpm
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/security.html">
+                                security
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/blog.html">
+                                blog
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/sun.html">
+                                sun
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/ems.html">
+                                EMS
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/apache.html">
+                                apache
+                            </a>
+                        </li>
+        </ul>
+    </section>
+</aside>        </div>
+    </div>
+</div>
+<footer>
+    <div class="container">
+        <hr>
+        <p class="pull-right"><i class="icon-arrow-up"></i> <a href="#">Back to top</a></p>
+
+
+        <p>&copy; 2014 Jason Antman &middot; Powered by <a href="https://github.com/DandyDev/pelican-bootstrap3" target="_blank">pelican-bootstrap3</a>,
+            <a href="http://docs.getpelican.com/" target="_blank">Pelican</a>,
+            <a href="http://getbootstrap.com" target="_blank">Bootstrap</a></p>
+    </div>
+</footer>
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="/theme/js/bootstrap.min.js"></script>
+
+<!-- Enable responsive features in IE8 with Respond.js (https://github.com/scottjehl/Respond) -->
+<script src="/theme/js/respond.min.js"></script>
+
+
+</body>
+</html>

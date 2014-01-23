@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:og="http://ogp.me/ns#"
+      xmlns:fb="https://www.facebook.com/2008/fbml">
+<head>
+    <title>VMWare vSphere CLI and Perl SDK as an RPM</title>
+    <!-- Using the latest rendering mode for IE -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Open Graph tags -->
+
+            <meta property="og:type" content="article"/>
+            <meta property="og:title" content="VMWare vSphere CLI and Perl SDK as an RPM"/>
+            <meta property="og:url" content="/2012/02/vmware-vsphere-cli-and-perl-sdk-as-an-rpm/"/>
+            <meta property="og:description" content="Lately I’ve been playing around with the VMWare vSphere SDK for Perl, since the new job uses a bunch of VMWare stuff (and I’ve been starting my foray into Perl as a new language, and am amazed by the massive number of modules out there). As much as ..."/>
+
+    <!-- Bootstrap -->
+        <link rel="stylesheet" href="/theme/css/bootstrap.min.css" type="text/css"/>
+    <link href="/theme/css/font-awesome.min.css" rel="stylesheet">
+    <link href="/theme/css/pygments.css" rel="stylesheet">
+        <link href="/theme/css/typogrify.css" rel="stylesheet">
+    <link rel="stylesheet" href="/theme/css/style.css" type="text/css"/>
+    <!-- JavaScript plugins (requires jQuery) -->
+    <script src="http://code.jquery.com/jquery.js"></script>
+
+        <link href="/feeds/all.atom.xml" type="application/atom+xml" rel="alternate"
+              title="Jason Antman's Blog ATOM Feed"/>
+
+</head>
+<body>
+<nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="" class="navbar-brand">Jason Antman's Blog</a>
+        </div>
+        <div class="collapse navbar-collapse navbar-ex1-collapse">
+            <ul class="nav navbar-nav">
+                         <li><a href="/pages/about.html">
+                             About
+                          </a></li>
+                        <li >
+                            <a href="/category/ideas-and-rants.html">Ideas and rants</a>
+                        </li>
+                        <li >
+                            <a href="/category/miscellaneous.html">Miscellaneous</a>
+                        </li>
+                        <li >
+                            <a href="/category/monitoring.html">Monitoring</a>
+                        </li>
+                        <li >
+                            <a href="/category/projects.html">Projects</a>
+                        </li>
+                        <li >
+                            <a href="/category/puppet.html">Puppet</a>
+                        </li>
+                        <li >
+                            <a href="/category/sysadmin.html">Sysadmin</a>
+                        </li>
+                        <li class="active">
+                            <a href="/category/tech-howtos.html">Tech howtos</a>
+                        </li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="/archives.html"><i class="icon-th-list"></i>Archives</a></li>
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+</nav>
+<!-- /.navbar -->
+<div class="container">
+    <div class="row">
+        <div class="col-lg-9">
+    <section id="content">
+        <article>
+            <header class="page-header">
+                <h1>
+                    <a href="/2012/02/vmware-vsphere-cli-and-perl-sdk-as-an-rpm/"
+                       rel="bookmark"
+                       title="Permalink to VMWare vSphere CLI and Perl SDK as an RPM">
+                        VMWare vSphere <span class="caps">CLI</span> and Perl <span class="caps">SDK</span> as an&nbsp;<span class="caps">RPM</span>
+                    </a>
+                </h1>
+            </header>
+            <div class="entry-content">
+                <div class="panel">
+                    <div class="panel-body">
+<footer class="post-info">
+    <span class="label label-default">Date</span>
+    <span class="published">
+        <i class="icon-calendar"></i>Tue 28 February 2012
+    </span>
+
+
+
+<span class="label label-default">Tags</span>
+	<a href="/tag/perl.html">perl</a>
+        /
+	<a href="/tag/rpm.html">rpm</a>
+        /
+	<a href="/tag/vcli.html">vcli</a>
+        /
+	<a href="/tag/vmware.html">vmware</a>
+        /
+	<a href="/tag/vsphere.html">vsphere</a>
+</footer><!-- /.post-info -->                    </div>
+                </div>
+                <p>Lately I&#8217;ve been playing around with the VMWare <a href="http://www.vmware.com/support/developer/viperltoolkit/">vSphere <span class="caps">SDK</span> for
+Perl</a>, since the new job uses a bunch of VMWare stuff (and I&#8217;ve been
+starting my foray into Perl as a new language, and am amazed by the
+<a href="http://www.cpan.org/">massive number</a> of modules out there). As much as I find [<code>yum</code>][]
+limiting having used [<code>zypper</code>][] on OpenSuSE, I&#8217;m not much of a fan of
+non-natively-packaged software. Not only is it more difficult to
+maintain and upgrade a system and nearly impossible to nicely automate
+when building from source (or a proprietary installer script), it&#8217;s also
+much more difficult to transition from a development environment to&nbsp;production.</p>
+<p>In a quick search, I found a perfectly working spec file and some
+<span class="caps">RHEL</span>/Cent-specific patches (and even beginner-level <code>rpmbuild</code>
+instructions) for the current 5.0.0-422456 VMWare <span class="caps">CLI</span> and Perl <span class="caps">SDK</span> for
+x86_64 at
+<a href="">http://www.firetooth.net/confluence/display/public/vSphere+Perl+<span class="caps">SDK</span>+and+<span class="caps">CLI</span>+<span class="caps">RPM</span>+Packages</a>.
+Many thanks to <a href="http://www.linkedin.com/in/vwhitteron">Vaughan Whitteron</a> of <span class="caps">NSW</span> in Australia for posting
+this! It built and installed without any problems on my Fedora 16
+desktop, and a CentOS 6.2 development&nbsp;box.</p>
+<div class="codehilite"><pre>http://www.firetooth.net/confluence/display/public/vSphere+Perl+SDK+and+CLI+RPM+Packages
+</pre></div>
+            </div>
+            <!-- /.entry-content -->
+        </article>
+    </section>
+
+        </div>
+        <div class="col-lg-3 well well-sm" id="sidebar">
+
+<aside>
+    <section>
+        <ul class="list-group list-group-flush">
+                <li class="list-group-item"><h4><i class="icon-home icon-large"></i>Social</h4></li>
+                    <li class="list-group-item"><a href="#"><i
+                            class="icon-You can add links in your config file-sign icon-large"></i>You can add links in your config file
+                    </a></li>
+                    <li class="list-group-item"><a href="#"><i
+                            class="icon-Another social link-sign icon-large"></i>Another social link
+                    </a></li>
+
+
+
+                <li class="list-group-item"><a href="/tags.html"><h4><i class="icon-tags icon-large"></i>Tags</h4></a></li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/android.html">
+                                android
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/google.html">
+                                google
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/nagios.html">
+                                Nagios
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/php.html">
+                                PHP
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/sysadmin.html">
+                                sysadmin
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/linux.html">
+                                linux
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/perl.html">
+                                perl
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/logging.html">
+                                logging
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/puppet.html">
+                                puppet
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/bind.html">
+                                bind
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/monitoring.html">
+                                monitoring
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/dns.html">
+                                dns
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/droid.html">
+                                droid
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/firefox.html">
+                                firefox
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/mediawiki.html">
+                                mediawiki
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/mac.html">
+                                mac
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/microsoft.html">
+                                microsoft
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/syslog.html">
+                                syslog
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/wordpress.html">
+                                wordpress
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/rpm.html">
+                                rpm
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/security.html">
+                                security
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/blog.html">
+                                blog
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/sun.html">
+                                sun
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/ems.html">
+                                EMS
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/apache.html">
+                                apache
+                            </a>
+                        </li>
+        </ul>
+    </section>
+</aside>        </div>
+    </div>
+</div>
+<footer>
+    <div class="container">
+        <hr>
+        <p class="pull-right"><i class="icon-arrow-up"></i> <a href="#">Back to top</a></p>
+
+
+        <p>&copy; 2014 Jason Antman &middot; Powered by <a href="https://github.com/DandyDev/pelican-bootstrap3" target="_blank">pelican-bootstrap3</a>,
+            <a href="http://docs.getpelican.com/" target="_blank">Pelican</a>,
+            <a href="http://getbootstrap.com" target="_blank">Bootstrap</a></p>
+    </div>
+</footer>
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="/theme/js/bootstrap.min.js"></script>
+
+<!-- Enable responsive features in IE8 with Respond.js (https://github.com/scottjehl/Respond) -->
+<script src="/theme/js/respond.min.js"></script>
+
+
+</body>
+</html>

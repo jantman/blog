@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:og="http://ogp.me/ns#"
+      xmlns:fb="https://www.facebook.com/2008/fbml">
+<head>
+    <title>Print Accounting</title>
+    <!-- Using the latest rendering mode for IE -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Open Graph tags -->
+
+            <meta property="og:type" content="article"/>
+            <meta property="og:title" content="Print Accounting"/>
+            <meta property="og:url" content="/2007/11/print-accounting/"/>
+            <meta property="og:description" content="Since we moved into our apartment at the end of last summer, my roommates and I have had a Brother 5170DN monochrome laser in the hallway as a communal printer. Last weekend, two new printers arrived - I got a Xerox DocuPrint N4525 - a big surplus student lab printer that handles ..."/>
+
+    <!-- Bootstrap -->
+        <link rel="stylesheet" href="/theme/css/bootstrap.min.css" type="text/css"/>
+    <link href="/theme/css/font-awesome.min.css" rel="stylesheet">
+    <link href="/theme/css/pygments.css" rel="stylesheet">
+        <link href="/theme/css/typogrify.css" rel="stylesheet">
+    <link rel="stylesheet" href="/theme/css/style.css" type="text/css"/>
+    <!-- JavaScript plugins (requires jQuery) -->
+    <script src="http://code.jquery.com/jquery.js"></script>
+
+        <link href="/feeds/all.atom.xml" type="application/atom+xml" rel="alternate"
+              title="Jason Antman's Blog ATOM Feed"/>
+
+</head>
+<body>
+<nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="" class="navbar-brand">Jason Antman's Blog</a>
+        </div>
+        <div class="collapse navbar-collapse navbar-ex1-collapse">
+            <ul class="nav navbar-nav">
+                         <li><a href="/pages/about.html">
+                             About
+                          </a></li>
+                        <li >
+                            <a href="/category/ideas-and-rants.html">Ideas and rants</a>
+                        </li>
+                        <li >
+                            <a href="/category/miscellaneous.html">Miscellaneous</a>
+                        </li>
+                        <li >
+                            <a href="/category/monitoring.html">Monitoring</a>
+                        </li>
+                        <li class="active">
+                            <a href="/category/projects.html">Projects</a>
+                        </li>
+                        <li >
+                            <a href="/category/puppet.html">Puppet</a>
+                        </li>
+                        <li >
+                            <a href="/category/sysadmin.html">Sysadmin</a>
+                        </li>
+                        <li >
+                            <a href="/category/tech-howtos.html">Tech howtos</a>
+                        </li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="/archives.html"><i class="icon-th-list"></i>Archives</a></li>
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+</nav>
+<!-- /.navbar -->
+<div class="container">
+    <div class="row">
+        <div class="col-lg-9">
+    <section id="content">
+        <article>
+            <header class="page-header">
+                <h1>
+                    <a href="/2007/11/print-accounting/"
+                       rel="bookmark"
+                       title="Permalink to Print Accounting">
+                        Print&nbsp;Accounting
+                    </a>
+                </h1>
+            </header>
+            <div class="entry-content">
+                <div class="panel">
+                    <div class="panel-body">
+<footer class="post-info">
+    <span class="label label-default">Date</span>
+    <span class="published">
+        <i class="icon-calendar"></i>Tue 27 November 2007
+    </span>
+
+
+
+</footer><!-- /.post-info -->                    </div>
+                </div>
+                <p>Since we moved into our apartment at the end of last summer, my
+roommates and I have had a Brother <span class="caps">5170DN</span> monochrome laser in the
+hallway as a communal printer. Last weekend, two new printers arrived -
+I got a Xerox DocuPrint N4525 - a big surplus student lab printer that
+handles paper up to 11x17&#8221; and print rates of up to 45 <span class="caps">PPM</span>. My roommates
+picked up a (free!) <span class="caps">HP</span> Color LaserJet 4500. So, I decided that I want
+accounting of who prints what on each&nbsp;printer.</p>
+<p>I setup a Dell PowerEdge 650 running openSuSE 10.3, Xen and 2 NICs, one
+on our main network and one with a static <span class="caps">IP</span> in a separate subnet hooked
+up to a small 5-port switch. I setup a Xen <span class="caps">VM</span> (also openSuSE 10.3) to
+act as a <span class="caps">CUPS</span> server. I then installed <a href="http://www.pykota.com/software/tea4cups">tea4cups</a> which allows
+outgoing <span class="caps">CUPS</span> jobs to be read via a pseudo-backend while they&#8217;re
+processing. tea4cups calls some <span class="caps">PHP</span> scripts that update a MySQL database
+with job information, including page counts and ink coverage amounts
+calculated by <a href="http://www.pykota.com/software/pkpgcounter">pkpgcounter</a>.</p>
+<p>This is all done with a kludge of custom scripts, which I&#8217;ll put in my
+<span class="caps">CVS</span> repo (and comment on here) sometime this&nbsp;week.</p>
+<p>I did run into two problems. First, I had issues with getting tea4cups
+to run at all. After googling a bit, I read about people having problems
+with tea4cups and SELinux. Sure enough, I disabled AppArmor and all went
+back to normal. Also, I later had some problems trying to perform ink
+accounting on a color printer. After some investigation, I also found
+out that GhostScript 8.15 is buggy and will cause problems with
+pkpgcounter. I upgraded to the 8.60 RPMs and all was&nbsp;well.</p>
+<p>The whole project is still in the works, but when finished I should have
+a system that will keep track of all printing in the apartment by
+username and <span class="caps">IP</span>, and track the page count, paper size, color or B&amp;W,
+resolution, and ink coverage percentage (both for grayscale and <span class="caps">CMYK</span> or
+<span class="caps">RGB</span> individually). I know it&#8217;s overkill - all I want to really know is
+enough data to fairly split the costs of paper, toner, etc. - but I
+thought it would be a fun&nbsp;project.</p>
+<p>I originally thought about using <a href="http://www.pykota.com/software/pykota">PyKota</a> for the accounting, but
+found it to be way too heavy-weight. My current kludge, done up in one
+night (before writing an essay), is based on <span class="caps">CUPS</span> and tea4cups, which
+calls <span class="caps">PHP</span> backend prehooks and posthooks, which in turn make use of a
+few pre-written python and perl scripts that deal with querying
+information from the printer (<span class="caps">IPP</span>) and local&nbsp;files.</p>
+<p>All in all, for something that didn&#8217;t exist 24 hours ago, I think it&#8217;s
+working pretty well so&nbsp;far.</p>
+            </div>
+            <!-- /.entry-content -->
+        </article>
+    </section>
+
+        </div>
+        <div class="col-lg-3 well well-sm" id="sidebar">
+
+<aside>
+    <section>
+        <ul class="list-group list-group-flush">
+                <li class="list-group-item"><h4><i class="icon-home icon-large"></i>Social</h4></li>
+                    <li class="list-group-item"><a href="#"><i
+                            class="icon-You can add links in your config file-sign icon-large"></i>You can add links in your config file
+                    </a></li>
+                    <li class="list-group-item"><a href="#"><i
+                            class="icon-Another social link-sign icon-large"></i>Another social link
+                    </a></li>
+
+
+
+                <li class="list-group-item"><a href="/tags.html"><h4><i class="icon-tags icon-large"></i>Tags</h4></a></li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/android.html">
+                                android
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/google.html">
+                                google
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/nagios.html">
+                                Nagios
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/php.html">
+                                PHP
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/sysadmin.html">
+                                sysadmin
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/linux.html">
+                                linux
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/perl.html">
+                                perl
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/logging.html">
+                                logging
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/puppet.html">
+                                puppet
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/bind.html">
+                                bind
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/monitoring.html">
+                                monitoring
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/dns.html">
+                                dns
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/droid.html">
+                                droid
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/firefox.html">
+                                firefox
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/mediawiki.html">
+                                mediawiki
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/mac.html">
+                                mac
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/microsoft.html">
+                                microsoft
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/syslog.html">
+                                syslog
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/wordpress.html">
+                                wordpress
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/rpm.html">
+                                rpm
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/security.html">
+                                security
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/blog.html">
+                                blog
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/sun.html">
+                                sun
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/ems.html">
+                                EMS
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/apache.html">
+                                apache
+                            </a>
+                        </li>
+        </ul>
+    </section>
+</aside>        </div>
+    </div>
+</div>
+<footer>
+    <div class="container">
+        <hr>
+        <p class="pull-right"><i class="icon-arrow-up"></i> <a href="#">Back to top</a></p>
+
+
+        <p>&copy; 2014 Jason Antman &middot; Powered by <a href="https://github.com/DandyDev/pelican-bootstrap3" target="_blank">pelican-bootstrap3</a>,
+            <a href="http://docs.getpelican.com/" target="_blank">Pelican</a>,
+            <a href="http://getbootstrap.com" target="_blank">Bootstrap</a></p>
+    </div>
+</footer>
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="/theme/js/bootstrap.min.js"></script>
+
+<!-- Enable responsive features in IE8 with Respond.js (https://github.com/scottjehl/Respond) -->
+<script src="/theme/js/respond.min.js"></script>
+
+
+</body>
+</html>

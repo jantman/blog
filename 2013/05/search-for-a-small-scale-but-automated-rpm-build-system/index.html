@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:og="http://ogp.me/ns#"
+      xmlns:fb="https://www.facebook.com/2008/fbml">
+<head>
+    <title>Search for a small-scale but automated RPM build system</title>
+    <!-- Using the latest rendering mode for IE -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Open Graph tags -->
+
+            <meta property="og:type" content="article"/>
+            <meta property="og:title" content="Search for a small-scale but automated RPM build system"/>
+            <meta property="og:url" content="/2013/05/search-for-a-small-scale-but-automated-rpm-build-system/"/>
+            <meta property="og:description" content="This post is part of a series of older draft posts from a few months ago that I’m just getting around to publishing. Unfortunately, I have yet to find a build system that meets my requirements (see the last paragraph). At work, we have a handful - currently a really ..."/>
+
+    <!-- Bootstrap -->
+        <link rel="stylesheet" href="/theme/css/bootstrap.min.css" type="text/css"/>
+    <link href="/theme/css/font-awesome.min.css" rel="stylesheet">
+    <link href="/theme/css/pygments.css" rel="stylesheet">
+        <link href="/theme/css/typogrify.css" rel="stylesheet">
+    <link rel="stylesheet" href="/theme/css/style.css" type="text/css"/>
+    <!-- JavaScript plugins (requires jQuery) -->
+    <script src="http://code.jquery.com/jquery.js"></script>
+
+        <link href="/feeds/all.atom.xml" type="application/atom+xml" rel="alternate"
+              title="Jason Antman's Blog ATOM Feed"/>
+
+</head>
+<body>
+<nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="" class="navbar-brand">Jason Antman's Blog</a>
+        </div>
+        <div class="collapse navbar-collapse navbar-ex1-collapse">
+            <ul class="nav navbar-nav">
+                         <li><a href="/pages/about.html">
+                             About
+                          </a></li>
+                        <li >
+                            <a href="/category/ideas-and-rants.html">Ideas and rants</a>
+                        </li>
+                        <li >
+                            <a href="/category/miscellaneous.html">Miscellaneous</a>
+                        </li>
+                        <li >
+                            <a href="/category/monitoring.html">Monitoring</a>
+                        </li>
+                        <li >
+                            <a href="/category/projects.html">Projects</a>
+                        </li>
+                        <li >
+                            <a href="/category/puppet.html">Puppet</a>
+                        </li>
+                        <li >
+                            <a href="/category/sysadmin.html">Sysadmin</a>
+                        </li>
+                        <li class="active">
+                            <a href="/category/tech-howtos.html">Tech howtos</a>
+                        </li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="/archives.html"><i class="icon-th-list"></i>Archives</a></li>
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+</nav>
+<!-- /.navbar -->
+<div class="container">
+    <div class="row">
+        <div class="col-lg-9">
+    <section id="content">
+        <article>
+            <header class="page-header">
+                <h1>
+                    <a href="/2013/05/search-for-a-small-scale-but-automated-rpm-build-system/"
+                       rel="bookmark"
+                       title="Permalink to Search for a small-scale but automated RPM build system">
+                        Search for a small-scale but automated <span class="caps">RPM</span> build&nbsp;system
+                    </a>
+                </h1>
+            </header>
+            <div class="entry-content">
+                <div class="panel">
+                    <div class="panel-body">
+<footer class="post-info">
+    <span class="label label-default">Date</span>
+    <span class="published">
+        <i class="icon-calendar"></i>Mon 13 May 2013
+    </span>
+
+
+
+<span class="label label-default">Tags</span>
+	<a href="/tag/build.html">build</a>
+        /
+	<a href="/tag/linux.html">linux</a>
+        /
+	<a href="/tag/nodejs.html">nodejs</a>
+        /
+	<a href="/tag/package.html">package</a>
+        /
+	<a href="/tag/packaging.html">packaging</a>
+        /
+	<a href="/tag/repository.html">repository</a>
+        /
+	<a href="/tag/rpm.html">rpm</a>
+        /
+	<a href="/tag/rpmbuild.html">rpmbuild</a>
+        /
+	<a href="/tag/software.html">software</a>
+        /
+	<a href="/tag/sysadmin.html">sysadmin</a>
+        /
+	<a href="/tag/yum.html">yum</a>
+</footer><!-- /.post-info -->                    </div>
+                </div>
+                <p><strong><em>This post is part of a series of older draft posts from a few months
+ago that I&#8217;m just getting around to publishing. Unfortunately, I have
+yet to find a build system that meets my requirements (see the last&nbsp;paragraph).</em></strong></p>
+<p>At work, we have a handful - currently a really small number - of <span class="caps">RPM</span>
+packages that we need to build and deploy internally for our CentOS
+server infrastructure. A number of them are just pulled down from
+specific third-party repositories and rebuilt to have the vendor set as
+us, and some are internally patched or developed software. We run
+websites, and on the product side, we&#8217;re a Python/<a href="https://www.djangoproject.com/">Django</a> shop (in
+fact, probably one of the largest Django apps out there). We don&#8217;t
+deploy our Django apps via <span class="caps">RPM</span>, so building and distributing RPMs is
+definitely not one of our core competencies. In fact, we really only
+want to do it when we&#8217;re testing/deploying a new distro, or when an
+upstream package is&nbsp;updated.</p>
+<p>Last week I pulled a ticket to deploy <a href="http://nodejs.org/">node.js</a> to one of our build
+hosts, and we&#8217;ve got a few things in the pipeline that also rely on it.
+I found the <a href="https://github.com/puppetlabs/puppetlabs-nodejs">puppetlabs-nodejs</a> module on Github that&#8217;s supposed to
+install it on <span class="caps">RHEL</span>/CentOS, but it pulls packages from
+<a href="http://patches.fedorapeople.org/oldnode/stable/">http://patches.fedorapeople.org/oldnode/stable/</a>, and the newest
+version of nodejs there is 0.6.18, which is quite old. I can&#8217;t find any
+actively maintained sources of newer nodejs packages for <span class="caps">RHEL</span>/CentOS
+(yeah, I know, that&#8217;s one down side to the distributions&#8230;). However, I
+did find that nodejs 0.9.5 is being <a href="http://koji.fedoraproject.org/koji/packageinfo?packageID=15154">built for Fedora 18/19 in the
+Fedora build system</a>, is already in the Fedora 18 Testing and Fedora
+Rawhide repos, but is failing its <span class="caps">EL6</span> builds in their system. The
+decision I&#8217;ve come to is to use the puppetlabs-nodejs module to install
+it, but try and rebuild the Fedora 18 RPMs under CentOS 5 and&nbsp;6.</p>
+<p>So that&#8217;s the background. Now, my current task: to search for an <span class="caps">RPM</span>
+build system for my current job. My core requirements, in no specific
+order,&nbsp;are:</p>
+<ul>
+<li>Be relatively easy and quick to use for people who have a specfile
+    or <span class="caps">SRPM</span> and want to be able to &#8220;ensure => present&#8221; the finished <span class="caps">RPM</span>
+    on a system. i.e., require as little per-package configuration as&nbsp;possible.</li>
+<li>Be able to handle rebuilding &#8220;all&#8221; of our RPMs when we roll out a
+    new distro version. Doesn&#8217;t necessarily need to be automatic, but
+    should be relatively&nbsp;simple.</li>
+<li>Ideally, not need to be running constantly - i.e. something that
+    will cope well with build hosts being VMs that are shut down when
+    they&#8217;re not&nbsp;needed.</li>
+<li>Handle automatically putting successfully built packages into a
+    repository, ideally with some sort of (manual) promotion process
+    from staging to&nbsp;stable.</li>
+<li>Have minimal external (infrastructure) dependencies that we can&#8217;t
+    satisfy with existing&nbsp;systems.</li>
+</ul>
+<p>So, the first step was to research existing <span class="caps">RPM</span> build systems and how
+others do this. Here&#8217;s a list of what I could find online, though most
+of these are from distributions and software vendors/projects, not
+end-user companies that are only building for internal&nbsp;use.</p>
+<ul>
+<li><a href="https://fedorahosted.org/koji/wiki">Koji</a> is the build system used by <a href="http://fedoraproject.org/wiki/Koji">Fedora</a> and RedHat. It&#8217;s
+    about as full-featured as any can be, and I&#8217;m familiar with it from
+    my time at <a href="http://koji.rutgers.edu/koji/">Rutgers University</a>, as it&#8217;s used to maintain their
+    CentOS/<span class="caps">RHEL</span> packages. It&#8217;s based largely on Mock. However, [setting
+    up the build server][] is no trivial task; there are few
+    installations outside of Fedora/RedHat, and it relies on either
+    Kerberos or an <span class="caps">SSL</span> <span class="caps">CA</span> infrastructure to authenticate machines and
+    clients. So, it&#8217;s designed for too large a scale and too much
+    infrastructure for&nbsp;me.</li>
+<li><span class="caps">PLD</span> Linux has a <a href="https://www.pld-linux.org/developingpld/builderscript">builder script</a> that seems to automate <code>rpmbuild</code>
+    as well as fetching sources and resolving/building dependencies. I
+    haven&#8217;t looked at the script yet, but apparently it&#8217;s in <span class="caps">PLD</span>&#8217;s
+    &#8220;rpm-build-tools&#8221;&nbsp;package.</li>
+<li><span class="caps">PLD</span> Linux also has a <span class="caps">CVS</span> repository for something called
+    <a href="http://cvs.pld-linux.org/cgi-bin/cvsweb/pld-builder.new">pld-builder.new</a>. The <a href="http://cvs.pld-linux.org/cgi-bin/cvsweb/pld-builder.new/doc/README?rev=1.5"><span class="caps">README</span></a> and <a href="http://cvs.pld-linux.org/cgi-bin/cvsweb/pld-builder.new/doc/ARCHITECTURE?rev=1.6"><span class="caps">ARCHITECTURE</span></a> files make
+    it sound like a relatively simple mainly-Python system that builds
+    <span class="caps">SRPMS</span> and binary packages when requested, and most importantly,
+    seems like a simple system that uses little more than shared
+    filesystem access for communication and&nbsp;coordination.</li>
+<li><span class="caps">ALT</span> Linux has <a href="http://en.altlinux.org/Sisyphus">Sisyphus</a>, which combines repository management and
+    web interface tools, package building and testing tools, and&nbsp;more.</li>
+<li>The Dries <span class="caps">RPM</span> repository uses (or at least used&#8230; my reference is
+    quite old) <a href="http://dries.ulyssis.org/rpm/pydar2/index.html">pydar2</a>, &#8220;a distributed client/server program which
+    allows you to build multiple spec files on multiple
+    distribution/architecture combinations automatically.&#8221; That sounds
+    like it could be what I need, but the last update says that it isn&#8217;t
+    finished yet, and that was in <strong>2005</strong>.</li>
+<li>Mandriva Linux has pretty extensive information on their build
+    system <a href="http://wiki.mandriva.com/en/Category:Build_System">on their wiki</a> and a <a href="http://wiki.mandriva.com/en/Development/Packaging/BuildSystem/Theory">build system theory page</a>, but it
+    seems to be largely a hodgepodge of shell scripts and cronjobs, and
+    is likely not a candidate for use by anyone other than its&nbsp;designers.</li>
+<li>Argeo provides the <a href="https://www.argeo.org/wiki/SLC"><span class="caps">SLC</span> framework</a> which has a &#8220;<span class="caps">RPM</span> Factory&#8221;
+    component, but I can&#8217;t seem to find much more than a wiki page, and
+    can&#8217;t tell if it&#8217;s a build automation system or just handles mocking
+    packages and putting them in a repo on a single&nbsp;host.</li>
+<li>Dag Wieers&#8217; repositories use (or used) a set of python scripts
+    called <a href="http://dag.wieers.com/home-made/dar/"><span class="caps">DAR</span>, &#8220;Dynamic Apt Repository builder&#8221;</a>. They&#8217;re on
+    <a href="https://github.com/dagwieers/dar">github</a> but are listed as &#8220;old&#8221; and haven&#8217;t been updated in at
+    least 2 years. The features sound quite interesting, and though it&#8217;s
+    based on the Apt repo format, it might provide some good ideas for
+    implementing a similar&nbsp;system.</li>
+</ul>
+<p><strong>Update four months later:</strong> I&#8217;ve yet to find a build system that meets
+my requirements above. For the moment I&#8217;m only managing \~20 packages,
+so my &#8220;build system&#8221; is a single shell script that reads in some
+environment variables and runs through using <a href="http://fedoraproject.org/wiki/Projects/Mock">mock</a> to build them in
+the correct order (including pushing the finished RPMs back into the
+local repository that mock reads from) and then pushing the finished
+packages to our internal repository. Maybe when I have some spare time,
+I&#8217;ll consider a project to either make a slightly better (but simple)
+<span class="caps">RPM</span> build system based on Python, or get our <a href="http://jenkins-ci.org/">Jenkins</a> install to
+handle this for&nbsp;me.</p>
+            </div>
+            <!-- /.entry-content -->
+        </article>
+    </section>
+
+        </div>
+        <div class="col-lg-3 well well-sm" id="sidebar">
+
+<aside>
+    <section>
+        <ul class="list-group list-group-flush">
+                <li class="list-group-item"><h4><i class="icon-home icon-large"></i>Social</h4></li>
+                    <li class="list-group-item"><a href="#"><i
+                            class="icon-You can add links in your config file-sign icon-large"></i>You can add links in your config file
+                    </a></li>
+                    <li class="list-group-item"><a href="#"><i
+                            class="icon-Another social link-sign icon-large"></i>Another social link
+                    </a></li>
+
+
+
+                <li class="list-group-item"><a href="/tags.html"><h4><i class="icon-tags icon-large"></i>Tags</h4></a></li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/android.html">
+                                android
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/google.html">
+                                google
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/nagios.html">
+                                Nagios
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/php.html">
+                                PHP
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/sysadmin.html">
+                                sysadmin
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/linux.html">
+                                linux
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/perl.html">
+                                perl
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/logging.html">
+                                logging
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/puppet.html">
+                                puppet
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/bind.html">
+                                bind
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/monitoring.html">
+                                monitoring
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/dns.html">
+                                dns
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/droid.html">
+                                droid
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/firefox.html">
+                                firefox
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/mediawiki.html">
+                                mediawiki
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/mac.html">
+                                mac
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/microsoft.html">
+                                microsoft
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/syslog.html">
+                                syslog
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/wordpress.html">
+                                wordpress
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/rpm.html">
+                                rpm
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/security.html">
+                                security
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/blog.html">
+                                blog
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/sun.html">
+                                sun
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/ems.html">
+                                EMS
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/apache.html">
+                                apache
+                            </a>
+                        </li>
+        </ul>
+    </section>
+</aside>        </div>
+    </div>
+</div>
+<footer>
+    <div class="container">
+        <hr>
+        <p class="pull-right"><i class="icon-arrow-up"></i> <a href="#">Back to top</a></p>
+
+
+        <p>&copy; 2014 Jason Antman &middot; Powered by <a href="https://github.com/DandyDev/pelican-bootstrap3" target="_blank">pelican-bootstrap3</a>,
+            <a href="http://docs.getpelican.com/" target="_blank">Pelican</a>,
+            <a href="http://getbootstrap.com" target="_blank">Bootstrap</a></p>
+    </div>
+</footer>
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="/theme/js/bootstrap.min.js"></script>
+
+<!-- Enable responsive features in IE8 with Respond.js (https://github.com/scottjehl/Respond) -->
+<script src="/theme/js/respond.min.js"></script>
+
+
+</body>
+</html>

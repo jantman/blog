@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:og="http://ogp.me/ns#"
+      xmlns:fb="https://www.facebook.com/2008/fbml">
+<head>
+    <title>Documentation generation for web apps - PHP and JavaScript</title>
+    <!-- Using the latest rendering mode for IE -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Open Graph tags -->
+
+            <meta property="og:type" content="article"/>
+            <meta property="og:title" content="Documentation generation for web apps - PHP and JavaScript"/>
+            <meta property="og:url" content="/2010/08/documentation-generation-for-web-apps-php-and-javascript/"/>
+            <meta property="og:description" content="Recently I’ve been making some changes to a relatively complex ePCR (electronic patient care report) program that I wrote for the ambulance corps. It’s a web application (available only on our LAN, of course) written in PHP, with a relatively large chunk of custom javascript to provide Ajax ..."/>
+
+    <!-- Bootstrap -->
+        <link rel="stylesheet" href="/theme/css/bootstrap.min.css" type="text/css"/>
+    <link href="/theme/css/font-awesome.min.css" rel="stylesheet">
+    <link href="/theme/css/pygments.css" rel="stylesheet">
+        <link href="/theme/css/typogrify.css" rel="stylesheet">
+    <link rel="stylesheet" href="/theme/css/style.css" type="text/css"/>
+    <!-- JavaScript plugins (requires jQuery) -->
+    <script src="http://code.jquery.com/jquery.js"></script>
+
+        <link href="/feeds/all.atom.xml" type="application/atom+xml" rel="alternate"
+              title="Jason Antman's Blog ATOM Feed"/>
+
+</head>
+<body>
+<nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="" class="navbar-brand">Jason Antman's Blog</a>
+        </div>
+        <div class="collapse navbar-collapse navbar-ex1-collapse">
+            <ul class="nav navbar-nav">
+                         <li><a href="/pages/about.html">
+                             About
+                          </a></li>
+                        <li >
+                            <a href="/category/ideas-and-rants.html">Ideas and rants</a>
+                        </li>
+                        <li >
+                            <a href="/category/miscellaneous.html">Miscellaneous</a>
+                        </li>
+                        <li >
+                            <a href="/category/monitoring.html">Monitoring</a>
+                        </li>
+                        <li >
+                            <a href="/category/projects.html">Projects</a>
+                        </li>
+                        <li >
+                            <a href="/category/puppet.html">Puppet</a>
+                        </li>
+                        <li >
+                            <a href="/category/sysadmin.html">Sysadmin</a>
+                        </li>
+                        <li class="active">
+                            <a href="/category/tech-howtos.html">Tech howtos</a>
+                        </li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="/archives.html"><i class="icon-th-list"></i>Archives</a></li>
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+</nav>
+<!-- /.navbar -->
+<div class="container">
+    <div class="row">
+        <div class="col-lg-9">
+    <section id="content">
+        <article>
+            <header class="page-header">
+                <h1>
+                    <a href="/2010/08/documentation-generation-for-web-apps-php-and-javascript/"
+                       rel="bookmark"
+                       title="Permalink to Documentation generation for web apps - PHP and JavaScript">
+                        Documentation generation for web apps - <span class="caps">PHP</span> and&nbsp;JavaScript
+                    </a>
+                </h1>
+            </header>
+            <div class="entry-content">
+                <div class="panel">
+                    <div class="panel-body">
+<footer class="post-info">
+    <span class="label label-default">Date</span>
+    <span class="published">
+        <i class="icon-calendar"></i>Thu 26 August 2010
+    </span>
+
+
+
+<span class="label label-default">Tags</span>
+	<a href="/tag/documentation.html">documentation</a>
+        /
+	<a href="/tag/javascript.html">javascript</a>
+        /
+	<a href="/tag/php.html">PHP</a>
+        /
+	<a href="/tag/web-programming.html">web programming</a>
+</footer><!-- /.post-info -->                    </div>
+                </div>
+                <p>Recently I&#8217;ve been making some changes to a relatively complex ePCR
+(electronic patient care report) program that I wrote for the <a href="http://www.midlandparkambulance.com">ambulance
+corps</a>. It&#8217;s a web application (available only on our <span class="caps">LAN</span>, of course)
+written in <span class="caps">PHP</span>, with a relatively large chunk of custom javascript to
+provide Ajax/<span class="caps">DHTML</span> functions. Most of the <span class="caps">PHP</span> code was already
+documented and processed with <a href="http://www.phpdoc.org/">phpDocumentor</a> (phpdoc) to generate <span class="caps">API</span>
+documentation. However, since so much of the functionality is
+<span class="caps">DHTML</span>-based, there was a lot of looking back to the JavaScript source to
+figure out what was called&nbsp;where.</p>
+<p>My search for a true multi-language documentation generator was
+relatively fruitless. There&#8217;s <a href="http://www.stack.nl/~dimitri/doxygen/">doxygen</a> but that needed a Perl helper
+script for javascript files. Since virtually all of the code, both <span class="caps">PHP</span>
+and JavaScript, is purely procedural, I was really only concerned about
+docblocks and the functions they&nbsp;precede.</p>
+<p>Luckily, it occurred to me that JavaScript is pretty close in syntax to
+<span class="caps">PHP</span>, and I tend to write them with exactly the same style. A little
+research showed that phpdoc can more or less handle javascript code,
+with a few&nbsp;caveats:</p>
+<ul>
+<li>The code needs to parse as <span class="caps">PHP</span>, so things like inline functions mess
+    it&nbsp;up.</li>
+<li>The default phpDocumentor ini file doesn&#8217;t recognize files with
+    <code>.js</code> extensions.</li>
+<li>The files need to have a &lt;?php at the&nbsp;top.</li>
+</ul>
+<p>Noting this, I wrote a small script that iterates through a directory of
+<code>.js</code> files, parses them line by line, pulls out only the function
+declarations (which, hopefully, don&#8217;t also have code on the same line)
+and docblocks, and writes the output (with a &lt;?php at the top) to a
+same-named file in a different&nbsp;directory.</p>
+<p>The script obviously requires phpdoc to be installed, and also requires
+you to edit the phpDocumentor.ini file (installed with <span class="caps">PEAR</span> on my system
+at <code>/usr/share/php5/PEAR/data/PhpDocumentor/phpDocumentor.ini</code>) and add
+a &#8220;js&#8221; line to the <code>[_phpDocumentor_phpfile_exts]</code> section to get phpdoc
+to recognize <code>*.js</code> files.</p>
+<p>I was easily able to integrate this with a Makefile rule and create a
+single set of cross-linked phpdoc <span class="caps">API</span> docs including both <span class="caps">JS</span> and <span class="caps">PHP</span>
+files. I also added explicit package names (like &#8220;-<span class="caps">PHP</span>&#8221; and &#8220;-<span class="caps">JS</span>&#8221;) to
+keep things separated a&nbsp;little.</p>
+<p>The script can be found at:
+<a href="http://svn.jasonantman.com/misc-scripts/js2phpdoc.php">http://svn.jasonantman.com/misc-scripts/js2phpdoc.php</a>. It&#8217;s
+(obviously) free for any use, provided that you follow the license terms
+(leave copyrights intact, send modifications back to me, and update the
+changelog if you modify&nbsp;it).</p>
+<p>My Makefile rule (which uses a temp directory to both keep the generated
+files separate from the source and keep the file paths as seen by phpdoc
+the same as the actual source):<br />
+<code>.PHONY: docs</code></p>
+<p>docs:<br />
+mkdir -p temp/js<br />
+bin/js2phpdoc.php js/ temp/js/<br />
+cp -r inc temp/<br />
+cp *.php temp/<br />
+phpdoc -c docs/default.ini<br />
+rm -Rf temp<br />
+</code></p>
+            </div>
+            <!-- /.entry-content -->
+        </article>
+    </section>
+
+        </div>
+        <div class="col-lg-3 well well-sm" id="sidebar">
+
+<aside>
+    <section>
+        <ul class="list-group list-group-flush">
+                <li class="list-group-item"><h4><i class="icon-home icon-large"></i>Social</h4></li>
+                    <li class="list-group-item"><a href="#"><i
+                            class="icon-You can add links in your config file-sign icon-large"></i>You can add links in your config file
+                    </a></li>
+                    <li class="list-group-item"><a href="#"><i
+                            class="icon-Another social link-sign icon-large"></i>Another social link
+                    </a></li>
+
+
+
+                <li class="list-group-item"><a href="/tags.html"><h4><i class="icon-tags icon-large"></i>Tags</h4></a></li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/android.html">
+                                android
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/google.html">
+                                google
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/nagios.html">
+                                Nagios
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/php.html">
+                                PHP
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/sysadmin.html">
+                                sysadmin
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/linux.html">
+                                linux
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/perl.html">
+                                perl
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/logging.html">
+                                logging
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/puppet.html">
+                                puppet
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/bind.html">
+                                bind
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/monitoring.html">
+                                monitoring
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/dns.html">
+                                dns
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/droid.html">
+                                droid
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/firefox.html">
+                                firefox
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/mediawiki.html">
+                                mediawiki
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/mac.html">
+                                mac
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/microsoft.html">
+                                microsoft
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/syslog.html">
+                                syslog
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/wordpress.html">
+                                wordpress
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/rpm.html">
+                                rpm
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/security.html">
+                                security
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/blog.html">
+                                blog
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/sun.html">
+                                sun
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/ems.html">
+                                EMS
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/apache.html">
+                                apache
+                            </a>
+                        </li>
+        </ul>
+    </section>
+</aside>        </div>
+    </div>
+</div>
+<footer>
+    <div class="container">
+        <hr>
+        <p class="pull-right"><i class="icon-arrow-up"></i> <a href="#">Back to top</a></p>
+
+
+        <p>&copy; 2014 Jason Antman &middot; Powered by <a href="https://github.com/DandyDev/pelican-bootstrap3" target="_blank">pelican-bootstrap3</a>,
+            <a href="http://docs.getpelican.com/" target="_blank">Pelican</a>,
+            <a href="http://getbootstrap.com" target="_blank">Bootstrap</a></p>
+    </div>
+</footer>
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="/theme/js/bootstrap.min.js"></script>
+
+<!-- Enable responsive features in IE8 with Respond.js (https://github.com/scottjehl/Respond) -->
+<script src="/theme/js/respond.min.js"></script>
+
+
+</body>
+</html>

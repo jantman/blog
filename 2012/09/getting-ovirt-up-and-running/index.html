@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:og="http://ogp.me/ns#"
+      xmlns:fb="https://www.facebook.com/2008/fbml">
+<head>
+    <title>Getting oVirt up and running</title>
+    <!-- Using the latest rendering mode for IE -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Open Graph tags -->
+
+            <meta property="og:type" content="article"/>
+            <meta property="og:title" content="Getting oVirt up and running"/>
+            <meta property="og:url" content="/2012/09/getting-ovirt-up-and-running/"/>
+            <meta property="og:description" content="The bulk of this post was written way back in April 2012. If you’re just coming here, and looking to setup oVirt, you should probably skip down to the postscript for an update, and ignore most of the content here (as it’s applicable to an older oVirt version ..."/>
+
+    <!-- Bootstrap -->
+        <link rel="stylesheet" href="/theme/css/bootstrap.min.css" type="text/css"/>
+    <link href="/theme/css/font-awesome.min.css" rel="stylesheet">
+    <link href="/theme/css/pygments.css" rel="stylesheet">
+        <link href="/theme/css/typogrify.css" rel="stylesheet">
+    <link rel="stylesheet" href="/theme/css/style.css" type="text/css"/>
+    <!-- JavaScript plugins (requires jQuery) -->
+    <script src="http://code.jquery.com/jquery.js"></script>
+
+        <link href="/feeds/all.atom.xml" type="application/atom+xml" rel="alternate"
+              title="Jason Antman's Blog ATOM Feed"/>
+
+</head>
+<body>
+<nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="" class="navbar-brand">Jason Antman's Blog</a>
+        </div>
+        <div class="collapse navbar-collapse navbar-ex1-collapse">
+            <ul class="nav navbar-nav">
+                         <li><a href="/pages/about.html">
+                             About
+                          </a></li>
+                        <li >
+                            <a href="/category/ideas-and-rants.html">Ideas and rants</a>
+                        </li>
+                        <li >
+                            <a href="/category/miscellaneous.html">Miscellaneous</a>
+                        </li>
+                        <li >
+                            <a href="/category/monitoring.html">Monitoring</a>
+                        </li>
+                        <li >
+                            <a href="/category/projects.html">Projects</a>
+                        </li>
+                        <li >
+                            <a href="/category/puppet.html">Puppet</a>
+                        </li>
+                        <li >
+                            <a href="/category/sysadmin.html">Sysadmin</a>
+                        </li>
+                        <li class="active">
+                            <a href="/category/tech-howtos.html">Tech howtos</a>
+                        </li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="/archives.html"><i class="icon-th-list"></i>Archives</a></li>
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+</nav>
+<!-- /.navbar -->
+<div class="container">
+    <div class="row">
+        <div class="col-lg-9">
+    <section id="content">
+        <article>
+            <header class="page-header">
+                <h1>
+                    <a href="/2012/09/getting-ovirt-up-and-running/"
+                       rel="bookmark"
+                       title="Permalink to Getting oVirt up and running">
+                        Getting oVirt up and&nbsp;running
+                    </a>
+                </h1>
+            </header>
+            <div class="entry-content">
+                <div class="panel">
+                    <div class="panel-body">
+<footer class="post-info">
+    <span class="label label-default">Date</span>
+    <span class="published">
+        <i class="icon-calendar"></i>Fri 07 September 2012
+    </span>
+
+
+
+<span class="label label-default">Tags</span>
+	<a href="/tag/fedora.html">fedora</a>
+        /
+	<a href="/tag/kvm.html">kvm</a>
+        /
+	<a href="/tag/ovirt.html">ovirt</a>
+        /
+	<a href="/tag/qemu.html">qemu</a>
+        /
+	<a href="/tag/redhat.html">redhat</a>
+        /
+	<a href="/tag/rhev.html">rhev</a>
+        /
+	<a href="/tag/spice.html">spice</a>
+        /
+	<a href="/tag/virtualization.html">virtualization</a>
+</footer><!-- /.post-info -->                    </div>
+                </div>
+                <p>The bulk of this post was written way back in April 2012. If you&#8217;re just
+coming here, and looking to setup oVirt, you should probably <a href="#postscript">skip down
+to the postscript</a> for an update, and ignore most of the content here
+(as it&#8217;s applicable to an older oVirt&nbsp;version).</p>
+<p>I recently started setting up <a href="http://www.ovirt.org">oVirt</a>, the community version of Red
+Hat Enterprise Virtualization, at work for some testing (mainly a
+&#8220;sandbox&#8221; <span class="caps">VM</span> environment, and because <a href="http://theforeman.org/">Foreman</a> <a href="http://blog.theforeman.org/2012/03/vnc-support-built-in-foreman.html">supports</a> it). To
+start with, I had two nodes, each with two dual-core Xeon processors
+(<span class="caps">VT</span>-x capable) with <span class="caps">20GB</span> <span class="caps">RAM</span>, one with <span class="caps">600GB</span> internal storage and one
+with <span class="caps">140GB</span> internal. While oVirt&#8217;s documentation isn&#8217;t exactly
+wonderful, I found a blgo post by Jason Brooks, <a href="http://blog.jebpages.com/archives/how-to-get-up-and-running-with-ovirt/">How to Get Up and
+Running with oVirt</a>, which gives a great walkthrough of getting the
+oVirt Engine setup on a machine, and also setting up that same machine
+as a <span class="caps">VM</span> host. As oVirt is still fairly young, this is all done on
+Fedora. I performed my installation via Cobbler, though I&#8217;m afraid to
+admit it was an entirely manual, interactive&nbsp;install.</p>
+<p>I did run into a few bumps during Jason&#8217;s tutorial. In step 15, adding
+the data <span class="caps">NFS</span> export as a Storage Domain, I was unable to add the <span class="caps">NFS</span>
+export. I found the <a href="http://www.ovirt.org/wiki/Troubleshooting_NFS_Storage_Issues">Troubleshooting <span class="caps">NFS</span> Storage Issues page on the
+oVirt wiki</a>, ensured that SELinux was disabled and that the export had
+the correct permissions, confirmed that <code>/etc/nfsmount.conf</code> specified
+<code>Nfsvers=3</code>, rebooted, and then ran the <code>nfs-check.py</code> script. At this
+point, I was able to add the other storage domains in steps 15 and&nbsp;16.</p>
+<p>My second issue was that even on Fedora 16, I simply can&#8217;t get the spice
+client (through the <code>spice-xpi</code> browser plugin) to work. As far as I can
+tell from the logs, it looks like <code>spicec</code> is being sent a value of
+&#8220;None&#8221; for the secured port parameter, instead of the correct port
+number. I assume this is a bug in oVirt, but I&#8217;ll revisit this problem
+when I have time. In the mean time, I changed my test <span class="caps">VM</span> to use <span class="caps">VNC</span>,
+which is launched by installing the <code>ovirt-engine-cli</code> package (see
+below) on your client computer, connecting to the oVirt <span class="caps">API</span> with&nbsp;ovirt-shell:  </p>
+<p><code>ovirt-shell --connect --url=https://ovirt-engine.example.com:8443/api --user=admin@internal --password adminpassword</code><br />
+and then running <code>console vm_name</code>. This launches the <code>vncviewer</code>
+binary, which is in the &#8220;tigervnc&#8221; package on&nbsp;Fedora.</p>
+<p><strong>Installing&nbsp;ovirt-engine-cli</strong></p>
+<p>To run <code>ovirt-shell</code> on your workstation (Fedora 16, of course&#8230;)
+you&#8217;ll need the ovirt-engine-cli and ovirt-engine-sdk packages. I
+manually downloaded them from
+<a href="http://www.ovirt.org/releases/nightly/fedora/16/">http://www.ovirt.org/releases/nightly/fedora/16/</a>, versions 2.1.3 and
+1.6.2, respecitively. The <span class="caps">SDK</span> and <span class="caps">CLI</span> are python based, so there are a
+few Python dependencies, all of which were automatically solved by yum.
+I know there are <span class="caps">SDK</span> and <span class="caps">CLI</span> packages out there for other distros, but
+haven&#8217;t tried them&nbsp;yet.</p>
+<p><strong>Installing Linux&nbsp;Guests</strong></p>
+<p>Installing a CentOS 6.2 x86_64 guest was relatively straightforward,
+and my usual kickstart infrastructure worked fine. The only catch was
+the VirtIO storage interface, which shows up as <code>/dev/vdx</code> instead of
+<code>/dev/sdx</code>; I just added another kickstart metadata option in Cobbler
+that allows me to use <code>sdx</code> by specifying &#8220;virtual=yes&#8221; (for our VMWare
+hosts), or <code>vdx</code> by specifying&nbsp;&#8220;virtual=ovirt&#8221;.</p>
+<p><strong>Setting up&nbsp;Authentication</strong></p>
+<p>As installed, oVirt only has one user, &#8220;admin@internal&#8221;; it requires an
+external directory service for user authentication. Currently, it
+supports <span class="caps">IPA</span>, Red Hat&#8217;s Enterprise Identity Management tool (combines
+<span class="caps">RHEL</span>, oVirt Directory Server, Kerberos and <span class="caps">NTP</span>; perhaps <a href="http://freeipa.org">FreeIPA</a>
+would work as well?) and Microsoft Active Directory. As much as I&#8217;d like
+to give <span class="caps">IPA</span> or FreeIPA a try, my company already has an <span class="caps">AD</span>
+infrastructure, so I opted to go that route. Documentation is given in
+the <a href="http://www.ovirt.org/wiki/File:OVirt-3.0-Installation_Guide-en-US.pdf">oVirt 3.0 Installation Guide</a>, starting on page 96.
+Unfortunately, I was never about to get <span class="caps">AD</span> auth working correctly, so I
+just worked with the one admin&nbsp;user.</p>
+<p><strong>Adding a&nbsp;Node</strong></p>
+<p>The biggest issue I had was adding the second node to oVirt. I attempted
+to use the <span class="caps">DVD</span> Import feature of Cobbler on the <a href="http://www.ovirt.org/get-ovirt/">oVirt Node Image
+<span class="caps">ISO</span></a>, but that failed. I then found the image&#8217;s
+<code>LiveOS/livecd-iso-to-pxeboot</code> script and used that to make a kernerl
+and initrd, and kernel parameters, for Cobbler. <span class="caps">PXE</span> works&nbsp;fine.</p>
+<p><a name="postscript"></a><strong>Postscript:</strong> I ended up blowing away my
+oVirt installation in favor of testing other things. At some point, the
+engine install got corrupted in a way that I just couldn&#8217;t fix; even
+though I spent all day one Saturday working on it, it took more time
+than I could allocate to a personal project. So this post is really
+semi-complete at best. However, there is some good news. Jason Brooks&#8217;
+original post, <a href="http://blog.jebpages.com/archives/how-to-get-up-and-running-with-ovirt/">How to Get Up and Running with oVirt</a>, was written for
+oVirt 3.0, as was this post. Since then, there has been a new release,
+<a href="http://wiki.ovirt.org/wiki/OVirt_3.1_release_notes">oVirt 3.1</a>, which apparently has a better <span class="caps">UI</span> and a better installer.
+Jason Brooks has a new post, <a href="http://blog.jebpages.com/archives/up-and-running-with-ovirt-3-1-edition/">Up and Running with oVirt, 3.1 Edition</a>,
+which covers installation and configuration of both an all-in-one
+machine and a separate node. If you&#8217;re looking to try oVirt, I&#8217;d
+recommend you give that a shot. Unfortunately (and strangely, given that
+this is supposed to be the &#8220;upstream&#8221; of RedHat&#8217;s proprietary <span class="caps">RHEV</span>) it&#8217;s
+still all based on&nbsp;Fedora.</p>
+            </div>
+            <!-- /.entry-content -->
+        </article>
+    </section>
+
+        </div>
+        <div class="col-lg-3 well well-sm" id="sidebar">
+
+<aside>
+    <section>
+        <ul class="list-group list-group-flush">
+                <li class="list-group-item"><h4><i class="icon-home icon-large"></i>Social</h4></li>
+                    <li class="list-group-item"><a href="#"><i
+                            class="icon-You can add links in your config file-sign icon-large"></i>You can add links in your config file
+                    </a></li>
+                    <li class="list-group-item"><a href="#"><i
+                            class="icon-Another social link-sign icon-large"></i>Another social link
+                    </a></li>
+
+
+
+                <li class="list-group-item"><a href="/tags.html"><h4><i class="icon-tags icon-large"></i>Tags</h4></a></li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/android.html">
+                                android
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/google.html">
+                                google
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/nagios.html">
+                                Nagios
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/php.html">
+                                PHP
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/sysadmin.html">
+                                sysadmin
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/linux.html">
+                                linux
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/perl.html">
+                                perl
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/logging.html">
+                                logging
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/puppet.html">
+                                puppet
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/bind.html">
+                                bind
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/monitoring.html">
+                                monitoring
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/dns.html">
+                                dns
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/droid.html">
+                                droid
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/firefox.html">
+                                firefox
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/mediawiki.html">
+                                mediawiki
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/mac.html">
+                                mac
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/microsoft.html">
+                                microsoft
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/syslog.html">
+                                syslog
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/wordpress.html">
+                                wordpress
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/rpm.html">
+                                rpm
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/security.html">
+                                security
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/blog.html">
+                                blog
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/sun.html">
+                                sun
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/ems.html">
+                                EMS
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/apache.html">
+                                apache
+                            </a>
+                        </li>
+        </ul>
+    </section>
+</aside>        </div>
+    </div>
+</div>
+<footer>
+    <div class="container">
+        <hr>
+        <p class="pull-right"><i class="icon-arrow-up"></i> <a href="#">Back to top</a></p>
+
+
+        <p>&copy; 2014 Jason Antman &middot; Powered by <a href="https://github.com/DandyDev/pelican-bootstrap3" target="_blank">pelican-bootstrap3</a>,
+            <a href="http://docs.getpelican.com/" target="_blank">Pelican</a>,
+            <a href="http://getbootstrap.com" target="_blank">Bootstrap</a></p>
+    </div>
+</footer>
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="/theme/js/bootstrap.min.js"></script>
+
+<!-- Enable responsive features in IE8 with Respond.js (https://github.com/scottjehl/Respond) -->
+<script src="/theme/js/respond.min.js"></script>
+
+
+</body>
+</html>

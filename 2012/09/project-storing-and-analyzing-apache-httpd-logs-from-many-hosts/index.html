@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:og="http://ogp.me/ns#"
+      xmlns:fb="https://www.facebook.com/2008/fbml">
+<head>
+    <title>Project - Storing and Analyzing Apache httpd Logs from Many Hosts</title>
+    <!-- Using the latest rendering mode for IE -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Open Graph tags -->
+
+            <meta property="og:type" content="article"/>
+            <meta property="og:title" content="Project - Storing and Analyzing Apache httpd Logs from Many Hosts"/>
+            <meta property="og:url" content="/2012/09/project-storing-and-analyzing-apache-httpd-logs-from-many-hosts/"/>
+            <meta property="og:description" content="I’ve recently started casual work on a side-project to collect, store, and analyze apache logs from a bunch of servers - for the initial implementation, I’m looking to handle about 15M access_log lines per day (that works out to 173 lines/second assuming an even distribution, which there certainly ..."/>
+
+    <!-- Bootstrap -->
+        <link rel="stylesheet" href="/theme/css/bootstrap.min.css" type="text/css"/>
+    <link href="/theme/css/font-awesome.min.css" rel="stylesheet">
+    <link href="/theme/css/pygments.css" rel="stylesheet">
+        <link href="/theme/css/typogrify.css" rel="stylesheet">
+    <link rel="stylesheet" href="/theme/css/style.css" type="text/css"/>
+    <!-- JavaScript plugins (requires jQuery) -->
+    <script src="http://code.jquery.com/jquery.js"></script>
+
+        <link href="/feeds/all.atom.xml" type="application/atom+xml" rel="alternate"
+              title="Jason Antman's Blog ATOM Feed"/>
+
+</head>
+<body>
+<nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="" class="navbar-brand">Jason Antman's Blog</a>
+        </div>
+        <div class="collapse navbar-collapse navbar-ex1-collapse">
+            <ul class="nav navbar-nav">
+                         <li><a href="/pages/about.html">
+                             About
+                          </a></li>
+                        <li >
+                            <a href="/category/ideas-and-rants.html">Ideas and rants</a>
+                        </li>
+                        <li >
+                            <a href="/category/miscellaneous.html">Miscellaneous</a>
+                        </li>
+                        <li >
+                            <a href="/category/monitoring.html">Monitoring</a>
+                        </li>
+                        <li class="active">
+                            <a href="/category/projects.html">Projects</a>
+                        </li>
+                        <li >
+                            <a href="/category/puppet.html">Puppet</a>
+                        </li>
+                        <li >
+                            <a href="/category/sysadmin.html">Sysadmin</a>
+                        </li>
+                        <li >
+                            <a href="/category/tech-howtos.html">Tech howtos</a>
+                        </li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="/archives.html"><i class="icon-th-list"></i>Archives</a></li>
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+</nav>
+<!-- /.navbar -->
+<div class="container">
+    <div class="row">
+        <div class="col-lg-9">
+    <section id="content">
+        <article>
+            <header class="page-header">
+                <h1>
+                    <a href="/2012/09/project-storing-and-analyzing-apache-httpd-logs-from-many-hosts/"
+                       rel="bookmark"
+                       title="Permalink to Project - Storing and Analyzing Apache httpd Logs from Many Hosts">
+                        Project - Storing and Analyzing Apache httpd Logs from Many&nbsp;Hosts
+                    </a>
+                </h1>
+            </header>
+            <div class="entry-content">
+                <div class="panel">
+                    <div class="panel-body">
+<footer class="post-info">
+    <span class="label label-default">Date</span>
+    <span class="published">
+        <i class="icon-calendar"></i>Thu 06 September 2012
+    </span>
+
+
+
+</footer><!-- /.post-info -->                    </div>
+                </div>
+                <p>I&#8217;ve recently started casual work on a side-project to collect, store,
+and analyze apache logs from a bunch of servers - for the initial
+implementation, I&#8217;m looking to handle about 15M access_log lines per
+day (that works out to 173 lines/second assuming an even distribution,
+which there certainly isn&#8217;t). Here is a selection of links that I&#8217;ve
+been using for ideas and inspiration, both for the technical side (data
+collection, transport, storage and analysis) and&nbsp;visualization:</p>
+<ul>
+<li><a href="http://oss.oetiker.ch/rrdtool/gallery/index.en.html">RRDtool - RRDtool Gallery</a> - I&#8217;m starting a graphing/log analysis
+    project, and looked here for some inspiration for my
+    proof-of-concept&nbsp;code</li>
+<li><a href="http://aplawrence.com/Girish/gv-rrdtool.html">Creating pretty graphs with <span class="caps">RRDTOOL</span></a> from [Girish&nbsp;Venkatachalam][].</li>
+<li>There&#8217;s some good information on RRDtool&#8217;s &#8220;Abberant Behavior
+    Detection&#8221; (Holt-Winters prediction, deviation and failure
+    detection) on the <a href="http://oss.oetiker.ch/rrdtool/doc/rrdtool.en.html">rrdtool</a>, [rrdgraph_examples][] and
+    <a href="http://oss.oetiker.ch/rrdtool/doc/rrdcreate.en.html">rrdcreate</a> documentation pages, but unfortunately no anchors to
+    link directly&nbsp;to.</li>
+<li><a href="http://square.github.com/cube/">Cube</a> - &#8220;Cube is a system for collecting timestamped events and
+    deriving metrics. By collecting events rather than metrics, Cube
+    lets you compute aggregate statistics post hoc. It also enables
+    richer analysis, such as quantiles and histograms of arbitrary event
+    sets. Cube is built on MongoDB and available under the Apache
+    License on&nbsp;GitHub.&#8221;</li>
+<li><a href="http://square.github.com/cubism/">Cubism.js</a> - &#8220;Cubism.js is a D3 plugin for visualizing time
+    series. Use Cubism to construct better realtime dashboards, pulling
+    data from Graphite, Cube and other sources. Cubism is available
+    under the Apache License on GitHub.&#8221; The demo on that page looks
+    pretty&nbsp;cool.</li>
+<li><a href="http://www.highcharts.com/demo/">Highcharts Demo Gallery</a> - <span class="caps">JS</span> chart/graph library. It requires a
+    paid license for commercial use (though it&#8217;s a bit unclear to me
+    whether an internal ops dashboard would fall under this license
+    provision) so I probably wouldn&#8217;t go with this one. They have some
+    cool charts, including a [dynamic line chart updating every
+    second][], a <a href="http://www.highcharts.com/demo/scatter/gray">scatter plot</a> and a nice [zoomable time-series
+    graph][], though <span class="caps">IMHO</span> it&#8217;s not as nice as the Google Chart Tools
+    (formerly Google Visualization) <a href="https://developers.google.com/chart/interactive/docs/gallery/annotatedtimeline">annotated timeline</a>.</li>
+<li>[[ <span class="caps">HOWTO</span> ] Graphing Holt-Winters Predictive Analysis][] - Cacti&nbsp;forums</li>
+<li><a href="http://dygraphs.com/">dygraphs</a> - an impressive permissive-license <span class="caps">JS</span> chart library
+    dedicated to visualizing dense time-series data. Developed by Google
+    and now used by them (Google Correlate, Google Latitude) as well as
+    <span class="caps">NASA</span>, 10gen and others. There are some very cool demos on that main
+    page, and also on the <a href="http://dygraphs.com/tests/">tests page</a>.</li>
+<li>[Graphite, JMXTrans, Ganglia, Logster, Collectd, say what ? « Planet&nbsp;DevOps][]</li>
+<li><a href="http://auxesis.github.com/visage/">Visage</a></li>
+<li>[kgorman/mongo_graph][] - a tool to pull data from MongoDB and put
+    it in <span class="caps">RRD</span>&nbsp;files</li>
+<li><a href="http://web.taranis.org/drraw/">drraw</a> - a perl-based graphing frontend (web <span class="caps">UI</span>) for&nbsp;RRDtool</li>
+<li><a href="https://github.com/etsy/logster">etsy/logster · GitHub</a> - Etsy&#8217;s Python tool to maintain a pointer
+    on a log file, and parse at a regular rate feeding the data into a
+    tool like Graphite or&nbsp;Ganglia.</li>
+<li><a href="https://github.com/cebailey59/charcoal">cebailey59/charcoal</a> - a Sinatra app that allows creation of
+    dashboards from Graphite, collectd, or any other service that
+    creates images from <span class="caps">URL</span>&nbsp;calls.</li>
+<li><a href="https://github.com/etsy/dashboard">etsy/dashboard</a> - some examples of how Etsy builds monitoring&nbsp;dashboards.</li>
+<li><a href="http://www.devco.net/archives/2011/10/08/gdash-graphite-dashboard.php">GDash – Graphite Dashboard | <span class="caps">R.I.</span>Pienaar</a> - a Sinatra dashboard
+    app for Graphite, using Twitter bootstrap for&nbsp;visualization.</li>
+<li><a href="https://github.com/paperlesspost/graphiti">paperlesspost/graphiti</a> - a Ruby and JavaScript front-end for&nbsp;Graphite.</li>
+<li><a href="http://graphite.wikidot.com/screen-shots">Graphite Screenshots</a> - just two, but they get the idea across
+    pretty&nbsp;well.</li>
+<li><a href="http://graylog2.org/">Graylog2</a> - a centralized log management application with a
+    powerful web interface. Stores logs in <a href="http://www.elasticsearch.org/">ElasticSearch</a> (which is
+    built on Lucene, a Java-based index and search server) and
+    statistics/graphs in MongoDB. It does analytics, alerting,
+    monitoring/graphing and searching all through a web interface, and
+    accepts log data via syslog, <span class="caps">AMQP</span> and <span class="caps">GELF</span> (its own log format).
+    Java server and Ruby on Rails web&nbsp;<span class="caps">UI</span>.</li>
+<li><a href="http://logstash.net/">Logstash</a> - another centralized log project that stores and
+    indexes logs, with search via a web <span class="caps">UI</span>. &#8220;Ship any event to anywhere
+    over any protocol.&#8221; Takes many inputs including files, syslog, <span class="caps">AMQP</span>,
+    Flume, <span class="caps">STOMP</span>, <span class="caps">HTTP</span> and even twitter, performs a number of filters
+    including timestamp checks, parsing, dropping, joins, etc, and then
+    sends logs back on an output including <span class="caps">AMQP</span>, Graylog2 <span class="caps">GELF</span>, <span class="caps">STOMP</span>,
+    MongoDB, ElasticSearch, syslog, WebSockets and to Nagios. One
+    particularly cool feature is its &#8220;file&#8221; input, which continuously
+    tails a file and claims to be log rotation safe. Just&nbsp;cool.</li>
+<li><a href="https://docs.google.com/present/view?id=dcmwwd94_16dfdxgpw8">jordansissel&#8217;s Logstash intro slides</a>.</li>
+<li><a href="http://rashidkpc.github.com/Kibana/">Kibana</a> - an alternative interface for Logstash and
+    <a href="http://www.elasticsearch.org/">ElasticSearch</a> that allows searching, graphing and analysis of
+    log data stored in&nbsp;Logstash.</li>
+<li><a href="http://pivotallabs.com/talks/139-metrics-metrics-everywhere">Pivotal Labs: Talks - Metrics Metrics Everywhere</a> (Coda&nbsp;Hale)</li>
+<li><a href="http://aq.iriscouch.com/swinger/_design/swinger/index.html#/preso/aq-mdd/display/1">PaperlessPost - @quirkey&#8217;s talk on metrics</a> - very good high
+    level stuff, but slides&nbsp;only</li>
+<li><a href="https://github.com/paperlesspost/graphiti">paperlesspost/graphiti</a> - graphiti, a <span class="caps">JS</span>/Ruby frontend for
+    Graphite that does graphs, dashboards, and point-in-time snapshots
+    of graphs. Lots of&nbsp;functionality.</li>
+<li><a href="http://redis.io/">Redis</a> - a distributed key/value store that&#8217;s really popular with
+    the cool kids. [Another Redis Use Case: Centralized Logging •&nbsp;myNoSQL][]</li>
+<li><a href="https://github.com/cebailey59/charcoal">Charcoal</a> - a <a href="http://www.sinatrarb.com/">Sinatra</a> (Ruby) dashboard app
+    (ready for use on <a href="http://www.heroku.com/">Heroku</a> but usable anywhere). Graphite-oriented
+    but will work with any tool that generates images from&nbsp;URLs.</li>
+<li><a href="https://github.com/etsy/logster">etsy/logster</a> - etsy&#8217;s Logster tool, which
+    keeps a tail on log files, parses them, and ships metrics to
+    Graphite or&nbsp;Ganglia.</li>
+</ul>
+<p>[[ <span class="caps">HOWTO</span> ] Graphing Holt-Winters Predictive Analysis]: http://forums.cacti.net/viewtopic.php?t=29963
+  [Graphite, JMXTrans, Ganglia, Logster, Collectd, say what ? « Planet
+  DevOps]:&nbsp;http://www.planetdevops.net/?p=12289</p>
+            </div>
+            <!-- /.entry-content -->
+        </article>
+    </section>
+
+        </div>
+        <div class="col-lg-3 well well-sm" id="sidebar">
+
+<aside>
+    <section>
+        <ul class="list-group list-group-flush">
+                <li class="list-group-item"><h4><i class="icon-home icon-large"></i>Social</h4></li>
+                    <li class="list-group-item"><a href="#"><i
+                            class="icon-You can add links in your config file-sign icon-large"></i>You can add links in your config file
+                    </a></li>
+                    <li class="list-group-item"><a href="#"><i
+                            class="icon-Another social link-sign icon-large"></i>Another social link
+                    </a></li>
+
+
+
+                <li class="list-group-item"><a href="/tags.html"><h4><i class="icon-tags icon-large"></i>Tags</h4></a></li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/android.html">
+                                android
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/google.html">
+                                google
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/nagios.html">
+                                Nagios
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/php.html">
+                                PHP
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/sysadmin.html">
+                                sysadmin
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/linux.html">
+                                linux
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/perl.html">
+                                perl
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/logging.html">
+                                logging
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/puppet.html">
+                                puppet
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/bind.html">
+                                bind
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/monitoring.html">
+                                monitoring
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/dns.html">
+                                dns
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/droid.html">
+                                droid
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/firefox.html">
+                                firefox
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/mediawiki.html">
+                                mediawiki
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/mac.html">
+                                mac
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/microsoft.html">
+                                microsoft
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/syslog.html">
+                                syslog
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/wordpress.html">
+                                wordpress
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/rpm.html">
+                                rpm
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/security.html">
+                                security
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/blog.html">
+                                blog
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/sun.html">
+                                sun
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/ems.html">
+                                EMS
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/apache.html">
+                                apache
+                            </a>
+                        </li>
+        </ul>
+    </section>
+</aside>        </div>
+    </div>
+</div>
+<footer>
+    <div class="container">
+        <hr>
+        <p class="pull-right"><i class="icon-arrow-up"></i> <a href="#">Back to top</a></p>
+
+
+        <p>&copy; 2014 Jason Antman &middot; Powered by <a href="https://github.com/DandyDev/pelican-bootstrap3" target="_blank">pelican-bootstrap3</a>,
+            <a href="http://docs.getpelican.com/" target="_blank">Pelican</a>,
+            <a href="http://getbootstrap.com" target="_blank">Bootstrap</a></p>
+    </div>
+</footer>
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="/theme/js/bootstrap.min.js"></script>
+
+<!-- Enable responsive features in IE8 with Respond.js (https://github.com/scottjehl/Respond) -->
+<script src="/theme/js/respond.min.js"></script>
+
+
+</body>
+</html>

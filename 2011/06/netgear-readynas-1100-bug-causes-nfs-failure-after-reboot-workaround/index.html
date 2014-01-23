@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:og="http://ogp.me/ns#"
+      xmlns:fb="https://www.facebook.com/2008/fbml">
+<head>
+    <title>Netgear ReadyNAS 1100 Bug causes NFS Failure after reboot - workaround</title>
+    <!-- Using the latest rendering mode for IE -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Open Graph tags -->
+
+            <meta property="og:type" content="article"/>
+            <meta property="og:title" content="Netgear ReadyNAS 1100 Bug causes NFS Failure after reboot - workaround"/>
+            <meta property="og:url" content="/2011/06/netgear-readynas-1100-bug-causes-nfs-failure-after-reboot-workaround/"/>
+            <meta property="og:description" content="At work, we have a [Netgear ReadyNAS 1100][]. It’s a 4TB NAS appliance, a cute little 1U half-depth Linux box with 4 SATA disks, a RAID controller, and some firmware to do a whole bunch of fancy stuff (mainly geared towards consumers and very small shops - all configuration is ..."/>
+
+    <!-- Bootstrap -->
+        <link rel="stylesheet" href="/theme/css/bootstrap.min.css" type="text/css"/>
+    <link href="/theme/css/font-awesome.min.css" rel="stylesheet">
+    <link href="/theme/css/pygments.css" rel="stylesheet">
+        <link href="/theme/css/typogrify.css" rel="stylesheet">
+    <link rel="stylesheet" href="/theme/css/style.css" type="text/css"/>
+    <!-- JavaScript plugins (requires jQuery) -->
+    <script src="http://code.jquery.com/jquery.js"></script>
+
+        <link href="/feeds/all.atom.xml" type="application/atom+xml" rel="alternate"
+              title="Jason Antman's Blog ATOM Feed"/>
+
+</head>
+<body>
+<nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="" class="navbar-brand">Jason Antman's Blog</a>
+        </div>
+        <div class="collapse navbar-collapse navbar-ex1-collapse">
+            <ul class="nav navbar-nav">
+                         <li><a href="/pages/about.html">
+                             About
+                          </a></li>
+                        <li >
+                            <a href="/category/ideas-and-rants.html">Ideas and rants</a>
+                        </li>
+                        <li >
+                            <a href="/category/miscellaneous.html">Miscellaneous</a>
+                        </li>
+                        <li >
+                            <a href="/category/monitoring.html">Monitoring</a>
+                        </li>
+                        <li >
+                            <a href="/category/projects.html">Projects</a>
+                        </li>
+                        <li >
+                            <a href="/category/puppet.html">Puppet</a>
+                        </li>
+                        <li >
+                            <a href="/category/sysadmin.html">Sysadmin</a>
+                        </li>
+                        <li class="active">
+                            <a href="/category/tech-howtos.html">Tech howtos</a>
+                        </li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="/archives.html"><i class="icon-th-list"></i>Archives</a></li>
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+</nav>
+<!-- /.navbar -->
+<div class="container">
+    <div class="row">
+        <div class="col-lg-9">
+    <section id="content">
+        <article>
+            <header class="page-header">
+                <h1>
+                    <a href="/2011/06/netgear-readynas-1100-bug-causes-nfs-failure-after-reboot-workaround/"
+                       rel="bookmark"
+                       title="Permalink to Netgear ReadyNAS 1100 Bug causes NFS Failure after reboot - workaround">
+                        Netgear ReadyNAS 1100 Bug causes <span class="caps">NFS</span> Failure after reboot -&nbsp;workaround
+                    </a>
+                </h1>
+            </header>
+            <div class="entry-content">
+                <div class="panel">
+                    <div class="panel-body">
+<footer class="post-info">
+    <span class="label label-default">Date</span>
+    <span class="published">
+        <i class="icon-calendar"></i>Tue 28 June 2011
+    </span>
+
+
+
+<span class="label label-default">Tags</span>
+	<a href="/tag/appliance.html">appliance</a>
+        /
+	<a href="/tag/embedded.html">embedded</a>
+        /
+	<a href="/tag/linux.html">linux</a>
+        /
+	<a href="/tag/nas.html">nas</a>
+        /
+	<a href="/tag/netgear.html">netgear</a>
+        /
+	<a href="/tag/nfs.html">nfs</a>
+        /
+	<a href="/tag/readynas.html">readynas</a>
+</footer><!-- /.post-info -->                    </div>
+                </div>
+                <p>At work, we have a [Netgear ReadyNAS 1100][]. It&#8217;s a <span class="caps">4TB</span> <span class="caps">NAS</span> appliance,
+a cute little 1U half-depth Linux box with 4 <span class="caps">SATA</span> disks, a <span class="caps">RAID</span>
+controller, and some firmware to do a whole bunch of fancy stuff (mainly
+geared towards consumers and very small shops - all configuration is
+point-and-click web <span class="caps">UI</span>). We&#8217;ve been using it for storing archived log
+data and low-priority backups. At the beginning of this problem, it was
+running RAIDiator 4.1.6 firmware since December of last year (over 6
+months), and hadn&#8217;t had any configuration changes in at least 4&nbsp;months.</p>
+<p>Last week, I had to power off the unit and remove the power cables for
+some rack maintenance. I went through the usual full shutdown procedure
+in the web <span class="caps">UI</span>, and also told it to `fsck` the volumes, as that hadn&#8217;t
+been done in quite some time. Unfortunately, when the unit came back up,
+even after I could log into the web <span class="caps">UI</span>, I couldn&#8217;t mount the <span class="caps">NFS</span> shares
+on my backup server. I kept getting messages&nbsp;like:</p>
+<div class="codehilite"><pre><span class="o">[</span>root@backup-server ~<span class="o">]</span><span class="c"># mount -a</span>
+mount: mount to <span class="caps">NFS</span> server <span class="s1">&#39;css-readynas&#39;</span> failed: <span class="caps">RPC</span> Error: Program not registered.
+</pre></div>
+
+
+<p>so my next step was to check <span class="caps">RPC</span> status of the readynas, from the
+client. That was also a bit of a&nbsp;surprise:</p>
+<div class="codehilite"><pre><span class="o">[</span>root@backup-server ~<span class="o">]</span><span class="c"># rpcinfo -p css-readynas                        </span>
+   program vers proto   port                                              
+    100000    2   tcp    111  portmapper                                  
+    100000    2   udp    111  portmapper                                  
+    100011    1   udp    620  rquotad                                     
+    100011    2   udp    620  rquotad                                     
+    100011    1   tcp    623  rquotad                                     
+    100011    2   tcp    623  rquotad                                     
+    100024    1   udp  32765  status                                      
+    100024    1   tcp  32765  status                                      
+    100005    1   udp   2051  mountd                                      
+    100005    1   tcp   3006  mountd                                      
+    100005    2   udp   2051  mountd                                      
+    100005    2   tcp   3006  mountd                                      
+    100005    3   udp   2051  mountd                                      
+    100005    3   tcp   3006  mountd 
+</pre></div>
+
+
+<p>Somewhere in that list is supposed to be nfsd, listening on port 2049.
+Next, I did an nmap (port scan) of the&nbsp;readynas:</p>
+<div class="codehilite"><pre><span class="o">[</span>root@backup-server ~<span class="o">]</span><span class="c"># nmap -sU -p2047-2050 css-readynas             </span>
+
+Starting Nmap 4.11 <span class="o">(</span> http://www.insecure.org/nmap/ <span class="o">)</span> at 2011-06-23 15:21 <span class="caps">EDT</span>
+Interesting ports on css-readynas.rutgers.edu <span class="o">(</span>172.16.25.108<span class="o">)</span>:              
+<span class="caps">PORT</span>     <span class="caps">STATE</span>         <span class="caps">SERVICE</span>                                              
+2047/udp closed        dls                                                  
+2048/udp closed        dls-monitor                                          
+2049/udp open|filtered nfs                                                  
+2050/udp closed        unknown  
+</pre></div>
+
+
+<p>Interesting. The port scan shows that <em>something</em> is listening on port
+2049. But rpcinfo doesn&#8217;t seem to recognize it as a <span class="caps">NFS</span>&nbsp;server.</p>
+<p>At this point, through FrontView (the web <span class="caps">UI</span>) I backed up the
+configuration and went through a few reboot cycles, with no change. I
+then started tweaking everything I could that I thought would restart
+the <span class="caps">NFS</span> server - I added and removed allowed hosts for the <span class="caps">NFS</span> share,
+enabled and disabled sync mode, etc. I started searching the [ReadyNAS
+Forum][] and found a post that reported a very similar problem - [upnpd
+grabbing nfsd port][]. The user reported that he was getting the same
+&#8220;<span class="caps">RPC</span> Error: Program not registered&#8221; message, and in <code>daemon.log</code> on the
+ReadyNAS, found a line including &#8220;storage nfsd[1087]: nfssvc: Address
+already in use&#8221;. I remembered that I&#8217;d setup the ReadyNAS to forward all
+logs to our central syslog server and, sure enough, found an identical
+message that something had already bound to <span class="caps">UDP</span> port 2049 when <span class="caps">NFS</span> was
+starting. I tried confirming that upnpd was disabled and rebooting, but
+that didn&#8217;t help. Grepping my logs for &#8220;nfs&#8221;&nbsp;returned:</p>
+<div class="codehilite"><pre>daemon.log:Jun 23 12:43:43 css-readynas nfsd<span class="o">[</span>2331<span class="o">]</span>: nfssvc: Address already in use
+daemon.log:Jun 23 15:26:33 css-readynas nfsd<span class="o">[</span>2724<span class="o">]</span>: nfssvc: Address already in use
+kern.log:Jun 23 11:35:29 css-readynas kernel: Installing knfsd <span class="o">(</span>copyright <span class="o">(</span>C<span class="o">)</span> 1996 okir@monad.swb.de<span class="o">)</span>.
+kern.log:Jun 23 12:43:43 css-readynas kernel: <span class="caps">NFSD</span>: Using /var/lib/nfs/v4recovery as the NFSv4 state recovery directory
+kern.log:Jun 23 12:43:43 css-readynas kernel: <span class="caps">NFSD</span>: starting 90-second grace period
+kern.log:Jun 23 14:56:20 css-readynas kernel: Installing knfsd <span class="o">(</span>copyright <span class="o">(</span>C<span class="o">)</span> 1996 okir@monad.swb.de<span class="o">)</span>.
+kern.log:Jun 23 15:12:41 css-readynas kernel: <span class="caps">NFSD</span>: starting 90-second grace period
+kern.log:Jun 23 15:26:33 css-readynas kernel: <span class="caps">NFSD</span>: Using /var/lib/nfs/v4recovery as the NFSv4 state recovery directory
+kern.log:Jun 23 15:26:33 css-readynas kernel: <span class="caps">NFSD</span>: starting 90-second grace period
+</pre></div>
+
+
+<p></p>
+My next step was a few more reboots, with no change. I then upgraded the
+RAIDiator firmware to the latest, 4.1.7. Still no luck. I installed the
+[Enable root <span class="caps">SSH</span>][] addon, and that&#8217;s when things became very&nbsp;clear:</p>
+<div class="codehilite"><pre>css-readynas:/var/log# netstat -unlp
+Active Internet connections <span class="o">(</span>only servers<span class="o">)</span>
+Proto Recv-Q Send-Q Local Address           Foreign Address         State       <span class="caps">PID</span>/Program name   
+udp        0      0 0.0.0.0:2049            0.0.0.0:*                           794/snmpd           
+udp        0      0 0.0.0.0:514             0.0.0.0:*                           673/syslogd         
+udp        0      0 172.16.25.108:137       0.0.0.0:*                           1672/nmbd           
+udp        0      0 0.0.0.0:137             0.0.0.0:*                           1672/nmbd           
+udp        0      0 172.16.25.108:138       0.0.0.0:*                           1672/nmbd           
+udp        0      0 0.0.0.0:138             0.0.0.0:*                           1672/nmbd           
+udp        0      0 0.0.0.0:161             0.0.0.0:*                           794/snmpd           
+udp        0      0 0.0.0.0:162             0.0.0.0:*                           802/snmptrapd       
+udp        0      0 0.0.0.0:2086            0.0.0.0:*                           1565/rpc.mountd     
+udp        0      0 127.0.0.1:22081         0.0.0.0:*                           1599/raidard        
+udp        0      0 172.16.25.108:22081     0.0.0.0:*                           1599/raidard        
+udp        0      0 0.0.0.0:22081           0.0.0.0:*                           1599/raidard        
+udp        0      0 0.0.0.0:988             0.0.0.0:*                           819/rpc.rquotad     
+udp        0      0 0.0.0.0:5353            0.0.0.0:*                           729/avahi-daemon: r 
+udp        0      0 0.0.0.0:111             0.0.0.0:*                           666/portmap         
+udp        0      0 0.0.0.0:881             0.0.0.0:*                           1553/rpc.statd      
+udp        0      0 0.0.0.0:32765           0.0.0.0:*                           1553/rpc.statd     
+</pre></div>
+
+
+<p></p>
+For some <strong><em>very</em></strong> strange reason, snmpd had bound to port 2049 (the
+nfs port) instead of 161. That left no port for nfs to bind&nbsp;to.</p>
+<p><strong>Solution:</strong></p>
+<p>
+
+wzxhzdk:5
+
+
+Stop snmpd, restart nfs-kernel-server so that it grabs port 2049 like it
+should, and then start snmpd back up. If all went well, nfsd should now
+be listening on <span class="caps">UDP</span> 2049, and snmpd should be listening on <span class="caps">UDP</span> 161 like
+it should. To confirm:
+
+
+wzxhzdk:6
+
+
+All is well. Now to confirm this from the client machine:
+
+
+wzxhzdk:7
+
+
+Ok, <span class="caps">NFS</span> is now there. It all looks good, and re-running `mount -a` on
+the client successfully mounts the <span class="caps">NFS</span> share.
+
+We&#8217;ll see what happens next time I have to reboot the ReadyNAS. In the
+mean time, I&#8217;m going to try to bring this to the attention of Netgear
+support and hope they do something about it.
+
+  [Netgear ReadyNAS 1100]: http://www.readynas.com/?cat=23
+  [ReadyNAS Forum]: http://www.readynas.com/forum/
+  [upnpd grabbing nfsd port]: http://www.readynas.com/forum/viewtopic.php?f=20&t=23139
+  [Enable root <span class="caps">SSH</span>]:&nbsp;http://www.readynas.com/?p=4203
+            </div>
+            <!-- /.entry-content -->
+        </article>
+    </section>
+
+        </div>
+        <div class="col-lg-3 well well-sm" id="sidebar">
+
+<aside>
+    <section>
+        <ul class="list-group list-group-flush">
+                <li class="list-group-item"><h4><i class="icon-home icon-large"></i>Social</h4></li>
+                    <li class="list-group-item"><a href="#"><i
+                            class="icon-You can add links in your config file-sign icon-large"></i>You can add links in your config file
+                    </a></li>
+                    <li class="list-group-item"><a href="#"><i
+                            class="icon-Another social link-sign icon-large"></i>Another social link
+                    </a></li>
+
+
+
+                <li class="list-group-item"><a href="/tags.html"><h4><i class="icon-tags icon-large"></i>Tags</h4></a></li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/android.html">
+                                android
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/google.html">
+                                google
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/nagios.html">
+                                Nagios
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/php.html">
+                                PHP
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/sysadmin.html">
+                                sysadmin
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/linux.html">
+                                linux
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/perl.html">
+                                perl
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/logging.html">
+                                logging
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/puppet.html">
+                                puppet
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/bind.html">
+                                bind
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/monitoring.html">
+                                monitoring
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/dns.html">
+                                dns
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/droid.html">
+                                droid
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/firefox.html">
+                                firefox
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/mediawiki.html">
+                                mediawiki
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/mac.html">
+                                mac
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/microsoft.html">
+                                microsoft
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/syslog.html">
+                                syslog
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/wordpress.html">
+                                wordpress
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/rpm.html">
+                                rpm
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/security.html">
+                                security
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/blog.html">
+                                blog
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/sun.html">
+                                sun
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/ems.html">
+                                EMS
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/apache.html">
+                                apache
+                            </a>
+                        </li>
+        </ul>
+    </section>
+</aside>        </div>
+    </div>
+</div>
+<footer>
+    <div class="container">
+        <hr>
+        <p class="pull-right"><i class="icon-arrow-up"></i> <a href="#">Back to top</a></p>
+
+
+        <p>&copy; 2014 Jason Antman &middot; Powered by <a href="https://github.com/DandyDev/pelican-bootstrap3" target="_blank">pelican-bootstrap3</a>,
+            <a href="http://docs.getpelican.com/" target="_blank">Pelican</a>,
+            <a href="http://getbootstrap.com" target="_blank">Bootstrap</a></p>
+    </div>
+</footer>
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="/theme/js/bootstrap.min.js"></script>
+
+<!-- Enable responsive features in IE8 with Respond.js (https://github.com/scottjehl/Respond) -->
+<script src="/theme/js/respond.min.js"></script>
+
+
+</body>
+</html>

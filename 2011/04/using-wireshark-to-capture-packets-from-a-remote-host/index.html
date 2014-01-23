@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:og="http://ogp.me/ns#"
+      xmlns:fb="https://www.facebook.com/2008/fbml">
+<head>
+    <title>Using wireshark to capture packets from a remote host</title>
+    <!-- Using the latest rendering mode for IE -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Open Graph tags -->
+
+            <meta property="og:type" content="article"/>
+            <meta property="og:title" content="Using wireshark to capture packets from a remote host"/>
+            <meta property="og:url" content="/2011/04/using-wireshark-to-capture-packets-from-a-remote-host/"/>
+            <meta property="og:description" content="I spend a fair amount of my time debugging network and service problems on a few racks of Linux servers. Of course, they’re located in a data center (yes, just downstairs, but still not quite as comfortable as my office), and they’re all command-line only - no sense in ..."/>
+
+    <!-- Bootstrap -->
+        <link rel="stylesheet" href="/theme/css/bootstrap.min.css" type="text/css"/>
+    <link href="/theme/css/font-awesome.min.css" rel="stylesheet">
+    <link href="/theme/css/pygments.css" rel="stylesheet">
+        <link href="/theme/css/typogrify.css" rel="stylesheet">
+    <link rel="stylesheet" href="/theme/css/style.css" type="text/css"/>
+    <!-- JavaScript plugins (requires jQuery) -->
+    <script src="http://code.jquery.com/jquery.js"></script>
+
+        <link href="/feeds/all.atom.xml" type="application/atom+xml" rel="alternate"
+              title="Jason Antman's Blog ATOM Feed"/>
+
+</head>
+<body>
+<nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="" class="navbar-brand">Jason Antman's Blog</a>
+        </div>
+        <div class="collapse navbar-collapse navbar-ex1-collapse">
+            <ul class="nav navbar-nav">
+                         <li><a href="/pages/about.html">
+                             About
+                          </a></li>
+                        <li >
+                            <a href="/category/ideas-and-rants.html">Ideas and rants</a>
+                        </li>
+                        <li >
+                            <a href="/category/miscellaneous.html">Miscellaneous</a>
+                        </li>
+                        <li >
+                            <a href="/category/monitoring.html">Monitoring</a>
+                        </li>
+                        <li >
+                            <a href="/category/projects.html">Projects</a>
+                        </li>
+                        <li >
+                            <a href="/category/puppet.html">Puppet</a>
+                        </li>
+                        <li >
+                            <a href="/category/sysadmin.html">Sysadmin</a>
+                        </li>
+                        <li class="active">
+                            <a href="/category/tech-howtos.html">Tech howtos</a>
+                        </li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="/archives.html"><i class="icon-th-list"></i>Archives</a></li>
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+</nav>
+<!-- /.navbar -->
+<div class="container">
+    <div class="row">
+        <div class="col-lg-9">
+    <section id="content">
+        <article>
+            <header class="page-header">
+                <h1>
+                    <a href="/2011/04/using-wireshark-to-capture-packets-from-a-remote-host/"
+                       rel="bookmark"
+                       title="Permalink to Using wireshark to capture packets from a remote host">
+                        Using wireshark to capture packets from a remote&nbsp;host
+                    </a>
+                </h1>
+            </header>
+            <div class="entry-content">
+                <div class="panel">
+                    <div class="panel-body">
+<footer class="post-info">
+    <span class="label label-default">Date</span>
+    <span class="published">
+        <i class="icon-calendar"></i>Tue 26 April 2011
+    </span>
+
+
+
+<span class="label label-default">Tags</span>
+	<a href="/tag/ethereal.html">ethereal</a>
+        /
+	<a href="/tag/linux.html">linux</a>
+        /
+	<a href="/tag/sysadmin.html">sysadmin</a>
+        /
+	<a href="/tag/tcpdump.html">tcpdump</a>
+        /
+	<a href="/tag/troubleshooting.html">troubleshooting</a>
+        /
+	<a href="/tag/wireshark.html">wireshark</a>
+</footer><!-- /.post-info -->                    </div>
+                </div>
+                <p>I spend a fair amount of my time debugging network and service problems
+on a few racks of Linux servers. Of course, they&#8217;re located in a data
+center (yes, just downstairs, but still not quite as comfortable as my
+office), and they&#8217;re all command-line only - no sense in using up <span class="caps">RAM</span>
+and <span class="caps">CPU</span> to run a graphical <span class="caps">UI</span> on a box that should just be serving
+remote clients. I used to go through the arduous task of running a
+command line [<code>tcpdump</code>][] session on the server until I thought I had
+enough packets, then SCPing it over to my workstation and opening the
+file in <a href="http://www.wireshark.org/">wireshark</a> (formerly Ethereal). Fortunately, thanks to a
+<a href="http://linuxexplore.wordpress.com/2010/05/30/remote-packet-capture-using-wireshark-tcpdump/">post</a> on Rahul Panwar&#8217;s <a href="http://linuxexplore.wordpress.com/">Linux Explore blog</a> (which seems to be
+sadly neglected), I found a much easier way to do it. I&#8217;ve summarized
+that post here, added a little explanation, and also made some useful
+comments for people working on Red Hat/CentOS and&nbsp;OpenSuSE.</p>
+<p><strong>What you&nbsp;need:</strong></p>
+<ol>
+<li>Source system (the server you want to capture packets on) that you
+    have <span class="caps">SSH</span> access to, with tcpdump installed, and available to your
+    user (either directly, or via sudo without&nbsp;password).</li>
+<li>Destination system (where you run graphical Wireshark) with
+    wireshark installed and working, and <code>mkfifo</code> available.</li>
+</ol>
+<p><strong>Procedure:</strong></p>
+<ol>
+<li>On the destination system, if you haven&#8217;t already done&nbsp;so,</li>
+</ol>
+<div class="codehilite"><pre>mkfifo /tmp/packet_capture
+</pre></div>
+
+
+<div class="codehilite"><pre>&lt;p&gt;
+This creates a [named pipe][] where the source packet data (via ssh)
+will be written and Wireshark will read it from. You can use any
+name or location you want, but `/tmp/packet_capture` is pretty
+logical.
+</pre></div>
+
+
+<ol>
+<li>On your destination system, open up Wireshark (we do this now, since
+    on many systems it required the root password to start). In the
+    &#8220;Capture&#8221; menu, select &#8220;Options&#8221;. In the &#8220;Interface&#8221; box, type in
+    the path to the <span class="caps">FIFO</span> you created (<code>/tmp/packet_capture</code>). You should
+    press the Start button before running the next command - I recommend
+    typing the command in a terminal window, pressing start, then
+    hitting enter in the terminal to run the&nbsp;command.</li>
+<li>On the destination system,&nbsp;run</li>
+</ol>
+<div class="codehilite"><pre>ssh user@source-hostname <span class="s2">&quot;sudo /usr/sbin/tcpdump -s 0 -U -n -w - -i eth0 not port 22&quot;</span> &gt; /tmp/packet_capture
+</pre></div>
+
+
+<div class="codehilite"><pre>&lt;p&gt;
+This will SSH to the source system (`source-hostname`, either by
+hostname or IP) as the specified user (`user`) and execute
+`sudo /usr/sbin/tcpdump`. Omit the &quot;sudo&quot; if you don&#39;t need it,
+though if you do, you&#39;ll need passwordless access. Options passed to
+tcpdump are: &quot;-s 0&quot; snarf entire packets, no length limit; &quot;-U&quot;
+packet-buffered output - write each complete packet to output once
+it&#39;s captured, rather than waiting for a buffer to fill up; &quot;-n&quot;
+don&#39;t convert addresses to hostnames; &quot;-w -&quot; write raw packets to
+STDOUT (which will be passed through the SSH tunnel and become
+STDOUT of the &quot;ssh&quot; command on the destination machine); &quot;-i eth0&quot;
+capture on interface eth0; &quot;not port 22&quot; a tcpdump filter expression
+to prevent capturing our own SSH packets (more on this below). The
+final &quot;\&gt; /tmp/packet\_capture&quot; redirects the STDOUT of the ssh
+program (the raw packets from tcpdump on the source machine) to the
+`/tmp/packet_capture` FIFO.
+</pre></div>
+
+
+<ol>
+<li>When you&#8217;re ready to stop the capture, just Ctrl+C the <span class="caps">SSH</span> command
+    in the terminal window. Wireshark will automatically stop capturing,
+    and you can save the capture file or play around with it. To capture
+    again, you&#8217;ll need to restart the capture in Wireshark and then run
+    the ssh command&nbsp;again.</li>
+</ol>
+<p><strong>A note on network usage and tcpdump&nbsp;filters</strong></p>
+<p>This is a relatively bandwidth intensive procedure. If you use the &#8220;not
+port 22&#8221; tcpdump filter (shown above) on the source machine, all traffic
+over eth0 (other than <span class="caps">SSH</span>) on that machine will be duplicated within an
+<span class="caps">SSH</span> tunnel. So you have double the traffic, plus the overhead of
+tunneling all that within <span class="caps">SSH</span> to the destination machine. If you&#8217;re
+capturing data from a busy machine this way, you could easily saturate
+the uplink and wreak all sorts of havoc. As a result, I&#8217;d recommend
+making the tcpdump filter as specific as you can while still retaining
+the data you need. If you can replace it with a filter for specific
+ports (i.e. <code>'(port 67 or port 68)'</code> for <span class="caps">DHCP</span>) or specific hosts, that
+should cut down on the amount of data you actually have to pass through
+the&nbsp;tunnel.</p>
+            </div>
+            <!-- /.entry-content -->
+        </article>
+    </section>
+
+        </div>
+        <div class="col-lg-3 well well-sm" id="sidebar">
+
+<aside>
+    <section>
+        <ul class="list-group list-group-flush">
+                <li class="list-group-item"><h4><i class="icon-home icon-large"></i>Social</h4></li>
+                    <li class="list-group-item"><a href="#"><i
+                            class="icon-You can add links in your config file-sign icon-large"></i>You can add links in your config file
+                    </a></li>
+                    <li class="list-group-item"><a href="#"><i
+                            class="icon-Another social link-sign icon-large"></i>Another social link
+                    </a></li>
+
+
+
+                <li class="list-group-item"><a href="/tags.html"><h4><i class="icon-tags icon-large"></i>Tags</h4></a></li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/android.html">
+                                android
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/google.html">
+                                google
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/nagios.html">
+                                Nagios
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/php.html">
+                                PHP
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/sysadmin.html">
+                                sysadmin
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/linux.html">
+                                linux
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/perl.html">
+                                perl
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/logging.html">
+                                logging
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/puppet.html">
+                                puppet
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/bind.html">
+                                bind
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/monitoring.html">
+                                monitoring
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/dns.html">
+                                dns
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/droid.html">
+                                droid
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/firefox.html">
+                                firefox
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/mediawiki.html">
+                                mediawiki
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/mac.html">
+                                mac
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/microsoft.html">
+                                microsoft
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/syslog.html">
+                                syslog
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/wordpress.html">
+                                wordpress
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/rpm.html">
+                                rpm
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/security.html">
+                                security
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/blog.html">
+                                blog
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/sun.html">
+                                sun
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/ems.html">
+                                EMS
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/apache.html">
+                                apache
+                            </a>
+                        </li>
+        </ul>
+    </section>
+</aside>        </div>
+    </div>
+</div>
+<footer>
+    <div class="container">
+        <hr>
+        <p class="pull-right"><i class="icon-arrow-up"></i> <a href="#">Back to top</a></p>
+
+
+        <p>&copy; 2014 Jason Antman &middot; Powered by <a href="https://github.com/DandyDev/pelican-bootstrap3" target="_blank">pelican-bootstrap3</a>,
+            <a href="http://docs.getpelican.com/" target="_blank">Pelican</a>,
+            <a href="http://getbootstrap.com" target="_blank">Bootstrap</a></p>
+    </div>
+</footer>
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="/theme/js/bootstrap.min.js"></script>
+
+<!-- Enable responsive features in IE8 with Respond.js (https://github.com/scottjehl/Respond) -->
+<script src="/theme/js/respond.min.js"></script>
+
+
+</body>
+</html>

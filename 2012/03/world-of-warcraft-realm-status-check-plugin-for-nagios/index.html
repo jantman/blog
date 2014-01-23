@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:og="http://ogp.me/ns#"
+      xmlns:fb="https://www.facebook.com/2008/fbml">
+<head>
+    <title>World of Warcraft Realm Status Check Plugin for Nagios</title>
+    <!-- Using the latest rendering mode for IE -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Open Graph tags -->
+
+            <meta property="og:type" content="article"/>
+            <meta property="og:title" content="World of Warcraft Realm Status Check Plugin for Nagios"/>
+            <meta property="og:url" content="/2012/03/world-of-warcraft-realm-status-check-plugin-for-nagios/"/>
+            <meta property="og:description" content="My wife Jackie (Syrilia) is an avid World of Warcraft player (it’s a MMORPG with over 10 million players). They have weekly server maintenance/update windows every Tuesday morning - total downtime. The length is never really fixed, so I looked around to see if there was a logical way ..."/>
+
+    <!-- Bootstrap -->
+        <link rel="stylesheet" href="/theme/css/bootstrap.min.css" type="text/css"/>
+    <link href="/theme/css/font-awesome.min.css" rel="stylesheet">
+    <link href="/theme/css/pygments.css" rel="stylesheet">
+        <link href="/theme/css/typogrify.css" rel="stylesheet">
+    <link rel="stylesheet" href="/theme/css/style.css" type="text/css"/>
+    <!-- JavaScript plugins (requires jQuery) -->
+    <script src="http://code.jquery.com/jquery.js"></script>
+
+        <link href="/feeds/all.atom.xml" type="application/atom+xml" rel="alternate"
+              title="Jason Antman's Blog ATOM Feed"/>
+
+</head>
+<body>
+<nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="" class="navbar-brand">Jason Antman's Blog</a>
+        </div>
+        <div class="collapse navbar-collapse navbar-ex1-collapse">
+            <ul class="nav navbar-nav">
+                         <li><a href="/pages/about.html">
+                             About
+                          </a></li>
+                        <li >
+                            <a href="/category/ideas-and-rants.html">Ideas and rants</a>
+                        </li>
+                        <li >
+                            <a href="/category/miscellaneous.html">Miscellaneous</a>
+                        </li>
+                        <li class="active">
+                            <a href="/category/monitoring.html">Monitoring</a>
+                        </li>
+                        <li >
+                            <a href="/category/projects.html">Projects</a>
+                        </li>
+                        <li >
+                            <a href="/category/puppet.html">Puppet</a>
+                        </li>
+                        <li >
+                            <a href="/category/sysadmin.html">Sysadmin</a>
+                        </li>
+                        <li >
+                            <a href="/category/tech-howtos.html">Tech howtos</a>
+                        </li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="/archives.html"><i class="icon-th-list"></i>Archives</a></li>
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+</nav>
+<!-- /.navbar -->
+<div class="container">
+    <div class="row">
+        <div class="col-lg-9">
+    <section id="content">
+        <article>
+            <header class="page-header">
+                <h1>
+                    <a href="/2012/03/world-of-warcraft-realm-status-check-plugin-for-nagios/"
+                       rel="bookmark"
+                       title="Permalink to World of Warcraft Realm Status Check Plugin for Nagios">
+                        World of Warcraft Realm Status Check Plugin for&nbsp;Nagios
+                    </a>
+                </h1>
+            </header>
+            <div class="entry-content">
+                <div class="panel">
+                    <div class="panel-body">
+<footer class="post-info">
+    <span class="label label-default">Date</span>
+    <span class="published">
+        <i class="icon-calendar"></i>Fri 16 March 2012
+    </span>
+
+
+
+<span class="label label-default">Tags</span>
+	<a href="/tag/blizzard.html">blizzard</a>
+        /
+	<a href="/tag/check-plugin.html">check plugin</a>
+        /
+	<a href="/tag/monitoring.html">monitoring</a>
+        /
+	<a href="/tag/nagios.html">Nagios</a>
+        /
+	<a href="/tag/warcraft.html">warcraft</a>
+        /
+	<a href="/tag/wow.html">wow</a>
+</footer><!-- /.post-info -->                    </div>
+                </div>
+                <p>My wife <a href="http://www.jackieantman.com/">Jackie</a> (<a href="http://us.battle.net/wow/en/character/Arthas/Syrilia/simple">Syrilia</a>) is an avid <a href="http://en.wikipedia.org/wiki/World_of_Warcraft">World of Warcraft</a> player
+(it&#8217;s a <a href="http://en.wikipedia.org/wiki/Massively_multiplayer_online_role-playing_game"><span class="caps">MMORPG</span></a> with over 10 million players). They have weekly
+server maintenance/update windows every Tuesday morning - total
+downtime. The length is never really fixed, so I looked around to see if
+there was a logical way to notify when the servers came back&nbsp;up.</p>
+<p>I managed to find a <a href="http://exchange.nagios.org/directory/Plugins/Games/World-of-Warcraft-Realm-status/details">World of Warcraft Realm status check plugin</a> on
+Nagios Exchange, but it was written to a now-discontinued <span class="caps">API</span>. It was
+also last modified in 2008, and I can&#8217;t seem to get in contact with the
+author, Scott A&#8217;Hearn (webmaster@scottahearn.com) - that email returns
+undeliverable, there&#8217;s no email link on the site that his domain now
+redirects to, and the domain scottahearn.com is a (eek) private
+registration in <span class="caps">WHOIS</span>, so I don&#8217;t really have any way of finding contact
+information. Regardless, I&#8217;ve modified the script to use the <a href="http://blizzard.github.com/api-wow-docs/#id3381933">new
+Blizzard <span class="caps">REST</span> <span class="caps">API</span></a> and it&#8217;s now working. Of course, this is pulling
+from Blizzard&#8217;s data feed, not doing any actual monitoring itself, and
+be warned that they impose query limits (at the moment, their <a href="http://blizzard.github.com/api-wow-docs/#id3379836">docs</a>
+say 3,000 requests per day for anonymous access; to be nice to them, I
+only check on Tuesdays from 3am-4pm, when I&#8217;m most concerned about it).
+The updated source code is shown below, but the most up-to-date version
+will always live&nbsp;at  </p>
+<p>[https://github.com/jantman/nagios-scripts/blob/master/check_wow.pl][].
+If you want, you can also see a diff of my changes to Scott&#8217;s original
+version on <a href="https://github.com/jantman/nagios-scripts/commit/f84eede5256aa6621812e91f0b3b73e91f3b11e8#check_wow.pl">github</a>.</p>
+<div class="codehilite"><pre><span class="c1">#!/usr/bin/perl -w</span>
+<span class="c1">#</span>
+<span class="c1"># World of Warcraft Realm detector plugin for Nagios</span>
+<span class="c1">#</span>
+<span class="c1"># Written by Scott A&#39;Hearn (webmaster@scottahearn.com), version 1.2, Last Modified: 07-21-2008</span>
+<span class="c1">#</span>
+<span class="c1"># Modified by Jason Antman  02-22-2012, to cope with the change from</span>
+<span class="c1"># the deprecated worldofwarcraft.com <span class="caps">XML</span> feed to the BattleNet <span class="caps">JSON</span> <span class="caps">API</span>.</span>
+<span class="c1">#</span>
+<span class="c1"># Usage: ./check_wow -r </span>
+<span class="c1">#</span>
+<span class="c1"># Description:</span>
+<span class="c1">#</span>
+<span class="c1"># This plugin will check the status of a World of Warcraft realm, based </span>
+<span class="c1"># on input from the battle.net <span class="caps">JSON</span> realm status <span class="caps">API</span>.</span>
+<span class="c1">#</span>
+<span class="c1"># Output:</span>
+<span class="c1">#</span>
+<span class="c1"># If the realm is up, the plugin will</span>
+<span class="c1"># return an <span class="caps">OK</span> state with a message containing the status of the realm as well </span>
+<span class="c1"># as some extended information such as type (PvP, PvE, etc) and population.  </span>
+<span class="c1"># If the realm is down, the plugin will return a <span class="caps">CRITICAL</span> state with a message</span>
+<span class="c1"># containing the status of the realm as well as any available extended </span>
+<span class="c1"># information such as type (PvP, PvE, etc) and population. If the realm is</span>
+<span class="c1"># shown as currently having a queue, a <span class="caps">WARNING</span> state will be returned.</span>
+<span class="c1">#</span>
+<span class="c1">#</span>
+<span class="c1"># If the requested realm is not found, the plugin will</span>
+<span class="c1"># return an <span class="caps">UNKNOWN</span> state with an appropriate warning message.</span>
+<span class="c1">#</span>
+<span class="c1"># If there is an invalid [or no] response from the battle.net server,</span>
+<span class="c1"># the plugin will return a <span class="caps">CRITICAL</span> state.</span>
+<span class="c1">#</span>
+<span class="c1"># $HeadURL: http://svn.jasonantman.com/public-nagios/check_wow.pl $</span>
+<span class="c1"># $LastChangedRevision: 13 $</span>
+<span class="c1">#</span>
+<span class="c1"># Changelog:</span>
+<span class="c1"># 2012-02-22 Jason Antman  (version 1.3):</span>
+<span class="c1">#     * modified for new BattleNet <span class="caps">JSON</span> <span class="caps">API</span></span>
+<span class="c1">#     * added <span class="caps">WARNING</span> output if realm has queue</span>
+<span class="c1">#</span>
+<span class="c1"># 2008-07-21 Scott A&#39;Hearn  (version 1.2):</span>
+<span class="c1">#     * version on Nagios Exchange</span>
+<span class="c1">#</span>
+
+<span class="c1"># use modules</span>
+<span class="k">use</span> <span class="n">strict</span><span class="p">;</span>             <span class="c1"># good coding practices</span>
+<span class="k">use</span> <span class="nn">Getopt::</span><span class="n">Long</span><span class="p">;</span>           <span class="c1"># command-line option parsing</span>
+<span class="k">use</span> <span class="n"><span class="caps">LWP</span></span><span class="p">;</span>                <span class="c1"># external content retrieval</span>
+<span class="k">use</span> <span class="n"><span class="caps">JSON</span></span><span class="p">;</span>                               <span class="c1"># <span class="caps">JSON</span> for <span class="caps">API</span> reply</span>
+<span class="k">use</span> <span class="n">lib</span>  <span class="s">&quot;/usr/lib/nagios/plugins&quot;</span><span class="p">;</span> <span class="c1"># nagios plugins</span>
+<span class="k">use</span> <span class="n">utils</span> <span class="sx">qw(%<span class="caps">ERRORS</span> &amp;print_revision &amp;support &amp;usage )</span><span class="p">;</span> <span class="c1"># nagios error and message libraries</span>
+<span class="k">use</span> <span class="nn">Data::</span><span class="n">Dumper</span><span class="p">;</span>                       <span class="c1"># debugging</span>
+
+<span class="c1"># init global vars</span>
+<span class="k">use</span> <span class="n">vars</span> <span class="sx">qw($<span class="caps">PROGNAME</span>)</span><span class="p">;</span> <span class="nv">$<span class="caps">PROGNAME</span></span><span class="o">=</span><span class="s">&quot;check_wow&quot;</span><span class="p">;</span>
+<span class="k">my</span> <span class="p">(</span><span class="nv">$ver_string</span><span class="p">,</span> <span class="nv">$browser</span><span class="p">,</span> <span class="nv">$jsonurl</span><span class="p">,</span> <span class="nv">$raw_json</span><span class="p">,</span> <span class="nv">$opt_V</span><span class="p">,</span> <span class="nv">$opt_h</span><span class="p">,</span> <span class="nv">$opt_r</span><span class="p">,</span> <span class="nv">$decoded</span><span class="p">)</span> <span class="o">=</span> <span class="p">(</span><span class="nb">undef</span><span class="p">,</span> <span class="nb">undef</span><span class="p">,</span> <span class="nb">undef</span><span class="p">,</span> <span class="nb">undef</span><span class="p">,</span> <span class="nb">undef</span><span class="p">,</span> <span class="nb">undef</span><span class="p">,</span> <span class="nb">undef</span><span class="p">,</span> <span class="nb">undef</span><span class="p">);</span>
+<span class="nv">$jsonurl</span> <span class="o">=</span> <span class="s">&quot;http://us.battle.net/api/wow/realm/status?realm=&quot;</span><span class="p">;</span>
+<span class="nv">$ver_string</span> <span class="o">=</span> <span class="s">&quot;1.3&quot;</span><span class="p">;</span>
+
+<span class="c1"># init subs</span>
+<span class="k">sub </span><span class="nf">print_help</span> <span class="p">($$);</span>
+<span class="p">sub print_usage ($);</span>
+
+<span class="p"># define command-line option handling</span>
+<span class="p">Getopt::Long::Configure(&#39;bundling&#39;);</span>
+<span class="p">GetOptions(</span>
+<span class="p">    &quot;V&quot;   =&gt; \$opt_V, &quot;version&quot; =&gt; \$opt_V,</span>
+<span class="p">    &quot;h&quot;   =&gt; \$opt_h, &quot;help&quot;    =&gt; \$opt_h,</span>
+<span class="p">    &quot;r=s&quot; =&gt; \$opt_r, &quot;realm=s&quot; =&gt; \$opt_r);</span>
+
+<span class="p"># show version info, exit</span>
+<span class="p">if ($opt_V) {</span>
+    <span class="n">print_revision</span><span class="p">(</span><span class="nv">$<span class="caps">PROGNAME</span></span><span class="p">,</span> <span class="nv">$ver_string</span><span class="p">);</span>
+    <span class="nb">exit</span> <span class="nv">$<span class="caps">ERRORS</span></span><span class="p">{</span><span class="s">&#39;<span class="caps">OK</span>&#39;</span><span class="p">};</span>
+<span class="p">}</span>
+
+<span class="c1"># show help, exit</span>
+<span class="k">if</span> <span class="p">(</span><span class="nv">$opt_h</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">print_help</span><span class="p">(</span><span class="nv">$<span class="caps">PROGNAME</span></span><span class="p">,</span> <span class="nv">$ver_string</span><span class="p">);</span>
+    <span class="nb">exit</span> <span class="nv">$<span class="caps">ERRORS</span></span><span class="p">{</span><span class="s">&#39;<span class="caps">OK</span>&#39;</span><span class="p">};</span>
+<span class="p">}</span>
+
+<span class="c1"># get first command-line param</span>
+<span class="nv">$opt_r</span> <span class="o">=</span> <span class="nb">shift</span> <span class="k">unless</span> <span class="p">(</span><span class="nv">$opt_r</span><span class="p">);</span>
+
+<span class="c1"># if no command-line param passed, show usage/help, exit</span>
+<span class="k">if</span> <span class="p">(</span><span class="o">!</span> <span class="nv">$opt_r</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">print_usage</span><span class="p">(</span><span class="nv">$<span class="caps">PROGNAME</span></span><span class="p">);</span>
+    <span class="nb">exit</span> <span class="nv">$<span class="caps">ERRORS</span></span><span class="p">{</span><span class="s">&#39;<span class="caps">UNKNOWN</span>&#39;</span><span class="p">};</span>
+<span class="p">}</span>
+
+<span class="c1"># new browser object, with agent</span>
+<span class="nv">$browser</span> <span class="o">=</span> <span class="nn"><span class="caps">LWP</span>::</span><span class="n">UserAgent</span><span class="o">-&gt;</span><span class="k">new</span><span class="p">();</span>
+<span class="nv">$browser</span><span class="o">-&gt;</span><span class="n">agent</span><span class="p">(</span><span class="s">&quot;check_wow/$ver_string&quot;</span><span class="p">);</span>
+
+<span class="c1"># retrieve <span class="caps">JSON</span> from WoW site</span>
+<span class="nv">$jsonurl</span> <span class="o">.=</span> <span class="nv">$opt_r</span><span class="p">;</span>
+<span class="nv">$raw_json</span> <span class="o">=</span> <span class="nv">$browser</span><span class="o">-&gt;</span><span class="n">request</span><span class="p">(</span><span class="nn"><span class="caps">HTTP</span>::</span><span class="n">Request</span><span class="o">-&gt;</span><span class="k">new</span><span class="p">(</span><span class="n"><span class="caps">GET</span></span> <span class="o">=&gt;</span> <span class="nv">$jsonurl</span><span class="p">));</span>
+
+<span class="k">if</span> <span class="p">(</span><span class="nv">$raw_json</span><span class="o">-&gt;</span><span class="n">is_success</span><span class="p">)</span> <span class="p">{</span>
+    <span class="c1"># if success, process</span>
+    <span class="nv">$raw_json</span> <span class="o">=</span> <span class="nv">$raw_json</span><span class="o">-&gt;</span><span class="n">content</span><span class="p">;</span>
+<span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+    <span class="c1"># otherwise, fail <span class="caps">UNKNOWN</span></span>
+    <span class="k">print</span> <span class="s">&quot;<span class="caps">UNKNOWN</span> - Realm &#39;$opt_r&#39; status not received.&quot;</span><span class="p">;</span>
+    <span class="nb">exit</span> <span class="nv">$<span class="caps">ERRORS</span></span><span class="p">{</span><span class="s">&#39;<span class="caps">UNKNOWN</span>&#39;</span><span class="p">};</span>
+<span class="p">}</span>
+
+<span class="nv">$decoded</span> <span class="o">=</span> <span class="n">decode_json</span> <span class="nv">$raw_json</span><span class="p">;</span>
+
+<span class="k">if</span><span class="p">(</span><span class="nv">$decoded</span><span class="o">-&gt;</span><span class="p">{</span><span class="n">realms</span><span class="p">}[</span><span class="mi">0</span><span class="p">]</span><span class="o">-&gt;</span><span class="p">{</span><span class="n">status</span><span class="p">}</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">print</span> <span class="s">&quot;<span class="caps">CRITICAL</span> - Realm &quot;</span><span class="o">.</span><span class="nv">$decoded</span><span class="o">-&gt;</span><span class="p">{</span><span class="n">realms</span><span class="p">}[</span><span class="mi">0</span><span class="p">]</span><span class="o">-&gt;</span><span class="p">{</span><span class="n">name</span><span class="p">}</span><span class="o">.</span><span class="s">&quot; Down (&quot;</span><span class="o">.</span><span class="nv">$decoded</span><span class="o">-&gt;</span><span class="p">{</span><span class="n">realms</span><span class="p">}[</span><span class="mi">0</span><span class="p">]</span><span class="o">-&gt;</span><span class="p">{</span><span class="n">type</span><span class="p">}</span><span class="o">.</span><span class="s">&quot;, population: &quot;</span><span class="o">.</span><span class="nv">$decoded</span><span class="o">-&gt;</span><span class="p">{</span><span class="n">realms</span><span class="p">}[</span><span class="mi">0</span><span class="p">]</span><span class="o">-&gt;</span><span class="p">{</span><span class="n">population</span><span class="p">}</span><span class="o">.</span><span class="s">&quot;)\n&quot;</span><span class="p">;</span>
+    <span class="nb">exit</span> <span class="nv">$<span class="caps">ERRORS</span></span><span class="p">{</span><span class="s">&#39;<span class="caps">CRITICAL</span>&#39;</span><span class="p">};</span>
+<span class="p">}</span> <span class="k">elsif</span><span class="p">(</span><span class="nv">$decoded</span><span class="o">-&gt;</span><span class="p">{</span><span class="n">realms</span><span class="p">}[</span><span class="mi">0</span><span class="p">]</span><span class="o">-&gt;</span><span class="p">{</span><span class="n">queue</span><span class="p">}</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">print</span> <span class="s">&quot;<span class="caps">WARNING</span> - Realm &quot;</span><span class="o">.</span><span class="nv">$decoded</span><span class="o">-&gt;</span><span class="p">{</span><span class="n">realms</span><span class="p">}[</span><span class="mi">0</span><span class="p">]</span><span class="o">-&gt;</span><span class="p">{</span><span class="n">name</span><span class="p">}</span><span class="o">.</span><span class="s">&quot; Has Queue (&quot;</span><span class="o">.</span><span class="nv">$decoded</span><span class="o">-&gt;</span><span class="p">{</span><span class="n">realms</span><span class="p">}[</span><span class="mi">0</span><span class="p">]</span><span class="o">-&gt;</span><span class="p">{</span><span class="n">type</span><span class="p">}</span><span class="o">.</span><span class="s">&quot;, population: &quot;</span><span class="o">.</span><span class="nv">$decoded</span><span class="o">-&gt;</span><span class="p">{</span><span class="n">realms</span><span class="p">}[</span><span class="mi">0</span><span class="p">]</span><span class="o">-&gt;</span><span class="p">{</span><span class="n">population</span><span class="p">}</span><span class="o">.</span><span class="s">&quot;)\n&quot;</span><span class="p">;</span>
+    <span class="nb">exit</span> <span class="nv">$<span class="caps">ERRORS</span></span><span class="p">{</span><span class="s">&#39;<span class="caps">WARNING</span>&#39;</span><span class="p">};</span>
+<span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+    <span class="k">print</span> <span class="s">&quot;<span class="caps">OK</span> - Realm &quot;</span><span class="o">.</span><span class="nv">$decoded</span><span class="o">-&gt;</span><span class="p">{</span><span class="n">realms</span><span class="p">}[</span><span class="mi">0</span><span class="p">]</span><span class="o">-&gt;</span><span class="p">{</span><span class="n">name</span><span class="p">}</span><span class="o">.</span><span class="s">&quot; Up (&quot;</span><span class="o">.</span><span class="nv">$decoded</span><span class="o">-&gt;</span><span class="p">{</span><span class="n">realms</span><span class="p">}[</span><span class="mi">0</span><span class="p">]</span><span class="o">-&gt;</span><span class="p">{</span><span class="n">type</span><span class="p">}</span><span class="o">.</span><span class="s">&quot;, population: &quot;</span><span class="o">.</span><span class="nv">$decoded</span><span class="o">-&gt;</span><span class="p">{</span><span class="n">realms</span><span class="p">}[</span><span class="mi">0</span><span class="p">]</span><span class="o">-&gt;</span><span class="p">{</span><span class="n">population</span><span class="p">}</span><span class="o">.</span><span class="s">&quot;)\n&quot;</span><span class="p">;</span>
+    <span class="nb">exit</span> <span class="nv">$<span class="caps">ERRORS</span></span><span class="p">{</span><span class="s">&#39;<span class="caps">OK</span>&#39;</span><span class="p">};</span>
+<span class="p">}</span>
+
+<span class="c1"># usage function</span>
+<span class="k">sub </span><span class="nf">print_usage</span> <span class="p">($)</span> <span class="p">{</span>
+        <span class="k">my</span> <span class="p">(</span><span class="nv">$<span class="caps">PROGNAME</span></span><span class="p">)</span> <span class="o">=</span> <span class="nv">@_</span><span class="p">;</span>
+    <span class="k">print</span> <span class="s">&quot;Usage:\n&quot;</span><span class="p">;</span>
+    <span class="k">print</span> <span class="s">&quot;  $<span class="caps">PROGNAME</span> [-r | --realm ]\n&quot;</span><span class="p">;</span>
+    <span class="k">print</span> <span class="s">&quot;  $<span class="caps">PROGNAME</span> [-h | --help]\n&quot;</span><span class="p">;</span>
+    <span class="k">print</span> <span class="s">&quot;  $<span class="caps">PROGNAME</span> [-V | --version]\n&quot;</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="c1"># help function</span>
+<span class="k">sub </span><span class="nf">print_help</span> <span class="p">($$)</span> <span class="p">{</span>
+        <span class="k">my</span> <span class="p">(</span><span class="nv">$<span class="caps">PROGNAME</span></span><span class="p">,</span> <span class="nv">$ver_string</span><span class="p">)</span> <span class="o">=</span> <span class="nv">@_</span><span class="p">;</span>
+    <span class="n">print_revision</span><span class="p">(</span><span class="nv">$<span class="caps">PROGNAME</span></span><span class="p">,</span> <span class="nv">$ver_string</span><span class="p">);</span>
+    <span class="k">print</span> <span class="s">&quot;Copyright (c) 2008 Scott A&#39;Hearn, 2012 Jason Antman\n\n&quot;</span><span class="p">;</span>
+    <span class="n">print_usage</span><span class="p">(</span><span class="nv">$<span class="caps">PROGNAME</span></span><span class="p">);</span>
+    <span class="k">print</span> <span class="s">&quot;\n&quot;</span><span class="p">;</span>
+    <span class="k">print</span> <span class="s">&quot;   Standard World of Warcraft realm name, case sensitive.\n&quot;</span><span class="p">;</span>
+    <span class="k">print</span> <span class="s">&quot;\n&quot;</span><span class="p">;</span>
+    <span class="c1"># support();</span>
+<span class="p">}</span>
+
+<span class="c1"># end</span>
+</pre></div>
+
+
+<div class="codehilite"><pre>https://github.com/jantman/nagios-scripts/blob/master/check_wow.pl
+</pre></div>
+            </div>
+            <!-- /.entry-content -->
+        </article>
+    </section>
+
+        </div>
+        <div class="col-lg-3 well well-sm" id="sidebar">
+
+<aside>
+    <section>
+        <ul class="list-group list-group-flush">
+                <li class="list-group-item"><h4><i class="icon-home icon-large"></i>Social</h4></li>
+                    <li class="list-group-item"><a href="#"><i
+                            class="icon-You can add links in your config file-sign icon-large"></i>You can add links in your config file
+                    </a></li>
+                    <li class="list-group-item"><a href="#"><i
+                            class="icon-Another social link-sign icon-large"></i>Another social link
+                    </a></li>
+
+
+
+                <li class="list-group-item"><a href="/tags.html"><h4><i class="icon-tags icon-large"></i>Tags</h4></a></li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/android.html">
+                                android
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/google.html">
+                                google
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/nagios.html">
+                                Nagios
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/php.html">
+                                PHP
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/sysadmin.html">
+                                sysadmin
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/linux.html">
+                                linux
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/perl.html">
+                                perl
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/logging.html">
+                                logging
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/puppet.html">
+                                puppet
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/bind.html">
+                                bind
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/monitoring.html">
+                                monitoring
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/dns.html">
+                                dns
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/droid.html">
+                                droid
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/firefox.html">
+                                firefox
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/mediawiki.html">
+                                mediawiki
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/mac.html">
+                                mac
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/microsoft.html">
+                                microsoft
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/syslog.html">
+                                syslog
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/wordpress.html">
+                                wordpress
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/rpm.html">
+                                rpm
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/security.html">
+                                security
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/blog.html">
+                                blog
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/sun.html">
+                                sun
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/ems.html">
+                                EMS
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/apache.html">
+                                apache
+                            </a>
+                        </li>
+        </ul>
+    </section>
+</aside>        </div>
+    </div>
+</div>
+<footer>
+    <div class="container">
+        <hr>
+        <p class="pull-right"><i class="icon-arrow-up"></i> <a href="#">Back to top</a></p>
+
+
+        <p>&copy; 2014 Jason Antman &middot; Powered by <a href="https://github.com/DandyDev/pelican-bootstrap3" target="_blank">pelican-bootstrap3</a>,
+            <a href="http://docs.getpelican.com/" target="_blank">Pelican</a>,
+            <a href="http://getbootstrap.com" target="_blank">Bootstrap</a></p>
+    </div>
+</footer>
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="/theme/js/bootstrap.min.js"></script>
+
+<!-- Enable responsive features in IE8 with Respond.js (https://github.com/scottjehl/Respond) -->
+<script src="/theme/js/respond.min.js"></script>
+
+
+</body>
+</html>

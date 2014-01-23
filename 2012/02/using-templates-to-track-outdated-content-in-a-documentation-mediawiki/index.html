@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:og="http://ogp.me/ns#"
+      xmlns:fb="https://www.facebook.com/2008/fbml">
+<head>
+    <title>Using Templates to Track Outdated Content in a Documentation MediaWiki</title>
+    <!-- Using the latest rendering mode for IE -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Open Graph tags -->
+
+            <meta property="og:type" content="article"/>
+            <meta property="og:title" content="Using Templates to Track Outdated Content in a Documentation MediaWiki"/>
+            <meta property="og:url" content="/2012/02/using-templates-to-track-outdated-content-in-a-documentation-mediawiki/"/>
+            <meta property="og:description" content="Both my last and current jobs use MediaWiki for internal documentation. As always happens, some of this documentation will inevitably get out-of-date, or totally deprecated. As is also the case, many times when we’re looking for docs in the middle of an incident, we don’t have the time ..."/>
+
+    <!-- Bootstrap -->
+        <link rel="stylesheet" href="/theme/css/bootstrap.min.css" type="text/css"/>
+    <link href="/theme/css/font-awesome.min.css" rel="stylesheet">
+    <link href="/theme/css/pygments.css" rel="stylesheet">
+        <link href="/theme/css/typogrify.css" rel="stylesheet">
+    <link rel="stylesheet" href="/theme/css/style.css" type="text/css"/>
+    <!-- JavaScript plugins (requires jQuery) -->
+    <script src="http://code.jquery.com/jquery.js"></script>
+
+        <link href="/feeds/all.atom.xml" type="application/atom+xml" rel="alternate"
+              title="Jason Antman's Blog ATOM Feed"/>
+
+</head>
+<body>
+<nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="" class="navbar-brand">Jason Antman's Blog</a>
+        </div>
+        <div class="collapse navbar-collapse navbar-ex1-collapse">
+            <ul class="nav navbar-nav">
+                         <li><a href="/pages/about.html">
+                             About
+                          </a></li>
+                        <li >
+                            <a href="/category/ideas-and-rants.html">Ideas and rants</a>
+                        </li>
+                        <li >
+                            <a href="/category/miscellaneous.html">Miscellaneous</a>
+                        </li>
+                        <li >
+                            <a href="/category/monitoring.html">Monitoring</a>
+                        </li>
+                        <li >
+                            <a href="/category/projects.html">Projects</a>
+                        </li>
+                        <li >
+                            <a href="/category/puppet.html">Puppet</a>
+                        </li>
+                        <li >
+                            <a href="/category/sysadmin.html">Sysadmin</a>
+                        </li>
+                        <li class="active">
+                            <a href="/category/tech-howtos.html">Tech howtos</a>
+                        </li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="/archives.html"><i class="icon-th-list"></i>Archives</a></li>
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+</nav>
+<!-- /.navbar -->
+<div class="container">
+    <div class="row">
+        <div class="col-lg-9">
+    <section id="content">
+        <article>
+            <header class="page-header">
+                <h1>
+                    <a href="/2012/02/using-templates-to-track-outdated-content-in-a-documentation-mediawiki/"
+                       rel="bookmark"
+                       title="Permalink to Using Templates to Track Outdated Content in a Documentation MediaWiki">
+                        Using Templates to Track Outdated Content in a Documentation&nbsp;MediaWiki
+                    </a>
+                </h1>
+            </header>
+            <div class="entry-content">
+                <div class="panel">
+                    <div class="panel-body">
+<footer class="post-info">
+    <span class="label label-default">Date</span>
+    <span class="published">
+        <i class="icon-calendar"></i>Thu 02 February 2012
+    </span>
+
+
+
+<span class="label label-default">Tags</span>
+	<a href="/tag/documentation.html">documentation</a>
+        /
+	<a href="/tag/mediawiki.html">mediawiki</a>
+        /
+	<a href="/tag/sysadmin.html">sysadmin</a>
+</footer><!-- /.post-info -->                    </div>
+                </div>
+                <p>Both my last and current jobs use <a href="http://www.mediawiki.org/">MediaWiki</a> for internal
+documentation. As always happens, some of this documentation will
+inevitably get out-of-date, or totally deprecated. As is also the case,
+many times when we&#8217;re looking for docs in the middle of an incident, we
+don&#8217;t have the time to go back and fix what&#8217;s wrong. So, I devised the
+following template/category system to help keep track of these problem&nbsp;pages.</p>
+<p>First, create some templates that you will apply to the problem pages. I
+use three - one for totally deprecated pages, one for pages that need
+updating, and one for pages that just need cleanup. For the cleanup
+template, in the MediaWiki search box, enter &#8220;Template:Cleanup&#8221; and
+click &#8220;go&#8221;. You should be told that the page doesn&#8217;t exist, and given a
+link to create the page. Create it, and enter the following&nbsp;content:</p>
+<div class="codehilite"><pre>[[Image:Cleanup.png]]
+
+&#39;&#39;&#39;This page needs to be cleaned up or reorganized.&#39;&#39;&#39;
+
+
+
+[[Category:Pages Needing Cleanup]]
+</pre></div>
+
+
+<p>Now we create a category page for it, &#8220;Category:Pages Needing Cleanup&#8221;,
+with the&nbsp;content:</p>
+<div class="codehilite"><pre>__HIDDENCAT__
+
+This category is for pages that are mostly correct and just need minor corrections or reorganization.
+
+&#39;&#39;&#39;To add pages to this category&#39;&#39;&#39;, include the following at the &#39;&#39;&#39;TOP&#39;&#39;&#39; of the page:
+
+
+{{cleanup}}
+</pre></div>
+
+
+<p>and save the&nbsp;page.</p>
+<p>Now there&#8217;s a few other changes we need to make. First, upload the
+Cleanup.png graphic, which I got from wikimedia.org <a href="http://upload.wikimedia.org/wikipedia/en/thumb/f/f2/Edit-clear.svg/40px-Edit-clear.svg.png">here</a> and
+uploaded as&nbsp;Cleanup.png.</p>
+<p>If you refresh the Template:Cleanup page, you should now see the image.
+On a side note, &#8220;__HIDDENCAT__&#8221; on the category page prevents that
+category from showing up in the category list at the bottom of the pages
+we add to it, but this only works in MediaWiki 1.13 and&nbsp;up.</p>
+<p>The last step is to add the <a href="http://www.mediawiki.org/wiki/Template:Mbox">MediaWiki mbox template</a> and its
+dependencies. While I did this once before, I didn&#8217;t really remember the
+steps, but I found a post on <a href="http://glynor.com/2010/05/the-trouble-with-ambox-and-mbox/">Glynor&#8217;s blog</a> that details them rather&nbsp;nicely:</p>
+<ol>
+<li>Enable the <a href="http://www.mediawiki.org/wiki/Extension:ParserFunctions">ParserFunctions extension</a>. There are download and
+    install instructions on the extension page, but you&#8217;ll want to
+    enable string functions. To do this, include the extension in
+    LocalSettings.php&nbsp;like:</li>
+</ol>
+<div class="codehilite"><pre><span class="x">require_once( &quot;$<span class="caps">IP</span>/extensions/ParserFunctions/ParserFunctions.php&quot; );</span>
+<span class="x">$wgPFEnableStringFunctions = true;</span>
+</pre></div>
+
+
+<ol>
+<li>Create a new page in your wiki called &#8220;Mediawiki:Common.css&#8221;, and
+    paste in the content from <a href="http://www.mediawiki.org/wiki/MediaWiki:Common.css">MediaWiki.org MediaWiki:Common.css</a>.</li>
+<li>Go to <a href="http://en.wikipedia.org/w/index.php?title=Special:Export">Wikipedia&#8217;s Special:Export</a> page, and enter
+    &#8220;Template:Ambox&#8221; in the box, check off &#8220;Include templates&#8221;, and
+    export the template (and all dependencies) to a local <span class="caps">XML</span>&nbsp;file.</li>
+<li>Go to the &#8220;Special:Import&#8221; page of your wiki, and upload the <span class="caps">XML</span>
+    file you just grabbed from Wikipedia. This will import the Ambox and
+    mbox templates, as well as their&nbsp;dependencies.</li>
+<li>Now, if you go back and refresh the Template:Cleanup page you
+    created, you should see the icon and a nice message&nbsp;box:</li>
+</ol>
+<p><img alt="cleanup message box" src="/GFX/mw_cleanup.png" /></p>
+<p>Finally, add the template and category pages for update and&nbsp;deprecated:  </p>
+<p><code>Template:Update</code></p>
+<div class="codehilite"><pre>[[Image:Warning.png]]
+
+&#39;&#39;&#39;This page is in need of updating. Some information on it may be out of date, and should not be relied on.&#39;&#39;&#39;
+
+
+
+[[Category:Pages Needing Updates]]
+</pre></div>
+
+
+<p><code>Category:Pages Needing Updates</code></p>
+<div class="codehilite"><pre>__HIDDENCAT__
+
+This category keeps track of pages that need changes or updates.
+
+&#39;&#39;&#39;To add pages to this category&#39;&#39;&#39;, include the following at the &#39;&#39;&#39;TOP&#39;&#39;&#39; of the page:
+
+
+{{update}}
+</pre></div>
+
+
+<p><code>Template:Deprecated</code></p>
+<div class="codehilite"><pre>[[Image:Critical.png]]
+
+&#39;&#39;&#39;The information on this page is badly out-of-date.&#39;&#39;&#39; It describes a system that is no longer in production or has drastically changed, and &#39;&#39;&#39;needs to be updated or rewritten&#39;&#39;&#39;.
+
+
+
+[[Category:Deprecated Content]]
+</pre></div>
+
+
+<p><code>Category:Deprecated Content</code></p>
+<div class="codehilite"><pre> __HIDDENCAT__
+
+This category keeps track of pages that are &#39;&#39;&#39;seriously old&#39;&#39;&#39; or otherwise describe systems/hosts/etc. that have seriously changed from what is described in the page.
+
+
+&#39;&#39;&#39;To add pages to this category&#39;&#39;&#39;, include the following at the &#39;&#39;&#39;TOP&#39;&#39;&#39; of the page:
+
+
+{{deprecated}}
+</pre></div>
+
+
+<p>And the download the two images -
+[http://upload.wikimedia.org/wikipedia/commons/9/98/Ambox_deletion.png][]
+gets uploaded as Critical.png and
+[http://upload.wikimedia.org/wikipedia/en/f/f4/Ambox_content.png][]
+gets uploaded as&nbsp;Warning.png.</p>
+<p>That&#8217;s it. To use this, just add <code>{{cleanup}}</code>, <code>{{deprecated}}</code> or
+<code>{{update}}</code> to the top of a wiki article (adding the <span class="caps">HTML</span> comment
+before it is also recommended), and it will add the page to the
+appropriate category and show a nice message box at the top of the&nbsp;page:  </p>
+<p>Cleanup:  </p>
+<p><img alt="cleanup message box" src="/GFX/mw_cleanup.png" />  </p>
+<p>Update:  </p>
+<p><img alt="update message box" src="/GFX/mw_update.png" />  </p>
+<p>Deprecated:  </p>
+<p><img alt="deprecated message box" src="/GFX/mw_deprecated.png" /></p>
+<p>I also add a link to the top of the main wiki&nbsp;page:</p>
+<div class="codehilite"><pre>Things that need to be done: [[:Category:Pages Needing Updates|Pages Needing Updates]], [[:Category:Deprecated Content|Pages with Largely Deprecated Content]], [[:Category:Pages Needing Cleanup|Pages Needing Cleanup]], [[Special:WantedPages|Links to Nonexistent Pages]]
+</pre></div>
+
+
+</p>
+
+<div class="codehilite"><pre>http://upload.wikimedia.org/wikipedia/commons/9/98/Ambox_deletion.png
+</pre></div>
+            </div>
+            <!-- /.entry-content -->
+        </article>
+    </section>
+
+        </div>
+        <div class="col-lg-3 well well-sm" id="sidebar">
+
+<aside>
+    <section>
+        <ul class="list-group list-group-flush">
+                <li class="list-group-item"><h4><i class="icon-home icon-large"></i>Social</h4></li>
+                    <li class="list-group-item"><a href="#"><i
+                            class="icon-You can add links in your config file-sign icon-large"></i>You can add links in your config file
+                    </a></li>
+                    <li class="list-group-item"><a href="#"><i
+                            class="icon-Another social link-sign icon-large"></i>Another social link
+                    </a></li>
+
+
+
+                <li class="list-group-item"><a href="/tags.html"><h4><i class="icon-tags icon-large"></i>Tags</h4></a></li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/android.html">
+                                android
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/google.html">
+                                google
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/nagios.html">
+                                Nagios
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/php.html">
+                                PHP
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/sysadmin.html">
+                                sysadmin
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/linux.html">
+                                linux
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/perl.html">
+                                perl
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/logging.html">
+                                logging
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/puppet.html">
+                                puppet
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/bind.html">
+                                bind
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/monitoring.html">
+                                monitoring
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/dns.html">
+                                dns
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/droid.html">
+                                droid
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/firefox.html">
+                                firefox
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/mediawiki.html">
+                                mediawiki
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/mac.html">
+                                mac
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/microsoft.html">
+                                microsoft
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/syslog.html">
+                                syslog
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/wordpress.html">
+                                wordpress
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/rpm.html">
+                                rpm
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/security.html">
+                                security
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/blog.html">
+                                blog
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/sun.html">
+                                sun
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/ems.html">
+                                EMS
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/apache.html">
+                                apache
+                            </a>
+                        </li>
+        </ul>
+    </section>
+</aside>        </div>
+    </div>
+</div>
+<footer>
+    <div class="container">
+        <hr>
+        <p class="pull-right"><i class="icon-arrow-up"></i> <a href="#">Back to top</a></p>
+
+
+        <p>&copy; 2014 Jason Antman &middot; Powered by <a href="https://github.com/DandyDev/pelican-bootstrap3" target="_blank">pelican-bootstrap3</a>,
+            <a href="http://docs.getpelican.com/" target="_blank">Pelican</a>,
+            <a href="http://getbootstrap.com" target="_blank">Bootstrap</a></p>
+    </div>
+</footer>
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="/theme/js/bootstrap.min.js"></script>
+
+<!-- Enable responsive features in IE8 with Respond.js (https://github.com/scottjehl/Respond) -->
+<script src="/theme/js/respond.min.js"></script>
+
+
+</body>
+</html>

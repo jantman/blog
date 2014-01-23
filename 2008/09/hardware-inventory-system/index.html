@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:og="http://ogp.me/ns#"
+      xmlns:fb="https://www.facebook.com/2008/fbml">
+<head>
+    <title>Hardware Inventory System</title>
+    <!-- Using the latest rendering mode for IE -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Open Graph tags -->
+
+            <meta property="og:type" content="article"/>
+            <meta property="og:title" content="Hardware Inventory System"/>
+            <meta property="og:url" content="/2008/09/hardware-inventory-system/"/>
+            <meta property="og:description" content="After a few crazy weeks at work, the pay check is finally here, and I’ve decided to allocate some of the money to hardware upgrades of my personal machines. While Nagios gives me a good idea of where performance is a problem, I’m still running a large amount ..."/>
+
+    <!-- Bootstrap -->
+        <link rel="stylesheet" href="/theme/css/bootstrap.min.css" type="text/css"/>
+    <link href="/theme/css/font-awesome.min.css" rel="stylesheet">
+    <link href="/theme/css/pygments.css" rel="stylesheet">
+        <link href="/theme/css/typogrify.css" rel="stylesheet">
+    <link rel="stylesheet" href="/theme/css/style.css" type="text/css"/>
+    <!-- JavaScript plugins (requires jQuery) -->
+    <script src="http://code.jquery.com/jquery.js"></script>
+
+        <link href="/feeds/all.atom.xml" type="application/atom+xml" rel="alternate"
+              title="Jason Antman's Blog ATOM Feed"/>
+
+</head>
+<body>
+<nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="" class="navbar-brand">Jason Antman's Blog</a>
+        </div>
+        <div class="collapse navbar-collapse navbar-ex1-collapse">
+            <ul class="nav navbar-nav">
+                         <li><a href="/pages/about.html">
+                             About
+                          </a></li>
+                        <li >
+                            <a href="/category/ideas-and-rants.html">Ideas and rants</a>
+                        </li>
+                        <li >
+                            <a href="/category/miscellaneous.html">Miscellaneous</a>
+                        </li>
+                        <li >
+                            <a href="/category/monitoring.html">Monitoring</a>
+                        </li>
+                        <li class="active">
+                            <a href="/category/projects.html">Projects</a>
+                        </li>
+                        <li >
+                            <a href="/category/puppet.html">Puppet</a>
+                        </li>
+                        <li >
+                            <a href="/category/sysadmin.html">Sysadmin</a>
+                        </li>
+                        <li >
+                            <a href="/category/tech-howtos.html">Tech howtos</a>
+                        </li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="/archives.html"><i class="icon-th-list"></i>Archives</a></li>
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+</nav>
+<!-- /.navbar -->
+<div class="container">
+    <div class="row">
+        <div class="col-lg-9">
+    <section id="content">
+        <article>
+            <header class="page-header">
+                <h1>
+                    <a href="/2008/09/hardware-inventory-system/"
+                       rel="bookmark"
+                       title="Permalink to Hardware Inventory System">
+                        Hardware Inventory&nbsp;System
+                    </a>
+                </h1>
+            </header>
+            <div class="entry-content">
+                <div class="panel">
+                    <div class="panel-body">
+<footer class="post-info">
+    <span class="label label-default">Date</span>
+    <span class="published">
+        <i class="icon-calendar"></i>Fri 12 September 2008
+    </span>
+
+
+
+<span class="label label-default">Tags</span>
+	<a href="/tag/configuration.html">configuration</a>
+        /
+	<a href="/tag/inventory.html">inventory</a>
+</footer><!-- /.post-info -->                    </div>
+                </div>
+                <p>After a few crazy weeks at work, the pay check is finally here, and I&#8217;ve
+decided to allocate some of the money to hardware upgrades of my
+personal machines. While <a href="http://www.nagios.org">Nagios</a> gives me a good idea of where
+performance is a problem, I&#8217;m still running a large amount of &#8220;legacy&#8221;
+hardware (my home router/firewall is a 350MHz P-<span class="caps">II</span> desktop) and hardware
+age is a significant factor in my upgrade&nbsp;plans.</p>
+<p>So, I set out looking for a program (most likely some backend scripts
+that dump data to MySQL, and then a <span class="caps">PHP</span> front-end) to perform a hardware
+inventory - essentially, run a script on each box, find out the system
+details, and dump it in a <span class="caps">DB</span>. Now that my pool of upgrade candidates is
+above a dozen machines, at multiple locations, some of which are
+single-use boxes often neglected/forgotten, doing this in my head isn&#8217;t
+the&nbsp;easiest.</p>
+<p>So, while I&#8217;ve been googling and searching some mailing list archives,
+I&#8217;m also developing a set of&nbsp;requirements.</p>
+<p>The chief&nbsp;requirements:</p>
+<ul>
+<li>Ability to run a script on a remote machine and have the results
+    returned in a meaningful format. Most likely, a single script, run
+    as root (<span class="caps">SUID</span> or sudo) that returns nice, formatted, <span class="caps">SQL</span>-ready
+    results (so the parsing of platform-specific command output will
+    happen on the client, with every client returning a normalized data&nbsp;set).</li>
+<li>Ability to track hardware changes - i.e. disks swapped from one box
+    to another, <span class="caps">NIC</span> replacement, processor upgrade,&nbsp;etc.</li>
+<li>Each piece of hardware tracked individually, allowing future support
+    of fully tracking components, spares,&nbsp;etc.</li>
+<li>Support for future barcoding of components and physically-performed&nbsp;inventory.</li>
+</ul>
+</p>
+
+<p>Some of the data that I&#8217;d like&nbsp;collected:</p>
+<ul>
+<li>Data on a machine stored by chassis vendor name and serial
+    numer/service&nbsp;tag.</li>
+<li>Hostname associated with each&nbsp;box.</li>
+<li>Architecture, number of CPUs/cores and type, model, speed, socket
+    (for upgrade&nbsp;planning/ordering).</li>
+<li>Motherboard model/manufacturer, serial number, <span class="caps">HW</span> and <span class="caps">SW</span>/<span class="caps">FW</span>
+    revisions, manufacture&nbsp;date.</li>
+<li>Storage (internal <span class="amp">&amp;</span> directly connected external) - type, interface,
+    capacity, specifications/manufacturer and&nbsp;model.</li>
+<li>Amount fo <span class="caps">RAM</span>, type of <span class="caps">RAM</span>, and configuration of cards (number of
+    empty&nbsp;slots).</li>
+<li><span class="caps">PCI</span> card configuration - number and type/mfr/model of cards, as well
+    as number of empty&nbsp;slots</li>
+<li>For all NICs - <span class="caps">MAC</span> addresses, current IPs, as well as link
+    type/speed and connected&nbsp;switch/port.</li>
+</ul>
+<p>I&#8217;d also like some level of software inventory, especially for those
+machines that may be running &#8220;forgotten&#8221;&nbsp;services:</p>
+<ul>
+<li><a href="http://nmap.org/">nmap</a> scan&nbsp;results.</li>
+<li><span class="caps">OS</span>-generated list of running services, with <span class="caps">GUI</span> including a
+    blacklist of &#8220;default&#8221; services not to be displayed, and possibly
+    also cross-links to Nagios&nbsp;status.</li>
+<li>Possibly a parsed output from ps, using a blacklist as shown&nbsp;above.</li>
+<li>If a firewall is running on the system, a list of all open&nbsp;ports.</li>
+</ul>
+<p>I&#8217;ll be checking out some options today. Unfortunately, I have a feeling
+that there&#8217;s most likely nothing that supports my requirements, and I&#8217;ll
+probably end up implementing a lot of this&nbsp;myself.</p>
+            </div>
+            <!-- /.entry-content -->
+        </article>
+    </section>
+
+        </div>
+        <div class="col-lg-3 well well-sm" id="sidebar">
+
+<aside>
+    <section>
+        <ul class="list-group list-group-flush">
+                <li class="list-group-item"><h4><i class="icon-home icon-large"></i>Social</h4></li>
+                    <li class="list-group-item"><a href="#"><i
+                            class="icon-You can add links in your config file-sign icon-large"></i>You can add links in your config file
+                    </a></li>
+                    <li class="list-group-item"><a href="#"><i
+                            class="icon-Another social link-sign icon-large"></i>Another social link
+                    </a></li>
+
+
+
+                <li class="list-group-item"><a href="/tags.html"><h4><i class="icon-tags icon-large"></i>Tags</h4></a></li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/android.html">
+                                android
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/google.html">
+                                google
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/nagios.html">
+                                Nagios
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/php.html">
+                                PHP
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/sysadmin.html">
+                                sysadmin
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/linux.html">
+                                linux
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/perl.html">
+                                perl
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/logging.html">
+                                logging
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/puppet.html">
+                                puppet
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/bind.html">
+                                bind
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/monitoring.html">
+                                monitoring
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/dns.html">
+                                dns
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/droid.html">
+                                droid
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/firefox.html">
+                                firefox
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/mediawiki.html">
+                                mediawiki
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/mac.html">
+                                mac
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/microsoft.html">
+                                microsoft
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/syslog.html">
+                                syslog
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/wordpress.html">
+                                wordpress
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/rpm.html">
+                                rpm
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/security.html">
+                                security
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/blog.html">
+                                blog
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/sun.html">
+                                sun
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/ems.html">
+                                EMS
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/apache.html">
+                                apache
+                            </a>
+                        </li>
+        </ul>
+    </section>
+</aside>        </div>
+    </div>
+</div>
+<footer>
+    <div class="container">
+        <hr>
+        <p class="pull-right"><i class="icon-arrow-up"></i> <a href="#">Back to top</a></p>
+
+
+        <p>&copy; 2014 Jason Antman &middot; Powered by <a href="https://github.com/DandyDev/pelican-bootstrap3" target="_blank">pelican-bootstrap3</a>,
+            <a href="http://docs.getpelican.com/" target="_blank">Pelican</a>,
+            <a href="http://getbootstrap.com" target="_blank">Bootstrap</a></p>
+    </div>
+</footer>
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="/theme/js/bootstrap.min.js"></script>
+
+<!-- Enable responsive features in IE8 with Respond.js (https://github.com/scottjehl/Respond) -->
+<script src="/theme/js/respond.min.js"></script>
+
+
+</body>
+</html>

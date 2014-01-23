@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:og="http://ogp.me/ns#"
+      xmlns:fb="https://www.facebook.com/2008/fbml">
+<head>
+    <title>Vyatta - Showing ISC dhcpd fixed-address leases</title>
+    <!-- Using the latest rendering mode for IE -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Open Graph tags -->
+
+            <meta property="og:type" content="article"/>
+            <meta property="og:title" content="Vyatta - Showing ISC dhcpd fixed-address leases"/>
+            <meta property="og:url" content="/2011/12/vyatta-showing-isc-dhcpd-fixed-address-leases/"/>
+            <meta property="og:description" content="ISC dhcpd has the ability to always give a specific MAC address the same IP address “lease” using the fixed-address configuration option. This is configured in Vyatta using the static-mapping configuration statement. Unfortunately, since dhcpd doesn’t store fixed-address leases in the dhcpd.leases file, the Vyatta show dhcp leases ..."/>
+
+    <!-- Bootstrap -->
+        <link rel="stylesheet" href="/theme/css/bootstrap.min.css" type="text/css"/>
+    <link href="/theme/css/font-awesome.min.css" rel="stylesheet">
+    <link href="/theme/css/pygments.css" rel="stylesheet">
+        <link href="/theme/css/typogrify.css" rel="stylesheet">
+    <link rel="stylesheet" href="/theme/css/style.css" type="text/css"/>
+    <!-- JavaScript plugins (requires jQuery) -->
+    <script src="http://code.jquery.com/jquery.js"></script>
+
+        <link href="/feeds/all.atom.xml" type="application/atom+xml" rel="alternate"
+              title="Jason Antman's Blog ATOM Feed"/>
+
+</head>
+<body>
+<nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="" class="navbar-brand">Jason Antman's Blog</a>
+        </div>
+        <div class="collapse navbar-collapse navbar-ex1-collapse">
+            <ul class="nav navbar-nav">
+                         <li><a href="/pages/about.html">
+                             About
+                          </a></li>
+                        <li >
+                            <a href="/category/ideas-and-rants.html">Ideas and rants</a>
+                        </li>
+                        <li >
+                            <a href="/category/miscellaneous.html">Miscellaneous</a>
+                        </li>
+                        <li >
+                            <a href="/category/monitoring.html">Monitoring</a>
+                        </li>
+                        <li >
+                            <a href="/category/projects.html">Projects</a>
+                        </li>
+                        <li >
+                            <a href="/category/puppet.html">Puppet</a>
+                        </li>
+                        <li >
+                            <a href="/category/sysadmin.html">Sysadmin</a>
+                        </li>
+                        <li class="active">
+                            <a href="/category/tech-howtos.html">Tech howtos</a>
+                        </li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="/archives.html"><i class="icon-th-list"></i>Archives</a></li>
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+</nav>
+<!-- /.navbar -->
+<div class="container">
+    <div class="row">
+        <div class="col-lg-9">
+    <section id="content">
+        <article>
+            <header class="page-header">
+                <h1>
+                    <a href="/2011/12/vyatta-showing-isc-dhcpd-fixed-address-leases/"
+                       rel="bookmark"
+                       title="Permalink to Vyatta - Showing ISC dhcpd fixed-address leases">
+                        Vyatta - Showing <span class="caps">ISC</span> dhcpd fixed-address&nbsp;leases
+                    </a>
+                </h1>
+            </header>
+            <div class="entry-content">
+                <div class="panel">
+                    <div class="panel-body">
+<footer class="post-info">
+    <span class="label label-default">Date</span>
+    <span class="published">
+        <i class="icon-calendar"></i>Sat 24 December 2011
+    </span>
+
+
+
+<span class="label label-default">Tags</span>
+	<a href="/tag/dhcpd.html">dhcpd</a>
+        /
+	<a href="/tag/rsyslog.html">rsyslog</a>
+        /
+	<a href="/tag/vyatta.html">vyatta</a>
+</footer><!-- /.post-info -->                    </div>
+                </div>
+                <p><span class="caps">ISC</span> <a href="http://www.isc.org/software/dhcp">dhcpd</a> has the ability to always give a specific <span class="caps">MAC</span> address the
+same <span class="caps">IP</span> address &#8220;lease&#8221; using the fixed-address configuration option.
+This is configured in <a href="http://www.vyatta.org">Vyatta</a> using the <code>static-mapping</code>
+configuration statement. Unfortunately, since dhcpd doesn&#8217;t store
+fixed-address leases in the <code>dhcpd.leases</code> file, the Vyatta
+<code>show dhcp leases</code> command doesn&#8217;t show anything about them - which
+makes it difficult to debug anything dhcp-related if all of the hosts on
+your network are setup for fixed addresses. I found a mention of this on
+the <a href="http://www.vyatta.org/forum/viewtopic.php?p=121558">vyatta forum</a>, and also an <a href="https://bugzilla.vyatta.com/show_bug.cgi?id=1990">open bug (1990)</a> to fix it, but no
+proposed resolution. Since I came across this problem and happen to know
+a bit about <span class="caps">ISC</span> dhcpd, I developed both a workaround for users
+(including a perl script) and a possible solution for the Vyatta
+developers to&nbsp;implement.</p>
+<p><strong>Workaround for&nbsp;Users:</strong></p>
+<p>There&#8217;s no way to get dhcpd to store fixed-address hosts in the
+dhcpd.leases file (though it&#8217;s been discussed on the dhcpd-users mailing
+list a few times). There is, however, a way to get dhcpd to log every
+time it sends an <span class="caps">ACK</span> to a client. The following Vyatta configuration
+commands will get dhcpd to log all transactions to syslog, will have
+<a href="http://rsyslog.com/">rsyslog</a> put that in <code>/var/log/user/dhcpd</code>. Since this log can fill
+up very quickly on a busy server, the latter two commands will tell
+<a href="https://fedorahosted.org/logrotate/">logrotate</a> to rotate the log file when it reaches 3000k in size, and
+keep 5 copies (feel free to adjust to your&nbsp;needs):</p>
+<div class="codehilite"><pre>set service dhcp-server global-parameters &quot;log-facility local2;&quot;
+set system syslog file dhcpd facility local2 level debug
+set system syslog file dhcpd archive files 5
+set system syslog file dhcpd archive size 3000
+</pre></div>
+
+
+<p>Once this is done, you can <code>tail -f /var/log/user/dhcpd</code> to watch <span class="caps">DHCP</span>
+discover/request/offer/ack in realtime, or grep through the log file for
+a specific <span class="caps">IP</span> or <span class="caps">MAC</span>. If you want an easier method, I&#8217;ve written a perl
+script (latest version will always live in <a href="http://svn.jasonantman.com/misc-scripts/show_dhcp_fixed_ACKs.pl">my subversion repo</a>) to
+grep through <code>/var/log/user/dhcpd</code> and show the most recent <span class="caps">DHCPACK</span> for
+each <span class="caps">IP</span> address, sorted by <span class="caps">IP</span>. Here&#8217;s the code of the simple script,
+which is more than half comments. To use it, after performing the above
+steps, all you need to do is login to your Vyatta box,
+<code>wget http://svn.jasonantman.com/misc-scripts/show_dhcp_fixed_ACKs.pl</code>
+and then <code>perl show_dhcp_fixed_ACKs.pl</code>.</p>
+<div class="codehilite"><pre><span class="c1">#!/usr/bin/perl</span>
+
+<span class="c1">#</span>
+<span class="c1"># show_dhcp_fixed_ACKs.pl - script to show the most recent <span class="caps">DHCP</span> ACKs per <span class="caps">IP</span> address for <span class="caps">ISC</span> DHCPd,</span>
+<span class="c1">#   from a log file. Originally written for Vyatta routers that just show the dynamic leases.</span>
+<span class="c1">#</span>
+<span class="c1"># To use this, you need to have dhcpd logging to syslog, and your syslog server putting the log file at</span>
+<span class="c1"># /var/log/user/dhcpd (or a file path specified by the $logfile variable below.</span>
+<span class="c1">#</span>
+<span class="c1"># To accomplish this on Vyatta 6.3, run:</span>
+<span class="c1"># set service dhcp-server global-parameters &quot;log-facility local2;&quot;</span>
+<span class="c1"># set system syslog file dhcpd facility local2 level debug</span>
+<span class="c1"># set system syslog file dhcpd archive files 5</span>
+<span class="c1"># set system syslog file dhcpd archive size 3000</span>
+<span class="c1"># commit</span>
+<span class="c1">#</span>
+<span class="c1"># Copyright 2011 Jason Antman  All Rights Reserved.</span>
+<span class="c1"># This script is free for use by anyone anywhere, provided that you comply with the following terms:</span>
+<span class="c1"># 1) Keep this notice and copyright statement intact.</span>
+<span class="c1"># 2) Send any substantial changes, improvements or bog fixes back to me at the above address.</span>
+<span class="c1"># 3) If you include this in a product or redistribute it, you notify me, and include my name in the credits or changelog.</span>
+<span class="c1">#</span>
+<span class="c1"># The following <span class="caps">URL</span> always points to the newest version of this script. If you obtained it from another source, you should</span>
+<span class="c1"># check here:</span>
+<span class="c1"># $HeadURL$</span>
+<span class="c1"># $LastChangedRevision$</span>
+<span class="c1">#</span>
+<span class="c1"># <span class="caps">CHANGELOG</span>:</span>
+<span class="c1"># 2011-12-24 jason@jasonantman.com:</span>
+<span class="c1">#    initial version of script</span>
+<span class="c1">#</span>
+<span class="c1">#</span>
+
+<span class="k">use</span> <span class="n">strict</span><span class="p">;</span>
+<span class="k">use</span> <span class="n">warnings</span><span class="p">;</span>
+
+<span class="k">my</span> <span class="nv">$logfile</span> <span class="o">=</span> <span class="s">&quot;/var/log/user/dhcpd&quot;</span><span class="p">;</span>
+
+<span class="k">my</span> <span class="nv">%data</span> <span class="o">=</span> <span class="p">();</span>
+
+<span class="nb">open</span> <span class="n"><span class="caps">DF</span></span><span class="p">,</span> <span class="nv">$logfile</span> <span class="ow">or</span> <span class="nb">die</span> <span class="vg">$!</span><span class="p">;</span>
+<span class="k">while</span> <span class="p">(</span> <span class="k">my</span> <span class="nv">$line</span> <span class="o">=</span>  <span class="p">)</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span> <span class="nv">$line</span> <span class="o">!~</span> <span class="sr">m/dhcpd: <span class="caps">DHCPACK</span>/</span><span class="p">)</span> <span class="p">{</span> <span class="k">next</span><span class="p">;}</span>
+    <span class="nv">$line</span> <span class="o">=~</span> <span class="sr">m/([A-Za-z]+ [0-9]+ [0-9]{1,2}:[0-9]{2}:[0-9]{2}) [^\/x]+ dhcpd: <span class="caps">DHCPACK</span> on (\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}) to ((?:[0-9a-f]{2}[:-]){5}[0-9a-f]{2}) via (.+)/</span><span class="p">;</span>
+    <span class="c1">#print &quot;$1==$2==$3==$4==\n&quot; ;</span>
+    <span class="nv">$data</span><span class="p">{</span><span class="s">&quot;$2&quot;</span><span class="p">}</span><span class="o">-&gt;</span><span class="p">{</span><span class="s">&#39;mac&#39;</span><span class="p">}</span> <span class="o">=</span> <span class="s">&quot;$3&quot;</span><span class="p">;</span>
+    <span class="nv">$data</span><span class="p">{</span><span class="s">&quot;$2&quot;</span><span class="p">}</span><span class="o">-&gt;</span><span class="p">{</span><span class="s">&#39;date&#39;</span><span class="p">}</span> <span class="o">=</span> <span class="s">&quot;$1&quot;</span><span class="p">;</span>
+    <span class="nv">$data</span><span class="p">{</span><span class="s">&quot;$2&quot;</span><span class="p">}</span><span class="o">-&gt;</span><span class="p">{</span><span class="s">&#39;if&#39;</span><span class="p">}</span> <span class="o">=</span> <span class="s">&quot;$4&quot;</span><span class="p">;</span>
+    <span class="nv">$data</span><span class="p">{</span><span class="s">&quot;$2&quot;</span><span class="p">}</span><span class="o">-&gt;</span><span class="p">{</span><span class="s">&#39;ip&#39;</span><span class="p">}</span> <span class="o">=</span> <span class="s">&quot;$2&quot;</span><span class="p">;</span>    
+<span class="p">}</span>
+
+<span class="nb">printf</span><span class="p">(</span><span class="s">&quot;%-18s %-20s %-18s %-10s\n&quot;</span><span class="p">,</span> <span class="s">&quot;<span class="caps">IP</span> Address&quot;</span><span class="p">,</span> <span class="s">&quot;Hardware Address&quot;</span><span class="p">,</span> <span class="s">&quot;Date&quot;</span><span class="p">,</span> <span class="s">&quot;Interface&quot;</span><span class="p">);</span>
+<span class="nb">printf</span><span class="p">(</span><span class="s">&quot;%-18s %-20s %-18s %-10s\n&quot;</span><span class="p">,</span> <span class="s">&quot;----------&quot;</span><span class="p">,</span> <span class="s">&quot;----------------&quot;</span><span class="p">,</span> <span class="s">&quot;----&quot;</span><span class="p">,</span> <span class="s">&quot;---------&quot;</span><span class="p">);</span>
+
+<span class="c1"># begin sort by <span class="caps">IP</span> address</span>
+<span class="k">my</span> <span class="nv">@keys</span> <span class="o">=</span>
+  <span class="nb">map</span>  <span class="nb">substr</span><span class="p">(</span><span class="nv">$_</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span> <span class="o">=&gt;</span>
+  <span class="nb">sort</span>
+  <span class="nb">map</span>  <span class="nb">pack</span><span class="p">(</span><span class="s">&#39;C4&#39;</span> <span class="o">=&gt;</span>
+    <span class="sr">/(\d+)\.(\d+)\.(\d+)\.(\d+)/</span><span class="p">)</span>
+    <span class="o">.</span> <span class="nv">$_</span> <span class="o">=&gt;</span> <span class="p">(</span><span class="nb">keys</span> <span class="nv">%data</span><span class="p">);</span>
+<span class="c1"># end sort by <span class="caps">IP</span> address</span>
+
+<span class="k">foreach</span> <span class="k">my</span> <span class="nv">$key</span> <span class="p">(</span><span class="nv">@keys</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nb">printf</span><span class="p">(</span><span class="s">&quot;%-18s %-20s %-18s %-10s\n&quot;</span><span class="p">,</span> <span class="nv">$data</span><span class="p">{</span><span class="nv">$key</span><span class="p">}{</span><span class="s">&#39;ip&#39;</span><span class="p">},</span> <span class="nv">$data</span><span class="p">{</span><span class="nv">$key</span><span class="p">}{</span><span class="s">&#39;mac&#39;</span><span class="p">},</span> <span class="nv">$data</span><span class="p">{</span><span class="nv">$key</span><span class="p">}{</span><span class="s">&#39;date&#39;</span><span class="p">},</span> <span class="nv">$data</span><span class="p">{</span><span class="nv">$key</span><span class="p">}{</span><span class="s">&#39;if&#39;</span><span class="p">});</span>
+<span class="p">}</span>
+</pre></div>
+
+
+<p><strong>A solution for&nbsp;Vyatta:</strong></p>
+<p>I suggested this to Vyatta in a reply to <a href="https://bugzilla.vyatta.com/show_bug.cgi?id=1990">bug 1990</a>.
+Since they already use <a href="http://rsyslog.com/">rsyslog</a> which has very powerful processing
+capabilities, it would be easy to have rsyslog parse the <span class="caps">DHCPACK</span>
+messages in real time and update some data store (flat files or a simple
+database) with the information. While how to store this would be up to
+the Vyatta guys, I have some rsyslog configuration to parse <span class="caps">DHCPACK</span>
+messages and update a MySQL database (with two tables; one for most
+recent <span class="caps">ACK</span> per <span class="caps">IP</span> address and one for most recent <span class="caps">ACK</span> per <span class="caps">MAC</span> address)
+that might be of some&nbsp;use:</p>
+<div class="codehilite"><pre>$template DHCPACKonIP, &quot;INSERT INTO dhcplog_ip   
+       SET   
+       server_ip=inet_aton(&#39;%fromhost-ip%&#39;),   
+       msg_type=&#39;DHCPACK&#39;,   
+       date=&#39;%timereported:::date-mysql%&#39;,   
+       mac_addr=&#39;%msg:R,ERE,2,BLANK:DHCPACK on ([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}) to (([0-9a-f]{2}:){5}[0-9a-f]{2})( \(([^)]+)\))? via (([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3})|eth0)--end%&#39;,   
+       client_ip=inet_aton(&#39;%msg:R,ERE,1,BLANK:DHCPACK on ([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}) to (([0-9a-f]{2}:){5}[0-9a-f]{2})( \(([^)]+)\))? via (([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3})|eth0)--end%&#39;),   
+       gateway=&#39;%msg:R,ERE,6,BLANK:DHCPACK on ([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}) to (([0-9a-f]{2}:){5}[0-9a-f]{2})( \(([^)]+)\))? via (([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3})|eth0)--end%&#39;,   
+       fullmsg=&#39;%msg%&#39;   
+       ON DUPLICATE KEY UPDATE   
+       server_ip=inet_aton(&#39;%fromhost-ip%&#39;),   
+       date=&#39;%timereported:::date-mysql%&#39;,   
+       mac_addr=&#39;%msg:R,ERE,2,BLANK:DHCPACK on ([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}) to (([0-9a-f]{2}:){5}[0-9a-f]{2})( \(([^)]+)\))? via (([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3})|eth0)--end%&#39;,   
+       gateway=&#39;%msg:R,ERE,6,BLANK:DHCPACK on ([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}) to (([0-9a-f]{2}:){5}[0-9a-f]{2})( \(([^)]+)\))? via (([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3})|eth0)--end%&#39;,   
+       fullmsg=&#39;%msg%&#39;  
+&quot;,SQL
+
+$template DHCPACKonMAC, &quot;INSERT INTO dhcplog_mac   
+       SET   
+       server_ip=inet_aton(&#39;%fromhost-ip%&#39;),   
+       msg_type=&#39;DHCPACK&#39;,   
+       date=&#39;%timereported:::date-mysql%&#39;,   
+       mac_addr=&#39;%msg:R,ERE,2,BLANK:DHCPACK on ([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}) to (([0-9a-f]{2}:){5}[0-9a-f]{2})( \(([^)]+)\))? via (([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3})|eth0)--end%&#39;,   
+       client_ip=inet_aton(&#39;%msg:R,ERE,1,BLANK:DHCPACK on ([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}) to (([0-9a-f]{2}:){5}[0-9a-f]{2})( \(([^)]+)\))? via (([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3})|eth0)--end%&#39;),   
+       gateway=&#39;%msg:R,ERE,6,BLANK:DHCPACK on ([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}) to (([0-9a-f]{2}:){5}[0-9a-f]{2})( \(([^)]+)\))? via (([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3})|eth0)--end%&#39;,   
+       fullmsg=&#39;%msg%&#39;   
+       ON DUPLICATE KEY UPDATE   
+       server_ip=inet_aton(&#39;%fromhost-ip%&#39;),   
+       date=&#39;%timereported:::date-mysql%&#39;,   
+       client_ip=inet_aton(&#39;%msg:R,ERE,1,BLANK:DHCPACK on ([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}) to (([0-9a-f]{2}:){5}[0-9a-f]{2})( \(([^)]+)\))? via (([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3})|eth0)--end%&#39;),   
+       gateway=&#39;%msg:R,ERE,6,BLANK:DHCPACK on ([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}) to (([0-9a-f]{2}:){5}[0-9a-f]{2})( \(([^)]+)\))? via (([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3})|eth0)--end%&#39;,   
+       fullmsg=&#39;%msg%&#39;  
+&quot;,SQL
+
+$template DHCPACKtoIP, &quot;INSERT INTO dhcplog_ip   
+       SET   
+       server_ip=inet_aton(&#39;%fromhost-ip%&#39;),   
+       msg_type=&#39;DHCPACK&#39;,   
+       date=&#39;%timereported:::date-mysql%&#39;,   
+       mac_addr=&#39;%msg:R,ERE,2,BLANK:DHCPACK to ([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}) \((([0-9a-f]{2}:){5}[0-9a-f]{2})\) via (([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3})|eth0)--end%&#39;,   
+       client_ip=inet_aton(&#39;%msg:R,ERE,1,BLANK:DHCPACK to ([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}) \((([0-9a-f]{2}:){5}[0-9a-f]{2})\) via (([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3})|eth0)--end%&#39;),   
+       gateway=&#39;%msg:R,ERE,4,BLANK:DHCPACK to ([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}) \((([0-9a-f]{2}:){5}[0-9a-f]{2})\) via (([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3})|eth0)--end%&#39;,   
+       fullmsg=&#39;%msg%&#39;   
+       ON DUPLICATE KEY UPDATE   
+       server_ip=inet_aton(&#39;%fromhost-ip%&#39;),   
+       date=&#39;%timereported:::date-mysql%&#39;,   
+       mac_addr=&#39;%msg:R,ERE,2,BLANK:DHCPACK to ([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}) \((([0-9a-f]{2}:){5}[0-9a-f]{2})\) via (([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3})|eth0)--end%&#39;,   
+       gateway=&#39;%msg:R,ERE,4,BLANK:DHCPACK to ([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}) \((([0-9a-f]{2}:){5}[0-9a-f]{2})\) via (([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3})|eth0)--end%&#39;,   
+       fullmsg=&#39;%msg%&#39;  
+&quot;,SQL
+
+$template DHCPACKtoMAC, &quot;INSERT INTO dhcplog_mac   
+       SET   
+       server_ip=inet_aton(&#39;%fromhost-ip%&#39;),   
+       msg_type=&#39;DHCPACK&#39;,   
+       date=&#39;%timereported:::date-mysql%&#39;,   
+       mac_addr=&#39;%msg:R,ERE,2,BLANK:DHCPACK to ([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}) \((([0-9a-f]{2}:){5}[0-9a-f]{2})\) via (([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3})|eth0)--end%&#39;,   
+       client_ip=inet_aton(&#39;%msg:R,ERE,1,BLANK:DHCPACK to ([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}) \((([0-9a-f]{2}:){5}[0-9a-f]{2})\) via (([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3})|eth0)--end%&#39;),   
+       gateway=&#39;%msg:R,ERE,4,BLANK:DHCPACK to ([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}) \((([0-9a-f]{2}:){5}[0-9a-f]{2})\) via (([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3})|eth0)--end%&#39;,   
+       fullmsg=&#39;%msg%&#39;   
+       ON DUPLICATE KEY UPDATE   
+       server_ip=inet_aton(&#39;%fromhost-ip%&#39;),   
+       date=&#39;%timereported:::date-mysql%&#39;,   
+       client_ip=inet_aton(&#39;%msg:R,ERE,1,BLANK:DHCPACK to ([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}) \((([0-9a-f]{2}:){5}[0-9a-f]{2})\) via (([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3})|eth0)--end%&#39;),   
+       gateway=&#39;%msg:R,ERE,4,BLANK:DHCPACK to ([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}) \((([0-9a-f]{2}:){5}[0-9a-f]{2})\) via (([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3})|eth0)--end%&#39;,   
+       fullmsg=&#39;%msg%&#39;  
+&quot;,SQL
+
+:msg, startswith, &quot; DHCPACK on&quot; :ommysql:hostname,database,dbuser,dbpass;DHCPACKonIP
+<span class="amp">&amp;</span> :ommysql:hostname,database,dbuser,dbpass;DHCPACKonMAC
+<span class="amp">&amp;</span> ~ ### <span class="caps">DISCARD</span>
+
+if $msg startswith &#39; <span class="caps">DHCPACK</span> to&#39; and ( not ( $msg contains &#39;no client hardware address&#39; ) )   
+then :ommysql:hostname,database,dbuser,dbpass;DHCPACKtoMAC
+<span class="amp">&amp;</span> :ommysql:hostname,database,dbuser,dbpass;DHCPACKtoIP
+<span class="amp">&amp;</span> ~ ### <span class="caps">DISCARD</span>
+</pre></div>
+            </div>
+            <!-- /.entry-content -->
+        </article>
+    </section>
+
+        </div>
+        <div class="col-lg-3 well well-sm" id="sidebar">
+
+<aside>
+    <section>
+        <ul class="list-group list-group-flush">
+                <li class="list-group-item"><h4><i class="icon-home icon-large"></i>Social</h4></li>
+                    <li class="list-group-item"><a href="#"><i
+                            class="icon-You can add links in your config file-sign icon-large"></i>You can add links in your config file
+                    </a></li>
+                    <li class="list-group-item"><a href="#"><i
+                            class="icon-Another social link-sign icon-large"></i>Another social link
+                    </a></li>
+
+
+
+                <li class="list-group-item"><a href="/tags.html"><h4><i class="icon-tags icon-large"></i>Tags</h4></a></li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/android.html">
+                                android
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/google.html">
+                                google
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/nagios.html">
+                                Nagios
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/php.html">
+                                PHP
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/sysadmin.html">
+                                sysadmin
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/linux.html">
+                                linux
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/perl.html">
+                                perl
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/logging.html">
+                                logging
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/puppet.html">
+                                puppet
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/bind.html">
+                                bind
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/monitoring.html">
+                                monitoring
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/dns.html">
+                                dns
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/droid.html">
+                                droid
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/firefox.html">
+                                firefox
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/mediawiki.html">
+                                mediawiki
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/mac.html">
+                                mac
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/microsoft.html">
+                                microsoft
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/syslog.html">
+                                syslog
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/wordpress.html">
+                                wordpress
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/rpm.html">
+                                rpm
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/security.html">
+                                security
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/blog.html">
+                                blog
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/sun.html">
+                                sun
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/ems.html">
+                                EMS
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/apache.html">
+                                apache
+                            </a>
+                        </li>
+        </ul>
+    </section>
+</aside>        </div>
+    </div>
+</div>
+<footer>
+    <div class="container">
+        <hr>
+        <p class="pull-right"><i class="icon-arrow-up"></i> <a href="#">Back to top</a></p>
+
+
+        <p>&copy; 2014 Jason Antman &middot; Powered by <a href="https://github.com/DandyDev/pelican-bootstrap3" target="_blank">pelican-bootstrap3</a>,
+            <a href="http://docs.getpelican.com/" target="_blank">Pelican</a>,
+            <a href="http://getbootstrap.com" target="_blank">Bootstrap</a></p>
+    </div>
+</footer>
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="/theme/js/bootstrap.min.js"></script>
+
+<!-- Enable responsive features in IE8 with Respond.js (https://github.com/scottjehl/Respond) -->
+<script src="/theme/js/respond.min.js"></script>
+
+
+</body>
+</html>

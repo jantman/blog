@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:og="http://ogp.me/ns#"
+      xmlns:fb="https://www.facebook.com/2008/fbml">
+<head>
+    <title>How to make software distribution secure</title>
+    <!-- Using the latest rendering mode for IE -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Open Graph tags -->
+
+            <meta property="og:type" content="article"/>
+            <meta property="og:title" content="How to make software distribution secure"/>
+            <meta property="og:url" content="/2010/09/how-to-make-software-distribution-secure/"/>
+            <meta property="og:description" content="We were seeing some strange behavior with Mac client machines on the network lately, specifically with DNS queries (I’d guess that a lot of it has to do with Bonjour), but the discussion touched on the DNS Changer trojan for Mac. I’d really never heard about it before ..."/>
+
+    <!-- Bootstrap -->
+        <link rel="stylesheet" href="/theme/css/bootstrap.min.css" type="text/css"/>
+    <link href="/theme/css/font-awesome.min.css" rel="stylesheet">
+    <link href="/theme/css/pygments.css" rel="stylesheet">
+        <link href="/theme/css/typogrify.css" rel="stylesheet">
+    <link rel="stylesheet" href="/theme/css/style.css" type="text/css"/>
+    <!-- JavaScript plugins (requires jQuery) -->
+    <script src="http://code.jquery.com/jquery.js"></script>
+
+        <link href="/feeds/all.atom.xml" type="application/atom+xml" rel="alternate"
+              title="Jason Antman's Blog ATOM Feed"/>
+
+</head>
+<body>
+<nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="" class="navbar-brand">Jason Antman's Blog</a>
+        </div>
+        <div class="collapse navbar-collapse navbar-ex1-collapse">
+            <ul class="nav navbar-nav">
+                         <li><a href="/pages/about.html">
+                             About
+                          </a></li>
+                        <li class="active">
+                            <a href="/category/ideas-and-rants.html">Ideas and rants</a>
+                        </li>
+                        <li >
+                            <a href="/category/miscellaneous.html">Miscellaneous</a>
+                        </li>
+                        <li >
+                            <a href="/category/monitoring.html">Monitoring</a>
+                        </li>
+                        <li >
+                            <a href="/category/projects.html">Projects</a>
+                        </li>
+                        <li >
+                            <a href="/category/puppet.html">Puppet</a>
+                        </li>
+                        <li >
+                            <a href="/category/sysadmin.html">Sysadmin</a>
+                        </li>
+                        <li >
+                            <a href="/category/tech-howtos.html">Tech howtos</a>
+                        </li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="/archives.html"><i class="icon-th-list"></i>Archives</a></li>
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+</nav>
+<!-- /.navbar -->
+<div class="container">
+    <div class="row">
+        <div class="col-lg-9">
+    <section id="content">
+        <article>
+            <header class="page-header">
+                <h1>
+                    <a href="/2010/09/how-to-make-software-distribution-secure/"
+                       rel="bookmark"
+                       title="Permalink to How to make software distribution secure">
+                        How to make software distribution&nbsp;secure
+                    </a>
+                </h1>
+            </header>
+            <div class="entry-content">
+                <div class="panel">
+                    <div class="panel-body">
+<footer class="post-info">
+    <span class="label label-default">Date</span>
+    <span class="published">
+        <i class="icon-calendar"></i>Fri 17 September 2010
+    </span>
+
+
+
+<span class="label label-default">Tags</span>
+	<a href="/tag/linux.html">linux</a>
+        /
+	<a href="/tag/mac.html">mac</a>
+        /
+	<a href="/tag/packaging.html">packaging</a>
+        /
+	<a href="/tag/security.html">security</a>
+        /
+	<a href="/tag/software.html">software</a>
+        /
+	<a href="/tag/windows.html">windows</a>
+</footer><!-- /.post-info -->                    </div>
+                </div>
+                <p>We were seeing some strange behavior with Mac client machines on the
+network lately, specifically with <span class="caps">DNS</span> queries (I&#8217;d guess that a lot of
+it has to do with <a href="http://en.wikipedia.org/wiki/Bonjour_(software)">Bonjour</a>), but the discussion touched on the <a href="http://isc.sans.edu/diary.html?storyid=3595"><span class="caps">DNS</span>
+Changer</a> <a href="http://www.dnschanger.com/">trojan</a> for Mac. I&#8217;d really never heard about it before,
+and after some basic reading, it really got me thinking about the state
+of software packaging, updates, and distribution. Granted, some of my
+observations would require sweeping changes to how packaging is handled
+(even on the *nixes), and would require buy-in from more than just the
+vendor and distributor (well, I guess <span class="caps">MS</span> can probably pressure ISVs to
+do whatever they want), but seems to be the only way to keep
+appliancization from becoming the solution to security issues. I&#8217;ve
+written about this <a href="/2009/12/book-comments-the-future-of-the-internet-and-how-to-stop-it-by-jonathan-zittrain/">before</a>, and a while ago in respect to <a href="/2008/10/my-biggest-problem-with-linux/">Linux</a>,
+but here&#8217;s my current take on what needs to be done to software
+packaging to allow our machines to stay secure, no matter what <span class="caps">OS</span> they&nbsp;run.</p>
+<ol>
+<li><strong>Allow packages to be installed as a user.</strong> This is a mammoth task
+    under Windows or Mac, but still an issue under Linux. The <span class="caps">DNS</span>
+    Changer trojan is a case in point - there&#8217;s no reason a &#8220;video
+    codec&#8221; would need to be installed system-wide, and if that were
+    simply installed user-specific, the malicious installer would never
+    have the privileges to change system-wide <span class="caps">DNS</span> settings. This is also
+    a big issue under Linux. Yum, apt, rpm, etc. should (if run as a
+    non-root user) install packages in a user-local path under <code>/home</code>
+    by default. Of course, this would mean many things would need to
+    change in order to cope - perhaps even a change to the <a href="http://www.linuxfoundation.org/collaborate/workgroups/lsb"><span class="caps">LSB</span></a>&nbsp;spec.</li>
+<li><strong>Warn about inconsistencies on package installation.</strong> The package
+    installation program should warn a user (whether installing packages
+    system-wide or local to a user) if the package is going to modify
+    system-wide files, i.e. files not specifically placed by that
+    package and that package&nbsp;only.</li>
+<li><strong>Real package management for Windows and Mac</strong> It&#8217;s about time that
+    Apple and Microsoft admit that people without billions in funding
+    can come up with good ideas. Get rid of these Installer programs
+    (the many many different ones). Each <span class="caps">OS</span> should pick a package
+    format, develop a yum-like (or, even better, zypper-like) package
+    management program that understands repositories. I don&#8217;t know how
+    they&#8217;d cope with the pervasive license keys and <span class="caps">DRM</span> in the non-nix
+    world, but I&#8217;m sure they could figure out a way that still allowed
+    sane package management. The idea here is that vendors run
+    repositories and are responsible for their <span class="caps">GPG</span> keys, so trojans
+    claiming to be an update to a given vendor&#8217;s software would be
+    rejected. Also, isn&#8217;t it about time that you can update all your
+    software on Windows or Mac through one&nbsp;tool?</li>
+<li><strong>Filesystem-based <span class="caps">IDS</span> for Windows and Mac</strong> Assuming it will take a
+    while to get everyone onboard with the packaging idea, and noting
+    that users of these OSes like installing applications from arbitrary
+    sources, there should be an <span class="caps">OS</span>-level feature to audit all filesystem
+    changes made by untrusted/unsigned applications, and a way to alert
+    the user to these changes if they appear suspisious (essentially
+    what <a href="http://www.safer-networking.org">Spybot Search <span class="amp">&amp;</span> Destroy / TeaTimer</a> do, but builtin to the&nbsp;<span class="caps">OS</span>).</li>
+<li><strong>Vendor support of packaging/repositories</strong> - Along with the idea
+    of repositories, vendors should have a trust or signing system for
+    ISVs signing keys. If users are installing arbitrary software,
+    making them trust an arbitrary key won&#8217;t do anything to improve
+    security. Microsoft and Apple need to run a <span class="caps">CA</span> that signs the
+    package signing keys of their ISVs. The also - and here&#8217;s the big
+    one - need to have a parallel framework for &#8220;independent
+    developers&#8221;. I.e. something that doesn&#8217;t cost any money for the
+    packagers, and allows them to at least give a &#8220;this person is who
+    they say they are&#8221;&nbsp;message.</li>
+<li>Finally, <strong>Make package management pervasive</strong> - Have a real push to
+    apply the packaging and signing keys standard to all software for
+    the&nbsp;<span class="caps">OS</span>.</li>
+<li></li>
+</ol>
+<p>On a final note, applicable to both the current state of Linux packaging
+and my ideas about Mac and Windows&#8230; <span class="caps">DNS</span> is the ideal method of key
+distribution (granted, yes, this just means that the security of the
+packager&#8217;s <span class="caps">DNS</span> records, and their servers and signing key, is just more
+of an issue). But even with Yum and Zypper, it seems to me to be logical
+that the packager&#8217;s public key should be stored in a <span class="caps">DNS</span> record (or at a
+<span class="caps">URL</span> stored in a <span class="caps">DNS</span> <span class="caps">TXT</span> record). That way, it wouldn&#8217;t be up to an end
+user to import and trust a key, they&#8217;d just have to trust the repository
+(i.e. software.adobe.com) and the package manager would pull down the
+key and verify that package X in software.adobe.com is, in fact, signed
+by the software.adobe.com&nbsp;key.</p>
+            </div>
+            <!-- /.entry-content -->
+        </article>
+    </section>
+
+        </div>
+        <div class="col-lg-3 well well-sm" id="sidebar">
+
+<aside>
+    <section>
+        <ul class="list-group list-group-flush">
+                <li class="list-group-item"><h4><i class="icon-home icon-large"></i>Social</h4></li>
+                    <li class="list-group-item"><a href="#"><i
+                            class="icon-You can add links in your config file-sign icon-large"></i>You can add links in your config file
+                    </a></li>
+                    <li class="list-group-item"><a href="#"><i
+                            class="icon-Another social link-sign icon-large"></i>Another social link
+                    </a></li>
+
+
+
+                <li class="list-group-item"><a href="/tags.html"><h4><i class="icon-tags icon-large"></i>Tags</h4></a></li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/android.html">
+                                android
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/google.html">
+                                google
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/nagios.html">
+                                Nagios
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/php.html">
+                                PHP
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/sysadmin.html">
+                                sysadmin
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/linux.html">
+                                linux
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/perl.html">
+                                perl
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/logging.html">
+                                logging
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/puppet.html">
+                                puppet
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/bind.html">
+                                bind
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/monitoring.html">
+                                monitoring
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/dns.html">
+                                dns
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/droid.html">
+                                droid
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/firefox.html">
+                                firefox
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/mediawiki.html">
+                                mediawiki
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/mac.html">
+                                mac
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/microsoft.html">
+                                microsoft
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/syslog.html">
+                                syslog
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/wordpress.html">
+                                wordpress
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/rpm.html">
+                                rpm
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/security.html">
+                                security
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/blog.html">
+                                blog
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/sun.html">
+                                sun
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/ems.html">
+                                EMS
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/apache.html">
+                                apache
+                            </a>
+                        </li>
+        </ul>
+    </section>
+</aside>        </div>
+    </div>
+</div>
+<footer>
+    <div class="container">
+        <hr>
+        <p class="pull-right"><i class="icon-arrow-up"></i> <a href="#">Back to top</a></p>
+
+
+        <p>&copy; 2014 Jason Antman &middot; Powered by <a href="https://github.com/DandyDev/pelican-bootstrap3" target="_blank">pelican-bootstrap3</a>,
+            <a href="http://docs.getpelican.com/" target="_blank">Pelican</a>,
+            <a href="http://getbootstrap.com" target="_blank">Bootstrap</a></p>
+    </div>
+</footer>
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="/theme/js/bootstrap.min.js"></script>
+
+<!-- Enable responsive features in IE8 with Respond.js (https://github.com/scottjehl/Respond) -->
+<script src="/theme/js/respond.min.js"></script>
+
+
+</body>
+</html>

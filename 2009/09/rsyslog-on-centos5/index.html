@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:og="http://ogp.me/ns#"
+      xmlns:fb="https://www.facebook.com/2008/fbml">
+<head>
+    <title>rsyslog on CentOS5</title>
+    <!-- Using the latest rendering mode for IE -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Open Graph tags -->
+
+            <meta property="og:type" content="article"/>
+            <meta property="og:title" content="rsyslog on CentOS5"/>
+            <meta property="og:url" content="/2009/09/rsyslog-on-centos5/"/>
+            <meta property="og:description" content="Update July 2011 - We’ve been using rsyslog for our centralized syslog infrastructure at work (site being redesigned at the moment) for about a year now. As a result, our colleagues at Rutgers University Open System Solutions have been nice enough to include rsyslog in their koji build system. Updated ..."/>
+
+    <!-- Bootstrap -->
+        <link rel="stylesheet" href="/theme/css/bootstrap.min.css" type="text/css"/>
+    <link href="/theme/css/font-awesome.min.css" rel="stylesheet">
+    <link href="/theme/css/pygments.css" rel="stylesheet">
+        <link href="/theme/css/typogrify.css" rel="stylesheet">
+    <link rel="stylesheet" href="/theme/css/style.css" type="text/css"/>
+    <!-- JavaScript plugins (requires jQuery) -->
+    <script src="http://code.jquery.com/jquery.js"></script>
+
+        <link href="/feeds/all.atom.xml" type="application/atom+xml" rel="alternate"
+              title="Jason Antman's Blog ATOM Feed"/>
+
+</head>
+<body>
+<nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="" class="navbar-brand">Jason Antman's Blog</a>
+        </div>
+        <div class="collapse navbar-collapse navbar-ex1-collapse">
+            <ul class="nav navbar-nav">
+                         <li><a href="/pages/about.html">
+                             About
+                          </a></li>
+                        <li >
+                            <a href="/category/ideas-and-rants.html">Ideas and rants</a>
+                        </li>
+                        <li >
+                            <a href="/category/miscellaneous.html">Miscellaneous</a>
+                        </li>
+                        <li >
+                            <a href="/category/monitoring.html">Monitoring</a>
+                        </li>
+                        <li >
+                            <a href="/category/projects.html">Projects</a>
+                        </li>
+                        <li >
+                            <a href="/category/puppet.html">Puppet</a>
+                        </li>
+                        <li >
+                            <a href="/category/sysadmin.html">Sysadmin</a>
+                        </li>
+                        <li class="active">
+                            <a href="/category/tech-howtos.html">Tech howtos</a>
+                        </li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="/archives.html"><i class="icon-th-list"></i>Archives</a></li>
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+</nav>
+<!-- /.navbar -->
+<div class="container">
+    <div class="row">
+        <div class="col-lg-9">
+    <section id="content">
+        <article>
+            <header class="page-header">
+                <h1>
+                    <a href="/2009/09/rsyslog-on-centos5/"
+                       rel="bookmark"
+                       title="Permalink to rsyslog on CentOS5">
+                        rsyslog on&nbsp;CentOS5
+                    </a>
+                </h1>
+            </header>
+            <div class="entry-content">
+                <div class="panel">
+                    <div class="panel-body">
+<footer class="post-info">
+    <span class="label label-default">Date</span>
+    <span class="published">
+        <i class="icon-calendar"></i>Thu 17 September 2009
+    </span>
+
+
+
+<span class="label label-default">Tags</span>
+	<a href="/tag/centos.html">centos</a>
+        /
+	<a href="/tag/logging.html">logging</a>
+        /
+	<a href="/tag/rsyslog.html">rsyslog</a>
+        /
+	<a href="/tag/syslog.html">syslog</a>
+</footer><!-- /.post-info -->                    </div>
+                </div>
+                <p><strong>Update July 2011</strong> - We&#8217;ve been using rsyslog for our centralized
+syslog infrastructure at <a href="http://services.rutgers.edu/">work</a> (site being redesigned at the moment)
+for about a year now. As a result, our colleagues at <a href="http://oss.rutgers.edu">Rutgers University
+Open System Solutions</a> have been nice enough to include rsyslog in
+their <a href="http://koji.rutgers.edu">koji</a> build system. Updated packages of rsyslog for CentOS 5
+x86 and x86_64 are available <a href="http://koji.rutgers.edu/koji/buildinfo?buildID=2140">here</a>. Please be aware that they have
+some dependencies of specific <span class="caps">RU</span> versions. It&#8217;s probably best if you
+download the source <span class="caps">RPM</span> and build it yourself using rpmbuild. The
+current <a href="http://koji.rutgers.edu/koji/rpminfo?rpmID=14051">5.6.2 source package</a> includes a CentOS 5 spec file and other
+related scripts. This <span class="caps">RPM</span> repository is only open to the public as a
+courtesy, so please download once at most and distribute it to your
+servers&nbsp;yourself.</p>
+<p>Having finally setup my storage server (I know it&#8217;s not much, but for me
+starting with <span class="caps">1TB</span> is wonderful), I actually got around to redoing my
+centralized logging infrastructure. Here&#8217;s a small summary of what I
+have to&nbsp;handle:</p>
+<ul>
+<li>logs from 15 hosts at 2 locations, including Cisco devices and a mix
+    of syslog and syslog-ng Linux&nbsp;boxen.</li>
+<li>Remote location logs forwarded to one server at remote location,
+    then to centralized log server via <span class="caps">SSH</span> port&nbsp;forwarding.</li>
+<li>48-hour retention of full iptables border firewall logs (\~&nbsp;<span class="caps">3GB</span>/day).</li>
+<li>Future plans to have all logs stored in&nbsp;MySQL.</li>
+</ul>
+<p>I&#8217;d previously had most of the boxes logging to an older host with low
+disk space, but had to discontinue this due to lack of storage. Having
+assessed the options, and with definite plans to log to a database, I
+decided to go with <a href="http://www.rsyslog.com">rsyslog</a> for the centralized&nbsp;host.</p>
+<p>Unfortunately, stable rsyslog is up to 4.4.x, with 5.x in development,
+and the newest package I could find for CentOS was 2.something. So, I
+set about building it from source. It was a *very* difficult build on
+my machine (CentOS 5.3, 2.6.18-128.el5 #1 <span class="caps">SMP</span> i686). Unfortunately, I
+don&#8217;t have an <span class="caps">RPM</span> build environment setup, but here&#8217;s how I accomplished&nbsp;it:</p>
+<ol>
+<li>I f not already done, <span style="font-family: courier new;">yum
+    install&nbsp;rpmforge-release</span></li>
+<li><span style="font-family: courier new;">yum install gnutls-devel
+    gnutls libatomic_ops-devel gcc43&nbsp;java-1.6.0-openjdk-devel</span></li>
+<li>Download <a href="http://rsyslog.com/Downloads-index-req-viewdownload-cid-1-orderby-dateD.phtml">rsyslog-4.5.2</a> (currently Beta). Extract, cd into the&nbsp;directory.</li>
+<li>To test the performance difference from MySQL,
+    <span style="font-family: courier new;">yum install php-pgsql
+    postgresql postgresql-devel postgresql-libs&nbsp;postgresql-server</span></li>
+<li>Edit the &#8220;configure&#8221; script, add
+    <span style="font-family: courier new;">-DHAVE_ATOMIC_BUILTINS</span>
+    to the <span style="font-family: courier new;"><span class="caps">DEFS</span></span> line
+    (28936 in this&nbsp;version).</li>
+<li><span style="font-family: courier new;">export&nbsp;<span class="caps">CC</span>=/usr/bin/gcc43</span></li>
+<li><span style="font-family: courier new;">export&nbsp;<span class="caps">CCDEPMODE</span>=&#8221;depmode=gcc4&#8221;</span></li>
+<li><span style="font-family: courier new;">export <span class="caps">CFLAGS</span>=&#8221;-O3&nbsp;-march=i686&#8221;</span></li>
+<li><span style="font-family: courier new;">./configure &#8212;enable-mysql
+    &#8212;enable-omtemplate &#8212;enable-gnutls&nbsp;&#8212;enable-pgsql</span></li>
+<li><span style="font-family: courier new;">make &amp;&amp; make&nbsp;install</span></li>
+</ol>
+<p>For my system, I used the
+<span style="font-family: courier new;">/etc/sysconfig/rsyslog</span>
+and <span style="font-family: courier new;">/etc/init.d/rsyslog</span>
+from the 2.x rsyslog RPMs, with some modifications as&nbsp;follows:</p>
+<p><span style="font-family: courier new;">/etc/sysconfig/rsyslog</span>
+<em>(comments have been removed to save space)</em>:</p>
+<div class="codehilite"><pre><span class="c"># -c4   version 4 compatibility mode</span>
+<span class="c"># -x     disable <span class="caps">DNS</span> for remote messages (don&#39;t want it to hang if <span class="caps">DNS</span> is down</span>
+<span class="c"># -4     IPv4 only</span>
+<span class="nv">SYSLOGD_OPTIONS</span><span class="o">=</span><span class="s2">&quot;-c4 -x -4&quot;</span>
+</pre></div>
+
+
+<p><span style="font-family: courier new;">/etc/init.d/rsyslog</span>
+<em>(comments have been removed to save space)</em>:</p>
+<div class="codehilite"><pre><span class="c">#!/bin/bash</span>
+<span class="c">#</span>
+<span class="c"># rsyslog        Starts rsyslogd.</span>
+<span class="c">#</span>
+<span class="c">#</span>
+<span class="c"># chkconfig: - 12 88</span>
+<span class="c"># description: Syslog is the facility by which many daemons use to log   </span>
+<span class="c"># messages to various system log files.  It is a good idea to always   </span>
+<span class="c"># run rsyslog.</span>
+<span class="c">### <span class="caps">BEGIN</span> <span class="caps">INIT</span> <span class="caps">INFO</span></span>
+<span class="c"># Provides: $syslog</span>
+<span class="c"># Required-Start: $local_fs $network $remote_fs</span>
+<span class="c"># Required-Stop: $local_fs $network $remote_fs</span>
+<span class="c"># Default-Stop: 0 1 2 3 4 5 6</span>
+<span class="c"># Short-Description: Enhanced system logging and kernel message trapping daemons</span>
+<span class="c"># Description: Rsyslog is an enhanced multi-threaded syslogd supporting,</span>
+<span class="c">#              among others, MySQL, syslog/tcp, <span class="caps">RFC</span> 3195, permitted</span>
+<span class="c">#              sender lists, filtering on any message part, and fine</span>
+<span class="c">#              grain output format control.</span>
+<span class="c">### <span class="caps">END</span> <span class="caps">INIT</span> <span class="caps">INFO</span></span>
+
+<span class="c"># Source function library.</span>
+. /etc/init.d/functions
+
+<span class="nv"><span class="caps">RETVAL</span></span><span class="o">=</span>0
+
+start<span class="o">()</span> <span class="o">{</span>
+        <span class="o">[</span> -x /sbin/rsyslogd <span class="o">]</span> <span class="o">||</span> <span class="nb">exit </span>5
+
+        <span class="c"># Do not start rsyslog when sysklogd is running</span>
+        <span class="k">if</span> <span class="o">[</span> -e /var/run/syslogd.pid <span class="o">]</span> ; <span class="k">then</span>
+<span class="k">                </span><span class="nb">echo</span> <span class="s2">$&quot;Shut down sysklogd before you run rsyslog&quot;</span>;
+                <span class="nb">exit </span>1;
+        <span class="k">fi</span>
+
+        <span class="c"># Source config</span>
+        <span class="k">if</span> <span class="o">[</span> -f /etc/sysconfig/rsyslog <span class="o">]</span> ; <span class="k">then</span>
+                . /etc/sysconfig/rsyslog
+        <span class="k">else</span>
+<span class="k">                </span><span class="nv">SYSLOGD_OPTIONS</span><span class="o">=</span><span class="s2">&quot;-m 0&quot;</span>
+        <span class="k">fi</span>
+
+<span class="k">        if</span> <span class="o">[</span> -z <span class="s2">&quot;$SYSLOG_UMASK&quot;</span> <span class="o">]</span> ; <span class="k">then</span>
+<span class="k">              </span><span class="nv">SYSLOG_UMASK</span><span class="o">=</span>077;
+        <span class="k">fi</span>
+<span class="k">        </span><span class="nb">umask</span> <span class="nv">$SYSLOG_UMASK</span>
+
+        <span class="nb">echo</span> -n <span class="s2">$&quot;Starting system logger: &quot;</span>
+        daemon rsyslogd <span class="nv">$SYSLOGD_OPTIONS</span>
+        <span class="nv"><span class="caps">RETVAL</span></span><span class="o">=</span><span class="nv">$?</span>
+        <span class="nb">echo</span>
+        <span class="o">[</span> <span class="nv">$<span class="caps">RETVAL</span></span> -eq 0 <span class="o">]</span> <span class="o">&amp;&amp;</span> touch /var/lock/subsys/rsyslog
+        <span class="k">return</span> <span class="nv">$<span class="caps">RETVAL</span></span>
+<span class="o">}</span>
+stop<span class="o">()</span> <span class="o">{</span>
+        <span class="nb">echo</span> -n <span class="s2">$&quot;Shutting down system logger: &quot;</span>
+        killproc rsyslogd
+        <span class="nv"><span class="caps">RETVAL</span></span><span class="o">=</span><span class="nv">$?</span>
+        <span class="nb">echo</span>
+        <span class="o">[</span> <span class="nv">$<span class="caps">RETVAL</span></span> -eq 0 <span class="o">]</span> <span class="o">&amp;&amp;</span> rm -f /var/lock/subsys/rsyslog
+        <span class="k">return</span> <span class="nv">$<span class="caps">RETVAL</span></span>
+<span class="o">}</span>
+reload<span class="o">()</span>  <span class="o">{</span>
+    <span class="nv"><span class="caps">RETVAL</span></span><span class="o">=</span>1
+    <span class="nv">syslog</span><span class="o">=</span><span class="sb">`</span>cat /var/run/rsyslogd.pid 2&gt;/dev/null<span class="sb">`</span>
+    <span class="nb">echo</span> -n <span class="s2">&quot;Reloading system logger...&quot;</span>
+    <span class="k">if</span> <span class="o">[</span> -n <span class="s2">&quot;${syslog}&quot;</span> <span class="o">]</span> <span class="o">&amp;&amp;</span> <span class="o">[</span> -e /proc/<span class="s2">&quot;${syslog}&quot;</span> <span class="o">]</span>; <span class="k">then</span>
+<span class="k">        </span><span class="nb">kill</span> -<span class="caps">HUP</span> <span class="s2">&quot;$syslog&quot;</span>;
+        <span class="nv"><span class="caps">RETVAL</span></span><span class="o">=</span><span class="nv">$?</span>
+    <span class="k">fi</span>
+<span class="k">    if</span> <span class="o">[</span> <span class="nv">$<span class="caps">RETVAL</span></span> -ne 0 <span class="o">]</span>; <span class="k">then</span>
+<span class="k">        </span>failure
+    <span class="k">else</span>
+<span class="k">        </span>success
+    <span class="k">fi</span>
+<span class="k">    </span><span class="nb">echo</span>
+<span class="nb">    </span><span class="k">return</span> <span class="nv">$<span class="caps">RETVAL</span></span>
+<span class="o">}</span>
+rhstatus<span class="o">()</span> <span class="o">{</span>
+        status rsyslogd
+<span class="o">}</span>
+restart<span class="o">()</span> <span class="o">{</span>
+        stop
+        start
+<span class="o">}</span>
+
+<span class="k">case</span> <span class="s2">&quot;$1&quot;</span> in
+  start<span class="o">)</span>
+        start
+        ;;
+  stop<span class="o">)</span>
+        stop
+        ;;
+  restart<span class="o">)</span>
+        restart
+        ;;
+  reload|force-reload<span class="o">)</span>
+        reload
+        ;;
+  status<span class="o">)</span>
+        rhstatus
+        ;;
+  condrestart<span class="o">)</span>
+        <span class="o">[</span> -f /var/lock/subsys/rsyslog <span class="o">]</span> <span class="o">&amp;&amp;</span> restart <span class="o">||</span> :
+        ;;
+  *<span class="o">)</span>
+        <span class="nb">echo</span> <span class="s2">$&quot;Usage: $0 {start|stop|restart|reload|force-reload|condrestart}&quot;</span>
+        <span class="nb">exit </span>2
+<span class="k">esac</span>
+
+<span class="nb">exit</span> <span class="nv">$?</span>
+</pre></div>
+
+
+<p><strong>My rsyslog.conf file</strong>:</p>
+<p>~~~~{.text&nbsp;only}</p>
+<h1 id="uncomment-next-line-for-debugging-use-graphvis-to-see-the-graph">uncomment next line for debugging, use graphvis to see the&nbsp;graph</h1>
+<h1 id="generateconfiggraph-rootrsyslog-graphdot">$GenerateConfigGraph&nbsp;/root/rsyslog-graph.dot</h1>
+<p>$ModLoad imklog
+$ModLoad imtcp
+$ModLoad imudp
+$ModLoad&nbsp;imuxsock</p>
+<h1 id="template">template</h1>
+<p>$template&nbsp;RemoteHost,&#8221;/var/log/<span class="caps">HOSTS</span>/%<span class="caps">HOSTNAME</span>%/%$<span class="caps">YEAR</span>%/%$<span class="caps">MONTH</span>%/%$<span class="caps">DAY</span>%/%syslogfacility-text%.log&#8221;</p>
+<h1 id="used-for-cisco-vanilla-syslog-when-we-cant-parse-host-name">used for Cisco, vanilla syslog when we can&#8217;t parse host&nbsp;name</h1>
+<p>$template&nbsp;RemoteFromHost,&#8221;/var/log/<span class="caps">HOSTS</span>/%<span class="caps">FROMHOST</span>%/%$<span class="caps">YEAR</span>%/%$<span class="caps">MONTH</span>%/%$<span class="caps">DAY</span>%/%syslogfacility-text%.log&#8221;</p>
+<h1 id="note-we-cant-bind-udp-to-a-ruleset-so-it-enters-the-local-ruleset"><span class="caps">NOTE</span> - we can&#8217;t bind <span class="caps">UDP</span> to a ruleset, so it enters the local&nbsp;RuleSet</h1>
+<h1 id="and-has-to-be-dealt-with-here">and has to be dealt with&nbsp;here</h1>
+<p>$RuleSet&nbsp;local</p>
+<h1 id="for-cisco-vyatta-doesnt-send-hostname-need-to-use-ip-manually">for cisco, vyatta - doesn&#8217;t send hostname, need to use <span class="caps">IP</span>&nbsp;manually</h1>
+<p>:fromhost, isequal, &#8220;192.168.0.99&#8221; ?RemoteFromHost
+:fromhost, isequal, &#8220;192.168.0.99&#8221; ~
+:fromhost, isequal, &#8220;192.168.0.103&#8221; ?RemoteFromHost
+:fromhost, isequal, &#8220;192.168.0.103&#8221; ~
+:fromhost, isequal, &#8220;192.168.0.97&#8221; ?RemoteFromHost
+:fromhost, isequal, &#8220;192.168.0.97&#8221; ~
+:fromhost, isequal, &#8220;192.168.0.111&#8221; ?RemoteFromHost
+:fromhost, isequal, &#8220;192.168.0.111&#8221;&nbsp;~</p>
+<h1 id="anything-from-a-remote-host-gets-logged-as-such">anything from a remote host gets logged as&nbsp;such</h1>
+<p>:source, isequal, &#8220;&#8221; ?RemoteHost
+:source, isequal, &#8220;&#8221;&nbsp;~</p>
+<h1></h1>
+<h1 id="local-logging"><span class="caps">LOCAL</span>&nbsp;<span class="caps">LOGGING</span></h1>
+<h1></h1>
+<p>kern.<em>                                                 /var/log/messages
+</em>.info;mail.none;authpriv.none;cron.none                /var/log/messages
+authpriv.<em>                                              /var/log/secure
+mail.</em>                                                  -/var/log/maillog
+cron.<em>                                                  /var/log/cron
+</em>.emerg                                                 <em>
+uucp,news.crit                                          /var/log/spooler
+local7.</em>&nbsp;/var/log/boot.log</p>
+<h1 id="use-the-local-ruleset-as-default">use the local RuleSet as&nbsp;default</h1>
+<p>$DefaultRuleset&nbsp;local</p>
+<h1></h1>
+<h1 id="begin-centralized-logging-stuff-added-2009-09-16-by-jantman"><span class="caps">BEGIN</span> centralized logging stuff added 2009-09-16 by&nbsp;jantman</h1>
+<h1></h1>
+<h1 id="define-ruleset-for-remote-logging">define ruleset for remote&nbsp;logging</h1>
+<p>$RuleSet&nbsp;remote</p>
+<p><em>.</em>&nbsp;?RemoteHost</p>
+<h1 id="bind-ruleset-to-tcp-listener">bind ruleset to tcp&nbsp;listener</h1>
+<p>$InputTCPServerBindRuleset&nbsp;remote</p>
+<h1 id="and-activate-it">and activate&nbsp;it:</h1>
+<p>$InputTCPServerRun&nbsp;5000</p>
+<p>$UDPServerRun 514
+$UDPServerRun&nbsp;5000</p>
+<h1></h1>
+<h1 id="end-remote-logging"><span class="caps">END</span> remote&nbsp;logging</h1>
+<h1></h1>
+<p>~~~~</p>
+            </div>
+            <!-- /.entry-content -->
+        </article>
+    </section>
+
+        </div>
+        <div class="col-lg-3 well well-sm" id="sidebar">
+
+<aside>
+    <section>
+        <ul class="list-group list-group-flush">
+                <li class="list-group-item"><h4><i class="icon-home icon-large"></i>Social</h4></li>
+                    <li class="list-group-item"><a href="#"><i
+                            class="icon-You can add links in your config file-sign icon-large"></i>You can add links in your config file
+                    </a></li>
+                    <li class="list-group-item"><a href="#"><i
+                            class="icon-Another social link-sign icon-large"></i>Another social link
+                    </a></li>
+
+
+
+                <li class="list-group-item"><a href="/tags.html"><h4><i class="icon-tags icon-large"></i>Tags</h4></a></li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/android.html">
+                                android
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/google.html">
+                                google
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/nagios.html">
+                                Nagios
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/php.html">
+                                PHP
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/sysadmin.html">
+                                sysadmin
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/linux.html">
+                                linux
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/perl.html">
+                                perl
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/logging.html">
+                                logging
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/puppet.html">
+                                puppet
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/bind.html">
+                                bind
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/monitoring.html">
+                                monitoring
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/dns.html">
+                                dns
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/droid.html">
+                                droid
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/firefox.html">
+                                firefox
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/mediawiki.html">
+                                mediawiki
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/mac.html">
+                                mac
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/microsoft.html">
+                                microsoft
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/syslog.html">
+                                syslog
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/wordpress.html">
+                                wordpress
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/rpm.html">
+                                rpm
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/security.html">
+                                security
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/blog.html">
+                                blog
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/sun.html">
+                                sun
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/ems.html">
+                                EMS
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/apache.html">
+                                apache
+                            </a>
+                        </li>
+        </ul>
+    </section>
+</aside>        </div>
+    </div>
+</div>
+<footer>
+    <div class="container">
+        <hr>
+        <p class="pull-right"><i class="icon-arrow-up"></i> <a href="#">Back to top</a></p>
+
+
+        <p>&copy; 2014 Jason Antman &middot; Powered by <a href="https://github.com/DandyDev/pelican-bootstrap3" target="_blank">pelican-bootstrap3</a>,
+            <a href="http://docs.getpelican.com/" target="_blank">Pelican</a>,
+            <a href="http://getbootstrap.com" target="_blank">Bootstrap</a></p>
+    </div>
+</footer>
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="/theme/js/bootstrap.min.js"></script>
+
+<!-- Enable responsive features in IE8 with Respond.js (https://github.com/scottjehl/Respond) -->
+<script src="/theme/js/respond.min.js"></script>
+
+
+</body>
+</html>

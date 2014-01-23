@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:og="http://ogp.me/ns#"
+      xmlns:fb="https://www.facebook.com/2008/fbml">
+<head>
+    <title>Updates, SuSE Online Update Issues</title>
+    <!-- Using the latest rendering mode for IE -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Open Graph tags -->
+
+            <meta property="og:type" content="article"/>
+            <meta property="og:title" content="Updates, SuSE Online Update Issues"/>
+            <meta property="og:url" content="/2007/11/updates-suse-online-update-issues/"/>
+            <meta property="og:description" content="It’s been way too long since I’ve posted an update. But I haven’t been doing nothing. In fact, I’ve been quite busy - and not just with school and Sun and the Rutgers job. So, I’ll go through a few of the happenings of the past ..."/>
+
+    <!-- Bootstrap -->
+        <link rel="stylesheet" href="/theme/css/bootstrap.min.css" type="text/css"/>
+    <link href="/theme/css/font-awesome.min.css" rel="stylesheet">
+    <link href="/theme/css/pygments.css" rel="stylesheet">
+        <link href="/theme/css/typogrify.css" rel="stylesheet">
+    <link rel="stylesheet" href="/theme/css/style.css" type="text/css"/>
+    <!-- JavaScript plugins (requires jQuery) -->
+    <script src="http://code.jquery.com/jquery.js"></script>
+
+        <link href="/feeds/all.atom.xml" type="application/atom+xml" rel="alternate"
+              title="Jason Antman's Blog ATOM Feed"/>
+
+</head>
+<body>
+<nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="" class="navbar-brand">Jason Antman's Blog</a>
+        </div>
+        <div class="collapse navbar-collapse navbar-ex1-collapse">
+            <ul class="nav navbar-nav">
+                         <li><a href="/pages/about.html">
+                             About
+                          </a></li>
+                        <li class="active">
+                            <a href="/category/ideas-and-rants.html">Ideas and rants</a>
+                        </li>
+                        <li >
+                            <a href="/category/miscellaneous.html">Miscellaneous</a>
+                        </li>
+                        <li >
+                            <a href="/category/monitoring.html">Monitoring</a>
+                        </li>
+                        <li >
+                            <a href="/category/projects.html">Projects</a>
+                        </li>
+                        <li >
+                            <a href="/category/puppet.html">Puppet</a>
+                        </li>
+                        <li >
+                            <a href="/category/sysadmin.html">Sysadmin</a>
+                        </li>
+                        <li >
+                            <a href="/category/tech-howtos.html">Tech howtos</a>
+                        </li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="/archives.html"><i class="icon-th-list"></i>Archives</a></li>
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+</nav>
+<!-- /.navbar -->
+<div class="container">
+    <div class="row">
+        <div class="col-lg-9">
+    <section id="content">
+        <article>
+            <header class="page-header">
+                <h1>
+                    <a href="/2007/11/updates-suse-online-update-issues/"
+                       rel="bookmark"
+                       title="Permalink to Updates, SuSE Online Update Issues">
+                        Updates, SuSE Online Update&nbsp;Issues
+                    </a>
+                </h1>
+            </header>
+            <div class="entry-content">
+                <div class="panel">
+                    <div class="panel-body">
+<footer class="post-info">
+    <span class="label label-default">Date</span>
+    <span class="published">
+        <i class="icon-calendar"></i>Thu 01 November 2007
+    </span>
+
+
+
+</footer><!-- /.post-info -->                    </div>
+                </div>
+                <p>It&#8217;s been way too long since I&#8217;ve posted an update. But I haven&#8217;t been
+doing nothing. In fact, I&#8217;ve been quite busy - and not just with school
+and Sun and the Rutgers job. So, I&#8217;ll go through a few of the happenings
+of the past few&nbsp;weeks.</p>
+<p><span style="font-weight: bold;">Machine <span class="amp">&amp;</span> Online Update
+Problems.</span> First, I lost two machines. About a month ago, my main
+storage machine (<span class="caps">STOR1</span>) running a 6-disk <span class="caps">SCSI</span> array of 18.2-Gb disks in
+<span class="caps">RAID</span> 0+1 lost two disks in an hour. Strange. Next time I was home, I
+pulled the two bad disks (bringing it down to 4 disks total), put
+OpenSuSE 10.1 back on it (10.2 won&#8217;t play well with my old Compaq <span class="caps">RAID</span>
+controllers - the machine is a G1 Proliant <span class="caps">ML370</span>) and installed Bacula.
+I&#8217;m happy to say that after a weeks&#8217; worth of work, I have Bacula
+working and backing up 3 machines locally. Unfortunately, I have two
+machines - my mail and <span class="caps">SSH</span> server and my storage server with a 250Gb <span class="caps">IDE</span>
+drive - that were running SuSE 9.3 (still!). They wouldn&#8217;t take Bacula
+from <span class="caps">RPM</span> or source, as the director (<span class="caps">STOR1</span>) was running Bacula 2.x and
+the only RPMs available were 1.x. I attempted an Online Update through
+YaST/YoU. Well, wouldn&#8217;t you know, it ran, it updated, and the whole
+system broke. I mean gone. I couldn&#8217;t run *any* command in the shell,
+at all, because - you guessed it - YoU updated glibc. To a much newer
+version, and pretty much everything was linked to the old version. I
+couldn&#8217;t even &#8220;exit&#8221; to end my&nbsp;session.</p>
+<p>Well, luckily, I had data on the 250-Gb disk and everything else on a
+10Gb, so next time I was home, I put OpenSuSE 10.2 on the box, and I now
+have a 250Gb Bacula storage target on the network. Maybe I&#8217;ll even
+upgrade to Gig-E sometime soon to speed up those slow weekly full&nbsp;backups.</p>
+<p><span style="font-weight: bold;">Help, My files are gone!</span> The big
+storage box with the 250-Gb disk has been called &#8220;janus&#8221; for years,
+since I called my do-everything-box &#8220;saturn&#8221; and the rest were Saturn&#8217;s
+moons. Since then, things have become complicated enough that I adopted
+a functional naming convention, and the box became &#8220;<span class="caps">STOR2</span>&#8221; when I
+re-installed the <span class="caps">OS</span>. Well, about a week later, I <span class="caps">SSH</span>&#8217;d into saturn - a
+10-year-old Gateway desktop, 40Gb<br />
+<span class="caps">HDD</span>, 192Mb <span class="caps">RAM</span>, and a <span class="caps">PII</span>-350MHz processor - that now runs my mail
+server and is my externally-visible box to <span class="caps">SSH</span> into. I ran &#8220;ls&#8221; in my
+home directory, and got nothing. Nothing at all. It just hung there. I
+exited and tried again. I tried as root. By then I had about a dozen &#8220;D&#8221;
+state ls processes. I was stumped. I tried everything. My first thought
+was a stale <span class="caps">NFS</span> mount, but I checked, and everything looked right. I
+could ls portions, like &#8220;ls a*&#8221; and get good output. I could strace ls
+and see all the right output. But I couldn&#8217;t ls. Just the one directory
+- not any subdirectories - but any user. I spent hours looking around,<br />
+to no avail. It wasn&#8217;t until two nights ago - about a week into the
+problem - that I finally gave up and rebooted to get rid of those
+now-zombie processes. And, wouldn&#8217;t you know, ls worked perfectly. Why?<br />
+Yeah, you probably guessed that, too. When I looked over fstab and
+mount, everything looked normal - except that after two years, the
+hostname &#8220;janus&#8221; looked perfectly correct to&nbsp;me!</p>
+<p><span style="font-weight: bold;">Rack.</span> After some discussion with
+my roommates, last Friday night I found a 42U Compaq rack enclosure -
+complete with wheels, door, and a side panel, on Craigslist from a
+seller a few towns over. We all drove over in the truck and, $65 later,
+we now have a 42U rack in the living room of our apartment. It&#8217;s a thing
+of beauty. We got it setup around 10:30 <span class="caps">PM</span>, and Joe and I were up until
+6 <span class="caps">AM</span> the next morning bringing down the network, moving hardware to the
+rack, re-cabling, and bringing everything back up. We did hit a few
+snags - mainly because I demanded an <span class="caps">IP</span> switch from 192.168.0.xxx to
+192.168.2.xxx so that I could easily setup a <span class="caps">VPN</span> from the IPcop firewall
+at the apartment to its&#8217; matching counterpart in my basement at home.
+Well, things are still being added to the rack, but it&#8217;s coming along
+very&nbsp;nicely.</p>
+<p>
+<center>
+![image][]
+
+</center>
+</p>
+
+<p><strong>The Rack</strong> - (clockwise from top left) some ballast in the bottom (an
+ancient Proliant 6000 with 12 or so <span class="caps">SCSI</span> disks and 3 power supplies, 3x
+220MHz pentium, not running), 3 <span class="caps">AM</span> - Joe troubleshooting the IPcop box,
+with the rack almost fully loaded, Soekris net4501 as a temporary
+firewall/router (running m0n0wall), me in my new home&#8230;err&#8230;&nbsp;rack.</p>
+<p><span style="font-weight: bold;"><span class="caps">VPN</span>.</span> The main impetus behind the
+<span class="caps">IP</span> switch was my desire to have an IPsec <span class="caps">VPN</span> between home and the
+apartment. Beyond ease of use, a good intranet, and the hope of being
+able to <span class="caps">SSH</span> into my various boxen<br />
+without going through saturn, my one externally-visible <span class="caps">SSH</span> server, I
+was also psyched about the idea of small backups with Bacula over the
+<span class="caps">VPN</span>, and the hope of getting two Nagios boxes - one at each end - that<br />
+would work in concert. Well, of course, the subnet mask here is /22 and
+everything at home is still /24, so it&#8217;s going to take a bit of work
+this weekend, but hopefully everything will come together well. Stay&nbsp;tuned.</p>
+<p><span style="font-weight: bold;"><span class="caps">PBX</span>.</span> While I was working on <span class="caps">VPN</span>
+stuff, Joe took it upon himself to forcibly commandeer one of my spare
+boxes and setup
+<a href="http://www.trixbox.org/">Trixbox</a><http: org><span style="text-decoration: underline;">
+</span>(formerly Asterisk @ Home) on the <span class="caps">LAN</span>. At the moment, we&#8217;re
+waiting for an <span class="caps">FXO</span> card to show up in the mail - and for the money to
+get a few <span class="caps">SIP</span> phones for testing - but it looks like it&#8217;ll all be up and
+running, and we may even move over to VoIP in the apartment. To make
+things better, we have Festival working, and I&#8217;m well on my way to a
+Nagios interface that will be able to dial an extension (or dial out)
+and speak an&nbsp;alert.</p>
+<p><span style="font-weight: bold;">Conserver.</span> A lot of stuff on the
+rack has serial console access - switches, IPcop, routers, development
+stuff, and - hopefully soon - some Sun hardware. So, a terminal server
+sounded great. After some research, I came up with two possibilities - a
+<a href="http://www.eng.auburn.edu/users/doug/console.html">page</a> from 1998 giving an example of a kludge of a console server
+using <span class="caps">GNU</span> Screen, and <a href="http://www.conserver.com/">conserver</a>, a purpose-built application that
+can operate in a client-server model over the <span class="caps">LAN</span>, and also includes
+good handling of locking on a per-user basis and console locking. I
+planned two incarnations of the console server - the first and current
+development machine is an ancient <span class="caps">PII</span> laptop with <span class="caps">192MB</span> <span class="caps">RAM</span>, <span class="caps">CD</span> drive,
+10Gb <span class="caps">HDD</span>, networking, and serial and <span class="caps">USB</span> ports. I decided to give serial
+to <span class="caps">USB</span> adapters a&nbsp;shot.</p>
+<p>My first installation was <a href="http://www.debian.org/">Debian</a>-based, as <a href="http://www.opensuse.org/">OpenSuSE</a> 10.2 won&#8217;t
+load on such an old machine. However, after grappling with learning a
+new distro, I opted to reinstall with <a href="http://www.centos.org/">CentOS</a> 5.0, a much more
+natural transition from SuSE. After installing CentOS, it only took me a
+few hours to get everything humming away, and get conserver compiled,
+installed, and running. Configuration is fairly simple though, on my
+next box, I&#8217;m going to have it install to the locations I&#8217;m used to -
+/bin instead of /usr/local/bin, etc. All in all, it seems to work well.
+I didn&#8217;t try networked mode, but it works beautifully by SSHing into the
+box. It handles multiple users on the same console very well, shows the
+status of the consoles, and allows stealing of locks. I&#8217;m working on
+writing a Nagios check script for it in Python, but be warned - a
+console&#8217;s &#8220;up&#8221; or &#8220;down&#8221; status is simply whether the port is open. You
+can, obviously, pull the cable from the device and still see&nbsp;&#8220;up&#8221;.</p>
+<p>The one issue with this kludgey test setup is that my <span class="caps">USB</span> serial
+adapters seem to change device names on reboot. I currently have two,
+and at the last reboot, /dev/ttyUSB0 and /dev/ttyUSB1 switched names
+which created some confusion. When I get around to it, I plan on getting
+a small, quiet, older (and cheap) 1U server with a <span class="caps">PCI</span> slot to serve as
+the console server. I have a few spare Equinox breakout cables for
+multiport serial cards, and I might be able to find and use a card that
+they&nbsp;fit.</p>
+<p><span style="font-weight: bold;">Netra.</span> For a while, I&#8217;ve been
+wanting to try Solaris, and I can&#8217;t think of a better way to do it than
+buying some Sparc hardware, for the fun of it. Well, I found a Sun Netra
+T1 on Ebay, 500MHz Sparc-<span class="caps">II</span>, 512Mb <span class="caps">RAM</span>, 40Gb <span class="caps">HDD</span> (<span class="caps">SCSI</span>) for $47 on Ebay,
+and couldn&#8217;t resist it. I ordered it Sunday night. Sure enough, Tuesday
+afternoon, I get the following E-Mail:<br />
+&#8220;</http:><span style="color: rgb(0, 0, 0);font-family:arial,sans-serif;font-size:10;">Hello,<br />
+This is Bcd-parts. we contact you because we make a mistake in this
+item: 230185304870. we put it online but we sell it before, so we do not
+have any of this item. I&#8217;m apologize about this mistake, we will refund
+the money as soon you respond back the email.<br />
+Thank&nbsp;you!&#8221;</p>
+<p>Amazingly, I was able to resolve the issue that day, and the refund is
+being processed. However, I don&#8217;t have my server!<br />
+</span><http: org><br />
+<span style="font-weight: bold;">Nagios.</span> I&#8217;m a big fan of
+<a href="http://www.nagios.org/">Nagios</a>. I use it at home to monitor all of my hosts, as well as some
+remote systems that I&#8217;m responsible for. I make heavy use of the
+check_by_ssh plugin, so that it doesn&#8217;t require any infrastructure
+past pubkey authentication for the Nagios user. Now that I have a few
+systems running in the apartment also, once I get the <span class="caps">VPN</span> setup, I&#8217;ll be
+installing Nagios down here as well, and probably trying to tackle the
+task of setting up the two servers to jive by passing passive check
+results of the <span class="caps">LAN</span> hosts to each&nbsp;other.</p>
+<p><span style="font-weight: bold;">Print Quota.</span> We have a shared
+laser printer in the apartment, used by all five people living there.
+It&#8217;s a low-end Brother model. After a discussion one evening, I got very
+interested in finding out how many pages each user is printing. The
+built-in print server doesn&#8217;t provide this functionality, nor does it
+support <span class="caps">JCL</span>. So, I googled for a solution&#8230; and, amazingly, didn&#8217;t find
+one. The most that I could find is that there are two big Unix-based
+print quota packages, but both of them require a print server between
+the network and the printer - an option that I may consider, but don&#8217;t
+really want to implement. I don&#8217;t need the ability to deny printing, or
+figure out how much toner is used, or anything fancy like that - I just
+want to find out how many pages each user on a defined list&nbsp;prints.</p>
+<p>After some brainstorming, I came up with an awful kludge that might
+work. I wrote a Python script that screen-scrapes the print server&#8217;s web
+interface for the current lifetime page count and status. The concept is
+essentially that I put a server on the network, and configure the switch
+so that it is a monitor port for the printer. I then have access to 1)
+the printer&#8217;s page count and 2) all traffic to/from the printer. I&#8217;ve
+thought of two ways to get the page count of a job:<br />
+</http:></p>
+<ol>
+<li>Dump all of the <span class="caps">TCP</span> traffic to the printer. When a job starts, find
+    the <span class="caps">IP</span> (and <span class="caps">MAC</span>?) that started it. Wait for it to finish. Wait a few
+    seconds, check the printer status, if it&#8217;s back to &#8220;ready&#8221;, get the
+    page&nbsp;count.</li>
+<li>Dump the traffic to the printer. Analyze all traffic to extract the
+    print job information, and get the page count there. Then check
+    against the printer&#8217;s web interface (so we don&#8217;t count pages when it
+    ran out of paper or&nbsp;jammed).</li>
+</ol>
+<p>Obviously, #2 is much more complex. However, #1 already is wrought
+with edge cases - two users printing simultaneously, a paper jam that
+causes the printer to wait (and the script times out and returns a page
+count of 0), etc. We&#8217;ll see where I get in designing a&nbsp;solution.</p>
+<p>Once each job is complete, and we have a page count, we can put that
+into a database with the date and time, page count, printer name (the
+advantage to this is that it would theoretically support multiple
+printers as long as it could see their traffic), client <span class="caps">IP</span> and <span class="caps">MAC</span>, and
+client username (looked up from a table mapping <span class="caps">IP</span>/<span class="caps">MAC</span> to&nbsp;username).</p>
+<p><span style="font-weight: bold;">Surplus</span>. One of the wonderful
+things about working for Rutgers is that they own millions of dollars of
+computer equipment. Usually, it seems like when they&#8217;re done with it, it
+falls into a black hole of buybacks, trade-ins, and disposal. However,
+it just so happened that my department has a lot of stuff they&#8217;re
+getting rid of, and I was able to work out an employee purchase before
+it disappears. So, coming to a rack in my living room (or my basement at
+home) is a Dell PowerEdge 2550, PowerEdge 650, two rackmount
+monitor/keyboard/mouse units, a BackUPS Pro 1400 (no monitoring, but
+better than nothing), a BayStack 350T-<span class="caps">HD</span> switch, a Xerox DocuPritn
+N4525, and a few other goodies. I&#8217;m already working on putting OpenSuSE
+10.3 as Xen dom0 on the 650 and Solaris <span class="caps">SXCE</span> 11 (built 75) on the 2550.
+We&#8217;ll see what happens with it all soon&#8230;<br />
+<http: org></http:></p>
+            </div>
+            <!-- /.entry-content -->
+        </article>
+    </section>
+
+        </div>
+        <div class="col-lg-3 well well-sm" id="sidebar">
+
+<aside>
+    <section>
+        <ul class="list-group list-group-flush">
+                <li class="list-group-item"><h4><i class="icon-home icon-large"></i>Social</h4></li>
+                    <li class="list-group-item"><a href="#"><i
+                            class="icon-You can add links in your config file-sign icon-large"></i>You can add links in your config file
+                    </a></li>
+                    <li class="list-group-item"><a href="#"><i
+                            class="icon-Another social link-sign icon-large"></i>Another social link
+                    </a></li>
+
+
+
+                <li class="list-group-item"><a href="/tags.html"><h4><i class="icon-tags icon-large"></i>Tags</h4></a></li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/android.html">
+                                android
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/google.html">
+                                google
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/nagios.html">
+                                Nagios
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/php.html">
+                                PHP
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/sysadmin.html">
+                                sysadmin
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/linux.html">
+                                linux
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/perl.html">
+                                perl
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/logging.html">
+                                logging
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/puppet.html">
+                                puppet
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/bind.html">
+                                bind
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/monitoring.html">
+                                monitoring
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/dns.html">
+                                dns
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/droid.html">
+                                droid
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/firefox.html">
+                                firefox
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/mediawiki.html">
+                                mediawiki
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/mac.html">
+                                mac
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/microsoft.html">
+                                microsoft
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/syslog.html">
+                                syslog
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/wordpress.html">
+                                wordpress
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/rpm.html">
+                                rpm
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/security.html">
+                                security
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/blog.html">
+                                blog
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/sun.html">
+                                sun
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/ems.html">
+                                EMS
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/apache.html">
+                                apache
+                            </a>
+                        </li>
+        </ul>
+    </section>
+</aside>        </div>
+    </div>
+</div>
+<footer>
+    <div class="container">
+        <hr>
+        <p class="pull-right"><i class="icon-arrow-up"></i> <a href="#">Back to top</a></p>
+
+
+        <p>&copy; 2014 Jason Antman &middot; Powered by <a href="https://github.com/DandyDev/pelican-bootstrap3" target="_blank">pelican-bootstrap3</a>,
+            <a href="http://docs.getpelican.com/" target="_blank">Pelican</a>,
+            <a href="http://getbootstrap.com" target="_blank">Bootstrap</a></p>
+    </div>
+</footer>
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="/theme/js/bootstrap.min.js"></script>
+
+<!-- Enable responsive features in IE8 with Respond.js (https://github.com/scottjehl/Respond) -->
+<script src="/theme/js/respond.min.js"></script>
+
+
+</body>
+</html>

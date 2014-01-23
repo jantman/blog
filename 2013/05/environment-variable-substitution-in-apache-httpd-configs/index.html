@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:og="http://ogp.me/ns#"
+      xmlns:fb="https://www.facebook.com/2008/fbml">
+<head>
+    <title>Environment Variable Substitution in Apache httpd Configs</title>
+    <!-- Using the latest rendering mode for IE -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Open Graph tags -->
+
+            <meta property="og:type" content="article"/>
+            <meta property="og:title" content="Environment Variable Substitution in Apache httpd Configs"/>
+            <meta property="og:url" content="/2013/05/environment-variable-substitution-in-apache-httpd-configs/"/>
+            <meta property="og:description" content="I’ve been configuring Apache httpd for over a decade, from a single personal web server to web farms running thousands of vhosts. In most of the “real” environments I’ve worked in, we’ve had some variation of production, stage/test/QA and development hosts; and usually some method ..."/>
+
+    <!-- Bootstrap -->
+        <link rel="stylesheet" href="/theme/css/bootstrap.min.css" type="text/css"/>
+    <link href="/theme/css/font-awesome.min.css" rel="stylesheet">
+    <link href="/theme/css/pygments.css" rel="stylesheet">
+        <link href="/theme/css/typogrify.css" rel="stylesheet">
+    <link rel="stylesheet" href="/theme/css/style.css" type="text/css"/>
+    <!-- JavaScript plugins (requires jQuery) -->
+    <script src="http://code.jquery.com/jquery.js"></script>
+
+        <link href="/feeds/all.atom.xml" type="application/atom+xml" rel="alternate"
+              title="Jason Antman's Blog ATOM Feed"/>
+
+</head>
+<body>
+<nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="" class="navbar-brand">Jason Antman's Blog</a>
+        </div>
+        <div class="collapse navbar-collapse navbar-ex1-collapse">
+            <ul class="nav navbar-nav">
+                         <li><a href="/pages/about.html">
+                             About
+                          </a></li>
+                        <li >
+                            <a href="/category/ideas-and-rants.html">Ideas and rants</a>
+                        </li>
+                        <li >
+                            <a href="/category/miscellaneous.html">Miscellaneous</a>
+                        </li>
+                        <li >
+                            <a href="/category/monitoring.html">Monitoring</a>
+                        </li>
+                        <li >
+                            <a href="/category/projects.html">Projects</a>
+                        </li>
+                        <li >
+                            <a href="/category/puppet.html">Puppet</a>
+                        </li>
+                        <li >
+                            <a href="/category/sysadmin.html">Sysadmin</a>
+                        </li>
+                        <li class="active">
+                            <a href="/category/tech-howtos.html">Tech howtos</a>
+                        </li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="/archives.html"><i class="icon-th-list"></i>Archives</a></li>
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+</nav>
+<!-- /.navbar -->
+<div class="container">
+    <div class="row">
+        <div class="col-lg-9">
+    <section id="content">
+        <article>
+            <header class="page-header">
+                <h1>
+                    <a href="/2013/05/environment-variable-substitution-in-apache-httpd-configs/"
+                       rel="bookmark"
+                       title="Permalink to Environment Variable Substitution in Apache httpd Configs">
+                        Environment Variable Substitution in Apache httpd&nbsp;Configs
+                    </a>
+                </h1>
+            </header>
+            <div class="entry-content">
+                <div class="panel">
+                    <div class="panel-body">
+<footer class="post-info">
+    <span class="label label-default">Date</span>
+    <span class="published">
+        <i class="icon-calendar"></i>Sat 11 May 2013
+    </span>
+
+
+
+<span class="label label-default">Tags</span>
+	<a href="/tag/apache.html">apache</a>
+        /
+	<a href="/tag/environment.html">environment</a>
+        /
+	<a href="/tag/httpd.html">httpd</a>
+        /
+	<a href="/tag/variable.html">variable</a>
+</footer><!-- /.post-info -->                    </div>
+                </div>
+                <p>I&#8217;ve been configuring Apache httpd for over a decade, from a single
+personal web server to web farms running thousands of vhosts. In most of
+the &#8220;real&#8221; environments I&#8217;ve worked in, we&#8217;ve had some variation of
+production, stage/test/<span class="caps">QA</span> and development hosts; and usually some method
+of managing configurations between them, whether it&#8217;s source control or
+generating them from template. And in all of these environments, there
+has invariably been drift between the configurations in the various
+environments, whether it&#8217;s because of poor tools to maintain a unified
+configuration or many of those emergency redirect requests that make it
+into production but are never backported. This is made all the worse
+because everywhere I&#8217;ve worked, the real difference between what
+production and other environments <em>should</em> be is really just a string
+replacement in Apache configurations - <code>/prod/</code> to <code>/test/</code> or
+<code>www.example.com</code> to <code>www.dev.example.com</code> or something along those&nbsp;lines.</p>
+<p>Well a few days ago I was having a discussion with some co-workers that
+dovetailed into this topic, and when I started some research, I found
+(<em>finally after using httpd for years</em>) that the <a href="http://httpd.apache.org/docs/2.2/configuring.html#syntax">Apache httpd 2.2
+configuration file syntax documentation</a> states that httpd supports
+environment variable interpolation anywhere in the config files (and
+<a href="http://httpd.apache.org/docs/2.4/configuring.html#syntax">httpd 2.4</a> supports it with Defines as&nbsp;well).</p>
+<p>Yup, that&#8217;s right. All those different Apache configs I&#8217;ve worked with
+for years that define separate vhosts, document roots, rewrite targets,
+ServerAliases, etc. for <code>www.example.com</code> and <code>www.qa.example.com</code> and
+<code>www.dev.example.com</code> really only had to be
+<code>www.${ENV_URL_PART}example.com</code>, and set <code>ENV_URL_PART</code> in the init
+script or sysconfig file. (Of course this all assumes that you have your
+different environments served by different httpd instances, which you
+do, of&nbsp;course&#8230;)</p>
+<p>For me, this is a very big deal. It means that finally, instead of
+maintaining separate sets of configs for different environments which
+are (theoretically, except for those emergencies) kept identical by
+hand, or updating templates and then re-generating each environment&#8217;s
+configs, we can finally follow the same
+commit/merge/promotion-between-environments workflow that we use for
+other production code and Puppet configuration. It also means that those
+pesky little rewrites and other minor tweaks will make it all the way
+back to development&nbsp;environments.</p>
+<p>So, here&#8217;s a little example of how this would work in reality. Let&#8217;s
+assume that we have 3 main environments, <code>prod</code>, <code>qa</code> and <code>dev</code> (though
+this should work for N environments) and that domains are prefixed with
+&#8220;qa.&#8221; or &#8220;dev.&#8221; for the respective internal environments. We set
+environment variables before httpd is started, on a per-host basis,
+depending on what environment that host is in. On RedHat based systems,
+we&#8217;d add the variables to <code>/etc/sysconfig/httpd</code> for&nbsp;production:</p>
+<div class="codehilite"><pre><span class="nv">HTTPD_ENV_NAME</span><span class="o">=</span><span class="s2">&quot;prod&quot;</span>
+<span class="nv">HTTPD_ENV_URL_PART</span><span class="o">=</span><span class="s2">&quot;&quot;</span>
+</pre></div>
+
+
+<p>or for&nbsp;<span class="caps">QA</span>:</p>
+<div class="codehilite"><pre><span class="nv">HTTPD_ENV_NAME</span><span class="o">=</span><span class="s2">&quot;qa&quot;</span>
+<span class="nv">HTTPD_ENV_URL_PART</span><span class="o">=</span><span class="s2">&quot;qa.&quot;</span>
+</pre></div>
+
+
+<p>Those variables will now be available to httpd within the configurations
+(and also to any applications or scripts that have access to the web
+server&#8217;s environment&nbsp;variables).</p>
+<p>Now let&#8217;s look at an example vhost configuration file that uses the
+environment&nbsp;variables:</p>
+<div class="codehilite"><pre><span class="nb">ServerName</span> example.com
+<span class="nb">ServerAlias</span> www.example.com
+<span class="c"># Aliases including proper environment name</span>
+<span class="nb">ServerAlias</span> www.${HTTPD_ENV_NAME}.example.com ${HTTPD_ENV_NAME}.example.com
+
+<span class="nb">ErrorLog</span> <span class="sx">/var/log/httpd/example.com-error_log</span>
+<span class="nb">CustomLog</span> <span class="sx">/var/log/httpd/example.com-access_log</span> combined
+
+<span class="nb">DocumentRoot</span> <span class="sx">/sites/example.com/</span>${HTTPD_ENV_NAME}/
+
+<span class="c"># Environment-specific configuration, if we absolutely need it:</span>
+<span class="nb">Include</span> <span class="sx">/etc/httpd/sites/</span>${HTTPD_ENV_NAME}/env.conf
+
+
+<span class="nb">RewriteEngine</span> <span class="k">on</span>
+<span class="nb">RewriteRule</span> <span class="sx">/foobar/.</span>* http://www.${HTTPD_ENV_URL_PART}example.com/baz/ [R=302,L]
+</pre></div>
+
+
+<p>Every instance of <code>${HTTPD_ENV_NAME}</code> will be replaced with the value
+set in the sysconfig file, and likewise with every instance of
+<code>${HTTPD_ENV_URL_PART}</code>. This way, we can have one set of configurations
+and use our normal source control branch/promotion process to both test
+and promote changes through the environments along with application
+code, and ensure that any straight-to-production emergency changes
+(everyone has customer-ordered rewrites like that, right?) make it back
+to development and&nbsp;qa.</p>
+<p>One caveat is that, if the environment variable is not defined, the
+<code>${VAR_NAME}</code> will be left as a literal string in the configuration
+file. There doesn&#8217;t seem to be any way to protect against this in httpd
+2.2, other than making sure the variables are set before the server
+starts (and maybe setting logical default values, like an empty string,
+in your init script which should be overridden by the sysconfig&nbsp;file).</p>
+<p>If you&#8217;re running httpd 2.4+, you can turn on [mod_info][] and browse
+to <code>http://servername/server-info?config</code> to dump the current
+configuration, which will show the variable&nbsp;substitution.</p>
+            </div>
+            <!-- /.entry-content -->
+        </article>
+    </section>
+
+        </div>
+        <div class="col-lg-3 well well-sm" id="sidebar">
+
+<aside>
+    <section>
+        <ul class="list-group list-group-flush">
+                <li class="list-group-item"><h4><i class="icon-home icon-large"></i>Social</h4></li>
+                    <li class="list-group-item"><a href="#"><i
+                            class="icon-You can add links in your config file-sign icon-large"></i>You can add links in your config file
+                    </a></li>
+                    <li class="list-group-item"><a href="#"><i
+                            class="icon-Another social link-sign icon-large"></i>Another social link
+                    </a></li>
+
+
+
+                <li class="list-group-item"><a href="/tags.html"><h4><i class="icon-tags icon-large"></i>Tags</h4></a></li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/android.html">
+                                android
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/google.html">
+                                google
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/nagios.html">
+                                Nagios
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/php.html">
+                                PHP
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/sysadmin.html">
+                                sysadmin
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/linux.html">
+                                linux
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/perl.html">
+                                perl
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/logging.html">
+                                logging
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/puppet.html">
+                                puppet
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/bind.html">
+                                bind
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/monitoring.html">
+                                monitoring
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/dns.html">
+                                dns
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/droid.html">
+                                droid
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/firefox.html">
+                                firefox
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/mediawiki.html">
+                                mediawiki
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/mac.html">
+                                mac
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/microsoft.html">
+                                microsoft
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/syslog.html">
+                                syslog
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/wordpress.html">
+                                wordpress
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/rpm.html">
+                                rpm
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/security.html">
+                                security
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/blog.html">
+                                blog
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/sun.html">
+                                sun
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/ems.html">
+                                EMS
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/apache.html">
+                                apache
+                            </a>
+                        </li>
+        </ul>
+    </section>
+</aside>        </div>
+    </div>
+</div>
+<footer>
+    <div class="container">
+        <hr>
+        <p class="pull-right"><i class="icon-arrow-up"></i> <a href="#">Back to top</a></p>
+
+
+        <p>&copy; 2014 Jason Antman &middot; Powered by <a href="https://github.com/DandyDev/pelican-bootstrap3" target="_blank">pelican-bootstrap3</a>,
+            <a href="http://docs.getpelican.com/" target="_blank">Pelican</a>,
+            <a href="http://getbootstrap.com" target="_blank">Bootstrap</a></p>
+    </div>
+</footer>
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="/theme/js/bootstrap.min.js"></script>
+
+<!-- Enable responsive features in IE8 with Respond.js (https://github.com/scottjehl/Respond) -->
+<script src="/theme/js/respond.min.js"></script>
+
+
+</body>
+</html>

@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:og="http://ogp.me/ns#"
+      xmlns:fb="https://www.facebook.com/2008/fbml">
+<head>
+    <title>Running a script on USB drive insertion</title>
+    <!-- Using the latest rendering mode for IE -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Open Graph tags -->
+
+            <meta property="og:type" content="article"/>
+            <meta property="og:title" content="Running a script on USB drive insertion"/>
+            <meta property="og:url" content="/2009/11/running-a-script-on-usb-drive-insertion/"/>
+            <meta property="og:description" content="Before I even get into how to do this, be warned: this is a really bad idea unless you can ensure total physical access control to the machine. About the only place I’d ever use it is in a non-networked embedded system in a secure location. Its original intent ..."/>
+
+    <!-- Bootstrap -->
+        <link rel="stylesheet" href="/theme/css/bootstrap.min.css" type="text/css"/>
+    <link href="/theme/css/font-awesome.min.css" rel="stylesheet">
+    <link href="/theme/css/pygments.css" rel="stylesheet">
+        <link href="/theme/css/typogrify.css" rel="stylesheet">
+    <link rel="stylesheet" href="/theme/css/style.css" type="text/css"/>
+    <!-- JavaScript plugins (requires jQuery) -->
+    <script src="http://code.jquery.com/jquery.js"></script>
+
+        <link href="/feeds/all.atom.xml" type="application/atom+xml" rel="alternate"
+              title="Jason Antman's Blog ATOM Feed"/>
+
+</head>
+<body>
+<nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="" class="navbar-brand">Jason Antman's Blog</a>
+        </div>
+        <div class="collapse navbar-collapse navbar-ex1-collapse">
+            <ul class="nav navbar-nav">
+                         <li><a href="/pages/about.html">
+                             About
+                          </a></li>
+                        <li >
+                            <a href="/category/ideas-and-rants.html">Ideas and rants</a>
+                        </li>
+                        <li >
+                            <a href="/category/miscellaneous.html">Miscellaneous</a>
+                        </li>
+                        <li >
+                            <a href="/category/monitoring.html">Monitoring</a>
+                        </li>
+                        <li >
+                            <a href="/category/projects.html">Projects</a>
+                        </li>
+                        <li >
+                            <a href="/category/puppet.html">Puppet</a>
+                        </li>
+                        <li >
+                            <a href="/category/sysadmin.html">Sysadmin</a>
+                        </li>
+                        <li class="active">
+                            <a href="/category/tech-howtos.html">Tech howtos</a>
+                        </li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="/archives.html"><i class="icon-th-list"></i>Archives</a></li>
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+</nav>
+<!-- /.navbar -->
+<div class="container">
+    <div class="row">
+        <div class="col-lg-9">
+    <section id="content">
+        <article>
+            <header class="page-header">
+                <h1>
+                    <a href="/2009/11/running-a-script-on-usb-drive-insertion/"
+                       rel="bookmark"
+                       title="Permalink to Running a script on USB drive insertion">
+                        Running a script on <span class="caps">USB</span> drive&nbsp;insertion
+                    </a>
+                </h1>
+            </header>
+            <div class="entry-content">
+                <div class="panel">
+                    <div class="panel-body">
+<footer class="post-info">
+    <span class="label label-default">Date</span>
+    <span class="published">
+        <i class="icon-calendar"></i>Wed 11 November 2009
+    </span>
+
+
+
+<span class="label label-default">Tags</span>
+	<a href="/tag/linux.html">linux</a>
+        /
+	<a href="/tag/script.html">script</a>
+        /
+	<a href="/tag/udev.html">udev</a>
+        /
+	<a href="/tag/usb.html">usb</a>
+</footer><!-- /.post-info -->                    </div>
+                </div>
+                <p>Before I even get into how to do this, <strong>be warned:</strong> this is a <em>really</em>
+bad idea unless you can ensure total physical access control to the
+machine. About the only place I&#8217;d ever use it is in a non-networked
+embedded system in a secure location. Its original intent is to handle
+loading of pictures onto a Linux-based digital photo&nbsp;frame.</p>
+<p>So, you want to run a specific script on insertion of a <span class="caps">USB</span> drive.
+Here&#8217;s how to use udev to do&nbsp;it:</p>
+<ol>
+<li>Create <code>/etc/udev/rules.d/99-usbhook.rules</code>:</li>
+</ol>
+<div class="codehilite"><pre>ACTION==&quot;add&quot;,KERNEL==&quot;sd*&quot;, SUBSYSTEMS==&quot;usb&quot;, ATTRS{product}==&quot;Mass Storage&quot;, RUN+=&quot;/root/bin/usbhook %k&quot;
+</pre></div>
+
+
+<div class="codehilite"><pre>&lt;p&gt;
+This will run &quot;/root/bin/usbook&quot;, passing it the device name as an
+argument, every time a USB Mass Storage device is plugged in.
+</pre></div>
+
+
+<ol>
+<li>run <code>udevcontrol reload_rules</code></li>
+<li>Create your usbhook&nbsp;script.</li>
+<li>Enjoy</li>
+</ol>
+<p>Here is my usbhook script to copy all files from a <span class="caps">USB</span> mass storage disk
+to a specific location. It includes quite a bit of debugging, and also
+checks for the presence of a file called &#8220;foobarbaz.txt&#8221; on the device
+before copying the files&nbsp;over.</p>
+<div class="codehilite"><pre><span class="c">#!/bin/bash</span>
+
+<span class="c"># script to move over all files from a <span class="caps">USB</span> key</span>
+<span class="c"># when it is inserted into the system.</span>
+
+<span class="c"># should be called from a udev rule like:</span>
+<span class="c">#<span class="caps">ACTION</span>==&quot;add&quot;,<span class="caps">KERNEL</span>==&quot;sd*&quot;, <span class="caps">SUBSYSTEMS</span>==&quot;usb&quot;, <span class="caps">ATTRS</span>{product}==&quot;Mass Storage&quot;, <span class="caps">RUN</span>+=&quot;/root/bin/usbhook %k&quot;</span>
+
+<span class="c"># Copyright 2009 Jason Antman.  </span>
+<span class="c"># </span>
+
+<span class="c"># <span class="caps">CONFIGURATION</span></span>
+<span class="nv"><span class="caps">DEBUG</span></span><span class="o">=</span>1 <span class="c"># set to 1 for debugging output</span>
+<span class="nv"><span class="caps">DEST</span></span><span class="o">=</span><span class="s2">&quot;/home/foo/&quot;</span> <span class="c"># destination for files</span>
+
+
+<span class="nv"><span class="caps">DEVICE</span></span><span class="o">=</span><span class="s2">&quot;$1&quot;</span> <span class="c"># the device name</span>
+<span class="nv"><span class="caps">LOGFACILITY</span></span><span class="o">=</span><span class="s2">&quot;kernel.info&quot;</span> <span class="c"># for debugging output</span>
+
+
+<span class="k">if</span> <span class="o">[</span> <span class="k">${</span><span class="nv"><span class="caps">DEBUG</span></span><span class="p">:=0</span><span class="k">}</span> <span class="o">==</span> 1 <span class="o">]</span>; <span class="k">then </span>logger <span class="s2">&quot;$<span class="caps">LOGFACILITY</span>&quot;</span> usbhook called with arguments: <span class="s2">&quot;$<span class="caps">DEVICE</span>&quot;</span>; <span class="k">fi</span>
+
+sleep 5 <span class="c"># delay 5 seconds to wait for mount</span>
+
+mount | grep <span class="s2">&quot;$<span class="caps">DEVICE</span>&quot;</span>
+<span class="nv"><span class="caps">FOO</span></span><span class="o">=</span><span class="s2">&quot;$?&quot;</span>
+
+<span class="k">if</span> <span class="o">[</span> <span class="nv">$<span class="caps">FOO</span></span> <span class="o">==</span> 0 <span class="o">]</span>;
+<span class="k">then</span>
+<span class="k">    if</span> <span class="o">[</span> <span class="k">${</span><span class="nv"><span class="caps">DEBUG</span></span><span class="p">:=0</span><span class="k">}</span> <span class="o">==</span> 1 <span class="o">]</span>; <span class="k">then </span>logger <span class="s2">&quot;$<span class="caps">LOGFACILITY</span>&quot;</span> usbhook device mounted: <span class="s2">&quot;$<span class="caps">DEVICE</span>&quot;</span>; <span class="k">fi</span>
+<span class="k">else</span>
+<span class="k">    if</span> <span class="o">[</span> <span class="k">${</span><span class="nv"><span class="caps">DEBUG</span></span><span class="p">:=0</span><span class="k">}</span> <span class="o">==</span> 1 <span class="o">]</span>; <span class="k">then </span>logger <span class="s2">&quot;$<span class="caps">LOGFACILITY</span>&quot;</span> usbhook device <span class="caps">NOT</span> mounted: <span class="s2">&quot;$<span class="caps">DEVICE</span>&quot;</span> - exiting; <span class="k">fi</span>
+<span class="k">    </span><span class="nb">exit </span>0
+<span class="k">fi</span>
+
+<span class="nv"><span class="caps">BAR</span></span><span class="o">=</span><span class="sb">`</span>mount | grep <span class="s2">&quot;$<span class="caps">DEVICE</span>&quot;</span> | awk <span class="s1">&#39;{ print $3 }&#39;</span><span class="sb">`</span>
+
+<span class="k">if</span> <span class="o">[</span> -e <span class="s2">&quot;$<span class="caps">BAR</span>/foobarbaz.txt&quot;</span> <span class="o">]</span>
+<span class="k">then</span>
+<span class="k">    if</span> <span class="o">[</span> <span class="k">${</span><span class="nv"><span class="caps">DEBUG</span></span><span class="p">:=0</span><span class="k">}</span> <span class="o">==</span> 1 <span class="o">]</span>; <span class="k">then </span>logger <span class="s2">&quot;$<span class="caps">LOGFACILITY</span>&quot;</span> usbhook <span class="s2">&quot;$<span class="caps">BAR</span>&quot;</span>/foobarbaz.txt found; <span class="k">fi</span>
+<span class="k">else</span>
+<span class="k">    if</span> <span class="o">[</span> <span class="k">${</span><span class="nv"><span class="caps">DEBUG</span></span><span class="p">:=0</span><span class="k">}</span> <span class="o">==</span> 1 <span class="o">]</span>; <span class="k">then </span>logger <span class="s2">&quot;$<span class="caps">LOGFACILITY</span>&quot;</span> usbhook <span class="s2">&quot;$<span class="caps">BAR</span>&quot;</span>/foobarbaz.txt <span class="caps">NOT</span> found - exiting; <span class="k">fi</span>
+<span class="k">    </span><span class="nb">exit </span>0
+<span class="k">fi</span>
+
+cp -R <span class="s2">&quot;$<span class="caps">DEVICE</span>&quot;</span>/* <span class="s2">&quot;$<span class="caps">DEST</span>&quot;</span>
+</pre></div>
+
+
+<p>This was tested on <a href="http://www.opensuse.org">OpenSuSE</a>&nbsp;10.3.</p>
+            </div>
+            <!-- /.entry-content -->
+        </article>
+    </section>
+
+        </div>
+        <div class="col-lg-3 well well-sm" id="sidebar">
+
+<aside>
+    <section>
+        <ul class="list-group list-group-flush">
+                <li class="list-group-item"><h4><i class="icon-home icon-large"></i>Social</h4></li>
+                    <li class="list-group-item"><a href="#"><i
+                            class="icon-You can add links in your config file-sign icon-large"></i>You can add links in your config file
+                    </a></li>
+                    <li class="list-group-item"><a href="#"><i
+                            class="icon-Another social link-sign icon-large"></i>Another social link
+                    </a></li>
+
+
+
+                <li class="list-group-item"><a href="/tags.html"><h4><i class="icon-tags icon-large"></i>Tags</h4></a></li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/android.html">
+                                android
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/google.html">
+                                google
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/nagios.html">
+                                Nagios
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/php.html">
+                                PHP
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/sysadmin.html">
+                                sysadmin
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/linux.html">
+                                linux
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/perl.html">
+                                perl
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/logging.html">
+                                logging
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/puppet.html">
+                                puppet
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/bind.html">
+                                bind
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/monitoring.html">
+                                monitoring
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/dns.html">
+                                dns
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/droid.html">
+                                droid
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/firefox.html">
+                                firefox
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/mediawiki.html">
+                                mediawiki
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/mac.html">
+                                mac
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/microsoft.html">
+                                microsoft
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/syslog.html">
+                                syslog
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/wordpress.html">
+                                wordpress
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/rpm.html">
+                                rpm
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/security.html">
+                                security
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/blog.html">
+                                blog
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/sun.html">
+                                sun
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/ems.html">
+                                EMS
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/apache.html">
+                                apache
+                            </a>
+                        </li>
+        </ul>
+    </section>
+</aside>        </div>
+    </div>
+</div>
+<footer>
+    <div class="container">
+        <hr>
+        <p class="pull-right"><i class="icon-arrow-up"></i> <a href="#">Back to top</a></p>
+
+
+        <p>&copy; 2014 Jason Antman &middot; Powered by <a href="https://github.com/DandyDev/pelican-bootstrap3" target="_blank">pelican-bootstrap3</a>,
+            <a href="http://docs.getpelican.com/" target="_blank">Pelican</a>,
+            <a href="http://getbootstrap.com" target="_blank">Bootstrap</a></p>
+    </div>
+</footer>
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="/theme/js/bootstrap.min.js"></script>
+
+<!-- Enable responsive features in IE8 with Respond.js (https://github.com/scottjehl/Respond) -->
+<script src="/theme/js/respond.min.js"></script>
+
+
+</body>
+</html>

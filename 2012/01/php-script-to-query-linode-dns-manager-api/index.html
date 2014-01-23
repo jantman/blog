@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:og="http://ogp.me/ns#"
+      xmlns:fb="https://www.facebook.com/2008/fbml">
+<head>
+    <title>PHP Script to Query Linode DNS Manager API</title>
+    <!-- Using the latest rendering mode for IE -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Open Graph tags -->
+
+            <meta property="og:type" content="article"/>
+            <meta property="og:title" content="PHP Script to Query Linode DNS Manager API"/>
+            <meta property="og:url" content="/2012/01/php-script-to-query-linode-dns-manager-api/"/>
+            <meta property="og:description" content="I’m in the process of moving all of my public-facing services, currently hosted on a single Linode, to a new virtual machine (still with Linode, of course, just a new CentOS 6 VM). Of course, I’ve got a lot (about 60) of DNS records, spread across 8 domains ..."/>
+
+    <!-- Bootstrap -->
+        <link rel="stylesheet" href="/theme/css/bootstrap.min.css" type="text/css"/>
+    <link href="/theme/css/font-awesome.min.css" rel="stylesheet">
+    <link href="/theme/css/pygments.css" rel="stylesheet">
+        <link href="/theme/css/typogrify.css" rel="stylesheet">
+    <link rel="stylesheet" href="/theme/css/style.css" type="text/css"/>
+    <!-- JavaScript plugins (requires jQuery) -->
+    <script src="http://code.jquery.com/jquery.js"></script>
+
+        <link href="/feeds/all.atom.xml" type="application/atom+xml" rel="alternate"
+              title="Jason Antman's Blog ATOM Feed"/>
+
+</head>
+<body>
+<nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="" class="navbar-brand">Jason Antman's Blog</a>
+        </div>
+        <div class="collapse navbar-collapse navbar-ex1-collapse">
+            <ul class="nav navbar-nav">
+                         <li><a href="/pages/about.html">
+                             About
+                          </a></li>
+                        <li >
+                            <a href="/category/ideas-and-rants.html">Ideas and rants</a>
+                        </li>
+                        <li >
+                            <a href="/category/miscellaneous.html">Miscellaneous</a>
+                        </li>
+                        <li >
+                            <a href="/category/monitoring.html">Monitoring</a>
+                        </li>
+                        <li >
+                            <a href="/category/projects.html">Projects</a>
+                        </li>
+                        <li >
+                            <a href="/category/puppet.html">Puppet</a>
+                        </li>
+                        <li >
+                            <a href="/category/sysadmin.html">Sysadmin</a>
+                        </li>
+                        <li class="active">
+                            <a href="/category/tech-howtos.html">Tech howtos</a>
+                        </li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="/archives.html"><i class="icon-th-list"></i>Archives</a></li>
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+</nav>
+<!-- /.navbar -->
+<div class="container">
+    <div class="row">
+        <div class="col-lg-9">
+    <section id="content">
+        <article>
+            <header class="page-header">
+                <h1>
+                    <a href="/2012/01/php-script-to-query-linode-dns-manager-api/"
+                       rel="bookmark"
+                       title="Permalink to PHP Script to Query Linode DNS Manager API">
+                        <span class="caps">PHP</span> Script to Query Linode <span class="caps">DNS</span> Manager&nbsp;<span class="caps">API</span>
+                    </a>
+                </h1>
+            </header>
+            <div class="entry-content">
+                <div class="panel">
+                    <div class="panel-body">
+<footer class="post-info">
+    <span class="label label-default">Date</span>
+    <span class="published">
+        <i class="icon-calendar"></i>Fri 20 January 2012
+    </span>
+
+
+
+<span class="label label-default">Tags</span>
+	<a href="/tag/api.html">api</a>
+        /
+	<a href="/tag/dns.html">dns</a>
+        /
+	<a href="/tag/linode.html">linode</a>
+        /
+	<a href="/tag/php.html">PHP</a>
+        /
+	<a href="/tag/sysadmin.html">sysadmin</a>
+</footer><!-- /.post-info -->                    </div>
+                </div>
+                <p>I&#8217;m in the process of moving all of my public-facing services, currently
+hosted on a single <a href="http://www.linode.com/?r=5c8ad2931b410b55455aadbcf0a8d86d6f698a91">Linode</a>, to a new virtual machine (still with
+Linode, of course, just a new CentOS 6 <span class="caps">VM</span>). Of course, I&#8217;ve got a <em>lot</em>
+(about 60) of <span class="caps">DNS</span> records, spread across 8 domains, that point at the
+old machine. For name-based vhosts in Apache, my usual procedure is to
+migrate everything over to the new host and then change <span class="caps">DNS</span>, and once
+the change propagates (I&#8217;m using Linode&#8217;s <span class="caps">DNS</span> hosting, so it makes
+things a <span class="caps">LOT</span> easier but I don&#8217;t have <code>rndc reload</code> anymore) I test in a
+browser and, assuming all is well, disable the vhost on the old server.
+To do all this, I need an easy way to get a list of all the <span class="caps">DNS</span> records
+that still point to the old&nbsp;machine.</p>
+<p>Luckily, to augment their web-based control panel (Linode Manager),
+Linode has a pretty full-featured <a href="http://www.linode.com/api/"><span class="caps">API</span></a> with bindings for Python,
+Perl, <span class="caps">PHP</span>, Ruby, Java and others. While I like Python and I&#8217;m starting
+to learn Perl (by trying to shift most of my non-time-sensitive
+scripting to it) for my new job, <span class="caps">PHP</span> is still my strongest language (and
+the majority of my existing administrative scripting is written in it,
+especially handy when it comes time to add a web front-end to things).
+So I wrote the following script to query Linode&#8217;s <a href="http://www.linode.com/api/dns"><span class="caps">DNS</span> Manager <span class="caps">API</span></a>
+using <a href="https://github.com/krmdrms/linode/">Kerem Durmus&#8217; Linode <span class="caps">API</span> <span class="caps">PHP</span> wrapper</a> (installation
+instructions and info at that Github link). The script simply writes all
+Linode <span class="caps">DNS</span> records for all zones to a <span class="caps">CSV</span> file (this could take a while
+if you have a lot of&nbsp;records&#8230;).</p>
+<div class="codehilite"><pre><span class="x">, many thanks to him for releasing this.</span>
+<span class="x">   *</span>
+<span class="x">   * <span class="caps">INSTALLATION</span> (as per krmdrms <span class="caps">README</span>):</span>
+<span class="x">   *  pear install Net_URL2-0.3.1</span>
+<span class="x">   *  pear install HTTP_Request2-0.5.2</span>
+<span class="x">   *  pear channel-discover pear.keremdurmus.com</span>
+<span class="x">   *  pear install krmdrms/Services_Linode</span>
+<span class="x">   *</span>
+<span class="x">   * Also requires php-openssl / php5-openssl</span>
+<span class="x">   *</span>
+<span class="x">   * <span class="caps">USAGE</span>: php linodeDnsToCsv.php</span>
+<span class="x">   *</span>
+<span class="x">   * Copyright 2011 Jason Antman  , all rights reserved.</span>
+<span class="x">   * This script is free for use by anyone anywhere, provided that you comply with the following terms:</span>
+<span class="x">   * 1) Keep this notice and copyright statement intact.</span>
+<span class="x">   * 2) Send any substantial changes, improvements or bog fixes back to me at the above address.</span>
+<span class="x">   * 3) If you include this in a product or redistribute it, you notify me, and include my name in the credits or changelog.</span>
+<span class="x">   *</span>
+<span class="x">   * The following <span class="caps">URL</span> always points to the newest version of this script. If you obtained it from another source, you should</span>
+<span class="x">   * check here:</span>
+<span class="x">   * $HeadURL: http://svn.jasonantman.com/misc-scripts/linodeDnsToCsv.php $</span>
+<span class="x">   * $LastChangedRevision: 25 $</span>
+<span class="x">   *</span>
+<span class="x">   * <span class="caps">CHANGELOG</span>:</span>
+<span class="x">   * 2011-12-17 Jason Antman :</span>
+<span class="x">   *    merged into my svn repo</span>
+<span class="x">   * 2011-09-12 Jason Antman :</span>
+<span class="x">   *    initial version of script</span>
+<span class="x">   *</span>
+<span class="x">   */</span>
+
+<span class="x">require_once(&quot;/var/www/linode_apikey.php&quot;); // <span class="caps">PHP</span> file containing:   define(&quot;API_KEY_LINODE&quot;, &quot;myApiKeyHere&quot;);</span>
+<span class="x">require_once(&#39;Services/Linode.php&#39;);</span>
+
+<span class="x">// get list of all domains</span>
+<span class="x">$domains = array(); // <span class="caps">DOMAINID</span> =&gt; domain.tld</span>
+<span class="x">try {</span>
+<span class="x">  $linode = new Services_Linode(API_KEY_LINODE);</span>
+<span class="x">  $result = $linode-&gt;domain_list();</span>
+
+<span class="x">  foreach($result[&#39;<span class="caps">DATA</span>&#39;] as $domain)</span>
+<span class="x">    {</span>
+<span class="x">      $domains[$domain[&#39;<span class="caps">DOMAINID</span>&#39;]] = $domain[&quot;<span class="caps">DOMAIN</span>&quot;];</span>
+<span class="x">    }</span>
+<span class="x">}</span>
+<span class="x">catch (Services_Linode_Exception $e)</span>
+<span class="x">{</span>
+<span class="x">  echo $e-&gt;getMessage();</span>
+<span class="x">}</span>
+
+<span class="x">$records = array(); // array of resource records</span>
+<span class="x">$linode-&gt;batching = true;</span>
+<span class="x">foreach($domains as $id =&gt; $name)</span>
+<span class="x">{</span>
+<span class="x">  $linode-&gt;domain_resource_list(array(&#39;DomainID&#39; =&gt; $id));</span>
+<span class="x">}</span>
+
+<span class="x">try {</span>
+<span class="x">  $result = $linode-&gt;batchFlush();</span>
+
+<span class="x">  foreach($result as $batchPart)</span>
+<span class="x">    {</span>
+<span class="x">      foreach($batchPart[&#39;<span class="caps">DATA</span>&#39;] as $rrec)</span>
+<span class="x">    {</span>
+<span class="x">      if(! isset($records[$rrec[&#39;<span class="caps">DOMAINID</span>&#39;]])){ $records[$rrec[&#39;<span class="caps">DOMAINID</span>&#39;]] = array();}</span>
+<span class="x">      $records[$rrec[&#39;<span class="caps">DOMAINID</span>&#39;]][$rrec[&#39;<span class="caps">RESOURCEID</span>&#39;]] = array(&#39;name&#39; =&gt; $rrec[&#39;<span class="caps">NAME</span>&#39;], &#39;type&#39; =&gt; $rrec[&#39;<span class="caps">TYPE</span>&#39;], &#39;target&#39; =&gt; $rrec[&#39;<span class="caps">TARGET</span>&#39;]);</span>
+<span class="x">    }</span>
+<span class="x">    }</span>
+<span class="x">}</span>
+<span class="x">catch (Services_Linode_Exception $e)</span>
+<span class="x">{</span>
+<span class="x">  echo $e-&gt;getMessage();</span>
+<span class="x">}</span>
+
+<span class="x">echo &#39;&quot;recid&quot;,&quot;domain&quot;,&quot;name&quot;,&quot;type&quot;,&quot;target&quot;&#39;.&quot;\n&quot;;</span>
+<span class="x">foreach($domains as $id =&gt; $name)</span>
+<span class="x">{</span>
+<span class="x">  foreach($records[$id] as $recid =&gt; $arr)</span>
+<span class="x">    {</span>
+<span class="x">      echo &#39;&quot;&#39;.$recid.&#39;&quot;,&quot;&#39;.$name.&#39;&quot;,&quot;&#39;.$arr[&#39;name&#39;].&#39;&quot;,&quot;&#39;.$arr[&#39;type&#39;].&#39;&quot;,&quot;&#39;.$arr[&#39;target&#39;].&quot;\&quot;\n&quot;;</span>
+<span class="x">    }</span>
+<span class="x">}</span>
+
+
+<span class="x">?&gt;</span>
+</pre></div>
+
+
+<p>That will print out a list containing the Linode <span class="caps">DNS</span> record id (recid),
+domain, record name, type and&nbsp;target:</p>
+<div class="codehilite"><pre>&quot;recid&quot;,&quot;domain&quot;,&quot;name&quot;,&quot;type&quot;,&quot;target&quot;
+&quot;137423&quot;,&quot;jasonantman.com&quot;,&quot;&quot;,&quot;TXT&quot;,&quot;v=spf1 mx:jasonantman.com -all&quot;
+&quot;3597859&quot;,&quot;jasonantman.com&quot;,&quot;&quot;,&quot;MX&quot;,&quot;linode1.jasonantman.com&quot;
+&quot;3488952&quot;,&quot;jasonantman.com&quot;,&quot;&quot;,&quot;mx&quot;,&quot;linode2.jasonantman.com&quot;
+&quot;3472952&quot;,&quot;jasonantman.com&quot;,&quot;blog&quot;,&quot;CNAME&quot;,&quot;linode1.jasonantman.com&quot;
+</pre></div>
+
+
+<p>If you want to, say, search for only records that include host
+&#8220;example&#8221;, you could use grep and awk&nbsp;like:</p>
+<div class="codehilite"><pre>php linodeDnsToCsv.php | grep linode1 | grep -v <span class="s1">&#39;&quot;linode1&quot;,&quot;a&quot;&#39;</span> | awk -F , <span class="s1">&#39;{printf &quot;%-27s %-20s %-7s %s\n&quot;, $2, $3, $4, $5}&#39;</span> | sed <span class="s1">&#39;s/&quot;//g&#39;</span>
+</pre></div>
+
+
+<p>I hope this helps someone else out, and saves them a few minutes of&nbsp;coding&#8230;</p>
+            </div>
+            <!-- /.entry-content -->
+        </article>
+    </section>
+
+        </div>
+        <div class="col-lg-3 well well-sm" id="sidebar">
+
+<aside>
+    <section>
+        <ul class="list-group list-group-flush">
+                <li class="list-group-item"><h4><i class="icon-home icon-large"></i>Social</h4></li>
+                    <li class="list-group-item"><a href="#"><i
+                            class="icon-You can add links in your config file-sign icon-large"></i>You can add links in your config file
+                    </a></li>
+                    <li class="list-group-item"><a href="#"><i
+                            class="icon-Another social link-sign icon-large"></i>Another social link
+                    </a></li>
+
+
+
+                <li class="list-group-item"><a href="/tags.html"><h4><i class="icon-tags icon-large"></i>Tags</h4></a></li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/android.html">
+                                android
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/google.html">
+                                google
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/nagios.html">
+                                Nagios
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/php.html">
+                                PHP
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/sysadmin.html">
+                                sysadmin
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/linux.html">
+                                linux
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/perl.html">
+                                perl
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/logging.html">
+                                logging
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/puppet.html">
+                                puppet
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/bind.html">
+                                bind
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/monitoring.html">
+                                monitoring
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/dns.html">
+                                dns
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/droid.html">
+                                droid
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/firefox.html">
+                                firefox
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/mediawiki.html">
+                                mediawiki
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/mac.html">
+                                mac
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/microsoft.html">
+                                microsoft
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/syslog.html">
+                                syslog
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/wordpress.html">
+                                wordpress
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/rpm.html">
+                                rpm
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/security.html">
+                                security
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/blog.html">
+                                blog
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/sun.html">
+                                sun
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/ems.html">
+                                EMS
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/apache.html">
+                                apache
+                            </a>
+                        </li>
+        </ul>
+    </section>
+</aside>        </div>
+    </div>
+</div>
+<footer>
+    <div class="container">
+        <hr>
+        <p class="pull-right"><i class="icon-arrow-up"></i> <a href="#">Back to top</a></p>
+
+
+        <p>&copy; 2014 Jason Antman &middot; Powered by <a href="https://github.com/DandyDev/pelican-bootstrap3" target="_blank">pelican-bootstrap3</a>,
+            <a href="http://docs.getpelican.com/" target="_blank">Pelican</a>,
+            <a href="http://getbootstrap.com" target="_blank">Bootstrap</a></p>
+    </div>
+</footer>
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="/theme/js/bootstrap.min.js"></script>
+
+<!-- Enable responsive features in IE8 with Respond.js (https://github.com/scottjehl/Respond) -->
+<script src="/theme/js/respond.min.js"></script>
+
+
+</body>
+</html>

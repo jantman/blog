@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:og="http://ogp.me/ns#"
+      xmlns:fb="https://www.facebook.com/2008/fbml">
+<head>
+    <title>My Dream Network</title>
+    <!-- Using the latest rendering mode for IE -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Open Graph tags -->
+
+            <meta property="og:type" content="article"/>
+            <meta property="og:title" content="My Dream Network"/>
+            <meta property="og:url" content="/2009/02/my-dream-network/"/>
+            <meta property="og:description" content="On the same thread as the last post, some thoughts on my ideal network, or the hosts on that network: One “gold master” installation/kickstart file of a single chosen distro, with a base set of packages, including site-specific packages. (or something like this implemented in a configuration management system ..."/>
+
+    <!-- Bootstrap -->
+        <link rel="stylesheet" href="/theme/css/bootstrap.min.css" type="text/css"/>
+    <link href="/theme/css/font-awesome.min.css" rel="stylesheet">
+    <link href="/theme/css/pygments.css" rel="stylesheet">
+        <link href="/theme/css/typogrify.css" rel="stylesheet">
+    <link rel="stylesheet" href="/theme/css/style.css" type="text/css"/>
+    <!-- JavaScript plugins (requires jQuery) -->
+    <script src="http://code.jquery.com/jquery.js"></script>
+
+        <link href="/feeds/all.atom.xml" type="application/atom+xml" rel="alternate"
+              title="Jason Antman's Blog ATOM Feed"/>
+
+</head>
+<body>
+<nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="" class="navbar-brand">Jason Antman's Blog</a>
+        </div>
+        <div class="collapse navbar-collapse navbar-ex1-collapse">
+            <ul class="nav navbar-nav">
+                         <li><a href="/pages/about.html">
+                             About
+                          </a></li>
+                        <li class="active">
+                            <a href="/category/ideas-and-rants.html">Ideas and rants</a>
+                        </li>
+                        <li >
+                            <a href="/category/miscellaneous.html">Miscellaneous</a>
+                        </li>
+                        <li >
+                            <a href="/category/monitoring.html">Monitoring</a>
+                        </li>
+                        <li >
+                            <a href="/category/projects.html">Projects</a>
+                        </li>
+                        <li >
+                            <a href="/category/puppet.html">Puppet</a>
+                        </li>
+                        <li >
+                            <a href="/category/sysadmin.html">Sysadmin</a>
+                        </li>
+                        <li >
+                            <a href="/category/tech-howtos.html">Tech howtos</a>
+                        </li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="/archives.html"><i class="icon-th-list"></i>Archives</a></li>
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+</nav>
+<!-- /.navbar -->
+<div class="container">
+    <div class="row">
+        <div class="col-lg-9">
+    <section id="content">
+        <article>
+            <header class="page-header">
+                <h1>
+                    <a href="/2009/02/my-dream-network/"
+                       rel="bookmark"
+                       title="Permalink to My Dream Network">
+                        My Dream&nbsp;Network
+                    </a>
+                </h1>
+            </header>
+            <div class="entry-content">
+                <div class="panel">
+                    <div class="panel-body">
+<footer class="post-info">
+    <span class="label label-default">Date</span>
+    <span class="published">
+        <i class="icon-calendar"></i>Sat 07 February 2009
+    </span>
+
+
+
+<span class="label label-default">Tags</span>
+	<a href="/tag/configuration.html">configuration</a>
+        /
+	<a href="/tag/dream-network.html">dream network</a>
+        /
+	<a href="/tag/ideal-network.html">ideal network</a>
+        /
+	<a href="/tag/management.html">management</a>
+</footer><!-- /.post-info -->                    </div>
+                </div>
+                <p>On the same thread as the <a href="http://blog.jasonantman.com/2009/02/community-datacenter/">last post</a>, some thoughts on my ideal
+network, or the hosts on that&nbsp;network:</p>
+<ul>
+<li>One &#8220;gold master&#8221; installation/kickstart file of a single chosen
+    distro, with a base set of packages, including site-specific
+    packages. (or something like this implemented in a configuration
+    management&nbsp;system)</li>
+<li>All new installations performed over the network in an automated
+    fashion, and from a local&nbsp;repository.</li>
+<li>Software updates are automated (either through a configuration
+    management tool or something like the behemoth I talked about
+    <a href="http://blog.jasonantman.com/2008/10/my-biggest-problem-with-linux/">here</a> and pulled from a local repository (perhaps one which
+    mirrors the mainline repos, but only downloads a package the first
+    time it&#8217;s&nbsp;requested?).</li>
+<li><a href="http://reductivelabs.com/trac/puppet">Puppet</a> or <a href="http://www.cfengine.org/">CFengine</a> on each machine. Better than just having
+    them is having each machine automatically added when it&#8217;s created.
+    Even better yet would be to have Puppet or CFengine combined with
+    something like <a href="https://fedorahosted.org/cobbler/">Cobbler</a>, so I can define a new machine in
+    {puppet|cfengine}, list its&#8217; <span class="caps">MAC</span> address, then netboot the box and
+    come back in a few hours to have an <span class="caps">OS</span> installed, packages installed
+    and the machine configured, monitored in Nagios, monitored for
+    security and backed&nbsp;up.</li>
+<li><a href="http://www.tripwire.com/">Tripwire</a> or some other sort of security software, as well as
+    centralized logging and auditing, on every&nbsp;box.</li>
+<li>A small number of additional &#8220;package groups&#8221; to add to the &#8220;gold
+    master&#8221; via config management - something like &#8220;web server&#8221;
+    (Apache2, <span class="caps">PHP</span>, MySQL, log analysis for them, etc.), &#8220;development
+    server&#8221; (<span class="caps">CVS</span>, debuggers, etc.). These would also update the backup
+    system to include appropriate directories, update Nagios configs,&nbsp;etc.</li>
+<li>A good way - if even a human making notes in a per-machine text file<ul>
+<li>of tracking the &#8220;little stuff&#8221; like that one cron script that
+makes everything work right, the location of that hacked-together
+Python script, etc. A way to easily remember the things needed to
+recreate a box which aren&#8217;t found in <code>rpm -qa</code> or any obvious&nbsp;overviews.</li>
+</ul>
+</li>
+<li><a href="http://www.bacula.org">Bacula</a> or <a href="http://www.amanda.org/"><span class="caps">AMANDA</span></a> setup to backup every box, perhaps with
+    some sort of template system for server types - every machine gets
+    <code>/root</code> and <code>/etc</code> backed up, but web servers get <code>/srv/www</code> and
+    mail servers get <code>/var/mail</code>.</li>
+<li>Nagios setup to monitor everything logical on every box. Perhaps
+    this would use a configuration management engine to handle Nagios
+    configs, so that for example if any Proliant hardware is used,
+    {config management program} will figure this out, install the <span class="caps">HPASM</span>
+    packages, put the appropriate check scripts on the box, and update
+    the Nagios configs. Likewise, adding Apache to a machine should
+    cause it to be monitored in the Nagios&nbsp;configs.</li>
+</ul>
+<p>Unfortunately, as I&#8217;m not independently wealthy, I don&#8217;t have the time
+to quit my job, wipe every machine I own, and start from scratch. But it
+sure would be nice to be able to, one day, start a server farm from
+scratch and be able to implement some of these cool&nbsp;things&#8230;</p>
+            </div>
+            <!-- /.entry-content -->
+        </article>
+    </section>
+
+        </div>
+        <div class="col-lg-3 well well-sm" id="sidebar">
+
+<aside>
+    <section>
+        <ul class="list-group list-group-flush">
+                <li class="list-group-item"><h4><i class="icon-home icon-large"></i>Social</h4></li>
+                    <li class="list-group-item"><a href="#"><i
+                            class="icon-You can add links in your config file-sign icon-large"></i>You can add links in your config file
+                    </a></li>
+                    <li class="list-group-item"><a href="#"><i
+                            class="icon-Another social link-sign icon-large"></i>Another social link
+                    </a></li>
+
+
+
+                <li class="list-group-item"><a href="/tags.html"><h4><i class="icon-tags icon-large"></i>Tags</h4></a></li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/android.html">
+                                android
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/google.html">
+                                google
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/nagios.html">
+                                Nagios
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/php.html">
+                                PHP
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/sysadmin.html">
+                                sysadmin
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/linux.html">
+                                linux
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/perl.html">
+                                perl
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/logging.html">
+                                logging
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/puppet.html">
+                                puppet
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/bind.html">
+                                bind
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/monitoring.html">
+                                monitoring
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/dns.html">
+                                dns
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/droid.html">
+                                droid
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/firefox.html">
+                                firefox
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/mediawiki.html">
+                                mediawiki
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/mac.html">
+                                mac
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/microsoft.html">
+                                microsoft
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/syslog.html">
+                                syslog
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/wordpress.html">
+                                wordpress
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/rpm.html">
+                                rpm
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/security.html">
+                                security
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/blog.html">
+                                blog
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/sun.html">
+                                sun
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/ems.html">
+                                EMS
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/apache.html">
+                                apache
+                            </a>
+                        </li>
+        </ul>
+    </section>
+</aside>        </div>
+    </div>
+</div>
+<footer>
+    <div class="container">
+        <hr>
+        <p class="pull-right"><i class="icon-arrow-up"></i> <a href="#">Back to top</a></p>
+
+
+        <p>&copy; 2014 Jason Antman &middot; Powered by <a href="https://github.com/DandyDev/pelican-bootstrap3" target="_blank">pelican-bootstrap3</a>,
+            <a href="http://docs.getpelican.com/" target="_blank">Pelican</a>,
+            <a href="http://getbootstrap.com" target="_blank">Bootstrap</a></p>
+    </div>
+</footer>
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="/theme/js/bootstrap.min.js"></script>
+
+<!-- Enable responsive features in IE8 with Respond.js (https://github.com/scottjehl/Respond) -->
+<script src="/theme/js/respond.min.js"></script>
+
+
+</body>
+</html>

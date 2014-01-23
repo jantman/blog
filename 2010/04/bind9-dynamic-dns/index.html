@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:og="http://ogp.me/ns#"
+      xmlns:fb="https://www.facebook.com/2008/fbml">
+<head>
+    <title>BIND9 Dynamic DNS</title>
+    <!-- Using the latest rendering mode for IE -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Open Graph tags -->
+
+            <meta property="og:type" content="article"/>
+            <meta property="og:title" content="BIND9 Dynamic DNS"/>
+            <meta property="og:url" content="/2010/04/bind9-dynamic-dns/"/>
+            <meta property="og:description" content="I needed a better solution for Dynamic DNS than dyndns.org for something, so I set about setting up DDNS through my BIND9 servers. I found a number of very helpful blog posts, including nsupdate: Painless Dynamic DNS, Painless DDNS part 2: the server, Secure dynamic DNS howto and A ..."/>
+
+    <!-- Bootstrap -->
+        <link rel="stylesheet" href="/theme/css/bootstrap.min.css" type="text/css"/>
+    <link href="/theme/css/font-awesome.min.css" rel="stylesheet">
+    <link href="/theme/css/pygments.css" rel="stylesheet">
+        <link href="/theme/css/typogrify.css" rel="stylesheet">
+    <link rel="stylesheet" href="/theme/css/style.css" type="text/css"/>
+    <!-- JavaScript plugins (requires jQuery) -->
+    <script src="http://code.jquery.com/jquery.js"></script>
+
+        <link href="/feeds/all.atom.xml" type="application/atom+xml" rel="alternate"
+              title="Jason Antman's Blog ATOM Feed"/>
+
+</head>
+<body>
+<nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="" class="navbar-brand">Jason Antman's Blog</a>
+        </div>
+        <div class="collapse navbar-collapse navbar-ex1-collapse">
+            <ul class="nav navbar-nav">
+                         <li><a href="/pages/about.html">
+                             About
+                          </a></li>
+                        <li >
+                            <a href="/category/ideas-and-rants.html">Ideas and rants</a>
+                        </li>
+                        <li >
+                            <a href="/category/miscellaneous.html">Miscellaneous</a>
+                        </li>
+                        <li >
+                            <a href="/category/monitoring.html">Monitoring</a>
+                        </li>
+                        <li >
+                            <a href="/category/projects.html">Projects</a>
+                        </li>
+                        <li >
+                            <a href="/category/puppet.html">Puppet</a>
+                        </li>
+                        <li >
+                            <a href="/category/sysadmin.html">Sysadmin</a>
+                        </li>
+                        <li class="active">
+                            <a href="/category/tech-howtos.html">Tech howtos</a>
+                        </li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="/archives.html"><i class="icon-th-list"></i>Archives</a></li>
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+</nav>
+<!-- /.navbar -->
+<div class="container">
+    <div class="row">
+        <div class="col-lg-9">
+    <section id="content">
+        <article>
+            <header class="page-header">
+                <h1>
+                    <a href="/2010/04/bind9-dynamic-dns/"
+                       rel="bookmark"
+                       title="Permalink to BIND9 Dynamic DNS">
+                        <span class="caps">BIND9</span> Dynamic&nbsp;<span class="caps">DNS</span>
+                    </a>
+                </h1>
+            </header>
+            <div class="entry-content">
+                <div class="panel">
+                    <div class="panel-body">
+<footer class="post-info">
+    <span class="label label-default">Date</span>
+    <span class="published">
+        <i class="icon-calendar"></i>Wed 07 April 2010
+    </span>
+
+
+
+<span class="label label-default">Tags</span>
+	<a href="/tag/bind.html">bind</a>
+        /
+	<a href="/tag/ddns.html">ddns</a>
+        /
+	<a href="/tag/dhcp.html">dhcp</a>
+        /
+	<a href="/tag/multibindadmin.html">multibindadmin</a>
+</footer><!-- /.post-info -->                    </div>
+                </div>
+                <p>I needed a better solution for Dynamic <span class="caps">DNS</span> than <a href="http://www.dyndns.org">dyndns.org</a> for
+something, so I set about setting up <span class="caps">DDNS</span> through my <span class="caps">BIND9</span> servers. I
+found a number of very helpful blog posts, including <a href="http://linux.yyz.us/nsupdate/">nsupdate: Painless
+Dynamic <span class="caps">DNS</span></a>, <a href="http://linux.yyz.us/dns/ddns-server.html">Painless <span class="caps">DDNS</span> part 2: the server</a>, <a href="http://ops.ietf.org/dns/dynupd/secure-ddns-howto.html">Secure dynamic
+<span class="caps">DNS</span> howto</a> and <a href="http://www.oceanwave.com/technical-resources/unix-admin/nsupdate.html">A <span class="caps">DDNS</span> Server Using <span class="caps">BIND</span> and Nsupdate</a>. Of course,
+the <a href="http://www.zytrax.com/books/dns/ch7/statements.html"><span class="caps">BIND</span> configuration statement reference</a> was also very&nbsp;helpful.</p>
+<p>The whole process was relatively&nbsp;simple&#8230;</p>
+<ol>
+<li>Add an <span class="caps">RR</span> for the host I want, in the appropriate&nbsp;zone.</li>
+<li>Generate <span class="caps">TSIG</span> keys, distribute them to the&nbsp;client.</li>
+<li>Make sure you have logging enabled for things of interest in your
+    <code>logging</code> section of <code>named.conf</code>:</li>
+</ol>
+<div class="codehilite"><pre>category dnssec { syslog_info; };
+category update { syslog_info; };
+category security { syslog_info; };
+</pre></div>
+
+
+<ol>
+<li>Create a keys.conf file for your keys (you <em>do</em> split your configs
+    out into usable chunks,&nbsp;right?):</li>
+</ol>
+<div class="codehilite"><pre>key foo.example.com. {
+    algorithm HMAC-MD5.SIG-ALG.REG.INT;
+    secret &quot;this is your secret here (after Key: in the .private file)&quot;;
+};
+</pre></div>
+
+
+<div class="codehilite"><pre>&lt;p&gt;
+and include it in `named.conf` like
+`include &quot;/etc/named.d/keys.conf&quot;;`
+</pre></div>
+
+
+<ol>
+<li>
+<p>Set an [<code>update-policy</code>][] statement in <code>named.conf</code>. I just added
+    mine to a specific zone in a specific view (external), as that&#8217;s the
+    only place I would conceivably want updates right&nbsp;now.</p>
+</p>
+
+</li>
+</ol>
+<div class="codehilite"><pre>update-policy {
+    grant * self * A TXT;
+};
+</pre></div>
+
+
+<div class="codehilite"><pre>&lt;p&gt;
+Assuming your TSIG keys are named for specific RRs, this will let
+any client (with a valid key setup on the server) update its own RR
+and nothing else.
+</pre></div>
+
+
+<ol>
+<li>
+<p>Finally, I created a script for ddns updates on the client. Since I
+    want to be able to fire off this script manually or via cron (if I
+    have to reload <span class="caps">BIND</span>, and until I make the needed changes to
+    MultiBINDadmin), I bypassed the usual dhclient stuff and manually
+    grab the current <span class="caps">IP</span> from the interface of interest. I symlinked this
+    in <code>/etc/dhcp3/dhclient-exit-hooks.d</code> so it will run on <span class="caps">DHCP</span>&nbsp;updates.</p>
+</p>
+
+</li>
+</ol>
+<div class="codehilite"><pre><span class="c">#!/bin/bash</span>
+<span class="nv"><span class="caps">IFACE</span></span><span class="o">=</span><span class="s2">&quot;eth0&quot;</span>
+<span class="nv"><span class="caps">TTL</span></span><span class="o">=</span>3600
+<span class="nv"><span class="caps">SERVER</span></span><span class="o">=</span>ns1.example.com
+<span class="nv"><span class="caps">HOSTNAME</span></span><span class="o">=</span>foo.example.com
+<span class="nv"><span class="caps">ZONE</span></span><span class="o">=</span>example.com
+<span class="nv"><span class="caps">KEYFILE</span></span><span class="o">=</span>/root/ddns-keys/Kfoo.example.com.+157+12345.private
+
+<span class="nv">new_ip_address</span><span class="o">=</span><span class="sb">`</span>ifconfig <span class="nv">$<span class="caps">IFACE</span></span> | grep <span class="s2">&quot;inet addr:&quot;</span> | awk <span class="s1">&#39;{print $2}&#39;</span> | awk -F <span class="s2">&quot;:&quot;</span> <span class="s1">&#39;{print $2}&#39;</span><span class="sb">`</span>
+<span class="nv">new_ip_address</span><span class="o">=</span><span class="k">${</span><span class="nv">new_ip_address</span><span class="p">/ /</span><span class="k">}</span>
+
+nsupdate -v -k <span class="nv">$<span class="caps">KEYFILE</span></span> <span class="s">&lt;&lt; <span class="caps">EOF</span></span>
+<span class="s">server $<span class="caps">SERVER</span></span>
+<span class="s">zone $<span class="caps">ZONE</span></span>
+<span class="s">update delete $<span class="caps">HOSTNAME</span> A</span>
+<span class="s">update add $<span class="caps">HOSTNAME</span> $<span class="caps">TTL</span> A $new_ip_address</span>
+<span class="s">send</span>
+<span class="s"><span class="caps">EOF</span></span>
+</pre></div>
+
+
+<p>When I finally got things setup, my only problem was with permissions on
+the zone file directories, which was easily corrected.Once this was
+straightened out, my <code>nsupdate</code> script ran flawlessly, and the update
+was instantly (thanks to using &#8220;notify&#8221;) propagated out to the slave&nbsp;server.</p>
+<p>The only problem that I now have is one of my own creation - I use a
+small <span class="caps">PHP</span> application that I wrote (<a href="http://multibindadmin.jasonantman.com/">MultiBINDadmin</a>) to manage <span class="caps">DNS</span>.
+It&#8217;s incredibly easy, as it keeps track of internal and external IPs,
+and everything else, for my zones, and triggers a pull on the master
+<span class="caps">BIND</span> server via the web interface. The only problem I now have is that
+this messes with <span class="caps">DDNS</span> updates. First, if I make changes in the web
+interface and there&#8217;s already been a <span class="caps">DDNS</span> update that day, the zone
+serial generated by MultiBINDadmin will match the automatically
+incremented serial generated by the <span class="caps">BIND</span> server. Second, and more
+troubling, when the <span class="caps">BIND</span> server reloads, it loses the dynamic update. So
+when I push changes to a zone from the web interface, my dynamic updates
+go&nbsp;away.</p>
+<p>For the short-term, I&#8217;m just going to check the zone serial before I
+make any updates and, if need be, manually increment it in the web tool.
+As to losing the dynamic updates, I&#8217;m just going to have cron on the
+client fire the <code>nsupdate</code> script every 30 minutes. I also did a little
+kludge, setup a vhost on one of my web servers to answer for the dynamic
+host (as a catch-all page), and set the <span class="caps">IP</span> of my web server as the
+hard-coded <span class="caps">RR</span> address in the zone file. If someone tries to use the new
+(<span class="caps">DDNS</span> through my <span class="caps">BIND</span> server) address for <span class="caps">HTTP</span> and for some reason the
+current dynamic address disappeared (<span class="caps">BIND</span> reloaded), they&#8217;ll get a
+little page with a message and the old dyndns.org-based&nbsp;<span class="caps">URL</span>.</p>
+<p>When I get around to it (or when this becomes a problem), I&#8217;ll make two
+changes to&nbsp;MultiBINDadmin:</p>
+<ol>
+<li>Before it pushes an update, check the current serial for the zone
+    (ok, this may be a bit interesting, as the internal and external
+    zones could have different serials) and increment from&nbsp;that.</li>
+<li>Have a &#8220;<span class="caps">DDNS</span>&#8221; flag in the database and <span class="caps">GUI</span> for RRs. For all flagged
+    RRs, try to get the (unfortunately external) current address and
+    update the record in the <span class="caps">DB</span> before the&nbsp;push.</li>
+</ol>
+<p>The real question here, which I haven&#8217;t looked into yet, is how I can
+interrogate <span class="caps">BIND</span> about RRs for the external zone from an internal&nbsp;host.</p>
+            </div>
+            <!-- /.entry-content -->
+        </article>
+    </section>
+
+        </div>
+        <div class="col-lg-3 well well-sm" id="sidebar">
+
+<aside>
+    <section>
+        <ul class="list-group list-group-flush">
+                <li class="list-group-item"><h4><i class="icon-home icon-large"></i>Social</h4></li>
+                    <li class="list-group-item"><a href="#"><i
+                            class="icon-You can add links in your config file-sign icon-large"></i>You can add links in your config file
+                    </a></li>
+                    <li class="list-group-item"><a href="#"><i
+                            class="icon-Another social link-sign icon-large"></i>Another social link
+                    </a></li>
+
+
+
+                <li class="list-group-item"><a href="/tags.html"><h4><i class="icon-tags icon-large"></i>Tags</h4></a></li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/android.html">
+                                android
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/google.html">
+                                google
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/nagios.html">
+                                Nagios
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/php.html">
+                                PHP
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/sysadmin.html">
+                                sysadmin
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/linux.html">
+                                linux
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/perl.html">
+                                perl
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/logging.html">
+                                logging
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/puppet.html">
+                                puppet
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/bind.html">
+                                bind
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/monitoring.html">
+                                monitoring
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/dns.html">
+                                dns
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/droid.html">
+                                droid
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/firefox.html">
+                                firefox
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/mediawiki.html">
+                                mediawiki
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/mac.html">
+                                mac
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/microsoft.html">
+                                microsoft
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/syslog.html">
+                                syslog
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/wordpress.html">
+                                wordpress
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/rpm.html">
+                                rpm
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/security.html">
+                                security
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/blog.html">
+                                blog
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/sun.html">
+                                sun
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/ems.html">
+                                EMS
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/apache.html">
+                                apache
+                            </a>
+                        </li>
+        </ul>
+    </section>
+</aside>        </div>
+    </div>
+</div>
+<footer>
+    <div class="container">
+        <hr>
+        <p class="pull-right"><i class="icon-arrow-up"></i> <a href="#">Back to top</a></p>
+
+
+        <p>&copy; 2014 Jason Antman &middot; Powered by <a href="https://github.com/DandyDev/pelican-bootstrap3" target="_blank">pelican-bootstrap3</a>,
+            <a href="http://docs.getpelican.com/" target="_blank">Pelican</a>,
+            <a href="http://getbootstrap.com" target="_blank">Bootstrap</a></p>
+    </div>
+</footer>
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="/theme/js/bootstrap.min.js"></script>
+
+<!-- Enable responsive features in IE8 with Respond.js (https://github.com/scottjehl/Respond) -->
+<script src="/theme/js/respond.min.js"></script>
+
+
+</body>
+</html>

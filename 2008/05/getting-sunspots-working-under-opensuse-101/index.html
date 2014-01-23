@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:og="http://ogp.me/ns#"
+      xmlns:fb="https://www.facebook.com/2008/fbml">
+<head>
+    <title>Getting SunSPOTs working under OpenSuSE 10.1</title>
+    <!-- Using the latest rendering mode for IE -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Open Graph tags -->
+
+            <meta property="og:type" content="article"/>
+            <meta property="og:title" content="Getting SunSPOTs working under OpenSuSE 10.1"/>
+            <meta property="og:url" content="/2008/05/getting-sunspots-working-under-opensuse-101/"/>
+            <meta property="og:description" content="So I’ve been playing around withSunSPOTs lately. Or trying to. My only x86 (32-bit) machines are an old desktop running OpenSuSE 10.1 and my eeePC. It looks like I just killed my new install on the 8GB SDHC card, so I gave the desktop a try ..."/>
+
+    <!-- Bootstrap -->
+        <link rel="stylesheet" href="/theme/css/bootstrap.min.css" type="text/css"/>
+    <link href="/theme/css/font-awesome.min.css" rel="stylesheet">
+    <link href="/theme/css/pygments.css" rel="stylesheet">
+        <link href="/theme/css/typogrify.css" rel="stylesheet">
+    <link rel="stylesheet" href="/theme/css/style.css" type="text/css"/>
+    <!-- JavaScript plugins (requires jQuery) -->
+    <script src="http://code.jquery.com/jquery.js"></script>
+
+        <link href="/feeds/all.atom.xml" type="application/atom+xml" rel="alternate"
+              title="Jason Antman's Blog ATOM Feed"/>
+
+</head>
+<body>
+<nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="" class="navbar-brand">Jason Antman's Blog</a>
+        </div>
+        <div class="collapse navbar-collapse navbar-ex1-collapse">
+            <ul class="nav navbar-nav">
+                         <li><a href="/pages/about.html">
+                             About
+                          </a></li>
+                        <li >
+                            <a href="/category/ideas-and-rants.html">Ideas and rants</a>
+                        </li>
+                        <li >
+                            <a href="/category/miscellaneous.html">Miscellaneous</a>
+                        </li>
+                        <li >
+                            <a href="/category/monitoring.html">Monitoring</a>
+                        </li>
+                        <li >
+                            <a href="/category/projects.html">Projects</a>
+                        </li>
+                        <li >
+                            <a href="/category/puppet.html">Puppet</a>
+                        </li>
+                        <li >
+                            <a href="/category/sysadmin.html">Sysadmin</a>
+                        </li>
+                        <li class="active">
+                            <a href="/category/tech-howtos.html">Tech howtos</a>
+                        </li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="/archives.html"><i class="icon-th-list"></i>Archives</a></li>
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+</nav>
+<!-- /.navbar -->
+<div class="container">
+    <div class="row">
+        <div class="col-lg-9">
+    <section id="content">
+        <article>
+            <header class="page-header">
+                <h1>
+                    <a href="/2008/05/getting-sunspots-working-under-opensuse-101/"
+                       rel="bookmark"
+                       title="Permalink to Getting SunSPOTs working under OpenSuSE 10.1">
+                        Getting SunSPOTs working under OpenSuSE&nbsp;10.1
+                    </a>
+                </h1>
+            </header>
+            <div class="entry-content">
+                <div class="panel">
+                    <div class="panel-body">
+<footer class="post-info">
+    <span class="label label-default">Date</span>
+    <span class="published">
+        <i class="icon-calendar"></i>Tue 13 May 2008
+    </span>
+
+
+
+<span class="label label-default">Tags</span>
+	<a href="/tag/java.html">java</a>
+        /
+	<a href="/tag/linux.html">linux</a>
+        /
+	<a href="/tag/netbeans.html">netbeans</a>
+        /
+	<a href="/tag/sun.html">sun</a>
+        /
+	<a href="/tag/sunspot.html">sunspot</a>
+</footer><!-- /.post-info -->                    </div>
+                </div>
+                <p>So I&#8217;ve been playing around with<a href="http://www.sunspotworld.com">SunSPOT</a>s lately. Or trying to. My
+only x86 (32-bit) machines are an old desktop running OpenSuSE 10.1 and
+my eeePC. It looks like I just killed my new install on the <span class="caps">8GB</span> <span class="caps">SDHC</span>
+card, so I gave the desktop a try. I&#8217;d already tried once with the
+install of Orange from the <span class="caps">CD</span> that came with them, and had NetBeans 6
+installed, so I had to do some recovery. The procedure was as&nbsp;follows:</p>
+<ol>
+<li>Install all of the Java6 java-sun packages (specifically the base as&nbsp;devel).</li>
+<li>Download the Java 6 <span class="caps">JDK</span> from Sun, and install all of the&nbsp;RPMs.</li>
+<li>Screw with /usr/lib/jvm and get it sane - specifically, replace all
+    of the symlinks that point to /etc/alternatives with new ones
+    pointing to the Java6 install in&nbsp;/usr/lib/jvm/java-1.6.0-sun-1.6.0</li>
+<li>Delete your entire .netbeans directory (I was having serious issues
+    with&nbsp;NetBeans).</li>
+<li>Start NetBeans from the command line with an explicitly set jdkhome:
+    &#8220;netbeans &#8212;jdkhome&nbsp;/usr/lib/jvm/java-1.6.0-sun-1.6.0</li>
+<li>Download the <span class="caps">SPOT</span> plugin for NetBeans, following the instructions on
+    <a href="http://weblogs.java.net/blog/brunogh/archive/2008/04/starting_with_s.html">Bruno Ghisi&#8217;s blog</a>.</li>
+<li>Once installed, you should have a little <span class="caps">SPOT</span>-looking icon on the
+    toolbar below &#8220;Navigate&#8221;. Click on it, and launch SPOTManager from
+    the link in the right panel (&#8220;Sun SPOTs Info&#8221;, the link is an icon
+    not text). Go through whatever configuration is&nbsp;needed.</li>
+<li>Upgrade local <span class="caps">SDK</span> to Purple (Click the <span class="caps">SDK</span> tab, select &#8220;v3.0 Purple&#8221;
+    from the right panel, click the Upgrade button near the&nbsp;bottom).</li>
+<li>Upgrade your demos following davidgs&#8217;s <a href="http://blogs.sun.com/davidgs/entry/beta_follow_up">blog posting</a>.</li>
+<li>Upgrade all of the SPOTs to Purple (plug them in one at a time, on
+    the SPOTManager SunSPOTs tab, click&nbsp;&#8220;Upgrade&#8221;).</li>
+<li>I&#8217;m still having some minor issues here. I&#8217;ll update when I have
+    everything figured&nbsp;out&#8230;</li>
+</ol>
+            </div>
+            <!-- /.entry-content -->
+        </article>
+    </section>
+
+        </div>
+        <div class="col-lg-3 well well-sm" id="sidebar">
+
+<aside>
+    <section>
+        <ul class="list-group list-group-flush">
+                <li class="list-group-item"><h4><i class="icon-home icon-large"></i>Social</h4></li>
+                    <li class="list-group-item"><a href="#"><i
+                            class="icon-You can add links in your config file-sign icon-large"></i>You can add links in your config file
+                    </a></li>
+                    <li class="list-group-item"><a href="#"><i
+                            class="icon-Another social link-sign icon-large"></i>Another social link
+                    </a></li>
+
+
+
+                <li class="list-group-item"><a href="/tags.html"><h4><i class="icon-tags icon-large"></i>Tags</h4></a></li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/android.html">
+                                android
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/google.html">
+                                google
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/nagios.html">
+                                Nagios
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/php.html">
+                                PHP
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/sysadmin.html">
+                                sysadmin
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/linux.html">
+                                linux
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/perl.html">
+                                perl
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/logging.html">
+                                logging
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/puppet.html">
+                                puppet
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/bind.html">
+                                bind
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/monitoring.html">
+                                monitoring
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/dns.html">
+                                dns
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/droid.html">
+                                droid
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/firefox.html">
+                                firefox
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/mediawiki.html">
+                                mediawiki
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/mac.html">
+                                mac
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/microsoft.html">
+                                microsoft
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/syslog.html">
+                                syslog
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/wordpress.html">
+                                wordpress
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/rpm.html">
+                                rpm
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/security.html">
+                                security
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/blog.html">
+                                blog
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/sun.html">
+                                sun
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/ems.html">
+                                EMS
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/apache.html">
+                                apache
+                            </a>
+                        </li>
+        </ul>
+    </section>
+</aside>        </div>
+    </div>
+</div>
+<footer>
+    <div class="container">
+        <hr>
+        <p class="pull-right"><i class="icon-arrow-up"></i> <a href="#">Back to top</a></p>
+
+
+        <p>&copy; 2014 Jason Antman &middot; Powered by <a href="https://github.com/DandyDev/pelican-bootstrap3" target="_blank">pelican-bootstrap3</a>,
+            <a href="http://docs.getpelican.com/" target="_blank">Pelican</a>,
+            <a href="http://getbootstrap.com" target="_blank">Bootstrap</a></p>
+    </div>
+</footer>
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="/theme/js/bootstrap.min.js"></script>
+
+<!-- Enable responsive features in IE8 with Respond.js (https://github.com/scottjehl/Respond) -->
+<script src="/theme/js/respond.min.js"></script>
+
+
+</body>
+</html>

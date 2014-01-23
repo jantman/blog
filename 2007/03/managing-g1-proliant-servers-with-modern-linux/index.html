@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:og="http://ogp.me/ns#"
+      xmlns:fb="https://www.facebook.com/2008/fbml">
+<head>
+    <title>Managing G1 Proliant Servers with modern Linux</title>
+    <!-- Using the latest rendering mode for IE -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Open Graph tags -->
+
+            <meta property="og:type" content="article"/>
+            <meta property="og:title" content="Managing G1 Proliant Servers with modern Linux"/>
+            <meta property="og:url" content="/2007/03/managing-g1-proliant-servers-with-modern-linux/"/>
+            <meta property="og:description" content="Not much of an “upgrade” for anyone who’s in IT, but jasonantman.com is currently being upgraded from old desktops used as servers to a pile of generation-1 (G1) HP/Compaq Proliants. I know that there are utilities for Linux to manage the servers, specifically control fan speed and ..."/>
+
+    <!-- Bootstrap -->
+        <link rel="stylesheet" href="/theme/css/bootstrap.min.css" type="text/css"/>
+    <link href="/theme/css/font-awesome.min.css" rel="stylesheet">
+    <link href="/theme/css/pygments.css" rel="stylesheet">
+        <link href="/theme/css/typogrify.css" rel="stylesheet">
+    <link rel="stylesheet" href="/theme/css/style.css" type="text/css"/>
+    <!-- JavaScript plugins (requires jQuery) -->
+    <script src="http://code.jquery.com/jquery.js"></script>
+
+        <link href="/feeds/all.atom.xml" type="application/atom+xml" rel="alternate"
+              title="Jason Antman's Blog ATOM Feed"/>
+
+</head>
+<body>
+<nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="" class="navbar-brand">Jason Antman's Blog</a>
+        </div>
+        <div class="collapse navbar-collapse navbar-ex1-collapse">
+            <ul class="nav navbar-nav">
+                         <li><a href="/pages/about.html">
+                             About
+                          </a></li>
+                        <li >
+                            <a href="/category/ideas-and-rants.html">Ideas and rants</a>
+                        </li>
+                        <li >
+                            <a href="/category/miscellaneous.html">Miscellaneous</a>
+                        </li>
+                        <li >
+                            <a href="/category/monitoring.html">Monitoring</a>
+                        </li>
+                        <li >
+                            <a href="/category/projects.html">Projects</a>
+                        </li>
+                        <li >
+                            <a href="/category/puppet.html">Puppet</a>
+                        </li>
+                        <li >
+                            <a href="/category/sysadmin.html">Sysadmin</a>
+                        </li>
+                        <li class="active">
+                            <a href="/category/tech-howtos.html">Tech howtos</a>
+                        </li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="/archives.html"><i class="icon-th-list"></i>Archives</a></li>
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+</nav>
+<!-- /.navbar -->
+<div class="container">
+    <div class="row">
+        <div class="col-lg-9">
+    <section id="content">
+        <article>
+            <header class="page-header">
+                <h1>
+                    <a href="/2007/03/managing-g1-proliant-servers-with-modern-linux/"
+                       rel="bookmark"
+                       title="Permalink to Managing G1 Proliant Servers with modern Linux">
+                        Managing G1 Proliant Servers with modern&nbsp;Linux
+                    </a>
+                </h1>
+            </header>
+            <div class="entry-content">
+                <div class="panel">
+                    <div class="panel-body">
+<footer class="post-info">
+    <span class="label label-default">Date</span>
+    <span class="published">
+        <i class="icon-calendar"></i>Thu 01 March 2007
+    </span>
+
+
+
+<span class="label label-default">Tags</span>
+	<a href="/tag/compaq.html">compaq</a>
+        /
+	<a href="/tag/hp.html">hp</a>
+        /
+	<a href="/tag/hpadu.html">hpadu</a>
+        /
+	<a href="/tag/hpasm.html">hpasm</a>
+        /
+	<a href="/tag/linux.html">linux</a>
+        /
+	<a href="/tag/management.html">management</a>
+        /
+	<a href="/tag/proliant.html">proliant</a>
+        /
+	<a href="/tag/psp.html">psp</a>
+</footer><!-- /.post-info -->                    </div>
+                </div>
+                <p>Not much of an &#8220;upgrade&#8221; for anyone who&#8217;s in <span class="caps">IT</span>, but jasonantman.com is
+currently being upgraded from old desktops used as servers to a pile of
+generation-1 (G1) <span class="caps">HP</span>/Compaq Proliants. I know that there are utilities
+for Linux to manage the servers, specifically control fan speed and
+monitor hardware-level health for Linux. However, the most recent
+download on <span class="caps">HP</span>&#8217;s site is for <span class="caps">SLES9</span>. All of my boxes will be running
+openSuSE 10.2, and the <span class="caps">SLES9</span> version wouldn&#8217;t install on&nbsp;them.</p>
+<p>After an hour long phone call to <span class="caps">HP</span> support, I ended up speaking with
+Paulo, the third support person I was transferred to. #1 read off the
+web site, #2 knew what Linux was, but Paulo (#3) actually told me that
+he was experimenting with installing <span class="caps">HPASM</span> (<span class="caps">HP</span>&#8217;s server
+administration/management utility) on an older Proliant as well. He
+spent about half an hour walking me through it. Here&#8217;s what I&nbsp;found:</p>
+<p>The most compatible version of <span class="caps">HPASM</span> (I guess it&#8217;s some hidden feature
+for people who know it) is the version for the <span class="caps">DL380</span> G4. Paulo
+instructed me to download this <span class="caps">RPM</span> from their site. I did, choosing the
+<span class="caps">SLES10</span> (x86) download (hpasm-7.7.0-115.sles10.i586.rpm). This installed
+fine. Running <code>hpasm status</code> from the command line asks us to activate
+it first. Do the activation. Now, running <code>hpasm status</code> still asks us
+to activate. Paulo confirmed this as happening on his machine too. Try
+<code>/etc/init.d/hpasm status</code> and you should see that all of the modules
+are&nbsp;working.</p>
+<p>Now, the install is complete. I&#8217;m not sure if the <span class="caps">SNMP</span> works, but it
+should as long as your snmpd is running. The <code>hpasm activate</code> command
+modifies snmpd.conf appropriately. and you will be queried for the
+currect configuration&nbsp;information.</p>
+<p>To give it a test, run <code>hplog -f</code> or <code>hplog -p</code> and you should see fan
+and power status,&nbsp;respectively.</p>
+<p>Paulo also told me that I could download the hpadu package (also <span class="caps">DL380</span>
+G4 / <span class="caps">SLES10</span>) to get array diagnostics, He warned me that some of the
+install scripts in <span class="caps">HPADU</span> look for the web management homepage, which we
+haven&#8217;t installed. To get around this, install the <span class="caps">HPADU</span> <span class="caps">RPM</span> file
+(hpadu-7.70-12.linux.rpm)
+<code>rpm -ivh --force --nodeps --noscripts hpadu-7.70-12.linux.rpm</code>. Be
+aware, though, that this package is supposed to be web-based. It
+installs to&nbsp;/opt/hp/hpadu.</p>
+<p>The web interface, luckily for me, is written in <span class="caps">PHP</span>. It is pretty
+complex so it might take me a while to figure out the workings, but when
+I do, I&#8217;ll post as much info as I can on how to make a <span class="caps">CLI</span> interface, or
+where one exists if I can find&nbsp;it.</p>
+<p>Also, I&#8217;ll most likely develop a Python check script to use with
+<a href="http://www.nagios.org">Nagios</a> to monitor most of the hpasm-enabled&nbsp;components.</p>
+<p>For the use of anyone else, here are some of the links that <span class="caps">HP</span> Support
+sent me after the&nbsp;call:</p>
+<p>Link for users guide for Proliant Support Pack, which includes
+documentation on <span class="caps">HPASM</span> from the&nbsp;<span class="caps">CLI</span>:</p>
+<p><a href="">http://h18000.www1.hp.com/support/files/server/us/WebDoc/720/psp-users-guide.pdf</a></p>
+<p>Product&nbsp;manuals:</p>
+<p>[http://h20180.www2.hp.com/apps/Nav?h_pagetype=s-003&amp;h_lang=en&amp;h_cc=us&amp;h_product=241435&amp;h_page=hpcom&amp;h_client=z-a-r1002-3&amp;cc=us〈=en][]</p>
+<p><span class="caps">ML370</span>&nbsp;G1</p>
+<p>[http://h20000.www2.hp.com/bc/docs/support/<span class="caps">UCR</span>/SupportManual/TPM_143091-004/TPM_143091-004.pdf][]</p>
+<div class="codehilite"><pre>http://h18000.www1.hp.com/support/files/server/us/WebDoc/720/psp-users-guide.pdf
+http://h20180.www2.hp.com/apps/Nav?h_pagetype=s-003&amp;h_lang=en&amp;h_cc=us&amp;h_product=241435&amp;h_page=hpcom&amp;h_client=z-a-r1002-3&amp;cc=us〈=en
+http://h20000.www2.hp.com/bc/docs/support/UCR/SupportManual/TPM_143091-004/TPM_143091-004.pdf
+</pre></div>
+            </div>
+            <!-- /.entry-content -->
+        </article>
+    </section>
+
+        </div>
+        <div class="col-lg-3 well well-sm" id="sidebar">
+
+<aside>
+    <section>
+        <ul class="list-group list-group-flush">
+                <li class="list-group-item"><h4><i class="icon-home icon-large"></i>Social</h4></li>
+                    <li class="list-group-item"><a href="#"><i
+                            class="icon-You can add links in your config file-sign icon-large"></i>You can add links in your config file
+                    </a></li>
+                    <li class="list-group-item"><a href="#"><i
+                            class="icon-Another social link-sign icon-large"></i>Another social link
+                    </a></li>
+
+
+
+                <li class="list-group-item"><a href="/tags.html"><h4><i class="icon-tags icon-large"></i>Tags</h4></a></li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/android.html">
+                                android
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/google.html">
+                                google
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/nagios.html">
+                                Nagios
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/php.html">
+                                PHP
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/sysadmin.html">
+                                sysadmin
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/linux.html">
+                                linux
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/perl.html">
+                                perl
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/logging.html">
+                                logging
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/puppet.html">
+                                puppet
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/bind.html">
+                                bind
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/monitoring.html">
+                                monitoring
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/dns.html">
+                                dns
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/droid.html">
+                                droid
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/firefox.html">
+                                firefox
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/mediawiki.html">
+                                mediawiki
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/mac.html">
+                                mac
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/microsoft.html">
+                                microsoft
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/syslog.html">
+                                syslog
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/wordpress.html">
+                                wordpress
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/rpm.html">
+                                rpm
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/security.html">
+                                security
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/blog.html">
+                                blog
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/sun.html">
+                                sun
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/ems.html">
+                                EMS
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/apache.html">
+                                apache
+                            </a>
+                        </li>
+        </ul>
+    </section>
+</aside>        </div>
+    </div>
+</div>
+<footer>
+    <div class="container">
+        <hr>
+        <p class="pull-right"><i class="icon-arrow-up"></i> <a href="#">Back to top</a></p>
+
+
+        <p>&copy; 2014 Jason Antman &middot; Powered by <a href="https://github.com/DandyDev/pelican-bootstrap3" target="_blank">pelican-bootstrap3</a>,
+            <a href="http://docs.getpelican.com/" target="_blank">Pelican</a>,
+            <a href="http://getbootstrap.com" target="_blank">Bootstrap</a></p>
+    </div>
+</footer>
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="/theme/js/bootstrap.min.js"></script>
+
+<!-- Enable responsive features in IE8 with Respond.js (https://github.com/scottjehl/Respond) -->
+<script src="/theme/js/respond.min.js"></script>
+
+
+</body>
+</html>

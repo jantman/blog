@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:og="http://ogp.me/ns#"
+      xmlns:fb="https://www.facebook.com/2008/fbml">
+<head>
+    <title>Tools for watching apache httpd and memcached</title>
+    <!-- Using the latest rendering mode for IE -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Open Graph tags -->
+
+            <meta property="og:type" content="article"/>
+            <meta property="og:title" content="Tools for watching apache httpd and memcached"/>
+            <meta property="og:url" content="/2012/06/tools-for-watching-apache-httpd-and-memcached/"/>
+            <meta property="og:description" content="Recently I was working on a code release on a site running PHP on Apache httpd, and using [>memcached][]. Without getting into specifics, we had a number of issues that were both Apache and memcached problems, and little visibility into them as it was running on an older server without ..."/>
+
+    <!-- Bootstrap -->
+        <link rel="stylesheet" href="/theme/css/bootstrap.min.css" type="text/css"/>
+    <link href="/theme/css/font-awesome.min.css" rel="stylesheet">
+    <link href="/theme/css/pygments.css" rel="stylesheet">
+        <link href="/theme/css/typogrify.css" rel="stylesheet">
+    <link rel="stylesheet" href="/theme/css/style.css" type="text/css"/>
+    <!-- JavaScript plugins (requires jQuery) -->
+    <script src="http://code.jquery.com/jquery.js"></script>
+
+        <link href="/feeds/all.atom.xml" type="application/atom+xml" rel="alternate"
+              title="Jason Antman's Blog ATOM Feed"/>
+
+</head>
+<body>
+<nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="" class="navbar-brand">Jason Antman's Blog</a>
+        </div>
+        <div class="collapse navbar-collapse navbar-ex1-collapse">
+            <ul class="nav navbar-nav">
+                         <li><a href="/pages/about.html">
+                             About
+                          </a></li>
+                        <li >
+                            <a href="/category/ideas-and-rants.html">Ideas and rants</a>
+                        </li>
+                        <li >
+                            <a href="/category/miscellaneous.html">Miscellaneous</a>
+                        </li>
+                        <li >
+                            <a href="/category/monitoring.html">Monitoring</a>
+                        </li>
+                        <li >
+                            <a href="/category/projects.html">Projects</a>
+                        </li>
+                        <li >
+                            <a href="/category/puppet.html">Puppet</a>
+                        </li>
+                        <li >
+                            <a href="/category/sysadmin.html">Sysadmin</a>
+                        </li>
+                        <li class="active">
+                            <a href="/category/tech-howtos.html">Tech howtos</a>
+                        </li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="/archives.html"><i class="icon-th-list"></i>Archives</a></li>
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+</nav>
+<!-- /.navbar -->
+<div class="container">
+    <div class="row">
+        <div class="col-lg-9">
+    <section id="content">
+        <article>
+            <header class="page-header">
+                <h1>
+                    <a href="/2012/06/tools-for-watching-apache-httpd-and-memcached/"
+                       rel="bookmark"
+                       title="Permalink to Tools for watching apache httpd and memcached">
+                        Tools for watching apache httpd and&nbsp;memcached
+                    </a>
+                </h1>
+            </header>
+            <div class="entry-content">
+                <div class="panel">
+                    <div class="panel-body">
+<footer class="post-info">
+    <span class="label label-default">Date</span>
+    <span class="published">
+        <i class="icon-calendar"></i>Tue 26 June 2012
+    </span>
+
+
+
+<span class="label label-default">Tags</span>
+	<a href="/tag/apache.html">apache</a>
+        /
+	<a href="/tag/memcached.html">memcached</a>
+        /
+	<a href="/tag/perl.html">perl</a>
+        /
+	<a href="/tag/top.html">top</a>
+        /
+	<a href="/tag/troubleshooting.html">troubleshooting</a>
+</footer><!-- /.post-info -->                    </div>
+                </div>
+                <p>Recently I was working on a code release on a site running <span class="caps">PHP</span> on
+<a href="http://httpd.apache.org/">Apache httpd</a>, and using [>memcached][]. Without getting into
+specifics, we had a number of issues that were both Apache and memcached
+problems, and little visibility into them as it was running on an older
+server without much monitoring in place. I started looking around for
+simple tools that could provide a bit more insight, without many
+dependencies (as the machine is a relatively minimalist install). Here
+are some of the options I&nbsp;found:</p>
+<ul>
+<li>
+<p><a href="http://code.google.com/p/memcache-top/">memcache-top</a> - A top-like script that pulls stats from memcached
+    instances and can show both per-instance, total and average usage %,
+    hit rate, number of connections, time to run the stats query,
+    evictions, gets, sets, and read and write amounts. Best of all, it&#8217;s
+    a very small perl script that requires only <span class="caps">IO</span>::Socket and
+    Time::HiRes. Here&#8217;s a small example of the&nbsp;output:</p>
+<div class="codehilite"><pre>memcache-top v0.6       (default port: 11211, color: on, refresh: 3 seconds)
+
+INSTANCE                USAGE   HIT %   CONN    TIME    EVICT   GETS    SETS    READ    WRITE
+127.0.0.1:11211         86.6%   99.4%   115     0.6ms   0.0     4114    1669    1.3M    24.2M
+127.0.0.1:11212         85.5%   59.9%   2       0.4ms   0.0     0       0       90      8055
+
+AVERAGE:                86.0%   79.6%   58      0.5ms   0.0     2057    834     682.4K  12.1M
+
+TOTAL:          0.9GB/  1.0GB           117     1.0ms   0.0     4114    1669    1.3M    24.2M
+</pre></div>
+
+
+</li>
+<li>
+<p><a href="https://github.com/dormando/damemtop">damemtop</a> is also a nice top-like memcached tool. On the positive
+    side, you can specify any column from &#8220;stats&#8221;, &#8220;stats items&#8221; or
+    &#8220;stats slabs&#8221; in the configuration file, and can choose between
+    average or one-second snapshots for each column. On the down side,
+    it requires the <span class="caps">YAML</span> and AnyEvent Perl modules, so it has some
+    uncommon&nbsp;dependencies.</p>
+<div class="codehilite"><pre>damemtop: Tue Jun 26 14:02:24 2012 [sort: hostname asc] [delay: 3s]
+hostname           all_version  all_fill_rate  hit_rate  evictions  curr_items  curr_connections   cmd_get  cmd_set  bytes_written  bytes_read  get_hits  get_misses  
+TOTAL:             
+NA                 NA           NA             NA        NA         NA          NA                 87       32       491,735        30,894      86        1           
+AVERAGE:           
+NA                 NA           86.00%         99.00%    NA         NA          NA                 43       16       122,933        7,723       43        1           
+10.200.1.78:11211  1.2.6        86.63%         98.04%    0          0           -1.00204024880524  51       19       386,492        21,613      50        1           
+10.200.1.78:11212  1.2.6        85.46%         NA        0          0           0                  0        0        11,373         31          0         0           
+10.200.1.79:11211  1.2.6        87.31%         100.00%   0          0           -1.00204024880524  36       13       82,479         9,219       36        0           
+10.200.1.79:11212  1.2.6        85.08%         NA        0          0           0                  0        0        11,389         31          0         0           
+loop took: 0.305617094039917
+</pre></div>
+
+
+</li>
+</ul>
+<p>I&#8217;m still looking around for something for apache that uses mod_status
+and isn&#8217;t too verbose; ideally I&#8217;d like to be able to watch memcached,
+apache response codes/times, and apache mod_status all in the same
+terminal&nbsp;window.</p>
+            </div>
+            <!-- /.entry-content -->
+        </article>
+    </section>
+
+        </div>
+        <div class="col-lg-3 well well-sm" id="sidebar">
+
+<aside>
+    <section>
+        <ul class="list-group list-group-flush">
+                <li class="list-group-item"><h4><i class="icon-home icon-large"></i>Social</h4></li>
+                    <li class="list-group-item"><a href="#"><i
+                            class="icon-You can add links in your config file-sign icon-large"></i>You can add links in your config file
+                    </a></li>
+                    <li class="list-group-item"><a href="#"><i
+                            class="icon-Another social link-sign icon-large"></i>Another social link
+                    </a></li>
+
+
+
+                <li class="list-group-item"><a href="/tags.html"><h4><i class="icon-tags icon-large"></i>Tags</h4></a></li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/android.html">
+                                android
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/google.html">
+                                google
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/nagios.html">
+                                Nagios
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/php.html">
+                                PHP
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/sysadmin.html">
+                                sysadmin
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/linux.html">
+                                linux
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/perl.html">
+                                perl
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/logging.html">
+                                logging
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/puppet.html">
+                                puppet
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/bind.html">
+                                bind
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/monitoring.html">
+                                monitoring
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/dns.html">
+                                dns
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/droid.html">
+                                droid
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/firefox.html">
+                                firefox
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/mediawiki.html">
+                                mediawiki
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/mac.html">
+                                mac
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/microsoft.html">
+                                microsoft
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/syslog.html">
+                                syslog
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/wordpress.html">
+                                wordpress
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/rpm.html">
+                                rpm
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/security.html">
+                                security
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/blog.html">
+                                blog
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/sun.html">
+                                sun
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/ems.html">
+                                EMS
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/apache.html">
+                                apache
+                            </a>
+                        </li>
+        </ul>
+    </section>
+</aside>        </div>
+    </div>
+</div>
+<footer>
+    <div class="container">
+        <hr>
+        <p class="pull-right"><i class="icon-arrow-up"></i> <a href="#">Back to top</a></p>
+
+
+        <p>&copy; 2014 Jason Antman &middot; Powered by <a href="https://github.com/DandyDev/pelican-bootstrap3" target="_blank">pelican-bootstrap3</a>,
+            <a href="http://docs.getpelican.com/" target="_blank">Pelican</a>,
+            <a href="http://getbootstrap.com" target="_blank">Bootstrap</a></p>
+    </div>
+</footer>
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="/theme/js/bootstrap.min.js"></script>
+
+<!-- Enable responsive features in IE8 with Respond.js (https://github.com/scottjehl/Respond) -->
+<script src="/theme/js/respond.min.js"></script>
+
+
+</body>
+</html>

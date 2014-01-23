@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:og="http://ogp.me/ns#"
+      xmlns:fb="https://www.facebook.com/2008/fbml">
+<head>
+    <title>RVM and Ruby 1.9 to test logstash grok patterns on Fedora/CentOS</title>
+    <!-- Using the latest rendering mode for IE -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Open Graph tags -->
+
+            <meta property="og:type" content="article"/>
+            <meta property="og:title" content="RVM and Ruby 1.9 to test logstash grok patterns on Fedora/CentOS"/>
+            <meta property="og:url" content="/2012/09/rvm-and-ruby-1-9-to-test-logstash-grok-patterns-on-fedoracentos/"/>
+            <meta property="og:description" content="I’ve been working on a personal project with Logstash lately, and it relies relatively heavily on grok filters for matching text and extracting matched parts. Today, I’ve been parsing syslog from Puppet to extract various metrics and timings, which will then be passed on from Logstash to Etsy ..."/>
+
+    <!-- Bootstrap -->
+        <link rel="stylesheet" href="/theme/css/bootstrap.min.css" type="text/css"/>
+    <link href="/theme/css/font-awesome.min.css" rel="stylesheet">
+    <link href="/theme/css/pygments.css" rel="stylesheet">
+        <link href="/theme/css/typogrify.css" rel="stylesheet">
+    <link rel="stylesheet" href="/theme/css/style.css" type="text/css"/>
+    <!-- JavaScript plugins (requires jQuery) -->
+    <script src="http://code.jquery.com/jquery.js"></script>
+
+        <link href="/feeds/all.atom.xml" type="application/atom+xml" rel="alternate"
+              title="Jason Antman's Blog ATOM Feed"/>
+
+</head>
+<body>
+<nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="" class="navbar-brand">Jason Antman's Blog</a>
+        </div>
+        <div class="collapse navbar-collapse navbar-ex1-collapse">
+            <ul class="nav navbar-nav">
+                         <li><a href="/pages/about.html">
+                             About
+                          </a></li>
+                        <li >
+                            <a href="/category/ideas-and-rants.html">Ideas and rants</a>
+                        </li>
+                        <li >
+                            <a href="/category/miscellaneous.html">Miscellaneous</a>
+                        </li>
+                        <li >
+                            <a href="/category/monitoring.html">Monitoring</a>
+                        </li>
+                        <li >
+                            <a href="/category/projects.html">Projects</a>
+                        </li>
+                        <li >
+                            <a href="/category/puppet.html">Puppet</a>
+                        </li>
+                        <li >
+                            <a href="/category/sysadmin.html">Sysadmin</a>
+                        </li>
+                        <li class="active">
+                            <a href="/category/tech-howtos.html">Tech howtos</a>
+                        </li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="/archives.html"><i class="icon-th-list"></i>Archives</a></li>
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+</nav>
+<!-- /.navbar -->
+<div class="container">
+    <div class="row">
+        <div class="col-lg-9">
+    <section id="content">
+        <article>
+            <header class="page-header">
+                <h1>
+                    <a href="/2012/09/rvm-and-ruby-1-9-to-test-logstash-grok-patterns-on-fedoracentos/"
+                       rel="bookmark"
+                       title="Permalink to RVM and Ruby 1.9 to test logstash grok patterns on Fedora/CentOS">
+                        <span class="caps">RVM</span> and Ruby 1.9 to test logstash grok patterns on&nbsp;Fedora/CentOS
+                    </a>
+                </h1>
+            </header>
+            <div class="entry-content">
+                <div class="panel">
+                    <div class="panel-body">
+<footer class="post-info">
+    <span class="label label-default">Date</span>
+    <span class="published">
+        <i class="icon-calendar"></i>Mon 03 September 2012
+    </span>
+
+
+
+<span class="label label-default">Tags</span>
+	<a href="/tag/grok.html">grok</a>
+        /
+	<a href="/tag/grokparsefailure.html">grokparsefailure</a>
+        /
+	<a href="/tag/jruby.html">jruby</a>
+        /
+	<a href="/tag/kibana.html">kibana</a>
+        /
+	<a href="/tag/logstash.html">logstash</a>
+        /
+	<a href="/tag/ruby.html">ruby</a>
+        /
+	<a href="/tag/rvm.html">rvm</a>
+</footer><!-- /.post-info -->                    </div>
+                </div>
+                <p>I&#8217;ve been working on a personal project with <a href="http://logstash.net/">Logstash</a> lately, and it
+relies relatively heavily on <a href="https://github.com/jordansissel/grok">grok</a> filters for matching text and
+extracting matched parts. Today, I&#8217;ve been parsing syslog from
+<a href="http://puppetlabs.com/puppet/puppet-open-source/">Puppet</a> to extract various metrics and timings, which will then be
+passed on from Logstash to <a href="https://github.com/etsy/statsd">Etsy&#8217;s statsd</a> and then to <a href="http://graphite.wikidot.com/">graphite</a>
+for display. Unfortunately, a few of my patterns are showing the
+&#8220;_grokparsefailure&#8221; tag and I just can&#8217;t seem to find the&nbsp;problem.</p>
+<p>The logstash wiki provides a page on <a href="https://github.com/logstash/logstash/wiki/Testing-your-Grok-patterns-(--logstash-1.1.0-and-above-)">Testing your Grok patterns</a>, as
+does Sean Laurent on his blog: <a href="http://blog.bealetech.com/content/testing-logstash-grok-filters">Testing Logstash grok filters</a>.
+Unfortunately, I work in a CentOS/<span class="caps">RHEL</span> shop, and we&#8217;re decidedly <em>not</em> a
+Ruby shop. Our Logstash install is using the monolithic/standalone Java
+<span class="caps">JAR</span>. We run Puppet, which is currently under ruby 1.8.7, and the
+<a href="http://rubygems.org/gems/jls-grok">jls-grok rubygem</a> requires ruby 1.9. There&#8217;s no way I&#8217;d feel safe
+installing 1.9 on any of our machines, as they all run (and require)
+Puppet. So, I found out about <a href="https://rvm.io/"><span class="caps">RVM</span></a>, the Ruby Version Manager, which
+allows you to run and switch between multiple ruby versions, and all of
+it is installed on a per-user basis. So, I created a new user on my
+Fedora 16 desktop called &#8220;rvmtest&#8221; and went about the process of setting
+up what&#8217;s needed to test grok patterns in the user&#8217;s local environment.
+I imagine this would work similarly under CentOS or <span class="caps">RHEL</span>, but the
+following is only tested on Fedora 16. If you have any issues, you
+should probably refer back to the <span class="caps">RVM</span>&nbsp;documentation.</p>
+<ol>
+<li>Create the isolated user, just to be extra careful. Login as that&nbsp;user.</li>
+<li>As per <a href="https://rvm.io/rvm/install/">Installing <span class="caps">RVM</span></a>:
+    <code>curl https://raw.github.com/wayneeseguin/rvm/master/binscripts/rvm-installer | bash -s stable</code></li>
+<li>edit your <code>~/.bashrc</code> and&nbsp;add:</li>
+</ol>
+<div class="codehilite"><pre><span class="o">[[</span> -s <span class="s2">&quot;$<span class="caps">HOME</span>/.rvm/scripts/rvm&quot;</span> <span class="o">]]</span> <span class="o">&amp;&amp;</span> . <span class="s2">&quot;$<span class="caps">HOME</span>/.rvm/scripts/rvm&quot;</span>
+<span class="o">[[</span> -r <span class="nv">$rvm_path</span>/scripts/completion <span class="o">]]</span> <span class="o">&amp;&amp;</span> . <span class="nv">$rvm_path</span>/scripts/completion
+</pre></div>
+
+
+<div class="codehilite"><pre>&lt;p&gt;
+The first line sets up RVM for your sessions, and the second sources
+in tab-completion for the `rvm` command.
+</pre></div>
+
+
+<ol>
+<li><code>source .bashrc</code></li>
+<li>If you&#8217;re interested, you can see a list of all known rubies with:
+    <code>rvm list known</code></li>
+<li>Install Ruby (<span class="caps">MRI</span>) 1.9.2: <code>rvm install 1.9.2</code></li>
+<li><span class="dquo">&#8220;</span>switch&#8221; to that ruby: <code>rvm use 1.9.2</code> and confirm it by running
+    <code>ruby -v</code></li>
+<li>Make it the default ruby for us: <code>rvm use 1.9.2 --default</code></li>
+<li>Create a &#8220;gemset&#8221; (set of rubygems for our environment):
+    <code>rvm gemset create groktest</code></li>
+<li>Use it, and set it as default: <code>rvm use 1.9.2@groktest --default</code></li>
+<li>for grok testing, <code>gem install jls-grok</code></li>
+<li>check that it&#8217;s there: <code>gem list</code></li>
+<li>Download Logstash&#8217;s default grok patterns <a href="https://raw.github.com/logstash/logstash/master/patterns/grok-patterns">from&nbsp;github</a></li>
+<li>You should now be ready to test some grok&nbsp;patterns.</li>
+</ol>
+<p>While the two howto&#8217;s linked above use <code>irb</code> to interactively test the
+patterns, I prefer something easier to move to production, more
+reliable, and more repeatable. The following quick little ruby script
+takes test to match against on <span class="caps">STDIN</span> (log files, messages, etc.) and
+prints the matches to <span class="caps">STDOUT</span>. The script is based on <a href="https://github.com/jordansissel/ruby-grok/blob/master/examples/test.rb">test.rb</a> from
+<a href="https://github.com/jordansissel/ruby-grok">jordansissel&#8217;s ruby-grok</a>. Note one important thing here, I couldn&#8217;t
+get the shebang (<code>#!</code>) to work with anything other than the explicit
+path to my <span class="caps">RVM</span> ruby install (<code>which ruby</code>) so you&#8217;ll need to manually
+update this&nbsp;yourself.</p>
+<div class="codehilite"><pre><span class="c1">#!.rvm/rubies/ruby-1.9.2-320bin/ruby</span>
+
+<span class="nb">require</span> <span class="s1">&#39;rubygems&#39;</span>
+<span class="nb">require</span> <span class="s1">&#39;grok-pure&#39;</span>
+<span class="nb">require</span> <span class="s1">&#39;pp&#39;</span>
+
+<span class="n">grok</span> <span class="o">=</span> <span class="no">Grok</span><span class="o">.</span><span class="n">new</span>
+<span class="n">grok</span><span class="o">.</span><span class="n">add_patterns_from_file</span><span class="p">(</span><span class="s2">&quot;grok-patterns&quot;</span><span class="p">)</span>
+
+<span class="n">pattern</span> <span class="o">=</span> <span class="s1">&#39;your_grok_pattern_here&#39;</span>
+<span class="n">grok</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="n">pattern</span><span class="p">)</span>
+<span class="nb">puts</span> <span class="s2">&quot;<span class="caps">PATTERN</span>: </span><span class="si">#{</span><span class="n">pattern</span><span class="si">}</span><span class="s2">&quot;</span>
+
+<span class="k">while</span> <span class="n">a</span> <span class="o">=</span> <span class="nb">gets</span>
+  <span class="nb">puts</span> <span class="s2">&quot;<span class="caps">IN</span>: </span><span class="si">#{</span><span class="n">a</span><span class="si">}</span><span class="s2">&quot;</span>
+  <span class="n">match</span> <span class="o">=</span> <span class="n">grok</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+  <span class="k">if</span> <span class="n">match</span>
+    <span class="nb">puts</span> <span class="s2">&quot;<span class="caps">MATCH</span>:&quot;</span>
+    <span class="n">pp</span> <span class="n">match</span><span class="o">.</span><span class="n">captures</span>
+  <span class="k">else</span>
+    <span class="nb">puts</span> <span class="s2">&quot;No Match.&quot;</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</pre></div>
+
+
+<p>Here&#8217;s an example using a pattern to capture information from custom
+syslog messages triggered by updating puppet configs. Here&#8217;s some sample&nbsp;messages:</p>
+<div class="codehilite"><pre>[rvmtest@jantmanwork ~]$ cat puppet.log
+Updated 2 files in puppet svn (environment prod) to revision 754
+Updated 3 files in puppet svn (environment prod) to revision 756
+Updated 1 files in puppet svn (environment prod) to revision 757
+</pre></div>
+
+
+<p>And the pattern that I&nbsp;use:</p>
+<div class="codehilite"><pre>Updated%{SPACE}%{NUMBER:puppet_svn_num_files}%{SPACE}files%{SPACE}in%{SPACE}puppet%{SPACE}svn%{SPACE}\(environment%{SPACE}%{WORD:puppet_svn_env}\)%{SPACE}to%{SPACE}revision%{SPACE}%{NUMBER:puppet_svn_revision}
+</pre></div>
+
+
+<p>And the output of the&nbsp;script:</p>
+<div class="codehilite"><pre>[rvmtest@jantmanwork ~]$ cat puppet.log | ./puppet-update-test.rb 
+PATTERN: Updated%{SPACE}%{NUMBER:puppet_svn_num_files}%{SPACE}files%{SPACE}in%{SPACE}puppet%{SPACE}svn%{SPACE}\(environment%{SPACE}%{WORD:puppet_svn_env}\)%{SPACE}to%{SPACE}revision%{SPACE}%{NUMBER:puppet_svn_revision}
+IN: Updated 2 files in puppet svn (environment prod) to revision 754
+MATCH:
+{&quot;SPACE&quot;=&gt;[&quot; &quot;, &quot; &quot;, &quot; &quot;, &quot; &quot;, &quot; &quot;, &quot; &quot;, &quot; &quot;, &quot; &quot;, &quot; &quot;, &quot; &quot;],
+ &quot;NUMBER:puppet_svn_num_files&quot;=&gt;[&quot;2&quot;],
+ &quot;BASE10NUM&quot;=&gt;[&quot;2&quot;, &quot;754&quot;],
+ &quot;WORD:puppet_svn_env&quot;=&gt;[&quot;prod&quot;],
+ &quot;NUMBER:puppet_svn_revision&quot;=&gt;[&quot;754&quot;]}
+IN: Updated 3 files in puppet svn (environment prod) to revision 756
+MATCH:
+{&quot;SPACE&quot;=&gt;[&quot; &quot;, &quot; &quot;, &quot; &quot;, &quot; &quot;, &quot; &quot;, &quot; &quot;, &quot; &quot;, &quot; &quot;, &quot; &quot;, &quot; &quot;],
+ &quot;NUMBER:puppet_svn_num_files&quot;=&gt;[&quot;3&quot;],
+ &quot;BASE10NUM&quot;=&gt;[&quot;3&quot;, &quot;756&quot;],
+ &quot;WORD:puppet_svn_env&quot;=&gt;[&quot;prod&quot;],
+ &quot;NUMBER:puppet_svn_revision&quot;=&gt;[&quot;756&quot;]}
+IN: Updated 1 files in puppet svn (environment prod) to revision 757
+MATCH:
+{&quot;SPACE&quot;=&gt;[&quot; &quot;, &quot; &quot;, &quot; &quot;, &quot; &quot;, &quot; &quot;, &quot; &quot;, &quot; &quot;, &quot; &quot;, &quot; &quot;, &quot; &quot;],
+ &quot;NUMBER:puppet_svn_num_files&quot;=&gt;[&quot;1&quot;],
+ &quot;BASE10NUM&quot;=&gt;[&quot;1&quot;, &quot;757&quot;],
+ &quot;WORD:puppet_svn_env&quot;=&gt;[&quot;prod&quot;],
+ &quot;NUMBER:puppet_svn_revision&quot;=&gt;[&quot;757&quot;]}
+</pre></div>
+
+
+<p>Hopefully this will make the process a bit simpler for someone&nbsp;else&#8230;</p>
+            </div>
+            <!-- /.entry-content -->
+        </article>
+    </section>
+
+        </div>
+        <div class="col-lg-3 well well-sm" id="sidebar">
+
+<aside>
+    <section>
+        <ul class="list-group list-group-flush">
+                <li class="list-group-item"><h4><i class="icon-home icon-large"></i>Social</h4></li>
+                    <li class="list-group-item"><a href="#"><i
+                            class="icon-You can add links in your config file-sign icon-large"></i>You can add links in your config file
+                    </a></li>
+                    <li class="list-group-item"><a href="#"><i
+                            class="icon-Another social link-sign icon-large"></i>Another social link
+                    </a></li>
+
+
+
+                <li class="list-group-item"><a href="/tags.html"><h4><i class="icon-tags icon-large"></i>Tags</h4></a></li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/android.html">
+                                android
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/google.html">
+                                google
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/nagios.html">
+                                Nagios
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/php.html">
+                                PHP
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/sysadmin.html">
+                                sysadmin
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/linux.html">
+                                linux
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/perl.html">
+                                perl
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/logging.html">
+                                logging
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/puppet.html">
+                                puppet
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/bind.html">
+                                bind
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/monitoring.html">
+                                monitoring
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/dns.html">
+                                dns
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/droid.html">
+                                droid
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/firefox.html">
+                                firefox
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/mediawiki.html">
+                                mediawiki
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/mac.html">
+                                mac
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/microsoft.html">
+                                microsoft
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/syslog.html">
+                                syslog
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/wordpress.html">
+                                wordpress
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/rpm.html">
+                                rpm
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/security.html">
+                                security
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/blog.html">
+                                blog
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/sun.html">
+                                sun
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/ems.html">
+                                EMS
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/apache.html">
+                                apache
+                            </a>
+                        </li>
+        </ul>
+    </section>
+</aside>        </div>
+    </div>
+</div>
+<footer>
+    <div class="container">
+        <hr>
+        <p class="pull-right"><i class="icon-arrow-up"></i> <a href="#">Back to top</a></p>
+
+
+        <p>&copy; 2014 Jason Antman &middot; Powered by <a href="https://github.com/DandyDev/pelican-bootstrap3" target="_blank">pelican-bootstrap3</a>,
+            <a href="http://docs.getpelican.com/" target="_blank">Pelican</a>,
+            <a href="http://getbootstrap.com" target="_blank">Bootstrap</a></p>
+    </div>
+</footer>
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="/theme/js/bootstrap.min.js"></script>
+
+<!-- Enable responsive features in IE8 with Respond.js (https://github.com/scottjehl/Respond) -->
+<script src="/theme/js/respond.min.js"></script>
+
+
+</body>
+</html>

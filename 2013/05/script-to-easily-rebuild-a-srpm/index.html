@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:og="http://ogp.me/ns#"
+      xmlns:fb="https://www.facebook.com/2008/fbml">
+<head>
+    <title>Script to easily rebuild a SRPM</title>
+    <!-- Using the latest rendering mode for IE -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Open Graph tags -->
+
+            <meta property="og:type" content="article"/>
+            <meta property="og:title" content="Script to easily rebuild a SRPM"/>
+            <meta property="og:url" content="/2013/05/script-to-easily-rebuild-a-srpm/"/>
+            <meta property="og:description" content="Between RHEL/CentOS 5 and 6 the default RPM compression format was changed to xz. As such, trying to build a recent Fedora or Cent6 SRPM on Cent5 will error out with a message like error: unpacking of archive failed on file foo;51a4c2a5: cpio: MD5 sum mismatch because tar ..."/>
+
+    <!-- Bootstrap -->
+        <link rel="stylesheet" href="/theme/css/bootstrap.min.css" type="text/css"/>
+    <link href="/theme/css/font-awesome.min.css" rel="stylesheet">
+    <link href="/theme/css/pygments.css" rel="stylesheet">
+        <link href="/theme/css/typogrify.css" rel="stylesheet">
+    <link rel="stylesheet" href="/theme/css/style.css" type="text/css"/>
+    <!-- JavaScript plugins (requires jQuery) -->
+    <script src="http://code.jquery.com/jquery.js"></script>
+
+        <link href="/feeds/all.atom.xml" type="application/atom+xml" rel="alternate"
+              title="Jason Antman's Blog ATOM Feed"/>
+
+</head>
+<body>
+<nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="" class="navbar-brand">Jason Antman's Blog</a>
+        </div>
+        <div class="collapse navbar-collapse navbar-ex1-collapse">
+            <ul class="nav navbar-nav">
+                         <li><a href="/pages/about.html">
+                             About
+                          </a></li>
+                        <li >
+                            <a href="/category/ideas-and-rants.html">Ideas and rants</a>
+                        </li>
+                        <li >
+                            <a href="/category/miscellaneous.html">Miscellaneous</a>
+                        </li>
+                        <li >
+                            <a href="/category/monitoring.html">Monitoring</a>
+                        </li>
+                        <li >
+                            <a href="/category/projects.html">Projects</a>
+                        </li>
+                        <li >
+                            <a href="/category/puppet.html">Puppet</a>
+                        </li>
+                        <li >
+                            <a href="/category/sysadmin.html">Sysadmin</a>
+                        </li>
+                        <li class="active">
+                            <a href="/category/tech-howtos.html">Tech howtos</a>
+                        </li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="/archives.html"><i class="icon-th-list"></i>Archives</a></li>
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+</nav>
+<!-- /.navbar -->
+<div class="container">
+    <div class="row">
+        <div class="col-lg-9">
+    <section id="content">
+        <article>
+            <header class="page-header">
+                <h1>
+                    <a href="/2013/05/script-to-easily-rebuild-a-srpm/"
+                       rel="bookmark"
+                       title="Permalink to Script to easily rebuild a SRPM">
+                        Script to easily rebuild a&nbsp;<span class="caps">SRPM</span>
+                    </a>
+                </h1>
+            </header>
+            <div class="entry-content">
+                <div class="panel">
+                    <div class="panel-body">
+<footer class="post-info">
+    <span class="label label-default">Date</span>
+    <span class="published">
+        <i class="icon-calendar"></i>Tue 28 May 2013
+    </span>
+
+
+
+<span class="label label-default">Tags</span>
+	<a href="/tag/lzma.html">lzma</a>
+        /
+	<a href="/tag/packaging.html">packaging</a>
+        /
+	<a href="/tag/rpm.html">rpm</a>
+        /
+	<a href="/tag/rpm2cpio.html">rpm2cpio</a>
+        /
+	<a href="/tag/rpmbuild.html">rpmbuild</a>
+        /
+	<a href="/tag/srpm.html">srpm</a>
+        /
+	<a href="/tag/xz.html">xz</a>
+</footer><!-- /.post-info -->                    </div>
+                </div>
+                <p>Between <span class="caps">RHEL</span>/CentOS 5 and 6 the default <span class="caps">RPM</span> compression format was
+changed to xz. As such, trying to build a recent Fedora or Cent6 <span class="caps">SRPM</span> on
+Cent5 will error out with a message like
+<code>error: unpacking of archive failed on file foo;51a4c2a5: cpio: MD5 sum mismatch</code>
+because tar on CentOS 5 doesn&#8217;t support&nbsp;xz.</p>
+<p>Here&#8217;s a quick and dirty little script to use <code>rpm2cpio</code> to rebuild a
+<span class="caps">SRPM</span> using the host&#8217;s native <span class="caps">RPM</span> compression. The latest version will
+live at&nbsp;[https://github.com/jantman/misc-scripts/blob/master/rebuild_srpm.sh][]</p>
+<div class="codehilite"><pre><span class="c">#!/bin/bash</span>
+<span class="c">#</span>
+<span class="c"># Script to rebuild a <span class="caps">SRPM</span> 1:1, useful when you want to build a <span class="caps">RHEL</span>/CentOS 6</span>
+<span class="c"># <span class="caps">SRPM</span> on a <span class="caps">RHEL</span>/CentOS 5 system that doesn&#39;t support newer compression (cpio: <span class="caps">MD5</span> sum mismatch)</span>
+<span class="c">#</span>
+<span class="c"># by Jason Antman </span>
+<span class="c"># The latest version of this script will always live at:</span>
+<span class="c"># </span>
+<span class="c">#</span>
+
+<span class="k">if</span> <span class="o">[[</span> -z <span class="s2">&quot;$1&quot;</span> <span class="o">||</span> <span class="s2">&quot;$1&quot;</span> <span class="o">==</span> <span class="s2">&quot;-h&quot;</span> <span class="o">||</span> <span class="s2">&quot;$1&quot;</span> <span class="o">==</span> <span class="s2">&quot;--help&quot;</span> <span class="o">]]</span>
+<span class="k">then</span>
+<span class="k">    </span><span class="nb">echo</span> <span class="s2">&quot;<span class="caps">USAGE</span>: rebuild_srpm.sh  &quot;</span>
+    <span class="nb">exit </span>1
+<span class="k">fi</span>
+
+<span class="k">if</span> <span class="o">[[</span> -z <span class="s2">&quot;$2&quot;</span> <span class="o">]]</span>
+<span class="k">then</span>
+<span class="k">    </span><span class="nv"><span class="caps">OUTDIR</span></span><span class="o">=</span><span class="sb">`</span><span class="nb">pwd</span><span class="sb">`</span>
+<span class="k">else</span>
+<span class="k">    </span><span class="nv"><span class="caps">OUTDIR</span></span><span class="o">=</span><span class="s2">&quot;$2&quot;</span>
+<span class="k">fi</span>
+
+<span class="k">if</span> <span class="o">[[</span> ! -e <span class="s2">&quot;$1&quot;</span> <span class="o">]]</span>
+<span class="k">then</span>
+<span class="k">    </span><span class="nb">echo</span> <span class="s2">&quot;<span class="caps">ERROR</span>: <span class="caps">SRPM</span> file not found: $1&quot;</span>
+    <span class="nb">exit </span>1
+<span class="k">fi</span>
+
+<span class="k">if</span> ! which rpmbuild &amp;&gt; /dev/null
+<span class="k">then</span>
+<span class="k">    </span><span class="nb">echo</span> <span class="s2">&quot;rpmbuild could not be found. please install. (sudo yum install rpm-build)&quot;</span>
+    <span class="nb">exit </span>1
+<span class="k">fi</span>
+
+<span class="k">if</span> ! which rpm2cpio &amp;&gt; /dev/null
+<span class="k">then</span>
+<span class="k">    </span><span class="nb">echo</span> <span class="s2">&quot;rpm2cpio could not be found. please install. (sudo yum install rpm)&quot;</span>
+    <span class="nb">exit </span>1
+<span class="k">fi</span>
+
+<span class="nv"><span class="caps">SRPM</span></span><span class="o">=</span><span class="sb">`</span>dirname <span class="s2">&quot;$1&quot;</span><span class="sb">`</span><span class="s2">&quot;/&quot;</span><span class="sb">`</span>basename <span class="s2">&quot;$1&quot;</span><span class="sb">`</span>
+<span class="nv"><span class="caps">TEMPDIR</span></span><span class="o">=</span><span class="sb">`</span>mktemp -d<span class="sb">`</span>
+<span class="nv"><span class="caps">STARTPWD</span></span><span class="o">=</span><span class="sb">`</span><span class="nb">pwd</span><span class="sb">`</span>
+
+<span class="nb">echo</span> <span class="s2">&quot;Rebuilding $<span class="caps">SRPM</span>...&quot;</span>
+
+<span class="c"># copy srpm into tempdir</span>
+cp <span class="nv">$<span class="caps">SRPM</span></span> <span class="nv">$<span class="caps">TEMPDIR</span></span>
+
+<span class="nb">pushd</span> <span class="nv">$<span class="caps">TEMPDIR</span></span> &amp;&gt;/dev/null
+
+<span class="c"># setup local build dir structure</span>
+mkdir -p rpm rpm/<span class="caps">BUILD</span> rpm/<span class="caps">RPMS</span> rpm/<span class="caps">SOURCES</span> rpm/<span class="caps">SPECS</span> rpm/<span class="caps">SRPMS</span> rpm/<span class="caps">RPMS</span>/athlon rpm/<span class="caps">RPMS</span>/i<span class="se">\[</span>3456<span class="se">\]</span>86 rpm/<span class="caps">RPMS</span>/i386 rpm/<span class="caps">RPMS</span>/noarch rpm/<span class="caps">RPMS</span>/x86_64
+
+<span class="c"># setup rpmmacros file</span>
+cat /dev/null &gt; <span class="nv">$<span class="caps">TEMPDIR</span></span>/.rpmmacros
+<span class="nb">echo</span> <span class="s2">&quot;%_topdir        $<span class="caps">TEMPDIR</span>/rpm&quot;</span> &gt;&gt; ~/.rpmmacros
+
+<span class="nb">echo</span> <span class="s2">&quot;Extracting <span class="caps">SRPM</span>...&quot;</span>
+<span class="nb">pushd</span> <span class="nv">$<span class="caps">TEMPDIR</span></span>/rpm/<span class="caps">SOURCES</span>/ &amp;&gt;/dev/null
+rpm2cpio <span class="nv">$<span class="caps">SRPM</span></span> | cpio -idmv &amp;&gt;/dev/null
+<span class="nb">popd</span> &amp;&gt;/dev/null
+
+<span class="c"># build the <span class="caps">SRPM</span> from the spec and sources</span>
+<span class="c"># we&#39;re just building a <span class="caps">SRPM</span> so we can ignore dependencies</span>
+<span class="nb">echo</span> <span class="s2">&quot;Rebuilding <span class="caps">SRPM</span>...&quot;</span>
+<span class="nv">NEW_SRPM</span><span class="o">=</span><span class="sb">`</span>rpmbuild -bs --nodeps --macros<span class="o">=</span><span class="nv">$<span class="caps">TEMPDIR</span></span>/.rpmmacros <span class="nv">$<span class="caps">TEMPDIR</span></span>/rpm/<span class="caps">SOURCES</span>/*.spec | grep <span class="s2">&quot;^Wrote: &quot;</span> | awk <span class="s1">&#39;{print $2}&#39;</span><span class="sb">`</span>
+
+<span class="nb">echo</span> <span class="s2">&quot;Copying to $<span class="caps">OUTDIR</span>&quot;</span>
+cp <span class="nv">$NEW_SRPM</span> <span class="nv">$<span class="caps">OUTDIR</span></span>/
+
+<span class="nb">echo</span> <span class="s2">&quot;Wrote file to $<span class="caps">OUTDIR</span>/`basename $NEW_SRPM`&quot;</span>
+
+<span class="c"># cleanup</span>
+<span class="nb">cd</span> <span class="nv">$<span class="caps">STARTPWD</span></span>
+rm -Rf <span class="nv">$<span class="caps">TEMPDIR</span></span>
+</pre></div>
+
+
+<div class="codehilite"><pre>https://github.com/jantman/misc-scripts/blob/master/rebuild_srpm.sh
+</pre></div>
+            </div>
+            <!-- /.entry-content -->
+        </article>
+    </section>
+
+        </div>
+        <div class="col-lg-3 well well-sm" id="sidebar">
+
+<aside>
+    <section>
+        <ul class="list-group list-group-flush">
+                <li class="list-group-item"><h4><i class="icon-home icon-large"></i>Social</h4></li>
+                    <li class="list-group-item"><a href="#"><i
+                            class="icon-You can add links in your config file-sign icon-large"></i>You can add links in your config file
+                    </a></li>
+                    <li class="list-group-item"><a href="#"><i
+                            class="icon-Another social link-sign icon-large"></i>Another social link
+                    </a></li>
+
+
+
+                <li class="list-group-item"><a href="/tags.html"><h4><i class="icon-tags icon-large"></i>Tags</h4></a></li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/android.html">
+                                android
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/google.html">
+                                google
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/nagios.html">
+                                Nagios
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/php.html">
+                                PHP
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/sysadmin.html">
+                                sysadmin
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/linux.html">
+                                linux
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/perl.html">
+                                perl
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/logging.html">
+                                logging
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/puppet.html">
+                                puppet
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/bind.html">
+                                bind
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/monitoring.html">
+                                monitoring
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/dns.html">
+                                dns
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/droid.html">
+                                droid
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/firefox.html">
+                                firefox
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/mediawiki.html">
+                                mediawiki
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/mac.html">
+                                mac
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/microsoft.html">
+                                microsoft
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/syslog.html">
+                                syslog
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/wordpress.html">
+                                wordpress
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/rpm.html">
+                                rpm
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/security.html">
+                                security
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/blog.html">
+                                blog
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/sun.html">
+                                sun
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/ems.html">
+                                EMS
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/apache.html">
+                                apache
+                            </a>
+                        </li>
+        </ul>
+    </section>
+</aside>        </div>
+    </div>
+</div>
+<footer>
+    <div class="container">
+        <hr>
+        <p class="pull-right"><i class="icon-arrow-up"></i> <a href="#">Back to top</a></p>
+
+
+        <p>&copy; 2014 Jason Antman &middot; Powered by <a href="https://github.com/DandyDev/pelican-bootstrap3" target="_blank">pelican-bootstrap3</a>,
+            <a href="http://docs.getpelican.com/" target="_blank">Pelican</a>,
+            <a href="http://getbootstrap.com" target="_blank">Bootstrap</a></p>
+    </div>
+</footer>
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="/theme/js/bootstrap.min.js"></script>
+
+<!-- Enable responsive features in IE8 with Respond.js (https://github.com/scottjehl/Respond) -->
+<script src="/theme/js/respond.min.js"></script>
+
+
+</body>
+</html>

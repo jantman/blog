@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:og="http://ogp.me/ns#"
+      xmlns:fb="https://www.facebook.com/2008/fbml">
+<head>
+    <title>Secure rsnapshot backups over the WAN via SSH</title>
+    <!-- Using the latest rendering mode for IE -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Open Graph tags -->
+
+            <meta property="og:type" content="article"/>
+            <meta property="og:title" content="Secure rsnapshot backups over the WAN via SSH"/>
+            <meta property="og:url" content="/2012/01/secure-rsnapshot-backups-over-the-wan-via-ssh/"/>
+            <meta property="og:description" content="Since I moved all of my WAN-facing stuff (mail, web, this blog, svn etc.) to a virtual server with Linode, and just have a desktop at home, it’s no longer practical to use Bacula for backups. Linode manages daily and weekly backups through their backup service, but they ..."/>
+
+    <!-- Bootstrap -->
+        <link rel="stylesheet" href="/theme/css/bootstrap.min.css" type="text/css"/>
+    <link href="/theme/css/font-awesome.min.css" rel="stylesheet">
+    <link href="/theme/css/pygments.css" rel="stylesheet">
+        <link href="/theme/css/typogrify.css" rel="stylesheet">
+    <link rel="stylesheet" href="/theme/css/style.css" type="text/css"/>
+    <!-- JavaScript plugins (requires jQuery) -->
+    <script src="http://code.jquery.com/jquery.js"></script>
+
+        <link href="/feeds/all.atom.xml" type="application/atom+xml" rel="alternate"
+              title="Jason Antman's Blog ATOM Feed"/>
+
+</head>
+<body>
+<nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="" class="navbar-brand">Jason Antman's Blog</a>
+        </div>
+        <div class="collapse navbar-collapse navbar-ex1-collapse">
+            <ul class="nav navbar-nav">
+                         <li><a href="/pages/about.html">
+                             About
+                          </a></li>
+                        <li >
+                            <a href="/category/ideas-and-rants.html">Ideas and rants</a>
+                        </li>
+                        <li >
+                            <a href="/category/miscellaneous.html">Miscellaneous</a>
+                        </li>
+                        <li >
+                            <a href="/category/monitoring.html">Monitoring</a>
+                        </li>
+                        <li >
+                            <a href="/category/projects.html">Projects</a>
+                        </li>
+                        <li >
+                            <a href="/category/puppet.html">Puppet</a>
+                        </li>
+                        <li >
+                            <a href="/category/sysadmin.html">Sysadmin</a>
+                        </li>
+                        <li class="active">
+                            <a href="/category/tech-howtos.html">Tech howtos</a>
+                        </li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="/archives.html"><i class="icon-th-list"></i>Archives</a></li>
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+</nav>
+<!-- /.navbar -->
+<div class="container">
+    <div class="row">
+        <div class="col-lg-9">
+    <section id="content">
+        <article>
+            <header class="page-header">
+                <h1>
+                    <a href="/2012/01/secure-rsnapshot-backups-over-the-wan-via-ssh/"
+                       rel="bookmark"
+                       title="Permalink to Secure rsnapshot backups over the WAN via SSH">
+                        Secure rsnapshot backups over the <span class="caps">WAN</span> via&nbsp;<span class="caps">SSH</span>
+                    </a>
+                </h1>
+            </header>
+            <div class="entry-content">
+                <div class="panel">
+                    <div class="panel-body">
+<footer class="post-info">
+    <span class="label label-default">Date</span>
+    <span class="published">
+        <i class="icon-calendar"></i>Sun 15 January 2012
+    </span>
+
+
+
+<span class="label label-default">Tags</span>
+	<a href="/tag/backups.html">backups</a>
+        /
+	<a href="/tag/linode.html">linode</a>
+        /
+	<a href="/tag/rsnapshot.html">rsnapshot</a>
+        /
+	<a href="/tag/rsync.html">rsync</a>
+        /
+	<a href="/tag/security.html">security</a>
+        /
+	<a href="/tag/ssh.html">ssh</a>
+        /
+	<a href="/tag/wrapper.html">wrapper</a>
+</footer><!-- /.post-info -->                    </div>
+                </div>
+                <p>Since I moved all of my <span class="caps">WAN</span>-facing stuff (mail, web, this blog, svn
+etc.) to a virtual server with <a href="http://www.linode.com">Linode</a>, and just have a desktop at
+home, it&#8217;s no longer practical to use <a href="http://www.bacula.org/">Bacula</a> for backups. Linode
+manages daily and weekly backups through their backup service, but
+they&#8217;ll only restore a full filesystem at a time. I wanted something
+that would keep daily and weekly incremental backups long enough that I
+could find a file changed (or accidentally deleted) a few days or weeks
+ago. Since I&#8217;d be backing up to my desktop at home (which is on a
+residential dynamic <span class="caps">IP</span> connection), the logical solution was something
+using <a href="http://rsync.samba.org/">rsync</a>. Even better than that is the <a href="http://rsnapshot.org/">rsnapshot</a> tool, which
+builds upon rsync and hard links to manage incremental backups with as
+little disk usage as possible (though I&#8217;d certainly recommend excluding
+log&nbsp;files).</p>
+<p>I&#8217;m pretty strict about security. Since my home connection has a dynamic
+<span class="caps">IP</span>, things are a bit more complicated - I can&#8217;t push from the server, I
+can&#8217;t <span class="caps">ACL</span> or firewall the server to just my home <span class="caps">IP</span>, and an IPsec <span class="caps">VPN</span>
+would be difficult to accomplish (not to mention add a lot of overhead
+to big file transfers). So, I opted for a solution that uses <span class="caps">SSH</span>
+key-based authentication, forced comands, and a C&nbsp;wrapper.</p>
+<p>The configuration of rsync and rsnapshot is mostly out of the scope of
+this post. There are plenty of good resources for that, so I&#8217;ll just
+cover the things that won&#8217;t be found in most tutorials. Also, I&#8217;ll be
+referring to the remote machine to be backed up as the &#8220;remote host&#8221; and
+the local machine which triggers the backup and stores the data as the
+&#8220;local&nbsp;host&#8221;.</p>
+<p><strong>Local Host Setup - Part&nbsp;I</strong></p>
+<ol>
+<li>Choose and create a directory to store your backups in. I have a <span class="caps">1TB</span>
+    external disk mounted at <code>/mnt/backup/</code>, so I chose
+    <code>/mnt/backup/rsnapshot/</code>.</li>
+<li>Generate two sets of password-less <span class="caps">SSH</span> keys using the <code>ssh-keygen</code>
+    program. One will be used to run the rsync command on the remote
+    host, the other will be used to trigger your pre- and post-backup
+    scripts. Name them accordingly (i.e.
+    &#8220;remoteHostname_remoteBackupUsername_cmd&#8221; and
+    &#8220;remoteHostname_remoteBackupUsername_rsync&#8221;). Now, get (scp) the
+    public key for each pair to the remote&nbsp;host.</li>
+</ol>
+<p><strong>Remote Host&nbsp;Setup</strong></p>
+<ol>
+<li>Ensure that rsync is installed on the&nbsp;host.</li>
+<li>Create a user to run the backups. I called this user &#8220;rsyncuser&#8221;.
+    Create a home directory, and a group for the user. Do not set a
+    password (you don&#8217;t want password&nbsp;logins).</li>
+<li>Copy the public key files you created above to the user&#8217;s <code>~/.ssh/</code>
+    directory.</li>
+<li>Cat the &#8220;remoteHostname_remoteBackupUsername_cmd&#8221; public key into
+    the user&#8217;s <code>~/.ssh/authorized_keys</code> file.</li>
+<li>Now comes the first fun part. Let&#8217;s assume that your pre- and
+    post-backup scripts are <code>/root/bin/rsnapshot-pre.sh</code> and
+    <code>/root/bin/rsnapshot-post.sh</code>, respectively. As root, grab a copy of
+    cmd-wrapper.c (from <a href="http://svn.jasonantman.com/misc-scripts/cmd-wrapper.c">subversion</a> or at the bottom of this post).
+    Modify for your use - the only thing likely to change is line 38,
+    which ensures it will only run for a member of <span class="caps">GID</span> 502. Change this
+    to rsyncuser&#8217;s <span class="caps">GID</span>. Compile the wrapper with
+    <code>gcc -o cmd-wrapper cmd-wrapper.c</code>. Copy it to rsyncuser&#8217;s home
+    directory (/home/rsyncuser), <code>chown root:rsyncuser</code> and
+    <code>chmod 4750</code>. Yes, this sets the <span class="caps">SUID</span> bit. The program will now be
+    owned by root, and runnable <em>as root</em> by rsyncuser (or, more
+    specifically, any member of the rsyncuser&nbsp;group).</li>
+<li>Open rsyncuser&#8217;s <code>.ssh/authorized_keys</code> file in a text editor. At
+    the beginning of the &#8220;remoteHostname_remoteBackupUsername_cmd&#8221; key
+    line, prepend <code>command="/home/rsyncuser/cmd-wrapper"</code>. This sets up
+    <span class="caps">SSH</span> forced command (there&#8217;s a good overview in [O&#8217;Reilly&#8217;s <span class="caps">SSH</span>: The
+    Definitive Guide][]) so that when this key is used to login, it will
+    directly execute <code>/home/rsyncuser/cmd-wrapper</code> and then exit,
+    without allowing access to anything&nbsp;else.</li>
+<li>Add rsyncuser to <code>AllowUsers</code> in <code>/etc/ssh/sshd_config</code> (you <em>do</em>
+    limit user access via <span class="caps">SSH</span>, right?) and then reload&nbsp;sshd.</li>
+<li>Now, if you <span class="caps">SSH</span> to rsyncuser@remoteHost from the local host, using
+    the &#8220;_cmd&#8221; ssh key and a command of &#8220;pre&#8221; (i.e.
+    <code>ssh -i /path/to/remoteHostname_remoteBackupUsername_cmd rsyncuser@remoteHost pre</code>),
+    it should execute <code>/root/bin/rsnapshot-pre.sh</code> ad root, and you
+    should see the output&nbsp;locally.</li>
+<li>Repeat the above step for the post-backup script (replacing &#8220;pre&#8221;
+    above with &#8220;post&#8221;). You should now have your pre- and post-backup
+    scripts working, and triggered remotely. <em>(Note: these steps, and
+    some of the other setup here, is a bit more complex so that it will
+    work better with rsnapshot backups of multiple remote&nbsp;hosts.)</em></li>
+<li>Cat the &#8220;remoteHostname_remoteBackupUsername_rsync&#8221; public key
+    into the backup user&#8217;s <code>~/.ssh/authorized_keys</code> file.</li>
+<li>As root, grab a copy of rsync-wrapper.c (from <a href="http://svn.jasonantman.com/misc-scripts/rsync-wrapper.c">subversion</a> or at
+    the bottom of this post). Modify for your use - the only thing
+    likely to change is line 38, which ensures it will only run for a
+    member of <span class="caps">GID</span> 502 (change this to rsyncuser&#8217;s <span class="caps">GID</span>), and perhaps the
+    path of or arguments passed to rsync (the wrapper will call
+    <code>/usr/bin/rsync --server --sender -vlogDtprRe.iLsf --numeric-ids . /</code>).
+    Compile the wrapper with <code>gcc -o rsync-wrapper rsync-wrapper.c</code>.
+    Copy it to rsyncuser&#8217;s home directory (/home/rsyncuser),
+    <code>chown root:rsyncuser</code> and <code>chmod 4750</code>.</li>
+<li>Open rsyncuser&#8217;s <code>.ssh/authorized_keys</code> file in a text editor. At
+    the beginning of the &#8220;remoteHostname_remoteBackupUsername_rsync&#8221;
+    key line, prepend <code>command="/home/rsyncuser/rsync-wrapper"</code>. This
+    will run rsync with the arguments specified in rsync-wrapper.c every
+    time this key is used to&nbsp;login.</li>
+</ol>
+<p><strong>Local Host Setup - Part&nbsp;<span class="caps">II</span></strong></p>
+<p>I use totally separate configs for each host that I backup, to keep
+things clean and to let me enable, disable, or tweak one remote backup
+without affecting the&nbsp;others.</p>
+<ol>
+<li>
+<p>Create host-specific pre- and post-backup scripts. I put them in
+    <code>/etc/rsnapshot.d/</code>.   </p>
+<p><code>/etc/rsnapshot.d/pre-remoteHostName.sh</code>:</p>
+</p>
+
+</li>
+</ol>
+<div class="codehilite"><pre>#!/bin/bash
+
+# do anything else needed on the local system before a backup
+ssh -i /path/to/remoteHostname_remoteBackupUsername_cmd rsyncuser@remoteHost pre
+</pre></div>
+
+
+<div class="codehilite"><pre>`/etc/rsnapshot.d/post-remoteHostName.sh`:
+</pre></div>
+
+
+<div class="codehilite"><pre>#!/bin/bash
+
+# do anything else needed on the local system after a backup
+ssh -i /path/to/remoteHostname_remoteBackupUsername_cmd rsyncuser@remoteHost post
+</pre></div>
+
+
+<ol>
+<li>Setup a set of rsync include and exclude files (see <code>man rsync(1)</code>,
+    <code>--include-from=</code> and <code>--exclude-from=</code>). I put mine at
+    <code>/etc/rsnapshot.d/rsync-include-remoteHostName.txt</code> and
+    <code>/etc/rsnapshot.d/rsync-exclude-remoteHostName.txt</code>, respectively.
+    (Examples included at the bottom of this&nbsp;post).</li>
+<li>Configure rsnapshot. I use a separate config file for each remote
+    host. Copy the default <code>/etc/rsnapshot.conf</code> to
+    <code>/etc/rsnapshot-remoteHostName.conf</code>. The important items are
+    <code>rsync_short_args</code>, <code>rsync_long_args</code>, <code>ssh_args</code>, <code>cmd_preexec</code>,
+    <code>cmd_postexec</code> and <code>backup</code>. Here&#8217;s an example of my config file,
+    with comments and blank lines&nbsp;removed:</li>
+</ol>
+<div class="codehilite"><pre>config_version  1.2
+snapshot_root   /mnt/backup/rsnapshot/
+cmd_cp          /bin/cp
+cmd_rm          /bin/rm
+cmd_rsync       /usr/bin/rsync
+cmd_ssh         /usr/bin/ssh
+cmd_logger      /bin/logger
+cmd_du          /usr/bin/du
+cmd_rsnapshot_diff      /usr/bin/rsnapshot-diff
+interval        daily   14 # save 14 daily backups
+interval        weekly  6 # save 6 weekly backups
+verbose         2
+loglevel        3
+logfile /var/log/rsnapshot-remoteHostName.log
+lockfile        /var/run/rsnapshot-remoteHostName.pid
+rsync_short_args        -a
+rsync_long_args --delete --numeric-ids --relative --delete-excluded
+ssh_args        -i /path/to/remoteHostname_remoteBackupUsername_rsync
+exclude_file    /etc/rsnapshot.d/rsync-exclude-remoteHostName.txt
+include_file    /etc/rsnapshot.d/rsync-include-remoteHostName.txt
+link_dest       1
+use_lazy_deletes        1
+cmd_preexec     /etc/rsnapshot.d/pre-remoteHostName.sh
+cmd_postexec    /etc/rsnapshot.d/post-remoteHostName.sh
+backup  rsyncuser@remoteHostName:/      remoteHostName/
+</pre></div>
+
+
+<div class="codehilite"><pre>&lt;p&gt;
+The `backup` line is what tells rsync what to back up (`/` on
+remoteHostName, logging in as rsyncuser), and where to back up to
+(snapshot\_root/remoteHostName/).
+</pre></div>
+
+
+<ol>
+<li>
+<p>Create two scripts that will actually trigger the backups, which
+    I&#8217;ll call <code>/root/bin/rsnapshot-daily.sh</code> and
+    <code>/root/bin/rsnapshot-weekly.sh</code>:  </p>
+<p><code>/root/bin/rsnapshot-daily.sh</code>:</p>
+</p>
+
+</li>
+</ol>
+<div class="codehilite"><pre>#!/bin/bash
+
+/usr/bin/rsnapshot -c /etc/rsnapshot-remoteHostName.conf daily
+# add other hosts here; note, they&#39;ll run in series
+</pre></div>
+
+
+<div class="codehilite"><pre>`/root/bin/rsnapshot-weekly.sh`:
+</pre></div>
+
+
+<div class="codehilite"><pre>#!/bin/bash
+
+/usr/bin/rsnapshot -c /etc/rsnapshot-remoteHostName.conf weekly
+# add other hosts here; note, they&#39;ll run in series
+</pre></div>
+
+
+<ol>
+<li>Add two entries to root&#8217;s croontab to run the rsnapshot backups.
+    Adjust the following days and times to your&nbsp;liking:</li>
+</ol>
+<div class="codehilite"><pre>0 1 * * Mon /root/bin/rsnapshot-weekly.sh <span class="c"># run the weekly backups every Monday at 01:00</span>
+30 2 * * * /root/bin/rsnapshot-daily.sh <span class="c"># run the daily backups every day at 02:30, which *should* be after the weekly finished on Monday morning</span>
+</pre></div>
+
+
+<ol>
+<li>Check, after the next scheduled runs, that everything appears to
+    have run correctly. If you want, you can manually trigger the daily
+    script and watch what happens. If you do this more than once, you
+    should delete the directories it creates, or else rotation will be
+    messed up. If you have issues with rsync, aside from the usual
+    troubleshooting, check that rsync-wrapper.c is calling rsync with
+    the same arguments that rsnapshot is sending. It may be useful to
+    use my <a href="http://svn.jasonantman.com/misc-scripts/print-cmd.sh">print-cmd.sh</a> script in place of the &#8220;rsync-wrapper&#8221;
+    forced command. This script will simply log the command rsnapshot
+    calls via&nbsp;<span class="caps">SSH</span>.</li>
+</ol>
+<p>Assuming all of this worked, you should now have a fairly secure
+<span class="caps">SSH</span>-based remotely-triggered backup system. In a follow-up post I
+provide my <a href="/2012/02/nagios-check-plugin-for-rsnapshot-backups/">Nagios Check Plugin for Rsnapshot Backups</a>.</p>
+<p>The referenced scripts, config files, etc. are&nbsp;below:</p>
+<p><code>cmd-wrapper.c</code>:</p>
+<div class="codehilite"><pre><span class="cp">#include </span>
+<span class="cp">#include </span>
+<span class="cp">#include </span>
+<span class="cp">#include </span>
+<span class="cp">#include </span>
+<span class="cp">#include </span>
+
+<span class="cm">/********************************************</span>
+<span class="cm"> * Wrapper - Secure Yourself                </span>
+<span class="cm"> *                                          </span>
+<span class="cm"> * 2007 - Mike Golvach - eggi@comcast.net   </span>
+<span class="cm"> * Modified 2012 by Jason Antman  </span>
+<span class="cm"> *  - configured for use as pre- and post-backup script wrapper</span>
+<span class="cm"> *                                          </span>
+<span class="cm"> * <span class="caps">USAGE</span>: cmd-wrapper [pre|post]</span>
+<span class="cm"> *</span>
+<span class="cm"> * $HeadURL: http://svn.jasonantman.com/misc-scripts/cmd-wrapper.c $</span>
+<span class="cm"> * $LastChangedRevision: 26 $</span>
+<span class="cm"> *                                          </span>
+<span class="cm"> ********************************************/</span>
+
+<span class="cm">/* Creative Commons Attribution-Noncommercial-Share Alike 3.0 United States License */</span>
+
+<span class="cm">/* Define global variables */</span>
+
+<span class="kt">int</span> <span class="n">gid</span><span class="p">;</span>
+
+<span class="cm">/* main(int argc, char **argv) - main process loop */</span>
+
+<span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span> <span class="o">**</span><span class="n">argv</span><span class="p">,</span> <span class="kt">char</span> <span class="o">**</span><span class="n">envp</span><span class="p">)</span>
+<span class="p">{</span>
+  <span class="kt">char</span> <span class="o">*</span><span class="n">origcmd</span><span class="p">;</span>
+
+  <span class="n">origcmd</span> <span class="o">=</span> <span class="n">getenv</span><span class="p">(</span><span class="s">&quot;SSH_ORIGINAL_COMMAND&quot;</span><span class="p">);</span>
+
+  <span class="cm">/* printf (&quot;Original Command:%s\n&quot;, origcmd); */</span>
+
+  <span class="cm">/* Set euid and egid to actual user */</span>
+
+  <span class="n">gid</span> <span class="o">=</span> <span class="n">getgid</span><span class="p">();</span>
+  <span class="n">setegid</span><span class="p">(</span><span class="n">getgid</span><span class="p">());</span>
+  <span class="n">seteuid</span><span class="p">(</span><span class="n">getuid</span><span class="p">());</span>
+
+  <span class="cm">/* Confirm user is in <span class="caps">GROUP</span>(502) group */</span>
+
+  <span class="k">if</span> <span class="p">(</span> <span class="n">gid</span> <span class="o">!=</span> <span class="mi">502</span> <span class="p">)</span> <span class="p">{</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;User Not Authorized! Exiting...</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+    <span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+  <span class="p">}</span>
+
+  <span class="cm">/* Check argc count only at this point */</span>
+
+  <span class="k">if</span> <span class="p">(</span> <span class="n">argc</span> <span class="o">!=</span> <span class="mi">1</span> <span class="p">)</span> <span class="p">{</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;Usage: cmd-wrapper [pre|post]</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+    <span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+  <span class="p">}</span>
+
+  <span class="cm">/* Set uid, gid, euid and egid to root */</span>
+
+  <span class="n">setegid</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+  <span class="n">seteuid</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+  <span class="n">setgid</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+  <span class="n">setuid</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+
+  <span class="cm">/* Check argv for proper arguments and run</span>
+<span class="cm">   * the corresponding script, if invoked.</span>
+<span class="cm">   */</span>
+
+  <span class="k">if</span> <span class="p">(</span> <span class="n">strncmp</span><span class="p">(</span><span class="n">origcmd</span><span class="p">,</span> <span class="s">&quot;pre&quot;</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="p">)</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">execl</span><span class="p">(</span><span class="s">&quot;/root/bin/rsnapshot-pre.sh&quot;</span><span class="p">,</span> <span class="s">&quot;rsnapshot-pre.sh&quot;</span><span class="p">,</span> <span class="nb"><span class="caps">NULL</span></span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+      <span class="n">perror</span><span class="p">(</span><span class="s">&quot;Execl:&quot;</span><span class="p">);</span>
+    <span class="p">}</span>
+  <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span> <span class="n">strncmp</span><span class="p">(</span><span class="n">origcmd</span><span class="p">,</span> <span class="s">&quot;post&quot;</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="p">)</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">execl</span><span class="p">(</span><span class="s">&quot;/root/bin/rsnapshot-post.sh&quot;</span><span class="p">,</span> <span class="s">&quot;rsnapshot-post.sh&quot;</span><span class="p">,</span> <span class="nb"><span class="caps">NULL</span></span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+      <span class="n">perror</span><span class="p">(</span><span class="s">&quot;Execl:&quot;</span><span class="p">);</span>
+    <span class="p">}</span>
+  <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;<span class="caps">ERROR</span>: Invalid command: %s</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">origcmd</span><span class="p">);</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;Usage: <span class="caps">COMMAND</span> [pre|post]</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+    <span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+  <span class="p">}</span>
+  <span class="n">exit</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+
+
+<p><code>rsync-wrapper.c</code>:</p>
+<div class="codehilite"><pre><span class="cp">#include </span>
+<span class="cp">#include </span>
+<span class="cp">#include </span>
+<span class="cp">#include </span>
+<span class="cp">#include </span>
+
+<span class="cm">/********************************************</span>
+<span class="cm"> * Wrapper - Secure Yourself                </span>
+<span class="cm"> *                                          </span>
+<span class="cm"> * 2007 - Mike Golvach - eggi@comcast.net   </span>
+<span class="cm"> * Modified 2012 by Jason Antman  </span>
+<span class="cm"> *  - configured for use as rsync wrapper</span>
+<span class="cm"> *                                          </span>
+<span class="cm"> * $HeadURL: http://svn.jasonantman.com/misc-scripts/rsync-wrapper.c $</span>
+<span class="cm"> * $LastChangedRevision: 26 $</span>
+<span class="cm"> *                                          </span>
+<span class="cm"> ********************************************/</span>
+
+<span class="cm">/* Creative Commons Attribution-Noncommercial-Share Alike 3.0 United States License */</span>
+
+<span class="cm">/* Define global variables */</span>
+
+<span class="kt">int</span> <span class="n">gid</span><span class="p">;</span>
+
+<span class="cm">/* main(int argc, char **argv) - main process loop */</span>
+
+<span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span> <span class="o">**</span><span class="n">argv</span><span class="p">)</span>
+<span class="p">{</span>
+
+  <span class="cm">/* Set euid and egid to actual user */</span>
+
+  <span class="n">gid</span> <span class="o">=</span> <span class="n">getgid</span><span class="p">();</span>
+  <span class="n">setegid</span><span class="p">(</span><span class="n">getgid</span><span class="p">());</span>
+  <span class="n">seteuid</span><span class="p">(</span><span class="n">getuid</span><span class="p">());</span>
+
+  <span class="cm">/* Confirm user is in <span class="caps">GROUP</span>(502) group */</span>
+
+  <span class="k">if</span> <span class="p">(</span> <span class="n">gid</span> <span class="o">!=</span> <span class="mi">502</span> <span class="p">)</span> <span class="p">{</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;User Not Authorized! Exiting...</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+    <span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+  <span class="p">}</span>
+
+  <span class="cm">/* Check argc count only at this point */</span>
+
+  <span class="k">if</span> <span class="p">(</span> <span class="n">argc</span> <span class="o">!=</span> <span class="mi">1</span> <span class="p">)</span> <span class="p">{</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;Usage: rsync-wrapper</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+    <span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+  <span class="p">}</span>
+
+  <span class="cm">/* Set uid, gid, euid and egid to root */</span>
+
+  <span class="n">setegid</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+  <span class="n">seteuid</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+  <span class="n">setgid</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+  <span class="n">setuid</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+
+  <span class="cm">/* Check argv for proper arguments and run</span>
+<span class="cm">   * the corresponding script, if invoked.</span>
+<span class="cm">   */</span>
+  <span class="k">if</span> <span class="p">(</span><span class="n">execl</span><span class="p">(</span><span class="s">&quot;/usr/bin/rsync&quot;</span><span class="p">,</span> <span class="s">&quot;rsync&quot;</span><span class="p">,</span> <span class="s">&quot;--server&quot;</span><span class="p">,</span> <span class="s">&quot;--sender&quot;</span><span class="p">,</span> <span class="s">&quot;-vlogDtprRe.iLsf&quot;</span><span class="p">,</span> <span class="s">&quot;--numeric-ids&quot;</span><span class="p">,</span> <span class="s">&quot;.&quot;</span><span class="p">,</span> <span class="s">&quot;/&quot;</span><span class="p">,</span> <span class="nb"><span class="caps">NULL</span></span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">perror</span><span class="p">(</span><span class="s">&quot;Execl:&quot;</span><span class="p">);</span>
+  <span class="p">}</span>
+  <span class="n">exit</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+
+
+<p><code>/etc/rsnapshot.d/rsync-include-remoteHostName.txt</code>:</p>
+<p>~~~~{.text&nbsp;only}</p>
+<h1 id="include">Include</h1>
+<ul>
+<li>/dev/console</li>
+<li>/dev/initctl</li>
+<li>/dev/null</li>
+<li>/dev/zero</li>
+<li>/usr/local/*</li>
+</ul>
+<div class="codehilite"><pre>`/etc/rsnapshot.d/rsync-exclude-remoteHostName.txt`:
+
+~~~~{.text only}
+# Exclude
+- /cgroup/*
+- /dev/*
+- /lib/*
+- lost+found/
+- /proc/*
+- /sys/
+- /tmp/
+- /var/log/*
+</pre></div>
+            </div>
+            <!-- /.entry-content -->
+        </article>
+    </section>
+
+        </div>
+        <div class="col-lg-3 well well-sm" id="sidebar">
+
+<aside>
+    <section>
+        <ul class="list-group list-group-flush">
+                <li class="list-group-item"><h4><i class="icon-home icon-large"></i>Social</h4></li>
+                    <li class="list-group-item"><a href="#"><i
+                            class="icon-You can add links in your config file-sign icon-large"></i>You can add links in your config file
+                    </a></li>
+                    <li class="list-group-item"><a href="#"><i
+                            class="icon-Another social link-sign icon-large"></i>Another social link
+                    </a></li>
+
+
+
+                <li class="list-group-item"><a href="/tags.html"><h4><i class="icon-tags icon-large"></i>Tags</h4></a></li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/android.html">
+                                android
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/google.html">
+                                google
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/nagios.html">
+                                Nagios
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/php.html">
+                                PHP
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/sysadmin.html">
+                                sysadmin
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/linux.html">
+                                linux
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/perl.html">
+                                perl
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/logging.html">
+                                logging
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/puppet.html">
+                                puppet
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/bind.html">
+                                bind
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/monitoring.html">
+                                monitoring
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/dns.html">
+                                dns
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/droid.html">
+                                droid
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/firefox.html">
+                                firefox
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/mediawiki.html">
+                                mediawiki
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/mac.html">
+                                mac
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/microsoft.html">
+                                microsoft
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/syslog.html">
+                                syslog
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/wordpress.html">
+                                wordpress
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/rpm.html">
+                                rpm
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/security.html">
+                                security
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/blog.html">
+                                blog
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/sun.html">
+                                sun
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/ems.html">
+                                EMS
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/apache.html">
+                                apache
+                            </a>
+                        </li>
+        </ul>
+    </section>
+</aside>        </div>
+    </div>
+</div>
+<footer>
+    <div class="container">
+        <hr>
+        <p class="pull-right"><i class="icon-arrow-up"></i> <a href="#">Back to top</a></p>
+
+
+        <p>&copy; 2014 Jason Antman &middot; Powered by <a href="https://github.com/DandyDev/pelican-bootstrap3" target="_blank">pelican-bootstrap3</a>,
+            <a href="http://docs.getpelican.com/" target="_blank">Pelican</a>,
+            <a href="http://getbootstrap.com" target="_blank">Bootstrap</a></p>
+    </div>
+</footer>
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="/theme/js/bootstrap.min.js"></script>
+
+<!-- Enable responsive features in IE8 with Respond.js (https://github.com/scottjehl/Respond) -->
+<script src="/theme/js/respond.min.js"></script>
+
+
+</body>
+</html>

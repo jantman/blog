@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:og="http://ogp.me/ns#"
+      xmlns:fb="https://www.facebook.com/2008/fbml">
+<head>
+    <title>Workflow for contributing to GitHub projects</title>
+    <!-- Using the latest rendering mode for IE -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Open Graph tags -->
+
+            <meta property="og:type" content="article"/>
+            <meta property="og:title" content="Workflow for contributing to GitHub projects"/>
+            <meta property="og:url" content="/2012/08/workflow-for-contributing-to-github-projects/"/>
+            <meta property="og:description" content="Lately I’ve been contributing to some open source projects hosted on github. I’m pretty new to git, and the process is a bit confusing for beginners. So, here’s a sample workflow, based on the The Foreman‘s foreman github repository. Note that I’m developing against the ..."/>
+
+    <!-- Bootstrap -->
+        <link rel="stylesheet" href="/theme/css/bootstrap.min.css" type="text/css"/>
+    <link href="/theme/css/font-awesome.min.css" rel="stylesheet">
+    <link href="/theme/css/pygments.css" rel="stylesheet">
+        <link href="/theme/css/typogrify.css" rel="stylesheet">
+    <link rel="stylesheet" href="/theme/css/style.css" type="text/css"/>
+    <!-- JavaScript plugins (requires jQuery) -->
+    <script src="http://code.jquery.com/jquery.js"></script>
+
+        <link href="/feeds/all.atom.xml" type="application/atom+xml" rel="alternate"
+              title="Jason Antman's Blog ATOM Feed"/>
+
+</head>
+<body>
+<nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="" class="navbar-brand">Jason Antman's Blog</a>
+        </div>
+        <div class="collapse navbar-collapse navbar-ex1-collapse">
+            <ul class="nav navbar-nav">
+                         <li><a href="/pages/about.html">
+                             About
+                          </a></li>
+                        <li >
+                            <a href="/category/ideas-and-rants.html">Ideas and rants</a>
+                        </li>
+                        <li >
+                            <a href="/category/miscellaneous.html">Miscellaneous</a>
+                        </li>
+                        <li >
+                            <a href="/category/monitoring.html">Monitoring</a>
+                        </li>
+                        <li >
+                            <a href="/category/projects.html">Projects</a>
+                        </li>
+                        <li >
+                            <a href="/category/puppet.html">Puppet</a>
+                        </li>
+                        <li >
+                            <a href="/category/sysadmin.html">Sysadmin</a>
+                        </li>
+                        <li class="active">
+                            <a href="/category/tech-howtos.html">Tech howtos</a>
+                        </li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="/archives.html"><i class="icon-th-list"></i>Archives</a></li>
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+</nav>
+<!-- /.navbar -->
+<div class="container">
+    <div class="row">
+        <div class="col-lg-9">
+    <section id="content">
+        <article>
+            <header class="page-header">
+                <h1>
+                    <a href="/2012/08/workflow-for-contributing-to-github-projects/"
+                       rel="bookmark"
+                       title="Permalink to Workflow for contributing to GitHub projects">
+                        Workflow for contributing to GitHub&nbsp;projects
+                    </a>
+                </h1>
+            </header>
+            <div class="entry-content">
+                <div class="panel">
+                    <div class="panel-body">
+<footer class="post-info">
+    <span class="label label-default">Date</span>
+    <span class="published">
+        <i class="icon-calendar"></i>Sat 11 August 2012
+    </span>
+
+
+
+<span class="label label-default">Tags</span>
+	<a href="/tag/foreman.html">foreman</a>
+        /
+	<a href="/tag/git.html">git</a>
+        /
+	<a href="/tag/github.html">github</a>
+        /
+	<a href="/tag/workflow.html">workflow</a>
+</footer><!-- /.post-info -->                    </div>
+                </div>
+                <p>Lately I&#8217;ve been contributing to some open source projects hosted on
+<a href="http://github.com">github</a>. I&#8217;m pretty new to git, and the process is a bit confusing
+for beginners. So, here&#8217;s a sample workflow, based on the <a href="http://theforeman.org">The
+Foreman</a>&#8216;s <a href="https://github.com/theforeman/foreman">foreman github repository</a>. Note that I&#8217;m developing
+against the &#8220;develop&#8221; branch of that repository, not the master, so that
+throws in a little difference that isn&#8217;t documented in most
+introductions. To throw in another wrench, I maintan a branch with the
+code that I&#8217;m currently actually using (i.e. the application code that I
+have checked out on the production server), called &#8220;jantman&#8221;. This is
+more or less composed of the upstream &#8220;develop&#8221; branch, with all of my
+finished (but not yet merged in the upstream) topic branches. I&#8217;m pretty
+sure all this is correct, but honestly, I&#8217;m still new enough at git that
+I can&#8217;t make any promises. Unfortunatelty, I haven&#8217;t had the time to
+<em>really</em> learn git, and I also can&#8217;t find a simple enough tutorial that
+covers all&nbsp;this&#8230;</p>
+<ol>
+<li>Fork the original repository through the GitHub&nbsp;interface.</li>
+<li>On your machine, clone your&nbsp;fork:</li>
+</ol>
+<div class="codehilite"><pre>git clone git@github.com:username/reponame.git <span class="o">&amp;&amp;</span> <span class="nb">cd </span>reponame
+</pre></div>
+
+
+<ol>
+<li>Make sure you&#8217;ve&nbsp;setup</li>
+</ol>
+<div class="codehilite"><pre>git config --global branch.autosetupmerge <span class="nb">true</span>
+</pre></div>
+
+
+<ol>
+<li>Add your upstream&nbsp;repo:</li>
+</ol>
+<div class="codehilite"><pre>git remote add upstream git://github.com/upstream_user/upstream_repo.git
+</pre></div>
+
+
+<ol>
+<li>Fetch it and initialize any&nbsp;submodules:</li>
+</ol>
+<div class="codehilite"><pre>git fetch upstream <span class="o">&amp;&amp;</span> git submodule update --init
+</pre></div>
+
+
+<ol>
+<li>Check the current branch (<code>git branch</code>, let&#8217;s assume it&#8217;s called
+    &#8220;develop&#8221;) and rebase to its&nbsp;upstream:</li>
+</ol>
+<div class="codehilite"><pre>git rebase upstream/develop develop
+</pre></div>
+
+
+<ol>
+<li>Create my &#8220;jantman&#8221; branch, which will be the upstream &#8220;develop&#8221;,
+    plus my finished work merged into&nbsp;it:</li>
+</ol>
+<div class="codehilite"><pre>git checkout -b jantman origin/develop
+</pre></div>
+
+
+<ol>
+<li>Create a topic branch to do some&nbsp;work:</li>
+</ol>
+<div class="codehilite"><pre>git checkout -b NewBranchName jantman
+</pre></div>
+
+
+<ol>
+<li>Periodically, push the topic branch to&nbsp;github:</li>
+</ol>
+<div class="codehilite"><pre>git push origin NewBranchName
+</pre></div>
+
+
+<ol>
+<li>If you commit to this branch from another computer (or someone else
+    commits to it), periodically update your local tracking&nbsp;branch:</li>
+</ol>
+<div class="codehilite"><pre>git pull origin NewBranchName
+</pre></div>
+
+
+<ol>
+<li>Periodically, you want to pull in the upstream changes:<ol>
+<li>switch to the develop&nbsp;branch:</li>
+</ol>
+</li>
+</ol>
+<div class="codehilite"><pre>git checkout develop
+</pre></div>
+
+
+<div class="codehilite"><pre>2.  grab the latest version of the upstream git repo:
+</pre></div>
+
+
+<div class="codehilite"><pre>git fetch upstream
+</pre></div>
+
+
+<div class="codehilite"><pre>3.  rebase develop to mirror the upstream develop branch:
+</pre></div>
+
+
+<div class="codehilite"><pre>git rebase upstream/develop develop
+</pre></div>
+
+
+<div class="codehilite"><pre>4.  switch to our personal branch:
+</pre></div>
+
+
+<div class="codehilite"><pre>git checkout jantman
+</pre></div>
+
+
+<div class="codehilite"><pre>5.  rebase our personal branch onto develop (pull all the new
+    commits from develop into our personal branch):
+</pre></div>
+
+
+<div class="codehilite"><pre>git rebase develop jantman
+</pre></div>
+
+
+<div class="codehilite"><pre>6.  If we want those new upstream changes to continue down to our
+    topic branches:
+</pre></div>
+
+
+<div class="codehilite"><pre>git rebase develop topicBranchName
+</pre></div>
+
+
+<ol>
+<li>When we&#8217;re done with a topic branch, we want to merge it into our
+    &#8220;personal&#8221;&nbsp;branch:</li>
+</ol>
+<div class="codehilite"><pre>git checkout jantman; git merge --squash node-table-facts
+</pre></div>
+
+
+<div class="codehilite"><pre>&lt;p&gt;
+and then commit:
+</pre></div>
+
+
+<div class="codehilite"><pre>git commit
+</pre></div>
+
+
+<div class="codehilite"><pre>&lt;p&gt;
+The `--squash` will squash all the history of that branch down to
+one commit. This is generally easier for integration into upstream,
+and assuming the topic branch was created for a single feature or
+bug, should be logical.
+</pre></div>
+
+
+<ol>
+<li>If we&#8217;re sure we don&#8217;t need it anymore, delete the topic branch from
+    our local&nbsp;machine:</li>
+</ol>
+<div class="codehilite"><pre>git branch -d topicBranchName
+</pre></div>
+
+
+<div class="codehilite"><pre>&lt;p&gt;
+and from github:
+</pre></div>
+
+
+<div class="codehilite"><pre>git push origin --delete topicBranchName
+</pre></div>
+
+
+<ol>
+<li>Finally, make sure we push our &#8220;personal&#8221; branch back to&nbsp;origin:</li>
+</ol>
+<div class="codehilite"><pre>git push origin jantman
+</pre></div>
+
+
+<ol>
+<li>Assuming all went well, you&#8217;ll see the new commit on github, and
+    have a nice pull request&nbsp;button.</li>
+</ol>
+<p>References:</p>
+<ol>
+<li><a href="http://www.doctrine-project.org/contribute.html">Contribute —&nbsp;Doctrine-Project</a></li>
+<li><a href="http://qsapp.com/wiki/Github">Github - Quicksilver&nbsp;Wiki</a></li>
+<li><a href="https://github.com/carmaa/inception/wiki/Contributor-Workflow-with-Github">Contributor Workflow with Github · carmaa/inception&nbsp;Wiki</a></li>
+<li><a href="http://help.github.com/fork-a-repo/">Help.GitHub - Fork A&nbsp;Repo</a></li>
+</ol>
+            </div>
+            <!-- /.entry-content -->
+        </article>
+    </section>
+
+        </div>
+        <div class="col-lg-3 well well-sm" id="sidebar">
+
+<aside>
+    <section>
+        <ul class="list-group list-group-flush">
+                <li class="list-group-item"><h4><i class="icon-home icon-large"></i>Social</h4></li>
+                    <li class="list-group-item"><a href="#"><i
+                            class="icon-You can add links in your config file-sign icon-large"></i>You can add links in your config file
+                    </a></li>
+                    <li class="list-group-item"><a href="#"><i
+                            class="icon-Another social link-sign icon-large"></i>Another social link
+                    </a></li>
+
+
+
+                <li class="list-group-item"><a href="/tags.html"><h4><i class="icon-tags icon-large"></i>Tags</h4></a></li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/android.html">
+                                android
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/google.html">
+                                google
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/nagios.html">
+                                Nagios
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/php.html">
+                                PHP
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/sysadmin.html">
+                                sysadmin
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/linux.html">
+                                linux
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/perl.html">
+                                perl
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/logging.html">
+                                logging
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/puppet.html">
+                                puppet
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/bind.html">
+                                bind
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/monitoring.html">
+                                monitoring
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/dns.html">
+                                dns
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/droid.html">
+                                droid
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/firefox.html">
+                                firefox
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/mediawiki.html">
+                                mediawiki
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/mac.html">
+                                mac
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/microsoft.html">
+                                microsoft
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/syslog.html">
+                                syslog
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/wordpress.html">
+                                wordpress
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/rpm.html">
+                                rpm
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/security.html">
+                                security
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/blog.html">
+                                blog
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/sun.html">
+                                sun
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/ems.html">
+                                EMS
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/apache.html">
+                                apache
+                            </a>
+                        </li>
+        </ul>
+    </section>
+</aside>        </div>
+    </div>
+</div>
+<footer>
+    <div class="container">
+        <hr>
+        <p class="pull-right"><i class="icon-arrow-up"></i> <a href="#">Back to top</a></p>
+
+
+        <p>&copy; 2014 Jason Antman &middot; Powered by <a href="https://github.com/DandyDev/pelican-bootstrap3" target="_blank">pelican-bootstrap3</a>,
+            <a href="http://docs.getpelican.com/" target="_blank">Pelican</a>,
+            <a href="http://getbootstrap.com" target="_blank">Bootstrap</a></p>
+    </div>
+</footer>
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="/theme/js/bootstrap.min.js"></script>
+
+<!-- Enable responsive features in IE8 with Respond.js (https://github.com/scottjehl/Respond) -->
+<script src="/theme/js/respond.min.js"></script>
+
+
+</body>
+</html>

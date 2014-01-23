@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:og="http://ogp.me/ns#"
+      xmlns:fb="https://www.facebook.com/2008/fbml">
+<head>
+    <title>Converting WordPress Posts to Pelican MarkDown</title>
+    <!-- Using the latest rendering mode for IE -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Open Graph tags -->
+
+            <meta property="og:type" content="article"/>
+            <meta property="og:title" content="Converting WordPress Posts to Pelican MarkDown"/>
+            <meta property="og:url" content="/2014/01/converting-wordpress-posts-to-pelican-markdown/"/>
+            <meta property="og:description" content="My adventures converting my WordPress blog to Pelican, the problems I encountered, and how I solved them."/>
+
+    <!-- Bootstrap -->
+        <link rel="stylesheet" href="/theme/css/bootstrap.min.css" type="text/css"/>
+    <link href="/theme/css/font-awesome.min.css" rel="stylesheet">
+    <link href="/theme/css/pygments.css" rel="stylesheet">
+        <link href="/theme/css/typogrify.css" rel="stylesheet">
+    <link rel="stylesheet" href="/theme/css/style.css" type="text/css"/>
+    <!-- JavaScript plugins (requires jQuery) -->
+    <script src="http://code.jquery.com/jquery.js"></script>
+
+        <link href="/feeds/all.atom.xml" type="application/atom+xml" rel="alternate"
+              title="Jason Antman's Blog ATOM Feed"/>
+
+</head>
+<body>
+<nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="" class="navbar-brand">Jason Antman's Blog</a>
+        </div>
+        <div class="collapse navbar-collapse navbar-ex1-collapse">
+            <ul class="nav navbar-nav">
+                         <li><a href="/pages/about.html">
+                             About
+                          </a></li>
+                        <li >
+                            <a href="/category/ideas-and-rants.html">Ideas and rants</a>
+                        </li>
+                        <li >
+                            <a href="/category/miscellaneous.html">Miscellaneous</a>
+                        </li>
+                        <li >
+                            <a href="/category/monitoring.html">Monitoring</a>
+                        </li>
+                        <li >
+                            <a href="/category/projects.html">Projects</a>
+                        </li>
+                        <li >
+                            <a href="/category/puppet.html">Puppet</a>
+                        </li>
+                        <li >
+                            <a href="/category/sysadmin.html">Sysadmin</a>
+                        </li>
+                        <li >
+                            <a href="/category/tech-howtos.html">Tech howtos</a>
+                        </li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="/archives.html"><i class="icon-th-list"></i>Archives</a></li>
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+</nav>
+<!-- /.navbar -->
+<div class="container">
+    <div class="row">
+        <div class="col-lg-9">
+    <section id="content">
+        <article>
+            <header class="page-header">
+                <h1>
+                    <a href="/2014/01/converting-wordpress-posts-to-pelican-markdown/"
+                       rel="bookmark"
+                       title="Permalink to Converting WordPress Posts to Pelican MarkDown">
+                        Converting WordPress Posts to Pelican&nbsp;MarkDown
+                    </a>
+                </h1>
+            </header>
+            <div class="entry-content">
+                <div class="panel">
+                    <div class="panel-body">
+<footer class="post-info">
+    <span class="label label-default">Date</span>
+    <span class="published">
+        <i class="icon-calendar"></i>Sun 19 January 2014
+    </span>
+
+
+
+<span class="label label-default">Tags</span>
+	<a href="/tag/pelican.html">pelican</a>
+        /
+	<a href="/tag/wordpress.html">wordpress</a>
+        /
+	<a href="/tag/blog.html">blog</a>
+        /
+	<a href="/tag/markdown.html">markdown</a>
+</footer><!-- /.post-info -->                    </div>
+                </div>
+                <p>A few weeks ago, I
+<a href="/2014/01/planning-migration-from-wordpress-to-static-site/">posted</a> about my
+plans to convert my self-hosted WordPress blog to a static site using a static
+blog generator. Since then, I&#8217;ve decided to stop working on my exhaustive
+<a href="https://docs.google.com/spreadsheet/ccc?key=0AnHh-ye5DNiNdF9DWkJrT2kzSkNsNVp6cjMzLXJ6VEE&amp;usp=sharing">static blog generator comparison spreadsheet</a>
+and just try <a href="http://getpelican.com">Pelican</a> - mainly because it&#8217;s written in
+Python which is my current strongest language, comes highly recommended, seems
+to have most of the features I want, and seems to be easily&nbsp;extensible.</p>
+<p>So, I walked through the documentation for the latest version (3.3.0), started
+a <a href="https://github.com/jantman/blog">GitHub repo</a>, and tweaked a bunch of
+settings. The repo is public, so if you want to take a look behind the scenes,
+see my <a href="https://github.com/jantman/blog/blob/master/fabfile.py">fabfile</a>,
+etc. feel&nbsp;free. </p>
+<h2 id="initial-wordpress-import-attempt">Initial WordPress Import&nbsp;Attempt</h2>
+<p>I used the WordPress <span class="caps">XML</span> Export tool, as instructed in the <a href="http://docs.getpelican.com/en/latest/importer.html">Pelican Importer documentation</a>.
+At first, I attempted to do a more-or-less default import from WordPress using
+the <code>pelican-import</code> tool, which writes rST, and then build the blog. What I
+ended up with was thousands of errors complaining about &#8220;Inline interpreted
+text or phrase reference start-string without end-string&#8221;, &#8220;Explicit markup
+ends without a blank line; unexpected uninden&#8221;, &#8220;malformed hyperlink target&#8221;,
+&#8220;Unknown target name&#8221; on all of my links, and a bevy of other Docutils
+errors. It was so utterly awful that I gave&nbsp;up.</p>
+<h2 id="wordpress-import-as-markdown">WordPress Import as&nbsp;MarkDown</h2>
+<p>Next I tried importing as MarkDown instead of rST,&nbsp;using:</p>
+<div class="codehilite"><pre>pelican-import --markup markdown --wpfile -o content/ --dir-page jasonantman039sblog.wordpress.2014-01-11.xml
+</pre></div>
+
+
+<p>That built without errors, and the posts looked somewhat right out of the
+box, without any of the previous thousands of errors. And the links looked
+mostly right - even the captions for images. Though I&#8217;m working at a Python
+shop and writing a lot of Python these days, my knowledge of MarkDown is still
+much better than rST, so this is fine for me. (I even wrote a <code>fab post</code> task
+that prompts for a title, generates all of the post metadata, writes it to the
+right file, and opens up an editor on&nbsp;it.)</p>
+<p>The first problem was that the import script gave me one &#8220;content&#8221; directory
+with 346 &#8220;.md&#8221; files in it - not exactly easy to work with. Luckily the
+metadata was right, so a quick little
+<a href="https://github.com/jantman/blog/blob/master/move_wordpress.sh">bash script</a>
+moved the posts into a <span class="caps">YYYY</span>/<span class="caps">MM</span> directory&nbsp;hierarchy.</p>
+<h2 id="obvious-problems-with-imported-posts">Obvious Problems with Imported&nbsp;Posts</h2>
+<p>After getting the MarkDown import working, and the posts moved to the proper
+paths, I was still having some&nbsp;issues&#8230;</p>
+<h3 id="syntax-hilighting-gone">Syntax Hilighting&nbsp;Gone</h3>
+<p>In WordPress, I was using the
+<a href="http://wordpress.org/extend/plugins/wp-syntax/"><span class="caps">WP</span>-Syntax</a> plugin to perform
+syntax hilighting via <a href="http://qbnz.com/highlighter/">GeSHi</a>. The plugin uses
+<pre> tags with a <code>lang=</code> attribute to specify the language,&nbsp;like:</p>
+<div class="codehilite"><pre>&lt;pre lang=&quot;bash&quot;&gt;
+</pre></div>
+
+
+<p>Unfortunately, these translated to some really ugly MarkDown fenced blocks&nbsp;like:</p>
+<div class="codehilite"><pre>~~~~ {lang=&quot;bash&quot;}
+cp /boot/efi/EFI/fedora/grub.cfg /boot/efi/EFI/fedora/grub.cfg.bak
+echo &#39;GRUB_DISABLE_OS_PROBER=&quot;true&quot;&#39; &gt;&gt; /etc/default/grub
+grub2-mkconfig &gt; /boot/efi/EFI/fedora/grub.cfg
+~~~~
+</pre></div>
+
+
+<p>that seem to be just a bit off from what MarkDown/Pygments can handle. The
+places where I just used bare <code>&lt;pre&gt;</code> blocks translated&nbsp;fine.</p>
+<p>http://blog.gastove.com/2013-09-17_enabling_line_numbers_for_pygments.html</p>
+<p>Fixed this by using fenced blocks with the 'lang=' stuff removed, and in class
+syntax like the MarkDown docs suggest. Some four-tab-indents with
+:::identifier&nbsp;work.</p>
+<h3 id="broken-links">Broken&nbsp;Links</h3>
+<p>It seems that something in the conversion process introduced line wraps (could
+it really be Pandoc itself???) Unfortunately, this wreaks havoc with any
+explicit reference links
+that use long (long enough to break across lines) titles, depending on where
+they are in the line. It seems that in some places they end up breaking
+differently in the link in the text and in the link definition, which MarkDown misses, and
+then renders broken links and plain text of the link table at the bottom of
+the page. Manually removing the line breaks and any extraneous spaces seems to
+fix&nbsp;it.</p>
+            </div>
+            <!-- /.entry-content -->
+        </article>
+    </section>
+
+        </div>
+        <div class="col-lg-3 well well-sm" id="sidebar">
+
+<aside>
+    <section>
+        <ul class="list-group list-group-flush">
+                <li class="list-group-item"><h4><i class="icon-home icon-large"></i>Social</h4></li>
+                    <li class="list-group-item"><a href="#"><i
+                            class="icon-You can add links in your config file-sign icon-large"></i>You can add links in your config file
+                    </a></li>
+                    <li class="list-group-item"><a href="#"><i
+                            class="icon-Another social link-sign icon-large"></i>Another social link
+                    </a></li>
+
+
+
+                <li class="list-group-item"><a href="/tags.html"><h4><i class="icon-tags icon-large"></i>Tags</h4></a></li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/android.html">
+                                android
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/google.html">
+                                google
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/nagios.html">
+                                Nagios
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/php.html">
+                                PHP
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/sysadmin.html">
+                                sysadmin
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/linux.html">
+                                linux
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/perl.html">
+                                perl
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/logging.html">
+                                logging
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/puppet.html">
+                                puppet
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/bind.html">
+                                bind
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/monitoring.html">
+                                monitoring
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/dns.html">
+                                dns
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/droid.html">
+                                droid
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/firefox.html">
+                                firefox
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/mediawiki.html">
+                                mediawiki
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/mac.html">
+                                mac
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/microsoft.html">
+                                microsoft
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/syslog.html">
+                                syslog
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/wordpress.html">
+                                wordpress
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/rpm.html">
+                                rpm
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/security.html">
+                                security
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/blog.html">
+                                blog
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/sun.html">
+                                sun
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/ems.html">
+                                EMS
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/apache.html">
+                                apache
+                            </a>
+                        </li>
+        </ul>
+    </section>
+</aside>        </div>
+    </div>
+</div>
+<footer>
+    <div class="container">
+        <hr>
+        <p class="pull-right"><i class="icon-arrow-up"></i> <a href="#">Back to top</a></p>
+
+
+        <p>&copy; 2014 Jason Antman &middot; Powered by <a href="https://github.com/DandyDev/pelican-bootstrap3" target="_blank">pelican-bootstrap3</a>,
+            <a href="http://docs.getpelican.com/" target="_blank">Pelican</a>,
+            <a href="http://getbootstrap.com" target="_blank">Bootstrap</a></p>
+    </div>
+</footer>
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="/theme/js/bootstrap.min.js"></script>
+
+<!-- Enable responsive features in IE8 with Respond.js (https://github.com/scottjehl/Respond) -->
+<script src="/theme/js/respond.min.js"></script>
+
+
+</body>
+</html>

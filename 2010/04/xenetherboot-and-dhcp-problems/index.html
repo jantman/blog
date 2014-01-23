@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:og="http://ogp.me/ns#"
+      xmlns:fb="https://www.facebook.com/2008/fbml">
+<head>
+    <title>Xen/Etherboot and DHCP Problems</title>
+    <!-- Using the latest rendering mode for IE -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Open Graph tags -->
+
+            <meta property="og:type" content="article"/>
+            <meta property="og:title" content="Xen/Etherboot and DHCP Problems"/>
+            <meta property="og:url" content="/2010/04/xenetherboot-and-dhcp-problems/"/>
+            <meta property="og:description" content="Well, I’ve spend the better part of the last week or so debugging a problem with out new Xen VMs (on one host) not getting DHCP leases. Since our DHCP servers (ISC DHCPd 3.0.6) are using Brian Masney’s LDAP patch (which has recently been included in ..."/>
+
+    <!-- Bootstrap -->
+        <link rel="stylesheet" href="/theme/css/bootstrap.min.css" type="text/css"/>
+    <link href="/theme/css/font-awesome.min.css" rel="stylesheet">
+    <link href="/theme/css/pygments.css" rel="stylesheet">
+        <link href="/theme/css/typogrify.css" rel="stylesheet">
+    <link rel="stylesheet" href="/theme/css/style.css" type="text/css"/>
+    <!-- JavaScript plugins (requires jQuery) -->
+    <script src="http://code.jquery.com/jquery.js"></script>
+
+        <link href="/feeds/all.atom.xml" type="application/atom+xml" rel="alternate"
+              title="Jason Antman's Blog ATOM Feed"/>
+
+</head>
+<body>
+<nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="" class="navbar-brand">Jason Antman's Blog</a>
+        </div>
+        <div class="collapse navbar-collapse navbar-ex1-collapse">
+            <ul class="nav navbar-nav">
+                         <li><a href="/pages/about.html">
+                             About
+                          </a></li>
+                        <li >
+                            <a href="/category/ideas-and-rants.html">Ideas and rants</a>
+                        </li>
+                        <li >
+                            <a href="/category/miscellaneous.html">Miscellaneous</a>
+                        </li>
+                        <li >
+                            <a href="/category/monitoring.html">Monitoring</a>
+                        </li>
+                        <li >
+                            <a href="/category/projects.html">Projects</a>
+                        </li>
+                        <li >
+                            <a href="/category/puppet.html">Puppet</a>
+                        </li>
+                        <li >
+                            <a href="/category/sysadmin.html">Sysadmin</a>
+                        </li>
+                        <li class="active">
+                            <a href="/category/tech-howtos.html">Tech howtos</a>
+                        </li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="/archives.html"><i class="icon-th-list"></i>Archives</a></li>
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+</nav>
+<!-- /.navbar -->
+<div class="container">
+    <div class="row">
+        <div class="col-lg-9">
+    <section id="content">
+        <article>
+            <header class="page-header">
+                <h1>
+                    <a href="/2010/04/xenetherboot-and-dhcp-problems/"
+                       rel="bookmark"
+                       title="Permalink to Xen/Etherboot and DHCP Problems">
+                        Xen/Etherboot and <span class="caps">DHCP</span>&nbsp;Problems
+                    </a>
+                </h1>
+            </header>
+            <div class="entry-content">
+                <div class="panel">
+                    <div class="panel-body">
+<footer class="post-info">
+    <span class="label label-default">Date</span>
+    <span class="published">
+        <i class="icon-calendar"></i>Tue 20 April 2010
+    </span>
+
+
+
+<span class="label label-default">Tags</span>
+	<a href="/tag/dhcp.html">dhcp</a>
+        /
+	<a href="/tag/dhcpd.html">dhcpd</a>
+        /
+	<a href="/tag/etherboot.html">etherboot</a>
+        /
+	<a href="/tag/ldap.html">ldap</a>
+        /
+	<a href="/tag/pxe.html">pxe</a>
+        /
+	<a href="/tag/xen.html">xen</a>
+</footer><!-- /.post-info -->                    </div>
+                </div>
+                <p>Well, I&#8217;ve spend the better part of the last week or so debugging a
+problem with out new Xen VMs (on one host) not getting <span class="caps">DHCP</span> leases.
+Since our <span class="caps">DHCP</span> servers (<span class="caps">ISC</span> DHCPd 3.0.6) are using Brian Masney&#8217;s <a href="http://personal.cfw.com/~masneyb/"><span class="caps">LDAP</span>
+patch</a> (which has recently been included in <a href="http://www.isc.org/files/release-notes/42b2_0.html">mainline DHCPd</a>), I
+assumed that this might be the source of some of the&nbsp;problems.</p>
+<p>The Xen client booting process uses <a href="http://etherboot.org/">Etherboot</a> (specifically 5.4.2 on
+my machines) to get <span class="caps">DHCP</span> and <span class="caps">PXE</span> for the client. The Etherboot <span class="caps">ROM</span> is
+generated online with <a href="http://rom-o-matic.net/"><span class="caps">ROM</span>-o-Matic</a> (by the Xen devs) and is then
+packaged into <code>hvmloader</code> (though I would not find this out until much
+later in my investigation, given the piss-poor documentation about it).
+So, aside from pulling the <span class="caps">SRPM</span> for Xen and looking around, I decided I
+couldn&#8217;t really debug much on the client end (I wasn&#8217;t getting any
+<span class="caps">BIOS</span>-like messages from Xen, so the client end seemed to be pretty much
+a black&nbsp;box).</p>
+<p>After a week of re-examining our <span class="caps">DHCP</span> servers, moving the client between
+pieces of hardware and different networks, tracing out the <span class="caps">DHCP</span> logs,
+and debugging everything in-between, I finally resorted to doing packet
+captures and analyzing them. Last Thursday (my last work day of the
+week), I popped my laptop on the same network, set it up in <span class="caps">DHCP</span>, and
+did some captures of the laptop (which worked correctly) and the problem&nbsp;<span class="caps">VM</span>.</p>
+<p>Sometime around 10:00 <span class="caps">PM</span>, long after I&#8217;d gotten home, I had opened
+captures of both the good and bad hosts in separate <a href="http://www.wireshark.org/">Wireshark</a>
+windows, and was going through them line-by-line. I&#8217;d also written a
+nifty little <a href="/GFX/dhcptest.pl">Perl script</a> (my weakest language) using
+<a href="http://search.cpan.org/~fvandun/Net-DHCP-0.11/lib/Net/DHCP/Packet.pm">Net::<span class="caps">DHCP</span>::Packet</a> to craft packets identical to the ones from the
+working and <span class="caps">FUBAR</span> hosts, and inject them into the network. The only
+thing I could find different was the value of the &#8220;secs&#8221; field of the
+<span class="caps">DHCPDISCOVER</span> packets (octets 9 and 10), which are supposed to contain
+the number of seconds that have passed since the host started booting
+(<a href="http://www.faqs.org/rfcs/rfc1541.html"><span class="caps">RFC</span> 1541</a>). My laptop (the working host) started getting replies
+from the server at 21 seconds. I took my Perl packet-injecting script,
+and started adjusting the &#8220;secs&#8221; values of both the working and bad
+packets. Sure enough, with identical packets from each host, the values
+converged. Anything with &#8220;secs&#8221; below 2 got no response from the <span class="caps">DHCP</span>
+server, anything with 2 or greater got a correct&nbsp;lease.</p>
+<p>Then it hit me. When we used to have a primary/secondary <span class="caps">DHCP</span> server
+setup (with manual failover), we&#8217;d configured the secondary server with
+<code>min-secs: 2</code>, instructing it to not give out any leases to clients with
+a &#8220;secs&#8221; value of under 2, to prevent the secondary server from
+answering if, for some reason, the primary was still online.&nbsp;Bingo.</p>
+<p>At this point, I&#8217;m waiting to have a meeting of the binds before I add a
+network-level override of &#8220;min-secs: 0&#8221; for the networks in question.
+But I&#8217;m relatively confident that everything will go smoothly from there&nbsp;on.</p>
+<p>This experience highlighted that one small &#8220;bug&#8221; can confuse 3 people
+for the better part of a&nbsp;week:</p>
+<p><a href="http://etherboot.org/">Etherboot</a> (at least 5.4.2) doesn&#8217;t increment the &#8220;secs&#8221; field in its
+<span class="caps">DISCOVER</span> packets as <span class="caps">RFC</span> 1541 suggests. Therefore anyone with &#8220;min-secs&#8221;
+in their dhcpd configuration won&#8217;t ever give out a&nbsp;lease.</p>
+<p>In hindsight, it really was a brain-dead moment. There was a little note
+in the dhcpd logs that I, and the others, totally overlooked:
+&#8220;<span class="caps">DHCPDISCOVER</span> (&#8230;) 0 secs &lt; 2&#8221;. I guess I should have turned my brain
+on and realized that those few characters were probably important, and
+there for a reason, no matter how unassuming (and un-error-like) they
+may&nbsp;be&#8230;</p>
+            </div>
+            <!-- /.entry-content -->
+        </article>
+    </section>
+
+        </div>
+        <div class="col-lg-3 well well-sm" id="sidebar">
+
+<aside>
+    <section>
+        <ul class="list-group list-group-flush">
+                <li class="list-group-item"><h4><i class="icon-home icon-large"></i>Social</h4></li>
+                    <li class="list-group-item"><a href="#"><i
+                            class="icon-You can add links in your config file-sign icon-large"></i>You can add links in your config file
+                    </a></li>
+                    <li class="list-group-item"><a href="#"><i
+                            class="icon-Another social link-sign icon-large"></i>Another social link
+                    </a></li>
+
+
+
+                <li class="list-group-item"><a href="/tags.html"><h4><i class="icon-tags icon-large"></i>Tags</h4></a></li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/android.html">
+                                android
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/google.html">
+                                google
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/nagios.html">
+                                Nagios
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/php.html">
+                                PHP
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/sysadmin.html">
+                                sysadmin
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/linux.html">
+                                linux
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/perl.html">
+                                perl
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/logging.html">
+                                logging
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/puppet.html">
+                                puppet
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/bind.html">
+                                bind
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/monitoring.html">
+                                monitoring
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/dns.html">
+                                dns
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/droid.html">
+                                droid
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/firefox.html">
+                                firefox
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/mediawiki.html">
+                                mediawiki
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/mac.html">
+                                mac
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/microsoft.html">
+                                microsoft
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/syslog.html">
+                                syslog
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/wordpress.html">
+                                wordpress
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/rpm.html">
+                                rpm
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/security.html">
+                                security
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/blog.html">
+                                blog
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/sun.html">
+                                sun
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/ems.html">
+                                EMS
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/apache.html">
+                                apache
+                            </a>
+                        </li>
+        </ul>
+    </section>
+</aside>        </div>
+    </div>
+</div>
+<footer>
+    <div class="container">
+        <hr>
+        <p class="pull-right"><i class="icon-arrow-up"></i> <a href="#">Back to top</a></p>
+
+
+        <p>&copy; 2014 Jason Antman &middot; Powered by <a href="https://github.com/DandyDev/pelican-bootstrap3" target="_blank">pelican-bootstrap3</a>,
+            <a href="http://docs.getpelican.com/" target="_blank">Pelican</a>,
+            <a href="http://getbootstrap.com" target="_blank">Bootstrap</a></p>
+    </div>
+</footer>
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="/theme/js/bootstrap.min.js"></script>
+
+<!-- Enable responsive features in IE8 with Respond.js (https://github.com/scottjehl/Respond) -->
+<script src="/theme/js/respond.min.js"></script>
+
+
+</body>
+</html>

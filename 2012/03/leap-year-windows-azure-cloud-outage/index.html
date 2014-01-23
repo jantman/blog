@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:og="http://ogp.me/ns#"
+      xmlns:fb="https://www.facebook.com/2008/fbml">
+<head>
+    <title>Leap Year Windows Azure Cloud Outage</title>
+    <!-- Using the latest rendering mode for IE -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Open Graph tags -->
+
+            <meta property="og:type" content="article"/>
+            <meta property="og:title" content="Leap Year Windows Azure Cloud Outage"/>
+            <meta property="og:url" content="/2012/03/leap-year-windows-azure-cloud-outage/"/>
+            <meta property="og:description" content="I haven’t talked about Microsoft in quite a while (mainly because I don’t follow mainstream tech news as much anymore), but I happened by a very interesting post on the Windows Azure blog the other day. It’s a very detailed postmortem of the major outage of the ..."/>
+
+    <!-- Bootstrap -->
+        <link rel="stylesheet" href="/theme/css/bootstrap.min.css" type="text/css"/>
+    <link href="/theme/css/font-awesome.min.css" rel="stylesheet">
+    <link href="/theme/css/pygments.css" rel="stylesheet">
+        <link href="/theme/css/typogrify.css" rel="stylesheet">
+    <link rel="stylesheet" href="/theme/css/style.css" type="text/css"/>
+    <!-- JavaScript plugins (requires jQuery) -->
+    <script src="http://code.jquery.com/jquery.js"></script>
+
+        <link href="/feeds/all.atom.xml" type="application/atom+xml" rel="alternate"
+              title="Jason Antman's Blog ATOM Feed"/>
+
+</head>
+<body>
+<nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="" class="navbar-brand">Jason Antman's Blog</a>
+        </div>
+        <div class="collapse navbar-collapse navbar-ex1-collapse">
+            <ul class="nav navbar-nav">
+                         <li><a href="/pages/about.html">
+                             About
+                          </a></li>
+                        <li >
+                            <a href="/category/ideas-and-rants.html">Ideas and rants</a>
+                        </li>
+                        <li >
+                            <a href="/category/miscellaneous.html">Miscellaneous</a>
+                        </li>
+                        <li >
+                            <a href="/category/monitoring.html">Monitoring</a>
+                        </li>
+                        <li >
+                            <a href="/category/projects.html">Projects</a>
+                        </li>
+                        <li >
+                            <a href="/category/puppet.html">Puppet</a>
+                        </li>
+                        <li class="active">
+                            <a href="/category/sysadmin.html">Sysadmin</a>
+                        </li>
+                        <li >
+                            <a href="/category/tech-howtos.html">Tech howtos</a>
+                        </li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="/archives.html"><i class="icon-th-list"></i>Archives</a></li>
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+</nav>
+<!-- /.navbar -->
+<div class="container">
+    <div class="row">
+        <div class="col-lg-9">
+    <section id="content">
+        <article>
+            <header class="page-header">
+                <h1>
+                    <a href="/2012/03/leap-year-windows-azure-cloud-outage/"
+                       rel="bookmark"
+                       title="Permalink to Leap Year Windows Azure Cloud Outage">
+                        Leap Year Windows Azure Cloud&nbsp;Outage
+                    </a>
+                </h1>
+            </header>
+            <div class="entry-content">
+                <div class="panel">
+                    <div class="panel-body">
+<footer class="post-info">
+    <span class="label label-default">Date</span>
+    <span class="published">
+        <i class="icon-calendar"></i>Tue 20 March 2012
+    </span>
+
+
+
+<span class="label label-default">Tags</span>
+	<a href="/tag/azure.html">azure</a>
+        /
+	<a href="/tag/microsoft.html">microsoft</a>
+        /
+	<a href="/tag/outage.html">outage</a>
+        /
+	<a href="/tag/release.html">release</a>
+        /
+	<a href="/tag/testing.html">testing</a>
+        /
+	<a href="/tag/windows.html">windows</a>
+</footer><!-- /.post-info -->                    </div>
+                </div>
+                <p>I haven&#8217;t talked about Microsoft in quite a while (mainly because I
+don&#8217;t follow mainstream tech news as much anymore), but I happened by a
+very interesting <a href="http://blogs.msdn.com/b/windowsazure/archive/2012/03/09/summary-of-windows-azure-service-disruption-on-feb-29th-2012.aspx">post on the Windows Azure blog</a> the other day. It&#8217;s
+a very detailed postmortem of the major outage of the Windows Azure
+cloud service which occurred from 4:00 <span class="caps">PM</span> <span class="caps">PST</span> on February 28^th^ through
+2:15 <span class="caps">AM</span> on March 1^st^. Before I get into any of the details, I should
+say that it really is a nice, well-done post. And the fact that they&#8217;re
+willing to do such a detailed, public postmortem - and admit the
+failures that they did - is a step in the right direction for Microsoft
+(a company that I don&#8217;t particularly care for, to put it&nbsp;lightly.</p>
+<p>I&#8217;m going to glance over the majority of the post, though I highly
+recommend that anyone interested in running web-scale services,
+specifically highly available ones, read it. The general overview
+(really just the points that are germane to my discussion) is as
+follows: An agent running inside the guest <span class="caps">VM</span> instances (i.e. domU)
+communicates with a counterpart on the host <span class="caps">OS</span> (i.e. dom0) over an
+encrypted channel, authenticated by certificate. The certs are generated
+and passed from the guest to the host when the guest instance is first
+initialized, which means when an app is first deployed, scaled out, <span class="caps">OS</span>
+updated, or when an app is reinitialized on a new host. This cert was
+generated for a 1-year validity period, by adding 1 to the integer year
+- hence, the generation process failed on February 29th of a leap year,
+as the cert end date wasn&#8217;t valid. When the cert generation failed, the
+guest agent essentially stopped cold. The host agent waited for a 25
+minute timeout, then re-initialized the guest and started over. After
+three of these failures, the host assumes there&#8217;s a hardware error
+(since the guest would have reported a more specific error otherwise),
+declares itself in an error state, and tries to move its current
+workload over to another host. Which re-initializes the guests on that
+host, thereby causing a chain-reaction of failures in this case. Skip
+forward the 2-1/2 hours it took them to identify the problem, and
+further 2-1/2 hours to get a fix ready. They fast-tracked their fix to 7
+clusters that had already been in the process of a software update, but
+ended up with those clusters in an inconsistent state with
+incompatibilities between the guest and host networking subsystems,
+bringing down previously-unaffected instances on these&nbsp;clusters.</p>
+<p>This whole scenario offers a few important points on both the
+development and operations&nbsp;sides:</p>
+<p><strong>Inputs need error checking, and errors need to be raised.</strong> So the
+first problem here was the failed cert generation. I&#8217;ll leave alone the
+fact that, in my opinion, doing math on a the integer year of a date is
+a high school or college programming mistake, and never should have been
+made by someone doing platform coding for a major company (believe it or
+not, 25% of years are leap years &lt;/sarcasm>). If whatever code was
+generating the cert was smart enough to check the cert end date validity
+and error out, that error should have been pushed up the stack to
+somewhere where it could be handled - or, at least, sent to a central
+log server that does error&nbsp;trending.</p>
+<p><strong>Secure communications when provisioning need an insecure error path.</strong>
+This is somewhat connected to the previous point. If the normal process
+of creating a new instance and communicating errors up the stack relies
+on certs and authentication or encryption, there should be some method
+of communicating errors with <em>that</em> process either up the stack, or to a
+separate event correlation/trending system. Errors with a
+certificate-based system are not unusual, and even something as simple
+as a vastly incorrect time set on the guests could have caused this same
+problem. In environments where management/control communication between
+levels of a system are encrypted or authenticated, there should be some
+way for lower levels of the system to deliver a meaningful error message
+&#8220;somewhere&#8221;. Even if this is just a syslog server or web service that
+listens for errors and can escalate a warning when the numbers spike,
+it&#8217;s a useful alarm and debugging&nbsp;tool.</p>
+<p><strong>Autonomous systems shouldn&#8217;t lightly assume hardware failures.</strong> It&#8217;s
+arrogance for a host system to assume that just because it can&#8217;t
+instantiate new guests, a hardware failure exists. This entire incident
+is a perfect example that, at least if hardware error indicators are
+properly monitored, it&#8217;s more likely for a software problem to be
+falsely identified as a hardware problem than the other way around. All
+of my points are somewhat related, but I can think of many more reasons
+why a new guest can&#8217;t be instantiated that are software-related rather
+than&nbsp;hardware-related.</p>
+<p><strong>Autonomous control mechanisms need historical trending, and need to
+call for help if this looks wrong.</strong> These host systems tried to
+instantiate new guests three times, waiting 25 minutes in between, and
+then declared themselves bad and tried to migrate guests to other hosts.
+From what I understand, Microsoft got it right in having a &#8220;kill switch&#8221;
+that prevented further migration of guests. What they didn&#8217;t have right
+was reporting of autonomous actions (guest migration) to a central
+location that performs trending. The 25 minute timeout with three
+attempts is a great safety feature, but if the status of guest creation
+actions was reported to a central server, it would have been much more
+quickly apparent that 100% of guest creations in the past, say, 10
+minutes, had failed - across all clusters. I know plenty of shops that
+do little, if any, real-time analysis and historical comparisons of
+their log data. But when systems are designed to perform self-healing
+and autonomous actions, it&#8217;s imperative that these actions are tracked
+in near-real-time, compared to historical averages, and that deviation
+from a baseline is identified and escalated to&nbsp;humans.</p>
+<p><strong>Release procedures are more, not less, important when the sky is
+falling.</strong> The extended downtime of the last seven clusters was because
+of an improperly <span class="caps">QA</span>&#8217;ed update that was pushed out bypassing the normal
+release and testing procedures. As a matter of fact, it was so poorly
+<span class="caps">QA</span>&#8217;ed that the update totally broke networking for the guest VMs, and
+was still pushed out. I&#8217;m sure this was more of a management/executive
+decision than one made by the actual engineers, but organizations (even
+management) need to understand that when the sky is falling, services
+are down, and everybody is stressed, it&#8217;s <em>more</em> likely for mistakes and
+oversights to happen, and this is when a proper, well-documented <span class="caps">QA</span> and
+release procedure (including phased rollout) is <em>most</em> important.
+Failure to follow these procedures results in exactly what happened in
+this case - making an already bad problem much&nbsp;worse.</p>
+<p>Even <em>I</em> can&#8217;t blame Microsoft specifically for all this (though the
+whole thing would have been avoided if they just represented timestamps
+as integers like the rest of us&#8230;), but it is a good opportunity for us
+all to learn from a major incident at a &#8220;pretty well known&#8221;&nbsp;company.</p>
+<p>release procedures are most important when things are already going&nbsp;wrong</p>
+            </div>
+            <!-- /.entry-content -->
+        </article>
+    </section>
+
+        </div>
+        <div class="col-lg-3 well well-sm" id="sidebar">
+
+<aside>
+    <section>
+        <ul class="list-group list-group-flush">
+                <li class="list-group-item"><h4><i class="icon-home icon-large"></i>Social</h4></li>
+                    <li class="list-group-item"><a href="#"><i
+                            class="icon-You can add links in your config file-sign icon-large"></i>You can add links in your config file
+                    </a></li>
+                    <li class="list-group-item"><a href="#"><i
+                            class="icon-Another social link-sign icon-large"></i>Another social link
+                    </a></li>
+
+
+
+                <li class="list-group-item"><a href="/tags.html"><h4><i class="icon-tags icon-large"></i>Tags</h4></a></li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/android.html">
+                                android
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/google.html">
+                                google
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/nagios.html">
+                                Nagios
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/php.html">
+                                PHP
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/sysadmin.html">
+                                sysadmin
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/linux.html">
+                                linux
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/perl.html">
+                                perl
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/logging.html">
+                                logging
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/puppet.html">
+                                puppet
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/bind.html">
+                                bind
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/monitoring.html">
+                                monitoring
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/dns.html">
+                                dns
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/droid.html">
+                                droid
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/firefox.html">
+                                firefox
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/mediawiki.html">
+                                mediawiki
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/mac.html">
+                                mac
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/microsoft.html">
+                                microsoft
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/syslog.html">
+                                syslog
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/wordpress.html">
+                                wordpress
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/rpm.html">
+                                rpm
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/security.html">
+                                security
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/blog.html">
+                                blog
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/sun.html">
+                                sun
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/ems.html">
+                                EMS
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/apache.html">
+                                apache
+                            </a>
+                        </li>
+        </ul>
+    </section>
+</aside>        </div>
+    </div>
+</div>
+<footer>
+    <div class="container">
+        <hr>
+        <p class="pull-right"><i class="icon-arrow-up"></i> <a href="#">Back to top</a></p>
+
+
+        <p>&copy; 2014 Jason Antman &middot; Powered by <a href="https://github.com/DandyDev/pelican-bootstrap3" target="_blank">pelican-bootstrap3</a>,
+            <a href="http://docs.getpelican.com/" target="_blank">Pelican</a>,
+            <a href="http://getbootstrap.com" target="_blank">Bootstrap</a></p>
+    </div>
+</footer>
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="/theme/js/bootstrap.min.js"></script>
+
+<!-- Enable responsive features in IE8 with Respond.js (https://github.com/scottjehl/Respond) -->
+<script src="/theme/js/respond.min.js"></script>
+
+
+</body>
+</html>

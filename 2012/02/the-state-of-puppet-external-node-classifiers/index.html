@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:og="http://ogp.me/ns#"
+      xmlns:fb="https://www.facebook.com/2008/fbml">
+<head>
+    <title>The state of Puppet External Node Classifiers</title>
+    <!-- Using the latest rendering mode for IE -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Open Graph tags -->
+
+            <meta property="og:type" content="article"/>
+            <meta property="og:title" content="The state of Puppet External Node Classifiers"/>
+            <meta property="og:url" content="/2012/02/the-state-of-puppet-external-node-classifiers/"/>
+            <meta property="og:description" content="Update November 2013: This post has brought an amazing amount of traffic to my blog, probably because it still seems to be one of the only ENC comparisons out there. Both Dashboard (and Puppet Enterprise Console) and The Foreman have changed quite a bit since I wrote this. Foreman has ..."/>
+
+    <!-- Bootstrap -->
+        <link rel="stylesheet" href="/theme/css/bootstrap.min.css" type="text/css"/>
+    <link href="/theme/css/font-awesome.min.css" rel="stylesheet">
+    <link href="/theme/css/pygments.css" rel="stylesheet">
+        <link href="/theme/css/typogrify.css" rel="stylesheet">
+    <link rel="stylesheet" href="/theme/css/style.css" type="text/css"/>
+    <!-- JavaScript plugins (requires jQuery) -->
+    <script src="http://code.jquery.com/jquery.js"></script>
+
+        <link href="/feeds/all.atom.xml" type="application/atom+xml" rel="alternate"
+              title="Jason Antman's Blog ATOM Feed"/>
+
+</head>
+<body>
+<nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="" class="navbar-brand">Jason Antman's Blog</a>
+        </div>
+        <div class="collapse navbar-collapse navbar-ex1-collapse">
+            <ul class="nav navbar-nav">
+                         <li><a href="/pages/about.html">
+                             About
+                          </a></li>
+                        <li >
+                            <a href="/category/ideas-and-rants.html">Ideas and rants</a>
+                        </li>
+                        <li >
+                            <a href="/category/miscellaneous.html">Miscellaneous</a>
+                        </li>
+                        <li >
+                            <a href="/category/monitoring.html">Monitoring</a>
+                        </li>
+                        <li >
+                            <a href="/category/projects.html">Projects</a>
+                        </li>
+                        <li class="active">
+                            <a href="/category/puppet.html">Puppet</a>
+                        </li>
+                        <li >
+                            <a href="/category/sysadmin.html">Sysadmin</a>
+                        </li>
+                        <li >
+                            <a href="/category/tech-howtos.html">Tech howtos</a>
+                        </li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="/archives.html"><i class="icon-th-list"></i>Archives</a></li>
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+</nav>
+<!-- /.navbar -->
+<div class="container">
+    <div class="row">
+        <div class="col-lg-9">
+    <section id="content">
+        <article>
+            <header class="page-header">
+                <h1>
+                    <a href="/2012/02/the-state-of-puppet-external-node-classifiers/"
+                       rel="bookmark"
+                       title="Permalink to The state of Puppet External Node Classifiers">
+                        The state of Puppet External Node&nbsp;Classifiers
+                    </a>
+                </h1>
+            </header>
+            <div class="entry-content">
+                <div class="panel">
+                    <div class="panel-body">
+<footer class="post-info">
+    <span class="label label-default">Date</span>
+    <span class="published">
+        <i class="icon-calendar"></i>Sun 26 February 2012
+    </span>
+
+
+
+<span class="label label-default">Tags</span>
+	<a href="/tag/dashboard.html">dashboard</a>
+        /
+	<a href="/tag/foreman.html">foreman</a>
+        /
+	<a href="/tag/node-classifier.html">node classifier</a>
+        /
+	<a href="/tag/puppet.html">puppet</a>
+</footer><!-- /.post-info -->                    </div>
+                </div>
+                <p><strong>Update November 2013</strong>: This post has brought an amazing amount of
+traffic to my blog, probably because it still seems to be one of the
+only <span class="caps">ENC</span> comparisons out there. Both Dashboard (and Puppet Enterprise
+Console) and The Foreman have changed quite a bit since I wrote this.
+Foreman has certainly been developed at warp speed. I&#8217;ll try to write an
+update to this sometime soon, but be advised that the information here
+is somewhat&nbsp;dated.</p>
+<p>At work, we&#8217;re in the process of rolling out <a href="http://projects.puppetlabs.com/projects/puppet">puppet</a> for
+configuration management of our servers. It will be an integral part of
+the provisioning process of all new physical and virtual hosts, and will
+also be phased in on existing hosts as possible. Right now, we have an
+initial puppet install that was &#8220;development&#8221;, but we&#8217;re about to move
+to &#8220;production&#8221; (new puppetmaster in our production infrastructure,
+production MySQL, etc.). We&#8217;ve been using <a href="http://puppetlabs.com/puppet/related-projects/dashboard/">Dashboard</a>, but just as a
+report viewer. Up until now, we&#8217;ve been using nodes.pp and per-node
+flat-file manifests. I&#8217;ve got a few issues with this, but the biggest is
+that all of our node definitions (and their classes and parameters) live
+in the same <span class="caps">SVN</span> repository as our modules and other puppet
+configuration. Not only does this mean a checkout and commit just to
+change a node parameter or add a module/class to a node, but it also
+means that for my team members who don&#8217;t have previous puppet
+experience, it greatly blurs the line between administering puppet
+(developing and maintaining modules) and using puppet (building a node,
+changing node params or modules/classes), since both tasks are
+accomplished in the same <span class="caps">SVN</span>&nbsp;repository.</p>
+<p>So, I&#8217;ve been pushing an <a href="http://docs.puppetlabs.com/guides/external_nodes.html">External Node Classifier (<span class="caps">ENC</span>)</a> with a web
+interface as one of the biggest feature enhancements we need for our
+puppet install. The complicating factor is that I&#8217;ve been given a time
+frame of approximately 1 week to get the &#8220;production&#8221; puppetmaster
+running on our production infrastructure and marked as &#8220;done&#8221;. That
+includes the <span class="caps">ENC</span>. At my last gig, at Rutgers University, I wrote our <span class="caps">ENC</span>
+in <span class="caps">PHP</span> (actually I wrote it for my half-dozen or so boxes at home, and
+brought it to Rutgers gratis), and it also handled kickstart file
+distribution and <span class="caps">PXE</span> configuration, and was extended to also set <span class="caps">DHCP</span>
+and <span class="caps">DNS</span> for the hosts - a one-stop solution. Unfortunately the code is
+very organization-specific, not terribly solid, and the <span class="caps">UI</span> looks awful,
+so it&#8217;s not a fit for the current employer. So I have to find something
+else that fits the bill. I have a list of initial (&#8220;phase 1&#8221;)
+requirements that are a mix of functionality that we require and
+management&nbsp;requirements:</p>
+<ul>
+<li>Must support environments, since we make use of&nbsp;them.</li>
+<li>Must support default values for parameters based on environment,
+    &#8220;zone&#8221; (a custom fact and variable we define), or a combination of&nbsp;both.</li>
+<li>For accountability and legal reasons, must have full auditing of all
+    changes by all users (and, obviously, support&nbsp;authentication).</li>
+<li>Display node last run time and&nbsp;status.</li>
+</ul>
+<p>As well as at least the ability to implement some of our phase 2&nbsp;requirements:</p>
+<ul>
+<li>Ability to show modules and classes applied to a node, including
+    those required/included through other&nbsp;modules/classes/roles.</li>
+<li>Should support at least some level of puppet report&nbsp;display.</li>
+<li>Ability to trigger a node run (kick) from the&nbsp;<span class="caps">UI</span>.</li>
+<li>Some level of permission separation, <span class="caps">ACL</span> or <span class="caps">RBAC</span> so that we could
+    potentially delegate control of a certain module or parameter, on a
+    certain group of nodes, to the development&nbsp;team.</li>
+<li>Per-node links to other tools such as Icinga/Nagios or our&nbsp;wiki.</li>
+<li>Some way of detecting valid classes and modules (and our &#8220;role&#8221;
+    module) per-environment (i.e. available modules/classes/roles should
+    be pulled from the configs, not manually&nbsp;entered).</li>
+<li>Ability to display puppet docs from&nbsp;modules/classes</li>
+</ul>
+<p>Our current situation makes this even more difficult: we&#8217;re an
+operations team of five (hiring at the moment to fill the position of
+the sixth), and I believe I&#8217;m the only member of the team with any real
+software development experience. And none of us have experience with
+Ruby (which Puppet and most of its universe is written in). This means
+that any in-house solution runs the risk of being unmaintainable should
+I get hit by a bus (some of our team have various levels of experience
+with Perl and other scripting languages, but not really from an app
+development perspective). Because of these reasons, there&#8217;s a management
+aversion to anything that we code ourselves (well, these reasons, and
+the fact that with a shorthanded team we don&#8217;t have much time for
+projects without an immediate&nbsp;impact).</p>
+<p>So, I spent hours looking around online trying to find existing
+web-based <span class="caps">ENC</span> projects, and came up with a pretty small&nbsp;list:</p>
+<ul>
+<li><a href="http://puppetlabs.com/puppet/related-projects/dashboard/">Dashboard</a>, the Puppet Labs web <span class="caps">UI</span>. It&#8217;s the most common
+    web-based puppet <span class="caps">ENC</span> as far as I know, and since it&#8217;s an official
+    Puppet Labs project (and the basis for their Puppet Enterprise <span class="caps">UI</span>),
+    its future is pretty secure. But it&#8217;s still very basic (let alone
+    enterprise features), and has a plugin system that is very&nbsp;young.</li>
+<li><a href="http://theforeman.org/projects/foreman">The Foreman</a> is probably the second-most-common puppet <span class="caps">ENC</span>, and
+    has also been around about as long as Dashboard. Its features are
+    nice, and it includes support for Kickstart (management of <span class="caps">TFTP</span> and
+    <span class="caps">DHCP</span>) and <span class="caps">DNS</span>, as well as some virtual machine management.
+    Unfortunately, we already have <span class="caps">DHCP</span> and <span class="caps">DNS</span> infrastructure so I&#8217;m
+    sure it would be quite a bit of effort to integrate it with our
+    environment, and for a non-Ruby shop, it has the same problem with
+    maintainability of custom&nbsp;code.</li>
+<li><a href="http://www.ingent.net/projects/initr/wiki">initr</a>, a <a href="http://www.redmine.org/">Redmine</a> plugin that functions as an <span class="caps">ENC</span> and manages
+    modules. It includes <span class="caps">RBAC</span> and leverages Redmine. But since we don&#8217;t
+    use Redmine, it&#8217;s not much of an&nbsp;advantage.</li>
+<li><a href="http://www.gitorious.org/opennms-puppet-node-pusher">OpenNMS Puppet Node Pusher</a>An <span class="caps">ENC</span> script for <a href="http://www.opennms.org/">OpenNMS</a>, which
+    we also don&#8217;t&nbsp;use.</li>
+</ul>
+<p>I was pretty amazed to see that nobody had written a puppet web <span class="caps">UI</span>/<span class="caps">ENC</span>
+in <span class="caps">PHP</span> (or Perl or Python), especially since Puppet is now quite&nbsp;popular.</p>
+<p>So, I&#8217;m essentially left with the following&nbsp;options:</p>
+<ul>
+<li>Start from scratch and write my own in <span class="caps">PHP</span>. By far the worst option,
+    since we don&#8217;t have anyone on our team who&#8217;s likely to maintain it,
+    and the Puppet community is&nbsp;Ruby-focused.</li>
+<li>Use Foreman, since it&#8217;s the only one that appears to offer audit
+    logging, have a bunch of features that don&#8217;t work for us, and
+    hopefully deal with&nbsp;it.</li>
+<li>Learn Ruby, write plugins for Dashboard, and hope that Puppet Labs
+    or someone else will pick them up and maintain them if I&nbsp;can&#8217;t.</li>
+</ul>
+<p>At the moment, I&#8217;ve decided to investigate Foreman and initr in a bit
+more depth, and also play around with the Dashboard code and try to pick
+up some Ruby (as they&#8217;re all written in Ruby anyway). I&#8217;ll also discuss
+these options with the team and see how opinions go (keeping in mind
+that the higher the likelihood of the community picking up/merging my
+changes, the&nbsp;better).</p>
+            </div>
+            <!-- /.entry-content -->
+        </article>
+    </section>
+
+        </div>
+        <div class="col-lg-3 well well-sm" id="sidebar">
+
+<aside>
+    <section>
+        <ul class="list-group list-group-flush">
+                <li class="list-group-item"><h4><i class="icon-home icon-large"></i>Social</h4></li>
+                    <li class="list-group-item"><a href="#"><i
+                            class="icon-You can add links in your config file-sign icon-large"></i>You can add links in your config file
+                    </a></li>
+                    <li class="list-group-item"><a href="#"><i
+                            class="icon-Another social link-sign icon-large"></i>Another social link
+                    </a></li>
+
+
+
+                <li class="list-group-item"><a href="/tags.html"><h4><i class="icon-tags icon-large"></i>Tags</h4></a></li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/android.html">
+                                android
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/google.html">
+                                google
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/nagios.html">
+                                Nagios
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/php.html">
+                                PHP
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/sysadmin.html">
+                                sysadmin
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/linux.html">
+                                linux
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/perl.html">
+                                perl
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/logging.html">
+                                logging
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/puppet.html">
+                                puppet
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/bind.html">
+                                bind
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/monitoring.html">
+                                monitoring
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/dns.html">
+                                dns
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/droid.html">
+                                droid
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/firefox.html">
+                                firefox
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/mediawiki.html">
+                                mediawiki
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/mac.html">
+                                mac
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/microsoft.html">
+                                microsoft
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/syslog.html">
+                                syslog
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/wordpress.html">
+                                wordpress
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/rpm.html">
+                                rpm
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/security.html">
+                                security
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/blog.html">
+                                blog
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/sun.html">
+                                sun
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/ems.html">
+                                EMS
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/apache.html">
+                                apache
+                            </a>
+                        </li>
+        </ul>
+    </section>
+</aside>        </div>
+    </div>
+</div>
+<footer>
+    <div class="container">
+        <hr>
+        <p class="pull-right"><i class="icon-arrow-up"></i> <a href="#">Back to top</a></p>
+
+
+        <p>&copy; 2014 Jason Antman &middot; Powered by <a href="https://github.com/DandyDev/pelican-bootstrap3" target="_blank">pelican-bootstrap3</a>,
+            <a href="http://docs.getpelican.com/" target="_blank">Pelican</a>,
+            <a href="http://getbootstrap.com" target="_blank">Bootstrap</a></p>
+    </div>
+</footer>
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="/theme/js/bootstrap.min.js"></script>
+
+<!-- Enable responsive features in IE8 with Respond.js (https://github.com/scottjehl/Respond) -->
+<script src="/theme/js/respond.min.js"></script>
+
+
+</body>
+</html>

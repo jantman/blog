@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:og="http://ogp.me/ns#"
+      xmlns:fb="https://www.facebook.com/2008/fbml">
+<head>
+    <title>Building a Rebuild-able Site</title>
+    <!-- Using the latest rendering mode for IE -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Open Graph tags -->
+
+            <meta property="og:type" content="article"/>
+            <meta property="og:title" content="Building a Rebuild-able Site"/>
+            <meta property="og:url" content="/2009/05/building-a-rebuild-able-site/"/>
+            <meta property="og:description" content="At $WORK, my group runs about two dozen servers that provide services for over 60,000 users. They’re a mix of Windows and Linux, with some old Solaris stuff thrown in there. The one thing they have in common is they’re all hand-built, hand-configured, and old. They’ve ..."/>
+
+    <!-- Bootstrap -->
+        <link rel="stylesheet" href="/theme/css/bootstrap.min.css" type="text/css"/>
+    <link href="/theme/css/font-awesome.min.css" rel="stylesheet">
+    <link href="/theme/css/pygments.css" rel="stylesheet">
+        <link href="/theme/css/typogrify.css" rel="stylesheet">
+    <link rel="stylesheet" href="/theme/css/style.css" type="text/css"/>
+    <!-- JavaScript plugins (requires jQuery) -->
+    <script src="http://code.jquery.com/jquery.js"></script>
+
+        <link href="/feeds/all.atom.xml" type="application/atom+xml" rel="alternate"
+              title="Jason Antman's Blog ATOM Feed"/>
+
+</head>
+<body>
+<nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="" class="navbar-brand">Jason Antman's Blog</a>
+        </div>
+        <div class="collapse navbar-collapse navbar-ex1-collapse">
+            <ul class="nav navbar-nav">
+                         <li><a href="/pages/about.html">
+                             About
+                          </a></li>
+                        <li >
+                            <a href="/category/ideas-and-rants.html">Ideas and rants</a>
+                        </li>
+                        <li >
+                            <a href="/category/miscellaneous.html">Miscellaneous</a>
+                        </li>
+                        <li >
+                            <a href="/category/monitoring.html">Monitoring</a>
+                        </li>
+                        <li >
+                            <a href="/category/projects.html">Projects</a>
+                        </li>
+                        <li class="active">
+                            <a href="/category/puppet.html">Puppet</a>
+                        </li>
+                        <li >
+                            <a href="/category/sysadmin.html">Sysadmin</a>
+                        </li>
+                        <li >
+                            <a href="/category/tech-howtos.html">Tech howtos</a>
+                        </li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="/archives.html"><i class="icon-th-list"></i>Archives</a></li>
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+</nav>
+<!-- /.navbar -->
+<div class="container">
+    <div class="row">
+        <div class="col-lg-9">
+    <section id="content">
+        <article>
+            <header class="page-header">
+                <h1>
+                    <a href="/2009/05/building-a-rebuild-able-site/"
+                       rel="bookmark"
+                       title="Permalink to Building a Rebuild-able Site">
+                        Building a Rebuild-able&nbsp;Site
+                    </a>
+                </h1>
+            </header>
+            <div class="entry-content">
+                <div class="panel">
+                    <div class="panel-body">
+<footer class="post-info">
+    <span class="label label-default">Date</span>
+    <span class="published">
+        <i class="icon-calendar"></i>Wed 06 May 2009
+    </span>
+
+
+
+<span class="label label-default">Tags</span>
+	<a href="/tag/backup.html">backup</a>
+        /
+	<a href="/tag/configuration.html">configuration</a>
+        /
+	<a href="/tag/kickstart.html">kickstart</a>
+        /
+	<a href="/tag/linux.html">linux</a>
+        /
+	<a href="/tag/puppet.html">puppet</a>
+        /
+	<a href="/tag/recovery.html">recovery</a>
+        /
+	<a href="/tag/work.html">work</a>
+</footer><!-- /.post-info -->                    </div>
+                </div>
+                <p>At $<span class="caps">WORK</span>, my group runs about two dozen servers that provide services
+for over 60,000 users. They&#8217;re a mix of Windows and Linux, with some old
+Solaris stuff thrown in there. The one thing they have in common is
+they&#8217;re all hand-built, hand-configured, and old. They&#8217;ve been around
+for a while. At the moment, we don&#8217;t even have an adequate backup&nbsp;system.</p>
+<p>So, being the closest thing to a SysAdmin we have (my official title is
+still Student Systems Programmer), it&#8217;s my job to build a new
+installation, configuration and backup infrastructure. We&#8217;ve already
+standardized on <a href="http://www.centos.org">CentOS</a> as a University-wide distro, and have a local
+full mirror, so I don&#8217;t need to choose a distro. I do, however, have to
+plan the installation and backup architecture. The main requirements&nbsp;are:</p>
+<ol>
+<li>Lowest overall time for bare-metal recovery to a working&nbsp;system.</li>
+<li>Ease of use, as people other than myself will need to administer it
+    (so they should be able to do so from a cheat sheet in the&nbsp;wiki).</li>
+<li>Repeatability - it should be easy and intuitive to make an
+    almost-exact-copy of a&nbsp;machine.</li>
+</ol>
+<p>I started a thread a few days ago on the <span class="caps">SAGE</span> mailing list, which you
+can find <a href="http://mailman.sage.org/pipermail/sage-members/2009/msg00447.html">here</a>.</p>
+<p>At the moment, it looks like the general idea that I&#8217;m going with is to
+use <a href="http://fedoraproject.org/wiki/Anaconda/Kickstart">Kickstart</a> to install the systems, using a basic and minimal
+Kickstart file. Basic package selection (minimalist) with just what&#8217;s
+needed to configure the system with a hostname and network settings for
+the management <span class="caps">VLAN</span>. I&#8217;ll then have Kickstart install and configure a
+configuration management package - I&#8217;m leaning towards <a href="http://reductivelabs.com/products/puppet/">Puppet</a> over
+<a href="http://www.cfengine.org/">Cfengine</a> and am starting testing. The config management software
+will handle all of the customization for the system (everything
+different from the base generic Kickstart install) so it&#8217;s all kept
+under the control of config management from step&nbsp;1.</p>
+<p>The final part is a backup system, mainly for whatever eventually -
+whether out of human error or simple laziness - ends up out of the
+config management system&#8217;s control. Our previous <span class="caps">SA</span> had settled on
+<a href="http://www.zmanda.com/">Zmanda</a>, the paid version of <a href="http://www.amanda.org/">Amanda</a>, which comes with specific
+plugins for MySQL and <span class="caps">MSSQL</span>. I&#8217;m also looking at <a href="http://www.bacula.org">Bacula</a>, mainly
+because of its&#8217; advanced features, scheduling (especially the new
+scheduling in Bacula 3) and&nbsp;scalability.</p>
+<p>The beauty that I see in having Kickstart do something minimal and then
+letting Puppet handle the rest is that (especially since we&#8217;ve
+standardized on SunFire X4100&#8217;s with identical configurations) I can
+kickstart and rack up a few spare machines, and to get them up and
+running all I need to do is power them up (iLOM) and tell Puppet what to
+make&nbsp;them.</p>
+<p>I&#8217;m currently starting testing of both Puppet itself and getting
+Kickstart to start the puppet install and daemon (instructions from
+<a href="http://watzmann.net/blog/index.php?cat=21">David Lutterkort&#8217;s blog (Red Hat software engineer)</a>). We&#8217;ll see how
+everything&nbsp;goes&#8230;</p>
+            </div>
+            <!-- /.entry-content -->
+        </article>
+    </section>
+
+        </div>
+        <div class="col-lg-3 well well-sm" id="sidebar">
+
+<aside>
+    <section>
+        <ul class="list-group list-group-flush">
+                <li class="list-group-item"><h4><i class="icon-home icon-large"></i>Social</h4></li>
+                    <li class="list-group-item"><a href="#"><i
+                            class="icon-You can add links in your config file-sign icon-large"></i>You can add links in your config file
+                    </a></li>
+                    <li class="list-group-item"><a href="#"><i
+                            class="icon-Another social link-sign icon-large"></i>Another social link
+                    </a></li>
+
+
+
+                <li class="list-group-item"><a href="/tags.html"><h4><i class="icon-tags icon-large"></i>Tags</h4></a></li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/android.html">
+                                android
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/google.html">
+                                google
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/nagios.html">
+                                Nagios
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/php.html">
+                                PHP
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/sysadmin.html">
+                                sysadmin
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/linux.html">
+                                linux
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/perl.html">
+                                perl
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/logging.html">
+                                logging
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/puppet.html">
+                                puppet
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/bind.html">
+                                bind
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/monitoring.html">
+                                monitoring
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/dns.html">
+                                dns
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/droid.html">
+                                droid
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/firefox.html">
+                                firefox
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/mediawiki.html">
+                                mediawiki
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/mac.html">
+                                mac
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/microsoft.html">
+                                microsoft
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/syslog.html">
+                                syslog
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/wordpress.html">
+                                wordpress
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/rpm.html">
+                                rpm
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/security.html">
+                                security
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/blog.html">
+                                blog
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/sun.html">
+                                sun
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/ems.html">
+                                EMS
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/apache.html">
+                                apache
+                            </a>
+                        </li>
+        </ul>
+    </section>
+</aside>        </div>
+    </div>
+</div>
+<footer>
+    <div class="container">
+        <hr>
+        <p class="pull-right"><i class="icon-arrow-up"></i> <a href="#">Back to top</a></p>
+
+
+        <p>&copy; 2014 Jason Antman &middot; Powered by <a href="https://github.com/DandyDev/pelican-bootstrap3" target="_blank">pelican-bootstrap3</a>,
+            <a href="http://docs.getpelican.com/" target="_blank">Pelican</a>,
+            <a href="http://getbootstrap.com" target="_blank">Bootstrap</a></p>
+    </div>
+</footer>
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="/theme/js/bootstrap.min.js"></script>
+
+<!-- Enable responsive features in IE8 with Respond.js (https://github.com/scottjehl/Respond) -->
+<script src="/theme/js/respond.min.js"></script>
+
+
+</body>
+</html>

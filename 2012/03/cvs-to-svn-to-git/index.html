@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:og="http://ogp.me/ns#"
+      xmlns:fb="https://www.facebook.com/2008/fbml">
+<head>
+    <title>CVS to SVN to Git</title>
+    <!-- Using the latest rendering mode for IE -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Open Graph tags -->
+
+            <meta property="og:type" content="article"/>
+            <meta property="og:title" content="CVS to SVN to Git"/>
+            <meta property="og:url" content="/2012/03/cvs-to-svn-to-git/"/>
+            <meta property="og:description" content="Thanks to some new interest, I’ve decided to resurrect an old project of mine, PHP EMS Tools. It’s a web-based tool for small emergency services organizations, mainly aimed at volunteer EMS/ambulance providers. The tool handles roster tracking, scheduling, equipment maintenance and checks, and a bunch of other ..."/>
+
+    <!-- Bootstrap -->
+        <link rel="stylesheet" href="/theme/css/bootstrap.min.css" type="text/css"/>
+    <link href="/theme/css/font-awesome.min.css" rel="stylesheet">
+    <link href="/theme/css/pygments.css" rel="stylesheet">
+        <link href="/theme/css/typogrify.css" rel="stylesheet">
+    <link rel="stylesheet" href="/theme/css/style.css" type="text/css"/>
+    <!-- JavaScript plugins (requires jQuery) -->
+    <script src="http://code.jquery.com/jquery.js"></script>
+
+        <link href="/feeds/all.atom.xml" type="application/atom+xml" rel="alternate"
+              title="Jason Antman's Blog ATOM Feed"/>
+
+</head>
+<body>
+<nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="" class="navbar-brand">Jason Antman's Blog</a>
+        </div>
+        <div class="collapse navbar-collapse navbar-ex1-collapse">
+            <ul class="nav navbar-nav">
+                         <li><a href="/pages/about.html">
+                             About
+                          </a></li>
+                        <li >
+                            <a href="/category/ideas-and-rants.html">Ideas and rants</a>
+                        </li>
+                        <li >
+                            <a href="/category/miscellaneous.html">Miscellaneous</a>
+                        </li>
+                        <li >
+                            <a href="/category/monitoring.html">Monitoring</a>
+                        </li>
+                        <li class="active">
+                            <a href="/category/projects.html">Projects</a>
+                        </li>
+                        <li >
+                            <a href="/category/puppet.html">Puppet</a>
+                        </li>
+                        <li >
+                            <a href="/category/sysadmin.html">Sysadmin</a>
+                        </li>
+                        <li >
+                            <a href="/category/tech-howtos.html">Tech howtos</a>
+                        </li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="/archives.html"><i class="icon-th-list"></i>Archives</a></li>
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+</nav>
+<!-- /.navbar -->
+<div class="container">
+    <div class="row">
+        <div class="col-lg-9">
+    <section id="content">
+        <article>
+            <header class="page-header">
+                <h1>
+                    <a href="/2012/03/cvs-to-svn-to-git/"
+                       rel="bookmark"
+                       title="Permalink to CVS to SVN to Git">
+                        <span class="caps">CVS</span> to <span class="caps">SVN</span> to&nbsp;Git
+                    </a>
+                </h1>
+            </header>
+            <div class="entry-content">
+                <div class="panel">
+                    <div class="panel-body">
+<footer class="post-info">
+    <span class="label label-default">Date</span>
+    <span class="published">
+        <i class="icon-calendar"></i>Sun 25 March 2012
+    </span>
+
+
+
+<span class="label label-default">Tags</span>
+	<a href="/tag/cvs.html">cvs</a>
+        /
+	<a href="/tag/git.html">git</a>
+        /
+	<a href="/tag/svn.html">svn</a>
+        /
+	<a href="/tag/version-control.html">version control</a>
+</footer><!-- /.post-info -->                    </div>
+                </div>
+                <p>Thanks to some new interest, I&#8217;ve decided to resurrect an old project of
+mine, <a href="http://www.php-ems-tools.com"><span class="caps">PHP</span> <span class="caps">EMS</span> Tools</a>. It&#8217;s a web-based tool for small emergency
+services organizations, mainly aimed at volunteer <span class="caps">EMS</span>/ambulance
+providers. The tool handles roster tracking, scheduling, equipment
+maintenance and checks, and a bunch of other administrative tasks. I
+first started it in 2007 for the <a href="http://www.midlandparkambulance.com">Midland Park Ambulance Corps</a>
+(<span class="caps">MPAC</span>), which I was a volunteer <span class="caps">EMT</span> with from 2005 through 2011. I&#8217;ll
+admit that it&#8217;s a perfect model of how not to run a software project.
+The first few releases are plain awful code. I was keeping the project
+in <span class="caps">CVS</span> at the time, and posted some early releases on <a href="http://sourceforge.net/projects/php-ems-tools/">sourceforge</a>
+and FreshMeat, now <a href="http://freecode.com/projects/php-ems-tools">FreeCode</a>. Sometime in 2009, I migrated the
+contents of the trunk of the <span class="caps">CVS</span> module to a <a href="http://svn.jasonantman.com/php-ems-tools/"><span class="caps">SVN</span> repository</a>, but
+discarded the history. I also setup a MediaWiki-based website for the
+project, giving some information and mainly asking for feedback. Around
+that time I started working on a new and heavily updated (fixed) version
+for <span class="caps">MPAC</span>, but since it appeared that there was no interest in the
+project, and there were many many local customizations and
+organization-specific features, I let their codebase diverge from what
+was released, and as a result, stopped keeping it in version control.
+Until now, when they need to migrate to a new server, and I&#8217;ve also
+gotten some outside interest in the&nbsp;project.</p>
+<p>So, as of this morning, I was left with at least four code&nbsp;bases:</p>
+<ol>
+<li>the original <a href="http://cvs.jasonantman.com/cgi-bin/viewvc.cgi/cvs/php-ems-tools-trunk/"><span class="caps">CVS</span> repository</a> with branches and tags and some
+    history, untouched since&nbsp;2007</li>
+<li>the <a href="http://svn.jasonantman.com/php-ems-tools/"><span class="caps">SVN</span> repository</a> circa 2009, with only 3 commits, all related
+    to the migration from <span class="caps">CVS</span> to&nbsp;<span class="caps">SVN</span></li>
+<li>a &#8220;release&#8221; tarball that at least one outside organization is
+    actually&nbsp;using.</li>
+<li>the code that <span class="caps">MPAC</span> is running, which has been largely rewritten
+    since 2009, but also contains a lot of organization-specific&nbsp;customizations.</li>
+</ol>
+<p>As a first step, I created a new <span class="caps">SVN</span> repository and migrated the
+original <span class="caps">CVS</span> repo, complete with history, branches, and tags, to it
+using <a href="http://cvs2svn.tigris.org/">cvs2svn</a>, and then removed write permissions on the actual
+module in the repository. This gave me a <span class="caps">SVN</span> repository with all of the
+history of previous so-called releases, with a trunk matching r1 of the
+&#8220;current&#8221; <span class="caps">SVN</span> repository. I then manually applied patches to trunk/ for
+the two commits in the current <span class="caps">SVN</span> repository, and set the svn:date
+revision property to the correct 2009 date for those commits. I also
+confirmed that the correct tag matches up to the &#8220;release&#8221; tarball
+mentioned above. So, I&#8217;m down to a &#8220;current&#8221; trunk, plus the locally
+modified code running on <span class="caps">MPAC</span>&#8217;s current server. My plan of action from
+this point is as&nbsp;follows:</p>
+<ol>
+<li>Move the <span class="caps">PHP</span> <span class="caps">EMS</span> Tools website from Mediawiki to my local redmine
+    installation, and update the news with a link to this&nbsp;post.</li>
+<li>Migrate the <span class="caps">SVN</span> repository, which now contains full history, to Git
+    hosted at Github. Add Github integration to&nbsp;Redmine.</li>
+<li>Update freshmeat, sourceforge, and anywhere else online that knows
+    about the&nbsp;project.</li>
+<li>Working in a git branch, begin converging the code <span class="caps">MPAC</span> is currently
+    running with the latest (now git) trunk, trying to provide
+    configuration options for anything organization specific, and
+    testing as I&nbsp;go.</li>
+</ol>
+<p>If all works well, I&#8217;ll end up with <span class="caps">MPAC</span> running the current trunk, just
+some different configuration options, and a working, up-to-date release.
+The biggest issues are going to be how I handle the <span class="caps">MPAC</span>-specific
+additions and customizations (a lot of stuff hard-coded for our position
+titles, plus our very custom call report and telephone-based call-in
+software, which is pretty tightly linked with the <span class="caps">PHP</span> <span class="caps">EMS</span> Tools core),
+and how I balance abstracting things to be configurable for other users
+versus getting this all done in a reasonable amount of&nbsp;time.</p>
+<p>Stay&nbsp;tuned&#8230;</p>
+            </div>
+            <!-- /.entry-content -->
+        </article>
+    </section>
+
+        </div>
+        <div class="col-lg-3 well well-sm" id="sidebar">
+
+<aside>
+    <section>
+        <ul class="list-group list-group-flush">
+                <li class="list-group-item"><h4><i class="icon-home icon-large"></i>Social</h4></li>
+                    <li class="list-group-item"><a href="#"><i
+                            class="icon-You can add links in your config file-sign icon-large"></i>You can add links in your config file
+                    </a></li>
+                    <li class="list-group-item"><a href="#"><i
+                            class="icon-Another social link-sign icon-large"></i>Another social link
+                    </a></li>
+
+
+
+                <li class="list-group-item"><a href="/tags.html"><h4><i class="icon-tags icon-large"></i>Tags</h4></a></li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/android.html">
+                                android
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/google.html">
+                                google
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/nagios.html">
+                                Nagios
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/php.html">
+                                PHP
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/sysadmin.html">
+                                sysadmin
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/linux.html">
+                                linux
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/perl.html">
+                                perl
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/logging.html">
+                                logging
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/puppet.html">
+                                puppet
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/bind.html">
+                                bind
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/monitoring.html">
+                                monitoring
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/dns.html">
+                                dns
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/droid.html">
+                                droid
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/firefox.html">
+                                firefox
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/mediawiki.html">
+                                mediawiki
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/mac.html">
+                                mac
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/microsoft.html">
+                                microsoft
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/syslog.html">
+                                syslog
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/wordpress.html">
+                                wordpress
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/rpm.html">
+                                rpm
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/security.html">
+                                security
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/blog.html">
+                                blog
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/sun.html">
+                                sun
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/ems.html">
+                                EMS
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/apache.html">
+                                apache
+                            </a>
+                        </li>
+        </ul>
+    </section>
+</aside>        </div>
+    </div>
+</div>
+<footer>
+    <div class="container">
+        <hr>
+        <p class="pull-right"><i class="icon-arrow-up"></i> <a href="#">Back to top</a></p>
+
+
+        <p>&copy; 2014 Jason Antman &middot; Powered by <a href="https://github.com/DandyDev/pelican-bootstrap3" target="_blank">pelican-bootstrap3</a>,
+            <a href="http://docs.getpelican.com/" target="_blank">Pelican</a>,
+            <a href="http://getbootstrap.com" target="_blank">Bootstrap</a></p>
+    </div>
+</footer>
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="/theme/js/bootstrap.min.js"></script>
+
+<!-- Enable responsive features in IE8 with Respond.js (https://github.com/scottjehl/Respond) -->
+<script src="/theme/js/respond.min.js"></script>
+
+
+</body>
+</html>

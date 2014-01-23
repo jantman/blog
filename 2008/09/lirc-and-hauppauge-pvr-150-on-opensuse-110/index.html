@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:og="http://ogp.me/ns#"
+      xmlns:fb="https://www.facebook.com/2008/fbml">
+<head>
+    <title>LIRC and Hauppauge PVR-150 on OpenSuSE 11.0</title>
+    <!-- Using the latest rendering mode for IE -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Open Graph tags -->
+
+            <meta property="og:type" content="article"/>
+            <meta property="og:title" content="LIRC and Hauppauge PVR-150 on OpenSuSE 11.0"/>
+            <meta property="og:url" content="/2008/09/lirc-and-hauppauge-pvr-150-on-opensuse-110/"/>
+            <meta property="og:description" content="Well, despite what’s been said elsewhere, it IS possible! It’s a bit error-ridden at first, but here is the procedure that I used to compile and install the PVR-150 patched LIRC 0.8.3-CVS. First, Download the tarball mentioned in the Version 3 blog post at ..."/>
+
+    <!-- Bootstrap -->
+        <link rel="stylesheet" href="/theme/css/bootstrap.min.css" type="text/css"/>
+    <link href="/theme/css/font-awesome.min.css" rel="stylesheet">
+    <link href="/theme/css/pygments.css" rel="stylesheet">
+        <link href="/theme/css/typogrify.css" rel="stylesheet">
+    <link rel="stylesheet" href="/theme/css/style.css" type="text/css"/>
+    <!-- JavaScript plugins (requires jQuery) -->
+    <script src="http://code.jquery.com/jquery.js"></script>
+
+        <link href="/feeds/all.atom.xml" type="application/atom+xml" rel="alternate"
+              title="Jason Antman's Blog ATOM Feed"/>
+
+</head>
+<body>
+<nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="" class="navbar-brand">Jason Antman's Blog</a>
+        </div>
+        <div class="collapse navbar-collapse navbar-ex1-collapse">
+            <ul class="nav navbar-nav">
+                         <li><a href="/pages/about.html">
+                             About
+                          </a></li>
+                        <li >
+                            <a href="/category/ideas-and-rants.html">Ideas and rants</a>
+                        </li>
+                        <li >
+                            <a href="/category/miscellaneous.html">Miscellaneous</a>
+                        </li>
+                        <li >
+                            <a href="/category/monitoring.html">Monitoring</a>
+                        </li>
+                        <li >
+                            <a href="/category/projects.html">Projects</a>
+                        </li>
+                        <li >
+                            <a href="/category/puppet.html">Puppet</a>
+                        </li>
+                        <li >
+                            <a href="/category/sysadmin.html">Sysadmin</a>
+                        </li>
+                        <li class="active">
+                            <a href="/category/tech-howtos.html">Tech howtos</a>
+                        </li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="/archives.html"><i class="icon-th-list"></i>Archives</a></li>
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+</nav>
+<!-- /.navbar -->
+<div class="container">
+    <div class="row">
+        <div class="col-lg-9">
+    <section id="content">
+        <article>
+            <header class="page-header">
+                <h1>
+                    <a href="/2008/09/lirc-and-hauppauge-pvr-150-on-opensuse-110/"
+                       rel="bookmark"
+                       title="Permalink to LIRC and Hauppauge PVR-150 on OpenSuSE 11.0">
+                        <span class="caps">LIRC</span> and Hauppauge <span class="caps">PVR</span>-150 on OpenSuSE&nbsp;11.0
+                    </a>
+                </h1>
+            </header>
+            <div class="entry-content">
+                <div class="panel">
+                    <div class="panel-body">
+<footer class="post-info">
+    <span class="label label-default">Date</span>
+    <span class="published">
+        <i class="icon-calendar"></i>Mon 01 September 2008
+    </span>
+
+
+
+<span class="label label-default">Tags</span>
+	<a href="/tag/hauppauge.html">hauppauge</a>
+        /
+	<a href="/tag/linux.html">linux</a>
+        /
+	<a href="/tag/lirc.html">lirc</a>
+        /
+	<a href="/tag/mythtv.html">mythtv</a>
+        /
+	<a href="/tag/opensuse.html">opensuse</a>
+        /
+	<a href="/tag/pvr-150.html">pvr-150</a>
+        /
+	<a href="/tag/suse.html">suse</a>
+</footer><!-- /.post-info -->                    </div>
+                </div>
+                <p>Well, despite what&#8217;s been said elsewhere, it <em><span class="caps">IS</span></em> possible! It&#8217;s a bit
+error-ridden at first, but here is the procedure that I used to compile
+and install the <span class="caps">PVR</span>-150 patched <span class="caps">LIRC</span>&nbsp;0.8.3-<span class="caps">CVS</span>.</p>
+<p>First, Download the tarball mentioned in the <a href="http://www.blushingpenguin.com/mark/blog/?p=24">Version 3 blog post</a> at
+<a href="http://www.blushingpenguin.com/mark/blog/">Marks Braindump</a>. You can pretty much follow his instructions on the
+installation in the blog post, with some changes that are specific to
+getting it to compile on OpenSuSE&nbsp;11.</p>
+<ol>
+<li>First, remove all traces of the OpenSuSE <span class="caps">LIRC</span> from you system.
+    Uninstall the <span class="caps">RPMS</span> and everything else that goes with them. Then
+    unload all of the kernel modules, especially lirc_i2c (if you have
+    it&nbsp;loaded).</li>
+<li>In your kernel source directory, run
+    <code>make oldconfig &amp;&amp; make prepare.</code>
+    <p></li>
+<li>In your kernel source directory, run <code>make prepare scripts</code> which,
+    among other things, compiles the required <code>genksyms</code> scurript.</li>
+<li>I was getting a compile error like &#8220;<span class="caps">WARNING</span>: Symbol version dump
+    /usr/src/`uname -r`/Module.symvers is missing&#8221;. Find out which
+    kernel you&#8217;re running (<code>uname -r</code>). In yout kernel source directory,
+    copy your Module.symvers file from /usr/src/linux-obj. I was running
+    i386 architecture with the &#8220;default&#8221; kernel, so mine was located at
+    <code>/usr/src/linux-obj/i386/debug/Module.symvers</code>. Copy that into
+    <code>/usr/src/linux</code>.</li>
+<li>In the lirc (patched) directory, run <code>setup.sh</code> as instructed. <span class="caps">DO</span>
+    <span class="caps">NOT</span> tell it to run configure - just save settings and&nbsp;exit.</li>
+<li>Edit the generated <code>configure.sh</code> file, adding a
+    <code>--with-kerneldir=/usr/src/KERNELDIR</code>, replacing <span class="caps">KERNELDIR</span> with the
+    actual path to your kernel soruce (i.e. /usr/src/`uname&nbsp;-r`).</li>
+<li><code>make</code>. If no errors, <code>make install</code>.</li>
+<li>I decided to reboot at this point, and when I did, everything worked&nbsp;perfectly.</li>
+</ol>
+<p>Also, I found that I needed to explicitly specify <code>--device=/dev/lirc0</code>
+when starting <span class="caps">LIRC</span>, as well as not specifying a driver. I just took the
+<code>/etc/init.d/lirc</code> from the official OpenSuSE 11.0 package, commented
+out line 108 in <code>makeargs()</code> that adds the <code>-H $LIRC_DRIVER</code> to the
+args, and added <code>LIRC_DEVICE="/dev/lirc0"</code> to the top after the <span class="caps">INIT</span>&nbsp;info.</p>
+<p>Unfortunately, figuring out this process took me a long time. I&#8217;ve
+reconstructed these instructions from various post-it notes, the
+whiteboard next to my desk, and some bash history files and terminal
+dumps. If this doesn&#8217;t seem to work for you, please drop an email to
+jason <span class="caps">AT</span> jason antman <span class="caps">DOT</span> com, with as much information as you have, and
+I&#8217;ll figure it out and update the&nbsp;instructions.</p>
+<p>Now, finally, an up-to-date system <span class="caps">AND</span> <a href="http://www.mythtv.org">MythTV</a>.</p>
+            </div>
+            <!-- /.entry-content -->
+        </article>
+    </section>
+
+        </div>
+        <div class="col-lg-3 well well-sm" id="sidebar">
+
+<aside>
+    <section>
+        <ul class="list-group list-group-flush">
+                <li class="list-group-item"><h4><i class="icon-home icon-large"></i>Social</h4></li>
+                    <li class="list-group-item"><a href="#"><i
+                            class="icon-You can add links in your config file-sign icon-large"></i>You can add links in your config file
+                    </a></li>
+                    <li class="list-group-item"><a href="#"><i
+                            class="icon-Another social link-sign icon-large"></i>Another social link
+                    </a></li>
+
+
+
+                <li class="list-group-item"><a href="/tags.html"><h4><i class="icon-tags icon-large"></i>Tags</h4></a></li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/android.html">
+                                android
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/google.html">
+                                google
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/nagios.html">
+                                Nagios
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/php.html">
+                                PHP
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/sysadmin.html">
+                                sysadmin
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/linux.html">
+                                linux
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/perl.html">
+                                perl
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/logging.html">
+                                logging
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/puppet.html">
+                                puppet
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/bind.html">
+                                bind
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/monitoring.html">
+                                monitoring
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/dns.html">
+                                dns
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/droid.html">
+                                droid
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/firefox.html">
+                                firefox
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/mediawiki.html">
+                                mediawiki
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/mac.html">
+                                mac
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/microsoft.html">
+                                microsoft
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/syslog.html">
+                                syslog
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/wordpress.html">
+                                wordpress
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/rpm.html">
+                                rpm
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/security.html">
+                                security
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/blog.html">
+                                blog
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/sun.html">
+                                sun
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/ems.html">
+                                EMS
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/apache.html">
+                                apache
+                            </a>
+                        </li>
+        </ul>
+    </section>
+</aside>        </div>
+    </div>
+</div>
+<footer>
+    <div class="container">
+        <hr>
+        <p class="pull-right"><i class="icon-arrow-up"></i> <a href="#">Back to top</a></p>
+
+
+        <p>&copy; 2014 Jason Antman &middot; Powered by <a href="https://github.com/DandyDev/pelican-bootstrap3" target="_blank">pelican-bootstrap3</a>,
+            <a href="http://docs.getpelican.com/" target="_blank">Pelican</a>,
+            <a href="http://getbootstrap.com" target="_blank">Bootstrap</a></p>
+    </div>
+</footer>
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="/theme/js/bootstrap.min.js"></script>
+
+<!-- Enable responsive features in IE8 with Respond.js (https://github.com/scottjehl/Respond) -->
+<script src="/theme/js/respond.min.js"></script>
+
+
+</body>
+</html>

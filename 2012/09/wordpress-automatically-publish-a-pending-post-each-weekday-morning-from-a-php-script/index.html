@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:og="http://ogp.me/ns#"
+      xmlns:fb="https://www.facebook.com/2008/fbml">
+<head>
+    <title>Wordpress - Automatically publish a pending post each weekday morning from a PHP script</title>
+    <!-- Using the latest rendering mode for IE -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Open Graph tags -->
+
+            <meta property="og:type" content="article"/>
+            <meta property="og:title" content="Wordpress - Automatically publish a pending post each weekday morning from a PHP script"/>
+            <meta property="og:url" content="/2012/09/wordpress-automatically-publish-a-pending-post-each-weekday-morning-from-a-php-script/"/>
+            <meta property="og:description" content="In an earlier post, Piwik Web Analytics, and some unfortunate stats about my blog, I mentioned that the Feedburner stats for this blog show a relatively high subscribe/unsubscribe rate for this blog. I think a large part of that is my tendency to blog in spurts, and even worse ..."/>
+
+    <!-- Bootstrap -->
+        <link rel="stylesheet" href="/theme/css/bootstrap.min.css" type="text/css"/>
+    <link href="/theme/css/font-awesome.min.css" rel="stylesheet">
+    <link href="/theme/css/pygments.css" rel="stylesheet">
+        <link href="/theme/css/typogrify.css" rel="stylesheet">
+    <link rel="stylesheet" href="/theme/css/style.css" type="text/css"/>
+    <!-- JavaScript plugins (requires jQuery) -->
+    <script src="http://code.jquery.com/jquery.js"></script>
+
+        <link href="/feeds/all.atom.xml" type="application/atom+xml" rel="alternate"
+              title="Jason Antman's Blog ATOM Feed"/>
+
+</head>
+<body>
+<nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="" class="navbar-brand">Jason Antman's Blog</a>
+        </div>
+        <div class="collapse navbar-collapse navbar-ex1-collapse">
+            <ul class="nav navbar-nav">
+                         <li><a href="/pages/about.html">
+                             About
+                          </a></li>
+                        <li >
+                            <a href="/category/ideas-and-rants.html">Ideas and rants</a>
+                        </li>
+                        <li >
+                            <a href="/category/miscellaneous.html">Miscellaneous</a>
+                        </li>
+                        <li >
+                            <a href="/category/monitoring.html">Monitoring</a>
+                        </li>
+                        <li >
+                            <a href="/category/projects.html">Projects</a>
+                        </li>
+                        <li >
+                            <a href="/category/puppet.html">Puppet</a>
+                        </li>
+                        <li >
+                            <a href="/category/sysadmin.html">Sysadmin</a>
+                        </li>
+                        <li class="active">
+                            <a href="/category/tech-howtos.html">Tech howtos</a>
+                        </li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="/archives.html"><i class="icon-th-list"></i>Archives</a></li>
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+</nav>
+<!-- /.navbar -->
+<div class="container">
+    <div class="row">
+        <div class="col-lg-9">
+    <section id="content">
+        <article>
+            <header class="page-header">
+                <h1>
+                    <a href="/2012/09/wordpress-automatically-publish-a-pending-post-each-weekday-morning-from-a-php-script/"
+                       rel="bookmark"
+                       title="Permalink to Wordpress - Automatically publish a pending post each weekday morning from a PHP script">
+                        Wordpress - Automatically publish a pending post each weekday morning from a <span class="caps">PHP</span>&nbsp;script
+                    </a>
+                </h1>
+            </header>
+            <div class="entry-content">
+                <div class="panel">
+                    <div class="panel-body">
+<footer class="post-info">
+    <span class="label label-default">Date</span>
+    <span class="published">
+        <i class="icon-calendar"></i>Tue 04 September 2012
+    </span>
+
+
+
+<span class="label label-default">Tags</span>
+	<a href="/tag/cron.html">cron</a>
+        /
+	<a href="/tag/php.html">PHP</a>
+        /
+	<a href="/tag/wordpress.html">wordpress</a>
+</footer><!-- /.post-info -->                    </div>
+                </div>
+                <p>In an earlier post, <a href="/2012/08/piwik-web-analytics-and-some-unfortunate-stats-about-my-blog/">Piwik Web Analytics, and some unfortunate stats
+about my blog</a>, I mentioned that the <a href="http://feedburner.google.com/">Feedburner</a> stats for this
+blog show a relatively high subscribe/unsubscribe rate for this blog. I
+think a large part of that is my tendency to blog in spurts, and even
+worse, my tendency to write drafts and not publish them. In an effort to
+combat this, I&#8217;ve been trying to finish blog posts and then set them to
+&#8220;Pending&#8221; status, and go back and publish one every day (well, every day
+that I have some still sitting unpublished). Of course, that counts on
+me logging in to Wordpress every day, which isn&#8217;t something I do. The
+following script is, at least for now, the answer for&nbsp;me.</p>
+<p>This script (a standalone <span class="caps">PHP</span> script) uses [<code>wp-load.php</code>][] to load the
+wordpress environment, and then finds the oldest post with a given
+status (&#8220;pending&#8221; in my case) and attempts to publish it. It only does
+this if there has not been another post published in the last 24 hours.
+The following script can be found in subversion at&nbsp;[http://svn.jasonantman.com/misc-scripts/wordpress_daily_post.php][]:</p>
+<div class="codehilite"><pre><span class="x">#!/usr/bin/php</span>
+<span class="cp">&lt;?php</span>
+<span class="sd">/**</span>
+<span class="sd"> * wordpress_daily_post.php</span>
+<span class="sd"> * Script to publish the oldest post with a given status, if no</span>
+<span class="sd"> * other post has been published in 24 hours. Intended to be run</span>
+<span class="sd"> * via cron on weekdays.</span>
+<span class="sd"> *</span>
+<span class="sd"> * Copyright 2012 Jason Antman </span>
+<span class="sd"> *</span>
+<span class="sd"> * Licensed under the Apache License, Version 2.0 </span>
+<span class="sd"> *</span>
+<span class="sd"> * use it anywhere you want, however you want, provided that this header is left intact,</span>
+<span class="sd"> * and that if redistributed, credit is given to me.</span>
+<span class="sd"> *</span>
+<span class="sd"> * It is strongly requested, but not technically required, that any changes/improvements</span>
+<span class="sd"> * be emailed to the above address.</span>
+<span class="sd"> *</span>
+<span class="sd"> * The latest version of this script will always be available at:</span>
+<span class="sd"> * $HeadURL: http://svn.jasonantman.com/misc-scripts/wordpress_daily_post.php $</span>
+<span class="sd"> * $LastChangedRevision: 40 $</span>
+<span class="sd"> *</span>
+<span class="sd"> * Changelog:</span>
+<span class="sd"> * 2012-09-03 Jason Antman  - 1.0</span>
+<span class="sd"> *  - first version</span>
+<span class="sd"> */</span>
+
+<span class="c1"># <span class="caps">BEGIN</span> <span class="caps">CONFIGURATION</span></span>
+<span class="nb">define</span><span class="p">(</span><span class="s1">&#39;WP_LOAD_LOC&#39;</span><span class="p">,</span> <span class="s1">&#39;/var/www/vhosts/blog.jasonantman.com/wp-load.php&#39;</span><span class="p">);</span> <span class="c1">// Configure this to the full path of your Wordpress wp-load.php</span>
+<span class="nb">define</span><span class="p">(</span><span class="s1">&#39;SOURCE_POST_STATUS&#39;</span><span class="p">,</span> <span class="s1">&#39;pending&#39;</span><span class="p">);</span> <span class="c1">// post status to publish</span>
+<span class="c1"># <span class="caps">END</span> <span class="caps">CONFIGURATION</span></span>
+
+<span class="nv">$<span class="caps">VERBOSE</span></span> <span class="o">=</span> <span class="k">false</span><span class="p">;</span>
+<span class="nv">$DRY_RUN</span> <span class="o">=</span> <span class="k">false</span><span class="p">;</span>
+<span class="nb">array_shift</span><span class="p">(</span><span class="nv">$argv</span><span class="p">);</span>
+<span class="k">while</span><span class="p">(</span><span class="nb">count</span><span class="p">(</span><span class="nv">$argv</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">if</span><span class="p">(</span><span class="nb">isset</span><span class="p">(</span><span class="nv">$argv</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">&amp;&amp;</span> <span class="nv">$argv</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;-d&quot;</span> <span class="o">||</span> <span class="nv">$argv</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;--dry-run&quot;</span><span class="p">){</span>
+    <span class="nv">$DRY_RUN</span> <span class="o">=</span> <span class="k">true</span><span class="p">;</span>
+    <span class="nb">fwrite</span><span class="p">(</span><span class="nx"><span class="caps">STDERR</span></span><span class="p">,</span> <span class="s2">&quot;<span class="caps">DRY</span> <span class="caps">RUN</span> <span class="caps">ONLY</span> - <span class="caps">NOT</span> <span class="caps">ACTUALLY</span> <span class="caps">PUBLISHING</span>.</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">);</span>
+  <span class="p">}</span>
+  <span class="k">if</span><span class="p">(</span><span class="nb">isset</span><span class="p">(</span><span class="nv">$argv</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">&amp;&amp;</span> <span class="nv">$argv</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;-v&quot;</span> <span class="o">||</span> <span class="nv">$argv</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;--verbose&quot;</span><span class="p">){</span>
+    <span class="nv">$<span class="caps">VERBOSE</span></span> <span class="o">=</span> <span class="k">true</span><span class="p">;</span>
+    <span class="nb">fwrite</span><span class="p">(</span><span class="nx"><span class="caps">STDERR</span></span><span class="p">,</span> <span class="s2">&quot;WP_LOAD_LOC=&quot;</span><span class="o">.</span><span class="nx">WP_LOAD_LOC</span><span class="o">.</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">);</span>
+    <span class="nb">fwrite</span><span class="p">(</span><span class="nx"><span class="caps">STDERR</span></span><span class="p">,</span> <span class="s2">&quot;SOURCE_POST_STATUS=&quot;</span><span class="o">.</span><span class="nx">SOURCE_POST_STATUS</span><span class="o">.</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">);</span>
+  <span class="p">}</span>
+  <span class="nb">array_shift</span><span class="p">(</span><span class="nv">$argv</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="nv">$_SERVER</span><span class="p">[</span><span class="s1">&#39;HTTP_HOST&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;localhost&#39;</span><span class="p">;</span> <span class="c1">// needed for wp-includes/ms-settings.php:100</span>
+<span class="k">require_once</span><span class="p">(</span><span class="nx">WP_LOAD_LOC</span><span class="p">);</span>
+
+<span class="c1"># check that we&#39;re running on a weekday</span>
+<span class="k">if</span><span class="p">(</span><span class="nb">date</span><span class="p">(</span><span class="s1">&#39;N&#39;</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">6</span><span class="p">)</span> <span class="p">{</span>
+<span class="c1">#  if($<span class="caps">VERBOSE</span>){ fwrite(<span class="caps">STDERR</span>, &quot;today is a saturday or sunday, dieing.\n&quot;); }</span>
+<span class="c1">#  exit(1);</span>
+<span class="p">}</span>
+
+<span class="c1"># find the publish date/time of the last published post</span>
+<span class="nv">$published</span> <span class="o">=</span> <span class="nx">get_posts</span><span class="p">(</span><span class="k">array</span><span class="p">(</span><span class="s1">&#39;numberposts&#39;</span> <span class="o">=&gt;</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;orderby&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;post_date&#39;</span><span class="p">,</span> <span class="s1">&#39;order&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;<span class="caps">DESC</span>&#39;</span><span class="p">,</span> <span class="s1">&#39;post_status&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;publish&#39;</span><span class="p">));</span>
+<span class="nv">$post</span> <span class="o">=</span> <span class="nv">$published</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span>
+<span class="nv">$pub_date</span> <span class="o">=</span> <span class="nv">$post</span><span class="o">-&gt;</span><span class="na">post_date</span><span class="p">;</span>
+<span class="nv">$pub_id</span> <span class="o">=</span> <span class="nv">$post</span><span class="o">-&gt;</span><span class="na"><span class="caps">ID</span></span><span class="p">;</span>
+
+<span class="k">if</span><span class="p">(</span><span class="nb">strtotime</span><span class="p">(</span><span class="nv">$pub_date</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="p">(</span><span class="nb">time</span><span class="p">()</span> <span class="o">-</span> <span class="mi">86400</span><span class="p">))</span> <span class="p">{</span>
+  <span class="k">if</span><span class="p">(</span><span class="nv">$<span class="caps">VERBOSE</span></span><span class="p">){</span> <span class="nb">fwrite</span><span class="p">(</span><span class="nx"><span class="caps">STDERR</span></span><span class="p">,</span> <span class="s2">&quot;last post (<span class="caps">ID</span> </span><span class="si">$pub_id</span><span class="s2">) within last day (</span><span class="si">$pub_date</span><span class="s2">). Nothing to do. Exiting.</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">);</span> <span class="p">}</span>
+  <span class="k">exit</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+<span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+  <span class="k">if</span><span class="p">(</span><span class="nv">$<span class="caps">VERBOSE</span></span><span class="p">){</span> <span class="nb">fwrite</span><span class="p">(</span><span class="nx"><span class="caps">STDERR</span></span><span class="p">,</span> <span class="s2">&quot;Found last post (<span class="caps">ID</span> </span><span class="si">$pub_id</span><span class="s2">) with post date </span><span class="si">$pub_date</span><span class="s2">.</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">);</span> <span class="p">}</span>
+<span class="p">}</span>
+
+
+<span class="c1"># find the earliest post of status SOURCE_POST_STATUS, if there is one.</span>
+<span class="nv">$to_post</span> <span class="o">=</span> <span class="nx">get_posts</span><span class="p">(</span><span class="k">array</span><span class="p">(</span><span class="s1">&#39;numberposts&#39;</span> <span class="o">=&gt;</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;orderby&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;post_date&#39;</span><span class="p">,</span> <span class="s1">&#39;order&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;<span class="caps">ASC</span>&#39;</span><span class="p">,</span> <span class="s1">&#39;post_status&#39;</span> <span class="o">=&gt;</span> <span class="nx">SOURCE_POST_STATUS</span><span class="p">));</span>
+<span class="k">if</span><span class="p">(</span><span class="nb">count</span><span class="p">(</span><span class="nv">$to_post</span><span class="p">)</span> <span class="nx"><span class="caps">ID</span></span><span class="p">;</span>
+<span class="nv">$to_pub_date</span> <span class="o">=</span> <span class="nv">$post</span><span class="o">-&gt;</span><span class="na">post_date</span><span class="p">;</span>
+<span class="nv">$to_pub_title</span> <span class="o">=</span> <span class="nv">$post</span><span class="o">-&gt;</span><span class="na">post_title</span><span class="p">;</span>
+<span class="nv">$now</span> <span class="o">=</span> <span class="nb">time</span><span class="p">();</span>
+<span class="nv">$new_date</span> <span class="o">=</span> <span class="nb">date</span><span class="p">(</span><span class="s2">&quot;Y-m-d H:i:s&quot;</span><span class="p">,</span> <span class="nv">$now</span><span class="p">);</span>
+<span class="nv">$new_date_gmt</span> <span class="o">=</span> <span class="nb">gmdate</span><span class="p">(</span><span class="s2">&quot;Y-m-d H:i:s&quot;</span><span class="p">,</span> <span class="nv">$now</span><span class="p">);</span>
+
+<span class="k">if</span><span class="p">(</span><span class="nv">$<span class="caps">VERBOSE</span></span><span class="p">){</span> <span class="nb">fwrite</span><span class="p">(</span><span class="nx"><span class="caps">STDERR</span></span><span class="p">,</span> <span class="s2">&quot;Post to publish: <span class="caps">ID</span>=</span><span class="si">$to_pub_id</span><span class="s2"> <span class="caps">DATE</span>=</span><span class="si">$to_pub_date</span><span class="s2"> NEW_DATE=</span><span class="si">$new_date</span><span class="s2"> <span class="caps">TITLE</span>=</span><span class="si">$to_pub_title</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">);</span> <span class="p">}</span>
+
+<span class="c1"># actually publish it</span>
+<span class="k">if</span><span class="p">(</span><span class="o">!</span> <span class="nv">$DRY_RUN</span><span class="p">){</span>
+  <span class="nv">$arr</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span><span class="s1">&#39;<span class="caps">ID</span>&#39;</span> <span class="o">=&gt;</span> <span class="nv">$to_pub_id</span><span class="p">,</span> <span class="s1">&#39;post_status&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;publish&#39;</span><span class="p">,</span> <span class="s1">&#39;post_date&#39;</span> <span class="o">=&gt;</span> <span class="nv">$new_date</span><span class="p">,</span> <span class="s1">&#39;post_date_gmt&#39;</span> <span class="o">=&gt;</span> <span class="nv">$new_date_gmt</span><span class="p">);</span>
+  <span class="nv">$ret</span> <span class="o">=</span> <span class="nx">wp_update_post</span><span class="p">(</span><span class="nv">$arr</span><span class="p">);</span> <span class="c1">// publish the post</span>
+  <span class="k">if</span><span class="p">(</span><span class="nv">$ret</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nb">fwrite</span><span class="p">(</span><span class="nx"><span class="caps">STDERR</span></span><span class="p">,</span> <span class="s2">&quot;<span class="caps">ERROR</span>: Post </span><span class="si">$to_pub_id</span><span class="s2"> was not successfully published.&quot;</span><span class="p">);</span>
+    <span class="k">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+  <span class="p">}</span>
+  <span class="k">if</span><span class="p">(</span><span class="nv">$<span class="caps">VERBOSE</span></span><span class="p">){</span> <span class="nb">fwrite</span><span class="p">(</span><span class="nx"><span class="caps">STDERR</span></span><span class="p">,</span> <span class="s2">&quot;Published post. New <span class="caps">ID</span>: </span><span class="si">$ret</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">);</span> <span class="p">}</span>
+<span class="p">}</span>
+<span class="k">else</span> <span class="p">{</span>
+  <span class="nb">fwrite</span><span class="p">(</span><span class="nx"><span class="caps">STDERR</span></span><span class="p">,</span> <span class="s2">&quot;Dry run only, not publishing post.</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="c1"># check that the post really was published</span>
+<span class="nv">$published</span> <span class="o">=</span> <span class="nx">get_posts</span><span class="p">(</span><span class="k">array</span><span class="p">(</span><span class="s1">&#39;numberposts&#39;</span> <span class="o">=&gt;</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;orderby&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;post_date&#39;</span><span class="p">,</span> <span class="s1">&#39;order&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;<span class="caps">DESC</span>&#39;</span><span class="p">,</span> <span class="s1">&#39;post_status&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;publish&#39;</span><span class="p">));</span>
+<span class="nv">$post</span> <span class="o">=</span> <span class="nv">$published</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span>
+<span class="nv">$pub_date</span> <span class="o">=</span> <span class="nv">$post</span><span class="o">-&gt;</span><span class="na">post_date</span><span class="p">;</span>
+<span class="nv">$pub_id</span> <span class="o">=</span> <span class="nv">$post</span><span class="o">-&gt;</span><span class="na"><span class="caps">ID</span></span><span class="p">;</span>
+<span class="nv">$pub_title</span> <span class="o">=</span> <span class="nv">$post</span><span class="o">-&gt;</span><span class="na">post_title</span><span class="p">;</span>
+<span class="nv">$pub_guid</span> <span class="o">=</span> <span class="nv">$post</span><span class="o">-&gt;</span><span class="na">guid</span><span class="p">;</span>
+
+<span class="k">if</span><span class="p">(</span><span class="nv">$pub_title</span> <span class="o">!=</span> <span class="nv">$to_pub_title</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nb">fwrite</span><span class="p">(</span><span class="nx"><span class="caps">STDERR</span></span><span class="p">,</span> <span class="s2">&quot;<span class="caps">ERROR</span>: title of most recent post does not match title of what we wanted to post.&quot;</span><span class="p">);</span>
+  <span class="k">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="nb">fwrite</span><span class="p">(</span><span class="nx"><span class="caps">STDOUT</span></span><span class="p">,</span> <span class="s2">&quot;Published post </span><span class="si">$pub_id</span><span class="s2"> at </span><span class="si">$pub_date</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">);</span>
+<span class="nb">fwrite</span><span class="p">(</span><span class="nx"><span class="caps">STDOUT</span></span><span class="p">,</span> <span class="s2">&quot;Title: </span><span class="si">$pub_title</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">);</span>
+<span class="nb">fwrite</span><span class="p">(</span><span class="nx"><span class="caps">STDOUT</span></span><span class="p">,</span> <span class="s2">&quot;</span><span class="se">\n\n\n</span><span class="s2"> <span class="caps">GUID</span>/Link: </span><span class="si">$pub_guid</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">);</span>
+<span class="nb">fwrite</span><span class="p">(</span><span class="nx"><span class="caps">STDOUT</span></span><span class="p">,</span> <span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="k">__FILE__</span><span class="o">.</span><span class="s2">&quot; on &quot;</span><span class="o">.</span><span class="nx">trim</span><span class="p">(</span><span class="nb">shell_exec</span><span class="p">(</span><span class="s1">&#39;hostname --fqdn&#39;</span><span class="p">))</span><span class="o">.</span><span class="s2">&quot; running as &quot;</span><span class="o">.</span><span class="nb">get_current_user</span><span class="p">()</span><span class="o">.</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">);</span>
+
+<span class="cp">?&gt;</span><span class="x"></span>
+</pre></div>
+
+
+<p>You&#8217;ll need to set <code>WP_LOAD_LOC</code> (line 29) to the full path of your
+Wordpress installation&#8217;s <code>wp-load.php</code> (it should be in the top-level
+directory of your Wordpress installation. I run this script from cron&nbsp;like:</p>
+<div class="codehilite"><pre>0 6 * * 1-5 /home/jantman/bin/wordpress_daily_post.php --verbose # publish WP pending posts daily
+</pre></div>
+
+
+<p>so that it runs at <span class="caps">6AM</span> (local time) each weekday. Assuming you have cron
+setup to send you mail, you&#8217;ll get a daily message saying what was (or
+wasn&#8217;t)&nbsp;done.</p>
+            </div>
+            <!-- /.entry-content -->
+        </article>
+    </section>
+
+        </div>
+        <div class="col-lg-3 well well-sm" id="sidebar">
+
+<aside>
+    <section>
+        <ul class="list-group list-group-flush">
+                <li class="list-group-item"><h4><i class="icon-home icon-large"></i>Social</h4></li>
+                    <li class="list-group-item"><a href="#"><i
+                            class="icon-You can add links in your config file-sign icon-large"></i>You can add links in your config file
+                    </a></li>
+                    <li class="list-group-item"><a href="#"><i
+                            class="icon-Another social link-sign icon-large"></i>Another social link
+                    </a></li>
+
+
+
+                <li class="list-group-item"><a href="/tags.html"><h4><i class="icon-tags icon-large"></i>Tags</h4></a></li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/android.html">
+                                android
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/google.html">
+                                google
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/nagios.html">
+                                Nagios
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/php.html">
+                                PHP
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/sysadmin.html">
+                                sysadmin
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/linux.html">
+                                linux
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/perl.html">
+                                perl
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/logging.html">
+                                logging
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/puppet.html">
+                                puppet
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/bind.html">
+                                bind
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/monitoring.html">
+                                monitoring
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/dns.html">
+                                dns
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/droid.html">
+                                droid
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/firefox.html">
+                                firefox
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/mediawiki.html">
+                                mediawiki
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/mac.html">
+                                mac
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/microsoft.html">
+                                microsoft
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/syslog.html">
+                                syslog
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/wordpress.html">
+                                wordpress
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/rpm.html">
+                                rpm
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/security.html">
+                                security
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/blog.html">
+                                blog
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/sun.html">
+                                sun
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/ems.html">
+                                EMS
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/apache.html">
+                                apache
+                            </a>
+                        </li>
+        </ul>
+    </section>
+</aside>        </div>
+    </div>
+</div>
+<footer>
+    <div class="container">
+        <hr>
+        <p class="pull-right"><i class="icon-arrow-up"></i> <a href="#">Back to top</a></p>
+
+
+        <p>&copy; 2014 Jason Antman &middot; Powered by <a href="https://github.com/DandyDev/pelican-bootstrap3" target="_blank">pelican-bootstrap3</a>,
+            <a href="http://docs.getpelican.com/" target="_blank">Pelican</a>,
+            <a href="http://getbootstrap.com" target="_blank">Bootstrap</a></p>
+    </div>
+</footer>
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="/theme/js/bootstrap.min.js"></script>
+
+<!-- Enable responsive features in IE8 with Respond.js (https://github.com/scottjehl/Respond) -->
+<script src="/theme/js/respond.min.js"></script>
+
+
+</body>
+</html>

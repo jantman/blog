@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:og="http://ogp.me/ns#"
+      xmlns:fb="https://www.facebook.com/2008/fbml">
+<head>
+    <title>Making maps from GIS data with Inkscape</title>
+    <!-- Using the latest rendering mode for IE -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Open Graph tags -->
+
+            <meta property="og:type" content="article"/>
+            <meta property="og:title" content="Making maps from GIS data with Inkscape"/>
+            <meta property="og:url" content="/2009/11/making-maps-from-gis-data-with-inkscape/"/>
+            <meta property="og:description" content="NOTE- I more or less dropped this project, in favor of a more precise approach, as outlined in Using Google Maps to produce usable, printable maps. This is being left just to give other people ideas. Background I was recently asked by one of the officers of our volunteer fire ..."/>
+
+    <!-- Bootstrap -->
+        <link rel="stylesheet" href="/theme/css/bootstrap.min.css" type="text/css"/>
+    <link href="/theme/css/font-awesome.min.css" rel="stylesheet">
+    <link href="/theme/css/pygments.css" rel="stylesheet">
+        <link href="/theme/css/typogrify.css" rel="stylesheet">
+    <link rel="stylesheet" href="/theme/css/style.css" type="text/css"/>
+    <!-- JavaScript plugins (requires jQuery) -->
+    <script src="http://code.jquery.com/jquery.js"></script>
+
+        <link href="/feeds/all.atom.xml" type="application/atom+xml" rel="alternate"
+              title="Jason Antman's Blog ATOM Feed"/>
+
+</head>
+<body>
+<nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="" class="navbar-brand">Jason Antman's Blog</a>
+        </div>
+        <div class="collapse navbar-collapse navbar-ex1-collapse">
+            <ul class="nav navbar-nav">
+                         <li><a href="/pages/about.html">
+                             About
+                          </a></li>
+                        <li >
+                            <a href="/category/ideas-and-rants.html">Ideas and rants</a>
+                        </li>
+                        <li >
+                            <a href="/category/miscellaneous.html">Miscellaneous</a>
+                        </li>
+                        <li >
+                            <a href="/category/monitoring.html">Monitoring</a>
+                        </li>
+                        <li >
+                            <a href="/category/projects.html">Projects</a>
+                        </li>
+                        <li >
+                            <a href="/category/puppet.html">Puppet</a>
+                        </li>
+                        <li >
+                            <a href="/category/sysadmin.html">Sysadmin</a>
+                        </li>
+                        <li class="active">
+                            <a href="/category/tech-howtos.html">Tech howtos</a>
+                        </li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="/archives.html"><i class="icon-th-list"></i>Archives</a></li>
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+</nav>
+<!-- /.navbar -->
+<div class="container">
+    <div class="row">
+        <div class="col-lg-9">
+    <section id="content">
+        <article>
+            <header class="page-header">
+                <h1>
+                    <a href="/2009/11/making-maps-from-gis-data-with-inkscape/"
+                       rel="bookmark"
+                       title="Permalink to Making maps from GIS data with Inkscape">
+                        Making maps from <span class="caps">GIS</span> data with&nbsp;Inkscape
+                    </a>
+                </h1>
+            </header>
+            <div class="entry-content">
+                <div class="panel">
+                    <div class="panel-body">
+<footer class="post-info">
+    <span class="label label-default">Date</span>
+    <span class="published">
+        <i class="icon-calendar"></i>Wed 25 November 2009
+    </span>
+
+
+
+<span class="label label-default">Tags</span>
+	<a href="/tag/gis.html">gis</a>
+        /
+	<a href="/tag/inkscape.html">inkscape</a>
+        /
+	<a href="/tag/map.html">map</a>
+        /
+	<a href="/tag/shapefile.html">shapefile</a>
+        /
+	<a href="/tag/svg.html">svg</a>
+</footer><!-- /.post-info -->                    </div>
+                </div>
+                <p><strong><span class="caps">NOTE</span>-</strong> I more or less dropped this project, in favor of a more
+precise approach, as outlined in <a href="http://blog.jasonantman.com/2009/12/using-google-maps-to-produce-usable-printable-maps/">Using Google Maps to produce usable,
+printable maps</a>. This is being left just to give other people&nbsp;ideas.</p>
+<p><strong>Background</strong></p>
+<p>I was recently asked by one of the officers of our volunteer <a href="http://www.mpnj.com/mp_fd.asp">fire
+department</a> if I could come up with a good map of our town that could
+be laminated and put in the trucks. We currently have a really simple
+<a href="http://www.mpnj.com/forms/TownMap.pdf"><span class="caps">PDF</span> map</a> of our town, but it was done by a for-profit entity and is
+only available as the single-size <span class="caps">PDF</span>. The map itself looks&nbsp;like:</p>
+<p><img alt="town map" src="GFX/TownMap.png" /></p>
+<p><strong>Data</strong></p>
+<p>With a little research, I was able to find quite a lot of <span class="caps">GIS</span> data on
+the <a href="http://www.state.nj.us/dep/gis/"><span class="caps">NJ</span> Department of Environmental Protection <span class="caps">GIS</span> site</a>. While the
+<span class="caps">GIS</span> viewer software by <a href="http://www.esri.com"><span class="caps">ESRI</span></a> seems to be the usual choice, I found
+that the <span class="caps">GPL</span>&#8217;ed <a href="http://www.qgis.org/">Quantum <span class="caps">GIS</span></a> project (available in the OpenSuSE
+<a href="http://download.opensuse.org/repositories/Application:/Geo/">Application:Geo</a> repository) displayed the data quite nicely. The
+only major issue was with street names - there was no way to label lines
+with two fields from the metadata (the <span class="caps">TIGER</span>/Line files have separate
+fields for the street name and the st/rd/ln suffix). More importantly, I
+needed something that both looked nice and included overlays
+(specifically of the fire department&#8217;s hydrant&nbsp;map).</p>
+<p><strong><span class="caps">SVG</span></strong></p>
+<p>A little research led me to the <a href="http://wiki.github.com/kbh3rd/shptosvg">shptosvg</a> perl script that converts a
+shapefile to <span class="caps">SVG</span>. As the streets within our town won&#8217;t change any time
+soon, I figured it was the most logical solution, when producing a map
+for print where I would need to re-scale and edit overlay layers - to
+just get the data I needed into <span class="caps">SVG</span> and do the rest there. I was able to
+export both the county roads shapefile and the state municipal
+boundaries shapefile to an <span class="caps">SVG</span> drawing, and then open that in
+<a href="http://www.inkscape.org/">Inkscape</a>. To export them, I&nbsp;used:</p>
+<div class="codehilite"><pre>perl shptosvg.pl -x3300 -y5100 -p1 -d0.5 berrds00.shp muni_boundaries/nj_munis.shp &gt; test2.svg
+</pre></div>
+
+
+<p>where berrds00.shp is the <span class="caps">TIGER</span>/Line roads shapefile for our county
+(from the 2000 census) and muni_boundaries/nj_munis.shp is the
+shapefile for the <span class="caps">NJ</span> municipal boundaries. The x and y sizes (3300px and
+5100px, respectively) were based on an 11x17&#8221; sheet printed at&nbsp;300dpi.</p>
+<p><strong>Initial&nbsp;Work</strong></p>
+<p>The initial work was a real pain. I moved each group of objects (the
+municipal boundaries and the county road lines) to a separate layer and
+then ungrouped them. Next, I began the painstaking process of deleting
+all of the objects outside of our town boundary, except the roads
+directly around our town. Once this was done, I used File -> Document
+Properties -> Fit to Page Selection to &#8220;crop&#8221; the canvas to the
+remaining objects. Thanks to the nature of <strong>S</strong><span class="caps">VG</span>, I was able to crop
+the page down and then scale it up again to 11x17&#8221; without any loss of
+data or quality. I then moved the roads outside of our town (luckily,
+most of the roads from the <span class="caps">TIGER</span> data ended up being made up of a series
+of line segments, with most of them having a break at the town boundary)
+to another layer, so that they could be easily given a light gray color.
+I also gave the down boundary a nice red color. Finally, as I neglected
+to include a railroad shapefile when I did the original conversion to
+<span class="caps">SVG</span>, and adding one would obviously not jive with the massive deletion
+and re-scaling I&#8217;d done, I drew in the one railroad line running through
+town by hand, and gave it a nice dashed line&nbsp;type.</p>
+<p>At this point, I ended up with something that looked&nbsp;like:</p>
+<p><img alt="inkscape work version 1" src="GFX/inkscape.png" /></p>
+<p><strong>Cleaning&nbsp;Up</strong></p>
+<p>I now had the following tasks to&nbsp;perform:</p>
+<ol>
+<li>Find a nicer way to show the street lines. The ideal would be a line
+    made up of 1-2px lines on either side, with a white center. Second
+    best would just be thinner&nbsp;lines.</li>
+<li>Cleanup the roads around the town boundary - make sure they&#8217;re black
+    within the town and gray outside. If need be. delete some lines and
+    re-draw them to split at the town&nbsp;boundary.</li>
+<li>Add labels for the bordering&nbsp;towns.</li>
+<li>The big one - add street name&nbsp;labels.</li>
+<li>Perhaps add in icons/labels/boxes for churches, schools, municipal
+    buildings,&nbsp;etc.</li>
+<li>Add in, once I get a copy of the map, the fire department hydrant
+    locations as another&nbsp;layer.</li>
+</ol>
+<p>And the added bonuses that I&#8217;d like to&nbsp;do:</p>
+<ol>
+<li>Add house numbering on a block level for each&nbsp;street.</li>
+<li>Add a grid overlay, with an index of streets by grid square on the&nbsp;back.</li>
+</ol>
+<p>As of right now (about <span class="caps">9AM</span> on November 25, 2009) this is where I stand.
+I&#8217;ll update a bit more when I get farther&nbsp;along.</p>
+            </div>
+            <!-- /.entry-content -->
+        </article>
+    </section>
+
+        </div>
+        <div class="col-lg-3 well well-sm" id="sidebar">
+
+<aside>
+    <section>
+        <ul class="list-group list-group-flush">
+                <li class="list-group-item"><h4><i class="icon-home icon-large"></i>Social</h4></li>
+                    <li class="list-group-item"><a href="#"><i
+                            class="icon-You can add links in your config file-sign icon-large"></i>You can add links in your config file
+                    </a></li>
+                    <li class="list-group-item"><a href="#"><i
+                            class="icon-Another social link-sign icon-large"></i>Another social link
+                    </a></li>
+
+
+
+                <li class="list-group-item"><a href="/tags.html"><h4><i class="icon-tags icon-large"></i>Tags</h4></a></li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/android.html">
+                                android
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/google.html">
+                                google
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/nagios.html">
+                                Nagios
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/php.html">
+                                PHP
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/sysadmin.html">
+                                sysadmin
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/linux.html">
+                                linux
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/perl.html">
+                                perl
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/logging.html">
+                                logging
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/puppet.html">
+                                puppet
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/bind.html">
+                                bind
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/monitoring.html">
+                                monitoring
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/dns.html">
+                                dns
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/droid.html">
+                                droid
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/firefox.html">
+                                firefox
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/mediawiki.html">
+                                mediawiki
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/mac.html">
+                                mac
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/microsoft.html">
+                                microsoft
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/syslog.html">
+                                syslog
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/wordpress.html">
+                                wordpress
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/rpm.html">
+                                rpm
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/security.html">
+                                security
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/blog.html">
+                                blog
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/sun.html">
+                                sun
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/ems.html">
+                                EMS
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/apache.html">
+                                apache
+                            </a>
+                        </li>
+        </ul>
+    </section>
+</aside>        </div>
+    </div>
+</div>
+<footer>
+    <div class="container">
+        <hr>
+        <p class="pull-right"><i class="icon-arrow-up"></i> <a href="#">Back to top</a></p>
+
+
+        <p>&copy; 2014 Jason Antman &middot; Powered by <a href="https://github.com/DandyDev/pelican-bootstrap3" target="_blank">pelican-bootstrap3</a>,
+            <a href="http://docs.getpelican.com/" target="_blank">Pelican</a>,
+            <a href="http://getbootstrap.com" target="_blank">Bootstrap</a></p>
+    </div>
+</footer>
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="/theme/js/bootstrap.min.js"></script>
+
+<!-- Enable responsive features in IE8 with Respond.js (https://github.com/scottjehl/Respond) -->
+<script src="/theme/js/respond.min.js"></script>
+
+
+</body>
+</html>

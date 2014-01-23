@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:og="http://ogp.me/ns#"
+      xmlns:fb="https://www.facebook.com/2008/fbml">
+<head>
+    <title>Planning Migration from WordPress to Static Site</title>
+    <!-- Using the latest rendering mode for IE -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Open Graph tags -->
+
+            <meta property="og:type" content="article"/>
+            <meta property="og:title" content="Planning Migration from WordPress to Static Site"/>
+            <meta property="og:url" content="/2014/01/planning-migration-from-wordpress-to-static-site/"/>
+            <meta property="og:description" content="Right now, this blog, my email, and a whole bunch of other services are hosted on a Linode Xen VM. I don’t really keep up to date with administration and upgrades the way I used to, and honestly, I’d rather spend my time working on other things (like ..."/>
+
+    <!-- Bootstrap -->
+        <link rel="stylesheet" href="/theme/css/bootstrap.min.css" type="text/css"/>
+    <link href="/theme/css/font-awesome.min.css" rel="stylesheet">
+    <link href="/theme/css/pygments.css" rel="stylesheet">
+        <link href="/theme/css/typogrify.css" rel="stylesheet">
+    <link rel="stylesheet" href="/theme/css/style.css" type="text/css"/>
+    <!-- JavaScript plugins (requires jQuery) -->
+    <script src="http://code.jquery.com/jquery.js"></script>
+
+        <link href="/feeds/all.atom.xml" type="application/atom+xml" rel="alternate"
+              title="Jason Antman's Blog ATOM Feed"/>
+
+</head>
+<body>
+<nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="" class="navbar-brand">Jason Antman's Blog</a>
+        </div>
+        <div class="collapse navbar-collapse navbar-ex1-collapse">
+            <ul class="nav navbar-nav">
+                         <li><a href="/pages/about.html">
+                             About
+                          </a></li>
+                        <li >
+                            <a href="/category/ideas-and-rants.html">Ideas and rants</a>
+                        </li>
+                        <li class="active">
+                            <a href="/category/miscellaneous.html">Miscellaneous</a>
+                        </li>
+                        <li >
+                            <a href="/category/monitoring.html">Monitoring</a>
+                        </li>
+                        <li >
+                            <a href="/category/projects.html">Projects</a>
+                        </li>
+                        <li >
+                            <a href="/category/puppet.html">Puppet</a>
+                        </li>
+                        <li >
+                            <a href="/category/sysadmin.html">Sysadmin</a>
+                        </li>
+                        <li >
+                            <a href="/category/tech-howtos.html">Tech howtos</a>
+                        </li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="/archives.html"><i class="icon-th-list"></i>Archives</a></li>
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+</nav>
+<!-- /.navbar -->
+<div class="container">
+    <div class="row">
+        <div class="col-lg-9">
+    <section id="content">
+        <article>
+            <header class="page-header">
+                <h1>
+                    <a href="/2014/01/planning-migration-from-wordpress-to-static-site/"
+                       rel="bookmark"
+                       title="Permalink to Planning Migration from WordPress to Static Site">
+                        Planning Migration from WordPress to Static&nbsp;Site
+                    </a>
+                </h1>
+            </header>
+            <div class="entry-content">
+                <div class="panel">
+                    <div class="panel-body">
+<footer class="post-info">
+    <span class="label label-default">Date</span>
+    <span class="published">
+        <i class="icon-calendar"></i>Wed 01 January 2014
+    </span>
+
+
+
+<span class="label label-default">Tags</span>
+	<a href="/tag/blog.html">blog</a>
+        /
+	<a href="/tag/jekyll.html">jekyll</a>
+        /
+	<a href="/tag/pelican.html">pelican</a>
+        /
+	<a href="/tag/python.html">python</a>
+        /
+	<a href="/tag/static-site.html">static site</a>
+        /
+	<a href="/tag/wordpress.html">wordpress</a>
+</footer><!-- /.post-info -->                    </div>
+                </div>
+                <p>Right now, this blog, my email, and a whole bunch of other services are
+hosted on a <a href="http://linode.com">Linode</a> Xen <span class="caps">VM</span>. I don&#8217;t really keep up to date with
+administration and upgrades the way I used to, and honestly, I&#8217;d rather
+spend my time working on other things (like actually writing all of the
+blog posts that I&#8217;ve been planning to. The first thing I&#8217;ve identified
+for migration is this blog itself. It&#8217;s currently on WordPress and,
+frankly, I don&#8217;t either need nor like it. But there are some features I
+like. I&#8217;d like to end up with a static site generator, hosted from
+either S3 or GitHub Pages. I know that means I&#8217;ll lost comments (unless
+I move to a third-party, <span class="caps">JS</span>-based comment system like <a href="http://disqus.com/">Disqus</a>, which
+means I&#8217;ll lose <em>control</em> over my comments) but I suppose I can live
+with that. What I really want is something simple, static, cheap or free
+(that I&#8217;ll likely put behind a small ec2 instance running nginx for&nbsp;redirects/rewrites).</p>
+<p>I&#8217;m still in the planning phase, and trying to come up with a
+feature-by-feature comparison of my options. I&#8217;ll likely post that when
+I finally have it done (at the moment it&#8217;s in a very rough <a href="https://docs.google.com/spreadsheet/ccc?key=0AnHh-ye5DNiNdF9DWkJrT2kzSkNsNVp6cjMzLXJ6VEE&amp;usp=sharing">Google Docs
+spreadsheet</a>). I&#8217;m trying to round up my static site generator options
+and see which ones will do most, if not all, of what I want (though I
+still haven&#8217;t discounted using hosted wordpress if it comes down to it).
+Here are the features I currently &#8220;use&#8221; (have) on my WordPress&nbsp;blog:</p>
+<ul>
+<li>User-defined permalinks to&nbsp;posts</li>
+<li>Overall <span class="caps">RSS</span> feed of blog (currently powered by FeedBurner) and of&nbsp;comments)</li>
+<li>Categories (a post can be in multiple&nbsp;categories)</li>
+<li>Tags</li>
+<li>Category and Tag&nbsp;pages</li>
+<li>per-Category and per-Tag feeds&nbsp;(<span class="caps">RSS</span>)</li>
+<li>Tag cloud &#8220;widget&#8221; in&nbsp;sidebar</li>
+<li>Themes. I actually like my current <span class="caps">WP</span>&nbsp;theme&#8230;</li>
+<li>Visitor statistics (currently self-hosted <a href="http://piwik.org/">Piwik</a>, formerly Google&nbsp;Analytics)</li>
+<li>Post publishing via cron&#8217;ed script (<em>see below</em>)</li>
+<li>Draft/Pending status (i.e. let me save a partial post, and let me
+    save a complete post but mark it &#8220;pending&#8221; so I can just publish it&nbsp;later)</li>
+<li>Commenting (this will probably be the big sticking&nbsp;point)</li>
+<li>Syntax&nbsp;hilighting</li>
+<li>As &#8220;weird&#8221; as this is, I write all my posts in raw <span class="caps">HTML</span>, and am
+    perfectly happy doing&nbsp;that.</li>
+<li><span class="dquo">&#8220;</span>Subscribe via Email&#8221; FeedBurner&nbsp;widget</li>
+<li><span class="caps">XML</span>&nbsp;Sitemap</li>
+<li>Twitter&nbsp;box/widget</li>
+<li>Pingbacks (not that these are really useful for anything other than
+    spam these&nbsp;days)</li>
+<li>Automatic or manual post excerpts for feeds,&nbsp;etc.</li>
+<li>Remote publishing via <span class="caps">XML</span>-<span class="caps">RPC</span>/Android app (not that I&#8217;ve used it
+    more than once or&nbsp;twice)</li>
+<li>Advertising - I currently use Google AdSense on my blog. The revenue
+    from my tiny hit count isn&#8217;t enough to offset the cost of a Linode,
+    but if I moved to a much less expensive hosting service, it might be
+    worth considering (you can&#8217;t run ads on the free hosted WordPress,
+    and I doubt you can on GitHub Pages&nbsp;either).</li>
+</ul>
+<p>I should be updating this post when I do some more research and have a
+comparison of the&nbsp;options.</p>
+<p>Note on &#8220;Post publishing via cron&#8217;ed script&#8221; - sometimes I sit down and
+write half a dozen or so blog posts at a time. But I don&#8217;t want them all
+to show up immediately, and spam the few people who still use <span class="caps">RSS</span>
+readers after the death of Google Reader. So I set the posts to
+&#8220;Pending&#8221; status, and I have a cron&#8217;ed script that runs every weekday
+morning and publishes the one oldest &#8220;pending&#8221; post. Who knows if this
+actually does any good or&nbsp;not&#8230;</p>
+            </div>
+            <!-- /.entry-content -->
+        </article>
+    </section>
+
+        </div>
+        <div class="col-lg-3 well well-sm" id="sidebar">
+
+<aside>
+    <section>
+        <ul class="list-group list-group-flush">
+                <li class="list-group-item"><h4><i class="icon-home icon-large"></i>Social</h4></li>
+                    <li class="list-group-item"><a href="#"><i
+                            class="icon-You can add links in your config file-sign icon-large"></i>You can add links in your config file
+                    </a></li>
+                    <li class="list-group-item"><a href="#"><i
+                            class="icon-Another social link-sign icon-large"></i>Another social link
+                    </a></li>
+
+
+
+                <li class="list-group-item"><a href="/tags.html"><h4><i class="icon-tags icon-large"></i>Tags</h4></a></li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/android.html">
+                                android
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/google.html">
+                                google
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/nagios.html">
+                                Nagios
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/php.html">
+                                PHP
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/sysadmin.html">
+                                sysadmin
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/linux.html">
+                                linux
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/perl.html">
+                                perl
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/logging.html">
+                                logging
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/puppet.html">
+                                puppet
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/bind.html">
+                                bind
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/monitoring.html">
+                                monitoring
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/dns.html">
+                                dns
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/droid.html">
+                                droid
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/firefox.html">
+                                firefox
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/mediawiki.html">
+                                mediawiki
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/mac.html">
+                                mac
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/microsoft.html">
+                                microsoft
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/syslog.html">
+                                syslog
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/wordpress.html">
+                                wordpress
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/rpm.html">
+                                rpm
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/security.html">
+                                security
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/blog.html">
+                                blog
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/sun.html">
+                                sun
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/ems.html">
+                                EMS
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/apache.html">
+                                apache
+                            </a>
+                        </li>
+        </ul>
+    </section>
+</aside>        </div>
+    </div>
+</div>
+<footer>
+    <div class="container">
+        <hr>
+        <p class="pull-right"><i class="icon-arrow-up"></i> <a href="#">Back to top</a></p>
+
+
+        <p>&copy; 2014 Jason Antman &middot; Powered by <a href="https://github.com/DandyDev/pelican-bootstrap3" target="_blank">pelican-bootstrap3</a>,
+            <a href="http://docs.getpelican.com/" target="_blank">Pelican</a>,
+            <a href="http://getbootstrap.com" target="_blank">Bootstrap</a></p>
+    </div>
+</footer>
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="/theme/js/bootstrap.min.js"></script>
+
+<!-- Enable responsive features in IE8 with Respond.js (https://github.com/scottjehl/Respond) -->
+<script src="/theme/js/respond.min.js"></script>
+
+
+</body>
+</html>

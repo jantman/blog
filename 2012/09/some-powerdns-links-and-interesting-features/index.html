@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:og="http://ogp.me/ns#"
+      xmlns:fb="https://www.facebook.com/2008/fbml">
+<head>
+    <title>Some PowerDNS Links and Interesting Features</title>
+    <!-- Using the latest rendering mode for IE -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Open Graph tags -->
+
+            <meta property="og:type" content="article"/>
+            <meta property="og:title" content="Some PowerDNS Links and Interesting Features"/>
+            <meta property="og:url" content="/2012/09/some-powerdns-links-and-interesting-features/"/>
+            <meta property="og:description" content="At $WORK we lost a disk in the RAID1 of one of our external nameservers, and it rekindled an occasional discussion of migration from ISC BIND to PowerDNS. PowerDNS has separate authoritative and recursive servers, and doesn’t seem to natively support views or split-horizon the way BIND does, but ..."/>
+
+    <!-- Bootstrap -->
+        <link rel="stylesheet" href="/theme/css/bootstrap.min.css" type="text/css"/>
+    <link href="/theme/css/font-awesome.min.css" rel="stylesheet">
+    <link href="/theme/css/pygments.css" rel="stylesheet">
+        <link href="/theme/css/typogrify.css" rel="stylesheet">
+    <link rel="stylesheet" href="/theme/css/style.css" type="text/css"/>
+    <!-- JavaScript plugins (requires jQuery) -->
+    <script src="http://code.jquery.com/jquery.js"></script>
+
+        <link href="/feeds/all.atom.xml" type="application/atom+xml" rel="alternate"
+              title="Jason Antman's Blog ATOM Feed"/>
+
+</head>
+<body>
+<nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="" class="navbar-brand">Jason Antman's Blog</a>
+        </div>
+        <div class="collapse navbar-collapse navbar-ex1-collapse">
+            <ul class="nav navbar-nav">
+                         <li><a href="/pages/about.html">
+                             About
+                          </a></li>
+                        <li >
+                            <a href="/category/ideas-and-rants.html">Ideas and rants</a>
+                        </li>
+                        <li >
+                            <a href="/category/miscellaneous.html">Miscellaneous</a>
+                        </li>
+                        <li >
+                            <a href="/category/monitoring.html">Monitoring</a>
+                        </li>
+                        <li >
+                            <a href="/category/projects.html">Projects</a>
+                        </li>
+                        <li >
+                            <a href="/category/puppet.html">Puppet</a>
+                        </li>
+                        <li class="active">
+                            <a href="/category/sysadmin.html">Sysadmin</a>
+                        </li>
+                        <li >
+                            <a href="/category/tech-howtos.html">Tech howtos</a>
+                        </li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="/archives.html"><i class="icon-th-list"></i>Archives</a></li>
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+</nav>
+<!-- /.navbar -->
+<div class="container">
+    <div class="row">
+        <div class="col-lg-9">
+    <section id="content">
+        <article>
+            <header class="page-header">
+                <h1>
+                    <a href="/2012/09/some-powerdns-links-and-interesting-features/"
+                       rel="bookmark"
+                       title="Permalink to Some PowerDNS Links and Interesting Features">
+                        Some PowerDNS Links and Interesting&nbsp;Features
+                    </a>
+                </h1>
+            </header>
+            <div class="entry-content">
+                <div class="panel">
+                    <div class="panel-body">
+<footer class="post-info">
+    <span class="label label-default">Date</span>
+    <span class="published">
+        <i class="icon-calendar"></i>Wed 05 September 2012
+    </span>
+
+
+
+<span class="label label-default">Tags</span>
+	<a href="/tag/bind.html">bind</a>
+        /
+	<a href="/tag/dns.html">dns</a>
+        /
+	<a href="/tag/multibindadmin.html">multibindadmin</a>
+        /
+	<a href="/tag/powerdns.html">powerdns</a>
+</footer><!-- /.post-info -->                    </div>
+                </div>
+                <p>At $<span class="caps">WORK</span> we lost a disk in the <span class="caps">RAID1</span> of one of our external nameservers,
+and it rekindled an occasional discussion of migration from <a><span class="caps">ISC</span>
+<span class="caps">BIND</span></a> to <a href="http://powerdns.com/content/products.html">PowerDNS</a>. PowerDNS has separate authoritative and
+recursive servers, and doesn&#8217;t seem to natively support views or
+split-horizon the way <span class="caps">BIND</span> does, but it has some really cool features
+including very mature database backends, load balancing, Lua scripting
+support to modify how recursive queries are answered, and geolocation or
+<span class="caps">IP</span>-range based query&nbsp;results.</p>
+<p>While this project is still just casual research, I thought I&#8217;d share
+some of the useful links and information I&#8217;ve&nbsp;found:</p>
+<p>PowerDNS&nbsp;Front-ends:</p>
+<ul>
+<li><a href="http://www.nicmus.com/community.html">JPowerAdmin</a> - One of the two most popular, a GPLv3 Java (JBoss
+    <span class="caps">SEAM</span>) based web <span class="caps">UI</span> with a RESTful <span class="caps">API</span>, with support for &#8220;multiple&#8221;
+    database backends. Sponsored by Nicmus, Inc. <a href="http://www.nicmus.com/JPowerAdmin">Online demo</a>
+    (demo:demo). Looks nice, simple <span class="caps">UI</span>, but no support for&nbsp;split-horizon.</li>
+<li><a href="https://www.poweradmin.org">PowerAdmin</a> - the other most popular, though it seems to be
+    undergoing a large overhaul at the moment. Has full support for most
+    of PowerDNS&#8217;s features, written in <span class="caps">PHP</span>, supports &#8220;large&#8221; databases,
+    fine-grained user permissions, <span class="caps">RFC</span> validation, zone templates.
+    <a href="http://demo.poweradmin.org/">Online demo</a> (demo:demo). I don&#8217;t really like that it manages
+    the SOAs as full text (without any templating, dropdowns or default
+    values), and that it doesn&#8217;t prepopulate default values for <span class="caps">TTL</span> in
+    the new record form, but it looks like a good starting place for
+    someone (like me) who&#8217;s handy with&nbsp;<span class="caps">PHP</span>.</li>
+<li><a href="http://code.google.com/p/pdns-gui/">pdns-gui - PowerDNS <span class="caps">GUI</span> - Google Project Hosting</a> - <span class="caps">PHP</span>/MySQL
+    <span class="caps">GUI</span>. <a href="http://www.powerdns-gui.org/">Online demo</a>. Handles templates nicely but won&#8217;t scale to
+    too many of them. Window-based <span class="caps">UI</span> is visually pleasing but will
+    probably be a problem for big&nbsp;zones.</li>
+<li>[powerdns-webinterface - PowerDNS Webinterface - Google Project
+    Hosting][] - A nice but relatively simplistic <span class="caps">UI</span> written in <span class="caps">PHP</span>. It
+    has some nice features like multi-user authentication (and logging,
+    though I haven&#8217;t looked into how detailed it is), automatic <span class="caps">SOA</span>
+    serial update, automatic <span class="caps">PTR</span> creation, etc. Unfortunately not geared
+    towards people with lots of domains and multiple records; it has
+    only one template for new domains (and no way to update domains
+    created from a template), no easy filtering, and still treats <span class="caps">SOA</span>
+    like a single text&nbsp;record.</li>
+<li><a href="http://sourceforge.net/projects/zoneadmin/">ZoneAdmin | SourceForge.net</a> and <a>Project website</a> - Maybe
+    not the fastest tool to use in bulk, but a nice, relatively
+    intuitive and full-featured admin tool. <a href="http://open.megabit.net/demos/ZoneAdmin/">Online demo</a>&nbsp;(demo:demo).</li>
+</ul>
+<p>Some links on PowerDNS&nbsp;split-horizon</p>
+<ul>
+<li><a href="http://old.nabble.com/Split-Horizon-Scripts-td32843045.html">Old Nabble - PowerDNS - Split Horizon&nbsp;Scripts</a></li>
+</ul>
+<p>It looks to me that split-horizon is going to be the hardest part for
+us, at least to also have a web <span class="caps">UI</span> to manage it. It looks like with
+PowerDNS, the most common way to run split horizon <span class="caps">DNS</span> (views) is to run
+two separate sets of servers or instances, either on different boxes or
+multi-homed; one for internal and one for external. While that sounds
+like quite a bit of overhead beyond what <span class="caps">BIND</span> does, the real problem is
+finding a web <span class="caps">UI</span> that supports it; I don&#8217;t care if it&#8217;s in two separate
+databases, but what I want is a logical (web <span class="caps">UI</span>) view that has zones
+made up of resource names (i.e. the leftmost column in a zone file) with
+one or two RRs (type, ttl, priority, value) - one for each view. That&#8217;s
+the real catch - all of our machines are in private <span class="caps">IP</span> space behind a
+firewall, so I need to be able to manage the internal and external
+records on one screen. While it&#8217;s not exactly scalable, and the code
+stagnated quite a bit once I got it to a point that was usable for me,
+this was the main goal of my <a href="http://multibindadmin.jasonantman.com/">MultiBIND Admin</a>&nbsp;project.</p>
+<p>[powerdns-webinterface - PowerDNS Webinterface - Google Project
+  Hosting]:&nbsp;http://code.google.com/p/powerdns-webinterface/</p>
+            </div>
+            <!-- /.entry-content -->
+        </article>
+    </section>
+
+        </div>
+        <div class="col-lg-3 well well-sm" id="sidebar">
+
+<aside>
+    <section>
+        <ul class="list-group list-group-flush">
+                <li class="list-group-item"><h4><i class="icon-home icon-large"></i>Social</h4></li>
+                    <li class="list-group-item"><a href="#"><i
+                            class="icon-You can add links in your config file-sign icon-large"></i>You can add links in your config file
+                    </a></li>
+                    <li class="list-group-item"><a href="#"><i
+                            class="icon-Another social link-sign icon-large"></i>Another social link
+                    </a></li>
+
+
+
+                <li class="list-group-item"><a href="/tags.html"><h4><i class="icon-tags icon-large"></i>Tags</h4></a></li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/android.html">
+                                android
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/google.html">
+                                google
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/nagios.html">
+                                Nagios
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/php.html">
+                                PHP
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/sysadmin.html">
+                                sysadmin
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/linux.html">
+                                linux
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/perl.html">
+                                perl
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/logging.html">
+                                logging
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/puppet.html">
+                                puppet
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/bind.html">
+                                bind
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/monitoring.html">
+                                monitoring
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/dns.html">
+                                dns
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/droid.html">
+                                droid
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/firefox.html">
+                                firefox
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/mediawiki.html">
+                                mediawiki
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/mac.html">
+                                mac
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/microsoft.html">
+                                microsoft
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/syslog.html">
+                                syslog
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/wordpress.html">
+                                wordpress
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/rpm.html">
+                                rpm
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/security.html">
+                                security
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/blog.html">
+                                blog
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/sun.html">
+                                sun
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/ems.html">
+                                EMS
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/apache.html">
+                                apache
+                            </a>
+                        </li>
+        </ul>
+    </section>
+</aside>        </div>
+    </div>
+</div>
+<footer>
+    <div class="container">
+        <hr>
+        <p class="pull-right"><i class="icon-arrow-up"></i> <a href="#">Back to top</a></p>
+
+
+        <p>&copy; 2014 Jason Antman &middot; Powered by <a href="https://github.com/DandyDev/pelican-bootstrap3" target="_blank">pelican-bootstrap3</a>,
+            <a href="http://docs.getpelican.com/" target="_blank">Pelican</a>,
+            <a href="http://getbootstrap.com" target="_blank">Bootstrap</a></p>
+    </div>
+</footer>
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="/theme/js/bootstrap.min.js"></script>
+
+<!-- Enable responsive features in IE8 with Respond.js (https://github.com/scottjehl/Respond) -->
+<script src="/theme/js/respond.min.js"></script>
+
+
+</body>
+</html>

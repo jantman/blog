@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:og="http://ogp.me/ns#"
+      xmlns:fb="https://www.facebook.com/2008/fbml">
+<head>
+    <title>DHCP Debugging and Handy TCPdump filters</title>
+    <!-- Using the latest rendering mode for IE -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Open Graph tags -->
+
+            <meta property="og:type" content="article"/>
+            <meta property="og:title" content="DHCP Debugging and Handy TCPdump filters"/>
+            <meta property="og:url" content="/2010/04/dhcp-debugging-and-handy-tcpdump-filters/"/>
+            <meta property="og:description" content="Recently at $WORK we’ve been having some strange issues with a particular Xen VM not getting DHCP. Traditional (tail -f dhcpd.log) debugging hasn’t turned up much, other than the server is getting the DISCOVER but not sending out an OFFER. I’ve turned to packet captures to ..."/>
+
+    <!-- Bootstrap -->
+        <link rel="stylesheet" href="/theme/css/bootstrap.min.css" type="text/css"/>
+    <link href="/theme/css/font-awesome.min.css" rel="stylesheet">
+    <link href="/theme/css/pygments.css" rel="stylesheet">
+        <link href="/theme/css/typogrify.css" rel="stylesheet">
+    <link rel="stylesheet" href="/theme/css/style.css" type="text/css"/>
+    <!-- JavaScript plugins (requires jQuery) -->
+    <script src="http://code.jquery.com/jquery.js"></script>
+
+        <link href="/feeds/all.atom.xml" type="application/atom+xml" rel="alternate"
+              title="Jason Antman's Blog ATOM Feed"/>
+
+</head>
+<body>
+<nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="" class="navbar-brand">Jason Antman's Blog</a>
+        </div>
+        <div class="collapse navbar-collapse navbar-ex1-collapse">
+            <ul class="nav navbar-nav">
+                         <li><a href="/pages/about.html">
+                             About
+                          </a></li>
+                        <li >
+                            <a href="/category/ideas-and-rants.html">Ideas and rants</a>
+                        </li>
+                        <li >
+                            <a href="/category/miscellaneous.html">Miscellaneous</a>
+                        </li>
+                        <li >
+                            <a href="/category/monitoring.html">Monitoring</a>
+                        </li>
+                        <li >
+                            <a href="/category/projects.html">Projects</a>
+                        </li>
+                        <li >
+                            <a href="/category/puppet.html">Puppet</a>
+                        </li>
+                        <li >
+                            <a href="/category/sysadmin.html">Sysadmin</a>
+                        </li>
+                        <li class="active">
+                            <a href="/category/tech-howtos.html">Tech howtos</a>
+                        </li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="/archives.html"><i class="icon-th-list"></i>Archives</a></li>
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+</nav>
+<!-- /.navbar -->
+<div class="container">
+    <div class="row">
+        <div class="col-lg-9">
+    <section id="content">
+        <article>
+            <header class="page-header">
+                <h1>
+                    <a href="/2010/04/dhcp-debugging-and-handy-tcpdump-filters/"
+                       rel="bookmark"
+                       title="Permalink to DHCP Debugging and Handy TCPdump filters">
+                        <span class="caps">DHCP</span> Debugging and Handy TCPdump&nbsp;filters
+                    </a>
+                </h1>
+            </header>
+            <div class="entry-content">
+                <div class="panel">
+                    <div class="panel-body">
+<footer class="post-info">
+    <span class="label label-default">Date</span>
+    <span class="published">
+        <i class="icon-calendar"></i>Wed 14 April 2010
+    </span>
+
+
+
+<span class="label label-default">Tags</span>
+	<a href="/tag/dhcp.html">dhcp</a>
+        /
+	<a href="/tag/tcpdump.html">tcpdump</a>
+        /
+	<a href="/tag/wireshark.html">wireshark</a>
+</footer><!-- /.post-info -->                    </div>
+                </div>
+                <p>Recently at $<span class="caps">WORK</span> we&#8217;ve been having some strange issues with a
+particular Xen <span class="caps">VM</span> not getting <span class="caps">DHCP</span>. Traditional (tail -f dhcpd.log)
+debugging hasn&#8217;t turned up much, other than the server is getting the
+<span class="caps">DISCOVER</span> but not sending out an <span class="caps">OFFER</span>. I&#8217;ve turned to packet captures to
+try and track down the problem. Of course, this is where <a href="http://www.tcpdump.org/">tcpdump</a> and
+<a href="http://www.wireshark.org/">wireshark</a> come into play. So I thought I&#8217;d share some of the filters
+that I&#8217;ve been using, and a few that I&nbsp;developed.</p>
+<p>tcpdump filter for <span class="caps">CDP</span> (I should have this memorized by now) from
+<a href="http://sidewynder.blogspot.com/2005/07/tcpdump-filter-for-capturing-only.html">SWeidner</a>:</p>
+<div class="codehilite"><pre>tcpdump -nn -v -i eth0 -s 1500 -c 1 &#39;ether[20:2] == 0x2000&#39;
+</pre></div>
+
+
+<p></p>
+Wireshark display filter for a specific <span class="caps">DHCP</span> client (by&nbsp;<span class="caps">MAC</span>):</p>
+<div class="codehilite"><pre>bootp.hw.mac_addr == 00:11:22:33:44:55
+</pre></div>
+
+
+<p></p>
+tcpdump filter to match <span class="caps">DHCP</span> packets including a specific Client <span class="caps">MAC</span>&nbsp;Address:</p>
+<div class="codehilite"><pre>tcpdump -i br0 -vvv -s 1500 &#39;((port 67 or port 68) and (udp[38:4] = 0x3e0ccf08))&#39;
+</pre></div>
+
+
+<p></p>
+tcpdump only allows matching on a maximum of 4 bytes (octets), not the 6
+bytes of a <span class="caps">MAC</span> address. So, in the above example, we match the last 4
+bytes (presumably the most unique) - our original <span class="caps">MAC</span> address was
+<code>00:16:3e:0c:cf:08</code>, so we match on <code>3e0ccf08</code>. The <code>udp[38:4]</code> matches
+from the 38th octet after the start of the <span class="caps">UDP</span> header (so the comparison
+starts on the 39th octet) and compares a chunk 4 octets long. The <a href="http://www.networksorcery.com/enp/protocol/udp.htm"><span class="caps">UDP</span>
+header</a> is 8 octets long, followed immediately by the <a href="http://www.networksorcery.com/enp/protocol/dhcp.htm"><span class="caps">DHCP</span> header</a>,
+and the Client <span class="caps">MAC</span> Address field is composed of octets 29-35 of the <span class="caps">DHCP</span>
+header. Therefore, 8 octets for <span class="caps">UDP</span> header + 28 octets until Client <span class="caps">MAC</span>
+Address + 2 octets offset (drop the first 2 octets of <span class="caps">MAC</span> address to
+allow a 4 octet comparison) = 38 (our total&nbsp;offset).</p>
+<p>This can also be modified as a Wireshark display&nbsp;filter:</p>
+<div class="codehilite"><pre>udp[38:4]==3e:0c:cf:08
+</pre></div>
+
+
+<p></p>
+Using the same logic, a tcpdump filter to capture packets sent by the
+client (<span class="caps">DISCOVER</span>, <span class="caps">REQUEST</span>,&nbsp;<span class="caps">INFORM</span>):</p>
+<div class="codehilite"><pre>tcpdump -i br0 -vvv -s 1500 &#39;((port 67 or port 68) and (udp[8:1] = 0x1))&#39;
+</pre></div>
+
+
+<p></p>
+Finally, a tcpdump filter for <span class="caps">DHCPDISCOVER</span> packets (this makes the
+possibly flawed ass-umption that Option 53 will be the first option&nbsp;set:</p>
+<div class="codehilite"><pre>udp[247:4] = 0x63350101
+</pre></div>
+
+
+<p>and a wireshark display&nbsp;filter:</p>
+<div class="codehilite"><pre>udp[247:4]==63:35:01:01
+</pre></div>
+
+
+<p></p>
+And the same thing for <span class="caps">DHCPREQUEST</span>&nbsp;packets:</p>
+<div class="codehilite"><pre>udp[247:4] = 0x63350103
+</pre></div>
+
+
+<p>and a wireshark display&nbsp;filter:</p>
+<div class="codehilite"><pre>udp[247:4]==63:35:01:03
+</pre></div>
+
+
+</p>
+            </div>
+            <!-- /.entry-content -->
+        </article>
+    </section>
+
+        </div>
+        <div class="col-lg-3 well well-sm" id="sidebar">
+
+<aside>
+    <section>
+        <ul class="list-group list-group-flush">
+                <li class="list-group-item"><h4><i class="icon-home icon-large"></i>Social</h4></li>
+                    <li class="list-group-item"><a href="#"><i
+                            class="icon-You can add links in your config file-sign icon-large"></i>You can add links in your config file
+                    </a></li>
+                    <li class="list-group-item"><a href="#"><i
+                            class="icon-Another social link-sign icon-large"></i>Another social link
+                    </a></li>
+
+
+
+                <li class="list-group-item"><a href="/tags.html"><h4><i class="icon-tags icon-large"></i>Tags</h4></a></li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/android.html">
+                                android
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/google.html">
+                                google
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/nagios.html">
+                                Nagios
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/php.html">
+                                PHP
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/sysadmin.html">
+                                sysadmin
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/linux.html">
+                                linux
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/perl.html">
+                                perl
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/logging.html">
+                                logging
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/puppet.html">
+                                puppet
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/bind.html">
+                                bind
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/monitoring.html">
+                                monitoring
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/dns.html">
+                                dns
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/droid.html">
+                                droid
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/firefox.html">
+                                firefox
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/mediawiki.html">
+                                mediawiki
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/mac.html">
+                                mac
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/microsoft.html">
+                                microsoft
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/syslog.html">
+                                syslog
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/wordpress.html">
+                                wordpress
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/rpm.html">
+                                rpm
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/security.html">
+                                security
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/blog.html">
+                                blog
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/sun.html">
+                                sun
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/ems.html">
+                                EMS
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/apache.html">
+                                apache
+                            </a>
+                        </li>
+        </ul>
+    </section>
+</aside>        </div>
+    </div>
+</div>
+<footer>
+    <div class="container">
+        <hr>
+        <p class="pull-right"><i class="icon-arrow-up"></i> <a href="#">Back to top</a></p>
+
+
+        <p>&copy; 2014 Jason Antman &middot; Powered by <a href="https://github.com/DandyDev/pelican-bootstrap3" target="_blank">pelican-bootstrap3</a>,
+            <a href="http://docs.getpelican.com/" target="_blank">Pelican</a>,
+            <a href="http://getbootstrap.com" target="_blank">Bootstrap</a></p>
+    </div>
+</footer>
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="/theme/js/bootstrap.min.js"></script>
+
+<!-- Enable responsive features in IE8 with Respond.js (https://github.com/scottjehl/Respond) -->
+<script src="/theme/js/respond.min.js"></script>
+
+
+</body>
+</html>

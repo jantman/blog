@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:og="http://ogp.me/ns#"
+      xmlns:fb="https://www.facebook.com/2008/fbml">
+<head>
+    <title>Testing GPG Key Passphrases</title>
+    <!-- Using the latest rendering mode for IE -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Open Graph tags -->
+
+            <meta property="og:type" content="article"/>
+            <meta property="og:title" content="Testing GPG Key Passphrases"/>
+            <meta property="og:url" content="/2013/08/testing-gpg-key-passphrases/"/>
+            <meta property="og:description" content="So hypothetically, you have a GPG public/private keypair (from a backup or old computer), but you don’t remember the passphrase. Here’s a relatively simple way to find it from a number of possible options. This requires that you have a computer secure enough to store the possible ..."/>
+
+    <!-- Bootstrap -->
+        <link rel="stylesheet" href="/theme/css/bootstrap.min.css" type="text/css"/>
+    <link href="/theme/css/font-awesome.min.css" rel="stylesheet">
+    <link href="/theme/css/pygments.css" rel="stylesheet">
+        <link href="/theme/css/typogrify.css" rel="stylesheet">
+    <link rel="stylesheet" href="/theme/css/style.css" type="text/css"/>
+    <!-- JavaScript plugins (requires jQuery) -->
+    <script src="http://code.jquery.com/jquery.js"></script>
+
+        <link href="/feeds/all.atom.xml" type="application/atom+xml" rel="alternate"
+              title="Jason Antman's Blog ATOM Feed"/>
+
+</head>
+<body>
+<nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="" class="navbar-brand">Jason Antman's Blog</a>
+        </div>
+        <div class="collapse navbar-collapse navbar-ex1-collapse">
+            <ul class="nav navbar-nav">
+                         <li><a href="/pages/about.html">
+                             About
+                          </a></li>
+                        <li >
+                            <a href="/category/ideas-and-rants.html">Ideas and rants</a>
+                        </li>
+                        <li >
+                            <a href="/category/miscellaneous.html">Miscellaneous</a>
+                        </li>
+                        <li >
+                            <a href="/category/monitoring.html">Monitoring</a>
+                        </li>
+                        <li >
+                            <a href="/category/projects.html">Projects</a>
+                        </li>
+                        <li >
+                            <a href="/category/puppet.html">Puppet</a>
+                        </li>
+                        <li >
+                            <a href="/category/sysadmin.html">Sysadmin</a>
+                        </li>
+                        <li class="active">
+                            <a href="/category/tech-howtos.html">Tech howtos</a>
+                        </li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="/archives.html"><i class="icon-th-list"></i>Archives</a></li>
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+</nav>
+<!-- /.navbar -->
+<div class="container">
+    <div class="row">
+        <div class="col-lg-9">
+    <section id="content">
+        <article>
+            <header class="page-header">
+                <h1>
+                    <a href="/2013/08/testing-gpg-key-passphrases/"
+                       rel="bookmark"
+                       title="Permalink to Testing GPG Key Passphrases">
+                        Testing <span class="caps">GPG</span> Key&nbsp;Passphrases
+                    </a>
+                </h1>
+            </header>
+            <div class="entry-content">
+                <div class="panel">
+                    <div class="panel-body">
+<footer class="post-info">
+    <span class="label label-default">Date</span>
+    <span class="published">
+        <i class="icon-calendar"></i>Mon 26 August 2013
+    </span>
+
+
+
+<span class="label label-default">Tags</span>
+	<a href="/tag/encryption.html">encryption</a>
+        /
+	<a href="/tag/gnupg.html">gnupg</a>
+        /
+	<a href="/tag/gpg.html">gpg</a>
+        /
+	<a href="/tag/key.html">key</a>
+        /
+	<a href="/tag/passphrase.html">passphrase</a>
+        /
+	<a href="/tag/pgp.html">pgp</a>
+</footer><!-- /.post-info -->                    </div>
+                </div>
+                <p>So hypothetically, you have a <span class="caps">GPG</span> public/private keypair (from a backup
+or old computer), but you don&#8217;t remember the passphrase. Here&#8217;s a
+relatively simple way to find it from a number of possible options. This
+<em>requires</em> that you have a computer secure enough to store the possible
+options in a text file. I&#8217;d recommend storing that file on a
+ramdisk/tmpfs, and using a temporary <span class="caps">VM</span> for this, which you&#8217;ll wipe away
+when you&#8217;re&nbsp;done.</p>
+<p><strong>Preparation:</strong></p>
+<ol>
+<li>You have an appropriately secure place to do this with <span class="caps">GPG</span>
+    installed, and a safe place to store a text file of sample
+    passphrases (i.e. a&nbsp;ramdisk).</li>
+<li>Copy your backed up public and private keys to <code>~/.gnupg</code> on that
+    host. Let&#8217;s assume they&#8217;re called <code>TestUser_public.key</code> and
+    <code>TestUser_private.key</code>. We&#8217;re assuming that you <span class="caps">KNOW</span>, <span class="caps">BEYOND</span> A <span class="caps">DOUBT</span>
+    that these are your keys (i.e. you got them from a secure offline
+    backup medium, you&#8217;ve verified against a printed key fingerprint,
+    you&#8217;ve verified the fingerprints against a <a href="http://pgp.mit.edu/">keyserver</a> that you
+    know is authoritative for your keys,&nbsp;etc.).</li>
+<li>
+<p>First, we import the public and private keys to&nbsp;<span class="caps">GPG</span>:</p>
+<div class="codehilite"><pre>testuser:~$ cd .gnupg
+testuser:~/.gnupg$ gpg --import TestUser_public.key 
+gpg: keyring `/home/testuser/.gnupg/secring.gpg` created
+gpg: key 17AD8D3D: public key &quot;Test User (Test User) &quot; imported
+gpg: Total number processed: 1
+gpg:               imported: 1  (RSA: 1)
+
+testuser:~/.gnupg$ gpg --allow-secret-key-import --import TestUser_secret.key 
+gpg: key 17AD8D3D: secret key imported
+gpg: key 17AD8D3D: &quot;Test User (Test User) &quot; not changed
+gpg: Total number processed: 1
+gpg:              unchanged: 1
+gpg:       secret keys read: 1
+gpg:   secret keys imported: 1
+</pre></div>
+
+
+</li>
+<li>
+<p>Check that the keys are&nbsp;there:</p>
+<div class="codehilite"><pre>testuser:~/.gnupg$ gpg --list-keys
+/home/testuser/.gnupg/pubring.gpg
+--------------------------------
+pub   2048R/17AD8D3D 2013-08-24
+uid                  Test User (Test User) 
+sub   2048R/40D9F35E 2013-08-24
+
+testuser:~/.gnupg$ gpg --list-secret-keys
+/home/testuser/.gnupg/secring.gpg
+--------------------------------
+sec   2048R/17AD8D3D 2013-08-24
+uid                  Test User (Test User) 
+ssb   2048R/40D9F35E 2013-08-24
+
+testuser:~/.gnupg$
+</pre></div>
+
+
+</li>
+<li>
+<p>Note the fingerprint of the key which is, in this case, <code>17AD8D3D</code>.</p>
+</li>
+</ol>
+<p><strong>Testing&nbsp;Passphrases:</strong></p>
+<ol>
+<li>
+<p>Now that we have the keys imported, we&#8217;re ready to test some
+    passphrases. Enter your passphrases, one per line, in a text file.
+    We&#8217;re assuming that we&#8217;re working on a totally secured host
+    (ideally, a <span class="caps">VM</span> running on a standalone, non-networked machine) that
+    will be destroyed when we&#8217;re done. For added security, I&#8217;d put this
+    file on a ramdisk. In this example, the actual passphrase for the
+    key is &#8220;test&#8221;. Here&#8217;s our text&nbsp;file:</p>
+<div class="codehilite"><pre>testuser:~/.gnupg$ cat /tmp/passphrases 
+bad
+notgood
+notright
+test
+</pre></div>
+
+
+</li>
+<li>
+<p>Next, create a test data file to try to&nbsp;sign/encrypt:</p>
+<div class="codehilite"><pre>testuser:~/.gnupg$ echo &quot;test input&quot; &gt; /tmp/test.in
+</pre></div>
+
+
+</li>
+<li>
+<p>Now we run the actual test (see below for more&nbsp;information&#8230;</p>
+<div class="codehilite"><pre>testuser:~/.gnupg$ for p in `cat /tmp/passphrases`; do echo &quot;$p&quot; | gpg -q --sign --local-user 17AD8D3D --passphrase-fd 0 --output /dev/null --yes /tmp/test.in &amp;&amp; (echo &quot;CORRECT passphrase: $p&quot; &amp;&amp; break); done
+Reading passphrase from file descriptor 0
+
+You need a passphrase to unlock the secret key for
+user: &quot;Test User (Test User) &quot;
+2048-bit RSA key, ID 17AD8D3D, created 2013-08-24
+
+gpg: skipped &quot;17AD8D3D&quot;: bad passphrase
+gpg: signing failed: bad passphrase
+Reading passphrase from file descriptor 0
+
+You need a passphrase to unlock the secret key for
+user: &quot;Test User (Test User) &quot;
+2048-bit RSA key, ID 17AD8D3D, created 2013-08-24
+
+gpg: skipped &quot;17AD8D3D&quot;: bad passphrase
+gpg: signing failed: bad passphrase
+Reading passphrase from file descriptor 0
+
+You need a passphrase to unlock the secret key for
+user: &quot;Test User (Test User) &quot;
+2048-bit RSA key, ID 17AD8D3D, created 2013-08-24
+
+gpg: skipped &quot;17AD8D3D&quot;: bad passphrase
+gpg: signing failed: bad passphrase
+Reading passphrase from file descriptor 0
+
+You need a passphrase to unlock the secret key for
+user: &quot;Test User (Test User) &quot;
+2048-bit RSA key, ID 17AD8D3D, created 2013-08-24
+
+CORRECT passphrase: test
+testuser:~/.gnupg$
+</pre></div>
+
+
+</li>
+<li>
+<p>And there we have it, the working passphrase. I&#8217;m sure there&#8217;s a
+    more efficient way to do this, and probably a more secure way, but
+    I&#8217;m not trying to brute-force someone&#8217;s <span class="caps">GPG</span> key, I&#8217;m trying to
+    remember which one of my (many, many) passwords I used for a <span class="caps">GPG</span> key
+    that I generated a decade&nbsp;ago.</p>
+</li>
+</ol>
+<p>The actual command that we ran, rewritten with some linebreaks for
+legibility,&nbsp;is:</p>
+<div class="codehilite"><pre>for p in `cat /tmp/passphrases`
+do
+    echo &quot;$p&quot; | gpg -q --sign --local-user 17AD8D3D --passphrase-fd 0 --output /dev/null --yes /tmp/test.in &amp;&amp; (echo &quot;CORRECT passphrase: $p&quot; &amp;&amp; break)
+done
+</pre></div>
+
+
+<p>This loops over each line in the passphrases file (each passphrase that
+we want to try), and for each one, echoes the password and pipes it to
+<span class="caps">STDIN</span> of `gpg`, which tries to sign /tmp/test.in (sending the output
+to /dev/null) using the key with <span class="caps">ID</span> <code>17AD8D3D</code> (from #5 in the
+Preparation steps above) and a password provided on <span class="caps">STDIN</span>. If the <span class="caps">GPG</span>
+command succeeds, we echo the passphrase and stop looping through the
+passphrases&nbsp;file.</p>
+<p>I hope I wouldn&#8217;t have to say this for anyone who&#8217;s reading my blog, but
+this information (as easy as it is to be figured out), is not to be used
+for unethical&nbsp;purposes.</p>
+            </div>
+            <!-- /.entry-content -->
+        </article>
+    </section>
+
+        </div>
+        <div class="col-lg-3 well well-sm" id="sidebar">
+
+<aside>
+    <section>
+        <ul class="list-group list-group-flush">
+                <li class="list-group-item"><h4><i class="icon-home icon-large"></i>Social</h4></li>
+                    <li class="list-group-item"><a href="#"><i
+                            class="icon-You can add links in your config file-sign icon-large"></i>You can add links in your config file
+                    </a></li>
+                    <li class="list-group-item"><a href="#"><i
+                            class="icon-Another social link-sign icon-large"></i>Another social link
+                    </a></li>
+
+
+
+                <li class="list-group-item"><a href="/tags.html"><h4><i class="icon-tags icon-large"></i>Tags</h4></a></li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/android.html">
+                                android
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/google.html">
+                                google
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/nagios.html">
+                                Nagios
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/php.html">
+                                PHP
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/sysadmin.html">
+                                sysadmin
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/linux.html">
+                                linux
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/perl.html">
+                                perl
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/logging.html">
+                                logging
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/puppet.html">
+                                puppet
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/bind.html">
+                                bind
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/monitoring.html">
+                                monitoring
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/dns.html">
+                                dns
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/droid.html">
+                                droid
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/firefox.html">
+                                firefox
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/mediawiki.html">
+                                mediawiki
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/mac.html">
+                                mac
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/microsoft.html">
+                                microsoft
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/syslog.html">
+                                syslog
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/wordpress.html">
+                                wordpress
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/rpm.html">
+                                rpm
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/security.html">
+                                security
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/blog.html">
+                                blog
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/sun.html">
+                                sun
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/ems.html">
+                                EMS
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/apache.html">
+                                apache
+                            </a>
+                        </li>
+        </ul>
+    </section>
+</aside>        </div>
+    </div>
+</div>
+<footer>
+    <div class="container">
+        <hr>
+        <p class="pull-right"><i class="icon-arrow-up"></i> <a href="#">Back to top</a></p>
+
+
+        <p>&copy; 2014 Jason Antman &middot; Powered by <a href="https://github.com/DandyDev/pelican-bootstrap3" target="_blank">pelican-bootstrap3</a>,
+            <a href="http://docs.getpelican.com/" target="_blank">Pelican</a>,
+            <a href="http://getbootstrap.com" target="_blank">Bootstrap</a></p>
+    </div>
+</footer>
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="/theme/js/bootstrap.min.js"></script>
+
+<!-- Enable responsive features in IE8 with Respond.js (https://github.com/scottjehl/Respond) -->
+<script src="/theme/js/respond.min.js"></script>
+
+
+</body>
+</html>

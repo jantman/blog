@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:og="http://ogp.me/ns#"
+      xmlns:fb="https://www.facebook.com/2008/fbml">
+<head>
+    <title>Virtualization Options</title>
+    <!-- Using the latest rendering mode for IE -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Open Graph tags -->
+
+            <meta property="og:type" content="article"/>
+            <meta property="og:title" content="Virtualization Options"/>
+            <meta property="og:url" content="/2010/03/virtualization-options/"/>
+            <meta property="og:description" content="As I mentioned in Downtime past few days, coping with storms, as a result of some things I noticed with a recent power outage, I’ve decided to take the leap to virtualization. Given the cost of current hardware that supports HVM (Intel VT-x or AMD-V ), I immediately ..."/>
+
+    <!-- Bootstrap -->
+        <link rel="stylesheet" href="/theme/css/bootstrap.min.css" type="text/css"/>
+    <link href="/theme/css/font-awesome.min.css" rel="stylesheet">
+    <link href="/theme/css/pygments.css" rel="stylesheet">
+        <link href="/theme/css/typogrify.css" rel="stylesheet">
+    <link rel="stylesheet" href="/theme/css/style.css" type="text/css"/>
+    <!-- JavaScript plugins (requires jQuery) -->
+    <script src="http://code.jquery.com/jquery.js"></script>
+
+        <link href="/feeds/all.atom.xml" type="application/atom+xml" rel="alternate"
+              title="Jason Antman's Blog ATOM Feed"/>
+
+</head>
+<body>
+<nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="" class="navbar-brand">Jason Antman's Blog</a>
+        </div>
+        <div class="collapse navbar-collapse navbar-ex1-collapse">
+            <ul class="nav navbar-nav">
+                         <li><a href="/pages/about.html">
+                             About
+                          </a></li>
+                        <li >
+                            <a href="/category/ideas-and-rants.html">Ideas and rants</a>
+                        </li>
+                        <li >
+                            <a href="/category/miscellaneous.html">Miscellaneous</a>
+                        </li>
+                        <li >
+                            <a href="/category/monitoring.html">Monitoring</a>
+                        </li>
+                        <li class="active">
+                            <a href="/category/projects.html">Projects</a>
+                        </li>
+                        <li >
+                            <a href="/category/puppet.html">Puppet</a>
+                        </li>
+                        <li >
+                            <a href="/category/sysadmin.html">Sysadmin</a>
+                        </li>
+                        <li >
+                            <a href="/category/tech-howtos.html">Tech howtos</a>
+                        </li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="/archives.html"><i class="icon-th-list"></i>Archives</a></li>
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+</nav>
+<!-- /.navbar -->
+<div class="container">
+    <div class="row">
+        <div class="col-lg-9">
+    <section id="content">
+        <article>
+            <header class="page-header">
+                <h1>
+                    <a href="/2010/03/virtualization-options/"
+                       rel="bookmark"
+                       title="Permalink to Virtualization Options">
+                        Virtualization&nbsp;Options
+                    </a>
+                </h1>
+            </header>
+            <div class="entry-content">
+                <div class="panel">
+                    <div class="panel-body">
+<footer class="post-info">
+    <span class="label label-default">Date</span>
+    <span class="published">
+        <i class="icon-calendar"></i>Fri 19 March 2010
+    </span>
+
+
+
+<span class="label label-default">Tags</span>
+	<a href="/tag/openvz.html">OpenVZ</a>
+        /
+	<a href="/tag/virtualization.html">virtualization</a>
+        /
+	<a href="/tag/xen.html">xen</a>
+</footer><!-- /.post-info -->                    </div>
+                </div>
+                <p>As I mentioned in <a href="/2010/03/downtime-past-few-days-coping-with-storms/">Downtime past few days, coping with storms</a>, as a
+result of some things I noticed with a recent power outage, I&#8217;ve decided
+to take the leap to virtualization. Given the cost of current hardware
+that supports <span class="caps">HVM</span> (Intel <span class="caps">VT</span>-x or <span class="caps">AMD</span>-V ), I immediately decided that I
+might as well give up on any thoughts of doing full virtualization or
+getting new-ish hardware. So I settled on the next step up from what
+have now - a set of <a href="http://h18000.www1.hp.com/products/quickspecs/11504_na/11504_na.HTML"><span class="caps">HP</span> Proliant <span class="caps">DL360</span> G3</a> servers. I got them with a
+90 day warranty from a reputable dealer, dual 2.8GHz Xeon (512K cache),
+2Gb <span class="caps">RAM</span>, dual 36.4Gb U320 15k <span class="caps">RPM</span> <span class="caps">SCSI</span> disks and dual power supplies for
+$99 each. My next step is to decide what virtualization software to&nbsp;use.</p>
+<p>My main goals for the project&nbsp;are:</p>
+<ul>
+<li>Lower power consumption through consolidation of&nbsp;servers.</li>
+<li>Possibility to add capacity or resources by remotely powering up an
+    idle server and migrating VMs to&nbsp;it.</li>
+<li>Limited fault tolerance - ability to manually restore a <span class="caps">VM</span> that was
+    running on failed hardware, onto an idle&nbsp;server.</li>
+</ul>
+<p>I originally thought Xen, just out of reflex. However, given that all of
+my servers have the same base - the same distribution and, ideally, the
+same kernel and patch level - it seemed like a lot of overhead to
+duplicate that for multiple VMs. So I started looking into <a href="http://en.wikipedia.org/wiki/Operating_system-level_virtualization"><span class="caps">OS</span>-level
+virtualization</a>. There are relatively few options, and I&#8217;ll admit that
+aside from Solaris Containers (which I learned about while working at
+Sun) I don&#8217;t know much about it. But <a href="http://www.openvz.org/">OpenVZ</a> seems to be the front
+runner in that area. My initial impression was that it made a lot of
+sense - keep one common kernel, but allow containers/virtual
+environments (CTs/VEs) to have, essentially, their own userland.
+Unfortunately, it doesn&#8217;t seem to be as hyped as Xen, and I haven&#8217;t
+heard very much about it in the enterprise context. And it requires
+running a kernel from the OpenVZ project, which means I can&#8217;t just
+script updates through yum as easily as&nbsp;normal.</p>
+<p>On the up size, OpenVZ would allow me to eliminate the duplication of
+the kernel, and seems to have much less overhead than Xen (and logically
+so). On the down side, I lose the ability to virtualize other OSes,
+kernel versions, or make pre-packaged VMs. I&#8217;ve decided that if I wanted
+to do that, I could dedicate a single&nbsp;machine.</p>
+<p>I&#8217;ve spent the last day or so doing a lot of research, and have come up
+with the following questions and concerns about OpenVZ which I hope to
+be able to answer (I&#8217;ll post the answers in a&nbsp;follow-up).</p>
+<ul>
+<li>How do I handle distribution and kernel upgrades? The logical
+    solution would be to migrate the <span class="caps">CT</span> to another host while I upgrade
+    <span class="caps">CT0</span> (the hardware <span class="caps">OS</span>/host/dom0 in Xen speak). But if the guest and
+    host kernels must match, how does this&nbsp;work?</li>
+<li>Can I do package upgrades within the guest/<span class="caps">CT</span> easily? WIll this play
+    well with&nbsp;Puppet?</li>
+<li>How will I handle backups? Is it logical to run <a href="http://www.bacula.org">bacula</a> within
+    each <span class="caps">CT</span>, or just on <span class="caps">CT0</span>? If just on <span class="caps">CT0</span>, how do I easily verify that
+    a particular <span class="caps">CT</span> was backed&nbsp;up?</li>
+<li>WIll everything play well with Puppet? (see&nbsp;below)</li>
+<li>Am I willing to throw away my KickStart-based installs? And,
+    similarly, am I willing to give up the possibility of migrating from
+    a container to a Xen host or a physical host&nbsp;(easily)?</li>
+<li>OpenVZ live migration relies on rsync. This means that there&#8217;s a
+    significant delay (compared to shared storage) and also that I can&#8217;t
+    migrate off of a host that&#8217;s down. Is there a way around&nbsp;this?</li>
+<li>Similarly, live migration requires root <span class="caps">SSH</span> key exchange
+    (passwordless) between the hosts. This seems about equivalent to
+    using <code>hosts.equiv</code>. Do I really want root on one box to mean root
+    on another box (and all of the containers on that&nbsp;box)?</li>
+<li>Can I still firewall <span class="caps">CT0</span>? How will this&nbsp;work?</li>
+</ul>
+<p>It seems to me that OpenVZ may be significantly less enterprise-class
+than Xen. Sure, this is just my home setup, but I hold it to the same
+standards I use for my work systems. In fact, I usually test new
+technologies at home before I suggest them at work. A lot of the writing
+on the <a href="http://wiki.openvz.org/">OpenVZ wiki</a> seems to be riddled with spelling errors. They
+claim &#8220;zero downtime&#8221; live migration, but if they have to rsync 2Gb of
+MySQL tables, that sounds like a lot more than &#8220;zero&#8221;. And, most
+shockingly, the <a href="http://wiki.openvz.org/Hardware_testing">Hardware testing</a> wiki page talks about making sure
+your hosts aren&#8217;t overclocked or undercooled, and running <code>cpuburn</code> to
+test your system under high load. Sorry, but the engineers at <span class="caps">HP</span>, Sun,
+<span class="caps">IBM</span>, etc. handle that for me and most people I know. So, I&#8217;m a bit
+worried about the seriousness of the OpenVZ&nbsp;project.</p>
+<p>Most worrisome is a post I found in the <a href="http://forum.openvz.org">OpenVZ forum</a>, <a href="http://forum.openvz.org/index.php?t=msg&amp;goto=14818&amp;">&#8220;Stopping
+puppet on hn stops it in all <span class="caps">VE</span>&#8221;</a>. It seems that, since <span class="caps">CT0</span> is aware
+of all of the guest container processes, they show up in ps lists. Most,
+if not all RedHat init scripts use killproc to stop and restart
+services. This means that a <code>service syslog stop</code> on the <span class="caps">CT0</span> (host) will
+stop <strong>all</strong> <code>syslog</code> processes, including all of them in the CTs. This
+seems like a major issue. Sure, I could replace <code>killproc</code> on <span class="caps">CT0</span> with a
+script that parses the process list, isolates the PIDs for those running
+on <span class="caps">CT0</span>, and kills them. But what else needs to be fixed? Nagios check
+scripts would need to be adjusted. Is there anything else that would
+come back and bite&nbsp;me?</p>
+<p>The bottom line is that (I guess this is logical) it seems that
+containers in OpenVZ will seem - and act - a lot less like a logical
+host than they would under&nbsp;Xen.</p>
+            </div>
+            <!-- /.entry-content -->
+        </article>
+    </section>
+
+        </div>
+        <div class="col-lg-3 well well-sm" id="sidebar">
+
+<aside>
+    <section>
+        <ul class="list-group list-group-flush">
+                <li class="list-group-item"><h4><i class="icon-home icon-large"></i>Social</h4></li>
+                    <li class="list-group-item"><a href="#"><i
+                            class="icon-You can add links in your config file-sign icon-large"></i>You can add links in your config file
+                    </a></li>
+                    <li class="list-group-item"><a href="#"><i
+                            class="icon-Another social link-sign icon-large"></i>Another social link
+                    </a></li>
+
+
+
+                <li class="list-group-item"><a href="/tags.html"><h4><i class="icon-tags icon-large"></i>Tags</h4></a></li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/android.html">
+                                android
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/google.html">
+                                google
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/nagios.html">
+                                Nagios
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/php.html">
+                                PHP
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/sysadmin.html">
+                                sysadmin
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/linux.html">
+                                linux
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/perl.html">
+                                perl
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/logging.html">
+                                logging
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/puppet.html">
+                                puppet
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/bind.html">
+                                bind
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/monitoring.html">
+                                monitoring
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/dns.html">
+                                dns
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/droid.html">
+                                droid
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/firefox.html">
+                                firefox
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/mediawiki.html">
+                                mediawiki
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/mac.html">
+                                mac
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/microsoft.html">
+                                microsoft
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/syslog.html">
+                                syslog
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/wordpress.html">
+                                wordpress
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/rpm.html">
+                                rpm
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/security.html">
+                                security
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/blog.html">
+                                blog
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/sun.html">
+                                sun
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/ems.html">
+                                EMS
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/apache.html">
+                                apache
+                            </a>
+                        </li>
+        </ul>
+    </section>
+</aside>        </div>
+    </div>
+</div>
+<footer>
+    <div class="container">
+        <hr>
+        <p class="pull-right"><i class="icon-arrow-up"></i> <a href="#">Back to top</a></p>
+
+
+        <p>&copy; 2014 Jason Antman &middot; Powered by <a href="https://github.com/DandyDev/pelican-bootstrap3" target="_blank">pelican-bootstrap3</a>,
+            <a href="http://docs.getpelican.com/" target="_blank">Pelican</a>,
+            <a href="http://getbootstrap.com" target="_blank">Bootstrap</a></p>
+    </div>
+</footer>
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="/theme/js/bootstrap.min.js"></script>
+
+<!-- Enable responsive features in IE8 with Respond.js (https://github.com/scottjehl/Respond) -->
+<script src="/theme/js/respond.min.js"></script>
+
+
+</body>
+</html>

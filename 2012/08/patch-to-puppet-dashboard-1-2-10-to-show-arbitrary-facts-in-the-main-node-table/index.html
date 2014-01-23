@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:og="http://ogp.me/ns#"
+      xmlns:fb="https://www.facebook.com/2008/fbml">
+<head>
+    <title>Patch to Puppet Dashboard 1.2.10 to show arbitrary facts in the main node table</title>
+    <!-- Using the latest rendering mode for IE -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Open Graph tags -->
+
+            <meta property="og:type" content="article"/>
+            <meta property="og:title" content="Patch to Puppet Dashboard 1.2.10 to show arbitrary facts in the main node table"/>
+            <meta property="og:url" content="/2012/08/patch-to-puppet-dashboard-1-2-10-to-show-arbitrary-facts-in-the-main-node-table/"/>
+            <meta property="og:description" content="We use Puppet Dashboard at work to view the status of our puppet nodes. While it’s very handy, there’s one feature I really wanted: the ability to show the value of arbitrary puppet facts in the main node table on the home page. Specifically, the facts we use ..."/>
+
+    <!-- Bootstrap -->
+        <link rel="stylesheet" href="/theme/css/bootstrap.min.css" type="text/css"/>
+    <link href="/theme/css/font-awesome.min.css" rel="stylesheet">
+    <link href="/theme/css/pygments.css" rel="stylesheet">
+        <link href="/theme/css/typogrify.css" rel="stylesheet">
+    <link rel="stylesheet" href="/theme/css/style.css" type="text/css"/>
+    <!-- JavaScript plugins (requires jQuery) -->
+    <script src="http://code.jquery.com/jquery.js"></script>
+
+        <link href="/feeds/all.atom.xml" type="application/atom+xml" rel="alternate"
+              title="Jason Antman's Blog ATOM Feed"/>
+
+</head>
+<body>
+<nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="" class="navbar-brand">Jason Antman's Blog</a>
+        </div>
+        <div class="collapse navbar-collapse navbar-ex1-collapse">
+            <ul class="nav navbar-nav">
+                         <li><a href="/pages/about.html">
+                             About
+                          </a></li>
+                        <li >
+                            <a href="/category/ideas-and-rants.html">Ideas and rants</a>
+                        </li>
+                        <li >
+                            <a href="/category/miscellaneous.html">Miscellaneous</a>
+                        </li>
+                        <li >
+                            <a href="/category/monitoring.html">Monitoring</a>
+                        </li>
+                        <li >
+                            <a href="/category/projects.html">Projects</a>
+                        </li>
+                        <li class="active">
+                            <a href="/category/puppet.html">Puppet</a>
+                        </li>
+                        <li >
+                            <a href="/category/sysadmin.html">Sysadmin</a>
+                        </li>
+                        <li >
+                            <a href="/category/tech-howtos.html">Tech howtos</a>
+                        </li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="/archives.html"><i class="icon-th-list"></i>Archives</a></li>
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+</nav>
+<!-- /.navbar -->
+<div class="container">
+    <div class="row">
+        <div class="col-lg-9">
+    <section id="content">
+        <article>
+            <header class="page-header">
+                <h1>
+                    <a href="/2012/08/patch-to-puppet-dashboard-1-2-10-to-show-arbitrary-facts-in-the-main-node-table/"
+                       rel="bookmark"
+                       title="Permalink to Patch to Puppet Dashboard 1.2.10 to show arbitrary facts in the main node table">
+                        Patch to Puppet Dashboard 1.2.10 to show arbitrary facts in the main node&nbsp;table
+                    </a>
+                </h1>
+            </header>
+            <div class="entry-content">
+                <div class="panel">
+                    <div class="panel-body">
+<footer class="post-info">
+    <span class="label label-default">Date</span>
+    <span class="published">
+        <i class="icon-calendar"></i>Sat 11 August 2012
+    </span>
+
+
+
+<span class="label label-default">Tags</span>
+	<a href="/tag/dashboard.html">dashboard</a>
+        /
+	<a href="/tag/facts.html">facts</a>
+        /
+	<a href="/tag/puppet.html">puppet</a>
+        /
+	<a href="/tag/ruby.html">ruby</a>
+        /
+	<a href="/tag/sysadmin.html">sysadmin</a>
+</footer><!-- /.post-info -->                    </div>
+                </div>
+                <p>We use <a href="http://puppetlabs.com/puppet/related-projects/dashboard/">Puppet Dashboard</a> at work to view the status of our puppet
+nodes. While it&#8217;s very handy, there&#8217;s one feature I really wanted: the
+ability to show the value of arbitrary puppet facts in the main node
+table on the home page. Specifically, the facts we use for environment
+(we have eng/dev, qa, prod, and test puppet environments), zone
+(physical location) and last applied configuration version. I&#8217;m not
+terribly experience with Ruby, but I managed to muddle my way through a
+working patch to do this, along with options in the settings file to
+enable it and configure the facts. You&#8217;ll need to restart dashboard (or
+your web server) to change the facts, of course. The commit is currently
+<a href="https://github.com/jantman/puppet-dashboard/commit/5364e2b0188d18ae62c355279e58c7ce6d7db654">available on github</a>, but it doesn&#8217;t strictly follow the
+<a href="https://github.com/puppetlabs/puppet-dashboard/blob/master/CONTRIBUTING.md">puppet-dashboard contributing checklist</a> so I may have to redo&nbsp;it.</p>
+<p>Here&#8217;s a&nbsp;screenshot:</p>
+<p>[<img alt="Dashboard screenshot after patch" src="http://blog.jasonantman.com/GFX/dashboard_after_patch_sm.png" />][]</p>
+<p>And here&#8217;s that the configuration section added to settings.yml looks&nbsp;like:</p>
+<div class="codehilite"><pre># Enables display of arbitrary node facts in &quot;home&quot; page node table, between node name and latest report time
+enable_home_facts: true
+
+# If enable_home_facts is true, the fact names and column headings to display. Simply repeat the following two line pairs
+# as needed:
+#- name: &#39;factname&#39;
+#  heading: &#39;heading text&#39;
+home_facts: 
+- name: &#39;environment&#39;
+  heading: &#39;Env&#39;
+- name: &#39;zone&#39;
+  heading: &#39;Zone&#39;
+- name: &#39;catalog_config_version&#39;
+  heading: &#39;Cfg Ver&#39;
+</pre></div>
+
+
+<p>If I feel really adventurous, I&#8217;d like to implement my other big wish,
+some sort of pop-up list of links, based on arbitrary facts (mainly
+hostname and fqdn) for each node - something where I can mouse over the
+node name/table cell, and see links (static URLs with node
+name/fqdn/other facts plugged in) to things like Nagios/Icinga, our
+backup system,&nbsp;etc.</p>
+<p>[<img alt="Dashboard screenshot after patch" src="http://blog.jasonantman.com/GFX/dashboard_after_patch_sm.png" />]:&nbsp;http://blog.jasonantman.com/<span class="caps">GFX</span>/dashboard_after_patch.png</p>
+            </div>
+            <!-- /.entry-content -->
+        </article>
+    </section>
+
+        </div>
+        <div class="col-lg-3 well well-sm" id="sidebar">
+
+<aside>
+    <section>
+        <ul class="list-group list-group-flush">
+                <li class="list-group-item"><h4><i class="icon-home icon-large"></i>Social</h4></li>
+                    <li class="list-group-item"><a href="#"><i
+                            class="icon-You can add links in your config file-sign icon-large"></i>You can add links in your config file
+                    </a></li>
+                    <li class="list-group-item"><a href="#"><i
+                            class="icon-Another social link-sign icon-large"></i>Another social link
+                    </a></li>
+
+
+
+                <li class="list-group-item"><a href="/tags.html"><h4><i class="icon-tags icon-large"></i>Tags</h4></a></li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/android.html">
+                                android
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/google.html">
+                                google
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/nagios.html">
+                                Nagios
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/php.html">
+                                PHP
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/sysadmin.html">
+                                sysadmin
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/linux.html">
+                                linux
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/perl.html">
+                                perl
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/logging.html">
+                                logging
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/puppet.html">
+                                puppet
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/bind.html">
+                                bind
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/monitoring.html">
+                                monitoring
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/dns.html">
+                                dns
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/droid.html">
+                                droid
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/firefox.html">
+                                firefox
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/mediawiki.html">
+                                mediawiki
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/mac.html">
+                                mac
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/microsoft.html">
+                                microsoft
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/syslog.html">
+                                syslog
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/wordpress.html">
+                                wordpress
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/rpm.html">
+                                rpm
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/security.html">
+                                security
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/blog.html">
+                                blog
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/sun.html">
+                                sun
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/ems.html">
+                                EMS
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/apache.html">
+                                apache
+                            </a>
+                        </li>
+        </ul>
+    </section>
+</aside>        </div>
+    </div>
+</div>
+<footer>
+    <div class="container">
+        <hr>
+        <p class="pull-right"><i class="icon-arrow-up"></i> <a href="#">Back to top</a></p>
+
+
+        <p>&copy; 2014 Jason Antman &middot; Powered by <a href="https://github.com/DandyDev/pelican-bootstrap3" target="_blank">pelican-bootstrap3</a>,
+            <a href="http://docs.getpelican.com/" target="_blank">Pelican</a>,
+            <a href="http://getbootstrap.com" target="_blank">Bootstrap</a></p>
+    </div>
+</footer>
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="/theme/js/bootstrap.min.js"></script>
+
+<!-- Enable responsive features in IE8 with Respond.js (https://github.com/scottjehl/Respond) -->
+<script src="/theme/js/respond.min.js"></script>
+
+
+</body>
+</html>

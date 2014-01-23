@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:og="http://ogp.me/ns#"
+      xmlns:fb="https://www.facebook.com/2008/fbml">
+<head>
+    <title>Using nmap to quickly ping all hosts in an address range</title>
+    <!-- Using the latest rendering mode for IE -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Open Graph tags -->
+
+            <meta property="og:type" content="article"/>
+            <meta property="og:title" content="Using nmap to quickly ping all hosts in an address range"/>
+            <meta property="og:url" content="/2010/02/using-nmap-to-quickly-ping-all-hosts-in-an-address-range/"/>
+            <meta property="og:description" content="At $WORK, the subnet we use for some of our workstations and test boxes was only recently setup with DHCP. Previously, we’d used IP-by-Whiteboard in the office. As a result, most of the recent machines use DHCP, but there are a few older ones still around using static ..."/>
+
+    <!-- Bootstrap -->
+        <link rel="stylesheet" href="/theme/css/bootstrap.min.css" type="text/css"/>
+    <link href="/theme/css/font-awesome.min.css" rel="stylesheet">
+    <link href="/theme/css/pygments.css" rel="stylesheet">
+        <link href="/theme/css/typogrify.css" rel="stylesheet">
+    <link rel="stylesheet" href="/theme/css/style.css" type="text/css"/>
+    <!-- JavaScript plugins (requires jQuery) -->
+    <script src="http://code.jquery.com/jquery.js"></script>
+
+        <link href="/feeds/all.atom.xml" type="application/atom+xml" rel="alternate"
+              title="Jason Antman's Blog ATOM Feed"/>
+
+</head>
+<body>
+<nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="" class="navbar-brand">Jason Antman's Blog</a>
+        </div>
+        <div class="collapse navbar-collapse navbar-ex1-collapse">
+            <ul class="nav navbar-nav">
+                         <li><a href="/pages/about.html">
+                             About
+                          </a></li>
+                        <li >
+                            <a href="/category/ideas-and-rants.html">Ideas and rants</a>
+                        </li>
+                        <li >
+                            <a href="/category/miscellaneous.html">Miscellaneous</a>
+                        </li>
+                        <li >
+                            <a href="/category/monitoring.html">Monitoring</a>
+                        </li>
+                        <li >
+                            <a href="/category/projects.html">Projects</a>
+                        </li>
+                        <li >
+                            <a href="/category/puppet.html">Puppet</a>
+                        </li>
+                        <li >
+                            <a href="/category/sysadmin.html">Sysadmin</a>
+                        </li>
+                        <li class="active">
+                            <a href="/category/tech-howtos.html">Tech howtos</a>
+                        </li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="/archives.html"><i class="icon-th-list"></i>Archives</a></li>
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+</nav>
+<!-- /.navbar -->
+<div class="container">
+    <div class="row">
+        <div class="col-lg-9">
+    <section id="content">
+        <article>
+            <header class="page-header">
+                <h1>
+                    <a href="/2010/02/using-nmap-to-quickly-ping-all-hosts-in-an-address-range/"
+                       rel="bookmark"
+                       title="Permalink to Using nmap to quickly ping all hosts in an address range">
+                        Using nmap to quickly ping all hosts in an address&nbsp;range
+                    </a>
+                </h1>
+            </header>
+            <div class="entry-content">
+                <div class="panel">
+                    <div class="panel-body">
+<footer class="post-info">
+    <span class="label label-default">Date</span>
+    <span class="published">
+        <i class="icon-calendar"></i>Mon 08 February 2010
+    </span>
+
+
+
+<span class="label label-default">Tags</span>
+	<a href="/tag/dhcp.html">dhcp</a>
+        /
+	<a href="/tag/nmap.html">nmap</a>
+        /
+	<a href="/tag/ping.html">ping</a>
+        /
+	<a href="/tag/sysadmin.html">sysadmin</a>
+</footer><!-- /.post-info -->                    </div>
+                </div>
+                <p>At $<span class="caps">WORK</span>, the subnet we use for some of our workstations and test boxes
+was only recently setup with <span class="caps">DHCP</span>. Previously, we&#8217;d used
+<span class="caps">IP</span>-by-Whiteboard in the office. As a result, most of the recent machines
+use <span class="caps">DHCP</span>, but there are a few older ones still around using static
+addresses. I recently had to add a new machine, so I had to go through
+the process of finding out which IPs are in use and which aren&#8217;t (since
+some aren&#8217;t in&nbsp;<span class="caps">DHCP</span>).</p>
+<p>I decided to be good and update <span class="caps">DHCP</span> with records for all machines in
+the subnet, whether they&#8217;re actually using <span class="caps">DHCP</span> or not. There&#8217;s a quick
+way to do this with <code>nmap</code> using the options for ping scan (<code>-sP</code>) and
+always resolve <span class="caps">DNS</span> (<code>-R</code>):</p>
+<p><code>nmap -sP -R 172.16.43.129-159</code></p>
+<div class="codehilite"><pre>Host ar01-hill-hill.example.com (172.16.43.129) appears to be up.
+MAC Address: 00:11:BC:7D:28:0A (Cisco Systems)
+Host ccf-hill019-1.example.com (172.16.43.130) appears to be up.
+MAC Address: 00:00:AA:63:54:BB (Xerox)
+Host ccf-hill019-2.example.com (172.16.43.131) appears to be down.
+Host ccf-hill019-3.example.com (172.16.43.132) appears to be down.
+Host ccf-hill019-4.example.com (172.16.43.133) appears to be down.
+Host ccf-hill019-5.example.com (172.16.43.134) appears to be down.
+Host ccf-hill019-6.example.com (172.16.43.135) appears to be down.
+Host ccf-hill019-7.example.com (172.16.43.136) appears to be up.
+Host speakeasy.example.com (172.16.43.137) appears to be up.
+MAC Address: 00:17:A4:13:EB:57 (Global Data Services)
+Host ccf-hill019-9.example.com (172.16.43.138) appears to be up.
+MAC Address: 00:17:A4:13:E8:17 (Global Data Services)
+Host ccf-hill019-10.example.com (172.16.43.139) appears to be down.
+Host testmac01.example.com (172.16.43.140) appears to be down.
+Host ccf-hill019-12.example.com (172.16.43.141) appears to be down.
+Host ccf-hill019-13.example.com (172.16.43.142) appears to be up.
+MAC Address: 00:0D:29:59:58:00 (Cisco)
+Host ccf-hill019-14.example.com (172.16.43.143) appears to be down.
+Host ccf-hill019-15.example.com (172.16.43.144) appears to be down.
+Host ccf-hill019-16.example.com (172.16.43.145) appears to be down.
+Host ccf-hill019-17.example.com (172.16.43.146) appears to be down.
+Host ccf-hill019-18.example.com (172.16.43.147) appears to be up.
+MAC Address: 00:1E:C2:0D:C1:98 (Unknown)
+Host ccf-hill019-19.example.com (172.16.43.148) appears to be down.
+Host ccf-hill019-20.example.com (172.16.43.149) appears to be down.
+Host ccf-hill019-21.example.com (172.16.43.150) appears to be down.
+Host lordkris.example.com (172.16.43.151) appears to be down.
+Host ccf-hill019-23.example.com (172.16.43.152) appears to be down.
+Host ccf-hill019-24.example.com (172.16.43.153) appears to be down.
+Host ccf-hill019-25.example.com (172.16.43.154) appears to be down.
+Host ccf-hill019-26.example.com (172.16.43.155) appears to be down.
+Host ccf-hill019-27.example.com (172.16.43.156) appears to be down.
+Host ccf-hill019-28.example.com (172.16.43.157) appears to be down.
+Host ccf-hill019-29.example.com (172.16.43.158) appears to be down.
+Host ccf-hill019-30.example.com (172.16.43.159) appears to be down.
+Nmap finished: 31 IP addresses (7 hosts up) scanned in 0.892 seconds
+</pre></div>
+
+
+<p>As you can see, the results also (very usefully) include <span class="caps">MAC</span> addresses,
+so it&#8217;s pretty easy to update <span class="caps">DHCP</span> as&nbsp;needed.</p>
+            </div>
+            <!-- /.entry-content -->
+        </article>
+    </section>
+
+        </div>
+        <div class="col-lg-3 well well-sm" id="sidebar">
+
+<aside>
+    <section>
+        <ul class="list-group list-group-flush">
+                <li class="list-group-item"><h4><i class="icon-home icon-large"></i>Social</h4></li>
+                    <li class="list-group-item"><a href="#"><i
+                            class="icon-You can add links in your config file-sign icon-large"></i>You can add links in your config file
+                    </a></li>
+                    <li class="list-group-item"><a href="#"><i
+                            class="icon-Another social link-sign icon-large"></i>Another social link
+                    </a></li>
+
+
+
+                <li class="list-group-item"><a href="/tags.html"><h4><i class="icon-tags icon-large"></i>Tags</h4></a></li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/android.html">
+                                android
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/google.html">
+                                google
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/nagios.html">
+                                Nagios
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/php.html">
+                                PHP
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/sysadmin.html">
+                                sysadmin
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/linux.html">
+                                linux
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/perl.html">
+                                perl
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/logging.html">
+                                logging
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/puppet.html">
+                                puppet
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/bind.html">
+                                bind
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/monitoring.html">
+                                monitoring
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/dns.html">
+                                dns
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/droid.html">
+                                droid
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/firefox.html">
+                                firefox
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/mediawiki.html">
+                                mediawiki
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/mac.html">
+                                mac
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/microsoft.html">
+                                microsoft
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/syslog.html">
+                                syslog
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/wordpress.html">
+                                wordpress
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/rpm.html">
+                                rpm
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/security.html">
+                                security
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/blog.html">
+                                blog
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/sun.html">
+                                sun
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/ems.html">
+                                EMS
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/apache.html">
+                                apache
+                            </a>
+                        </li>
+        </ul>
+    </section>
+</aside>        </div>
+    </div>
+</div>
+<footer>
+    <div class="container">
+        <hr>
+        <p class="pull-right"><i class="icon-arrow-up"></i> <a href="#">Back to top</a></p>
+
+
+        <p>&copy; 2014 Jason Antman &middot; Powered by <a href="https://github.com/DandyDev/pelican-bootstrap3" target="_blank">pelican-bootstrap3</a>,
+            <a href="http://docs.getpelican.com/" target="_blank">Pelican</a>,
+            <a href="http://getbootstrap.com" target="_blank">Bootstrap</a></p>
+    </div>
+</footer>
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="/theme/js/bootstrap.min.js"></script>
+
+<!-- Enable responsive features in IE8 with Respond.js (https://github.com/scottjehl/Respond) -->
+<script src="/theme/js/respond.min.js"></script>
+
+
+</body>
+</html>

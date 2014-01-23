@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:og="http://ogp.me/ns#"
+      xmlns:fb="https://www.facebook.com/2008/fbml">
+<head>
+    <title>Big Plans - Major Infrastructure Upgrades</title>
+    <!-- Using the latest rendering mode for IE -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Open Graph tags -->
+
+            <meta property="og:type" content="article"/>
+            <meta property="og:title" content="Big Plans - Major Infrastructure Upgrades"/>
+            <meta property="og:url" content="/2008/02/big-plans-major-infrastructure-upgrades/"/>
+            <meta property="og:description" content="Well, some more news. I’ve got some pay coming to me, and I also realized that I have literally a pile of Dell server rack rails, cable management parts, and front bezels/panels (that I got from Rutgers Unversity Surplus) to sell on EBay. So, aside from expenses (like ..."/>
+
+    <!-- Bootstrap -->
+        <link rel="stylesheet" href="/theme/css/bootstrap.min.css" type="text/css"/>
+    <link href="/theme/css/font-awesome.min.css" rel="stylesheet">
+    <link href="/theme/css/pygments.css" rel="stylesheet">
+        <link href="/theme/css/typogrify.css" rel="stylesheet">
+    <link rel="stylesheet" href="/theme/css/style.css" type="text/css"/>
+    <!-- JavaScript plugins (requires jQuery) -->
+    <script src="http://code.jquery.com/jquery.js"></script>
+
+        <link href="/feeds/all.atom.xml" type="application/atom+xml" rel="alternate"
+              title="Jason Antman's Blog ATOM Feed"/>
+
+</head>
+<body>
+<nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="" class="navbar-brand">Jason Antman's Blog</a>
+        </div>
+        <div class="collapse navbar-collapse navbar-ex1-collapse">
+            <ul class="nav navbar-nav">
+                         <li><a href="/pages/about.html">
+                             About
+                          </a></li>
+                        <li >
+                            <a href="/category/ideas-and-rants.html">Ideas and rants</a>
+                        </li>
+                        <li >
+                            <a href="/category/miscellaneous.html">Miscellaneous</a>
+                        </li>
+                        <li >
+                            <a href="/category/monitoring.html">Monitoring</a>
+                        </li>
+                        <li class="active">
+                            <a href="/category/projects.html">Projects</a>
+                        </li>
+                        <li >
+                            <a href="/category/puppet.html">Puppet</a>
+                        </li>
+                        <li >
+                            <a href="/category/sysadmin.html">Sysadmin</a>
+                        </li>
+                        <li >
+                            <a href="/category/tech-howtos.html">Tech howtos</a>
+                        </li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="/archives.html"><i class="icon-th-list"></i>Archives</a></li>
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+</nav>
+<!-- /.navbar -->
+<div class="container">
+    <div class="row">
+        <div class="col-lg-9">
+    <section id="content">
+        <article>
+            <header class="page-header">
+                <h1>
+                    <a href="/2008/02/big-plans-major-infrastructure-upgrades/"
+                       rel="bookmark"
+                       title="Permalink to Big Plans - Major Infrastructure Upgrades">
+                        Big Plans - Major Infrastructure&nbsp;Upgrades
+                    </a>
+                </h1>
+            </header>
+            <div class="entry-content">
+                <div class="panel">
+                    <div class="panel-body">
+<footer class="post-info">
+    <span class="label label-default">Date</span>
+    <span class="published">
+        <i class="icon-calendar"></i>Tue 05 February 2008
+    </span>
+
+
+
+</footer><!-- /.post-info -->                    </div>
+                </div>
+                <p>Well, some more news. I&#8217;ve got some pay coming to me, and I also
+realized that I have literally a <em>pile</em> of Dell server rack rails, cable
+management parts, and front bezels/panels (that I got from <a href="http://www.material.rutgers.edu/surplussales.shtml">Rutgers
+Unversity Surplus</a>) to sell on <a href="http://myworld.ebay.com/jason-antman/">EBay</a>. So, aside from expenses (like
+$45/month for Verizon data service on my wonderful <a href="http://www.palm.com/us/products/smartphones/treo700p/">Treo 700p</a>) and
+savings, I decided that I should make some infrastructure upgrades to&nbsp;jasonantman.com.</p>
+<p>Just figuring out what to do was a task. I&#8217;ll admit that my
+administration techniques haven&#8217;t really scaled with the network, so I
+clicked into my <a href="http://www.nagios.org/">Nagios</a> installation, and remembered that I&#8217;m
+monitoring 17 hosts (and 165 services), I realized that this will end up
+being a big project, both in terms of infrastructure/hardware and
+software. The first decision was that I wouldn&#8217;t do anything with the
+hosts at the <a href="http://www.midlandparkambulance.com/">ambulance corps</a> or my apartment (the apartment is all
+non-mission-critical), so that narrowed it down to the main seven
+systems at&nbsp;home.</p>
+<p>Figuring out what I have running was also a major task, and highlighted
+some real problems. I found [a Perl script that gathers hardware
+information on Linux-based systems][] from <a href="http://www.dracoware.com/ppl/rtwomey/index.html">Ryan Twomey</a> (<em>everything</em>
+is running some version of <a href="http://www.opensuse.org/">OpenSuSE</a> 10.x except for the mailserver,
+which runs <a href="http://www.sun.com/software/solaris/">Sun Solaris 10</a>). I had to scp the script and its&#8217; two
+perl modules to five machines (not counting the one I was working on),
+<span class="caps">SSH</span> into them an run it, and then <span class="caps">SCP</span> the results back. Well, that&#8217;s
+something to worry about later. For Solaris, I just ran some commands
+and gathered the information&nbsp;manually.  </p>
+<h1 id="the-results">The&nbsp;Results:</h1>
+<h2 id="needs-replacing">Needs&nbsp;Replacing:</h2>
+<ol>
+<li>Router/Firewall - Old gateway mini-tower system, 400MHz Celeron,
+    <span class="caps">192MB</span> <span class="caps">RAM</span>, 6 <span class="caps">GB</span> <span class="caps">IDE</span>&nbsp;disk.</li>
+<li><span class="caps">SSH</span> gateway and temporary storage for <span class="caps">SFTP</span>&#8217;d files - Old Gateway
+    G6-350, 350MHz Pentium-<span class="caps">II</span>, <span class="caps">128MB</span> <span class="caps">RAM</span> (<strong>!!!</strong>), <span class="caps">40GB</span> <span class="caps">IDE</span>&nbsp;disk.</li>
+<li>Disk storage for backups - Old Dell tower, 500MHz Pentium-<span class="caps">II</span>, <span class="caps">256MB</span>
+    <span class="caps">RAM</span>, <span class="caps">250GB</span> <span class="caps">IDE</span> disk for&nbsp;storage.</li>
+</ol>
+<h2 id="still-has-a-ways-to-go">Still has a ways to&nbsp;go:</h2>
+<ol>
+<li>Web Server - Compaq Proliant <span class="caps">DL360</span>-G1, 2x 1GHz Pentium-<span class="caps">III</span>, <span class="caps">1GB</span> <span class="caps">RAM</span>,
+    2x <span class="caps">18GB</span> <span class="caps">SCSI</span> disks,&nbsp;<span class="caps">RAID</span>-1.</li>
+<li>Backup Director (and mirrored disk storage for critical backups) -
+    Compaq Proliant <span class="caps">ML370</span>-G1, 2x 750MHz Pentium-<span class="caps">III</span>, <span class="caps">2GB</span> <span class="caps">RAM</span>, 4x <span class="caps">18GB</span>
+    <span class="caps">SCSI</span> disks in a 3-disk <span class="caps">RAID5</span> with one hot&nbsp;spare.</li>
+<li>Monitoring (Nagios) box - Compaq Proliant <span class="caps">DL320</span>-G1, single
+    Pentium-<span class="caps">III</span> 1GHz, <span class="caps">512MB</span> <span class="caps">RAM</span>, single <span class="caps">18GB</span> <span class="caps">SCSI</span>&nbsp;disk.</li>
+</ol>
+<p>The one unfortunate about these (for me, &#8220;new&#8221;) machines is that they
+all have 10/100 Mb/s NICs, so an upgrade to gigabit will mean hardware&nbsp;changes.</p>
+<p>And the rest falls somewhere in the middle. One option, if budget is an
+issue, is to move an older machine down to the apartment to use as a
+print server for <a href="http://www.jasonantman.com/blog/2007/11/print-accounting.html">print accounting</a>, which is currently running in a
+Xen <span class="caps">VM</span> as the <em>only</em> load on a beautiful 1U Dell PowerEdge 650
+(Pentium-4 2.4GHz, <span class="caps">762MB</span> <span class="caps">RAM</span>, 2x <span class="caps">36GB</span> <span class="caps">SCSI</span> disks, 3com 10/100 <span class="caps">NIC</span> and
+Intel Pro Dual-Gigabit&nbsp;<span class="caps">NIC</span>).  </p>
+<h2 id="other-acquisitions-on-the-list">Other acquisitions on the&nbsp;list:</h2>
+<ol>
+<li>New switch to replace the aged <a href="http://www.jasonantman.com/wiki/index.php/BayStack_450-24T">BayStack 450-24T switch</a> that
+    <em>everything</em> is running on now. I&#8217;m looking for something good,
+    managed, with Telnet (or <span class="caps">SSH</span>) and <span class="caps">SNMP</span> for monitoring, as well as
+    the easy ability to do a span port. The important thing is that I
+    *never* have to be on-site to manage it. Maybe a Cisco if I can
+    choose a model and get the cash&nbsp;together.</li>
+<li>A gigabit (even unmanaged, though <span class="caps">SNMP</span> monitoring and <span class="caps">MRTG</span>/Cacti
+    would be nice) switch for a dedicated backup network, to move that
+    load off of the little 100Mbps main&nbsp;switch.</li>
+<li>Right now, I just have everything [crammed onto a Sears metal shop
+    shelf unit][]. I&#8217;d really like to replace that with a nice little
+    24U (low ceilings in the basement) rack, especially since most of my
+    stuff is&nbsp;rack-mount.</li>
+<li>I don&#8217;t have rack rails for any of the Proliants - none of them came
+    with them, and they were all purchased before I had anything rack
+    mounted (at the&nbsp;apartment).</li>
+</ol>
+<h1 id="software-needs">Software&nbsp;Needs:</h1>
+<ol>
+<li>Obviously, some better way of handling administration. Right now,
+    software updates (via YaST/<span class="caps">YOU</span>) are run as cron jobs, and I have no
+    easy way of distributing files or running commands on multiple
+    systems without manually scp/ssh&#8217;ing to all of&nbsp;them</li>
+<li>I&#8217;m going to start testing some other <a href="http://www.jasonantman.com/blog/2008/01/network-monitoring.html">Network Monitoring</a>
+    packages at the apartment. Since I&#8217;m going to have some scheduled
+    downtime for all of this (especially with a router/firewall
+    replacement), I might as well plan a move to a new monitoring&nbsp;system.</li>
+<li>At the moment, all of my web presence is on one Generation-1 (G-I)
+    Compaq Proliant server. While it seems to have a lot of life left
+    (especially under its&#8217; current low load), I don&#8217;t like that.
+    Especially given that I&#8217;m only home every other weekend, so even
+    with nightly backups, if it gives up the ghost I&#8217;m down for a while.
+    I&#8217;m going to think about mirroring this to a box at the apartment
+    (see both items below), but there are still some technical issues to
+    be dealt&nbsp;with:  </li>
+<li>
+<p>Both home and the apartment are on residential high-bandwidth
+        connections (<a href="http://www.verizon.com/fios">Verizon FiOS</a> and <a href="http://www.optimum.com/">Optimum Online</a>,
+        respectively) using <a href="http://www.dyndns.org/">DynDNS.org</a> with dynamic IPs. I still
+        haven&#8217;t been able to get <a href="http://ipcop.org/">IPcop</a> to <span class="caps">VPN</span> between the two
+        (either with the built-in <span class="caps">VPN</span> or Zerina). If I wanted to mirror
+        to the apartment, it would surely be easier to copy everything
+        over a <span class="caps">VPN</span>, and not worry as much about&nbsp;security.</p>
+<ol>
+<li>I use DynDNS and <a href="http://www.godaddy.com/">GoDaddy</a> (yes, this years&#8217; Super Bowl
+    commercial was a letdown) Domain Forwarding. As a result, I
+    don&#8217;t have any control over <span class="caps">DNS</span> at all, so I&#8217;m not quite sure
+    how I&#8217;d do a failover from home to the apartment automatically.
+    It would be possible, however, to do the manual failover from
+    home to the apartment, just for the downtime, if I mirrored the
+    home server to a box at the&nbsp;apartment.</li>
+</ol>
+<p><p>
+While I don&#8217;t want to give up my email on my Treo, it is tempting
+that Verizon FiOS is now listing <a href="http://www22.verizon.com/content/businessdsl/popups/bdsl+speeds+and+package+features/bdsl+speeds+and+package+features.htm">a business-class FiOS connection
+at 3Mbps down/768Kbps up</a> at $80/month with <em>static <span class="caps">IP</span></em>. We&#8217;re
+paying $30-40/month now, so dropping the data plan would cover it.
+I&#8217;d be getting slightly lower speed, but there would be so many
+fewer headaches with a static <span class="caps">IP</span>, not to mention that I could
+finally get my site on port 80 without nasty redirection, and get a
+real mailserver without relaying. Something to think about&#8230;
+4.  At the moment, I&#8217;m using IPcop&#8217;s builtin <span class="caps">DNS</span> cache for local <span class="caps">DNS</span>.
+That means I&#8217;m bound to a simple hostname&lt;-><span class="caps">IP</span> pairing. I&#8217;d really
+like a real <span class="caps">DNS</span> server, so that I can have both hostnames and
+functional names. It would also help with&nbsp;<span class="caps">VPN</span>.</p>
+</li>
+</ol>
+<p>The biggest problem with all of this is that I&#8217;m only home 2 weekends a
+month, so I&#8217;ll probably have to have everything shipped here (to the
+apartment at school), do the installation and configuration here, and
+then bring it home and drop it in place (and perform final&nbsp;configuration).</p>
+<p>I&#8217;ll keep everyone posted as work&nbsp;progresses.</p>
+<p>[a Perl script that gathers hardware information on Linux-based
+  systems]:&nbsp;http://www.dracoware.com/ppl/rtwomey/inventory.shtml</p>
+            </div>
+            <!-- /.entry-content -->
+        </article>
+    </section>
+
+        </div>
+        <div class="col-lg-3 well well-sm" id="sidebar">
+
+<aside>
+    <section>
+        <ul class="list-group list-group-flush">
+                <li class="list-group-item"><h4><i class="icon-home icon-large"></i>Social</h4></li>
+                    <li class="list-group-item"><a href="#"><i
+                            class="icon-You can add links in your config file-sign icon-large"></i>You can add links in your config file
+                    </a></li>
+                    <li class="list-group-item"><a href="#"><i
+                            class="icon-Another social link-sign icon-large"></i>Another social link
+                    </a></li>
+
+
+
+                <li class="list-group-item"><a href="/tags.html"><h4><i class="icon-tags icon-large"></i>Tags</h4></a></li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/android.html">
+                                android
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/google.html">
+                                google
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/nagios.html">
+                                Nagios
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/php.html">
+                                PHP
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/sysadmin.html">
+                                sysadmin
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/linux.html">
+                                linux
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/perl.html">
+                                perl
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/logging.html">
+                                logging
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/puppet.html">
+                                puppet
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/bind.html">
+                                bind
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/monitoring.html">
+                                monitoring
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/dns.html">
+                                dns
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/droid.html">
+                                droid
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/firefox.html">
+                                firefox
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/mediawiki.html">
+                                mediawiki
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/mac.html">
+                                mac
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/microsoft.html">
+                                microsoft
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/syslog.html">
+                                syslog
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/wordpress.html">
+                                wordpress
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/rpm.html">
+                                rpm
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/security.html">
+                                security
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/blog.html">
+                                blog
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/sun.html">
+                                sun
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/ems.html">
+                                EMS
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/apache.html">
+                                apache
+                            </a>
+                        </li>
+        </ul>
+    </section>
+</aside>        </div>
+    </div>
+</div>
+<footer>
+    <div class="container">
+        <hr>
+        <p class="pull-right"><i class="icon-arrow-up"></i> <a href="#">Back to top</a></p>
+
+
+        <p>&copy; 2014 Jason Antman &middot; Powered by <a href="https://github.com/DandyDev/pelican-bootstrap3" target="_blank">pelican-bootstrap3</a>,
+            <a href="http://docs.getpelican.com/" target="_blank">Pelican</a>,
+            <a href="http://getbootstrap.com" target="_blank">Bootstrap</a></p>
+    </div>
+</footer>
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="/theme/js/bootstrap.min.js"></script>
+
+<!-- Enable responsive features in IE8 with Respond.js (https://github.com/scottjehl/Respond) -->
+<script src="/theme/js/respond.min.js"></script>
+
+
+</body>
+</html>

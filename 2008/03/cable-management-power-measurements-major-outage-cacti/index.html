@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:og="http://ogp.me/ns#"
+      xmlns:fb="https://www.facebook.com/2008/fbml">
+<head>
+    <title>Cable Management, Power Measurements, Major Outage, Cacti</title>
+    <!-- Using the latest rendering mode for IE -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Open Graph tags -->
+
+            <meta property="og:type" content="article"/>
+            <meta property="og:title" content="Cable Management, Power Measurements, Major Outage, Cacti"/>
+            <meta property="og:url" content="/2008/03/cable-management-power-measurements-major-outage-cacti/"/>
+            <meta property="og:description" content="So, once again, still really busy. But a few new things. First, my racks both at home and at the apartment are atrocious. They have no cable management at all. Both started with 1-3 machines, and no real plans for upgrades (since they’re just my personal/development machines). Unfortunately ..."/>
+
+    <!-- Bootstrap -->
+        <link rel="stylesheet" href="/theme/css/bootstrap.min.css" type="text/css"/>
+    <link href="/theme/css/font-awesome.min.css" rel="stylesheet">
+    <link href="/theme/css/pygments.css" rel="stylesheet">
+        <link href="/theme/css/typogrify.css" rel="stylesheet">
+    <link rel="stylesheet" href="/theme/css/style.css" type="text/css"/>
+    <!-- JavaScript plugins (requires jQuery) -->
+    <script src="http://code.jquery.com/jquery.js"></script>
+
+        <link href="/feeds/all.atom.xml" type="application/atom+xml" rel="alternate"
+              title="Jason Antman's Blog ATOM Feed"/>
+
+</head>
+<body>
+<nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="" class="navbar-brand">Jason Antman's Blog</a>
+        </div>
+        <div class="collapse navbar-collapse navbar-ex1-collapse">
+            <ul class="nav navbar-nav">
+                         <li><a href="/pages/about.html">
+                             About
+                          </a></li>
+                        <li >
+                            <a href="/category/ideas-and-rants.html">Ideas and rants</a>
+                        </li>
+                        <li >
+                            <a href="/category/miscellaneous.html">Miscellaneous</a>
+                        </li>
+                        <li >
+                            <a href="/category/monitoring.html">Monitoring</a>
+                        </li>
+                        <li class="active">
+                            <a href="/category/projects.html">Projects</a>
+                        </li>
+                        <li >
+                            <a href="/category/puppet.html">Puppet</a>
+                        </li>
+                        <li >
+                            <a href="/category/sysadmin.html">Sysadmin</a>
+                        </li>
+                        <li >
+                            <a href="/category/tech-howtos.html">Tech howtos</a>
+                        </li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="/archives.html"><i class="icon-th-list"></i>Archives</a></li>
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+</nav>
+<!-- /.navbar -->
+<div class="container">
+    <div class="row">
+        <div class="col-lg-9">
+    <section id="content">
+        <article>
+            <header class="page-header">
+                <h1>
+                    <a href="/2008/03/cable-management-power-measurements-major-outage-cacti/"
+                       rel="bookmark"
+                       title="Permalink to Cable Management, Power Measurements, Major Outage, Cacti">
+                        Cable Management, Power Measurements, Major Outage,&nbsp;Cacti
+                    </a>
+                </h1>
+            </header>
+            <div class="entry-content">
+                <div class="panel">
+                    <div class="panel-body">
+<footer class="post-info">
+    <span class="label label-default">Date</span>
+    <span class="published">
+        <i class="icon-calendar"></i>Thu 06 March 2008
+    </span>
+
+
+
+<span class="label label-default">Tags</span>
+	<a href="/tag/apc.html">apc</a>
+        /
+	<a href="/tag/cable-management.html">cable management</a>
+        /
+	<a href="/tag/cacti.html">cacti</a>
+        /
+	<a href="/tag/disaster.html">disaster</a>
+        /
+	<a href="/tag/monitoring.html">monitoring</a>
+        /
+	<a href="/tag/power-distribution.html">power distribution</a>
+        /
+	<a href="/tag/power-failure.html">power failure</a>
+        /
+	<a href="/tag/rack.html">rack</a>
+        /
+	<a href="/tag/ups.html">UPS</a>
+</footer><!-- /.post-info -->                    </div>
+                </div>
+                <p>So, once again, still really busy. But a few new&nbsp;things.</p>
+<p>First, my racks both at home and at the apartment are atrocious. They
+have no cable management at all. Both started with 1-3 machines, and no
+real plans for upgrades (since they&#8217;re just my personal/development
+machines). Unfortunately, the &#8220;rack&#8221; (a metal workshop shelving unit) at
+home now has 8 machines and a host of ancillary equipment. The one at
+the apartment - an actual 42U rack - has 5 plus a few switches,
+rackmount <span class="caps">KMM</span>, etc. They&#8217;re both a jumble of wires in the back.
+Unfortunately, it seems like cable management hardware is *epxensive*.
+$30 for a 2U metal blank with a few plastic split D-rings, or almost $40
+for a 2-meter vertical hunk of plastic channel with slits in the sides?
+So, I&#8217;ve been vaguely considering what it will take to fabricate some
+cable management hardware of my own. Probably just building something
+out of rack blanks for the horizontal off of the switches, and buying
+some sort of vertical channel for power and networking/<span class="caps">KVM</span>. Man, those
+<span class="caps">KVM</span> cables sure do take up a lot of space. Also at the moment, at home
+my power is all coming directly out of two UPSs, whereas at the
+apartment it&#8217;s straight from mains off of a surge suppressor. I&#8217;s like
+to buy another <span class="caps">UPS</span> for the apartment from RefurbUPS.com, where I got the
+ones from home, and also add a <span class="caps">PDU</span> at home and a vertical power strip at
+the&nbsp;apartment.</p>
+<p>Also, at the apartment, the roommates and I have had some discussion
+lately about how much power the machines draw. This mainly stemmed from
+our plans to move this June, into a rented house with two more people.
+This seems to be falling through, so I don&#8217;t have to worry about moving
+and re-cabling everything, but I&#8217;m still interested in finding out how
+much power is being drawn. Granted, my UPSs at home give me a
+more-or-less good idea of power consumption, but I&#8217;d like to know in
+detail. The ideal solution would be a clamp ammeter around the mains
+line to the equipment - one with a serial interface. Unfortunately, I
+can&#8217;t seem to find such a thing, short of a digital multimeter left on
+all the time. So, I guess I&#8217;ll be looking around, and if I can&#8217;t find
+anything specific, maybe I&#8217;ll work on a microcontroller that can read
+1-200mV in 1mV increments, and use it with an inductive clamp ammeter
+(usual output for them is 1mV per&nbsp;A).</p>
+<p>So, on Monday I got into work and couldn&#8217;t access my mailserver. Weird.
+I never even got any Nagios alerts. I checked Nagios and&#8230; nothing. As
+in no connection. I <span class="caps">SSH</span>&#8217;d home and pinged both boxes, but nothing. The
+switch showed the mail server totally offline, and the Nagios box
+plugged connected but <span class="caps">ZERO</span> data out. I reset the counters and waited.
+Still nothing. After an hour or so of poking around, I determined that
+both devices were on the same 6-port group on the switch, and nothing
+else there was up too. So, after five long hours, I got someone back
+home to switch the cables. Still nothing. On a hunch, I asked to have
+her check the mail server (the &#8220;new&#8221; Sun Blade 150) and, sure enough, it
+wasn&#8217;t powered on. A click of the power button, and the mail server was
+back online. Along with an ominous last email from Nagios, stating that
+the <span class="caps">UPS</span> running my switch lost power, and 6 minutes later, was going
+down hard. Then&nbsp;quiet.</p>
+<p>I don&#8217;t usually have power outages. So I&#8217;ll admit, when I added some of
+the new machines, I committed a high sin - I &#8220;never got around&#8221; to
+setting up everything power-wise. I also have the switch running off of
+an old BackUPS <span class="caps">500VA</span> unit, <span class="caps">USB</span>, without automatic self-tests. As a
+result of all&nbsp;this:</p>
+<ol>
+<li>The little <span class="caps">UPS</span> powering the switch only held out for 6-7 minutes. As
+    a result, once that died, the bigger units didn&#8217;t even matter, as
+    all hope was lost. This needs to be on a bigger <span class="caps">UPS</span> - maybe one of
+    the <span class="caps">1000VA</span>&#8217;s until it gets its&#8217;&nbsp;own.</li>
+<li>APCupsd requires a network to initiate shutdown, so the rest of the
+    machines came down hard (as confirmed by looking through log&nbsp;files).</li>
+<li>The SunBlade was never setup to power on after power interruption,
+    so it just sat there like a&nbsp;brick.</li>
+</ol>
+<p>Most disturbingly, while my Nagios/monitoring box is up (according to
+the switch, power draw figures from the <span class="caps">UPS</span>, and the lights, as
+confirmed by someone on-site), it&#8217;s dead. No ping, nothing out. I&#8217;ll
+have to look into it, but it made me realize that this really is my only
+way of analyzing problems. That needs to&nbsp;stop.</p>
+<p>Maybe one day I&#8217;ll have the money for a nice <a href="http://www.apc.com/products/family/index.cfm?id=223">SmartUPS <span class="caps">RT</span></a> or even a
+<a href="http://www.apc.com/products/family/index.cfm?id=189">Symmetra</a> - though getting 208V into my basement is even more of a
+dream than spending $4000 on a&nbsp;<span class="caps">UPS</span>.</p>
+<p>Also, I decided (after all this) to setup graphing of <span class="caps">UPS</span> data (load,
+voltage in and out, temp, capacity, run time, etc.). While I haven&#8217;t
+gotten around to setting up <a href="http://www.zenoss.com/">Zenoss</a> yet, I did a quick (well, 4 hours
+later I&#8217;m done configuring it) <a href="http://www.cacti.net/">Cacti</a>installation on my web server (I
+should already have it running on the monitoring box, but who knows what
+that will look like when I get home). I also dropped a <a href="http://cvs.jasonantman.com/cvs/misc-scripts/cacti_host_template_apc_powernet_ap9605.xml?view=log">Cacti host
+template in <span class="caps">CVS</span></a> for the <a href="http://www.jasonantman.com/blog/2007/03/apc-ap9605-powernet-snmp-card.html"><span class="caps">AP9605</span> PowerNet <span class="caps">SNMP</span> card</a> in my&nbsp;UPSs.</p>
+            </div>
+            <!-- /.entry-content -->
+        </article>
+    </section>
+
+        </div>
+        <div class="col-lg-3 well well-sm" id="sidebar">
+
+<aside>
+    <section>
+        <ul class="list-group list-group-flush">
+                <li class="list-group-item"><h4><i class="icon-home icon-large"></i>Social</h4></li>
+                    <li class="list-group-item"><a href="#"><i
+                            class="icon-You can add links in your config file-sign icon-large"></i>You can add links in your config file
+                    </a></li>
+                    <li class="list-group-item"><a href="#"><i
+                            class="icon-Another social link-sign icon-large"></i>Another social link
+                    </a></li>
+
+
+
+                <li class="list-group-item"><a href="/tags.html"><h4><i class="icon-tags icon-large"></i>Tags</h4></a></li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/android.html">
+                                android
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/google.html">
+                                google
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/nagios.html">
+                                Nagios
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/php.html">
+                                PHP
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/sysadmin.html">
+                                sysadmin
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/linux.html">
+                                linux
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/perl.html">
+                                perl
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/logging.html">
+                                logging
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/puppet.html">
+                                puppet
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/bind.html">
+                                bind
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/monitoring.html">
+                                monitoring
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/dns.html">
+                                dns
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/droid.html">
+                                droid
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/firefox.html">
+                                firefox
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/mediawiki.html">
+                                mediawiki
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/mac.html">
+                                mac
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/microsoft.html">
+                                microsoft
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/syslog.html">
+                                syslog
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/wordpress.html">
+                                wordpress
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/rpm.html">
+                                rpm
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/security.html">
+                                security
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/blog.html">
+                                blog
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/sun.html">
+                                sun
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/ems.html">
+                                EMS
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/apache.html">
+                                apache
+                            </a>
+                        </li>
+        </ul>
+    </section>
+</aside>        </div>
+    </div>
+</div>
+<footer>
+    <div class="container">
+        <hr>
+        <p class="pull-right"><i class="icon-arrow-up"></i> <a href="#">Back to top</a></p>
+
+
+        <p>&copy; 2014 Jason Antman &middot; Powered by <a href="https://github.com/DandyDev/pelican-bootstrap3" target="_blank">pelican-bootstrap3</a>,
+            <a href="http://docs.getpelican.com/" target="_blank">Pelican</a>,
+            <a href="http://getbootstrap.com" target="_blank">Bootstrap</a></p>
+    </div>
+</footer>
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="/theme/js/bootstrap.min.js"></script>
+
+<!-- Enable responsive features in IE8 with Respond.js (https://github.com/scottjehl/Respond) -->
+<script src="/theme/js/respond.min.js"></script>
+
+
+</body>
+</html>

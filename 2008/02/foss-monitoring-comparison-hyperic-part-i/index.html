@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:og="http://ogp.me/ns#"
+      xmlns:fb="https://www.facebook.com/2008/fbml">
+<head>
+    <title>F/OSS Monitoring Comparison - Hyperic Part I</title>
+    <!-- Using the latest rendering mode for IE -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Open Graph tags -->
+
+            <meta property="og:type" content="article"/>
+            <meta property="og:title" content="F/OSS Monitoring Comparison - Hyperic Part I"/>
+            <meta property="og:url" content="/2008/02/foss-monitoring-comparison-hyperic-part-i/"/>
+            <meta property="og:description" content="So, I’ve made some headway on the comparison. I have Hyperic installed and partly configured, albeit without email alerts yet. I’ve found some serious features that I need missing, but I’m going to give it a full run before I move on to another. The full text ..."/>
+
+    <!-- Bootstrap -->
+        <link rel="stylesheet" href="/theme/css/bootstrap.min.css" type="text/css"/>
+    <link href="/theme/css/font-awesome.min.css" rel="stylesheet">
+    <link href="/theme/css/pygments.css" rel="stylesheet">
+        <link href="/theme/css/typogrify.css" rel="stylesheet">
+    <link rel="stylesheet" href="/theme/css/style.css" type="text/css"/>
+    <!-- JavaScript plugins (requires jQuery) -->
+    <script src="http://code.jquery.com/jquery.js"></script>
+
+        <link href="/feeds/all.atom.xml" type="application/atom+xml" rel="alternate"
+              title="Jason Antman's Blog ATOM Feed"/>
+
+</head>
+<body>
+<nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="" class="navbar-brand">Jason Antman's Blog</a>
+        </div>
+        <div class="collapse navbar-collapse navbar-ex1-collapse">
+            <ul class="nav navbar-nav">
+                         <li><a href="/pages/about.html">
+                             About
+                          </a></li>
+                        <li >
+                            <a href="/category/ideas-and-rants.html">Ideas and rants</a>
+                        </li>
+                        <li >
+                            <a href="/category/miscellaneous.html">Miscellaneous</a>
+                        </li>
+                        <li >
+                            <a href="/category/monitoring.html">Monitoring</a>
+                        </li>
+                        <li class="active">
+                            <a href="/category/projects.html">Projects</a>
+                        </li>
+                        <li >
+                            <a href="/category/puppet.html">Puppet</a>
+                        </li>
+                        <li >
+                            <a href="/category/sysadmin.html">Sysadmin</a>
+                        </li>
+                        <li >
+                            <a href="/category/tech-howtos.html">Tech howtos</a>
+                        </li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="/archives.html"><i class="icon-th-list"></i>Archives</a></li>
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+</nav>
+<!-- /.navbar -->
+<div class="container">
+    <div class="row">
+        <div class="col-lg-9">
+    <section id="content">
+        <article>
+            <header class="page-header">
+                <h1>
+                    <a href="/2008/02/foss-monitoring-comparison-hyperic-part-i/"
+                       rel="bookmark"
+                       title="Permalink to F/OSS Monitoring Comparison - Hyperic Part I">
+                        F/<span class="caps">OSS</span> Monitoring Comparison - Hyperic Part&nbsp;I
+                    </a>
+                </h1>
+            </header>
+            <div class="entry-content">
+                <div class="panel">
+                    <div class="panel-body">
+<footer class="post-info">
+    <span class="label label-default">Date</span>
+    <span class="published">
+        <i class="icon-calendar"></i>Fri 08 February 2008
+    </span>
+
+
+
+<span class="label label-default">Tags</span>
+	<a href="/tag/hyperic.html">hyperic</a>
+        /
+	<a href="/tag/monitoring.html">monitoring</a>
+        /
+	<a href="/tag/open-source.html">open source</a>
+</footer><!-- /.post-info -->                    </div>
+                </div>
+                <p>So, I&#8217;ve made some headway on the comparison. I have Hyperic installed
+and partly configured, albeit without email alerts yet. I&#8217;ve found some
+serious features that I need missing, but I&#8217;m going to give it a full
+run before I move on to&nbsp;another.</p>
+<p>The full text, updated a few times a day, is available on <a href="http://www.jasonantman.com/wiki/index.php/Network_Monitoring_Comparison">my wiki</a>.
+Here&#8217;s a bit of an excerpt:<br />
+<a name="Part_I_-_Installation"></a>  </p>
+<h3 id="wzxhzdk3part-i-installationwzxhzdk4"><span class="mw-headline">Part I -&nbsp;Installation</span></h3>
+<ol>
+<li>setup Xen virtual machine running OpenSuSE 10.3 base packages. (3
+    hours, some server problems, some Xen problems, and some time
+    learning Xen administration from the&nbsp;<span class="caps">CLI</span>)</li>
+<li>Download <code>hyperic-hq-installer-3.2.0-607-x86-linux.tgz</code> from
+    <a href="http://www.hyperic.com/downloads/dl-hq-oss.html" title="http://www.hyperic.com/downloads/dl-hq-oss.html">Hyperic</a> and&nbsp;extract.</li>
+<li>Browse to
+    <a href="">http://support.hyperic.com/confluence/display/<span class="caps">DOC</span>/Full+Installation+Guide</a></li>
+<li>
+<p><code>cd</code> into <code>hyperic-hq-installer</code> and run <code>./setup.sh -full</code></p>
+<ol>
+<li>The installation can&#8217;t be run as root (though I assumed it would
+    need root&nbsp;privileges).</li>
+<li>I selected to install all 3 components - Server, Shell, and&nbsp;Agent.</li>
+<li>Well, whoops! Sorta stupid to not allow installation as root,
+    when the default location to install to is <code>/home/hyperic</code>. How
+    do they expect an arbitrary user to install there? Even worse,
+    it appears that the default OpenSuSE 10.3 installation doesn&#8217;t
+    come with <code>sudo</code> (!!!!) so I can&#8217;t try&nbsp;that.</li>
+<li>As root, create <code>/home/hyperic</code> and chown to my&nbsp;user.</li>
+<li>Repear the above steps (well, hopefully not all of&nbsp;them).</li>
+<li>Default ports for everything - web <span class="caps">GUI</span> on 7080, <span class="caps">HTTPS</span> web <span class="caps">GUI</span> on
+    7443, jnp service on 2099, mbean server on&nbsp;9093,</li>
+<li>Change domain names in default URLs to logical ones for my test
+    environment (no real <span class="caps">DNS</span>, just IPcop hosts, so
+    devel-hyperic1.localdomian). I hope that I can change these
+    later, or even better that absolute paths aren&#8217;t used too much,
+    as this will screw with my idea of using <span class="caps">SSH</span> port forwarding for
+    remote&nbsp;access.</li>
+<li>Leave the default <span class="caps">SMTP</span> server alone and change it later - I
+    odn&#8217;t even have mail running here at the&nbsp;apartment.</li>
+<li>Use the built-in PostgreSQL database with default port of&nbsp;9432.</li>
+<li>Go with the defaults for everything after&nbsp;this.</li>
+<li>Everything runs nicely, and then it tells you to login to
+    another terminal as root and run a script. I&#8217;m not sure I like
+    this method, but I guess it works. Login and do&nbsp;it.</li>
+<li>How will it start the builtin database? As my user???? Yup.
+    postgres is running as my user. Wonderful. Nothing in the
+    <a href="">install
+    document</a>
+    mentioned user creation. Was this just assumed? Because in the
+    naive world I live in, most installer scripts (think Nagios)
+    create a user for you, or tell you&nbsp;to.</li>
+<li>Setup script complete. A few instructions&nbsp;follow&#8230;</li>
+</ol>
+</li>
+<li>
+<p>Run <code>/home/hyperic/server-3.2.0/bin/hq-server.sh start</code>&#8230; as my
+    user. <em>Note to self:</em> setup a user for Postgres and Hyperic. Believe
+    it or not, but it booted - but followed with the message, &#8220;Login to
+    <span class="caps">HQ</span> at: <a href="http://127.0.0.1:7080/" title="http://127.0.0.1:7080/">http://127.0.0.1:7080/</a>&#8221;</p>
+</li>
+<li>Browsed to <a href="http://devel-hyperic1:7080/" title="http://devel-hyperic1:7080">http://devel-hyperic1:7080</a> and was greeted by a
+    startup page, saying that the server was 18% finished booting. My, I
+    yearn for little C binaries and a <span class="caps">PHP</span>&nbsp;frontend.</li>
+<li>Page turns blank and stops there. I refresh, and get a login page. I
+    enter my username and password, and get a little message box where
+    the &#8220;invalid password&#8221; box usually is - says &#8220;Server is still
+    booting&#8221;. This is over a minute later. I&#8217;m happy to see
+    Apache/Coyote1.1, but would like to be able to get into Hyperic in
+    less time than it takes the machine to boot to a graphical login
+    screen (ok, granted, I&#8217;m running <span class="caps">XFCE</span>). In SuSE&#8217;s YaST Xen Monitor,
+    I see that the <span class="caps">VM</span> is at 45% of its&#8217; <span class="caps">464MB</span> <span class="caps">RAM</span>, and 90% <span class="caps">CPU</span> - with
+    8.5% consumed by&nbsp;dom0.</li>
+<li><span class="caps">CPU</span> usage for the <span class="caps">VM</span> drops to 1% and I login again. <span class="caps">BAM</span>! Hyperic <span class="caps">HQ</span>.
+    Aside from the fact that it shows <span class="caps">NO</span> resources&#8230; oh&#8230; start the&nbsp;Agent.</li>
+<li>Start the Agent on the <span class="caps">VM</span> running Hyperic. It asks me for the server
+    <span class="caps">IP</span> address. What, no <span class="caps">DNS</span>? I enter the <span class="caps">IP</span> as it is&#8230; for now. I keep
+    everything at defaults, including using the hqadmin username and
+    password. Successfully&nbsp;started.</li>
+<li><span class="caps">BAM</span>! In Dashboard, I see the auto-discovered host with the right
+    hostname, as well as Tomcat, Agent, JBoss, and PostgreSQL. Amazing!
+    Click &#8220;Add to&nbsp;Inventory&#8221;.</li>
+<li>Check out the &#8220;Resources&#8221; -> &#8220;Browse&#8221; screen. It knows this machine
+    is OpenSuSE 10.3, and I see my four services (listed above). Of
+    course, no metrics yet, but I see the correct <span class="caps">IP</span>, gateway, <span class="caps">DNS</span>,
+    vendor (SuSE), kernel version, <span class="caps">RAM</span>, architecture, and <span class="caps">CPU</span>&nbsp;speed.</li>
+<li>Looking through the &#8220;Inventory&#8221; screen, I see everything - NICs and
+    MACs, running servers and one service (a <span class="caps">CPU</span> resource). What more
+    could a man want in&#8230;let&#8217;s see.. just over an&nbsp;hour!</li>
+<li>I really *love* the &#8220;Views&#8221; screen which, even out-of-the-box,
+    allows &#8220;Live Exec&#8221; information from cpuinfo, df, ifconfig, netstat,
+    top, who, and&nbsp;more.</li>
+<li>Well, it&#8217;s 03:35, and I have work and class tomorrow. I think it&#8217;s
+    time to give Part I a rest. But&nbsp;first&#8230;</li>
+<li>Go to the &#8220;Platform&#8221; page for my one machine and&#8230; <span class="caps">YES</span>! Graphs are
+    starting to&nbsp;appear!</li>
+<li>Following the suggestion <a href="http://support.hyperic.com/confluence/display/DOC/HQ+Quick+Start#HQQuickStart-enableTracking" title="http://support.hyperic.com/confluence/display/DOC/HQ+Quick+Start#HQQuickStart-enableTracking">here</a>, I enable log and config tracking
+    on the platform for <code>/var/log/warn</code> and <code>/etc/hosts</code>,&nbsp;respecitvely.</li>
+<li>Before I call it a night (now 03:42), I stop back at the <a href="http://www.hyperic.com/downloads/dl-hq-oss.html" title="http://www.hyperic.com/downloads/dl-hq-oss.html">downloads
+    page</a> and grab the Linux x86 Agent for the dom0 machine,
+    hoping to get some physical information as well. While I&#8217;m at it, I
+    grab the Linux <span class="caps">AMD64</span> Agent to try on my laptop. I create &#8220;hyperic&#8221;
+    users on each system. On the base Xen server, I give it a shot and
+    get &#8220;Unable to register agent: Error communicating with agent:
+    Unauthorized&#8221;. Same thing on the&nbsp;laptop.</li>
+<li>Did a little reading <a href="http://support.hyperic.com/confluence/display/DOC/Installation+Non-Windows#InstallationNon-Windows-install" title="http://support.hyperic.com/confluence/display/DOC/Installation+Non-Windows#InstallationNon-Windows-install">here</a>. As to keeping all of the defaults,
+    it turns out that both clients had firewalls blocking <span class="caps">TCP</span> port 2144.
+    I opened it up on both, and also set the <span class="caps">IP</span> address (that the server
+    uses to contact the client) to the correct ones. Viola! Now I have 3
+    clients connected, and gatheirng data for the next \~16 hours until
+    I have time to check it out&nbsp;agian.</li>
+</ol>
+<p>More to come in Part <span class="caps">II</span> tomorrow - actually doing something with
+Hyperic. For<br />
+now (04:08), time to&nbsp;sleep.</p>
+<p><a name="Part_II_-_Configuration"></a>  </p>
+<h3 id="wzxhzdk7part-ii-configurationwzxhzdk8"><span class="mw-headline">Part <span class="caps">II</span> -&nbsp;Configuration</span></h3>
+<p>Unfortunately, I haven&#8217;t had much time to play with Hyperic in the two
+days<br />
+since installation. The most I&#8217;ve really done is setup Agents on my
+laptop,<br />
+desktop, and the host machine (both dom0 and domU for Hyperic), so that
+they<br />
+start to collect&nbsp;data.</p>
+<p>While I found a lot of upsetting stuff in the features list (see below),
+I<br />
+decided to go ahead and add some other devices. On the network at the<br />
+apartment, I have two manageable switches (a Linksys and a 3Com) - which
+pretty<br />
+much make up the sum of non-host equipment. I also have an IPcop box,
+though I<br />
+assume the standard Linux Agent will handle that. The one item missing
+that I<br />
+have at home is my set of <span class="caps">APC</span> SmartUPS UPSs with <span class="caps">SNMP</span> cards, but I guess
+I&#8217;ll<br />
+just have to skip them for this&nbsp;review.</p>
+<p>First, I went in and added a platform (Resources->Browse, Tools
+Menu->Add<br />
+Platform) for the 3Com switch (a SuperStack <span class="caps">II</span> Switch 3300). It showed<br />
+successful creation - but nothing else. I went in and entered the <span class="caps">SNMP</span><br />
+community string, <span class="caps">IP</span>, and version (1). In about a minute or so, I
+started to<br />
+see metrics - Availability, <span class="caps">IP</span> Forwards, <span class="caps">IP</span> In Receives, an <span class="caps">IP</span> In
+Received per<br />
+Second. While it&#8217;s quite basic, that&#8217;s good for a starting point. While
+the<br />
+[<a href="">http://support.hyperic.com/confluence/display/<span class="caps">DOCSHQ30</span>/Network+Device+platform</a><br />
+Network Device Platform] documentation lists lots of metrics that can
+be<br />
+enabled, I&#8217;d also like telnet availability and - my big one since I use
+a<br />
+&#8220;cute&#8221; (crappy) IPcop installation for local <span class="caps">DNS</span>, a dig on <span class="caps">DNS</span> to make
+sure<br />
+the entry is there. In the Monitor screen, I was able to enable a bunch
+of<br />
+additional metrics (by clicking on the &#8220;Show All Metrics&#8221; link), though<br />
+there&#8217;s also no way (that I can find) to monitor the status of
+individual<br />&nbsp;ports.</p>
+<p>Next, I browsed through the &#8220;Administration&#8221; pages, setup a few users,
+and<br />
+started setting *way* more default metrics for various platforms,
+services,<br />
+and servers. While I don&#8217;t have mail running yet, that will come this<br />
+weekend. While I added a lot of things as &#8220;Default On&#8221;, I still need to
+go<br />
+back and add more things in the templates as&nbsp;Indicators.</p>
+<p>I also added some escalations, though they&#8217;re quite simple - you can
+notify <span class="caps">HQ</span><br />
+users or &#8220;other users&#8221; by email or <span class="caps">SMS</span>, write to SysLog, or suppress
+alerts<br />
+for 0 minutes to 24 hours. Hopefully I&#8217;ll also find a plugin for
+Asterisk<br />
+integration. One striking omission is user groups. Also, the concept of<br />
+&#8220;Roles&#8221; (maybe their idea of groups?) is only available in the
+Enterprise<br />&nbsp;version.</p>
+<p>At this point, I also notice one other majoe issue, though perhaps I&#8217;ll
+find a<br />
+solution in my experimentation - there doesn&#8217;t be a way to setup
+default<br />
+alerts for metrics. If they have all of this platform, server, and
+service<br />
+information defined as default templates, why not just have a way to
+assign<br />
+default users (and groups) to these objects, and have default alerts<br />&nbsp;generated?</p>
+<p>In terms of Apache 2.2 monitoring, out-of-the-box, nothing worked. No
+metrics<br />
+at all. Firstly, Hyperic requires the mod_status module. Persoanlly,
+I&#8217;d<br />
+rather handle all of that through a backend, like Nagios. Secondly, it
+got the<br />
+pidfile and apache2ctl paths wrong. Furthermore, it has no &#8220;smart&#8221;
+checking for resources - while my Apache 2.2 resource config was clearly
+wrong (wrong <span class="caps">PID</span> file path, no mod_status), Hyperic didn&#8217;t detect this
+and was showing the resource as&nbsp;&#8220;Down&#8221;.</p>
+<p>After that, I setup a bunch of alerts for things that I thought would be
+off-kilter a lot (like <span class="caps">WARN</span> log entries on my laptop, high memory usage
+on some stressed machines, etc.) as well as log and config file
+monitoring and alerts for them. While I didn&#8217;t have mail working yet, I
+figured I might as well get that stuff&nbsp;running.</p>
+<p>On the Xen dom0 host that runs the Hyperic vm (box called xenmaster1), I
+wasn&#8217;t able to add config file tracking for any of the /etc/xen/ files.
+At this point I notice some serious shortcomings - not only is it not
+possible to define a template of alerts for a given
+platform/server/service, it&#8217;s also impossible to define a template for
+alerts. I also noticed that it&#8217;s not possible to define groups of
+contacts. This wasn&#8217;t much of a problem for my test installation - the
+alerts are only going to my roommate and I - but it would surely be an
+issue in any larger&nbsp;setting.</p>
+<p>At this point in configuration, I come to a make-or-break point. With
+some of these shortcomings, I really need a way to call a script with
+alert information when an alert is generated - whether it&#8217;s to dial out
+through Asterisk or just automatically create a ticket for the&nbsp;problem.</p>
+<p>Adding alerts is a cumbersome process. You have to browse to a page for
+a specific metric - which means going to the page for a specific
+platform, server, or service - and then opening the page for that
+metric. The actual alert creation takes up two pages - one for the
+metric, threshold, and time-based criteria, and a second for who to
+alert. This means that to add alerts for a machine, you need to view the
+platform page as well as the services and servers pages, and each metric&nbsp;therein.</p>
+<p>I&#8217;ll be posting some more in the days to come. From a <a href="http://forums.hyperic.com/jiveforums/thread.jspa?messageID=14561&amp;#14561">post at the
+Hyperic Forums</a>, I was able to find out that a Xen plugin is in the
+works, but for the Open Source version, the only way to trigger a script
+is to send an email and have it handled by a filter such as&nbsp;Procmail.</p>
+<div class="codehilite"><pre>http://support.hyperic.com/confluence/display/DOC/Full+Installation+Guide
+&quot;http://support.hyperic.com/confluence/display/DOC/Full+Installation+Guide&quot;
+http://support.hyperic.com/confluence/display/DOCSHQ30/Network+Device+platform
+&quot;http://support.hyperic.com/confluence/display/DOCSHQ30/Network+Device+platform&quot;
+</pre></div>
+            </div>
+            <!-- /.entry-content -->
+        </article>
+    </section>
+
+        </div>
+        <div class="col-lg-3 well well-sm" id="sidebar">
+
+<aside>
+    <section>
+        <ul class="list-group list-group-flush">
+                <li class="list-group-item"><h4><i class="icon-home icon-large"></i>Social</h4></li>
+                    <li class="list-group-item"><a href="#"><i
+                            class="icon-You can add links in your config file-sign icon-large"></i>You can add links in your config file
+                    </a></li>
+                    <li class="list-group-item"><a href="#"><i
+                            class="icon-Another social link-sign icon-large"></i>Another social link
+                    </a></li>
+
+
+
+                <li class="list-group-item"><a href="/tags.html"><h4><i class="icon-tags icon-large"></i>Tags</h4></a></li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/android.html">
+                                android
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/google.html">
+                                google
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/nagios.html">
+                                Nagios
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/php.html">
+                                PHP
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/sysadmin.html">
+                                sysadmin
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/linux.html">
+                                linux
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/perl.html">
+                                perl
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/logging.html">
+                                logging
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/puppet.html">
+                                puppet
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/bind.html">
+                                bind
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/monitoring.html">
+                                monitoring
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/dns.html">
+                                dns
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/droid.html">
+                                droid
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/firefox.html">
+                                firefox
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/mediawiki.html">
+                                mediawiki
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/mac.html">
+                                mac
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/microsoft.html">
+                                microsoft
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/syslog.html">
+                                syslog
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/wordpress.html">
+                                wordpress
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/rpm.html">
+                                rpm
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/security.html">
+                                security
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/blog.html">
+                                blog
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/sun.html">
+                                sun
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/ems.html">
+                                EMS
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/apache.html">
+                                apache
+                            </a>
+                        </li>
+        </ul>
+    </section>
+</aside>        </div>
+    </div>
+</div>
+<footer>
+    <div class="container">
+        <hr>
+        <p class="pull-right"><i class="icon-arrow-up"></i> <a href="#">Back to top</a></p>
+
+
+        <p>&copy; 2014 Jason Antman &middot; Powered by <a href="https://github.com/DandyDev/pelican-bootstrap3" target="_blank">pelican-bootstrap3</a>,
+            <a href="http://docs.getpelican.com/" target="_blank">Pelican</a>,
+            <a href="http://getbootstrap.com" target="_blank">Bootstrap</a></p>
+    </div>
+</footer>
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="/theme/js/bootstrap.min.js"></script>
+
+<!-- Enable responsive features in IE8 with Respond.js (https://github.com/scottjehl/Respond) -->
+<script src="/theme/js/respond.min.js"></script>
+
+
+</body>
+</html>

@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:og="http://ogp.me/ns#"
+      xmlns:fb="https://www.facebook.com/2008/fbml">
+<head>
+    <title>RPM Spec Files for nodejs 0.9.5 and v8 on CentOS 6</title>
+    <!-- Using the latest rendering mode for IE -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Open Graph tags -->
+
+            <meta property="og:type" content="article"/>
+            <meta property="og:title" content="RPM Spec Files for nodejs 0.9.5 and v8 on CentOS 6"/>
+            <meta property="og:url" content="/2013/01/rpm-spec-files-for-nodejs-0-9-5-and-v8-on-centos-5/"/>
+            <meta property="og:description" content="The latest version of nodejs that I could find as an RPM for CentOS was 0.6.16, from http://patches.fedorapeople.org/oldnode/stable/. That’s the one that puppetlabs currently uses in their puppetlabs-nodejs module. There is, however, a nodejs 0.9.5 RPM in the Fedora Rawhide ..."/>
+
+    <!-- Bootstrap -->
+        <link rel="stylesheet" href="/theme/css/bootstrap.min.css" type="text/css"/>
+    <link href="/theme/css/font-awesome.min.css" rel="stylesheet">
+    <link href="/theme/css/pygments.css" rel="stylesheet">
+        <link href="/theme/css/typogrify.css" rel="stylesheet">
+    <link rel="stylesheet" href="/theme/css/style.css" type="text/css"/>
+    <!-- JavaScript plugins (requires jQuery) -->
+    <script src="http://code.jquery.com/jquery.js"></script>
+
+        <link href="/feeds/all.atom.xml" type="application/atom+xml" rel="alternate"
+              title="Jason Antman's Blog ATOM Feed"/>
+
+</head>
+<body>
+<nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="" class="navbar-brand">Jason Antman's Blog</a>
+        </div>
+        <div class="collapse navbar-collapse navbar-ex1-collapse">
+            <ul class="nav navbar-nav">
+                         <li><a href="/pages/about.html">
+                             About
+                          </a></li>
+                        <li >
+                            <a href="/category/ideas-and-rants.html">Ideas and rants</a>
+                        </li>
+                        <li >
+                            <a href="/category/miscellaneous.html">Miscellaneous</a>
+                        </li>
+                        <li >
+                            <a href="/category/monitoring.html">Monitoring</a>
+                        </li>
+                        <li >
+                            <a href="/category/projects.html">Projects</a>
+                        </li>
+                        <li >
+                            <a href="/category/puppet.html">Puppet</a>
+                        </li>
+                        <li >
+                            <a href="/category/sysadmin.html">Sysadmin</a>
+                        </li>
+                        <li class="active">
+                            <a href="/category/tech-howtos.html">Tech howtos</a>
+                        </li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="/archives.html"><i class="icon-th-list"></i>Archives</a></li>
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+</nav>
+<!-- /.navbar -->
+<div class="container">
+    <div class="row">
+        <div class="col-lg-9">
+    <section id="content">
+        <article>
+            <header class="page-header">
+                <h1>
+                    <a href="/2013/01/rpm-spec-files-for-nodejs-0-9-5-and-v8-on-centos-5/"
+                       rel="bookmark"
+                       title="Permalink to RPM Spec Files for nodejs 0.9.5 and v8 on CentOS 6">
+                        <span class="caps">RPM</span> Spec Files for nodejs 0.9.5 and v8 on CentOS&nbsp;6
+                    </a>
+                </h1>
+            </header>
+            <div class="entry-content">
+                <div class="panel">
+                    <div class="panel-body">
+<footer class="post-info">
+    <span class="label label-default">Date</span>
+    <span class="published">
+        <i class="icon-calendar"></i>Thu 31 January 2013
+    </span>
+
+
+
+<span class="label label-default">Tags</span>
+	<a href="/tag/build.html">build</a>
+        /
+	<a href="/tag/centos.html">centos</a>
+        /
+	<a href="/tag/node.html">node</a>
+        /
+	<a href="/tag/nodejs.html">nodejs</a>
+        /
+	<a href="/tag/package.html">package</a>
+        /
+	<a href="/tag/packaging.html">packaging</a>
+        /
+	<a href="/tag/redhat.html">redhat</a>
+        /
+	<a href="/tag/rhel.html">RHEL</a>
+        /
+	<a href="/tag/rpm.html">rpm</a>
+        /
+	<a href="/tag/specfile.html">specfile</a>
+</footer><!-- /.post-info -->                    </div>
+                </div>
+                <p>The latest version of nodejs that I could find as an <span class="caps">RPM</span> for CentOS was
+0.6.16, from <a href="http://patches.fedorapeople.org/oldnode/stable/">http://patches.fedorapeople.org/oldnode/stable/</a>. That&#8217;s
+the one that puppetlabs currently uses in their <a href="https://github.com/puppetlabs/puppetlabs-nodejs">puppetlabs-nodejs</a>
+module. There is, however, a nodejs 0.9.5 <span class="caps">RPM</span> in the Fedora Rawhide (19)
+repository. Below are some patches to that specfile, and the specfile
+for its v8 dependency, to get them to build on CentOS 6. You can also
+find the full specfiles on my <a href="https://github.com/jantman/specfiles">github specfile repository</a>. I had
+originally wanted to get them built on CentOS 5 as well, but after
+following the dependency tree from nodejs to http-parser to gyp, and
+then finding issues in the gyp source that are incompatible with CentOS
+5&#8217;s python 2.4, I gave up on that&nbsp;target.</p>
+<p><strong>nodejs.spec</strong>, diff from Fedora Rawhide nodejs-0.9.5-9.fc18.src.rpm,
+buildID=377755 (<a href="https://raw.github.com/jantman/specfiles/master/nodejs.spec">full specfile</a>)</p>
+<div class="codehilite"><pre><span class="gh">diff --git a/nodejs.spec b/nodejs.spec</span>
+<span class="gh">index 050ed86..86c0f4b 100644</span>
+<span class="gd">--- a/nodejs.spec</span>
+<span class="gi">+++ b/nodejs.spec</span>
+<span class="gu">@@ -1,6 +1,6 @@</span>
+ Name: nodejs
+ Version: 0.9.5
+<span class="gd">-Release: 9%{?dist}</span>
+<span class="gi">+Release: 10%{?dist}</span>
+ Summary: JavaScript runtime
+ License: <span class="caps">MIT</span> and <span class="caps">ASL</span> 2.0 and <span class="caps">ISC</span> and <span class="caps">BSD</span>
+ Group: Development/Languages
+<span class="gu">@@ -25,7 +25,7 @@ Source6: nodejs-fixdep</span>
+ BuildRequires: v8-devel &gt;= %{v8_ge}
+ BuildRequires: http-parser-devel &gt;= 2.0
+ BuildRequires: libuv-devel
+<span class="gd">-BuildRequires: c-ares-devel</span>
+<span class="gi">+BuildRequires: c-ares-devel &gt;= 1.9.0</span>
+ BuildRequires: zlib-devel
+ # Node.js requires some features from openssl 1.0.1 for <span class="caps">SPDY</span> support
+ BuildRequires: openssl-devel &gt;= 1:1.0.1
+<span class="gu">@@ -165,9 +165,13 @@ cp -p common.gypi %{buildroot}%{_datadir}/node</span>
+
+ %files docs
+ %{_defaultdocdir}/%{name}-docs-%{version}
+<span class="gd">-%doc <span class="caps">LICENSE</span></span>
+
+ %changelog
+<span class="gi">+* Thu Jan 31 2013 Jason Antman  - 0.9.5-10</span>
+<span class="gi">+- specify build requirement of c-ares-devel &gt;= 1.9.0</span>
+<span class="gi">+- specify build requirement of libuv-devel 0.9.4</span>
+<span class="gi">+- remove duplicate %doc <span class="caps">LICENSE</span> that was causing cpio &#39;Bad magic&#39; error on CentOS6</span>
+<span class="gi">+</span>
+ * Sat Jan 12 2013 <span class="caps">T.C.</span> Hollingsworth  - 0.9.5-9
+ - fix brown paper bag bug in requires generation script
+</pre></div>
+
+
+<p><strong>v8.spec</strong>, diff from Fedora Rawhide 3.13.7.5-2 (<a href="https://raw.github.com/jantman/specfiles/master/v8.spec">full specfile</a>)</p>
+<div class="codehilite"><pre><span class="gd">--- v8.spec.orig       2013-01-26 16:03:18.000000000 -0500</span>
+<span class="gi">+++ v8.spec     2013-01-31 09:04:51.068029459 -0500</span>
+<span class="gu">@@ -21,9 +21,11 @@</span>
+
+ # %%global svnver 20110721svn8716
+
+<span class="gi">+%{!?python_sitelib: %define python_sitelib %(%{__python} -c &quot;import distutils.sysconfig as d; print d.get_python_lib()&quot;)}</span>
+<span class="gi">+</span>
+ Name:          v8
+ Version:       %{somajor}.%{sominor}.%{sobuild}.%{sotiny}
+<span class="gd">-Release:       2%{?dist}</span>
+<span class="gi">+Release:       5%{?dist}</span>
+ Epoch:         1
+ Summary:       JavaScript Engine
+ Group:         System Environment/Libraries
+<span class="gu">@@ -32,7 +34,7 @@</span>
+ Source0:       http://commondatastorage.googleapis.com/chromium-browser-official/v8-%{version}.tar.bz2
+ BuildRoot:     %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
+ ExclusiveArch: %{ix86} x86_64 %{arm}
+<span class="gd">-BuildRequires: scons, readline-devel, libicu-devel</span>
+<span class="gi">+BuildRequires: scons, readline-devel, libicu-devel, ncurses-devel</span>
+
+ %description
+ V8 is Google&#39;s open source JavaScript engine. V8 is written in C++ and is used 
+<span class="gu">@@ -51,8 +53,13 @@</span>
+ %setup -q -n %{name}-%{version}
+
+ # -fno-strict-aliasing is needed with gcc 4.4 to get past some ugly code
+<span class="gd">-PARSED_OPT_FLAGS=`echo \&#39;$RPM_OPT_FLAGS -fPIC -fno-strict-aliasing -Wno-unused-parameter -Wno-error=strict-overflow -Wno-error=unused-local-typedefs -Wno-unused-but-set-variable\&#39;| sed &quot;s/ /&#39;,/g&quot; | sed &quot;s/&#39;,/&#39;, &#39;/g&quot;`</span>
+<span class="gi">+%if 0%{?el5}</span>
+<span class="gi">+PARSED_OPT_FLAGS=`echo \&#39;$RPM_OPT_FLAGS -fPIC -fno-strict-aliasing -Wno-unused-parameter -lncurses\&#39;| sed &quot;s/ /&#39;,/g&quot; | sed &quot;s/&#39;,/&#39;, &#39;/g&quot;`</span>
+<span class="gi">+sed -i &quot;s|&#39;-O3&#39;,|$PARSED_OPT_FLAGS,|g&quot; SConstruct</span>
+<span class="gi">+%else</span>
+<span class="gi">+PARSED_OPT_FLAGS=`echo \&#39;$RPM_OPT_FLAGS -fPIC -fno-strict-aliasing -Wno-unused-parameter -Wno-error=strict-overflow -Wno-unused-but-set-variable\&#39;| sed &quot;s/ /&#39;,/g&quot; | sed &quot;s/&#39;,/&#39;, &#39;/g&quot;`</span>
+ sed -i &quot;s|&#39;-O3&#39;,|$PARSED_OPT_FLAGS,|g&quot; SConstruct
+<span class="gi">+%endif</span>
+
+ # clear spurious executable bits
+ find . \( -name \*.cc -o -name \*.h -o -name \*.py \) -a -executable   
+<span class="gu">@@ -198,6 +205,17 @@</span>
+ %{python_sitelib}/j*.py*
+
+ %changelog
+<span class="gi">+* Thu Jan 31 2013 Jason Antman  - 1:3.13.7.5-5</span>
+<span class="gi">+- remove -Werror=unused-local-typedefs on cent6</span>
+<span class="gi">+</span>
+<span class="gi">+* Wed Jan 30 2013 Jason Antman  - 1:3.13.7.5-4</span>
+<span class="gi">+- define python_sitelib if it isn&#39;t already (CentOS 5)</span>
+<span class="gi">+</span>
+<span class="gi">+* Wed Jan 30 2013 Jason Antman  - 1:3.13.7.5-3</span>
+<span class="gi">+- pull 3.13.7.5-2 <span class="caps">SRPM</span> from Fedora 19 Koji most recent build</span>
+<span class="gi">+- add ncurses-devel BuildRequires</span>
+<span class="gi">+- modify PARSED_OPT_FLAGS to work with g++ 4.1.2 on CentOS 5</span>
+<span class="gi">+ </span>
+ * Sat Jan 26 2013 <span class="caps">T.C.</span> Hollingsworth  - 1:3.13.7.5-2
+ - rebuild for icu-50
+ - ignore new <span class="caps">GCC</span> 4.8 warning
+</pre></div>
+            </div>
+            <!-- /.entry-content -->
+        </article>
+    </section>
+
+        </div>
+        <div class="col-lg-3 well well-sm" id="sidebar">
+
+<aside>
+    <section>
+        <ul class="list-group list-group-flush">
+                <li class="list-group-item"><h4><i class="icon-home icon-large"></i>Social</h4></li>
+                    <li class="list-group-item"><a href="#"><i
+                            class="icon-You can add links in your config file-sign icon-large"></i>You can add links in your config file
+                    </a></li>
+                    <li class="list-group-item"><a href="#"><i
+                            class="icon-Another social link-sign icon-large"></i>Another social link
+                    </a></li>
+
+
+
+                <li class="list-group-item"><a href="/tags.html"><h4><i class="icon-tags icon-large"></i>Tags</h4></a></li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/android.html">
+                                android
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/google.html">
+                                google
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/nagios.html">
+                                Nagios
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/php.html">
+                                PHP
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/sysadmin.html">
+                                sysadmin
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/linux.html">
+                                linux
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/perl.html">
+                                perl
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/logging.html">
+                                logging
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/puppet.html">
+                                puppet
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/bind.html">
+                                bind
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/monitoring.html">
+                                monitoring
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/dns.html">
+                                dns
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/droid.html">
+                                droid
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/firefox.html">
+                                firefox
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/mediawiki.html">
+                                mediawiki
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/mac.html">
+                                mac
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/microsoft.html">
+                                microsoft
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/syslog.html">
+                                syslog
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/wordpress.html">
+                                wordpress
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/rpm.html">
+                                rpm
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/security.html">
+                                security
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/blog.html">
+                                blog
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/sun.html">
+                                sun
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/ems.html">
+                                EMS
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/apache.html">
+                                apache
+                            </a>
+                        </li>
+        </ul>
+    </section>
+</aside>        </div>
+    </div>
+</div>
+<footer>
+    <div class="container">
+        <hr>
+        <p class="pull-right"><i class="icon-arrow-up"></i> <a href="#">Back to top</a></p>
+
+
+        <p>&copy; 2014 Jason Antman &middot; Powered by <a href="https://github.com/DandyDev/pelican-bootstrap3" target="_blank">pelican-bootstrap3</a>,
+            <a href="http://docs.getpelican.com/" target="_blank">Pelican</a>,
+            <a href="http://getbootstrap.com" target="_blank">Bootstrap</a></p>
+    </div>
+</footer>
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="/theme/js/bootstrap.min.js"></script>
+
+<!-- Enable responsive features in IE8 with Respond.js (https://github.com/scottjehl/Respond) -->
+<script src="/theme/js/respond.min.js"></script>
+
+
+</body>
+</html>

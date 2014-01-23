@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:og="http://ogp.me/ns#"
+      xmlns:fb="https://www.facebook.com/2008/fbml">
+<head>
+    <title>Fedora Init Script Specification Summary</title>
+    <!-- Using the latest rendering mode for IE -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Open Graph tags -->
+
+            <meta property="og:type" content="article"/>
+            <meta property="og:title" content="Fedora Init Script Specification Summary"/>
+            <meta property="og:url" content="/2013/01/fedora-init-script-specification-summary/"/>
+            <meta property="og:description" content="I’ve been deploying some new software lately (specifically selenesse, which combines Selenium and fitnesse, xvfb). None of these seem to come with init scripts to run as daemons, and the quality of the few Fedora/RedHat/CentOS init scripts I was able to find was quite poor. The Fedora ..."/>
+
+    <!-- Bootstrap -->
+        <link rel="stylesheet" href="/theme/css/bootstrap.min.css" type="text/css"/>
+    <link href="/theme/css/font-awesome.min.css" rel="stylesheet">
+    <link href="/theme/css/pygments.css" rel="stylesheet">
+        <link href="/theme/css/typogrify.css" rel="stylesheet">
+    <link rel="stylesheet" href="/theme/css/style.css" type="text/css"/>
+    <!-- JavaScript plugins (requires jQuery) -->
+    <script src="http://code.jquery.com/jquery.js"></script>
+
+        <link href="/feeds/all.atom.xml" type="application/atom+xml" rel="alternate"
+              title="Jason Antman's Blog ATOM Feed"/>
+
+</head>
+<body>
+<nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="" class="navbar-brand">Jason Antman's Blog</a>
+        </div>
+        <div class="collapse navbar-collapse navbar-ex1-collapse">
+            <ul class="nav navbar-nav">
+                         <li><a href="/pages/about.html">
+                             About
+                          </a></li>
+                        <li >
+                            <a href="/category/ideas-and-rants.html">Ideas and rants</a>
+                        </li>
+                        <li >
+                            <a href="/category/miscellaneous.html">Miscellaneous</a>
+                        </li>
+                        <li >
+                            <a href="/category/monitoring.html">Monitoring</a>
+                        </li>
+                        <li >
+                            <a href="/category/projects.html">Projects</a>
+                        </li>
+                        <li >
+                            <a href="/category/puppet.html">Puppet</a>
+                        </li>
+                        <li class="active">
+                            <a href="/category/sysadmin.html">Sysadmin</a>
+                        </li>
+                        <li >
+                            <a href="/category/tech-howtos.html">Tech howtos</a>
+                        </li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="/archives.html"><i class="icon-th-list"></i>Archives</a></li>
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+</nav>
+<!-- /.navbar -->
+<div class="container">
+    <div class="row">
+        <div class="col-lg-9">
+    <section id="content">
+        <article>
+            <header class="page-header">
+                <h1>
+                    <a href="/2013/01/fedora-init-script-specification-summary/"
+                       rel="bookmark"
+                       title="Permalink to Fedora Init Script Specification Summary">
+                        Fedora Init Script Specification&nbsp;Summary
+                    </a>
+                </h1>
+            </header>
+            <div class="entry-content">
+                <div class="panel">
+                    <div class="panel-body">
+<footer class="post-info">
+    <span class="label label-default">Date</span>
+    <span class="published">
+        <i class="icon-calendar"></i>Thu 03 January 2013
+    </span>
+
+
+
+<span class="label label-default">Tags</span>
+	<a href="/tag/centos.html">centos</a>
+        /
+	<a href="/tag/fedora.html">fedora</a>
+        /
+	<a href="/tag/init.html">init</a>
+        /
+	<a href="/tag/redhat.html">redhat</a>
+        /
+	<a href="/tag/startup.html">startup</a>
+</footer><!-- /.post-info -->                    </div>
+                </div>
+                <p>I&#8217;ve been deploying some new software lately (specifically
+<a href="https://github.com/marisaseal/selenesse">selenesse</a>, which combines <a href="http://seleniumhq.org/">Selenium</a> and <a href="http://fitnesse.org/">fitnesse</a>, <a href="http://en.wikipedia.org/wiki/Xvfb">xvfb</a>).
+None of these seem to come with init scripts to run as daemons, and the
+quality of the few Fedora/RedHat/CentOS init scripts I was able to find
+was quite poor. The Fedora project has a <a href="http://fedoraproject.org/wiki/Packaging:SysVInitScript">Specification for SysV-style
+Init Scripts in their Packaging wiki</a>, which specifies what a
+Fedora/RedHat/CentOS init script should look like, in excruciating
+detail. What follows is an overview of the more important points, which
+I&#8217;m using to develop or modify the scripts I&#8217;m currently working&nbsp;on.</p>
+<ul>
+<li>Scripts must be put in <code>/etc/rc.d/init.d</code>, not in the <code>/etc/init.d</code>
+    symlink. They should have 0755&nbsp;permissions.</li>
+<li>Scripts must have a Fedora-style <a href="http://fedoraproject.org/wiki/Packaging:SysVInitScript#Chkconfig_Header">chkconfig header</a> (&#8220;chkconfig:&#8221;,
+    &#8220;description:&#8221; lines), and may have an <a href="http://fedoraproject.org/wiki/Packaging:SysVInitScript#LSB_Header"><span class="caps">LSB</span>-style header</a> (<span class="caps">BEGIN</span>
+    <span class="caps">INIT</span> <span class="caps">INFO</span>/<span class="caps">END</span> <span class="caps">INIT</span> <span class="caps">INFO</span>). See <a href="http://fedoraproject.org/wiki/Packaging:SysVInitScript#Initscript_template">Initscript template</a>.</li>
+<li>Scripts <strong>must</strong> make use of a lockfile in <code>/var/lock/subsys/</code>, and
+    the name of the lockfile must be the same as the name of the init
+    script. (There is a technical reason for this relating to how sysv
+    init terminates daemons at shutdown). The lockfile should be touched
+    when the daemon successfully starts, and removed when it
+    successfully&nbsp;stops.</li>
+<li>Init scripts should not depend on any environment variables set
+    outside the script. They should operate gracefully with an
+    empty/uninitialized environment (or only <span class="caps">LANG</span> and <span class="caps">TERM</span> set and a <span class="caps">CWD</span>
+    of <code>/</code>, as enforced by <code>service(8)</code>, or with a full environment if
+    they are called directly by a&nbsp;user.</li>
+<li>
+<p><a href="http://fedoraproject.org/wiki/Packaging:SysVInitScript#Required_Actions">Required actions</a> - all of the following actions are required,
+    and have specific&nbsp;definitions:</p>
+<ul>
+<li><strong>start</strong>: starts the&nbsp;service</li>
+<li><strong>stop</strong>: stops the&nbsp;service</li>
+<li><strong>restart</strong>: stop and restart the service if the service is
+    already running, otherwise just start the&nbsp;service</li>
+<li><strong>condrestart (and try-restart)</strong>: restart the service if the
+    service is already running, if not, do&nbsp;nothing</li>
+<li><strong>reload</strong>: reload the configuration of the service without
+    actually stopping and restarting the service (if the service
+    does not support this, do&nbsp;nothing)</li>
+<li><strong>force-reload</strong>: reload the configuration of the service and
+    restart it so that it takes&nbsp;effect</li>
+<li><strong>status</strong>: print the current status of the&nbsp;service</li>
+<li><strong>usage</strong>: by default, if the initscript is run without any
+    action, it should list a &#8220;usage message&#8221; that has all actions
+    (intended for&nbsp;use)</li>
+</ul>
+</li>
+<li>
+<p>There are specified exit codes for <a href="http://fedoraproject.org/wiki/Packaging:SysVInitScript#Exit_Codes_for_the_Status_Action">status actions</a> and
+    <a href="http://fedoraproject.org/wiki/Packaging:SysVInitScript#Exit_Codes_for_non-Status_Actions">non-status actions</a>.</p>
+</li>
+<li>They must &#8220;behave sensibly&#8221;. I&#8217;ve found this to be one of the
+    biggest problems with homegrown init scripts. If <code>servicename start</code>
+    is called while the service is already running, it should simply
+    exit 0. Likewise if the service is already stopped. Init scripts
+    <strong>must not kill unrelated processes</strong>. I don&#8217;t know how many times
+    I&#8217;ve seen scripts that kill every java or python process on a&nbsp;machine.</li>
+</ul>
+<p>I intend to use this as a quick checklist when developing or evaluating
+init scripts for RedHat/Fedora based systems. In my experience, the
+biggest problems with most init scripts revolve around poor handling of
+<span class="caps">PID</span> files and lockfiles,&nbsp;mainly:</p>
+<ul>
+<li>Killing processes other than the one that the script started (i.e.
+    killing all java or python processes), usually because the <span class="caps">PID</span> isn&#8217;t
+    tracked at&nbsp;start</li>
+<li>Starting a second instance of the subsystem because lockfiles aren&#8217;t
+    used, or the status function is&nbsp;broken.</li>
+<li>improper exit&nbsp;codes</li>
+<li>either explicitly relying on environment variables (and therefore
+    breaking when called through <code>service(8)</code>), or conversely, not
+    cleaning/resetting environment variables that are used by dependent
+    code or&nbsp;processes.</li>
+</ul>
+            </div>
+            <!-- /.entry-content -->
+        </article>
+    </section>
+
+        </div>
+        <div class="col-lg-3 well well-sm" id="sidebar">
+
+<aside>
+    <section>
+        <ul class="list-group list-group-flush">
+                <li class="list-group-item"><h4><i class="icon-home icon-large"></i>Social</h4></li>
+                    <li class="list-group-item"><a href="#"><i
+                            class="icon-You can add links in your config file-sign icon-large"></i>You can add links in your config file
+                    </a></li>
+                    <li class="list-group-item"><a href="#"><i
+                            class="icon-Another social link-sign icon-large"></i>Another social link
+                    </a></li>
+
+
+
+                <li class="list-group-item"><a href="/tags.html"><h4><i class="icon-tags icon-large"></i>Tags</h4></a></li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/android.html">
+                                android
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/google.html">
+                                google
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/nagios.html">
+                                Nagios
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/php.html">
+                                PHP
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/sysadmin.html">
+                                sysadmin
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/linux.html">
+                                linux
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/perl.html">
+                                perl
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/logging.html">
+                                logging
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/puppet.html">
+                                puppet
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/bind.html">
+                                bind
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/monitoring.html">
+                                monitoring
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/dns.html">
+                                dns
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/droid.html">
+                                droid
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/firefox.html">
+                                firefox
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/mediawiki.html">
+                                mediawiki
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/mac.html">
+                                mac
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/microsoft.html">
+                                microsoft
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/syslog.html">
+                                syslog
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/wordpress.html">
+                                wordpress
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/rpm.html">
+                                rpm
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/security.html">
+                                security
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/blog.html">
+                                blog
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/sun.html">
+                                sun
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/ems.html">
+                                EMS
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/apache.html">
+                                apache
+                            </a>
+                        </li>
+        </ul>
+    </section>
+</aside>        </div>
+    </div>
+</div>
+<footer>
+    <div class="container">
+        <hr>
+        <p class="pull-right"><i class="icon-arrow-up"></i> <a href="#">Back to top</a></p>
+
+
+        <p>&copy; 2014 Jason Antman &middot; Powered by <a href="https://github.com/DandyDev/pelican-bootstrap3" target="_blank">pelican-bootstrap3</a>,
+            <a href="http://docs.getpelican.com/" target="_blank">Pelican</a>,
+            <a href="http://getbootstrap.com" target="_blank">Bootstrap</a></p>
+    </div>
+</footer>
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="/theme/js/bootstrap.min.js"></script>
+
+<!-- Enable responsive features in IE8 with Respond.js (https://github.com/scottjehl/Respond) -->
+<script src="/theme/js/respond.min.js"></script>
+
+
+</body>
+</html>

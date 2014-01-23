@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:og="http://ogp.me/ns#"
+      xmlns:fb="https://www.facebook.com/2008/fbml">
+<head>
+    <title>Puppet problems with hostname in autosign.conf - Invalid pattern</title>
+    <!-- Using the latest rendering mode for IE -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Open Graph tags -->
+
+            <meta property="og:type" content="article"/>
+            <meta property="og:title" content="Puppet problems with hostname in autosign.conf - Invalid pattern"/>
+            <meta property="og:url" content="/2009/10/puppet-problems-with-hostname-in-autosignconf-invalid-pattern/"/>
+            <meta property="og:description" content="In playing with Puppet (0.24.8 on clients and server) today (well, building a new host) I came by a strange error when I ran puppet on the client: ~~~~{.text only} err: Could not request certificate: Certificate retrieval failed: Invalid pattern css-storemanager The thing that was so strange is ..."/>
+
+    <!-- Bootstrap -->
+        <link rel="stylesheet" href="/theme/css/bootstrap.min.css" type="text/css"/>
+    <link href="/theme/css/font-awesome.min.css" rel="stylesheet">
+    <link href="/theme/css/pygments.css" rel="stylesheet">
+        <link href="/theme/css/typogrify.css" rel="stylesheet">
+    <link rel="stylesheet" href="/theme/css/style.css" type="text/css"/>
+    <!-- JavaScript plugins (requires jQuery) -->
+    <script src="http://code.jquery.com/jquery.js"></script>
+
+        <link href="/feeds/all.atom.xml" type="application/atom+xml" rel="alternate"
+              title="Jason Antman's Blog ATOM Feed"/>
+
+</head>
+<body>
+<nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="" class="navbar-brand">Jason Antman's Blog</a>
+        </div>
+        <div class="collapse navbar-collapse navbar-ex1-collapse">
+            <ul class="nav navbar-nav">
+                         <li><a href="/pages/about.html">
+                             About
+                          </a></li>
+                        <li >
+                            <a href="/category/ideas-and-rants.html">Ideas and rants</a>
+                        </li>
+                        <li >
+                            <a href="/category/miscellaneous.html">Miscellaneous</a>
+                        </li>
+                        <li >
+                            <a href="/category/monitoring.html">Monitoring</a>
+                        </li>
+                        <li >
+                            <a href="/category/projects.html">Projects</a>
+                        </li>
+                        <li class="active">
+                            <a href="/category/puppet.html">Puppet</a>
+                        </li>
+                        <li >
+                            <a href="/category/sysadmin.html">Sysadmin</a>
+                        </li>
+                        <li >
+                            <a href="/category/tech-howtos.html">Tech howtos</a>
+                        </li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="/archives.html"><i class="icon-th-list"></i>Archives</a></li>
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+</nav>
+<!-- /.navbar -->
+<div class="container">
+    <div class="row">
+        <div class="col-lg-9">
+    <section id="content">
+        <article>
+            <header class="page-header">
+                <h1>
+                    <a href="/2009/10/puppet-problems-with-hostname-in-autosignconf-invalid-pattern/"
+                       rel="bookmark"
+                       title="Permalink to Puppet problems with hostname in autosign.conf - Invalid pattern">
+                        Puppet problems with hostname in autosign.conf - Invalid&nbsp;pattern
+                    </a>
+                </h1>
+            </header>
+            <div class="entry-content">
+                <div class="panel">
+                    <div class="panel-body">
+<footer class="post-info">
+    <span class="label label-default">Date</span>
+    <span class="published">
+        <i class="icon-calendar"></i>Wed 14 October 2009
+    </span>
+
+
+
+<span class="label label-default">Tags</span>
+	<a href="/tag/autosignconf.html">autosign.conf</a>
+        /
+	<a href="/tag/hostname.html">hostname</a>
+        /
+	<a href="/tag/puppet.html">puppet</a>
+</footer><!-- /.post-info -->                    </div>
+                </div>
+                <p>In playing with Puppet (0.24.8 on clients and server) today (well,
+building a new host) I came by a strange error when I ran puppet on the&nbsp;client:</p>
+<p>~~~~{.text only}
+err: Could not request certificate: Certificate retrieval failed: Invalid pattern&nbsp;css-storemanager</p>
+<div class="codehilite"><pre>The thing that was so strange is that &quot;css-storemanager&quot; is the name of
+a host at my site, controlled by Puppet, but it has nothing to do with
+the host I was building. They&#39;re different boxes, on different subnets,
+in different rooms. One is a SunFire and the other is an HP desktop.
+
+Google turned up nothing. Running puppetmasterd with `--debug --trace`
+yielded:
+
+~~~~{.text only}
+info: Listening on port 8140
+notice: Starting Puppet server version 0.24.8
+notice: Allowing unauthenticated client ccf-hill019-12.example.edu(172.x.x.x) access to puppetca.getcert
+/usr/lib/ruby/site_ruby/1.8/puppet/network/authstore.rb:289:in `parse&#39;
+/usr/lib/ruby/site_ruby/1.8/puppet/network/authstore.rb:170:in `pattern=&#39;
+/usr/lib/ruby/site_ruby/1.8/puppet/network/authstore.rb:151:in `initialize&#39;
+/usr/lib/ruby/site_ruby/1.8/puppet/network/authstore.rb:80:in `new&#39;
+/usr/lib/ruby/site_ruby/1.8/puppet/network/authstore.rb:80:in `store&#39;
+/usr/lib/ruby/site_ruby/1.8/puppet/network/authstore.rb:20:in `allow&#39;
+/usr/lib/ruby/site_ruby/1.8/puppet/network/handler/ca.rb:54:in `autosign?&#39;
+/usr/lib/ruby/site_ruby/1.8/puppet/network/handler/ca.rb:51:in `each&#39;
+/usr/lib/ruby/site_ruby/1.8/puppet/network/handler/ca.rb:51:in `autosign?&#39;
+/usr/lib/ruby/site_ruby/1.8/puppet/network/handler/ca.rb:50:in `open&#39;
+/usr/lib/ruby/site_ruby/1.8/puppet/network/handler/ca.rb:50:in `autosign?&#39;
+/usr/lib/ruby/site_ruby/1.8/puppet/network/handler/ca.rb:112:in `getcert&#39;
+/usr/lib/ruby/site_ruby/1.8/rubygems/custom_require.rb:31:in `to_proc&#39;
+/usr/lib/ruby/site_ruby/1.8/puppet/network/xmlrpc/processor.rb:52:in `call&#39;
+/usr/lib/ruby/site_ruby/1.8/puppet/network/xmlrpc/processor.rb:52:in `protect_service&#39;
+/usr/lib/ruby/site_ruby/1.8/puppet/network/xmlrpc/processor.rb:85:in `setup_processor&#39;
+/usr/lib/ruby/1.8/xmlrpc/server.rb:336:in `call&#39;
+/usr/lib/ruby/1.8/xmlrpc/server.rb:336:in `dispatch&#39;
+/usr/lib/ruby/1.8/xmlrpc/server.rb:323:in `each&#39;
+/usr/lib/ruby/1.8/xmlrpc/server.rb:323:in `dispatch&#39;
+/usr/lib/ruby/1.8/xmlrpc/server.rb:366:in `call_method&#39;
+/usr/lib/ruby/1.8/xmlrpc/server.rb:378:in `handle&#39;
+/usr/lib/ruby/site_ruby/1.8/puppet/network/xmlrpc/processor.rb:44:in `process&#39;
+/usr/lib/ruby/site_ruby/1.8/puppet/network/xmlrpc/webrick_servlet.rb:68:in `service&#39;
+/usr/lib/ruby/1.8/webrick/httpserver.rb:104:in `service&#39;
+/usr/lib/ruby/1.8/webrick/httpserver.rb:65:in `run&#39;
+/usr/lib/ruby/1.8/webrick/server.rb:173:in `start_thread&#39;
+/usr/lib/ruby/1.8/webrick/server.rb:162:in `start&#39;
+/usr/lib/ruby/1.8/webrick/server.rb:162:in `start_thread&#39;
+/usr/lib/ruby/1.8/webrick/server.rb:95:in `start&#39;
+/usr/lib/ruby/1.8/webrick/server.rb:92:in `each&#39;
+/usr/lib/ruby/1.8/webrick/server.rb:92:in `start&#39;
+/usr/lib/ruby/1.8/webrick/server.rb:23:in `start&#39;
+/usr/lib/ruby/1.8/webrick/server.rb:82:in `start&#39;
+/usr/lib/ruby/site_ruby/1.8/puppet.rb:293:in `start&#39;
+/usr/lib/ruby/site_ruby/1.8/puppet.rb:144:in `newthread&#39;
+/usr/lib/ruby/site_ruby/1.8/puppet.rb:143:in `initialize&#39;
+/usr/lib/ruby/site_ruby/1.8/puppet.rb:143:in `new&#39;
+/usr/lib/ruby/site_ruby/1.8/puppet.rb:143:in `newthread&#39;
+/usr/lib/ruby/site_ruby/1.8/puppet.rb:291:in `start&#39;
+/usr/lib/ruby/site_ruby/1.8/puppet.rb:290:in `each&#39;
+/usr/lib/ruby/site_ruby/1.8/puppet.rb:290:in `start&#39;
+/usr/sbin/puppetmasterd:285
+err: Invalid pattern css-storemanager
+</pre></div>
+
+
+<p>After a bit of investigation into that trace, I found the following code
+in <code>/usr/lib/ruby/site_ruby/1.8/puppet/network/authstore.rb</code> starting on
+line&nbsp;242:</p>
+<p>~~~~ {lang=&#8221;ruby&#8221; line=&#8221;242&#8221;}
+            # Parse our input pattern and figure out what kind of allowal
+            # statement it is.  The output of this is used for later matching.
+            def parse(value)
+                case value
+                when /^(\d+.){1,3}*$/: # an ip address with a &#8216;*&#8217; at the end
+                    @name = :ip
+                    match = $1
+                    match.sub!(&#8220;.&#8221;, &#8221;)
+                    ary =&nbsp;value.split(&#8220;.&#8221;)</p>
+<div class="codehilite"><pre>                mask = case ary.index(match)
+                when 0: 8
+                when 1: 16
+                when 2: 24
+                else
+                    raise AuthStoreError, &quot;Invalid IP pattern %s&quot; % value
+                end
+
+                @length = mask
+
+                ary.pop
+                while ary.length &lt; 4
+                    ary.push(&quot;0&quot;)
+                end
+
+                begin
+                    @pattern = IPAddr.new(ary.join(&quot;.&quot;) + &quot;/&quot; + mask.to_s)
+                rescue ArgumentError =&gt; detail
+                    raise AuthStoreError, &quot;Invalid IP address pattern %s&quot; % value
+                end
+            when /^([a-zA-Z][-\w]*\.)+[-\w]+$/: # a full hostname
+                @name = :domain
+                @pattern = munge_name(value)
+            when /^\*(\.([a-zA-Z][-\w]*)){1,}$/: # *.domain.com
+                @name = :domain
+                @pattern = munge_name(value)
+                @pattern.pop # take off the &#39;*&#39;
+                @length = @pattern.length
+            else
+                # Else, use the IPAddr class to determine if we&#39;ve got a
+                # valid IP address.
+                if value =~ /\/(\d+)$/
+                    @length = Integer($1)
+                end
+                begin
+                    @pattern = IPAddr.new(value)
+                rescue ArgumentError =&gt; detail
+                    raise AuthStoreError, &quot;Invalid pattern %s&quot; % value
+                end
+                @name = :ip
+            end
+</pre></div>
+
+
+<div class="codehilite"><pre>Following the trace back, I took a look at
+`/usr/lib/ruby/site_ruby/1.8/puppet/network/handler/ca.rb` starting at
+line 50:
+
+~~~~ {lang=&quot;ruby&quot; line=&quot;50&quot;}
+            auth = Puppet::Network::AuthStore.new
+            File.open(autosign) { |f|
+                f.each { |line|
+                    next if line =~ /^\s*#/
+                    next if line =~ /^\s*$/
+                    auth.allow(line.chomp)
+                }
+            }
+</pre></div>
+
+
+<p>After looking at this, it clicked that it must be what evaluates
+autosign.conf. Taking a look at mine, one line stood out: a line
+containing only &#8220;css-storemanager&#8221;, not a <span class="caps">FQDN</span> like all the rest. The
+parse() function in authstore.rb only accepts <span class="caps">IP</span> addresses and FQDNs (or
+<span class="caps">IP</span> addresses ending in a wildcard, or wildcard FQDNs). It appears to
+choke on hostnames (a string that doesn&#8217;t match an <span class="caps">FQDN</span> or <span class="caps">IP</span>).
+Interestingly, it also evaluates in order, and stops evaluating
+autosign.conf once it finds a match. So, if you&#8217;re a Bad Person like me,
+and left autosign turned on for all of your hosts, you wouldn&#8217;t notice
+this until you try and build a new&nbsp;box.</p>
+<p>To solve this, just remove any offending lines from&nbsp;autosign.conf.</p>
+<p>I&#8217;ve filed a bug report on the Puppet Trac: <a href="http://projects.reductivelabs.com/issues/2723">Issue 2723</a>.</p>
+            </div>
+            <!-- /.entry-content -->
+        </article>
+    </section>
+
+        </div>
+        <div class="col-lg-3 well well-sm" id="sidebar">
+
+<aside>
+    <section>
+        <ul class="list-group list-group-flush">
+                <li class="list-group-item"><h4><i class="icon-home icon-large"></i>Social</h4></li>
+                    <li class="list-group-item"><a href="#"><i
+                            class="icon-You can add links in your config file-sign icon-large"></i>You can add links in your config file
+                    </a></li>
+                    <li class="list-group-item"><a href="#"><i
+                            class="icon-Another social link-sign icon-large"></i>Another social link
+                    </a></li>
+
+
+
+                <li class="list-group-item"><a href="/tags.html"><h4><i class="icon-tags icon-large"></i>Tags</h4></a></li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/android.html">
+                                android
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/google.html">
+                                google
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/nagios.html">
+                                Nagios
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/php.html">
+                                PHP
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/sysadmin.html">
+                                sysadmin
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/linux.html">
+                                linux
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/perl.html">
+                                perl
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/logging.html">
+                                logging
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/puppet.html">
+                                puppet
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/bind.html">
+                                bind
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/monitoring.html">
+                                monitoring
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/dns.html">
+                                dns
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/droid.html">
+                                droid
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/firefox.html">
+                                firefox
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/mediawiki.html">
+                                mediawiki
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/mac.html">
+                                mac
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/microsoft.html">
+                                microsoft
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/syslog.html">
+                                syslog
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/wordpress.html">
+                                wordpress
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/rpm.html">
+                                rpm
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/security.html">
+                                security
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/blog.html">
+                                blog
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/sun.html">
+                                sun
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/ems.html">
+                                EMS
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/apache.html">
+                                apache
+                            </a>
+                        </li>
+        </ul>
+    </section>
+</aside>        </div>
+    </div>
+</div>
+<footer>
+    <div class="container">
+        <hr>
+        <p class="pull-right"><i class="icon-arrow-up"></i> <a href="#">Back to top</a></p>
+
+
+        <p>&copy; 2014 Jason Antman &middot; Powered by <a href="https://github.com/DandyDev/pelican-bootstrap3" target="_blank">pelican-bootstrap3</a>,
+            <a href="http://docs.getpelican.com/" target="_blank">Pelican</a>,
+            <a href="http://getbootstrap.com" target="_blank">Bootstrap</a></p>
+    </div>
+</footer>
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="/theme/js/bootstrap.min.js"></script>
+
+<!-- Enable responsive features in IE8 with Respond.js (https://github.com/scottjehl/Respond) -->
+<script src="/theme/js/respond.min.js"></script>
+
+
+</body>
+</html>

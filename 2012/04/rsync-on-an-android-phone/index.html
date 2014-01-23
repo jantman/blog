@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:og="http://ogp.me/ns#"
+      xmlns:fb="https://www.facebook.com/2008/fbml">
+<head>
+    <title>Rsync on an Android phone</title>
+    <!-- Using the latest rendering mode for IE -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Open Graph tags -->
+
+            <meta property="og:type" content="article"/>
+            <meta property="og:title" content="Rsync on an Android phone"/>
+            <meta property="og:url" content="/2012/04/rsync-on-an-android-phone/"/>
+            <meta property="og:description" content="Every once in a while, there are some files that I want kept in sync between my Android-based phone and one of my Linux (or Mac, or any Unix, or maybe Windows too, but I use Linux…) boxes. Yeah, I can copy them over manually via USB or even something ..."/>
+
+    <!-- Bootstrap -->
+        <link rel="stylesheet" href="/theme/css/bootstrap.min.css" type="text/css"/>
+    <link href="/theme/css/font-awesome.min.css" rel="stylesheet">
+    <link href="/theme/css/pygments.css" rel="stylesheet">
+        <link href="/theme/css/typogrify.css" rel="stylesheet">
+    <link rel="stylesheet" href="/theme/css/style.css" type="text/css"/>
+    <!-- JavaScript plugins (requires jQuery) -->
+    <script src="http://code.jquery.com/jquery.js"></script>
+
+        <link href="/feeds/all.atom.xml" type="application/atom+xml" rel="alternate"
+              title="Jason Antman's Blog ATOM Feed"/>
+
+</head>
+<body>
+<nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="" class="navbar-brand">Jason Antman's Blog</a>
+        </div>
+        <div class="collapse navbar-collapse navbar-ex1-collapse">
+            <ul class="nav navbar-nav">
+                         <li><a href="/pages/about.html">
+                             About
+                          </a></li>
+                        <li >
+                            <a href="/category/ideas-and-rants.html">Ideas and rants</a>
+                        </li>
+                        <li class="active">
+                            <a href="/category/miscellaneous.html">Miscellaneous</a>
+                        </li>
+                        <li >
+                            <a href="/category/monitoring.html">Monitoring</a>
+                        </li>
+                        <li >
+                            <a href="/category/projects.html">Projects</a>
+                        </li>
+                        <li >
+                            <a href="/category/puppet.html">Puppet</a>
+                        </li>
+                        <li >
+                            <a href="/category/sysadmin.html">Sysadmin</a>
+                        </li>
+                        <li >
+                            <a href="/category/tech-howtos.html">Tech howtos</a>
+                        </li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="/archives.html"><i class="icon-th-list"></i>Archives</a></li>
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+</nav>
+<!-- /.navbar -->
+<div class="container">
+    <div class="row">
+        <div class="col-lg-9">
+    <section id="content">
+        <article>
+            <header class="page-header">
+                <h1>
+                    <a href="/2012/04/rsync-on-an-android-phone/"
+                       rel="bookmark"
+                       title="Permalink to Rsync on an Android phone">
+                        Rsync on an Android&nbsp;phone
+                    </a>
+                </h1>
+            </header>
+            <div class="entry-content">
+                <div class="panel">
+                    <div class="panel-body">
+<footer class="post-info">
+    <span class="label label-default">Date</span>
+    <span class="published">
+        <i class="icon-calendar"></i>Wed 04 April 2012
+    </span>
+
+
+
+<span class="label label-default">Tags</span>
+	<a href="/tag/android.html">android</a>
+        /
+	<a href="/tag/rsync.html">rsync</a>
+        /
+	<a href="/tag/tasker.html">tasker</a>
+</footer><!-- /.post-info -->                    </div>
+                </div>
+                <p>Every once in a while, there are some files that I want kept in sync
+between my Android-based phone and one of my Linux (or Mac, or any Unix,
+or maybe Windows too, but I use Linux&#8230;) boxes. Yeah, I can copy them
+over manually via <span class="caps">USB</span> or even something a bit simpler like <a href="https://market.android.com/details?id=lysesoft.andftp">AndFTP</a>
+(assuming you can <span class="caps">SCP</span> to the target machine). But that&#8217;s a real pain for
+anything like my <a href="http://keepass.info/">KeePass</a> (well, actually <a href="http://www.keepassx.org/">KeePassX</a> and
+<a href="https://market.android.com/details?id=com.android.keepass">KeePassDroid</a>) password database, that I might add something to at
+any time and forget to sync. I also try to occasionally (waiting in
+line?) backup <span class="caps">SMS</span>, call logs, etc. on my phone, and like to have those
+synced back to the desktop&nbsp;automatically.</p>
+<p>Enter the solution: <a href="https://market.android.com/details?id=eu.kowalczuk.rsync4android">rsync backup for Android</a>, a <a href="http://rsync.samba.org/">rsync</a> client for
+Android that includes Tasker plugins (there are a few things about the
+app that I don&#8217;t like, but it seems to be the only option at the
+moment), and <a href="https://market.android.com/details?id=net.dinglisch.android.taskerm">Tasker</a>, an automation framework for Android.Tasker is
+one of the few Android apps that I&#8217;ve actually bought (i.e. not
+free/no-cost), and is currently selling for $6.49. It&#8217;s an incredibly
+capable task automator, very much akin to <a href="http://www.twofortyfouram.com/">Locale</a> on steroids. On the
+down side, Tasker can eat up battery life if you don&#8217;t configure it
+intelligently, and it&#8217;s not <em>always</em> 100% reliable when interacting with
+the system. On the positive side, Tasker can identify practically any
+combination of states in the android system (from hardware and software
+events to <span class="caps">GPS</span> location, time, signal status, etc.) and perform almost
+any task on the system based on this information. Sure, this specific
+problem could be solved with a cron replacement (which Android lacks, of
+course), but Tasker can do things like play specific audio files when
+you get an <span class="caps">SMS</span> from a specific number, mute audio at certain <span class="caps">GPS</span>
+locations, or turn WiFi on when I get home and off when I leave the
+house. It also has a plugin architecture, and rsync backup for Android
+happens to have a plugin that works with&nbsp;it.</p>
+<p>So, our goal is to have a daily, bi-directional, newest-file-wins sync
+between a directory on our Android phone and a directory on a computer.
+I&#8217;m not going to go into a lot of the computer-side stuff, mainly
+because that varies quite a bit between operating systems, and also
+because my personal setup is a bit paranoid in terms of security. For
+the computer side, we&#8217;ll need a machine that can be SSHed to from the
+Internet (either a static <span class="caps">IP</span> or a known hostname/dynamic <span class="caps">DNS</span>), a user
+that can run rsync over <span class="caps">SSH</span>, and a directory that&#8217;s writable&nbsp;(obviously).</p>
+<p><strong>Setup:</strong></p>
+<ol>
+<li>Buy and install the <a href="https://play.google.com/store/apps/details?id=net.dinglisch.android.taskerm">Tasker</a>&nbsp;app.</li>
+<li>Install the <a href="https://play.google.com/store/apps/details?id=eu.kowalczuk.rsync4android">rsync backup for Android</a>&nbsp;app.</li>
+<li>Configure the rsync stuff on the computer. In the simplest form,
+    we&#8217;ll just need a user that can login and run rsync, and a directory
+    to sync from/to <em>(note: this should be a directory used only for
+    syncing the&nbsp;phone&#8230;).</em></li>
+<li>Open the rsync backup for Android app. Use Menu -> Generate Keys to
+    generate a new pair of <span class="caps">SSH</span> keys, and then get the public key setup
+    on the target computer. See <a href="http://android.kowalczuk.eu/rsync4android/">the developer&#8217;s web site</a> for&nbsp;instructions.</li>
+<li>Once keys are setup, create a new profile called &#8220;<span class="caps">PC</span>-droid&#8221;. Set the
+    local directory to a new empty directory (I used <code>/sdcard/sync</code>),
+    enter the remote host address, port, username, and remote directory,
+    and select the private <span class="caps">SSH</span> key that you created. Check off &#8220;rsync on
+    reverse direction&#8221;. As this program is just a <span class="caps">GUI</span> wrapper around
+    normal rsync binaries, you can specify additional options to the
+    rsync command; my string ended up being
+    <code>-vHrltDuO --chmod=Du+rwx,go-rwx,Fu+rw,go-rw --no-perms</code>. If it
+    helps, at the bottom of the screen you can see the actual rsync
+    command line that will be run. Save when&nbsp;done.</li>
+<li>Save the profile, then long-press it and select &#8220;Duplicate&#8221;. Change
+    the name to &#8220;droid-<span class="caps">PC</span>&#8221;, uncheck &#8220;rsync in reverse direction&#8221;, and
+    change your additional options as needed (mine became
+    <code>-vHrltDu --chmod=Dug+rwx,o-rwx,Fug+rw,o-rw --no-perms</code>). Save when&nbsp;done.</li>
+<li>Create a test file in the sync directory on the <span class="caps">PC</span>, and a different
+    one in the sync directory on the&nbsp;droid.</li>
+<li>One at a time, in the rsync backup app, tap on the profile names. If
+    all goes well, the syncs should run, and both files will now be in
+    both places. If there are any problems, the output should help; the
+    most likely issues are probably permissions, rsync command options,
+    or <span class="caps">SSH</span>&nbsp;keys.</li>
+<li>Long-press each profile, select &#8220;Edit&#8221;, and check off &#8220;Close log
+    window after job is done&#8221;. Save&nbsp;profile.</li>
+<li>Now fire up Tasker. Click the &#8220;+&#8221; at the bottom of the screen to
+    create a new profile, call it &#8220;sync&#8221;, and click the check&nbsp;mark.</li>
+<li>On the First Context panel, tap Time, and select when you want the
+    jobs to run; I chose 03:01. Tap the check&nbsp;mark.</li>
+<li>On the Task Selection panel, tap New Task. Give it a name, like&nbsp;&#8220;sync2&#8221;.</li>
+<li>On the Task Edit panel, tap the &#8220;+&#8221; button at the bottom left, tap
+    Plugin, tap &#8220;rsync backup for Android&#8221;, click the &#8220;Edit&#8221; button on
+    the Configuration line, and select the <span class="caps">PC</span>-droid rsync profile. Tap
+    the check mark in the lower left to&nbsp;save.</li>
+<li>Repeat the last step for the droid-<span class="caps">PC</span> rsync&nbsp;profile.</li>
+<li>Tap the check box in the lower left. This saves the&nbsp;profile.</li>
+<li>In the main Tasker screen, make sure there&#8217;s a green check to the
+    right of the profile you just added, and that the button at the
+    bottom right of the screen is set to&nbsp;&#8220;On&#8221;.</li>
+</ol>
+<p>Assuming this all went well, the next time the time you specified rolls
+around, your sync should run. If you gave the task a name in step 12,
+you can setup additional profiles to run it at other times (or use the
+repeat logic&nbsp;builtin).</p>
+            </div>
+            <!-- /.entry-content -->
+        </article>
+    </section>
+
+        </div>
+        <div class="col-lg-3 well well-sm" id="sidebar">
+
+<aside>
+    <section>
+        <ul class="list-group list-group-flush">
+                <li class="list-group-item"><h4><i class="icon-home icon-large"></i>Social</h4></li>
+                    <li class="list-group-item"><a href="#"><i
+                            class="icon-You can add links in your config file-sign icon-large"></i>You can add links in your config file
+                    </a></li>
+                    <li class="list-group-item"><a href="#"><i
+                            class="icon-Another social link-sign icon-large"></i>Another social link
+                    </a></li>
+
+
+
+                <li class="list-group-item"><a href="/tags.html"><h4><i class="icon-tags icon-large"></i>Tags</h4></a></li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/android.html">
+                                android
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/google.html">
+                                google
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/nagios.html">
+                                Nagios
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/php.html">
+                                PHP
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/sysadmin.html">
+                                sysadmin
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/linux.html">
+                                linux
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/perl.html">
+                                perl
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/logging.html">
+                                logging
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/puppet.html">
+                                puppet
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/bind.html">
+                                bind
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/monitoring.html">
+                                monitoring
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/dns.html">
+                                dns
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/droid.html">
+                                droid
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/firefox.html">
+                                firefox
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/mediawiki.html">
+                                mediawiki
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/mac.html">
+                                mac
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/microsoft.html">
+                                microsoft
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/syslog.html">
+                                syslog
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/wordpress.html">
+                                wordpress
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/rpm.html">
+                                rpm
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/security.html">
+                                security
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/blog.html">
+                                blog
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/sun.html">
+                                sun
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/ems.html">
+                                EMS
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/apache.html">
+                                apache
+                            </a>
+                        </li>
+        </ul>
+    </section>
+</aside>        </div>
+    </div>
+</div>
+<footer>
+    <div class="container">
+        <hr>
+        <p class="pull-right"><i class="icon-arrow-up"></i> <a href="#">Back to top</a></p>
+
+
+        <p>&copy; 2014 Jason Antman &middot; Powered by <a href="https://github.com/DandyDev/pelican-bootstrap3" target="_blank">pelican-bootstrap3</a>,
+            <a href="http://docs.getpelican.com/" target="_blank">Pelican</a>,
+            <a href="http://getbootstrap.com" target="_blank">Bootstrap</a></p>
+    </div>
+</footer>
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="/theme/js/bootstrap.min.js"></script>
+
+<!-- Enable responsive features in IE8 with Respond.js (https://github.com/scottjehl/Respond) -->
+<script src="/theme/js/respond.min.js"></script>
+
+
+</body>
+</html>

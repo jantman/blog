@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:og="http://ogp.me/ns#"
+      xmlns:fb="https://www.facebook.com/2008/fbml">
+<head>
+    <title>Nagios check_by_ssh and NAT</title>
+    <!-- Using the latest rendering mode for IE -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Open Graph tags -->
+
+            <meta property="og:type" content="article"/>
+            <meta property="og:title" content="Nagios check_by_ssh and NAT"/>
+            <meta property="og:url" content="/2009/10/nagios-check_by_ssh-and-nat/"/>
+            <meta property="og:description" content="At a remote location, I have a number of machines to monitor but only one IP (dynamic on a residential connection). Most of my remote monitoring with Nagios uses check_by_ssh. Previously, I’d used one host for Nagios to SSH to, and then chained together another check_by_ssh to reach the ..."/>
+
+    <!-- Bootstrap -->
+        <link rel="stylesheet" href="/theme/css/bootstrap.min.css" type="text/css"/>
+    <link href="/theme/css/font-awesome.min.css" rel="stylesheet">
+    <link href="/theme/css/pygments.css" rel="stylesheet">
+        <link href="/theme/css/typogrify.css" rel="stylesheet">
+    <link rel="stylesheet" href="/theme/css/style.css" type="text/css"/>
+    <!-- JavaScript plugins (requires jQuery) -->
+    <script src="http://code.jquery.com/jquery.js"></script>
+
+        <link href="/feeds/all.atom.xml" type="application/atom+xml" rel="alternate"
+              title="Jason Antman's Blog ATOM Feed"/>
+
+</head>
+<body>
+<nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="" class="navbar-brand">Jason Antman's Blog</a>
+        </div>
+        <div class="collapse navbar-collapse navbar-ex1-collapse">
+            <ul class="nav navbar-nav">
+                         <li><a href="/pages/about.html">
+                             About
+                          </a></li>
+                        <li >
+                            <a href="/category/ideas-and-rants.html">Ideas and rants</a>
+                        </li>
+                        <li >
+                            <a href="/category/miscellaneous.html">Miscellaneous</a>
+                        </li>
+                        <li class="active">
+                            <a href="/category/monitoring.html">Monitoring</a>
+                        </li>
+                        <li >
+                            <a href="/category/projects.html">Projects</a>
+                        </li>
+                        <li >
+                            <a href="/category/puppet.html">Puppet</a>
+                        </li>
+                        <li >
+                            <a href="/category/sysadmin.html">Sysadmin</a>
+                        </li>
+                        <li >
+                            <a href="/category/tech-howtos.html">Tech howtos</a>
+                        </li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="/archives.html"><i class="icon-th-list"></i>Archives</a></li>
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+</nav>
+<!-- /.navbar -->
+<div class="container">
+    <div class="row">
+        <div class="col-lg-9">
+    <section id="content">
+        <article>
+            <header class="page-header">
+                <h1>
+                    <a href="/2009/10/nagios-check_by_ssh-and-nat/"
+                       rel="bookmark"
+                       title="Permalink to Nagios check_by_ssh and NAT">
+                        Nagios check_by_ssh and&nbsp;<span class="caps">NAT</span>
+                    </a>
+                </h1>
+            </header>
+            <div class="entry-content">
+                <div class="panel">
+                    <div class="panel-body">
+<footer class="post-info">
+    <span class="label label-default">Date</span>
+    <span class="published">
+        <i class="icon-calendar"></i>Thu 22 October 2009
+    </span>
+
+
+
+<span class="label label-default">Tags</span>
+	<a href="/tag/monitoring.html">monitoring</a>
+        /
+	<a href="/tag/nagios.html">Nagios</a>
+</footer><!-- /.post-info -->                    </div>
+                </div>
+                <p>At a remote location, I have a number of machines to monitor but only
+one <span class="caps">IP</span> (dynamic on a residential connection). Most of my remote
+monitoring with Nagios uses check_by_ssh. Previously, I&#8217;d used one
+host for Nagios to <span class="caps">SSH</span> to, and then chained together another
+check_by_ssh to reach the remote hosts. Unfortunately, this means
+nothing past the one first host can get monitored if the first host is
+down. All of the other hosts (everything is behind <span class="caps">NAT</span>) have <span class="caps">SSH</span> visible
+externally on different&nbsp;ports.</p>
+<p><span class="caps">SSH</span> itself doesn&#8217;t like one <span class="caps">IP</span>/hostname with <span class="caps">SSH</span> on different ports -
+host key verification will fail, as the <span class="caps">SSH</span> client only looks at the
+address that it&#8217;s connecting to, not the port number. Normally, this is
+bypassed by using a <code>.ssh/config</code> file&nbsp;like:</p>
+<p>~~~~{.text only}
+Host foo1
+        Hostname foo.example.com
+        HostKeyAlias foo1
+        CheckHostIP no
+        Port 22
+        User&nbsp;nagios</p>
+<p>Host foo2
+        Hostname foo.example.com
+        HostKeyAlias foo2
+        CheckHostIP no
+        Port 222
+        User&nbsp;nagios</p>
+<p>Host foo3
+        Hostname foo.example.com
+        HostKeyAlias foo3
+        CheckHostIP no
+        Port 10022
+        User&nbsp;nagios</p>
+<div class="codehilite"><pre>And then you SSH using the &quot;Host&quot; named in the config file, not the
+actual hostname.
+
+Unfortunately, the only way to get check\_by\_ssh to do this was a bit
+messy, and required defining a bunch of extra macros for each host:
+
+~~~~{.text only}
+/check_by_ssh -o Hostname=foo.example.com -o HostKeyAlias=foo1 -o CheckHostIP=no -o Port=222 -o User=nagios -H foo.example.com -C uptime
+</pre></div>
+
+
+<p></p>
+So, I made a quick little patch for check_by_ssh.c (patched against
+the released nagios-plugins-1.4.14)&nbsp;:</p>
+<div class="codehilite"><pre><span class="gd">--- check_by_ssh.c      2009-10-22 14:32:26.000000000 -0400</span>
+<span class="gi">+++ check_by_ssh_ORIG.c 2009-10-22 14:12:15.000000000 -0400</span>
+<span class="gu">@@ -181,7 +181,6 @@</span>
+                {&quot;skip&quot;, optional_argument, 0, &#39;S&#39;}, /* backwards compatibility */
+                {&quot;skip-stdout&quot;, optional_argument, 0, &#39;S&#39;},
+                {&quot;skip-stderr&quot;, optional_argument, 0, &#39;E&#39;},
+<span class="gd">-               {&quot;ssh-config&quot;, optional_argument, 0, &quot;F&quot;},</span>
+                {&quot;proto1&quot;, no_argument, 0, &#39;1&#39;},
+                {&quot;proto2&quot;, no_argument, 0, &#39;2&#39;},
+                {&quot;use-ipv4&quot;, no_argument, 0, &#39;4&#39;},
+<span class="gu">@@ -199,7 +198,7 @@</span>
+                        strcpy (argv[c], &quot;-t&quot;);
+
+        while (1) {
+<span class="gd">-               c = getopt_long (argc, argv, &quot;Vvh1246fqt:H:O:p:i:u:l:C:S::E::n:s:o:F:&quot;, longopts,</span>
+<span class="gi">+               c = getopt_long (argc, argv, &quot;Vvh1246fqt:H:O:p:i:u:l:C:S::E::n:s:o:&quot;, longopts,</span>
+                                 &amp;option);
+
+                if (c == -1 || c == <span class="caps">EOF</span>)
+<span class="gu">@@ -222,7 +221,7 @@</span>
+                                timeout_interval = atoi (optarg);
+                        break;
+                case &#39;H&#39;:                                                                       /* host */
+<span class="gd">-                 /* host_or_die(optarg); */     /* commented out 2009-10-22 by jantman for ssh config file use */</span>
+<span class="gi">+                       host_or_die(optarg);</span>
+                        hostname = optarg;
+                        break;
+                case &#39;p&#39;: /* port number */
+<span class="gu">@@ -300,12 +299,6 @@</span>
+                        else
+                                skip_stderr = atoi (optarg);
+                        break;
+<span class="gd">-               /* added 2009-10-22 by jantman for ssh -F option (config file) */</span>
+<span class="gd">-               case &#39;F&#39;:                                                                       /* ssh config file */</span>
+<span class="gd">-                       comm_append(&quot;-F&quot;);</span>
+<span class="gd">-                       comm_append(optarg);</span>
+<span class="gd">-                       break;</span>
+<span class="gd">-               /* <span class="caps">END</span> added 2009-10-22 by jantman */</span>
+                case &#39;o&#39;:                                                                       /* Extra options for the ssh command */
+                        comm_append(&quot;-o&quot;);
+                        comm_append(optarg);
+<span class="gu">@@ -411,8 +404,6 @@</span>
+   printf (&quot;    %s\n&quot;, _(&quot;Ignore all or (if specified) first n lines on <span class="caps">STDERR</span> [optional]&quot;));
+   printf (&quot; %s\n&quot;, &quot;-f&quot;);
+   printf (&quot;    %s\n&quot;, _(&quot;tells ssh to fork rather than create a tty [optional]. This will always return <span class="caps">OK</span> if ssh is executed&quot;));
+<span class="gd">-  printf (&quot; %s\n&quot;, &quot;-F&quot;);</span>
+<span class="gd">-  printf (&quot;    %s\n&quot;, _(&quot;path to ssh config file [optional]&quot;));</span>
+   printf (&quot; %s\n&quot;,&quot;-C, --command=&#39;<span class="caps">COMMAND</span> <span class="caps">STRING</span>&#39;&quot;);
+   printf (&quot;    %s\n&quot;, _(&quot;command to execute on the remote machine&quot;));
+   printf (&quot; %s\n&quot;,&quot;-l, --logname=<span class="caps">USERNAME</span>&quot;);
+</pre></div>
+
+
+<p>It works fine. The only problem is that I disabled the check that the
+given hostname/<span class="caps">IP</span> is valid, so instead of getting a nice &#8220;Invalid
+hostname/address - foobar&#8221; error, you&#8217;ll get the usual &#8220;Remote command
+execution failed: ssh: foobar: Name or service not known&#8221; error (though
+it will still give an exit code of 3). I had to do this because
+check_by_ssh was checking for a valid hostname itself, though <span class="caps">SSH</span>
+needs to be passed the &#8220;Host&#8221; alias as defined in the config&nbsp;file.</p>
+<p>With the patch, we now have something nice and clean&nbsp;like:</p>
+<p>~~~~{.text only}
+./check_by_ssh -H foo1 -F /home/nagios/.ssh/config -l nagios -i /home/nagios/.ssh/id_dsa -C uptime&nbsp;~~~~</p>
+<p>Which only adds the &#8220;-F&#8221; flag to what I was already using, and is safe
+to use for all&nbsp;hosts.</p>
+<p>When I get a chance, I&#8217;ll figure out a way to gracefully deal with the
+host aliases (&#8220;fake hostnames&#8221;) and submit a patch. Most likely, I&#8217;ll
+add another option so that you have to specify both the actual hostname
+(so it can check that it exists) and the alias used in the config file
+(perhaps&nbsp;&#8221;-a&#8221;?)</p>
+            </div>
+            <!-- /.entry-content -->
+        </article>
+    </section>
+
+        </div>
+        <div class="col-lg-3 well well-sm" id="sidebar">
+
+<aside>
+    <section>
+        <ul class="list-group list-group-flush">
+                <li class="list-group-item"><h4><i class="icon-home icon-large"></i>Social</h4></li>
+                    <li class="list-group-item"><a href="#"><i
+                            class="icon-You can add links in your config file-sign icon-large"></i>You can add links in your config file
+                    </a></li>
+                    <li class="list-group-item"><a href="#"><i
+                            class="icon-Another social link-sign icon-large"></i>Another social link
+                    </a></li>
+
+
+
+                <li class="list-group-item"><a href="/tags.html"><h4><i class="icon-tags icon-large"></i>Tags</h4></a></li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/android.html">
+                                android
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/google.html">
+                                google
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/nagios.html">
+                                Nagios
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/php.html">
+                                PHP
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/sysadmin.html">
+                                sysadmin
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/linux.html">
+                                linux
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/perl.html">
+                                perl
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/logging.html">
+                                logging
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/puppet.html">
+                                puppet
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/bind.html">
+                                bind
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/monitoring.html">
+                                monitoring
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/dns.html">
+                                dns
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/droid.html">
+                                droid
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/firefox.html">
+                                firefox
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/mediawiki.html">
+                                mediawiki
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/mac.html">
+                                mac
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/microsoft.html">
+                                microsoft
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/syslog.html">
+                                syslog
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/wordpress.html">
+                                wordpress
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/rpm.html">
+                                rpm
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/security.html">
+                                security
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/blog.html">
+                                blog
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/sun.html">
+                                sun
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/ems.html">
+                                EMS
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/apache.html">
+                                apache
+                            </a>
+                        </li>
+        </ul>
+    </section>
+</aside>        </div>
+    </div>
+</div>
+<footer>
+    <div class="container">
+        <hr>
+        <p class="pull-right"><i class="icon-arrow-up"></i> <a href="#">Back to top</a></p>
+
+
+        <p>&copy; 2014 Jason Antman &middot; Powered by <a href="https://github.com/DandyDev/pelican-bootstrap3" target="_blank">pelican-bootstrap3</a>,
+            <a href="http://docs.getpelican.com/" target="_blank">Pelican</a>,
+            <a href="http://getbootstrap.com" target="_blank">Bootstrap</a></p>
+    </div>
+</footer>
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="/theme/js/bootstrap.min.js"></script>
+
+<!-- Enable responsive features in IE8 with Respond.js (https://github.com/scottjehl/Respond) -->
+<script src="/theme/js/respond.min.js"></script>
+
+
+</body>
+</html>

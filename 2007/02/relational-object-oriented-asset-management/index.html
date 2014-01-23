@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:og="http://ogp.me/ns#"
+      xmlns:fb="https://www.facebook.com/2008/fbml">
+<head>
+    <title>Relational / Object-Oriented Asset Management</title>
+    <!-- Using the latest rendering mode for IE -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Open Graph tags -->
+
+            <meta property="og:type" content="article"/>
+            <meta property="og:title" content="Relational / Object-Oriented Asset Management"/>
+            <meta property="og:url" content="/2007/02/relational-object-oriented-asset-management/"/>
+            <meta property="og:description" content="I just purchased four new servers, and set out to find some good asset management software. Specifically, I’m looking for a PHP package that allows me to track the details of all of my hardware. While software and configuration tracking would surely be good for some applications, I already ..."/>
+
+    <!-- Bootstrap -->
+        <link rel="stylesheet" href="/theme/css/bootstrap.min.css" type="text/css"/>
+    <link href="/theme/css/font-awesome.min.css" rel="stylesheet">
+    <link href="/theme/css/pygments.css" rel="stylesheet">
+        <link href="/theme/css/typogrify.css" rel="stylesheet">
+    <link rel="stylesheet" href="/theme/css/style.css" type="text/css"/>
+    <!-- JavaScript plugins (requires jQuery) -->
+    <script src="http://code.jquery.com/jquery.js"></script>
+
+        <link href="/feeds/all.atom.xml" type="application/atom+xml" rel="alternate"
+              title="Jason Antman's Blog ATOM Feed"/>
+
+</head>
+<body>
+<nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="" class="navbar-brand">Jason Antman's Blog</a>
+        </div>
+        <div class="collapse navbar-collapse navbar-ex1-collapse">
+            <ul class="nav navbar-nav">
+                         <li><a href="/pages/about.html">
+                             About
+                          </a></li>
+                        <li class="active">
+                            <a href="/category/ideas-and-rants.html">Ideas and rants</a>
+                        </li>
+                        <li >
+                            <a href="/category/miscellaneous.html">Miscellaneous</a>
+                        </li>
+                        <li >
+                            <a href="/category/monitoring.html">Monitoring</a>
+                        </li>
+                        <li >
+                            <a href="/category/projects.html">Projects</a>
+                        </li>
+                        <li >
+                            <a href="/category/puppet.html">Puppet</a>
+                        </li>
+                        <li >
+                            <a href="/category/sysadmin.html">Sysadmin</a>
+                        </li>
+                        <li >
+                            <a href="/category/tech-howtos.html">Tech howtos</a>
+                        </li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="/archives.html"><i class="icon-th-list"></i>Archives</a></li>
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+</nav>
+<!-- /.navbar -->
+<div class="container">
+    <div class="row">
+        <div class="col-lg-9">
+    <section id="content">
+        <article>
+            <header class="page-header">
+                <h1>
+                    <a href="/2007/02/relational-object-oriented-asset-management/"
+                       rel="bookmark"
+                       title="Permalink to Relational / Object-Oriented Asset Management">
+                        Relational / Object-Oriented Asset&nbsp;Management
+                    </a>
+                </h1>
+            </header>
+            <div class="entry-content">
+                <div class="panel">
+                    <div class="panel-body">
+<footer class="post-info">
+    <span class="label label-default">Date</span>
+    <span class="published">
+        <i class="icon-calendar"></i>Wed 21 February 2007
+    </span>
+
+
+
+<span class="label label-default">Tags</span>
+	<a href="/tag/asset-management.html">asset management</a>
+        /
+	<a href="/tag/asset-tracking.html">asset tracking</a>
+        /
+	<a href="/tag/it.html">IT</a>
+        /
+	<a href="/tag/object-oriented.html">object-oriented</a>
+        /
+	<a href="/tag/relational.html">relational</a>
+</footer><!-- /.post-info -->                    </div>
+                </div>
+                <p>I just purchased four new servers, and set out to find some good asset
+management software. Specifically, I&#8217;m looking for a <span class="caps">PHP</span> package that
+allows me to track the details of all of my hardware. While software and
+configuration tracking would surely be good for some applications, I
+already have a package to handle&nbsp;that.</p>
+<p>I searched a few popular sites, including SourceForge, and came up with
+a dozen or so possibilities that looked good. They varied in level of
+detail and features, but all had one common failure - they lack an
+object-oriented or relational approach. What do I mean by that? Most of
+them are designed so that you enter data in a form, it goes into a
+database, and exists just as a table of data. Devices, networks, etc.
+exist&nbsp;independently.</p>
+<p>What do I want? An object-oriented approach that can handle
+relationships between objects, and hierarchies. Lets design a few
+objects as examples: We&#8217;ll have Networks, Servers, Interfaces, Switches,
+Hard Drives, and UPSs. They each represent the real-world hardware. An
+interface, for our purposes, will be a physical way of connecting two
+devices - an <span class="caps">NIC</span>, serial line,&nbsp;etc.</p>
+<p>If you&#8217;re experienced in object-oriented programming, you can think of
+relationships as inheritance, with an added capability of other&nbsp;references.</p>
+<p>Our Server object will represent a real-world server. It has components
+(other objects) such as Interfaces, Hard Drives, and&nbsp;others.</p>
+<p>How does this all pull&nbsp;together?</p>
+<p>We define, in our asset management software, a Server which has one
+Interface (Ethernet <span class="caps">NIC</span> called &#8220;<span class="caps">NIC1</span>&#8221;) and three Hard Drives (called
+<span class="caps">HDD1</span>-<span class="caps">HDD3</span>). The Interface, in turn belongs to a Network (<span class="caps">LAN</span>/<span class="caps">VLAN</span>), and
+has a field called &#8220;connection&#8221; which references a Interface of a Switch
+object, specifically Interface &#8220;Port1&#8221; on Switch &#8220;Switch1&#8221;. We&#8217;ll define
+one Network called &#8220;<span class="caps">LAN</span>&#8221; which is identified by the 192.168.0 <span class="caps">IP</span> range
+(a field of the Network object). We create a Switch object, which
+belongs to <span class="caps">LAN</span>, has <span class="caps">IP</span> 192.168.0.2, and has 24 Interfaces, called
+&#8220;Port1&#8221; through &#8220;Port24&#8221;. This represents a BayStack 450-24T Ethernet
+switch. We&#8217;ll also define a <span class="caps">UPS</span> called &#8220;SmartUPS&#8221;, which in turn has an
+Interface which is part of &#8220;<span class="caps">LAN</span>&#8221;, Connected to Switch1 on&nbsp;Port21.</p>
+<p>Now, you see the concept beginning to emerge. We have, in essence, an
+inter-related mesh of objects representing physical hardware and its&#8217;
+properties. This can all be thought of in a three-dimensional form,
+which represents the connections and relationships in our&nbsp;network.</p>
+<p>The main two advantages of this approach are:<br />
+1) The ability to quickly recognize relationships between objects. If,
+for example, we looked at a summary page in Switch1, we would see a
+number of static fields describing its properties (manufacturer, model,
+<span class="caps">IP</span>, <span class="caps">MAC</span>, etc.) as well as a diagram of its&#8217; relationships. Such a
+diagram would look something like:<br />
+Port1 -> <span class="caps">NIC1</span> -> Server1<br />
+Port21 -> SmartSlotCard1 -> <span class="caps">UPS1</span></p>
+<p>It would also have a listing of Networks which this device is a member
+of, specifically:<br />&nbsp;<span class="caps">LAN</span></p>
+<p>In practice, on a web interface, each one of these entries would be a
+link to that object&#8217;s summary. Clicking on <span class="caps">LAN</span>, <span class="caps">UPS1</span>, Server1, etc.
+would show us the summary of that object, so that we can browse through
+our physical network. Clicking on <span class="caps">LAN</span>, for example, would show <span class="caps">LAN</span>&#8217;s
+properties, as well as all devices that are members of <span class="caps">LAN</span> (related to&nbsp;it).</p>
+<p>The power of such an approach also relies on binding objects to specific
+pieces of hardware. For example, the disk drives in Server1 (<span class="caps">HDD1</span>, <span class="caps">HDD2</span>,
+<span class="caps">HDD3</span>) would in turn be references to objects representing actual
+physical assets. We can then move these assets around. For example,
+let&#8217;s say that we assign a unique serial number of 000306 at a physical
+hard drive. We now create an object for it, and reference <span class="caps">HDD3</span> in
+Server1 to this object. If we reconfigure Server1 (physically) by
+removing <span class="caps">HDD1</span> (000306) and place it on a shelf, we could then edit
+Server1&#8217;s <span class="caps">HDD3</span> object to be &#8220;empty&#8221;, and have 000306 reassigned to an
+object &#8220;Shelf02&#8221; that represents a physical storage location. By viewing
+the summary for Server1, we would see that <span class="caps">HDD3</span> is &#8220;empty&#8221;, but if we
+viewed Shelf02, we would see that 000306 is there, waiting to be used.
+When we add a server, Server2, we could assign 000306 to that server,
+as, say,&nbsp;<span class="caps">HDD2</span>.</p>
+<p>To give another example, <span class="caps">UPS1</span> is an uninterruptible power supply. We can
+&#8220;assign&#8221; devices to it, such as Switch1 and Server1. Viewing a summary
+for <span class="caps">UPS1</span> would show us that Switch1 and Server1 are connected to it.
+Similarly, viewing the summary for either Server1 or Switch1 would show
+us that they are connected to <span class="caps">UPS1</span>. If we add <span class="caps">UPS2</span>, we could simply edit
+the Server1 object so that it is connected to <span class="caps">UPS2</span>, and the <span class="caps">UPS1</span> and
+<span class="caps">UPS2</span> objects would show this change&nbsp;automatically.</p>
+<p>\2) Historical tracking. Every change would be accompanied by a person
+responsible, a date and time, a reason, and perhaps other information.
+Exactly how this would be implemented is not decided (whether
+relationships would be marked as &#8216;deleted&#8217; or whether changes would be
+held in a separate table in the database), but the idea is that any
+object would also contain a history of relationships. From our previous
+examples, if we viewed a summary of Server1, we would see that the
+connection to <span class="caps">UPS1</span> was severed on a specific date due to a reason such
+as &#8220;overload&#8221; and on that same date, the current connection to <span class="caps">UPS2</span> was
+established. Similarly, if we view the summary for <span class="caps">HDD2</span> on Server2, we
+would see that the object represents real-world hardware asset #000306.
+Viewing the summary for 000306 would show us that it is a 18.2 Gb <span class="caps">SCSI</span>
+drive in a Compaq hot-swap tray, and that it was originally installed in
+Server1, but moved on a certain date for a certain reason to Shelf02,
+and then later moved to&nbsp;Server2.</p>
+<p>The implementation of this concept would most likely come about as a
+web-based <span class="caps">PHP</span> front-end with a MySQL database back-end. In order to
+achieve good functionality, there would be a simple interface with quick
+execution of common tasks. Most likely, the names I have used such as
+Server1, <span class="caps">UPS1</span>, <span class="caps">HDD3</span> on Server1, etc. would just be reference names to a
+real-world hardware object, and its&#8217; data object representation,
+identified by a unique <span class="caps">ID</span>. For example, the name <span class="caps">HDD3</span> on Server1 would
+really just be a reference to 000306, a Hard Drive&nbsp;object.</p>
+<p>If we physically removed this drive from Server1 and placed it on
+Shelf02, we would browse to the Server1 page in our web interface, and
+click on &#8220;<span class="caps">HDD3</span>&#8221;, which would bring us to a page representing 000306. We
+could then click on a &#8220;Move&#8221; link, bringing us to a form. This allows us
+to enter our name, date and time, reason, etc. and a new location of
+&#8220;Shelf02&#8221;. We click submit and the move information is entered into a
+table, which references all associated objects - Server1, <span class="caps">HDD3</span> on
+Server1, 000306, Shelf02, etc. <span class="caps">HDD3</span> on Server1 has the reference to
+000306 removed, and a reference to a History object added. Shelf02 has a
+reference to the History object, as well as a reference to 000306,&nbsp;added.</p>
+<p>Now, viewing <span class="caps">HDD3</span> on Server1 would show that there is no physical device
+associated with it (empty), but would give a reference (link) to the
+000306 drive, the History entry for the removal, and the current
+location of 000306 on&nbsp;Shelf02.</p>
+            </div>
+            <!-- /.entry-content -->
+        </article>
+    </section>
+
+        </div>
+        <div class="col-lg-3 well well-sm" id="sidebar">
+
+<aside>
+    <section>
+        <ul class="list-group list-group-flush">
+                <li class="list-group-item"><h4><i class="icon-home icon-large"></i>Social</h4></li>
+                    <li class="list-group-item"><a href="#"><i
+                            class="icon-You can add links in your config file-sign icon-large"></i>You can add links in your config file
+                    </a></li>
+                    <li class="list-group-item"><a href="#"><i
+                            class="icon-Another social link-sign icon-large"></i>Another social link
+                    </a></li>
+
+
+
+                <li class="list-group-item"><a href="/tags.html"><h4><i class="icon-tags icon-large"></i>Tags</h4></a></li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/android.html">
+                                android
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/google.html">
+                                google
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/nagios.html">
+                                Nagios
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/php.html">
+                                PHP
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/sysadmin.html">
+                                sysadmin
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/linux.html">
+                                linux
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/perl.html">
+                                perl
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/logging.html">
+                                logging
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/puppet.html">
+                                puppet
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/bind.html">
+                                bind
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/monitoring.html">
+                                monitoring
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/dns.html">
+                                dns
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/droid.html">
+                                droid
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/firefox.html">
+                                firefox
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/mediawiki.html">
+                                mediawiki
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/mac.html">
+                                mac
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/microsoft.html">
+                                microsoft
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/syslog.html">
+                                syslog
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/wordpress.html">
+                                wordpress
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/rpm.html">
+                                rpm
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/security.html">
+                                security
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/blog.html">
+                                blog
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/sun.html">
+                                sun
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/ems.html">
+                                EMS
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/apache.html">
+                                apache
+                            </a>
+                        </li>
+        </ul>
+    </section>
+</aside>        </div>
+    </div>
+</div>
+<footer>
+    <div class="container">
+        <hr>
+        <p class="pull-right"><i class="icon-arrow-up"></i> <a href="#">Back to top</a></p>
+
+
+        <p>&copy; 2014 Jason Antman &middot; Powered by <a href="https://github.com/DandyDev/pelican-bootstrap3" target="_blank">pelican-bootstrap3</a>,
+            <a href="http://docs.getpelican.com/" target="_blank">Pelican</a>,
+            <a href="http://getbootstrap.com" target="_blank">Bootstrap</a></p>
+    </div>
+</footer>
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="/theme/js/bootstrap.min.js"></script>
+
+<!-- Enable responsive features in IE8 with Respond.js (https://github.com/scottjehl/Respond) -->
+<script src="/theme/js/respond.min.js"></script>
+
+
+</body>
+</html>

@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:og="http://ogp.me/ns#"
+      xmlns:fb="https://www.facebook.com/2008/fbml">
+<head>
+    <title>WP-Syntax Plugin GeSHi Path Fix</title>
+    <!-- Using the latest rendering mode for IE -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Open Graph tags -->
+
+            <meta property="og:type" content="article"/>
+            <meta property="og:title" content="WP-Syntax Plugin GeSHi Path Fix"/>
+            <meta property="og:url" content="/2012/01/wp-syntax-plugin-geshi-path-fix/"/>
+            <meta property="og:description" content="The Wp-Syntax plugin for WordPress provides syntax highlighting for WordPress blogs via the GeSHi PHP syntax highlighter. Unfortunately, the plugin includes a builtin version of GeSHi (currently 1.0.8.9) in geshi/. As a result, not only are users of the plugin not instructed to use the latest version ..."/>
+
+    <!-- Bootstrap -->
+        <link rel="stylesheet" href="/theme/css/bootstrap.min.css" type="text/css"/>
+    <link href="/theme/css/font-awesome.min.css" rel="stylesheet">
+    <link href="/theme/css/pygments.css" rel="stylesheet">
+        <link href="/theme/css/typogrify.css" rel="stylesheet">
+    <link rel="stylesheet" href="/theme/css/style.css" type="text/css"/>
+    <!-- JavaScript plugins (requires jQuery) -->
+    <script src="http://code.jquery.com/jquery.js"></script>
+
+        <link href="/feeds/all.atom.xml" type="application/atom+xml" rel="alternate"
+              title="Jason Antman's Blog ATOM Feed"/>
+
+</head>
+<body>
+<nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="" class="navbar-brand">Jason Antman's Blog</a>
+        </div>
+        <div class="collapse navbar-collapse navbar-ex1-collapse">
+            <ul class="nav navbar-nav">
+                         <li><a href="/pages/about.html">
+                             About
+                          </a></li>
+                        <li >
+                            <a href="/category/ideas-and-rants.html">Ideas and rants</a>
+                        </li>
+                        <li >
+                            <a href="/category/miscellaneous.html">Miscellaneous</a>
+                        </li>
+                        <li >
+                            <a href="/category/monitoring.html">Monitoring</a>
+                        </li>
+                        <li >
+                            <a href="/category/projects.html">Projects</a>
+                        </li>
+                        <li >
+                            <a href="/category/puppet.html">Puppet</a>
+                        </li>
+                        <li >
+                            <a href="/category/sysadmin.html">Sysadmin</a>
+                        </li>
+                        <li class="active">
+                            <a href="/category/tech-howtos.html">Tech howtos</a>
+                        </li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="/archives.html"><i class="icon-th-list"></i>Archives</a></li>
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+</nav>
+<!-- /.navbar -->
+<div class="container">
+    <div class="row">
+        <div class="col-lg-9">
+    <section id="content">
+        <article>
+            <header class="page-header">
+                <h1>
+                    <a href="/2012/01/wp-syntax-plugin-geshi-path-fix/"
+                       rel="bookmark"
+                       title="Permalink to WP-Syntax Plugin GeSHi Path Fix">
+                        <span class="caps">WP</span>-Syntax Plugin GeSHi Path&nbsp;Fix
+                    </a>
+                </h1>
+            </header>
+            <div class="entry-content">
+                <div class="panel">
+                    <div class="panel-body">
+<footer class="post-info">
+    <span class="label label-default">Date</span>
+    <span class="published">
+        <i class="icon-calendar"></i>Thu 12 January 2012
+    </span>
+
+
+
+<span class="label label-default">Tags</span>
+	<a href="/tag/geshi.html">GeSHi</a>
+        /
+	<a href="/tag/php.html">PHP</a>
+        /
+	<a href="/tag/syntax-highlighting.html">syntax highlighting</a>
+        /
+	<a href="/tag/wordpress.html">wordpress</a>
+</footer><!-- /.post-info -->                    </div>
+                </div>
+                <p>The <a href="http://wordpress.org/extend/plugins/wp-syntax/">Wp-Syntax</a> plugin for <a href="http://wordpress.org">WordPress</a> provides syntax highlighting
+for WordPress blogs via the <a href="http://qbnz.com/highlighter">GeSHi</a> <span class="caps">PHP</span> syntax highlighter.
+Unfortunately, the plugin includes a builtin version of GeSHi (currently
+1.0.8.9) in <code>geshi/</code>. As a result, not only are users of the plugin not
+instructed to use the latest version of GeSHi, but it won&#8217;t use a
+host-wide GeSHi installation that&#8217;s already in the <span class="caps">PHP</span> include path
+(i.e. <code>/usr/share/php/</code>), like the the many <a href="http://pkgs.org/search/?keyword=php-geshi&amp;search_on=name&amp;distro=0&amp;arch=32-bit">php-geshi packages</a>
+offered by repositories including <a href="http://fedoraproject.org/wiki/EPEL"><span class="caps">EPEL</span></a> (for Fedora, CentOS and&nbsp;<span class="caps">RHEL</span>).</p>
+<p>The fix is quite simple. Just open <code>wp-syntax.php</code> in the <code>wp-syntax/</code>
+plugin directory in your favorite text editor and change the GeSHi
+include line (for <span class="caps">WP</span>-Syntax 0.9.12, this is line 53)&nbsp;from:</p>
+<div class="codehilite"><pre><span class="x">include_once(&quot;geshi/geshi.php&quot;);</span>
+</pre></div>
+
+
+<p>to:</p>
+<div class="codehilite"><pre><span class="x">include_once(&quot;geshi.php&quot;);</span>
+</pre></div>
+
+
+<p>If you already have GeSHi installed in the <span class="caps">PHP</span> include path, just remove
+the <code>geshi</code> directory in your <code>wp-syntax/</code> plugin directory, flush the
+WordPress caches (if any), and load a page which uses GeSHi - it should
+now use the host-wide version. If you want to still use a local version
+for wp-syntax, you can move things around to where they <em>should</em> be in
+the <code>wp-syntax/</code> plugin&nbsp;directory:</p>
+<div class="codehilite"><pre>mv geshi/geshi.php . <span class="o">&amp;&amp;</span> mv geshi/geshi/* geshi/ <span class="o">&amp;&amp;</span> rmdir geshi/geshi
+</pre></div>
+
+
+<p></p>
+Note - if you&#8217;re in a shared hosting environment, or are otherwise not
+able to upgrade the php-geshi package on your server yourself, you might
+not want to do&nbsp;this.</p>
+<p>I also <a href="http://wordpress.org/support/topic/wp-syntax-move-geshi-include-path-to-allow-use-with-host-wide-geshi?replies=1#post-2556903">posted about this in the WordPress support forums</a>. Hopefully
+the <span class="caps">WP</span>-Syntax devs will include this change in the next&nbsp;version&#8230;</p>
+            </div>
+            <!-- /.entry-content -->
+        </article>
+    </section>
+
+        </div>
+        <div class="col-lg-3 well well-sm" id="sidebar">
+
+<aside>
+    <section>
+        <ul class="list-group list-group-flush">
+                <li class="list-group-item"><h4><i class="icon-home icon-large"></i>Social</h4></li>
+                    <li class="list-group-item"><a href="#"><i
+                            class="icon-You can add links in your config file-sign icon-large"></i>You can add links in your config file
+                    </a></li>
+                    <li class="list-group-item"><a href="#"><i
+                            class="icon-Another social link-sign icon-large"></i>Another social link
+                    </a></li>
+
+
+
+                <li class="list-group-item"><a href="/tags.html"><h4><i class="icon-tags icon-large"></i>Tags</h4></a></li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/android.html">
+                                android
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/google.html">
+                                google
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/nagios.html">
+                                Nagios
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/php.html">
+                                PHP
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/sysadmin.html">
+                                sysadmin
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/linux.html">
+                                linux
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/perl.html">
+                                perl
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/logging.html">
+                                logging
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/puppet.html">
+                                puppet
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/bind.html">
+                                bind
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/monitoring.html">
+                                monitoring
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/dns.html">
+                                dns
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/droid.html">
+                                droid
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/firefox.html">
+                                firefox
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/mediawiki.html">
+                                mediawiki
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/mac.html">
+                                mac
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/microsoft.html">
+                                microsoft
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/syslog.html">
+                                syslog
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/wordpress.html">
+                                wordpress
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/rpm.html">
+                                rpm
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/security.html">
+                                security
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/blog.html">
+                                blog
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/sun.html">
+                                sun
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/ems.html">
+                                EMS
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/apache.html">
+                                apache
+                            </a>
+                        </li>
+        </ul>
+    </section>
+</aside>        </div>
+    </div>
+</div>
+<footer>
+    <div class="container">
+        <hr>
+        <p class="pull-right"><i class="icon-arrow-up"></i> <a href="#">Back to top</a></p>
+
+
+        <p>&copy; 2014 Jason Antman &middot; Powered by <a href="https://github.com/DandyDev/pelican-bootstrap3" target="_blank">pelican-bootstrap3</a>,
+            <a href="http://docs.getpelican.com/" target="_blank">Pelican</a>,
+            <a href="http://getbootstrap.com" target="_blank">Bootstrap</a></p>
+    </div>
+</footer>
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="/theme/js/bootstrap.min.js"></script>
+
+<!-- Enable responsive features in IE8 with Respond.js (https://github.com/scottjehl/Respond) -->
+<script src="/theme/js/respond.min.js"></script>
+
+
+</body>
+</html>

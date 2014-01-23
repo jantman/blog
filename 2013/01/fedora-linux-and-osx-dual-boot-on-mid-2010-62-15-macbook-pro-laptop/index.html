@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:og="http://ogp.me/ns#"
+      xmlns:fb="https://www.facebook.com/2008/fbml">
+<head>
+    <title>Fedora Linux and OSX Dual Boot on Mid-2010 (6,2) 15” MacBook Pro Laptop</title>
+    <!-- Using the latest rendering mode for IE -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Open Graph tags -->
+
+            <meta property="og:type" content="article"/>
+            <meta property="og:title" content="Fedora Linux and OSX Dual Boot on Mid-2010 (6,2) 15” MacBook Pro Laptop"/>
+            <meta property="og:url" content="/2013/01/fedora-linux-and-osx-dual-boot-on-mid-2010-62-15-macbook-pro-laptop/"/>
+            <meta property="og:description" content="As part of the transition from a contractor to a full-time employee of Cox Media Group Digital & Strategy (check out our github), I’ve been issued a Mid-2010 (6,2) 15” MacBook Pro laptop, to replace my current Early-2008 (3,1) MacPro desktop. The desktop is currently running Fedora 17 ..."/>
+
+    <!-- Bootstrap -->
+        <link rel="stylesheet" href="/theme/css/bootstrap.min.css" type="text/css"/>
+    <link href="/theme/css/font-awesome.min.css" rel="stylesheet">
+    <link href="/theme/css/pygments.css" rel="stylesheet">
+        <link href="/theme/css/typogrify.css" rel="stylesheet">
+    <link rel="stylesheet" href="/theme/css/style.css" type="text/css"/>
+    <!-- JavaScript plugins (requires jQuery) -->
+    <script src="http://code.jquery.com/jquery.js"></script>
+
+        <link href="/feeds/all.atom.xml" type="application/atom+xml" rel="alternate"
+              title="Jason Antman's Blog ATOM Feed"/>
+
+</head>
+<body>
+<nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="" class="navbar-brand">Jason Antman's Blog</a>
+        </div>
+        <div class="collapse navbar-collapse navbar-ex1-collapse">
+            <ul class="nav navbar-nav">
+                         <li><a href="/pages/about.html">
+                             About
+                          </a></li>
+                        <li >
+                            <a href="/category/ideas-and-rants.html">Ideas and rants</a>
+                        </li>
+                        <li >
+                            <a href="/category/miscellaneous.html">Miscellaneous</a>
+                        </li>
+                        <li >
+                            <a href="/category/monitoring.html">Monitoring</a>
+                        </li>
+                        <li >
+                            <a href="/category/projects.html">Projects</a>
+                        </li>
+                        <li >
+                            <a href="/category/puppet.html">Puppet</a>
+                        </li>
+                        <li >
+                            <a href="/category/sysadmin.html">Sysadmin</a>
+                        </li>
+                        <li class="active">
+                            <a href="/category/tech-howtos.html">Tech howtos</a>
+                        </li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="/archives.html"><i class="icon-th-list"></i>Archives</a></li>
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+</nav>
+<!-- /.navbar -->
+<div class="container">
+    <div class="row">
+        <div class="col-lg-9">
+    <section id="content">
+        <article>
+            <header class="page-header">
+                <h1>
+                    <a href="/2013/01/fedora-linux-and-osx-dual-boot-on-mid-2010-62-15-macbook-pro-laptop/"
+                       rel="bookmark"
+                       title="Permalink to Fedora Linux and OSX Dual Boot on Mid-2010 (6,2) 15” MacBook Pro Laptop">
+                        Fedora Linux and <span class="caps">OSX</span> Dual Boot on Mid-2010 (6,2) 15&#8221; MacBook Pro&nbsp;Laptop
+                    </a>
+                </h1>
+            </header>
+            <div class="entry-content">
+                <div class="panel">
+                    <div class="panel-body">
+<footer class="post-info">
+    <span class="label label-default">Date</span>
+    <span class="published">
+        <i class="icon-calendar"></i>Mon 21 January 2013
+    </span>
+
+
+
+<span class="label label-default">Tags</span>
+	<a href="/tag/bootloader.html">bootloader</a>
+        /
+	<a href="/tag/efi.html">efi</a>
+        /
+	<a href="/tag/fedora.html">fedora</a>
+        /
+	<a href="/tag/gpt.html">gpt</a>
+        /
+	<a href="/tag/grub.html">grub</a>
+        /
+	<a href="/tag/installation.html">installation</a>
+        /
+	<a href="/tag/laptop.html">laptop</a>
+        /
+	<a href="/tag/mac.html">mac</a>
+        /
+	<a href="/tag/macbook.html">macbook</a>
+        /
+	<a href="/tag/os-x.html">os x</a>
+</footer><!-- /.post-info -->                    </div>
+                </div>
+                <p>As part of the transition from a contractor to a full-time employee of
+<a href="http://www.cmgdigital.com">Cox Media Group Digital <span class="amp">&amp;</span> Strategy</a> (check out our <a href="https://github.com/cmgdigital">github</a>), I&#8217;ve
+been issued a <a href="http://support.apple.com/kb/SP582">Mid-2010 (6,2)</a> 15&#8221; <a href="http://en.wikipedia.org/wiki/Macbook_pro#Technical_specifications_2">MacBook Pro</a> laptop, to replace
+my current <a href="http://support.apple.com/kb/SP11">Early-2008 (3,1)</a> MacPro desktop. The desktop is currently
+running <a href="http://fedoraproject.org/">Fedora</a> 17, dual-boot with with Mac <span class="caps">OS</span> X (left in place for
+firmware updates and emergencies) using the <a href="http://www.rodsbooks.com/refind/index.html">rEFInd boot manager</a> to
+choose between the two OSes. It took me two days to get this working
+right on my desktop, but it had been my plan to duplicate this setup on
+my laptop. I found a lot of conflicting information online, but I
+decided to give it a&nbsp;try.</p>
+<p>Well, I have Fedora 18 and <span class="caps">OS</span> X 10.8 dual-booting on the laptop, but not
+as planned. After a day and a half of research, troubleshooting and
+re-installs, here&#8217;s what I found to actually work, in the hope that
+nobody else will go through the ordeal I went through. Following that
+are some notes about the new Fedora 18 installer (Anaconda 18),
+especially important for anyone who&#8217;s used Linux for a while. To those
+who are new to Linux, don&#8217;t be dissuaded by the above. Most of the
+frustration I experienced is because I&#8217;ve been using Linux for a
+relatively long time (about 10 years), had my own ideas about exactly
+how I wanted things setup (which are decidedly <em>not</em> supported by
+Fedora), and had some assumptions about the installation process based
+on earlier&nbsp;versions.</p>
+<p><strong>How to get it&nbsp;working:</strong></p>
+<p>Forget about rEFInd. This had been the original advice from <a href="http://mjg59.dreamwidth.org/">Matthew
+Garrett</a>, <a href="https://twitter.com/mjg59">@mjg59</a>, kernel coder, contributor to the Anaconda
+project, and all-around authority on booting Linux on <span class="caps">EFI</span>/<span class="caps">UEFI</span> hardware.
+My advice, and the method that worked for&nbsp;me:</p>
+<ol>
+<li>Shrink your Mac partitions and leave as much free space as you want
+    for Fedora. using the Disk Utility tool in <span class="caps">OS</span> X (I also created an
+    <span class="caps">8GB</span> <span class="caps">VFAT</span> partition that both OSes can read/write&nbsp;to).</li>
+<li><a href="http://fedoraproject.org/en/get-fedora">Download Fedora 18</a> 64-bit <span class="caps">DVD</span> image, I chose the <span class="caps">KDE</span> version.
+    Verify the sha256 sum if you want (they don&#8217;t have a readily visible
+    link to the checksum file. Copy the download link, paste it into
+    your address bar and remove the filename. You should get a directory
+    index that includes a <code>-CHECKSUM</code> file.</li>
+<li>Per the Installation Guide&#8217;s <a href="http://docs.fedoraproject.org/en-US/Fedora/18/html/Installation_Guide/Making_USB_Media-UNIX_Linux.html">Making Fedora <span class="caps">USB</span> Media page</a>, use
+    <code>liveusb-creator</code> to setup the installation image on the <span class="caps">USB</span> flash
+    drive (I needed to start it with the <code>--reset-mbr</code> option). You can
+    also use other tools (dd if you&#8217;re not on a Fedora-based distro), or
+    a <span class="caps">DVD</span>, but this is the method I&nbsp;chose.</li>
+<li>Due to a <a href="https://fedorahosted.org/liveusb-creator/ticket/810">bug in liveusb-creator</a>, you may need to manually edit
+    <code>/EFI/boot/grub.cfg</code> on the created <span class="caps">USB</span> stick if grub gives you a
+    file not found error. If that happens, please see my bug report
+    above for the action to take (in short, you need to mount the <span class="caps">USB</span>
+    stick, <code>chmod u+w /EFI/boot/grub.cfg</code> then edit that file and
+    replace every occurrence of &#8220;isolinux&#8221; with &#8220;syslinux&#8221; and every
+    occurrence of &#8220;root=live:<span class="caps">LABEL</span>=Fedora-18-x86_64-Live-<span class="caps">KDE</span>.iso&#8221; with&nbsp;&#8220;root=live:<span class="caps">LABEL</span>=<span class="caps">LIVE</span>&#8221;).</li>
+<li>Boot the <span class="caps">USB</span> drive (use the alt key when you turn on the laptop to
+    select the <span class="caps">USB</span> drive) and just install Fedora normally, letting it
+    do its thing. Select a boot disk and let it put <span class="caps">GRUB2</span> on the <span class="caps">EFI</span>&nbsp;partition.</li>
+</ol>
+<p>When you boot, it will boot to <span class="caps">GRUB</span>. There will be some options for Mac
+<span class="caps">OS</span> there, but they don&#8217;t work (more on that below). If you want to boot
+Mac, hold down the alt/option key when you power on the laptop, which
+will bring you to the boot disk selector and you can pick the Mac disk.
+I know it&#8217;s not pretty or ideal, but it&#8217;s the best option right&nbsp;now.</p>
+<p><strong>Making it&nbsp;Better:</strong></p>
+<p><span class="caps">GRUB2</span> tries to automatically detect other OSes and configure them in the
+boot loader (this is done through <code>/etc/grub.d/30_os-prober</code>, commonly
+just referred to as <code>os-prober</code>). It tries to boot Mac directly through
+the xnu_kernel64 module, which not only isn&#8217;t installed on the boot
+partition by default, but just doesn&#8217;t work with at least Mountain Lion
+(10.8). So getting <span class="caps">GRUB</span> to boot Mac means either having the bugs in the
+xnu module fixed, or figuring out how to setup a chainloader to boot
+from <span class="caps">GRUB</span> to Mac. The latter is probably the method I&#8217;ll investigate,
+but for now, since I rarely use Mac, I&#8217;m happy having to use the alt key
+at boot to get there. To remove the annoying, broken Mac <span class="caps">OS</span> options from
+the grub screen, run the following commands as root (they assume you
+have your <span class="caps">EFI</span> partition mounted at <code>/boot/efi</code> which I believe Fedora
+should do by&nbsp;default:</p>
+<div class="codehilite"><pre>cp /boot/efi/EFI/fedora/grub.cfg /boot/efi/EFI/fedora/grub.cfg.bak
+<span class="nb">echo</span> <span class="s1">&#39;GRUB_DISABLE_OS_PROBER=&quot;true&quot;&#39;</span> &gt;&gt; /etc/default/grub
+grub2-mkconfig &gt; /boot/efi/<span class="caps">EFI</span>/fedora/grub.cfg
+</pre></div>
+
+
+<p><strong>Thoughts on the Fedora 18 Anaconda&nbsp;Installer</strong></p>
+<p>I found a couple of issues with the new Anaconda 18 installer that were
+either unweildy or confusing for someone who&#8217;s been installing Linux for
+a long time. Overall, the new installer is very nice. It has a clean,
+even elegant <span class="caps">UI</span>, a relatively nice flow from start to completion, and is
+certainly beginner-friendly. It has fewer options than any Linux
+installer I&#8217;ve ever used before - not even options for package
+selection, firewall or SELinux configuration, etc. - but I guess this is
+in line with the goal of making Fedora a desktop <span class="caps">OS</span> for the masses. I
+would have appreciated an &#8220;advanced mode&#8221; installer that was more like
+Fedora 17 (or even much older versions), but I guess I&#8217;m an edge case,
+at least in the Fedora community. However, I did find two things
+especially difficult, both related to the fact that my laptop has two
+main drives (a <span class="caps">500GB</span> hard drive and a <span class="caps">120GB</span>&nbsp;<span class="caps">SSD</span>):</p>
+<p>First, the installer prompted me to select a &#8220;boot disk&#8221;. I guess I
+should have read the installation guide, but I assumed that nomenclature
+translated to either &#8220;which disk should the automatic partitiioning put
+yout <code>/boot</code> partition on&#8221; or &#8220;which disk should I set the bootable flag
+on in the partition table&#8221;. In fact, it means &#8220;which disk should I put
+<span class="caps">GRUB</span> on the <span class="caps">EFI</span> partition of&#8221;. I installed, rebooted, and was shocked -
+and somewhat distressed - to boot directly to <span class="caps">GRUB2</span> instead of the
+rEFInd installation I had setup. The installer didn&#8217;t have any of the
+previously-customary &#8220;warning: this will overwrite your <span class="caps">MBR</span>/<span class="caps">EFI</span> boot
+partition&#8221; notices, so I felt safe letting it continue. It turned out
+that this was the way I ended up going, and it also turns out that
+there&#8217;s a bug in Anaconda that makes it fail installation if you tell it
+not to write a bootloader to disk (though it&#8217;s patched by one line of
+Python code). But I was deeply distressed that - contrary to the
+experience of every, admittedly more complicated, Linux installer I&#8217;d
+used before - the Fedora 18 installer overwrote my <span class="caps">EFI</span> bootloader
+(analogous to overwriting the <span class="caps">MBR</span> on a <span class="caps">BIOS</span> boot machine) without ever
+warning me or asking for a&nbsp;confirmation.</p>
+<p>Secondly, the partitioning tool is clearly designed for only one
+destination disk. The overview screen lists configured partitions by
+label and mount point, but not by physical device, so figuring out which
+partitions are on which physical disks takes a click on each and every
+partition to view that information in the detail panel. When you create
+a new partition, it&#8217;s automatically put in a <span class="caps">LVM</span> volume group spanning
+all disks. Changing the target of the automatically created volume group
+requires a few clicks, as does changing the physical disks backing any
+new volume groups. To assign a newly created partition to a specific
+disk, you have to click on an unlabeled &#8220;tool&#8221; icon under the list of
+partitions, far away from the information on the partition in question.
+It&#8217;s a nice interface for someone who clicks the &#8220;partition
+automatically&#8221; button, or who just knows they want to add &#8220;an extra
+partition&#8221;, but for anyone who has a specific layout in mind (like
+having <code>/</code>, <code>/boot</code> and <code>/var</code>, specifically sized, on the <span class="caps">SSD</span> and
+<code>/home</code> on the rotating disk) it takes about 4-5 more clicks and dialogs
+to add a partition than the last Fedora installer did. Mainly, it&#8217;s
+lacking any sort of Advanced Mode for partitioning that allows the user
+to quickly and accurately layout a more complex partitioning&nbsp;scheme.</p>
+<p>Below are some screenshots from the Fedora 17 and Fedora 18 Installation
+Guides, which contrast both the overview of all partitions and the
+individual partition&nbsp;settings:</p>
+<p>Fedora 18 Overview, from <a href="http://docs.fedoraproject.org/en-US/Fedora/18/html/Installation_Guide/s1-diskpartitioning-x86.html">9.13. Creating a Custom Partition Layout</a>:  </p>
+<p><img alt="image" src="http://www.dedoimedo.com/images/computers_years/2013_1/fedora-18-installer-configure-partitions.jpg" />  </p>
+<p>Fedora 17 Overview, from <a href="http://docs.fedoraproject.org/en-US/Fedora/17/html/Installation_Guide/s1-diskpartitioning-x86.html">9.14. Creating a Custom Layout or Modifying
+the Default Layout</a>:  </p>
+<p><img alt="image" src="http://docs.fedoraproject.org/en-US/Fedora/17/html/Installation_Guide/images/diskpartitioning/ddmain.png" />  </p>
+<p>Fedora 18 Partition Creation/Editing, from <a href="http://docs.fedoraproject.org/en-US/Fedora/18/html/Installation_Guide/Create_LVM-x86.html">9.13.3. Create <span class="caps">LVM</span> Logical
+Volume</a>:  </p>
+<p><img alt="image" src="http://docs.fedoraproject.org/en-US/Fedora/18/html/Installation_Guide/images/diskpartitioning/lvm-pv.png" />  </p>
+<p>Fedora 17 Partition Creation/Editing, from <a href="http://docs.fedoraproject.org/en-US/Fedora/17/html/Installation_Guide/Adding_Partitions-x86.html">9.14.2. Adding
+Partitions</a>:  </p>
+<p><img alt="image" src="http://docs.fedoraproject.org/en-US/Fedora/17/html/Installation_Guide/images/diskpartitioning/part-add.png" /></p>
+            </div>
+            <!-- /.entry-content -->
+        </article>
+    </section>
+
+        </div>
+        <div class="col-lg-3 well well-sm" id="sidebar">
+
+<aside>
+    <section>
+        <ul class="list-group list-group-flush">
+                <li class="list-group-item"><h4><i class="icon-home icon-large"></i>Social</h4></li>
+                    <li class="list-group-item"><a href="#"><i
+                            class="icon-You can add links in your config file-sign icon-large"></i>You can add links in your config file
+                    </a></li>
+                    <li class="list-group-item"><a href="#"><i
+                            class="icon-Another social link-sign icon-large"></i>Another social link
+                    </a></li>
+
+
+
+                <li class="list-group-item"><a href="/tags.html"><h4><i class="icon-tags icon-large"></i>Tags</h4></a></li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/android.html">
+                                android
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/google.html">
+                                google
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/nagios.html">
+                                Nagios
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/php.html">
+                                PHP
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/sysadmin.html">
+                                sysadmin
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/linux.html">
+                                linux
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/perl.html">
+                                perl
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/logging.html">
+                                logging
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/puppet.html">
+                                puppet
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/bind.html">
+                                bind
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/monitoring.html">
+                                monitoring
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/dns.html">
+                                dns
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/droid.html">
+                                droid
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/firefox.html">
+                                firefox
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/mediawiki.html">
+                                mediawiki
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/mac.html">
+                                mac
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/microsoft.html">
+                                microsoft
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/syslog.html">
+                                syslog
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/wordpress.html">
+                                wordpress
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/rpm.html">
+                                rpm
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/security.html">
+                                security
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/blog.html">
+                                blog
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/sun.html">
+                                sun
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/ems.html">
+                                EMS
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/apache.html">
+                                apache
+                            </a>
+                        </li>
+        </ul>
+    </section>
+</aside>        </div>
+    </div>
+</div>
+<footer>
+    <div class="container">
+        <hr>
+        <p class="pull-right"><i class="icon-arrow-up"></i> <a href="#">Back to top</a></p>
+
+
+        <p>&copy; 2014 Jason Antman &middot; Powered by <a href="https://github.com/DandyDev/pelican-bootstrap3" target="_blank">pelican-bootstrap3</a>,
+            <a href="http://docs.getpelican.com/" target="_blank">Pelican</a>,
+            <a href="http://getbootstrap.com" target="_blank">Bootstrap</a></p>
+    </div>
+</footer>
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="/theme/js/bootstrap.min.js"></script>
+
+<!-- Enable responsive features in IE8 with Respond.js (https://github.com/scottjehl/Respond) -->
+<script src="/theme/js/respond.min.js"></script>
+
+
+</body>
+</html>

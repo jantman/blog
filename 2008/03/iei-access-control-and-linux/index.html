@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:og="http://ogp.me/ns#"
+      xmlns:fb="https://www.facebook.com/2008/fbml">
+<head>
+    <title>IEI HubMax Access Control and Linux</title>
+    <!-- Using the latest rendering mode for IE -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Open Graph tags -->
+
+            <meta property="og:type" content="article"/>
+            <meta property="og:title" content="IEI HubMax Access Control and Linux"/>
+            <meta property="og:url" content="/2008/03/iei-access-control-and-linux/"/>
+            <meta property="og:description" content="At the Midland Park Ambulance Corps, where I’ve been volunteering my time as an EMT and all-around tech guru for three years, we have an IEI HubMax2 access control system. Maybe overkill for us (only 78 users in it, including old codes), it’s pretty simple - a box with ..."/>
+
+    <!-- Bootstrap -->
+        <link rel="stylesheet" href="/theme/css/bootstrap.min.css" type="text/css"/>
+    <link href="/theme/css/font-awesome.min.css" rel="stylesheet">
+    <link href="/theme/css/pygments.css" rel="stylesheet">
+        <link href="/theme/css/typogrify.css" rel="stylesheet">
+    <link rel="stylesheet" href="/theme/css/style.css" type="text/css"/>
+    <!-- JavaScript plugins (requires jQuery) -->
+    <script src="http://code.jquery.com/jquery.js"></script>
+
+        <link href="/feeds/all.atom.xml" type="application/atom+xml" rel="alternate"
+              title="Jason Antman's Blog ATOM Feed"/>
+
+</head>
+<body>
+<nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="" class="navbar-brand">Jason Antman's Blog</a>
+        </div>
+        <div class="collapse navbar-collapse navbar-ex1-collapse">
+            <ul class="nav navbar-nav">
+                         <li><a href="/pages/about.html">
+                             About
+                          </a></li>
+                        <li >
+                            <a href="/category/ideas-and-rants.html">Ideas and rants</a>
+                        </li>
+                        <li >
+                            <a href="/category/miscellaneous.html">Miscellaneous</a>
+                        </li>
+                        <li >
+                            <a href="/category/monitoring.html">Monitoring</a>
+                        </li>
+                        <li >
+                            <a href="/category/projects.html">Projects</a>
+                        </li>
+                        <li >
+                            <a href="/category/puppet.html">Puppet</a>
+                        </li>
+                        <li >
+                            <a href="/category/sysadmin.html">Sysadmin</a>
+                        </li>
+                        <li class="active">
+                            <a href="/category/tech-howtos.html">Tech howtos</a>
+                        </li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="/archives.html"><i class="icon-th-list"></i>Archives</a></li>
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+</nav>
+<!-- /.navbar -->
+<div class="container">
+    <div class="row">
+        <div class="col-lg-9">
+    <section id="content">
+        <article>
+            <header class="page-header">
+                <h1>
+                    <a href="/2008/03/iei-access-control-and-linux/"
+                       rel="bookmark"
+                       title="Permalink to IEI HubMax Access Control and Linux">
+                        <span class="caps">IEI</span> HubMax Access Control and&nbsp;Linux
+                    </a>
+                </h1>
+            </header>
+            <div class="entry-content">
+                <div class="panel">
+                    <div class="panel-body">
+<footer class="post-info">
+    <span class="label label-default">Date</span>
+    <span class="published">
+        <i class="icon-calendar"></i>Mon 31 March 2008
+    </span>
+
+
+
+<span class="label label-default">Tags</span>
+	<a href="/tag/access-control.html">access control</a>
+        /
+	<a href="/tag/door-lock.html">door lock</a>
+        /
+	<a href="/tag/hubmax.html">hubmax</a>
+        /
+	<a href="/tag/iei.html">iei</a>
+        /
+	<a href="/tag/ieib.html">ieib</a>
+</footer><!-- /.post-info -->                    </div>
+                </div>
+                <p>At the <a href="http://www.midlandparkambulance.com/">Midland Park Ambulance Corps</a>, where I&#8217;ve been volunteering my
+time as an <span class="caps">EMT</span> and all-around tech guru for three years, we have an <a href="http://www.ieib.com/product-details.html?id=49"><span class="caps">IEI</span>
+HubMax2 access control system</a>. Maybe overkill for us (only 78 users
+in it, including old codes), it&#8217;s pretty simple - a box with some
+microcontrollers sits in a wiring closet, and is hooked up to keypads at
+each door, and relays to electromechanical strikes. Type in the right
+code, and the door opens. Obviously, it also logs all entries as well as
+unknown codes (but doesn&#8217;t log the actual code if unknown, so instead of
+removing old users, I set their codes to an invalid timezone so the
+doors don&#8217;t open, but accountability is still intact). Well, the old box
+died - fried by a surge from a blown computer that was hooked up to its&#8217;
+serial port. New one was installed this weekend - an 8 hour&nbsp;ordeal.</p>
+<p>The problem with the system is that to program it, I have to grab the
+laptop out of one of the ambulances, have <span class="caps">IEI</span>&#8217;s proprietary
+Windows-based programming software (which programs it via sending and
+receiving full binary memory maps of the controllers over 1200 baud
+serial), and spend half an hour in the utility closet (next to the
+furnace) where the box is waiting for memory maps to transfer over the
+slow direct connection. Well, there&#8217;s a proliant server running
+<a href="http://www.opensuse.org/">OpenSuSE</a> seven feet away&#8230; why not use&nbsp;that?</p>
+<p>While <span class="caps">IEI</span> offers their <a href="http://www.ieib.com/products-browser-managed.html">eMerge</a> systems - appliance servers that
+manage their access control units via a web interface - for $6000, which
+run RedHat, they won&#8217;t even respond to my emails inquiring whether they
+have Linux-based programming software for their HubMax line. We don&#8217;t
+get that many new members per year, so I figured just programming in a
+few spare codes will handle it. Removing people can wait, as people
+usually leave on good terms. However, every once in a while something&#8217;s
+amiss at the building (usually a door left ajar, or food left out), and
+I&#8217;m called upon to pull the logs. It&#8217;s a pain in the @$$. I have to
+hunker down in that utility closet with a laptop, waiting for the whole
+memory map to download over 1200 baud just to see who came and went.
+Porting the software to Linux wouldn&#8217;t be a quick project. This is even
+worse during the school year when I&#8217;m living in my apartment an hour
+away, taking classes full time, and still working 25 hours a&nbsp;week.</p>
+<p><span style="font-style: italic;">The Solution</span>: At the end of my
+eight-hour install, everything was programmed and setup, but the logs
+were still bothering me. Then I hit on an idea. Remembering how archaic
+the real-world interfacing of these things seemed to me (how can you use
+binary memory maps? What about a serial terminal with an <span class="caps">ASCII</span> command
+set, or even Ethernet and <span class="caps">SNMP</span> or Telnet? I really want to build one of
+these things running real-time Linux&#8230;), I started to flip through the
+manual and, sure enough, found a command (entered on a 12-key keypad on
+the main board) to dump logs in realtime to a serial line&nbsp;printer.</p>
+<p>I ran a cable to the Linux-based server not 10 feet away, fired up
+Kermit, issued the Enable Log Print code, and tried a code entry on the
+keypad by the front door.&nbsp;Bingo!</p>
+<p>In the two days since, I have a little daemon coded in <span class="caps">PHP</span> (yes, <span class="caps">PHP</span>)
+that reads the serial line and dumps all log data (entries, exits, door
+ajar, unknown code, access denied) to both a text file (for debugging
+and redundancy) and into a MySQL database. Another hour of coding and I
+have a simple web <span class="caps">GUI</span>, available on any of the computers on the <span class="caps">LAN</span>, for
+officers to check who&#8217;s come, and who tried to get in but&nbsp;couldn&#8217;t.</p>
+<p>I&#8217;ve never written a daemon before, so I still have a bit more research
+to do - mainly in terms of error handling and how to keep it constantly
+running. However, I have a first version&nbsp;working.</p>
+<p>In the next few days I&#8217;ll start posting better code for ieilogd. I have
+<a href="http://cvs.jasonantman.com/cvs/ieilogd/">some in <span class="caps">CVS</span> now</a>, but it&#8217;s kludgey (well, it was written through
+<a href="http://www.chiark.greenend.org.uk/~sgtatham/putty/download.html">PuTTY</a> on a Windows laptop in a utility closet at 3 <span class="caps">AM</span>). It also has
+quite a bit of user-handling code that&#8217;s specific to the roster format
+of my package <a href="http://www.php-ems-tools.com"><span class="caps">PHP</span> <span class="caps">EMS</span> Tools</a>.</p>
+            </div>
+            <!-- /.entry-content -->
+        </article>
+    </section>
+
+        </div>
+        <div class="col-lg-3 well well-sm" id="sidebar">
+
+<aside>
+    <section>
+        <ul class="list-group list-group-flush">
+                <li class="list-group-item"><h4><i class="icon-home icon-large"></i>Social</h4></li>
+                    <li class="list-group-item"><a href="#"><i
+                            class="icon-You can add links in your config file-sign icon-large"></i>You can add links in your config file
+                    </a></li>
+                    <li class="list-group-item"><a href="#"><i
+                            class="icon-Another social link-sign icon-large"></i>Another social link
+                    </a></li>
+
+
+
+                <li class="list-group-item"><a href="/tags.html"><h4><i class="icon-tags icon-large"></i>Tags</h4></a></li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/android.html">
+                                android
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/google.html">
+                                google
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/nagios.html">
+                                Nagios
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/php.html">
+                                PHP
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/sysadmin.html">
+                                sysadmin
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/linux.html">
+                                linux
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/perl.html">
+                                perl
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/logging.html">
+                                logging
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/puppet.html">
+                                puppet
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/bind.html">
+                                bind
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/monitoring.html">
+                                monitoring
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/dns.html">
+                                dns
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/droid.html">
+                                droid
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/firefox.html">
+                                firefox
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/mediawiki.html">
+                                mediawiki
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/mac.html">
+                                mac
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/microsoft.html">
+                                microsoft
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/syslog.html">
+                                syslog
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/wordpress.html">
+                                wordpress
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/rpm.html">
+                                rpm
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/security.html">
+                                security
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/blog.html">
+                                blog
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/sun.html">
+                                sun
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/ems.html">
+                                EMS
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/apache.html">
+                                apache
+                            </a>
+                        </li>
+        </ul>
+    </section>
+</aside>        </div>
+    </div>
+</div>
+<footer>
+    <div class="container">
+        <hr>
+        <p class="pull-right"><i class="icon-arrow-up"></i> <a href="#">Back to top</a></p>
+
+
+        <p>&copy; 2014 Jason Antman &middot; Powered by <a href="https://github.com/DandyDev/pelican-bootstrap3" target="_blank">pelican-bootstrap3</a>,
+            <a href="http://docs.getpelican.com/" target="_blank">Pelican</a>,
+            <a href="http://getbootstrap.com" target="_blank">Bootstrap</a></p>
+    </div>
+</footer>
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="/theme/js/bootstrap.min.js"></script>
+
+<!-- Enable responsive features in IE8 with Respond.js (https://github.com/scottjehl/Respond) -->
+<script src="/theme/js/respond.min.js"></script>
+
+
+</body>
+</html>

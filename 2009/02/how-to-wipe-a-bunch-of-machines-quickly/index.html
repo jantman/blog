@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:og="http://ogp.me/ns#"
+      xmlns:fb="https://www.facebook.com/2008/fbml">
+<head>
+    <title>How To Wipe a Bunch of Machines Quickly</title>
+    <!-- Using the latest rendering mode for IE -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Open Graph tags -->
+
+            <meta property="og:type" content="article"/>
+            <meta property="og:title" content="How To Wipe a Bunch of Machines Quickly"/>
+            <meta property="og:url" content="/2009/02/how-to-wipe-a-bunch-of-machines-quickly/"/>
+            <meta property="og:description" content="Updated 2009-03-05, see bottom. At work the other week, we decommissioned 24 old desktops - Dell GX280’s that were used in the student labs as print release stations. They didn’t have anything sensitive on them, just Windows XP, but with licensing and all we have to wipe Windows off ..."/>
+
+    <!-- Bootstrap -->
+        <link rel="stylesheet" href="/theme/css/bootstrap.min.css" type="text/css"/>
+    <link href="/theme/css/font-awesome.min.css" rel="stylesheet">
+    <link href="/theme/css/pygments.css" rel="stylesheet">
+        <link href="/theme/css/typogrify.css" rel="stylesheet">
+    <link rel="stylesheet" href="/theme/css/style.css" type="text/css"/>
+    <!-- JavaScript plugins (requires jQuery) -->
+    <script src="http://code.jquery.com/jquery.js"></script>
+
+        <link href="/feeds/all.atom.xml" type="application/atom+xml" rel="alternate"
+              title="Jason Antman's Blog ATOM Feed"/>
+
+</head>
+<body>
+<nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="" class="navbar-brand">Jason Antman's Blog</a>
+        </div>
+        <div class="collapse navbar-collapse navbar-ex1-collapse">
+            <ul class="nav navbar-nav">
+                         <li><a href="/pages/about.html">
+                             About
+                          </a></li>
+                        <li >
+                            <a href="/category/ideas-and-rants.html">Ideas and rants</a>
+                        </li>
+                        <li >
+                            <a href="/category/miscellaneous.html">Miscellaneous</a>
+                        </li>
+                        <li >
+                            <a href="/category/monitoring.html">Monitoring</a>
+                        </li>
+                        <li >
+                            <a href="/category/projects.html">Projects</a>
+                        </li>
+                        <li >
+                            <a href="/category/puppet.html">Puppet</a>
+                        </li>
+                        <li >
+                            <a href="/category/sysadmin.html">Sysadmin</a>
+                        </li>
+                        <li class="active">
+                            <a href="/category/tech-howtos.html">Tech howtos</a>
+                        </li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="/archives.html"><i class="icon-th-list"></i>Archives</a></li>
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+</nav>
+<!-- /.navbar -->
+<div class="container">
+    <div class="row">
+        <div class="col-lg-9">
+    <section id="content">
+        <article>
+            <header class="page-header">
+                <h1>
+                    <a href="/2009/02/how-to-wipe-a-bunch-of-machines-quickly/"
+                       rel="bookmark"
+                       title="Permalink to How To Wipe a Bunch of Machines Quickly">
+                        How To Wipe a Bunch of Machines&nbsp;Quickly
+                    </a>
+                </h1>
+            </header>
+            <div class="entry-content">
+                <div class="panel">
+                    <div class="panel-body">
+<footer class="post-info">
+    <span class="label label-default">Date</span>
+    <span class="published">
+        <i class="icon-calendar"></i>Tue 03 February 2009
+    </span>
+
+
+
+<span class="label label-default">Tags</span>
+	<a href="/tag/automation.html">automation</a>
+        /
+	<a href="/tag/cobbler.html">cobbler</a>
+        /
+	<a href="/tag/dban.html">dban</a>
+        /
+	<a href="/tag/pxe.html">pxe</a>
+        /
+	<a href="/tag/retirement.html">retirement</a>
+        /
+	<a href="/tag/security.html">security</a>
+        /
+	<a href="/tag/wiping.html">wiping</a>
+</footer><!-- /.post-info -->                    </div>
+                </div>
+                <p><strong>Updated 2009-03-05, see&nbsp;bottom.</strong></p>
+<p>At work the other week, we decommissioned 24 old desktops - Dell <span class="caps">GX280</span>&#8217;s
+that were used in the student labs as print release stations. They
+didn&#8217;t have anything sensitive on them, just Windows <span class="caps">XP</span>, but with
+licensing and all we have to wipe Windows off of them before surplussing
+them. Since there were 24 of them, it wasn&#8217;t exactly going to be the
+quickest task. Moreover, the <span class="caps">GX280</span>&#8217;s we used don&#8217;t have <em>any</em> removable
+media&nbsp;drives.</p>
+<p>A few people mentioned <a href="http://www.dban.org/">Darik&#8217;s Boot And Nuke</a> (<span class="caps">DBAN</span>), which is a
+bootable Linux distro (<span class="caps">CD</span> or floppy) aimed at wiping all of the fixed
+disks attached to a machine. While they do offer an &#8220;Enterprise&#8221; version
+that supports network booting (and logging wipe verifications to a
+central machine), the pricing isn&#8217;t exactly favorable for a small
+project (or something that just needs Windows to go away, not a
+DoD-grade 7-pass overwrite with random data). Between the lack of a <span class="caps">CD</span>
+drive and the apparent need to select wiping options at boot, this
+didn&#8217;t seem to be the best method for&nbsp;me.</p>
+<p>Luckily, with a little googling, I came by the <a href="https://fedorahosted.org/cobbler/">Cobbler</a> project, a
+ready-to-run install server aimed at automating network-based <span class="caps">OS</span>
+installation. It turns out that Cobbler has a wiki article on <a href="https://fedorahosted.org/cobbler/wiki/SystemRetirement">system
+retirement</a> that deals with using Cobbler to automate a network boot
+of <span class="caps">DBAN</span>. Cobbler takes control of <span class="caps">DHCP</span> and <span class="caps">TFTP</span>, boots the machine(s) to
+a <span class="caps">PXE</span> boot menu, and allows selection of one of the cobbler&nbsp;&#8220;profiles&#8221;.</p>
+<p>The general procedure is something along these&nbsp;lines:</p>
+<ol>
+<li>Get the <span class="caps">DBAN</span> iso and grab the .ima image off of it. Loopback mount&nbsp;it.</li>
+<li>Copy the <code>initrd</code> and kernel into <code>/opt/cobbler/dban</code> as
+    <code>initrd.img</code> and <code>vmlinuz</code>,&nbsp;respectively.</li>
+<li>Assuming you have cobblerd running (cobbler check), add a Distro for
+    <span class="caps">DBAN</span>:
+    <code>cobbler distro add --name=DBAN-1.0.7-i386 --kernel=/opt/cobbler/dban/vmlinuz --initrd=/opt/cobbler/dban/initrd.img --kopts="root=/dev/ram0 init=/rc nuke=dwipe floppy=0,16,cmos"</code></li>
+<li>Add a Profile for it:
+    <code>cobbler profile add --name=DBAN-1.0.7-i386 --distro=DBAN-1.0.7-i386</code></li>
+<li><code>cobbler sync</code></li>
+</ol>
+<p>Assuming all went well, when we <span class="caps">PXE</span> boot a machine on the same <span class="caps">LAN</span> as
+the Cobbler system, we&#8217;ll get <span class="caps">DHCP</span> and a <span class="caps">PXE</span> boot menu which will list
+<code>DBAN-1.0.7.i386</code> as one of the options. On some of the <span class="caps">GX280</span>&#8217;s that I
+did, I had to go into the <span class="caps">BIOS</span> and enable <span class="caps">PXE</span> boot (or select <span class="caps">PXE</span> from
+the <span class="caps">BIOS</span> boot menu). Now, when <span class="caps">DBAN</span> boots, we&#8217;ll get the standard dmesg
+output and then a selection screen allowing us to pick a wipe type (I
+used the single pass all zeros for just getting rid of the old <span class="caps">OS</span>) and
+select which disks to wipe. If you use the default wipe, just press
+&#8220;space&#8221; to select all disks and then &#8220;F10&#8221; to begin the&nbsp;wipe.</p>
+<p>This process allowed me to wipe 7 machines at once (8 port <span class="caps">KVM</span>, 1 port
+for the server). With a better <span class="caps">KVM</span> or (even better yet) a totally
+automatic system as described below, it would essentially be limited to
+whatever the server and network hardware will&nbsp;handle.</p>
+<p>To add a little more automation, we can run
+<code>cobbler system add --name=default --profile=DBAN-1.0.7-i386</code> which adds
+a default profile to Cobbler, saying that any machines with MACs not
+specifically assigned to a profile should boot the <span class="caps">DBAN</span> profile, and
+bypassing the <span class="caps">PXE</span> boot&nbsp;menu.</p>
+<p><strong><span class="caps">WARNING</span>:</strong> what follows will setup Cobbler and <span class="caps">DBAN</span> to automatically
+wipe all <span class="caps">PXE</span>-booting devices without <span class="caps">ANY</span> human intervention. Use at your
+own risk and, for God&#8217;s sake, don&#8217;t plug your server into a production
+network (I recommend this only in a lab environment with a dedicated
+switch, all machines in one physical area, and no possibility of getting
+on the same &#8216;net as production&nbsp;machines).</p>
+<p>It&#8217;s theoretically possible to totally automate this setup. According to
+the <span class="caps">DBAN</span> docs, it will also accept kernel options (kopts) that effect
+how dnuke works - specifically, <code>--autonuke</code> to tell it to wipe without
+human intervention and a method option such as <code>--method=zero</code> to select
+the wipe method. This means that if we <span class="caps">PXE</span> boot with kernel options set
+to <code>nuke="dwipe --autonuke --method=zero"</code> we should go straight to the
+dwipe utility (the heart of <span class="caps">DBAN</span>) and automatically wipe all disks by
+writing zeros once - without operator intervention. Unfortunately,
+there&#8217;s a <a href="https://fedorahosted.org/cobbler/ticket/148">bug</a> in the current (1.4.0) Cobbler which prevents
+quote-encapsulated strings in kopts, meaning that we can&#8217;t set one
+kernel option to a string with whitespace as needed here. If this bug is
+fixed, it should allow this process to work without any operator
+intervention, assuming the clients will <span class="caps">PXE</span>&nbsp;boot.</p>
+<p><strong>Updated 2009-03-05</strong> I haven&#8217;t tested it yet, but apparently the
+Cobbler bug preventing complex kernel options has <a href="https://fedorahosted.org/pipermail/cobbler/2009-February/002874.html">been fixed</a>. The
+fix should be included in the 1.4.3 release and is currently in the
+development&nbsp;tree.</p>
+            </div>
+            <!-- /.entry-content -->
+        </article>
+    </section>
+
+        </div>
+        <div class="col-lg-3 well well-sm" id="sidebar">
+
+<aside>
+    <section>
+        <ul class="list-group list-group-flush">
+                <li class="list-group-item"><h4><i class="icon-home icon-large"></i>Social</h4></li>
+                    <li class="list-group-item"><a href="#"><i
+                            class="icon-You can add links in your config file-sign icon-large"></i>You can add links in your config file
+                    </a></li>
+                    <li class="list-group-item"><a href="#"><i
+                            class="icon-Another social link-sign icon-large"></i>Another social link
+                    </a></li>
+
+
+
+                <li class="list-group-item"><a href="/tags.html"><h4><i class="icon-tags icon-large"></i>Tags</h4></a></li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/android.html">
+                                android
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/google.html">
+                                google
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/nagios.html">
+                                Nagios
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/php.html">
+                                PHP
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/sysadmin.html">
+                                sysadmin
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/linux.html">
+                                linux
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/perl.html">
+                                perl
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/logging.html">
+                                logging
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/puppet.html">
+                                puppet
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/bind.html">
+                                bind
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/monitoring.html">
+                                monitoring
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/dns.html">
+                                dns
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/droid.html">
+                                droid
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/firefox.html">
+                                firefox
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/mediawiki.html">
+                                mediawiki
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/mac.html">
+                                mac
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/microsoft.html">
+                                microsoft
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/syslog.html">
+                                syslog
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/wordpress.html">
+                                wordpress
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/rpm.html">
+                                rpm
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/security.html">
+                                security
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/blog.html">
+                                blog
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/sun.html">
+                                sun
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/ems.html">
+                                EMS
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/apache.html">
+                                apache
+                            </a>
+                        </li>
+        </ul>
+    </section>
+</aside>        </div>
+    </div>
+</div>
+<footer>
+    <div class="container">
+        <hr>
+        <p class="pull-right"><i class="icon-arrow-up"></i> <a href="#">Back to top</a></p>
+
+
+        <p>&copy; 2014 Jason Antman &middot; Powered by <a href="https://github.com/DandyDev/pelican-bootstrap3" target="_blank">pelican-bootstrap3</a>,
+            <a href="http://docs.getpelican.com/" target="_blank">Pelican</a>,
+            <a href="http://getbootstrap.com" target="_blank">Bootstrap</a></p>
+    </div>
+</footer>
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="/theme/js/bootstrap.min.js"></script>
+
+<!-- Enable responsive features in IE8 with Respond.js (https://github.com/scottjehl/Respond) -->
+<script src="/theme/js/respond.min.js"></script>
+
+
+</body>
+</html>

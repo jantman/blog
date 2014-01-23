@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:og="http://ogp.me/ns#"
+      xmlns:fb="https://www.facebook.com/2008/fbml">
+<head>
+    <title>Solaris Update, Hardware Photos, SMF Manifests, Nagios Plugins</title>
+    <!-- Using the latest rendering mode for IE -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Open Graph tags -->
+
+            <meta property="og:type" content="article"/>
+            <meta property="og:title" content="Solaris Update, Hardware Photos, SMF Manifests, Nagios Plugins"/>
+            <meta property="og:url" content="/2008/01/solaris-update-hardware-photos-smf-manifests-nagios-plugins/"/>
+            <meta property="og:description" content="So in the past weekend, I had my first real experience with Solaris in production. I finally setup my Sun Blade 150 running Solaris 10 as my new mailserver, replacing a (!!!) vintage 1998 Gateway Pentium II 350MHz desktop. Quite an upgrade, even to the still-not-new Sun workstation. Maybe sometime in ..."/>
+
+    <!-- Bootstrap -->
+        <link rel="stylesheet" href="/theme/css/bootstrap.min.css" type="text/css"/>
+    <link href="/theme/css/font-awesome.min.css" rel="stylesheet">
+    <link href="/theme/css/pygments.css" rel="stylesheet">
+        <link href="/theme/css/typogrify.css" rel="stylesheet">
+    <link rel="stylesheet" href="/theme/css/style.css" type="text/css"/>
+    <!-- JavaScript plugins (requires jQuery) -->
+    <script src="http://code.jquery.com/jquery.js"></script>
+
+        <link href="/feeds/all.atom.xml" type="application/atom+xml" rel="alternate"
+              title="Jason Antman's Blog ATOM Feed"/>
+
+</head>
+<body>
+<nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="" class="navbar-brand">Jason Antman's Blog</a>
+        </div>
+        <div class="collapse navbar-collapse navbar-ex1-collapse">
+            <ul class="nav navbar-nav">
+                         <li><a href="/pages/about.html">
+                             About
+                          </a></li>
+                        <li >
+                            <a href="/category/ideas-and-rants.html">Ideas and rants</a>
+                        </li>
+                        <li >
+                            <a href="/category/miscellaneous.html">Miscellaneous</a>
+                        </li>
+                        <li >
+                            <a href="/category/monitoring.html">Monitoring</a>
+                        </li>
+                        <li class="active">
+                            <a href="/category/projects.html">Projects</a>
+                        </li>
+                        <li >
+                            <a href="/category/puppet.html">Puppet</a>
+                        </li>
+                        <li >
+                            <a href="/category/sysadmin.html">Sysadmin</a>
+                        </li>
+                        <li >
+                            <a href="/category/tech-howtos.html">Tech howtos</a>
+                        </li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="/archives.html"><i class="icon-th-list"></i>Archives</a></li>
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+</nav>
+<!-- /.navbar -->
+<div class="container">
+    <div class="row">
+        <div class="col-lg-9">
+    <section id="content">
+        <article>
+            <header class="page-header">
+                <h1>
+                    <a href="/2008/01/solaris-update-hardware-photos-smf-manifests-nagios-plugins/"
+                       rel="bookmark"
+                       title="Permalink to Solaris Update, Hardware Photos, SMF Manifests, Nagios Plugins">
+                        Solaris Update, Hardware Photos, <span class="caps">SMF</span> Manifests, Nagios&nbsp;Plugins
+                    </a>
+                </h1>
+            </header>
+            <div class="entry-content">
+                <div class="panel">
+                    <div class="panel-body">
+<footer class="post-info">
+    <span class="label label-default">Date</span>
+    <span class="published">
+        <i class="icon-calendar"></i>Wed 02 January 2008
+    </span>
+
+
+
+</footer><!-- /.post-info -->                    </div>
+                </div>
+                <p>So in the past weekend, I had my first real experience with Solaris in
+production. I finally setup my Sun Blade 150 running Solaris 10 as my
+new mailserver, replacing a (!!!) vintage 1998 Gateway Pentium <span class="caps">II</span> 350MHz
+desktop. Quite an upgrade, even to the still-not-new Sun workstation.
+Maybe sometime in the future I&#8217;ll even upgrade some of my other old
+desktops with my spare Dell PowerEdge&nbsp;2550.</p>
+<p>Anyway, the whole process, from fresh Solaris install to working
+mailserver, probably took me around 24 work hours. That being said, I&#8217;ve
+never really administered Solaris before, so that also included horribly
+long stretches of doc reading and figuring out <span class="caps">SMF</span>, package and service
+administration,&nbsp;etc.</p>
+<p>I&#8217;ve detailed the entire process on my <a href="http://www.jasonantman.com/wiki/index.php/Solaris_Mailserver">wiki</a> in excruciating detail.
+The Solaris package repository any pkg-get systems from
+<a href="http://www.blastwave.org/">blastwave.org</a> were immensely helpful, as were a number of <a href="http://cuddletech.com/blog/">Ben
+Rockwood&#8217;s</a> blog posts. The entire operation involved installing and
+configuring Dovecot with <span class="caps">IMAPS</span>, Postfix with <span class="caps">TLS</span> and <span class="caps">SASL</span> to
+authenticate to my <span class="caps">ISP</span>&#8217;s mailserver (which I use to relay outgoing mail,
+given my dynamic <span class="caps">IP</span>), Procmail, Fetchmail and SpamAssassin. I also had
+to setup the machine to relay mail for other hosts on the <span class="caps">LAN</span>. Rounding
+it out, I setup monitoring with Nagios and backups of the system and
+mail through Bacula. During the process, I also had to modify some
+Service Management Facility (<span class="caps">SMF</span>) manifests for Fetchmail, Postfix, and&nbsp;Dovecot.</p>
+<p>I still have a few things to do - namely create <a href="http://www.nagios.org/">Nagios</a> check scripts
+for processors, temperatures, and fans (using the prtdiag command) and
+hard drive status/errors (using iostat -Exn, given that I haven&#8217;t been
+able to find a <span class="caps">SMART</span> tool that supports <span class="caps">IDE</span> under Solaris). For
+everything else, I just checked the <a href="http://www.nagios-exchange.org/">NagiosExchange</a> plugin
+repository, using check_by_ssh for everything. The only problem I had
+was that NagiosExchange didn&#8217;t appear to have working default Nagios
+plugins for Solaris 10. Luckily, though, Blastwave had a &#8220;nagiosp&#8221;
+plugin&nbsp;package.</p>
+<p>I&#8217;ll probably update this blog with my check plugins as I develop them,
+but for now I have a little <a href="http://www.jasonantman.com/wiki/index.php/Solaris_Nagios_Checks">page</a> on my <a href="http://www.jasonantman.com/wiki/">wiki</a>about using Nagios
+with&nbsp;Solaris.</p>
+<p>Also, I uploaded <a href="http://www.jasonantman.com/wiki/index.php/Jasonantman.com_Hardware">a few photos</a> of the equipment that runs this blog
+and the rest of my site and development network - all on a &#8220;beautiful&#8221;
+Sears shop shelf in my basement. Nothing wonderful, but it gets the job
+done. I&#8217;ll admit that I could have done a better job stitching the
+photos together, but the space is so tight that I can&#8217;t get a wide shot
+of the whole&nbsp;rack.</p>
+<p>The rack, in all its glory:<br />
+[<img alt="image" src="http://www.jasonantman.com/wiki/images/0/0a/Tall1_sm.jpg" />][]</p>
+<p>A closer view of (most of) the hardware:<br />
+[<img alt="image" src="http://www.jasonantman.com/wiki/images/5/57/Tall3_sm.jpg" />][]</p>
+<p>Happy New&nbsp;Year!</p>
+<p>[<img alt="image" src="http://www.jasonantman.com/wiki/images/0/0a/Tall1_sm.jpg" />]: http://www.jasonantman.com/wiki/images/c/c3/Tall1.jpg
+  [<img alt="image" src="http://www.jasonantman.com/wiki/images/5/57/Tall3_sm.jpg" />]:&nbsp;http://www.jasonantman.com/wiki/images/7/77/Tall3.jpg</p>
+            </div>
+            <!-- /.entry-content -->
+        </article>
+    </section>
+
+        </div>
+        <div class="col-lg-3 well well-sm" id="sidebar">
+
+<aside>
+    <section>
+        <ul class="list-group list-group-flush">
+                <li class="list-group-item"><h4><i class="icon-home icon-large"></i>Social</h4></li>
+                    <li class="list-group-item"><a href="#"><i
+                            class="icon-You can add links in your config file-sign icon-large"></i>You can add links in your config file
+                    </a></li>
+                    <li class="list-group-item"><a href="#"><i
+                            class="icon-Another social link-sign icon-large"></i>Another social link
+                    </a></li>
+
+
+
+                <li class="list-group-item"><a href="/tags.html"><h4><i class="icon-tags icon-large"></i>Tags</h4></a></li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/android.html">
+                                android
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/google.html">
+                                google
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/nagios.html">
+                                Nagios
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/php.html">
+                                PHP
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/sysadmin.html">
+                                sysadmin
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/linux.html">
+                                linux
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/perl.html">
+                                perl
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/logging.html">
+                                logging
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/puppet.html">
+                                puppet
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/bind.html">
+                                bind
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/monitoring.html">
+                                monitoring
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/dns.html">
+                                dns
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/droid.html">
+                                droid
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/firefox.html">
+                                firefox
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/mediawiki.html">
+                                mediawiki
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/mac.html">
+                                mac
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/microsoft.html">
+                                microsoft
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/syslog.html">
+                                syslog
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/wordpress.html">
+                                wordpress
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/rpm.html">
+                                rpm
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/security.html">
+                                security
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/blog.html">
+                                blog
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/sun.html">
+                                sun
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/ems.html">
+                                EMS
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/apache.html">
+                                apache
+                            </a>
+                        </li>
+        </ul>
+    </section>
+</aside>        </div>
+    </div>
+</div>
+<footer>
+    <div class="container">
+        <hr>
+        <p class="pull-right"><i class="icon-arrow-up"></i> <a href="#">Back to top</a></p>
+
+
+        <p>&copy; 2014 Jason Antman &middot; Powered by <a href="https://github.com/DandyDev/pelican-bootstrap3" target="_blank">pelican-bootstrap3</a>,
+            <a href="http://docs.getpelican.com/" target="_blank">Pelican</a>,
+            <a href="http://getbootstrap.com" target="_blank">Bootstrap</a></p>
+    </div>
+</footer>
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="/theme/js/bootstrap.min.js"></script>
+
+<!-- Enable responsive features in IE8 with Respond.js (https://github.com/scottjehl/Respond) -->
+<script src="/theme/js/respond.min.js"></script>
+
+
+</body>
+</html>

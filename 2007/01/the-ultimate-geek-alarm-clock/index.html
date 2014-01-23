@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:og="http://ogp.me/ns#"
+      xmlns:fb="https://www.facebook.com/2008/fbml">
+<head>
+    <title>The ultimate Geek alarm clock!</title>
+    <!-- Using the latest rendering mode for IE -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Open Graph tags -->
+
+            <meta property="og:type" content="article"/>
+            <meta property="og:title" content="The ultimate Geek alarm clock!"/>
+            <meta property="og:url" content="/2007/01/the-ultimate-geek-alarm-clock/"/>
+            <meta property="og:description" content="So, here’s an idea that I’ve been toying around with for a while. I’ve been dong some development on a pair of Soekris embedded Linix boards I bought to use as a firewall/router and WAP. So, naturally, my interest in embedded systems is piqued. I know ..."/>
+
+    <!-- Bootstrap -->
+        <link rel="stylesheet" href="/theme/css/bootstrap.min.css" type="text/css"/>
+    <link href="/theme/css/font-awesome.min.css" rel="stylesheet">
+    <link href="/theme/css/pygments.css" rel="stylesheet">
+        <link href="/theme/css/typogrify.css" rel="stylesheet">
+    <link rel="stylesheet" href="/theme/css/style.css" type="text/css"/>
+    <!-- JavaScript plugins (requires jQuery) -->
+    <script src="http://code.jquery.com/jquery.js"></script>
+
+        <link href="/feeds/all.atom.xml" type="application/atom+xml" rel="alternate"
+              title="Jason Antman's Blog ATOM Feed"/>
+
+</head>
+<body>
+<nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="" class="navbar-brand">Jason Antman's Blog</a>
+        </div>
+        <div class="collapse navbar-collapse navbar-ex1-collapse">
+            <ul class="nav navbar-nav">
+                         <li><a href="/pages/about.html">
+                             About
+                          </a></li>
+                        <li class="active">
+                            <a href="/category/ideas-and-rants.html">Ideas and rants</a>
+                        </li>
+                        <li >
+                            <a href="/category/miscellaneous.html">Miscellaneous</a>
+                        </li>
+                        <li >
+                            <a href="/category/monitoring.html">Monitoring</a>
+                        </li>
+                        <li >
+                            <a href="/category/projects.html">Projects</a>
+                        </li>
+                        <li >
+                            <a href="/category/puppet.html">Puppet</a>
+                        </li>
+                        <li >
+                            <a href="/category/sysadmin.html">Sysadmin</a>
+                        </li>
+                        <li >
+                            <a href="/category/tech-howtos.html">Tech howtos</a>
+                        </li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="/archives.html"><i class="icon-th-list"></i>Archives</a></li>
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+</nav>
+<!-- /.navbar -->
+<div class="container">
+    <div class="row">
+        <div class="col-lg-9">
+    <section id="content">
+        <article>
+            <header class="page-header">
+                <h1>
+                    <a href="/2007/01/the-ultimate-geek-alarm-clock/"
+                       rel="bookmark"
+                       title="Permalink to The ultimate Geek alarm clock!">
+                        The ultimate Geek alarm&nbsp;clock!
+                    </a>
+                </h1>
+            </header>
+            <div class="entry-content">
+                <div class="panel">
+                    <div class="panel-body">
+<footer class="post-info">
+    <span class="label label-default">Date</span>
+    <span class="published">
+        <i class="icon-calendar"></i>Tue 16 January 2007
+    </span>
+
+
+
+<span class="label label-default">Tags</span>
+	<a href="/tag/alarm-clock.html">alarm clock</a>
+        /
+	<a href="/tag/embedded.html">embedded</a>
+        /
+	<a href="/tag/geek.html">geek</a>
+        /
+	<a href="/tag/poe.html">PoE</a>
+</footer><!-- /.post-info -->                    </div>
+                </div>
+                <p>So, here&#8217;s an idea that I&#8217;ve been toying around with for a&nbsp;while.</p>
+<p>I&#8217;ve been dong some development on a pair of <a href="http://www.soekris.com">Soekris</a> embedded Linix
+boards I bought to use as a firewall/router and <span class="caps">WAP</span>. So, naturally, my
+interest in embedded systems is piqued. I know that there are some
+smaller embedded Linux devices out there. So, the idea is as&nbsp;follows:</p>
+<p>Get an embedded Linux box that is either PoE or uses a hardwired
+connection with a wall-wart, or better yet, uses both, so it can be
+designed to have PoE as the primary power, with a 9v battery backup (ok,
+it won&#8217;t run too long, but can handle minor power losses if the PoE
+switch isn&#8217;t on a&nbsp;<span class="caps">UPS</span>).</p>
+<p>Attach to it a clock-style <span class="caps">LED</span> display, or a matrix <span class="caps">LED</span> display, and an
+additional really bright red <span class="caps">LED</span>, both controlled by software (serial or&nbsp;<span class="caps">GPIO</span>).</p>
+<p>The system has one <span class="caps">RJ</span>-45 connector for Ethernet (10-BaseT) and a serial
+console. The console is a captive login to a setup program to define <span class="caps">IP</span>,
+etc. but by default uses&nbsp;<span class="caps">DHCP</span>.</p>
+<p>Plug it in, and it queries your <span class="caps">DHCP</span> server for an <span class="caps">NTP</span> server (or in the
+absence of one, uses a default Stratum 2). We re-update the time every
+day or so. Now, you have an accurate-to-the-second&nbsp;clock.</p>
+<p>We add a speaker to the box, and have a few default built-in MP3s or
+WAVs for alarm tones, and add a <span class="caps">GPIO</span> &#8220;snooze&#8221; and &#8220;off&#8221;&nbsp;button.</p>
+<p>The serial console allows setting a daily alarm or two, as well as
+selecting one of the default&nbsp;tones.</p>
+<p><span style="font-weight: bold;">The Geekier Part:</span><br />
+The alarm clock is controlled by a script called by a Cron job. Now, we
+add the miniserv web server and a <span class="caps">PHP</span> admin gateway. Login via a
+password (user-selectable) and we can upload new audio files for alarms,
+as well as adding alarms via the web as cron jobs - now I can program in
+my class schedule, and automatically have an alarm at the right time
+each day of the&nbsp;week!</p>
+<p><span style="font-weight: bold;">The Geekiest Part:</span><br />
+Remember the matrix display and that additional really bright <span class="caps">LED</span>? We
+setup simple communication between machines via <span class="caps">SNMP</span> or a script on the
+clock (called with an Expect script on a remote machine) and we can
+activate the super-bright <span class="caps">LED</span>, a custom sound, and even a scrolling
+message on the <span class="caps">LED</span> display (alternates between message and time, of
+course) for critical events. Now, when the servers go down, I have
+another device (in addition to the <span class="caps">SMS</span> alerts on my cell) to tell me to
+wake up and deal with it. If we want to get even more fancy, we can
+enable a feature through the serial console or web interface that emits
+a loud tone for a few seconds and blinks the <span class="caps">LED</span> if PoE is lost, or we
+can&#8217;t ping a user-selectable address for more than, say, one&nbsp;minute.</p>
+<p>I guess I have too much free time on my&nbsp;hands..</p>
+            </div>
+            <!-- /.entry-content -->
+        </article>
+    </section>
+
+        </div>
+        <div class="col-lg-3 well well-sm" id="sidebar">
+
+<aside>
+    <section>
+        <ul class="list-group list-group-flush">
+                <li class="list-group-item"><h4><i class="icon-home icon-large"></i>Social</h4></li>
+                    <li class="list-group-item"><a href="#"><i
+                            class="icon-You can add links in your config file-sign icon-large"></i>You can add links in your config file
+                    </a></li>
+                    <li class="list-group-item"><a href="#"><i
+                            class="icon-Another social link-sign icon-large"></i>Another social link
+                    </a></li>
+
+
+
+                <li class="list-group-item"><a href="/tags.html"><h4><i class="icon-tags icon-large"></i>Tags</h4></a></li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/android.html">
+                                android
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/google.html">
+                                google
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/nagios.html">
+                                Nagios
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/php.html">
+                                PHP
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/sysadmin.html">
+                                sysadmin
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/linux.html">
+                                linux
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/perl.html">
+                                perl
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/logging.html">
+                                logging
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/puppet.html">
+                                puppet
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/bind.html">
+                                bind
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/monitoring.html">
+                                monitoring
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/dns.html">
+                                dns
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/droid.html">
+                                droid
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/firefox.html">
+                                firefox
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/mediawiki.html">
+                                mediawiki
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/mac.html">
+                                mac
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/microsoft.html">
+                                microsoft
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/syslog.html">
+                                syslog
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/wordpress.html">
+                                wordpress
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/rpm.html">
+                                rpm
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/security.html">
+                                security
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/blog.html">
+                                blog
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/sun.html">
+                                sun
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/ems.html">
+                                EMS
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/apache.html">
+                                apache
+                            </a>
+                        </li>
+        </ul>
+    </section>
+</aside>        </div>
+    </div>
+</div>
+<footer>
+    <div class="container">
+        <hr>
+        <p class="pull-right"><i class="icon-arrow-up"></i> <a href="#">Back to top</a></p>
+
+
+        <p>&copy; 2014 Jason Antman &middot; Powered by <a href="https://github.com/DandyDev/pelican-bootstrap3" target="_blank">pelican-bootstrap3</a>,
+            <a href="http://docs.getpelican.com/" target="_blank">Pelican</a>,
+            <a href="http://getbootstrap.com" target="_blank">Bootstrap</a></p>
+    </div>
+</footer>
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="/theme/js/bootstrap.min.js"></script>
+
+<!-- Enable responsive features in IE8 with Respond.js (https://github.com/scottjehl/Respond) -->
+<script src="/theme/js/respond.min.js"></script>
+
+
+</body>
+</html>

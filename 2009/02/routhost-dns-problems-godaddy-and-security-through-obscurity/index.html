@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:og="http://ogp.me/ns#"
+      xmlns:fb="https://www.facebook.com/2008/fbml">
+<head>
+    <title>ROUThost DNS problems; GoDaddy and Security through Obscurity</title>
+    <!-- Using the latest rendering mode for IE -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Open Graph tags -->
+
+            <meta property="og:type" content="article"/>
+            <meta property="og:title" content="ROUThost DNS problems; GoDaddy and Security through Obscurity"/>
+            <meta property="og:url" content="/2009/02/routhost-dns-problems-godaddy-and-security-through-obscurity/"/>
+            <meta property="og:description" content="The external-facing web site and (internal use) mailing list for the ambulance corps is hosted by ROUThost. Not my choice, it was inherited. ROUThost, first off, appears to be a fly-by-night hosting provider that just buys a few boxes in a colo facility. I should have known to raise a ..."/>
+
+    <!-- Bootstrap -->
+        <link rel="stylesheet" href="/theme/css/bootstrap.min.css" type="text/css"/>
+    <link href="/theme/css/font-awesome.min.css" rel="stylesheet">
+    <link href="/theme/css/pygments.css" rel="stylesheet">
+        <link href="/theme/css/typogrify.css" rel="stylesheet">
+    <link rel="stylesheet" href="/theme/css/style.css" type="text/css"/>
+    <!-- JavaScript plugins (requires jQuery) -->
+    <script src="http://code.jquery.com/jquery.js"></script>
+
+        <link href="/feeds/all.atom.xml" type="application/atom+xml" rel="alternate"
+              title="Jason Antman's Blog ATOM Feed"/>
+
+</head>
+<body>
+<nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="" class="navbar-brand">Jason Antman's Blog</a>
+        </div>
+        <div class="collapse navbar-collapse navbar-ex1-collapse">
+            <ul class="nav navbar-nav">
+                         <li><a href="/pages/about.html">
+                             About
+                          </a></li>
+                        <li class="active">
+                            <a href="/category/ideas-and-rants.html">Ideas and rants</a>
+                        </li>
+                        <li >
+                            <a href="/category/miscellaneous.html">Miscellaneous</a>
+                        </li>
+                        <li >
+                            <a href="/category/monitoring.html">Monitoring</a>
+                        </li>
+                        <li >
+                            <a href="/category/projects.html">Projects</a>
+                        </li>
+                        <li >
+                            <a href="/category/puppet.html">Puppet</a>
+                        </li>
+                        <li >
+                            <a href="/category/sysadmin.html">Sysadmin</a>
+                        </li>
+                        <li >
+                            <a href="/category/tech-howtos.html">Tech howtos</a>
+                        </li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="/archives.html"><i class="icon-th-list"></i>Archives</a></li>
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+</nav>
+<!-- /.navbar -->
+<div class="container">
+    <div class="row">
+        <div class="col-lg-9">
+    <section id="content">
+        <article>
+            <header class="page-header">
+                <h1>
+                    <a href="/2009/02/routhost-dns-problems-godaddy-and-security-through-obscurity/"
+                       rel="bookmark"
+                       title="Permalink to ROUThost DNS problems; GoDaddy and Security through Obscurity">
+                        ROUThost <span class="caps">DNS</span> problems; GoDaddy and Security through&nbsp;Obscurity
+                    </a>
+                </h1>
+            </header>
+            <div class="entry-content">
+                <div class="panel">
+                    <div class="panel-body">
+<footer class="post-info">
+    <span class="label label-default">Date</span>
+    <span class="published">
+        <i class="icon-calendar"></i>Wed 25 February 2009
+    </span>
+
+
+
+<span class="label label-default">Tags</span>
+	<a href="/tag/dns.html">dns</a>
+        /
+	<a href="/tag/godaddy.html">godaddy</a>
+        /
+	<a href="/tag/hosting.html">hosting</a>
+        /
+	<a href="/tag/routhost.html">routhost</a>
+        /
+	<a href="/tag/security-through-obscurity.html">security through obscurity</a>
+        /
+	<a href="/tag/support.html">support</a>
+</footer><!-- /.post-info -->                    </div>
+                </div>
+                <p>The external-facing web site and (internal use) mailing list for the
+<a href="http://www.midlandparkambulance.com">ambulance corps</a> is hosted by <a href="http://www.routhost.com">ROUThost</a>. Not my choice, it was
+inherited. ROUThost, first off, appears to be a fly-by-night hosting
+provider that just buys a few boxes in a colo facility. I should have
+known to raise a stink when they say you need to fax a copy of your
+driver&#8217;s license to get <span class="caps">SSH</span> turned on, and that you have to agree - in
+legalese - not to mess with anyone else&#8217;s configs. Well, last night, <span class="caps">DNS</span>
+for the site went down. As in nothing, wouldn&#8217;t resolve at all. I
+submitted a ticket online for ROUThost&#8217;s &#8220;24x7&#8221; support - by the way,
+they don&#8217;t have a phone number, only an online ticket form. After 2h 34m
+40s of downtime, the issue resolved itself and I downgraded the ticket
+from &#8220;critical&#8221; to medium. Now, 11 hours later, it still hasn&#8217;t been
+replied to. And my emails to support and management - 2 hours ago - are&nbsp;unanswered.</p>
+<p>Once the problem started, I knew the yearly contract with ROUThost was a
+bad idea - even at $35/year <span class="caps">USD</span>. So, given the great experience I&#8217;ve had
+with them as registrar for my myriad domains, I took a look at <a href="http://www.godaddy.com"></a>
+>GoDaddy&#8217;s site</a>. They offer shared hosting at around $4/month (for
+shared on a Linux box) and are currently offering some deals, so I
+figured it would be a good idea. I know and trust GoDaddy&#8217;s support, and
+have had an account with them for <em>quite some time</em>.</p>
+<p>The ambulance corp&#8217;s web site, hosted through ROUThost, does essentially
+three things; provide a minimal web presence (the whole web root is
+probably &lt; 1Mb minus the photo albums), five e-mail forwarders for the
+officers and a <a href="http://www.gnu.org/software/mailman/index.html"><span class="caps">GNU</span> MailMan</a> mailing list for internal business.
+Unfortunately, I couldn&#8217;t find anything in their &#8220;features&#8221; list
+mentioning MialMan or any other listserv, or even what <span class="caps">MTA</span>/<span class="caps">MDA</span> they&nbsp;run.</p>
+<p>I put a call in to GoDaddy &#8220;Sales/Support&#8221;. The poor guy had never heard
+of MailMan, but asked &#8220;one of the hosting guys&#8221; and was told it would
+only be supported on dedicate hosting accounts. Not exactly financially
+feasible for a mailing list with 30 subscribers, maybe 2 messages a day,
+and a monthly <span class="caps">HTTP</span> transfer of under 20Mb. I was told their shared
+hosting packages don&#8217;t include any mailing list/listserv software,
+though they include every <span class="caps">CMS</span> and language known to man. Hell-bent to
+get away from ROUThost, I then asked if they ran an <span class="caps">MDA</span> that supported
+piping mail to a command, as can be done with .procmailrc. After a brief
+hold (not to sound cynical, but I&#8217;m sure the gentleman was looking up
+&#8220;<span class="caps">MDA</span>&#8221;) he came back on the line and told me they didn&#8217;t. I then switched
+to problem-solving mode and asked what <span class="caps">MTA</span> and <span class="caps">MDA</span> they were running.
+Another brief hold, and I was told <em>&#8220;I can&#8217;t tell you that&#8221;</em>. Speechless
+for a moment, I asked what that meant; <em>&#8220;we don&#8217;t give out that
+information&#8221;</em>. Just about ready to begin explaining <span class="caps">SMTP</span> headers, I gave
+up and thanked him for his&nbsp;time.</p>
+<p>Ok, so Sales probably doesn&#8217;t understand <span class="caps">SMTP</span> headers. I&#8217;d considered
+trying to find mail from a GoDaddy Linux hosted box and check the
+headers, but I figured I couldn&#8217;t do that before the call ended. So, now
+I&#8217;m left with a dilemma. ROUThost is not, in my opinion, reliable, and
+their support is flat-out nonexistent. 11 hours is far too long to wait
+for a reply to a &#8220;critical&#8221; ticket when someone claims 24x7 support.
+However, by previous experience, GoDaddy would be my next choice - but
+not only do they ot support mailing lists - arguably the most used
+feature of our current hosted account - but they won&#8217;t even tell a
+customer what <span class="caps">MTA</span> they&#8217;re running. I&#8217;m too let down by this to telnet 25
+on one of their boxes and see what&nbsp;happens.</p>
+<p>So what&#8217;s left? I guess waiting until (hopefully some time within the
+next few weeks) I upgrade to Optimum static <span class="caps">IP</span> at home, and consider
+running it all there (and hope mains power never goes out for more than
+30&nbsp;minutes?)</p>
+            </div>
+            <!-- /.entry-content -->
+        </article>
+    </section>
+
+        </div>
+        <div class="col-lg-3 well well-sm" id="sidebar">
+
+<aside>
+    <section>
+        <ul class="list-group list-group-flush">
+                <li class="list-group-item"><h4><i class="icon-home icon-large"></i>Social</h4></li>
+                    <li class="list-group-item"><a href="#"><i
+                            class="icon-You can add links in your config file-sign icon-large"></i>You can add links in your config file
+                    </a></li>
+                    <li class="list-group-item"><a href="#"><i
+                            class="icon-Another social link-sign icon-large"></i>Another social link
+                    </a></li>
+
+
+
+                <li class="list-group-item"><a href="/tags.html"><h4><i class="icon-tags icon-large"></i>Tags</h4></a></li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/android.html">
+                                android
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/google.html">
+                                google
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/nagios.html">
+                                Nagios
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/php.html">
+                                PHP
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/sysadmin.html">
+                                sysadmin
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/linux.html">
+                                linux
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/perl.html">
+                                perl
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/logging.html">
+                                logging
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/puppet.html">
+                                puppet
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/bind.html">
+                                bind
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/monitoring.html">
+                                monitoring
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/dns.html">
+                                dns
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/droid.html">
+                                droid
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/firefox.html">
+                                firefox
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/mediawiki.html">
+                                mediawiki
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/mac.html">
+                                mac
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/microsoft.html">
+                                microsoft
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/syslog.html">
+                                syslog
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/wordpress.html">
+                                wordpress
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/rpm.html">
+                                rpm
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/security.html">
+                                security
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/blog.html">
+                                blog
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/sun.html">
+                                sun
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/ems.html">
+                                EMS
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/apache.html">
+                                apache
+                            </a>
+                        </li>
+        </ul>
+    </section>
+</aside>        </div>
+    </div>
+</div>
+<footer>
+    <div class="container">
+        <hr>
+        <p class="pull-right"><i class="icon-arrow-up"></i> <a href="#">Back to top</a></p>
+
+
+        <p>&copy; 2014 Jason Antman &middot; Powered by <a href="https://github.com/DandyDev/pelican-bootstrap3" target="_blank">pelican-bootstrap3</a>,
+            <a href="http://docs.getpelican.com/" target="_blank">Pelican</a>,
+            <a href="http://getbootstrap.com" target="_blank">Bootstrap</a></p>
+    </div>
+</footer>
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="/theme/js/bootstrap.min.js"></script>
+
+<!-- Enable responsive features in IE8 with Respond.js (https://github.com/scottjehl/Respond) -->
+<script src="/theme/js/respond.min.js"></script>
+
+
+</body>
+</html>

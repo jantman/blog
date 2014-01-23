@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:og="http://ogp.me/ns#"
+      xmlns:fb="https://www.facebook.com/2008/fbml">
+<head>
+    <title>Vyatta Initial Impressions</title>
+    <!-- Using the latest rendering mode for IE -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Open Graph tags -->
+
+            <meta property="og:type" content="article"/>
+            <meta property="og:title" content="Vyatta Initial Impressions"/>
+            <meta property="og:url" content="/2009/02/vyatta-initial-impressions/"/>
+            <meta property="og:description" content="I’m part-way through the major overhaul of my home network (hosting this blog and everything else jasonantman.com) that I’ve been planning for quite some time. The current hardware is… uh… currently… described on my Hardware page, but I soon plan on ditching the wiki and moving to ..."/>
+
+    <!-- Bootstrap -->
+        <link rel="stylesheet" href="/theme/css/bootstrap.min.css" type="text/css"/>
+    <link href="/theme/css/font-awesome.min.css" rel="stylesheet">
+    <link href="/theme/css/pygments.css" rel="stylesheet">
+        <link href="/theme/css/typogrify.css" rel="stylesheet">
+    <link rel="stylesheet" href="/theme/css/style.css" type="text/css"/>
+    <!-- JavaScript plugins (requires jQuery) -->
+    <script src="http://code.jquery.com/jquery.js"></script>
+
+        <link href="/feeds/all.atom.xml" type="application/atom+xml" rel="alternate"
+              title="Jason Antman's Blog ATOM Feed"/>
+
+</head>
+<body>
+<nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="" class="navbar-brand">Jason Antman's Blog</a>
+        </div>
+        <div class="collapse navbar-collapse navbar-ex1-collapse">
+            <ul class="nav navbar-nav">
+                         <li><a href="/pages/about.html">
+                             About
+                          </a></li>
+                        <li >
+                            <a href="/category/ideas-and-rants.html">Ideas and rants</a>
+                        </li>
+                        <li >
+                            <a href="/category/miscellaneous.html">Miscellaneous</a>
+                        </li>
+                        <li >
+                            <a href="/category/monitoring.html">Monitoring</a>
+                        </li>
+                        <li class="active">
+                            <a href="/category/projects.html">Projects</a>
+                        </li>
+                        <li >
+                            <a href="/category/puppet.html">Puppet</a>
+                        </li>
+                        <li >
+                            <a href="/category/sysadmin.html">Sysadmin</a>
+                        </li>
+                        <li >
+                            <a href="/category/tech-howtos.html">Tech howtos</a>
+                        </li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="/archives.html"><i class="icon-th-list"></i>Archives</a></li>
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+</nav>
+<!-- /.navbar -->
+<div class="container">
+    <div class="row">
+        <div class="col-lg-9">
+    <section id="content">
+        <article>
+            <header class="page-header">
+                <h1>
+                    <a href="/2009/02/vyatta-initial-impressions/"
+                       rel="bookmark"
+                       title="Permalink to Vyatta Initial Impressions">
+                        Vyatta Initial&nbsp;Impressions
+                    </a>
+                </h1>
+            </header>
+            <div class="entry-content">
+                <div class="panel">
+                    <div class="panel-body">
+<footer class="post-info">
+    <span class="label label-default">Date</span>
+    <span class="published">
+        <i class="icon-calendar"></i>Thu 26 February 2009
+    </span>
+
+
+
+<span class="label label-default">Tags</span>
+	<a href="/tag/cisco.html">cisco</a>
+        /
+	<a href="/tag/networking.html">networking</a>
+        /
+	<a href="/tag/router.html">router</a>
+        /
+	<a href="/tag/vyatta.html">vyatta</a>
+</footer><!-- /.post-info -->                    </div>
+                </div>
+                <p>I&#8217;m part-way through the major overhaul of my home network (hosting this
+blog and everything else jasonantman.com) that I&#8217;ve been planning for
+quite some time. The current hardware is&#8230; uh&#8230; currently&#8230; described
+on my <a href="http://www.jasonantman.com/wiki/index.php/Jasonantman.com_Hardware">Hardware</a> page, but I soon plan on ditching the wiki and moving
+to a <span class="caps">CMS</span> for my entire&nbsp;site.</p>
+<p>Anyway, so far I&#8217;ve decommissioned my aged <a href="http://www.jasonantman.com/wiki/index.php/HP_ProCurve_2424M_Switch"><span class="caps">HP</span> ProCurve 2424M switch</a>
+and replaced it with used but less-aged Cisco 2948G from <a href="http://horizondatacom.com/">Horizon
+Datacom</a> (purchased on Ebay). Quite an upgrade. In order to handle
+network backups a little better, I&#8217;m also adding a Cisco 4912G 12-port
+Gigabit (<span class="caps">GBIC</span>) aggregation switch for the administrative/backup <span class="caps">VLAN</span> -
+though this was purchased via ebay from <a href="http://stores.ebay.com/RedApe-Technologies">RedApe Technologies</a> in <span class="caps">PA</span>.
+The switch came with 12 <span class="caps">1000BASE</span>-<span class="caps">SX</span> GBICs, and I plan to do a mix of
+copper (<span class="caps">1000BASE</span>-T) where it&#8217;s already available (onboard NICs) and
+<span class="caps">1000BASE</span>-<span class="caps">SX</span> where there&#8217;s enough room in the box for a&nbsp;card.</p>
+<p>On the hardware side, I also have 2 new boxes - a set of <span class="caps">HP</span> Proliant
+<a href="http://h18000.www1.hp.com/products/quickspecs/11049_na/11049_na.HTML"><span class="caps">DL360</span> G2</a>&#8216;s from <a href="http://www.mjsglobal.com/"><span class="caps">MJS</span> Global</a>, who I&#8217;ve done business with before.
+The prices were great, and though one of them showed up with a faulty
+temperature sensor that prevents boot, <span class="caps">MJS</span> has been wonderful and is
+shipping me a replacement motherboard. One of the boxes will be running
+<a href="http://www.vyatta.org/">Vyatta</a> (vee-<span class="caps">AH</span>-tha) <span class="caps">VC5</span> router/firewall software, and the other will
+be a new services box running internal <span class="caps">DNS</span>, <span class="caps">DHCP</span>, <span class="caps">NTP</span>, and whatever&nbsp;else.</p>
+<p>On the hardware side, I&#8217;m also planning some extended downtime a few
+weekends from now, when I should finally have a 42U rack to replace the
+Sears shelves my equipment is now on. It&#8217;ll be a fun-filled evening of
+racking equipment and re-patching everything. Also, hopefully within a
+few weeks, I&#8217;ll be moving my <span class="caps">WAN</span> pipe from Verizon FiOS residential to
+Optimum Business, which is essentially re-packaged residential but
+provides 5 static IPs, no blocked ports, and 30 Mbps down/5 Mbps&nbsp;up.</p>
+<p><strong>Vyatta</strong></p>
+<p>When planning this upgrade, I think I looked at every open source router
+package out there, as well as some of the lower-end or older Cisco
+models. I&#8217;m currently running <a href="http://www.ipcop.org/">IPcop</a>, which does everything I need
+except it doesn&#8217;t handle multiple <span class="caps">WAN</span> IPs, and all configuration is via
+a web interface - which means every time I want to make a change
+remotely (and during the week I&#8217;m not home) I have to forward <span class="caps">HTTPS</span> over
+<span class="caps">SSH</span>. After doing an extensive feature comparison, I ended up narrowing
+it down to a relative newcomer - Vyatta. Though I don&#8217;t know how much of
+it is marketing hype, they are targeted squarely at Cisco, and provide
+relatively enterprise-level features; a JunOS-based <span class="caps">CLI</span>, <span class="caps">BGP</span>, <span class="caps">OSPF</span>, and
+all of the other important&nbsp;stuff.</p>
+<p>Yesterday I attempted an install of Vyatta <span class="caps">CE</span> 5 Beta on one of the
+<span class="caps">DL360G2</span>&#8217;s. The only real problem that I found was the install script
+doesn&#8217;t support <span class="caps">CCISS</span> drives, as found in the Proliants, but a few
+manual hacks to the script fixed that. By far the best thing about
+Vyatta is it&#8217;s based on vanilla Debian Lenny, and full root shell access
+is available, so modifying the install script - or even adding
+non-Vyatta packages - is a cinch. I haven&#8217;t really played around with it
+too much, but it appears to be a wonderful mix of Linux and an
+enterprise router <span class="caps">CLI</span>. While root has a full <span class="caps">BASH</span> shell, and the Vyata
+commands are all done as shell aliases (so users still have access to
+shell primitives and <span class="caps">OS</span> commands), configuration is accomplished via a
+JunOS-like command set. You still get &#8220;commit&#8221; and &#8220;rollback&#8221; in config
+mode, and can still do fun things like save and load configs to/from
+tftp, ftp and <em>http</em>. On the other hand, I doubt I&#8217;ll do config backups
+that way since I can just use scp or&nbsp;sftp.</p>
+<p>The Vyatta box will probably go home this weekend, and get hooked up to
+the network for config-only use (and I can always get in via iLO on the
+hardware) and hopefully come up sometime in the next few&nbsp;weeks.</p>
+<p>At this point, the most daunting task is figuring out how to get all of
+the existing links to my site to work - since jantman.dyndns.org will be
+legacy, and most of the site structure will probably change to use
+name-based vhosts. Lately I&#8217;ve been trying to use the real subdomains in
+all of my public links, so the transition (planned for a while) will
+work, but I&#8217;m sure there are still plenty of links out there that will
+need dealing with (maybe keep port 10011 serving <span class="caps">HTTP</span> with a massive
+mod_rewrite script to redirect to the right place???), as well as
+checking everything on the web server to make sure there aren&#8217;t any
+absolute URLs (like&nbsp;WordPress).</p>
+            </div>
+            <!-- /.entry-content -->
+        </article>
+    </section>
+
+        </div>
+        <div class="col-lg-3 well well-sm" id="sidebar">
+
+<aside>
+    <section>
+        <ul class="list-group list-group-flush">
+                <li class="list-group-item"><h4><i class="icon-home icon-large"></i>Social</h4></li>
+                    <li class="list-group-item"><a href="#"><i
+                            class="icon-You can add links in your config file-sign icon-large"></i>You can add links in your config file
+                    </a></li>
+                    <li class="list-group-item"><a href="#"><i
+                            class="icon-Another social link-sign icon-large"></i>Another social link
+                    </a></li>
+
+
+
+                <li class="list-group-item"><a href="/tags.html"><h4><i class="icon-tags icon-large"></i>Tags</h4></a></li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/android.html">
+                                android
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/google.html">
+                                google
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/nagios.html">
+                                Nagios
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/php.html">
+                                PHP
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/sysadmin.html">
+                                sysadmin
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
+                            <a href="/tag/linux.html">
+                                linux
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/perl.html">
+                                perl
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/logging.html">
+                                logging
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/puppet.html">
+                                puppet
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/bind.html">
+                                bind
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/monitoring.html">
+                                monitoring
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/dns.html">
+                                dns
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/droid.html">
+                                droid
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/firefox.html">
+                                firefox
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/mediawiki.html">
+                                mediawiki
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/mac.html">
+                                mac
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/microsoft.html">
+                                microsoft
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/syslog.html">
+                                syslog
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/wordpress.html">
+                                wordpress
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/rpm.html">
+                                rpm
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/security.html">
+                                security
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/blog.html">
+                                blog
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/sun.html">
+                                sun
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/ems.html">
+                                EMS
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="/tag/apache.html">
+                                apache
+                            </a>
+                        </li>
+        </ul>
+    </section>
+</aside>        </div>
+    </div>
+</div>
+<footer>
+    <div class="container">
+        <hr>
+        <p class="pull-right"><i class="icon-arrow-up"></i> <a href="#">Back to top</a></p>
+
+
+        <p>&copy; 2014 Jason Antman &middot; Powered by <a href="https://github.com/DandyDev/pelican-bootstrap3" target="_blank">pelican-bootstrap3</a>,
+            <a href="http://docs.getpelican.com/" target="_blank">Pelican</a>,
+            <a href="http://getbootstrap.com" target="_blank">Bootstrap</a></p>
+    </div>
+</footer>
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="/theme/js/bootstrap.min.js"></script>
+
+<!-- Enable responsive features in IE8 with Respond.js (https://github.com/scottjehl/Respond) -->
+<script src="/theme/js/respond.min.js"></script>
+
+
+</body>
+</html>
