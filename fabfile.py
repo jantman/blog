@@ -58,7 +58,7 @@ def publish():
     if not re.match(r'(y|Y|yes|Yes|YES)', resp):
         return False
     clean()
-    build()
+    local('pelican -s publishconf.py')
     local("ghp-import %s" % OUTPUT_PATH)
     local("git push origin gh-pages")
 
