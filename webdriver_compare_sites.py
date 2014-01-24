@@ -32,10 +32,10 @@ def loadPages(browser, windows, one, two):
     """
     load pages, one in each window
     """
-    browser.switch_to_window(windows[0])
-    browser.get(one)
     browser.switch_to_window(windows[1])
     browser.get(two)
+    browser.switch_to_window(windows[0])
+    browser.get(one)
     return True
 
 def check_path(path, pdict, old, new, browser, windows):
