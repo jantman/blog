@@ -153,6 +153,9 @@ def parse_opts(argv):
     parser.add_option('-r', '--report', dest='report', action='store_true', default=False,
                       help='dont run, but report on savefile')
 
+    parser.add_option('--revisit', dest='revisit', action='store_true', default=False,
+                      help='revisit previously reviewed pages')
+
     options, args = parser.parse_args(argv)
 
     if not options.old or not options.new:
@@ -207,19 +210,22 @@ def main():
     for p in path_dict:
         if path_dict[p]['seen'] is True and path_dict[p]['review'] is False:
             continue
-        if path_dict[p]['review'] is True:
+        if (path_dict[p]['review'] is True or path_dict[p]['markup'] is True) and opts.revisit is False:
+            continue
+        if path_dict[p]['review'] is True or path_dict[p]['markup'] is True:
             print("Reopening %s for review" % p)
             if path_dict[p]['note'] != "":
                 print("\tPrevious Note: %s" % path_dict[p]['note'])
-        oldp = path_dict[p]
+        print("Checking: %s" % p)
+        #print("truck: %s" % ) # DEBUG
+        #print(": %s" % path_dict['/2012/03/leap-year-windows-azure-cloud-outage/']) # DEBUG
         path_dict[p] = check_path(p, path_dict[p], opts.old, opts.new, browser, windows)
+        #print(path_dict[p]) # debug
         # write the JSON out and flush
-        if oldp != path_dict[p]:
-            with open(opts.savefile, "w") as fh:
-                fh.write(anyjson.serialize(path_dict))
-                fh.flush()
-                os.fsync(fh.fileno())
-            print("+ Wrote JSON save file")
+        with open(opts.savefile, "w") as fh:
+            fh.write(anyjson.serialize(path_dict))
+            fh.flush()
+            os.fsync(fh.fileno())
     print("Print a report about the paths...")
 
 if __name__ == "__main__":
