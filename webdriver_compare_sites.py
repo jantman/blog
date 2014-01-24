@@ -217,10 +217,7 @@ def main():
             if path_dict[p]['note'] != "":
                 print("\tPrevious Note: %s" % path_dict[p]['note'])
         print("Checking: %s" % p)
-        #print("truck: %s" % ) # DEBUG
-        #print(": %s" % path_dict['/2012/03/leap-year-windows-azure-cloud-outage/']) # DEBUG
         path_dict[p] = check_path(p, path_dict[p], opts.old, opts.new, browser, windows)
-        #print(path_dict[p]) # debug
         # write the JSON out and flush
         with open(opts.savefile, "w") as fh:
             fh.write(anyjson.serialize(path_dict))
