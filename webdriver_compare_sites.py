@@ -223,6 +223,7 @@ def main():
             fh.write(anyjson.serialize(path_dict))
             fh.flush()
             os.fsync(fh.fileno())
+            print("\tsavefile written")
     print("Print a report about the paths...")
 
 if __name__ == "__main__":
