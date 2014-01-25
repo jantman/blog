@@ -164,3 +164,9 @@ def categories():
     """ show all current blog post categories """
     for c in _get_categories():
         print c
+
+def submodules():
+    """ update all git submodules """
+    print("Still needs to be implemented")
+    # GitPython 0.3.2 provides repo.git.version_info(), as we need 1.8.2+ to
+    # have submodules track branches - http://bec-systems.com/site/1020/git-submodules-can-now-track-branches
