@@ -37,7 +37,9 @@ errors. It was so utterly awful that I gave up.
 
 Next I tried importing as MarkDown instead of rST, using:
 
-    pelican-import --markup markdown --wpfile -o content/ --dir-page jasonantman039sblog.wordpress.2014-01-11.xml
+````
+pelican-import --markup markdown --wpfile -o content/ --dir-page jasonantman039sblog.wordpress.2014-01-11.xml
+````
 
 That built without errors, and the posts looked somewhat right out of the
 box, without any of the previous thousands of errors. And the links looked
@@ -65,7 +67,9 @@ In WordPress, I was using the
 syntax hilighting via [GeSHi](http://qbnz.com/highlighter/). The plugin uses
 <pre> tags with a `lang=` attribute to specify the language, like:
 
-    <pre lang="bash">
+````
+<pre lang="bash">
+````
 
 Unfortunately, these translated to some really ugly MarkDown fenced blocks like:
 
