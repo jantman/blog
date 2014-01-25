@@ -5,10 +5,10 @@ Category: Tech HowTos
 Tags: build, linux, nodejs, package, packaging, repository, rpm, rpmbuild, software, sysadmin, yum
 Slug: search-for-a-small-scale-but-automated-rpm-build-system
 
-***This post is part of a series of older draft posts from a few months
+**This post is part of a series of older draft posts from a few months
 ago that I'm just getting around to publishing. Unfortunately, I have
 yet to find a build system that meets my requirements (see the last
-paragraph).***
+paragraph).**
 
 At work, we have a handful - currently a really small number - of RPM
 packages that we need to build and deploy internally for our CentOS

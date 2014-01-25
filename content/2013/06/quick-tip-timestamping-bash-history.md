@@ -23,7 +23,7 @@ export HISTTIMEFORMAT="%F %T "
 and bash will store commented-out integer timestamps before each line in
 `.bash_history` like so:
 
-~~~~{.bash}
+~~~~{.console}
 #1370950005
 less .bashrc
 #1370950017
@@ -36,10 +36,11 @@ exit
 
 the output of `history` now uses the specified time format:
 
-      997  2013-06-11 07:26:45 less .bashrc
-      998  2013-06-11 07:26:57 history 
-      999  2013-06-11 07:31:19 tail -30 .bash_history 
-     1000  2013-06-11 07:31:33 exit
+~~~~{.text}
+ 997  2013-06-11 07:26:45 less .bashrc
+ 998  2013-06-11 07:26:57 history 
+ 999  2013-06-11 07:31:19 tail -30 .bash_history 
+1000  2013-06-11 07:31:33 exit
+~~~~
 
-</p>
 

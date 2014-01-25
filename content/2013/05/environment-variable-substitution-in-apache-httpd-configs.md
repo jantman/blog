@@ -78,7 +78,6 @@ Now let's look at an example vhost configuration file that uses the
 environment variables:
 
 ~~~~{.apacheconf}
-
 ServerName example.com
 ServerAlias www.example.com
 # Aliases including proper environment name
@@ -95,8 +94,6 @@ Include /etc/httpd/sites/${HTTPD_ENV_NAME}/env.conf
 
 RewriteEngine on
 RewriteRule /foobar/.* http://www.${HTTPD_ENV_URL_PART}example.com/baz/ [R=302,L]
-
-
 ~~~~
 
 Every instance of `${HTTPD_ENV_NAME}` will be replaced with the value
