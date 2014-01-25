@@ -7,13 +7,11 @@ Slug: stallman-and-free-software
 
 I've long been a fan of Free Software - both the technical aspects and
 the moral implications. As such, I've long been
-<span style="font-size:100%;">some</span>what of a fan of
+somewhat of a fan of
 [RMS](http://www.stallman.org), and have followed his public persona.
-I've had the experience of <span style="font-size:100%;">exchanging
+I've had the experience of exchanging
 short emails with him, and was lucky enough to attend a speech of his,
-entitled "</span>[<span style="font-size:100%;">Copyright vs. Community
-in the Age of Computer
-Networks</span>](http://www.fsf.org/events/rmsspeechrutgers/view)<span style="font-size:100%;">",
+entitled "[Copyright vs. Community in the Age of Computer Networks](http://www.fsf.org/events/rmsspeechrutgers/view)",
 here at Rutgers.
 
 I'm a big fan of most of RMS's thoughts. I do, however, think of him as
@@ -98,5 +96,4 @@ with Free drivers and Free alternatives to other proprietary software.
 My cry to the Free software world is, therefore, that trading some of
 our religious purity for a larger installed user base, and greater
 public awareness, is ultimately in the interest of the greater good of
-Free software.  
-</span>
+Free software.

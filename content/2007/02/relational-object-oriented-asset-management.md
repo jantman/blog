@@ -52,17 +52,22 @@ inter-related mesh of objects representing physical hardware and its'
 properties. This can all be thought of in a three-dimensional form,
 which represents the connections and relationships in our network.
 
-The main two advantages of this approach are:  
-1) The ability to quickly recognize relationships between objects. If,
+The main two advantages of this approach are:
+
+1.  The ability to quickly recognize relationships between objects. If,
 for example, we looked at a summary page in Switch1, we would see a
 number of static fields describing its properties (manufacturer, model,
 IP, MAC, etc.) as well as a diagram of its' relationships. Such a
-diagram would look something like:  
-Port1 -\> NIC1 -\> Server1  
-Port21 -\> SmartSlotCard1 -\> UPS1
+diagram would look something like:
+
+````
+Port1  -> NIC1 -> Server1
+Port21 -> SmartSlotCard1 -> UPS1
+````
 
 It would also have a listing of Networks which this device is a member
-of, specifically:  
+of, specifically:
+
 LAN
 
 In practice, on a web interface, each one of these entries would be a
@@ -95,7 +100,7 @@ us that they are connected to UPS1. If we add UPS2, we could simply edit
 the Server1 object so that it is connected to UPS2, and the UPS1 and
 UPS2 objects would show this change automatically.
 
-\2) Historical tracking. Every change would be accompanied by a person
+2. Historical tracking. Every change would be accompanied by a person
 responsible, a date and time, a reason, and perhaps other information.
 Exactly how this would be implemented is not decided (whether
 relationships would be marked as 'deleted' or whether changes would be

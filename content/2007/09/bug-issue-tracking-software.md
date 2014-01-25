@@ -8,52 +8,52 @@ Slug: bug-issue-tracking-software
 I recently posted the following to the DevShed forum in hope of an
 answer:
 
-"<span id="intelliTxt">I've spent the last 48 hours reading up on bug
-tracking software. At the moment, I'm using the SourceForge tracker for
-my public projects and a custom (lightweight kludge) system for internal
-and customer-specific stuff.
-
-First off, I'm looking for something that's F/OSS and no-cost. Beyond
-that, it should have a web-based interface, preferably coded in PHP as
-that's what I'm most comfortable writing code for.
-
-I've looked into many possibilities. At the moment, they're pretty much
-narrowed down to RT, FlySpray, Codetrack, Trac, and a few other
-america's promise rorabaugh3possibilities. I've immediately disregarded
-anything without an online demo, so some may have slipped by me.
-
-I can do some coding to add a few features as needed, but here's what
-I'm looking for:
-
-\1) Web-based interface  
-2) Ability to handle multiple projects  
-3) Ability to handle modules/branches of a project - specifically to be
-used for projects which also have custom, user-specific modifications on
-a branch.  
-4) \*multiple\* bug submission forms - ideally, one for team
-members/technical users, one (simplified) for non-technical end users,
-and one for non-technical users which also collects browser/OS
-information, as many of my projects are web-based.  
-5) If possible, integration with CVS or SVN so that I can track commits
-related to a specific bug.  
-6) Fine-grained access control. There should be a way to submit an
-anonymous (unregistered user) bug. Anonymous submissions and registered
-user submissions should be authorized on a project-by-project (or
-branch-by-branch) basis. There should also be access control on viewing
-\*any\* information at all for certain projects/modules (so the same
-system can be used for internal-only projects).
-
-I'm sure that I have a lot of other requirements, but these are the ones
-that stuck out in my mind. Also, though I don't have a system up and
-running yet, there's a possibility I may be moving to LDAP for all auth,
-so something where I could drop in a custom auth module would be a plus.
-
-Any suggestions?
-
-I know I probably won't find \*all\* of this in one place, but I'd like
-to minimize the amount of programming I have to do. After all, starting
-a new programming project to track bugs in an existing one isn't
-especially efficient."
+> I've spent the last 48 hours reading up on bug
+> tracking software. At the moment, I'm using the SourceForge tracker for
+> my public projects and a custom (lightweight kludge) system for internal
+> and customer-specific stuff.
+> 
+> First off, I'm looking for something that's F/OSS and no-cost. Beyond
+> that, it should have a web-based interface, preferably coded in PHP as
+> that's what I'm most comfortable writing code for.
+> 
+> I've looked into many possibilities. At the moment, they're pretty much
+> narrowed down to RT, FlySpray, Codetrack, Trac, and a few other
+> america's promise rorabaugh3possibilities. I've immediately disregarded
+> anything without an online demo, so some may have slipped by me.
+> 
+> I can do some coding to add a few features as needed, but here's what
+> I'm looking for:
+> 
+> 1) Web-based interface
+> 2) Ability to handle multiple projects
+> 3) Ability to handle modules/branches of a project - specifically to be
+> used for projects which also have custom, user-specific modifications on
+> a branch.
+> 4) \*multiple\* bug submission forms - ideally, one for team
+> members/technical users, one (simplified) for non-technical end users,
+> and one for non-technical users which also collects browser/OS
+> information, as many of my projects are web-based.
+> 5) If possible, integration with CVS or SVN so that I can track commits
+> related to a specific bug.
+> 6) Fine-grained access control. There should be a way to submit an
+> anonymous (unregistered user) bug. Anonymous submissions and registered
+> user submissions should be authorized on a project-by-project (or
+> branch-by-branch) basis. There should also be access control on viewing
+> \*any\* information at all for certain projects/modules (so the same
+> system can be used for internal-only projects).
+> 
+> I'm sure that I have a lot of other requirements, but these are the ones
+> that stuck out in my mind. Also, though I don't have a system up and
+> running yet, there's a possibility I may be moving to LDAP for all auth,
+> so something where I could drop in a custom auth module would be a plus.
+> 
+> Any suggestions?
+> 
+> I know I probably won't find \*all\* of this in one place, but I'd like
+> to minimize the amount of programming I have to do. After all, starting
+> a new programming project to track bugs in an existing one isn't
+> especially efficient.
 
 We'll see what happens out of it.
 
@@ -70,8 +70,7 @@ need something better.
 I know that a lot of ticketing systems use e-mail interfaces, but I have
 no interest in that - I want to be able to require certain information
 for certain people. Moreover, I have a few main issues with most of the
-ticketing software I've seen:  
-</span>
+ticketing software I've seen:
 
 1.  It's either designed for development team members or non-technical
     end users. I want a system that can present an end-user with a

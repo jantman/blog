@@ -25,7 +25,7 @@ better than anything else. But PHP is *NOT* a web programming language.
 It is a programming language that happens to work *very* well with web
 applications.
 
-Using fread() and fwrite() I can slam together a command-line menu-based
+Using `fread()` and `fwrite()` I can slam together a command-line menu-based
 PHP script for administration quicker than I could write the def's for a
 Python script. I've done it, I have a number of PHP CLI-based scripts
 running on my machines. Database access with PHP is a no-brainer. And

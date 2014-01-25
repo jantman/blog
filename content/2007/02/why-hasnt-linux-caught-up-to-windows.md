@@ -23,7 +23,7 @@ would bill as strong points of Linux. And they all have to do directly
 with some of the founding principles of Linux - interoperability and
 choice.
 
-\A) Packaging.  
+## Packaging.
 Searching for a package for a linux system goes something like this:
 figure out what package format your distro uses, figure out the distro
 version and architecture, and then start checking the online
@@ -53,44 +53,47 @@ technical knowledge) to the packages that come with their OS.
 While there are a few schemes to standardize all of this, the real
 solution is quite complex, and would be based on a single package system
 to be adopted by all distros (beginning with the main ones). Such a
-system should have the following features:  
-1) Ability to work easily with all distros  
-2) I main configuration file which can define which directories to use -
-i.e. /etc, /bin, etc.  
-3) Support for both simple, novice-oriented interfaces and expert-level
-configuration  
-4) Multiple interfaces, including command-line, text/ncurses, GTK, and
-other graphical subsystems  
-5) A generalized package format that is non-distro-specific  
-6) Integration with an online master-list of repositories  
-7) Ability to search, download, and install packages from these
-repositories  
-8) Automatic update ability  
-9) Ability to mine the repositories for updates, and display a list on
-screen or emailed to a user account  
-10) Very good tools for easy compilation from source.
+system should have the following features:
+
+1. Ability to work easily with all distros
+2. I main configuration file which can define which directories to use -
+i.e. /etc, /bin, etc.
+3. Support for both simple, novice-oriented interfaces and expert-level
+configuration
+4. Multiple interfaces, including command-line, text/ncurses, GTK, and
+other graphical subsystems
+5. A generalized package format that is non-distro-specific
+6. Integration with an online master-list of repositories
+7. Ability to search, download, and install packages from these
+repositories
+8. Automatic update ability
+9. Ability to mine the repositories for updates, and display a list on
+screen or emailed to a user account
+10. Very good tools for easy compilation from source.
 
 Some of these ideas would be incorporated in the tool itself, and some
 as add-on modules.
 
 The features that I, as administrator of a largely heterogeneous network
-of about 10 machines, would most like to see are:  
-1) Truly automatic updates via list - select which packages can be
+of about 10 machines, would most like to see are:
+
+1. Truly automatic updates via list - select which packages can be
 automatically updated, and run a cron job nightly to check for any
-updates for those packages and automatically get and install them.  
-2) LAN-based updating - A single server on the LAN maintains a list
+updates for those packages and automatically get and install them.
+2. LAN-based updating - A single server on the LAN maintains a list
 (perhaps gathered via an automatic tool) of ALL packages installed on
 ALL LAN machines. Each night the configured clients will update this
 list over the network, and then the master server will download all
 available updates for all packages. Once this is complete, it will send
 a message to all LAN machines, which will then update their software
 from the central repository on the LAN. This would, in effect,
-automatically keep all LAN machines 1) on the same version of each
-package and 2) totally up-to-date.  
+automatically keep all LAN machines on the same version of each
+package and totally up-to-date.
+
 Kernel updates would be done manually, but should have an option for the
 administrator to push the update to all machines.
 
-\B) Distro-specific tools, filesystem layout, etc.  
+## Distro-specific tools, filesystem layout, etc.
 This is not only a barrier for novice users, but experienced users as
 well. If you do a search online for Linux training, you will surely come
 by a nubmer of certifications - NCLE, RHCE, etc. The many distinct
@@ -102,52 +105,55 @@ totally lost.
 
 While the LSB project (http://www.linux-foundation.org/en/LSB) has aimed
 to provide compatibility between distros, there are three main points
-which must still be addressed:  
-1) The organization of filesystems on different distros, specifically
+which must still be addressed:
+
+1. The organization of filesystems on different distros, specifically
 the directory tree and default locations for certain components, still
 differs. In the interest of usability, the Linux directory tree should
 be standardized, so that locations of programs, files, etc. will be
-identical across distributions.  
-2) An effort needs to be made to make administration as similar as
+identical across distributions.
+2. An effort needs to be made to make administration as similar as
 possible across all distros. This means that program names,
 functionality, location, etc. should be standardized as much as
-possible.  
-3) It seems that each distro has its' own administration tool - YaST for
+possible.
+3. It seems that each distro has its' own administration tool - YaST for
 SuSE, and others for other distros. An effort needs to be made to
 develop a tool encompassing all of the features in one, distro-neutral
 form. Webmin (www.webmin.com) has done this wonderfully in a web-based
 interface, but attention should be focused on a text-mode console
 version as well.
 
-\C) GUI  
+## GUI
+
 Perhaps the biggest hurdle for novices using Linux, and the biggest
 development challenge, is general ease of use. While the above two
 points may fall into this category, I am specifically referring to the
 general, day-to-day use of the operating system.
 
 While I will not begin to suggest solutions, the main problems that I
-see are as follows:  
-1) The stability and security of Linux must be kept intact, unlike
-distros such as Lindows.  
-2) There must remain a way for advanced users to perform advanced
-tasks.  
-3) As much of the inner workings should be hidden from the end-user as
-possible, unless specifically requested.  
-4) I good system would have a field added to a users' GECOS data
+see are as follows:
+
+1. The stability and security of Linux must be kept intact, unlike
+distros such as Lindows.
+2. There must remain a way for advanced users to perform advanced
+tasks.
+3. As much of the inner workings should be hidden from the end-user as
+possible, unless specifically requested.
+4. I good system would have a field added to a users' GECOS data
 specifying their level of "novice-ness" - i.e. allowing a dumbed-down
 interface for users while retaining a full interface with Expert
-features for those who want it.  
-5) "Mysterious" things such as file permissions should be hidden from
-novice-level users when not absolutely needed.  
-6) There must be a strong integration with "anti-mistake" tools and DWIM
+features for those who want it.
+5. "Mysterious" things such as file permissions should be hidden from
+novice-level users when not absolutely needed.
+6. There must be a strong integration with "anti-mistake" tools and DWIM
 technology. The system itself should manage file permissions in a way
-that grants only the minimum needed access.  
-7) There should be good, strong mistake detection, specifically in terms
+that grants only the minimum needed access.
+7. There should be good, strong mistake detection, specifically in terms
 of catching a user's inadvertent changing of file permissions, deleting
-required files, etc.  
-8) Tools should be built so that the novice user is never required to
-login as root or run a root shell.  
-9) Perhaps, and I'm sure this is controversial, the root account should
+required files, etc.
+8. Tools should be built so that the novice user is never required to
+login as root or run a root shell.
+9. Perhaps, and I'm sure this is controversial, the root account should
 be given either CLI-only access, or should not have X running by
 default, so as to discourage novice users from running day-to-day tasks
 as root.

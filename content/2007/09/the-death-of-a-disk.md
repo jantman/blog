@@ -25,7 +25,7 @@ Now, I originally wasn't too worried. The system is mainly used for
 storing unimportant data. However, I quickly remembered three facts
 about STOR1:
 
-1.  My two and \*only\* tape drives are hooked up to this box.
+1.  My two and *only* tape drives are hooked up to this box.
 2.  This box is my CVS server, so now not only are my nightly builds
     stopped, but I don't have CVS access.
 3.  The To-Do list item stating "fix STOR1 backup script and re-enable

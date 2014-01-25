@@ -68,153 +68,150 @@ knowing it).
 **Now, something I wrote yesterday at work:**
 
 After having a Microsoft discussion with someone, I wanted to clear up
-a  
-few things related to my views on Microsoft. Mainly, that I don't have  
+a few things related to my views on Microsoft. Mainly, that I don't have
 an issue with Microsoft per se. I have issues with Microsoft's
-policies,  
-and Microsoft happens to be the most publicly visible company with such  
+policies, and Microsoft happens to be the most publicly visible company with such
 policies. Some of these Include:
 
-1.  The lack of software openness. Both the ethical implications of  
-   software that isn't [Free Software](http://www.fsf.org), and  
+1.  The lack of software openness. Both the ethical implications of
+   software that isn't [Free Software](http://www.fsf.org), and
    functional issues with software that I can't modify to do what I
-    want,  
-   distribute to others, or (if I were a large corporation) have an  
-   independent company audit the source of for security risks. I want  
+    want, distribute to others, or (if I were a large corporation) have an
+   independent company audit the source of for security risks. I want
    control of my software. Microsoft doesn't allow that. Moreover, I
-    think  
+    think
    that non-technical end users should have the option of having
-    control  
+    control
    over their software as well.
-2.  Software that is designed to a specific intended user, and can't be  
-   modified otherwise. Specifically, I'm a technical person. I want  
+2.  Software that is designed to a specific intended user, and can't be
+   modified otherwise. Specifically, I'm a technical person. I want
    software that's designed to be run on a network and an operating
-    system  
+    system
    that's designed to be administered from a graphical terminal in the
-    next  
+    next
    room, or over a text-based SSH session from hundreds of miles away.
-    If I  
+    If I
    want to use the command line, I want to have that option. Basically,
-    I  
+    I
    want options. I don't want someone deciding that I'm too stupid to
-    use  
+    use
    those options. Other users don't even need to know that a
-    command-line  
+    command-line
    is there, but I want to. And, more importantly, I don't believe
-    that  
+    that
    these options (such as \*good\* remote administration) should
-    require  
+    require
    expensive server versions.
 3.  I want an operating system that recognizes [Free
-    Software](http://www.fsf.org) and doesn't attempt to  
+    Software](http://www.fsf.org) and doesn't attempt to
    cripple it.
 4.  I'm a programmer. I like standards. Things work because of
-    standards.  
+    standards.
    We can send e-mail and view web sites because of standards. I think
-    that  
+    that
    standards are good. And I like \*one\* set of standards which are
-    accepted  
+    accepted
    as best. All web browsers let you view web pages via HTTP. I think
-    that  
+    that
    document formats should have one standard. I think that standard
-    should  
+    should
    include, for anyone to use however they wish, all of the
-    information  
-   needed to implement it. I don't want software that goes beyond a  
+    information
+   needed to implement it. I don't want software that goes beyond a
    standard in undocumented ways. Almost all non-Microsoft browsers
-    render  
+    render
    HTML in pretty much the same way. Web designers that I know have
-    two  
+    two
    test systems - IE and not IE. They test their web page under Windows
-    in  
+    in
    IE to find out how it looks on IE. They test it on anything else to
-    see  
+    see
    how it looks in everything else.
 5.  I don't want a vendor telling me that I have to use their software.
-    I  
-   don't want someone to tell me that their browser is \*part\* of my  
+    I
+   don't want someone to tell me that their browser is \*part\* of my
    operating system. I want to be able to add and remove whatever
-    software  
+    software
    I want. And I want to be able to make it work. If need be, I want to
-    be  
+    be
    able to replace software with my own, or with something that I think
-    is  
+    is
    better. I want to be able to choose what gets installed on my
-    computer,  
+    computer,
    in a fine-grained level of accuracy, if I want.
 6.  I want proven security. And more importantly, I want to have
-    control  
+    control
    over the security. I want to be able to add third-party patches
-    from  
+    from
    organizations like the NSA to harden my security. And I want them
-    to  
+    to
    pervade every level of the system, not just userspace. I want to be
-    able  
+    able
    to add security fixes from anyone I want, and have anyone I want
-    audit  
+    audit
    the code.
-7.  I want an operating system that's time-tested. I like seeing  
+7.  I want an operating system that's time-tested. I like seeing
    copyright notices that go back to the 1980s. The fact that an
-    operating  
+    operating
    system has had multiple major redesigns in the past 10 years does
-    not  
+    not
    speak well for your code. Furthermore, I don't want to buy a
-    product  
+    product
    that comes in five versions, or however many there are of Windows
-    now.  
-   I'd be happy with Desktop and Server versions. Maybe even a third  
+    now.
+   I'd be happy with Desktop and Server versions. Maybe even a third
    Development version. Anything more than that sends me the message
-    that  
+    that
    you're just trying to tax features and keep them out of the hands of
     users.
-8.  I don't want to be locked in to a vendor. Yes, this is a direct  
-   reference towards Free/Open Source Software. If your company goes  
-   bottom-up, or just decides that you don't care about what I want, I  
+8.  I don't want to be locked in to a vendor. Yes, this is a direct
+   reference towards Free/Open Source Software. If your company goes
+   bottom-up, or just decides that you don't care about what I want, I
    should be able to hire an independent programmer to maintain what
-    you  
-   gave me, or make the changes that I want. More importantly, if you  
+    you
+   gave me, or make the changes that I want. More importantly, if you
    decide to stop supporting a product that I like, I want to be able
-    to  
+    to
    have someone else support it, possibly better than you did.
 9.  I don't want to buy from a company that actively engages in
-    campaigns  
+    campaigns
    of FUD (fear, uncertainty, doubt). I want to buy from a company
-    that  
+    that
    respects their customers/users and their choices. I don't want a
-    vendor  
+    vendor
    that engages in scare tactics or buying up competitors and killing
-    them  
+    them
    off. I want a company that is nice to people. I don't want a
-    company  
+    company
    that threatens the the customers of their competitors with lawsuits.
-10. I want to buy from a company that understands compatibility and  
+10. I want to buy from a company that understands compatibility and
    strives for it. I don't want a company that tries to bury all
-    mention of  
-   competing products. I want a vendor that can honestly admit that in  
+    mention of
+   competing products. I want a vendor that can honestly admit that in
    certain cases their product X isn't as good as a competitor's
-    product Y,  
+    product Y,
    but in many other cases it's better. I want a vendor that
-    understands  
+    understands
    that I want to run operating systems W, X, Y, and Z and have them
-    all  
+    all
    work together, even if this vendor only sells X.
 11. A vendor that I buy from will NOT, EVER, tell me tell me that I
-    need  
+    need
    a state-of-the-art system to run a desktop computer or a server.
-    There  
-   is no reason at all why my mail server needs to run a GUI. More  
-   importantly, in 2007, there is absolutely no reason why my PHP  
+    There
+   is no reason at all why my mail server needs to run a GUI. More
+   importantly, in 2007, there is absolutely no reason why my PHP
    development web server should have 1 Gb of RAM just to run the
-    operating  
+    operating
    system. I'm only coding some HTML form-based apps for a personal
-    web  
+    web
    site - there's no reason why I need more than 512 Mb to run a simple
-    web  
+    web
    server. Finally, and this is just a personal thing, but I like a
-    vendor  
+    vendor
    that understands students. I'm in college. I want an operating
-    system  
-   that will install, if not out-of-the-box then with some simple  
+    system
+   that will install, if not out-of-the-box then with some simple
    customization, on the type of computer that I'd find at the curb.
 
 

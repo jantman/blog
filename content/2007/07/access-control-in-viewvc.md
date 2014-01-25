@@ -32,11 +32,8 @@ have rwx).
 To protect a given directory/module "foo" in your cvsroot from being
 viewed under ViewVC:
 
-<li>
-Make sure the directory is owned by someuser and group 'users'.
-
-<li>
-`chmod -R o-rwx foo"` - no permissions at all for 'other'
+- Make sure the directory is owned by someuser and group 'users'.
+- `chmod -R o-rwx foo"` - no permissions at all for 'other'
 
 As your web server (and, therefore, the CGI script viewvc.cgi) run as
 user 'www' and group 'wwwrun', they cannot access the directory 'foo' at

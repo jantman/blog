@@ -133,4 +133,4 @@ you're not ready to give up Windows, download
 guru, have a look at [OpenSolaris](http://www.opensolaris.org) - if
 you're a developer or a SysAdmin, you'll thank me for suggesting it (and
 Sun will mail you a free CD or DVD, too!). They even have LiveCD Solaris
-versions.<span style="display: block;" id="formatbar_Buttons"><span class="down" style="display: block;" id="formatbar_CreateLink" title="Link" onmouseover="ButtonHoverOn(this);" onmouseout="ButtonHoverOff(this);" onmouseup onmousedown="CheckFormatting(event);FormatbarButton('richeditorframe', this, 8);ButtonMouseDown(this);"></span></span>
+versions.

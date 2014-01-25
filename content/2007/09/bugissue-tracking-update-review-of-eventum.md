@@ -54,7 +54,7 @@ on, I found that the installation page was a confusing jumble of
 references to a deprecated perl script and the current PHP script to
 call from loginfo. Furthermore, database access is provided by having
 the script called from loginfo parse the logging information and then
-\*run a HTTP GET\* on a local script served in the Eventum web
+*run a HTTP GET* on a local script served in the Eventum web
 directory. This added level of abstraction not only confuses me to no
 end, but also introduces the possibility for malicious users to insert
 data in the Eventum SCM database simply by visiting a well-known URL.

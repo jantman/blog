@@ -75,4 +75,4 @@ ample comments in the code and sample config files. Most importantly,
 it's all wraped up in one PHP function, so generating a map (once you've
 generated XML config files) is as simple as including a PHP file and
 calling one
-function.<span style="display: block;" id="formatbar_Buttons"><span class="down" style="display: block;" id="formatbar_CreateLink" title="Link" onmouseover="ButtonHoverOn(this);" onmouseout="ButtonHoverOff(this);" onmouseup onmousedown="CheckFormatting(event);FormatbarButton('richeditorframe', this, 8);ButtonMouseDown(this);"></span></span>
+function.

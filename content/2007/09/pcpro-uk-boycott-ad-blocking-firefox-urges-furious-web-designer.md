@@ -8,7 +8,7 @@ Slug: pcpro-uk-boycott-ad-blocking-firefox-urges-furious-web-designer
 When browsing through [Digg](http://digg.com/) this morning, I came by a
 story at PCpro UK entitled "[Boycott ad-blocking Firefox, urges furious
 web designer](http://www.pcpro.co.uk/news/news/124719/)". This gentleman
-stated that, <span name="intelliTxt" id="intelliTXT">Software that
+stated that, "Software that
 blocks all advertisement is an infringement of the rights of website
 owners and developers."
 
@@ -21,7 +21,7 @@ is a dynamic medium. Moreover, I think of HTML as what it is - a markup
 language. It just tells a program (browser) how to display something in
 a user-friendly style. I test my pages with Lynx, and expect them to
 conform to HTML/1.1. In other words, I believe that the Internet is an
-information distribution tool. I expect, I \*want\*, my content to be
+information distribution tool. I expect, I *want*, my content to be
 viewable by as many people as possible. I try to use simple markup and
 make use of ALT tags so that as many people as possible will be able to
 view the content. I want it to make sense on as many platforms as
@@ -94,21 +94,20 @@ be, before they chose a distribution medium.
 
 In closing my rant, I will ask a few simple questions:
 
-\1) Why is it that the law, being as biased to corporate interests (and
+1. Why is it that the law, being as biased to corporate interests (and
 against the individual) as it is, doesn't recognize the rights of the
 individual to use what they legally purchased in a way that they see
 fit? (i.e. if I buy a DVD, I should be able to make a backup copy on my
-computer - even the \*copyright law\* states that).
+computer - even the *copyright law* states that).
 
-\2) How long will it be before someone turns up an internal RIAA memo
+2. How long will it be before someone turns up an internal RIAA memo
 from ten years ago stating that the industry could increase its' profits
 by releasing music on a medium (CD) that is prone to piracy, and then
 fining the people who exploit that common sense?
 
-\3) When they came out with VHS recorders, the industry was up in arms
+3. When they came out with VHS recorders, the industry was up in arms
 about piracy. So, they got together and added a small amount on the
 price of every blank tape, intended to reimburse the
 labels/artists/networks for the copy that it would be used to make. Why
 can't they just tack $3 onto every blank DVD and CD, $20 on every blank
-hard drive, and stop suing college kids?  
-</span>
+hard drive, and stop suing college kids?
