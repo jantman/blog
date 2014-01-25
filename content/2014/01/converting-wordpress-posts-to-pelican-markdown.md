@@ -95,3 +95,15 @@ differently in the link in the text and in the link definition, which MarkDown m
 then renders broken links and plain text of the link table at the bottom of
 the page. Manually removing the line breaks and any extraneous spaces seems to
 fix it.
+
+So, yes, Pandoc was doing this because of the `--reference-links` parameter
+that `pelican-import` was calling it with. There was an
+[issue](https://github.com/getpelican/pelican/issues/348) and
+[pull request](https://github.com/getpelican/pelican/pull/642) to fix this,
+but when I started with Pelican the last release was 3.3.0 (4 months ago) and
+the PR was merged after that. So, if you're having the same problem and the
+latest release of Pelican is still 3.3.0, you might as well just apply
+[the patch](https://github.com/getpelican/pelican/commit/83e4d35b44a422ee8d4b077f505970d03e555f45)
+yourself - it's just a very simple removal of a parameter in
+`pelican_import.py`.
+
