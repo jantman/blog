@@ -38,30 +38,45 @@ def loadPages(browser, windows, one, two):
     browser.get(one)
     return True
 
+def _status_string(pdict):
+    """ generate status string for a path dict """
+    s = ""
+    if pdict['seen'] is True:
+        s = s + "s"
+    if pdict['review'] is True:
+        s = s + "r"
+    if pdict['markup'] is True:
+        s = s + "m"
+    if pdict['note'] != "":
+        s = s + ", note: " + pdict['note']
+    return s
+
 def check_path(path, pdict, old, new, browser, windows):
     """
     Interactively check a path
     """
     pdict['seen'] = True
+    print("Previous Status: %s" % _status_string(pdict))
     one = old + path
     two = new + path
     loadPages(browser, windows, one, two)
     # prompt for status
     resp = ""
-    while resp not in ['s', 'r', 'o', 'm']:
-        resp = raw_input("Page Decision: [s=skip, r=review, o=ok, m=markup fix] ").strip()
+    while resp not in ['s', 'r', 'o', 'm', '']:
+        resp = raw_input("Page Decision: [s=skip, r=review, o=ok, m=markup fix, <Enter>=no change] ").strip()
     if resp == 'r':
         pdict['review'] = True
         note = raw_input("Notes: ").strip()
         if note != "":
             pdict['note'] = note
-    if resp == 'm':
+    elif resp == 'm':
         pdict['markup'] = True
         note = raw_input("Notes: ").strip()
         if note != "":
             pdict['note'] = note
     elif resp == 's':
         pdict['seen'] = False
+    print("New Status: %s" % _status_string(pdict))
     return pdict
 
 def get_all_paths(dname):
