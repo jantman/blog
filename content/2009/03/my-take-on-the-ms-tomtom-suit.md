@@ -7,11 +7,13 @@ Slug: my-take-on-the-ms-tomtom-suit
 
 To keep it short, I'm sure anyone who winds up here has already heard
 about the recent Microsoft lawsuit against TomTom, alleging patent
-infringement. Coverage has been extensive, including [GrokLaw][] and
-[Linux Magazine][]. While the mentioned patents include car navigation
-technology (at least the names of the patents seem amazingly vague) and
-FAT . Most of the news stories I've read say that it's "good for Linux"
-and will never see the inside of a courtroom.
+infringement. Coverage has been extensive, including
+[GrokLaw](http://www.groklaw.net/article.php?story=20090226070041454)
+and [Linux Magazine](http://www.linux-mag.com/id/7258). While the
+mentioned patents include car navigation technology (at least the names
+of the patents seem amazingly vague) and FAT . Most of the news stories
+I've read say that it's "good for Linux" and will never see the inside
+of a courtroom.
 
 Maybe I'm just a pessimist, but I see the idea behind this as much worse
 than "good for Linux". MS chose one company to sue. TomTom just happens
@@ -38,6 +40,3 @@ grasping the claim that Microsoft's developers are so all-powerful that
 they're the only people that thought of technology X, but it's about
 time that the US government got the balls to look Microsoft in the eyes
 and say, "you're not the only game in town anymore. Get used to it."
-
-  [GrokLaw]: http://www.groklaw.net/article.php?story=20090226070041454
-  [Linux Magazine]: http://www.linux-mag.com/id/7258

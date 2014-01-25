@@ -5,31 +5,39 @@ Category: Monitoring
 Tags: blizzard, check plugin, monitoring, Nagios, warcraft, wow
 Slug: world-of-warcraft-realm-status-check-plugin-for-nagios
 
-My wife [Jackie][] ([Syrilia][]) is an avid [World of Warcraft][] player
-(it's a [MMORPG][] with over 10 million players). They have weekly
-server maintenance/update windows every Tuesday morning - total
-downtime. The length is never really fixed, so I looked around to see if
-there was a logical way to notify when the servers came back up.
+My wife [Jackie](http://www.jackieantman.com/)
+([Syrilia](http://us.battle.net/wow/en/character/Arthas/Syrilia/simple))
+is an avid [World of
+Warcraft](http://en.wikipedia.org/wiki/World_of_Warcraft) player (it's a
+[MMORPG](http://en.wikipedia.org/wiki/Massively_multiplayer_online_role-playing_game)
+with over 10 million players). They have weekly server
+maintenance/update windows every Tuesday morning - total downtime. The
+length is never really fixed, so I looked around to see if there was a
+logical way to notify when the servers came back up.
 
-I managed to find a [World of Warcraft Realm status check plugin][] on
-Nagios Exchange, but it was written to a now-discontinued API. It was
+I managed to find a [World of Warcraft Realm status check
+plugin](http://exchange.nagios.org/directory/Plugins/Games/World-of-Warcraft-Realm-status/details)
+on Nagios Exchange, but it was written to a now-discontinued API. It was
 also last modified in 2008, and I can't seem to get in contact with the
 author, Scott A'Hearn (webmaster@scottahearn.com) - that email returns
 undeliverable, there's no email link on the site that his domain now
 redirects to, and the domain scottahearn.com is a (eek) private
 registration in WHOIS, so I don't really have any way of finding contact
 information. Regardless, I've modified the script to use the [new
-Blizzard REST API][] and it's now working. Of course, this is pulling
-from Blizzard's data feed, not doing any actual monitoring itself, and
-be warned that they impose query limits (at the moment, their [docs][]
-say 3,000 requests per day for anonymous access; to be nice to them, I
-only check on Tuesdays from 3am-4pm, when I'm most concerned about it).
-The updated source code is shown below, but the most up-to-date version
-will always live at  
+Blizzard REST API](http://blizzard.github.com/api-wow-docs/#id3381933)
+and it's now working. Of course, this is pulling from Blizzard's data
+feed, not doing any actual monitoring itself, and be warned that they
+impose query limits (at the moment, their
+[docs](http://blizzard.github.com/api-wow-docs/#id3379836) say 3,000
+requests per day for anonymous access; to be nice to them, I only check
+on Tuesdays from 3am-4pm, when I'm most concerned about it). The updated
+source code is shown below, but the most up-to-date version will always
+live at  
 
-[https://github.com/jantman/nagios-scripts/blob/master/check\_wow.pl][].
+[https://github.com/jantman/nagios-scripts/blob/master/check\_wow.pl](https://github.com/jantman/nagios-scripts/blob/master/check_wow.pl).
 If you want, you can also see a diff of my changes to Scott's original
-version on [github][].
+version on
+[github](https://github.com/jantman/nagios-scripts/commit/f84eede5256aa6621812e91f0b3b73e91f3b11e8#check_wow.pl).
 
 ~~~~{.perl}
 #!/usr/bin/perl -w
@@ -177,14 +185,3 @@ sub print_help ($$) {
 
 # end
 ~~~~
-
-  [Jackie]: http://www.jackieantman.com/
-  [Syrilia]: http://us.battle.net/wow/en/character/Arthas/Syrilia/simple
-  [World of Warcraft]: http://en.wikipedia.org/wiki/World_of_Warcraft
-  [MMORPG]: http://en.wikipedia.org/wiki/Massively_multiplayer_online_role-playing_game
-  [World of Warcraft Realm status check plugin]: http://exchange.nagios.org/directory/Plugins/Games/World-of-Warcraft-Realm-status/details
-  [new Blizzard REST API]: http://blizzard.github.com/api-wow-docs/#id3381933
-  [docs]: http://blizzard.github.com/api-wow-docs/#id3379836
-  [https://github.com/jantman/nagios-scripts/blob/master/check\_wow.pl]:
-    https://github.com/jantman/nagios-scripts/blob/master/check_wow.pl
-  [github]: https://github.com/jantman/nagios-scripts/commit/f84eede5256aa6621812e91f0b3b73e91f3b11e8#check_wow.pl

@@ -5,11 +5,13 @@ Category: Ideas and Rants
 Tags: hiring, hr, jobs
 Slug: hiring-technical-people
 
-After seeing a link to it on the [SAGE][] mailing list, I happened to
-read Mark Dennehy'sblog post on [  
-Tips for hiring new engineers][]. I felt the need to make a few
-comments on some of his findings. Perhaps someone in HR, or a recruiter,
-will actually read this and learn a thing or two.
+After seeing a link to it on the [SAGE](http://www.sage.org) mailing
+list, I happened to read Mark Dennehy'sblog post on [  
+Tips for hiring new
+engineers](http://www.stochasticgeometry.ie/2008/04/25/tips-for-hiring-new-engineers/).
+I felt the need to make a few comments on some of his findings. Perhaps
+someone in HR, or a recruiter, will actually read this and learn a thing
+or two.
 
 > The basics of professional work – getting along with others, being
 > able to manage your time, being able to communicate clearly and well,
@@ -73,7 +75,8 @@ the criteria I use:
 
 **Follow-up:**
 
--   Use of the [SAGE Job Descriptions][].
+-   Use of the [SAGE Job
+    Descriptions](http://www.sage.org/field/jobs-descriptions.html).
 -   An actual salary range, not "varies with experience" or
     "competitive".
 -   Some description of *where* I'll work - size of the team,
@@ -105,8 +108,3 @@ there will likely be hundreds of other applicants, I only send a resume
 in for jobs that I think I have a very good chance of getting. I'm sure
 I've skipped over good positions just because the description didn't
 communicate that to me - and I'm sure I'm not alone.
-
-  [SAGE]: http://www.sage.org
-  [  
-  Tips for hiring new engineers]: http://www.stochasticgeometry.ie/2008/04/25/tips-for-hiring-new-engineers/
-  [SAGE Job Descriptions]: http://www.sage.org/field/jobs-descriptions.html

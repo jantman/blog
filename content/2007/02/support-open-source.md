@@ -5,9 +5,9 @@ Category: Ideas and Rants
 Slug: support-open-source
 
 I get paid tomorrow, and it's time to spend some money. Sure, there are
-some great toys out there. The stuff from [ThinkGeek][] is always great.
-What about that monitoring server I want? Or upgrading my LAN to gigabit
-copper?
+some great toys out there. The stuff from
+[ThinkGeek](http://www.thinkgeek.com) is always great. What about that
+monitoring server I want? Or upgrading my LAN to gigabit copper?
 
 Of course, there are also many charitable causes. The homeless. Cancer.
 Strippers without implants.
@@ -27,5 +27,3 @@ So, this week, I'm going to do some good.
 And for the rest of you, next time you notice a bug or miss a feature in
 an open-source project, just think... if everyone who used it donated
 $10, would it still be missing?
-
-  [ThinkGeek]: http://www.thinkgeek.com

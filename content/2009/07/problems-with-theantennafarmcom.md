@@ -5,13 +5,15 @@ Category: Miscellaneous
 Tags: antennafarm, communications, EMS, radio
 Slug: problems-with-theantennafarmcom
 
-When I did the [communications upgrades to my truck][], I was originally
-going to order the antennas and mounts from [Tessco][], but I found that
-[The Antenna Farm][] in Montana had the best price on the IC-F5061, and
-also carried the antennas and mounts. I must first say that there was a
-notice on the Antenna Farm web site that they had moved to a new
-location a few days before I placed my order. I waited to place my order
-until the web site stated that things were shipping normally.
+When I did the [communications upgrades to my
+truck](http://blog.jasonantman.com/2009/07/update-on-my-f-250-icom-mobile-antennas-strobes/),
+I was originally going to order the antennas and mounts from
+[Tessco](http://www.tessco.com/), but I found that [The Antenna
+Farm](http://www.theantennafarm.com) in Montana had the best price on
+the IC-F5061, and also carried the antennas and mounts. I must first say
+that there was a notice on the Antenna Farm web site that they had moved
+to a new location a few days before I placed my order. I waited to place
+my order until the web site stated that things were shipping normally.
 
 When I placed my order, I added in the "notes" field that I would like
 tracking numbers sent to me as soon as they were available, as I had
@@ -53,12 +55,12 @@ The next week, on Tuesday, the Icom radio arrived. It was as ordered,
 but the second Antenex MB8X was nowhere to be found. I did finally
 receive a tracking number about 24 hours prior to delivery.
 
-Two weeks after I placed my order (with three day UPS shipping), [Ken][]
-managed to fit me in early in the morning. I told him about the missing
-third antenna mount, and he agreed to use one from his stock. Much to my
-dismay, when he dropped off the truck, I learned that \*neither\* of the
-antenna mounts that arrived were true NMO mounts, and thus they were
-both useless.
+Two weeks after I placed my order (with three day UPS shipping),
+[Ken](http://kensautoelectric.com/) managed to fit me in early in the
+morning. I told him about the missing third antenna mount, and he agreed
+to use one from his stock. Much to my dismay, when he dropped off the
+truck, I learned that \*neither\* of the antenna mounts that arrived
+were true NMO mounts, and thus they were both useless.
 
 Overall, I'm horribly disappointed with The Antenna Farm. The lack of
 communication is appalling, regardless of whether they're having
@@ -87,8 +89,3 @@ site.
 
 To top it all off, I was told by my installer that he stopped buying
 from The Antenna Farm a few years ago due to endless problems.
-
-  [communications upgrades to my truck]: http://blog.jasonantman.com/2009/07/update-on-my-f-250-icom-mobile-antennas-strobes/
-  [Tessco]: http://www.tessco.com/
-  [The Antenna Farm]: http://www.theantennafarm.com
-  [Ken]: http://kensautoelectric.com/

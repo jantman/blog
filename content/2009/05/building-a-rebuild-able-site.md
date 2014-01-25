@@ -15,10 +15,10 @@ system.
 So, being the closest thing to a SysAdmin we have (my official title is
 still Student Systems Programmer), it's my job to build a new
 installation, configuration and backup infrastructure. We've already
-standardized on [CentOS][] as a University-wide distro, and have a local
-full mirror, so I don't need to choose a distro. I do, however, have to
-plan the installation and backup architecture. The main requirements
-are:
+standardized on [CentOS](http://www.centos.org) as a University-wide
+distro, and have a local full mirror, so I don't need to choose a
+distro. I do, however, have to plan the installation and backup
+architecture. The main requirements are:
 
 1.  Lowest overall time for bare-metal recovery to a working system.
 2.  Ease of use, as people other than myself will need to administer it
@@ -27,25 +27,29 @@ are:
     almost-exact-copy of a machine.
 
 I started a thread a few days ago on the SAGE mailing list, which you
-can find [here][].
+can find
+[here](http://mailman.sage.org/pipermail/sage-members/2009/msg00447.html).
 
 At the moment, it looks like the general idea that I'm going with is to
-use [Kickstart][] to install the systems, using a basic and minimal
-Kickstart file. Basic package selection (minimalist) with just what's
-needed to configure the system with a hostname and network settings for
-the management VLAN. I'll then have Kickstart install and configure a
-configuration management package - I'm leaning towards [Puppet][] over
-[Cfengine][] and am starting testing. The config management software
-will handle all of the customization for the system (everything
-different from the base generic Kickstart install) so it's all kept
-under the control of config management from step 1.
+use [Kickstart](http://fedoraproject.org/wiki/Anaconda/Kickstart) to
+install the systems, using a basic and minimal Kickstart file. Basic
+package selection (minimalist) with just what's needed to configure the
+system with a hostname and network settings for the management VLAN.
+I'll then have Kickstart install and configure a configuration
+management package - I'm leaning towards
+[Puppet](http://reductivelabs.com/products/puppet/) over
+[Cfengine](http://www.cfengine.org/) and am starting testing. The config
+management software will handle all of the customization for the system
+(everything different from the base generic Kickstart install) so it's
+all kept under the control of config management from step 1.
 
 The final part is a backup system, mainly for whatever eventually -
 whether out of human error or simple laziness - ends up out of the
 config management system's control. Our previous SA had settled on
-[Zmanda][], the paid version of [Amanda][], which comes with specific
-plugins for MySQL and MSSQL. I'm also looking at [Bacula][], mainly
-because of its' advanced features, scheduling (especially the new
+[Zmanda](http://www.zmanda.com/), the paid version of
+[Amanda](http://www.amanda.org/), which comes with specific plugins for
+MySQL and MSSQL. I'm also looking at [Bacula](http://www.bacula.org),
+mainly because of its' advanced features, scheduling (especially the new
 scheduling in Bacula 3) and scalability.
 
 The beauty that I see in having Kickstart do something minimal and then
@@ -57,15 +61,6 @@ make them.
 
 I'm currently starting testing of both Puppet itself and getting
 Kickstart to start the puppet install and daemon (instructions from
-[David Lutterkort's blog (Red Hat software engineer)][]). We'll see how
+[David Lutterkort's blog (Red Hat software
+engineer)](http://watzmann.net/blog/index.php?cat=21)). We'll see how
 everything goes...
-
-  [CentOS]: http://www.centos.org
-  [here]: http://mailman.sage.org/pipermail/sage-members/2009/msg00447.html
-  [Kickstart]: http://fedoraproject.org/wiki/Anaconda/Kickstart
-  [Puppet]: http://reductivelabs.com/products/puppet/
-  [Cfengine]: http://www.cfengine.org/
-  [Zmanda]: http://www.zmanda.com/
-  [Amanda]: http://www.amanda.org/
-  [Bacula]: http://www.bacula.org
-  [David Lutterkort's blog (Red Hat software engineer)]: http://watzmann.net/blog/index.php?cat=21

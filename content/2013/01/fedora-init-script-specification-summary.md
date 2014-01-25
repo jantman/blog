@@ -6,20 +6,26 @@ Tags: centos, fedora, init, redhat, startup
 Slug: fedora-init-script-specification-summary
 
 I've been deploying some new software lately (specifically
-[selenesse][], which combines [Selenium][] and [fitnesse][], [xvfb][]).
-None of these seem to come with init scripts to run as daemons, and the
-quality of the few Fedora/RedHat/CentOS init scripts I was able to find
-was quite poor. The Fedora project has a [Specification for SysV-style
-Init Scripts in their Packaging wiki][], which specifies what a
-Fedora/RedHat/CentOS init script should look like, in excruciating
-detail. What follows is an overview of the more important points, which
-I'm using to develop or modify the scripts I'm currently working on.
+[selenesse](https://github.com/marisaseal/selenesse), which combines
+[Selenium](http://seleniumhq.org/) and [fitnesse](http://fitnesse.org/),
+[xvfb](http://en.wikipedia.org/wiki/Xvfb)). None of these seem to come
+with init scripts to run as daemons, and the quality of the few
+Fedora/RedHat/CentOS init scripts I was able to find was quite poor. The
+Fedora project has a [Specification for SysV-style Init Scripts in their
+Packaging wiki](http://fedoraproject.org/wiki/Packaging:SysVInitScript),
+which specifies what a Fedora/RedHat/CentOS init script should look
+like, in excruciating detail. What follows is an overview of the more
+important points, which I'm using to develop or modify the scripts I'm
+currently working on.
 
 -   Scripts must be put in `/etc/rc.d/init.d`, not in the `/etc/init.d`
     symlink. They should have 0755 permissions.
--   Scripts must have a Fedora-style [chkconfig header][] ("chkconfig:",
-    "description:" lines), and may have an [LSB-style header][] (BEGIN
-    INIT INFO/END INIT INFO). See [Initscript template][].
+-   Scripts must have a Fedora-style [chkconfig
+    header](http://fedoraproject.org/wiki/Packaging:SysVInitScript#Chkconfig_Header)
+    ("chkconfig:", "description:" lines), and may have an [LSB-style
+    header](http://fedoraproject.org/wiki/Packaging:SysVInitScript#LSB_Header)
+    (BEGIN INIT INFO/END INIT INFO). See [Initscript
+    template](http://fedoraproject.org/wiki/Packaging:SysVInitScript#Initscript_template).
 -   Scripts **must** make use of a lockfile in `/var/lock/subsys/`, and
     the name of the lockfile must be the same as the name of the init
     script. (There is a technical reason for this relating to how sysv
@@ -31,8 +37,10 @@ I'm using to develop or modify the scripts I'm currently working on.
     empty/uninitialized environment (or only LANG and TERM set and a CWD
     of `/`, as enforced by `service(8)`, or with a full environment if
     they are called directly by a user.
--   [Required actions][] - all of the following actions are required,
-    and have specific definitions:
+-   [Required
+    actions](http://fedoraproject.org/wiki/Packaging:SysVInitScript#Required_Actions)
+    - all of the following actions are required, and have specific
+    definitions:
     -   **start**: starts the service
     -   **stop**: stops the service
     -   **restart**: stop and restart the service if the service is
@@ -49,8 +57,10 @@ I'm using to develop or modify the scripts I'm currently working on.
         action, it should list a "usage message" that has all actions
         (intended for use)
 
--   There are specified exit codes for [status actions][] and
-    [non-status actions][].
+-   There are specified exit codes for [status
+    actions](http://fedoraproject.org/wiki/Packaging:SysVInitScript#Exit_Codes_for_the_Status_Action)
+    and [non-status
+    actions](http://fedoraproject.org/wiki/Packaging:SysVInitScript#Exit_Codes_for_non-Status_Actions).
 -   They must "behave sensibly". I've found this to be one of the
     biggest problems with homegrown init scripts. If `servicename start`
     is called while the service is already running, it should simply
@@ -75,14 +85,3 @@ PID files and lockfiles, mainly:
     cleaning/resetting environment variables that are used by dependent
     code or processes.
 
-  [selenesse]: https://github.com/marisaseal/selenesse
-  [Selenium]: http://seleniumhq.org/
-  [fitnesse]: http://fitnesse.org/
-  [xvfb]: http://en.wikipedia.org/wiki/Xvfb
-  [Specification for SysV-style Init Scripts in their Packaging wiki]: http://fedoraproject.org/wiki/Packaging:SysVInitScript
-  [chkconfig header]: http://fedoraproject.org/wiki/Packaging:SysVInitScript#Chkconfig_Header
-  [LSB-style header]: http://fedoraproject.org/wiki/Packaging:SysVInitScript#LSB_Header
-  [Initscript template]: http://fedoraproject.org/wiki/Packaging:SysVInitScript#Initscript_template
-  [Required actions]: http://fedoraproject.org/wiki/Packaging:SysVInitScript#Required_Actions
-  [status actions]: http://fedoraproject.org/wiki/Packaging:SysVInitScript#Exit_Codes_for_the_Status_Action
-  [non-status actions]: http://fedoraproject.org/wiki/Packaging:SysVInitScript#Exit_Codes_for_non-Status_Actions

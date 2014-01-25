@@ -7,10 +7,11 @@ Slug: the-ultimate-geek-alarm-clock
 
 So, here's an idea that I've been toying around with for a while.
 
-I've been dong some development on a pair of [Soekris][] embedded Linix
-boards I bought to use as a firewall/router and WAP. So, naturally, my
-interest in embedded systems is piqued. I know that there are some
-smaller embedded Linux devices out there. So, the idea is as follows:
+I've been dong some development on a pair of
+[Soekris](http://www.soekris.com) embedded Linix boards I bought to use
+as a firewall/router and WAP. So, naturally, my interest in embedded
+systems is piqued. I know that there are some smaller embedded Linux
+devices out there. So, the idea is as follows:
 
 Get an embedded Linux box that is either PoE or uses a hardwired
 connection with a wall-wart, or better yet, uses both, so it can be
@@ -58,5 +59,3 @@ a loud tone for a few seconds and blinks the LED if PoE is lost, or we
 can't ping a user-selectable address for more than, say, one minute.
 
 I guess I have too much free time on my hands..
-
-  [Soekris]: http://www.soekris.com

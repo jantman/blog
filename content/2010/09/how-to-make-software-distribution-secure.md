@@ -7,19 +7,24 @@ Slug: how-to-make-software-distribution-secure
 
 We were seeing some strange behavior with Mac client machines on the
 network lately, specifically with DNS queries (I'd guess that a lot of
-it has to do with [Bonjour][]), but the discussion touched on the [DNS
-Changer][] [trojan][] for Mac. I'd really never heard about it before,
-and after some basic reading, it really got me thinking about the state
-of software packaging, updates, and distribution. Granted, some of my
-observations would require sweeping changes to how packaging is handled
-(even on the \*nixes), and would require buy-in from more than just the
-vendor and distributor (well, I guess MS can probably pressure ISVs to
-do whatever they want), but seems to be the only way to keep
-appliancization from becoming the solution to security issues. I've
-written about this [before][], and a while ago in respect to [Linux][],
-but here's my current take on what needs to be done to software
-packaging to allow our machines to stay secure, no matter what OS they
-run.
+it has to do with
+[Bonjour](http://en.wikipedia.org/wiki/Bonjour_(software))), but the
+discussion touched on the [DNS
+Changer](http://isc.sans.edu/diary.html?storyid=3595)
+[trojan](http://www.dnschanger.com/) for Mac. I'd really never heard
+about it before, and after some basic reading, it really got me thinking
+about the state of software packaging, updates, and distribution.
+Granted, some of my observations would require sweeping changes to how
+packaging is handled (even on the \*nixes), and would require buy-in
+from more than just the vendor and distributor (well, I guess MS can
+probably pressure ISVs to do whatever they want), but seems to be the
+only way to keep appliancization from becoming the solution to security
+issues. I've written about this
+[before](/2009/12/book-comments-the-future-of-the-internet-and-how-to-stop-it-by-jonathan-zittrain/),
+and a while ago in respect to
+[Linux](/2008/10/my-biggest-problem-with-linux/), but here's my current
+take on what needs to be done to software packaging to allow our
+machines to stay secure, no matter what OS they run.
 
 1.  **Allow packages to be installed as a user.** This is a mammoth task
     under Windows or Mac, but still an issue under Linux. The DNS
@@ -30,7 +35,9 @@ run.
     a big issue under Linux. Yum, apt, rpm, etc. should (if run as a
     non-root user) install packages in a user-local path under `/home`
     by default. Of course, this would mean many things would need to
-    change in order to cope - perhaps even a change to the [LSB][] spec.
+    change in order to cope - perhaps even a change to the
+    [LSB](http://www.linuxfoundation.org/collaborate/workgroups/lsb)
+    spec.
 2.  **Warn about inconsistencies on package installation.** The package
     installation program should warn a user (whether installing packages
     system-wide or local to a user) if the package is going to modify
@@ -55,7 +62,8 @@ run.
     sources, there should be an OS-level feature to audit all filesystem
     changes made by untrusted/unsigned applications, and a way to alert
     the user to these changes if they appear suspisious (essentially
-    what [Spybot Search & Destroy / TeaTimer][] do, but builtin to the
+    what [Spybot Search & Destroy /
+    TeaTimer](http://www.safer-networking.org) do, but builtin to the
     OS).
 5.  **Vendor support of packaging/repositories** - Along with the idea
     of repositories, vendors should have a trust or signing system for
@@ -83,11 +91,3 @@ user to import and trust a key, they'd just have to trust the repository
 (i.e. software.adobe.com) and the package manager would pull down the
 key and verify that package X in software.adobe.com is, in fact, signed
 by the software.adobe.com key.
-
-  [Bonjour]: http://en.wikipedia.org/wiki/Bonjour_(software)
-  [DNS Changer]: http://isc.sans.edu/diary.html?storyid=3595
-  [trojan]: http://www.dnschanger.com/
-  [before]: /2009/12/book-comments-the-future-of-the-internet-and-how-to-stop-it-by-jonathan-zittrain/
-  [Linux]: /2008/10/my-biggest-problem-with-linux/
-  [LSB]: http://www.linuxfoundation.org/collaborate/workgroups/lsb
-  [Spybot Search & Destroy / TeaTimer]: http://www.safer-networking.org

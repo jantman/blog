@@ -24,9 +24,12 @@ lines.
 Well a few days ago I was having a discussion with some co-workers that
 dovetailed into this topic, and when I started some research, I found
 (*finally after using httpd for years*) that the [Apache httpd 2.2
-configuration file syntax documentation][] states that httpd supports
-environment variable interpolation anywhere in the config files (and
-[httpd 2.4][] supports it with Defines as well).
+configuration file syntax
+documentation](http://httpd.apache.org/docs/2.2/configuring.html#syntax)
+states that httpd supports environment variable interpolation anywhere
+in the config files (and [httpd
+2.4](http://httpd.apache.org/docs/2.4/configuring.html#syntax) supports
+it with Defines as well).
 
 Yup, that's right. All those different Apache configs I've worked with
 for years that define separate vhosts, document roots, rewrite targets,
@@ -112,10 +115,7 @@ file. There doesn't seem to be any way to protect against this in httpd
 starts (and maybe setting logical default values, like an empty string,
 in your init script which should be overridden by the sysconfig file).
 
-If you're running httpd 2.4+, you can turn on [mod\_info][] and browse
-to `http://servername/server-info?config` to dump the current
+If you're running httpd 2.4+, you can turn on
+[mod\_info](http://httpd.apache.org/docs/2.4/mod/mod_info.html) and
+browse to `http://servername/server-info?config` to dump the current
 configuration, which will show the variable substitution.
-
-  [Apache httpd 2.2 configuration file syntax documentation]: http://httpd.apache.org/docs/2.2/configuring.html#syntax
-  [httpd 2.4]: http://httpd.apache.org/docs/2.4/configuring.html#syntax
-  [mod\_info]: http://httpd.apache.org/docs/2.4/mod/mod_info.html

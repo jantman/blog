@@ -5,7 +5,6 @@ Category: Miscellaneous
 Slug: links-for-tuesday-november-23-2010
 
 -   [Did Google Arm Its Own Enemies With Android? - James Allworth - The
-    Conversation - Harvard Business Review][]
+    Conversation - Harvard Business
+    Review](http://blogs.hbr.org/cs/2010/11/did_google_train_its_own_enemi.html)
 
-  [Did Google Arm Its Own Enemies With Android? - James Allworth - The
-  Conversation - Harvard Business Review]: http://blogs.hbr.org/cs/2010/11/did_google_train_its_own_enemi.html

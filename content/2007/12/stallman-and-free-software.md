@@ -7,23 +7,26 @@ Slug: stallman-and-free-software
 
 I've long been a fan of Free Software - both the technical aspects and
 the moral implications. As such, I've long been
-<span style="font-size:100%;">some</span>what of a fan of [RMS][], and
-have followed his public persona. I've had the experience of
-<span style="font-size:100%;">exchanging short emails with him, and was
-lucky enough to attend a speech of his, entitled
-"</span>[<span style="font-size:100%;">Copyright vs. Community in the
-Age of Computer Networks</span>][]<span style="font-size:100%;">", here
-at Rutgers.
+<span style="font-size:100%;">some</span>what of a fan of
+[RMS](http://www.stallman.org), and have followed his public persona.
+I've had the experience of <span style="font-size:100%;">exchanging
+short emails with him, and was lucky enough to attend a speech of his,
+entitled "</span>[<span style="font-size:100%;">Copyright vs. Community
+in the Age of Computer
+Networks</span>](http://www.fsf.org/events/rmsspeechrutgers/view)<span style="font-size:100%;">",
+here at Rutgers.
 
 I'm a big fan of most of RMS's thoughts. I do, however, think of him as
 a religious zealot. While his teachings may be pure and closest to "the
 right way", I find them a bit to pure for the lay-people; perhaps
-they're more suited to the priestly class. Reading an [interview][] with
-RMS today, I came by an interesting response ([the first answer on the
-second page][]) dealing with the use of proprietary software and
-drivers. I'll be the first to say that I'm a big fan of GPL, including
-GPLv3 - granted most of the "software" I write is shorter than the GPL
-itself.
+they're more suited to the priestly class. Reading an
+[interview](http://itmanagement.earthweb.com/cnews/article.php/3717476)
+with RMS today, I came by an interesting response ([the first answer on
+the second
+page](http://itmanagement.earthweb.com/cnews/article.php/12035_3717476_2))
+dealing with the use of proprietary software and drivers. I'll be the
+first to say that I'm a big fan of GPL, including GPLv3 - granted most
+of the "software" I write is shorter than the GPL itself.
 
 However, I have a bit of an issue with RMS's stance. In my view, freedom
 is the right of the masses. The GPL speaks at length as to the freedoms
@@ -97,9 +100,3 @@ our religious purity for a larger installed user base, and greater
 public awareness, is ultimately in the interest of the greater good of
 Free software.  
 </span>
-
-  [RMS]: http://www.stallman.org
-  [<span style="font-size:100%;">Copyright vs. Community in the Age of
-  Computer Networks</span>]: http://www.fsf.org/events/rmsspeechrutgers/view
-  [interview]: http://itmanagement.earthweb.com/cnews/article.php/3717476
-  [the first answer on the second page]: http://itmanagement.earthweb.com/cnews/article.php/12035_3717476_2

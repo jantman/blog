@@ -6,20 +6,21 @@ Tags: foreman, git, github, workflow
 Slug: workflow-for-contributing-to-github-projects
 
 Lately I've been contributing to some open source projects hosted on
-[github][]. I'm pretty new to git, and the process is a bit confusing
-for beginners. So, here's a sample workflow, based on the [The
-Foreman][]'s [foreman github repository][]. Note that I'm developing
-against the "develop" branch of that repository, not the master, so that
-throws in a little difference that isn't documented in most
-introductions. To throw in another wrench, I maintan a branch with the
-code that I'm currently actually using (i.e. the application code that I
-have checked out on the production server), called "jantman". This is
-more or less composed of the upstream "develop" branch, with all of my
-finished (but not yet merged in the upstream) topic branches. I'm pretty
-sure all this is correct, but honestly, I'm still new enough at git that
-I can't make any promises. Unfortunatelty, I haven't had the time to
-*really* learn git, and I also can't find a simple enough tutorial that
-covers all this...
+[github](http://github.com). I'm pretty new to git, and the process is a
+bit confusing for beginners. So, here's a sample workflow, based on the
+[The Foreman](http://theforeman.org)'s [foreman github
+repository](https://github.com/theforeman/foreman). Note that I'm
+developing against the "develop" branch of that repository, not the
+master, so that throws in a little difference that isn't documented in
+most introductions. To throw in another wrench, I maintan a branch with
+the code that I'm currently actually using (i.e. the application code
+that I have checked out on the production server), called "jantman".
+This is more or less composed of the upstream "develop" branch, with all
+of my finished (but not yet merged in the upstream) topic branches. I'm
+pretty sure all this is correct, but honestly, I'm still new enough at
+git that I can't make any promises. Unfortunatelty, I haven't had the
+time to *really* learn git, and I also can't find a simple enough
+tutorial that covers all this...
 
 1.  Fork the original repository through the GitHub interface.
 2.  On your machine, clone your fork:
@@ -163,15 +164,10 @@ git push origin jantman
 
 References:
 
-1.  [Contribute — Doctrine-Project][]
-2.  [Github - Quicksilver Wiki][]
-3.  [Contributor Workflow with Github · carmaa/inception Wiki][]
-4.  [Help.GitHub - Fork A Repo][]
+1.  [Contribute —
+    Doctrine-Project](http://www.doctrine-project.org/contribute.html)
+2.  [Github - Quicksilver Wiki](http://qsapp.com/wiki/Github)
+3.  [Contributor Workflow with Github · carmaa/inception
+    Wiki](https://github.com/carmaa/inception/wiki/Contributor-Workflow-with-Github)
+4.  [Help.GitHub - Fork A Repo](http://help.github.com/fork-a-repo/)
 
-  [github]: http://github.com
-  [The Foreman]: http://theforeman.org
-  [foreman github repository]: https://github.com/theforeman/foreman
-  [Contribute — Doctrine-Project]: http://www.doctrine-project.org/contribute.html
-  [Github - Quicksilver Wiki]: http://qsapp.com/wiki/Github
-  [Contributor Workflow with Github · carmaa/inception Wiki]: https://github.com/carmaa/inception/wiki/Contributor-Workflow-with-Github
-  [Help.GitHub - Fork A Repo]: http://help.github.com/fork-a-repo/

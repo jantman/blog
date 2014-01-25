@@ -13,14 +13,15 @@ the default configuration with LogFormat directives in `httpd.conf`,
 this means that either we need to define log formats per-vhost or lose
 the client IP in one of our scenarios (LB or no LB).
 
-I came by a simple solution to this on [Emmanuel Chantréau][]'s blog,
-and here is my condensed version of it. It sets an environment variable
-("bigip-request") if the BIOrigClientAddr request header is set (this
-header holds the client's IP; it's the BigIp proprietary version of the
-X-Forwarded-For header. You could easily substitute that more standard
-header in the following snippet) and then sets the "combined" LogFormat
-based on that variable - a version using BIOrigClientAddr if it is set,
-and a version using the normal "%h" remote host otherwise.
+I came by a simple solution to this on [Emmanuel
+Chantréau](http://www.maretmanu.org/homepage/inform/apache-forwarded.php)'s
+blog, and here is my condensed version of it. It sets an environment
+variable ("bigip-request") if the BIOrigClientAddr request header is set
+(this header holds the client's IP; it's the BigIp proprietary version
+of the X-Forwarded-For header. You could easily substitute that more
+standard header in the following snippet) and then sets the "combined"
+LogFormat based on that variable - a version using BIOrigClientAddr if
+it is set, and a version using the normal "%h" remote host otherwise.
 
 In httpd.conf:
 
@@ -41,5 +42,3 @@ CustomLog logs/<%= domain %>_access_log combined env=!bigip-request
 # or this format if we're not
 CustomLog logs/<%= domain %>_access_log combined_lb env=bigip-request
 ~~~~
-
-  [Emmanuel Chantréau]: http://www.maretmanu.org/homepage/inform/apache-forwarded.php

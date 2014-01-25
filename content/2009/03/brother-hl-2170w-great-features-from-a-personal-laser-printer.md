@@ -6,15 +6,16 @@ Tags: printer, review
 Slug: brother-hl-2170w-great-features-from-a-personal-laser-printer
 
 **I've posted an [update about serious DHCP problems with this
-unit][].**
+unit](/2009/04/brother-hl2170w-dhcp-problems/).**
 
 Last week my mother's printer died, and she asked me to find a new one
-for her. After a quick look on [NewEgg][] (sort by ratings is a
-wonderful thing) I found the [Brother HL-2170W][]. Aside from having a
-wireless interface (only a security hole, as far as I'm concerned) it
-seemed pretty cool - tiny B&W laser, Ethernet, PCL6, 23ppm, 32 MB RAM,
-250 sheet capacity and 2400x600 dpi. So, for a mere $99 USD, I bought it
-for her.
+for her. After a quick look on [NewEgg](http://www.newegg.com) (sort by
+ratings is a wonderful thing) I found the [Brother
+HL-2170W](http://www.brother-usa.com/Printer/ModelDetail.aspx?ProductID=hl2170W).
+Aside from having a wireless interface (only a security hole, as far as
+I'm concerned) it seemed pretty cool - tiny B&W laser, Ethernet, PCL6,
+23ppm, 32 MB RAM, 250 sheet capacity and 2400x600 dpi. So, for a mere
+$99 USD, I bought it for her.
 
 When the printer showed up, I was a bit let down to find no sticker
 bearing the MAC address on either the box or the printer itself - and
@@ -42,7 +43,3 @@ cute little printer seems to have quite a feature set, especially when
 it comes to manageability and remote troubleshooting (a good thing for
 any printer that's used by a family member who you support). And best of
 all, it supports IPP and LPR.
-
-  [update about serious DHCP problems with this unit]: /2009/04/brother-hl2170w-dhcp-problems/
-  [NewEgg]: http://www.newegg.com
-  [Brother HL-2170W]: http://www.brother-usa.com/Printer/ModelDetail.aspx?ProductID=hl2170W

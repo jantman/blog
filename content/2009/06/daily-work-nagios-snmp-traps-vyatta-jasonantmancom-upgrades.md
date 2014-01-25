@@ -6,37 +6,43 @@ Tags: apc, bluesocket, Nagios, snmp, vyatta
 Slug: daily-work-nagios-snmp-traps-vyatta-jasonantmancom-upgrades
 
 So it's been a very busy day. I was up until 5 AM or so working on
-implementing [Puppet][] at home. I'm building two new boxes - a storage
-(centralized home directory)/syslog (to MySQL) server and a second web
-server (possibly also to handle Nagios) - and I decided that they'll be
-totally built by Puppet. The only thing I had to give up on was setting
-up the NFS share for my home directory on the new storage box and
-installing and testing [rsyslog][] on it.
+implementing [Puppet](http://reductivelabs.com/trac/puppet/) at home.
+I'm building two new boxes - a storage (centralized home
+directory)/syslog (to MySQL) server and a second web server (possibly
+also to handle Nagios) - and I decided that they'll be totally built by
+Puppet. The only thing I had to give up on was setting up the NFS share
+for my home directory on the new storage box and installing and testing
+[rsyslog](http://www.rsyslog.com/) on it.
 
 This afternoon around 7, I started on my weekend projects for [the
-ambulance corps][] - setting up [Nagios][] to receive SNMP traps from
-the APC UPS and moving over to the new [Vyatta][]-based router (from
-[m0n0wall][]). I'd attempted the router before, but had to rollback -
-I'm using an old [BlueSocket][] controller for hardware - it's just a
-nice black 1U enclosure with a stock Intel motherboard, 20GB HDD, 512MB
-RAM and three 10/100 NICs. The first time, I was unable to get link on
-either of the two NICs I was using, so I decided to rollback.
+ambulance corps](http://www.midlandparkambulance.com) - setting up
+[Nagios](http://www.nagios.org) to receive SNMP traps from the APC UPS
+and moving over to the new [Vyatta](http://www.vyatta.org)-based router
+(from [m0n0wall](http://m0n0.ch/wall/)). I'd attempted the router
+before, but had to rollback - I'm using an old
+[BlueSocket](http://www.bluesocket.com/) controller for hardware - it's
+just a nice black 1U enclosure with a stock Intel motherboard, 20GB HDD,
+512MB RAM and three 10/100 NICs. The first time, I was unable to get
+link on either of the two NICs I was using, so I decided to rollback.
 
 **Nagios SNMP Traps**
 
 I found a good starting point for Nagios SNMP traps on the [OpsView
-blog][]. I setup \`snmptrapd\` on the Nagios server and hacked together
-a little Python script to just write all of the traps to a file. After
-some testing with \`snmptrap\` on my laptop, I did a test by pulling the
+blog](http://altinity.blogs.com/dotorg/2006/03/lessons_in_snmp.html). I
+setup \`snmptrapd\` on the Nagios server and hacked together a little
+Python script to just write all of the traps to a file. After some
+testing with \`snmptrap\` on my laptop, I did a test by pulling the
 power plug of the UPS, waiting about 30 seconds, and then plugging it
-back in. Sure enough, the little old [AP9605 PowerNet SNMP card][]
+back in. Sure enough, the little old [AP9605 PowerNet SNMP
+card](http://blog.jasonantman.com/2007/03/apc-ap9605-powernet-snmp-card/)
 generated two SNMP traps - one for power loss and one for power regained
 - both of which showed up in the test file
 
 The next step will be deciding how to get the traps into Nagios -
 specifically whether I want to go with something heavy-weight, like
-[SNMPtt][] that can handle other devices, or whether I want to code a
-simple script myself just to deal with the APC cards.
+[SNMPtt](http://snmptt.sourceforge.net/) that can handle other devices,
+or whether I want to code a simple script myself just to deal with the
+APC cards.
 
 **Router**
 
@@ -85,21 +91,10 @@ outages for hardware upgrades or array rebuilds). Assuming I got
 everything off of it, it will be relegated to the spares pile.
 
 I'm going to make a serious effort to post on a daily basis, if only for
-my own future reference. I should have the demo of [RackMan][] out soon,
-and I'm also about to start on integrating it with Nathan Hubbard's
-[MachDB][] as well as a PHP script I wrote to pull port names and MACs
-from Cisco switches and associate them with NICs in machines. Hopefully
-I'll also have some interesting Puppet stuff out soon.
-
-  [Puppet]: http://reductivelabs.com/trac/puppet/
-  [rsyslog]: http://www.rsyslog.com/
-  [the ambulance corps]: http://www.midlandparkambulance.com
-  [Nagios]: http://www.nagios.org
-  [Vyatta]: http://www.vyatta.org
-  [m0n0wall]: http://m0n0.ch/wall/
-  [BlueSocket]: http://www.bluesocket.com/
-  [OpsView blog]: http://altinity.blogs.com/dotorg/2006/03/lessons_in_snmp.html
-  [AP9605 PowerNet SNMP card]: http://blog.jasonantman.com/2007/03/apc-ap9605-powernet-snmp-card/
-  [SNMPtt]: http://snmptt.sourceforge.net/
-  [RackMan]: http://rackman.jasonantman.com
-  [MachDB]: http://www.machdb.org/
+my own future reference. I should have the demo of
+[RackMan](http://rackman.jasonantman.com) out soon, and I'm also about
+to start on integrating it with Nathan Hubbard's
+[MachDB](http://www.machdb.org/) as well as a PHP script I wrote to pull
+port names and MACs from Cisco switches and associate them with NICs in
+machines. Hopefully I'll also have some interesting Puppet stuff out
+soon.

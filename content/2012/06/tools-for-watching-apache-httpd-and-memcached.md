@@ -6,20 +6,22 @@ Tags: apache, memcached, perl, top, troubleshooting
 Slug: tools-for-watching-apache-httpd-and-memcached
 
 Recently I was working on a code release on a site running PHP on
-[Apache httpd][], and using [\>memcached][]. Without getting into
-specifics, we had a number of issues that were both Apache and memcached
-problems, and little visibility into them as it was running on an older
-server without much monitoring in place. I started looking around for
-simple tools that could provide a bit more insight, without many
-dependencies (as the machine is a relatively minimalist install). Here
-are some of the options I found:
+[Apache httpd](http://httpd.apache.org/), and using
+[\>memcached](http://memcached.org/). Without getting into specifics, we
+had a number of issues that were both Apache and memcached problems, and
+little visibility into them as it was running on an older server without
+much monitoring in place. I started looking around for simple tools that
+could provide a bit more insight, without many dependencies (as the
+machine is a relatively minimalist install). Here are some of the
+options I found:
 
--   [memcache-top][] - A top-like script that pulls stats from memcached
-    instances and can show both per-instance, total and average usage %,
-    hit rate, number of connections, time to run the stats query,
-    evictions, gets, sets, and read and write amounts. Best of all, it's
-    a very small perl script that requires only IO::Socket and
-    Time::HiRes. Here's a small example of the output:
+-   [memcache-top](http://code.google.com/p/memcache-top/) - A top-like
+    script that pulls stats from memcached instances and can show both
+    per-instance, total and average usage %, hit rate, number of
+    connections, time to run the stats query, evictions, gets, sets, and
+    read and write amounts. Best of all, it's a very small perl script
+    that requires only IO::Socket and Time::HiRes. Here's a small
+    example of the output:
 
         memcache-top v0.6       (default port: 11211, color: on, refresh: 3 seconds)
 
@@ -31,12 +33,12 @@ are some of the options I found:
 
         TOTAL:          0.9GB/  1.0GB           117     1.0ms   0.0     4114    1669    1.3M    24.2M
 
--   [damemtop][] is also a nice top-like memcached tool. On the positive
-    side, you can specify any column from "stats", "stats items" or
-    "stats slabs" in the configuration file, and can choose between
-    average or one-second snapshots for each column. On the down side,
-    it requires the YAML and AnyEvent Perl modules, so it has some
-    uncommon dependencies.
+-   [damemtop](https://github.com/dormando/damemtop) is also a nice
+    top-like memcached tool. On the positive side, you can specify any
+    column from "stats", "stats items" or "stats slabs" in the
+    configuration file, and can choose between average or one-second
+    snapshots for each column. On the down side, it requires the YAML
+    and AnyEvent Perl modules, so it has some uncommon dependencies.
 
         damemtop: Tue Jun 26 14:02:24 2012 [sort: hostname asc] [delay: 3s]
         hostname           all_version  all_fill_rate  hit_rate  evictions  curr_items  curr_connections   cmd_get  cmd_set  bytes_written  bytes_read  get_hits  get_misses  
@@ -54,8 +56,3 @@ I'm still looking around for something for apache that uses mod\_status
 and isn't too verbose; ideally I'd like to be able to watch memcached,
 apache response codes/times, and apache mod\_status all in the same
 terminal window.
-
-  [Apache httpd]: http://httpd.apache.org/
-  [\>memcached]: http://memcached.org/
-  [memcache-top]: http://code.google.com/p/memcache-top/
-  [damemtop]: https://github.com/dormando/damemtop

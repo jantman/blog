@@ -5,10 +5,11 @@ Category: Tech HowTos
 Tags: git
 Slug: git-cheat-sheet
 
-I use [git][] quite a bit these days, both with an internal server at
-work and with a bunch of my projects and random code that now live on
-[my github account][]. The transition from SVN hasn't always been easy.
-Here's a quick cheat sheet of some of the things that I usually forget.
+I use [git](http://git-scm.com/) quite a bit these days, both with an
+internal server at work and with a bunch of my projects and random code
+that now live on [my github account](https://github.com/jantman/). The
+transition from SVN hasn't always been easy. Here's a quick cheat sheet
+of some of the things that I usually forget.
 
 -   Show diff of the last commit:
 
@@ -106,5 +107,4 @@ git merge other-guys-repo/master
 git remote prune origin
 ~~~~
 
-  [git]: http://git-scm.com/
-  [my github account]: https://github.com/jantman/
+

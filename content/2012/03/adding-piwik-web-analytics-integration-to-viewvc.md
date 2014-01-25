@@ -5,25 +5,28 @@ Category: Tech HowTos
 Tags: analytics, piwik, python, subversion, svn, tracking, viewvc
 Slug: adding-piwik-web-analytics-integration-to-viewvc
 
-All of my public [subversion repositories][] and [CVS repositories][]
-are available online through a great Python application called
-[ViewVC][], which provides a web-based interface to CVS and SVN
-repositories, as well as history browsing, graphical diffs, etc. An
-amazingly large amount of the traffic to my web server is for the vhosts
-that serve this, so I decided that I should add some analytics to it.
-I'm in the process of trying out [Piwik][], a full-featured,
-GPL-licensed, self-hosted alternative to [Google Analytics][]. It gives
-lots of useful information like number of visits and unique visits per
-page, search engine keywords, referrers, average time on page, bounce
-rate (number of one-page visits), etc.
+All of my public [subversion
+repositories](http://viewvc.jasonantman.com) and [CVS
+repositories](http://cvs.jasonantman.com) are available online through a
+great Python application called [ViewVC](http://viewvc.org/), which
+provides a web-based interface to CVS and SVN repositories, as well as
+history browsing, graphical diffs, etc. An amazingly large amount of the
+traffic to my web server is for the vhosts that serve this, so I decided
+that I should add some analytics to it. I'm in the process of trying out
+[Piwik](http://piwik.org), a full-featured, GPL-licensed, self-hosted
+alternative to [Google Analytics](http://www.google.com/analytics/). It
+gives lots of useful information like number of visits and unique visits
+per page, search engine keywords, referrers, average time on page,
+bounce rate (number of one-page visits), etc.
 
-I have ViewVC installed from the [RPMforge packages][], so there's one
-code base for both of my vhosts. This means that I can't simply slap the
-tracking code at the bottom of the templates and call it a day. I opted
-to go for a nicer solution, and what follows is a patch (diff -u) to the
-current (1.1.13) version of ViewVC that adds a "piwik" section to
-viewvc.conf, and adds the piwik tracking code with the specified base
-URL and site ID into all ViewVC pages. Enjoy.
+I have ViewVC installed from the [RPMforge
+packages](http://pkgs.repoforge.org/viewvc/), so there's one code base
+for both of my vhosts. This means that I can't simply slap the tracking
+code at the bottom of the templates and call it a day. I opted to go for
+a nicer solution, and what follows is a patch (diff -u) to the current
+(1.1.13) version of ViewVC that adds a "piwik" section to viewvc.conf,
+and adds the piwik tracking code with the specified base URL and site ID
+into all ViewVC pages. Enjoy.
 
 ~~~~{.diff}
 diff -ru viewvc-ORIG/lib/config.py viewvc/lib/config.py
@@ -118,10 +121,3 @@ diff -ru viewvc-ORIG/viewvc.conf.dist viewvc/viewvc.conf.dist
 +##---------------------------------------------------------------------------
 \ No newline at end of file
 ~~~~
-
-  [subversion repositories]: http://viewvc.jasonantman.com
-  [CVS repositories]: http://cvs.jasonantman.com
-  [ViewVC]: http://viewvc.org/
-  [Piwik]: http://piwik.org
-  [Google Analytics]: http://www.google.com/analytics/
-  [RPMforge packages]: http://pkgs.repoforge.org/viewvc/

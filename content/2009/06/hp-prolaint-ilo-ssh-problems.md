@@ -7,9 +7,10 @@ Slug: hp-prolaint-ilo-ssh-problems
 
 There's a known issue with the SSH implementation in the iLO firmware
 for HP Proliant servers (specifically G2 and G3) and OpenSSH 5.1p1.
-There was a [thread][] on the OpenSSH developers list that referenced
-this problem and suggested a solution, but it doesn't seem to be a sure
-fix.
+There was a
+[thread](http://marc.info/?l=openssh-unix-dev&m=122095298729858&w=2) on
+the OpenSSH developers list that referenced this problem and suggested a
+solution, but it doesn't seem to be a sure fix.
 
 This problem is present on my DL360 G2's which are running the 1.84
 2006-05-05 version of the iLO firmware (iLO 1.84 pass9) with the P26
@@ -34,9 +35,10 @@ ssh -a hostname-ilo
 
 Unfortunately this combination doesn't seem to do it for me.
 
-I happened to stumble by [this post][] to the debian-ssh mailing list,
-which suggested that shortening the new OpenSSH version string fixed the
-problem.
+I happened to stumble by [this
+post](http://www.mail-archive.com/debian-ssh@lists.debian.org/msg00904.html)
+to the debian-ssh mailing list, which suggested that shortening the new
+OpenSSH version string fixed the problem.
 
 I was able to confirm that the version string is, in fact, the sole
 problem. I downloaded the source of OpenSSH 5.2p1 and, with the
@@ -62,6 +64,3 @@ I patched version.h, ran \`./configure\`, \`make\`, and then copied the
 compiled ssh binary to /usr/bin/ilossh, so that my original ssh binary
 would be intact, and the ilossh binary would be left alone by RPM
 upgrades.
-
-  [thread]: http://marc.info/?l=openssh-unix-dev&m=122095298729858&w=2
-  [this post]: http://www.mail-archive.com/debian-ssh@lists.debian.org/msg00904.html

@@ -8,7 +8,8 @@ Slug: links-update-on-next-month
 So, the semester is finally over. I made it through another one alive.
 And aside from a trip to Maryland for five or six days, I'm home until
 the 20th of January. That's lots of time to spend running calls for the
-[Midland Park (Volunteer) Ambulance Corps][], here in my home town of
+[Midland Park (Volunteer) Ambulance
+Corps](http://www.midlandparkambulance.com/), here in my home town of
 Midland Park, NJ, with which I've been volunteering as an EMT-B for
 almost four years now. So far, in the past 24 hours (Christmas Eve and
 Christmas Day, I've done 3 runs, which is above average for us - usually
@@ -16,8 +17,9 @@ about 1.75/day). It's also a lot of time to spend on some projects of
 mine.
 
 I've already setup one of the SunBlade 150 machines as a desktop, and
-had to handle a lot of networking stuff (see the [Solaris Tips][] page
-on my [Wiki][]).
+had to handle a lot of networking stuff (see the [Solaris
+Tips](http://www.jasonantman.com/wiki/index.php/Solaris_Tips) page on my
+[Wiki](http://www.jasonantman.com)).
 
 In other news, after getting some Christmas and Chanukah (yes, my
 father's family is Jewish, and I've yet to find out a single accepted
@@ -43,43 +45,41 @@ So, I have a few big projects planned for the upcoming down time:
     Treo, and figure out how to sync the databases (just GnuPG-encrypted
     flat files). Also, port it to my Nokia 770 Tablet.
 5.  Get my Bluetooth Keyboard (an iGo Ultra Slim) working with the 770 -
-    right now, the [Bluetooth Plugin][] crashes the unit after typing a
-    few characters.
+    right now, the [Bluetooth
+    Plugin](http://770.fs-security.com/maemo-bt-plugin/) crashes the
+    unit after typing a few characters.
 6.  Do a bunch of overhauling on the website, especially generating
     sitemaps (big issue when you have static content, MediaWiki, and
     source code) and submitting my CVS repo to Google Code Search.
 
 Also, A few <span style="font-weight: bold;">Links</span> for your
 enjoyment:  
-A [New York Times blog][] by David Pogue talking about "intellectual
-property", "copyright morality", etc. He even goes so far as to imply
-that making a single backup copy of a legally purchased DVD is illegal.
+A [New York Times
+blog](http://pogue.blogs.nytimes.com/2007/12/20/the-generational-divide-in-copyright-morality/)
+by David Pogue talking about "intellectual property", "copyright
+morality", etc. He even goes so far as to imply that making a single
+backup copy of a legally purchased DVD is illegal.
 
-A [Groklaw article][] on the February ISO Ballot Resolution Meeting on
-MSOOXML. If you're not familiar with it, check out [noOOXML.org][] and
-their [petition][] listing the reasons to vote NO on the OOXML ballot.
+A [Groklaw
+article](http://www.groklaw.net/article.php?story=20071211055139790&mode=nested)
+on the February ISO Ballot Resolution Meeting on MSOOXML. If you're not
+familiar with it, check out [noOOXML.org](http://www.noooxml.org/) and
+their [petition](http://www.noooxml.org/petition) listing the reasons to
+vote NO on the OOXML ballot.
 
-A [CNN article][] stating that it's true that "Switching from a
-Windows-operated computer to a Linux-operated one could slash
-computer-generated e-waste levels by 50%."
+A [CNN
+article](http://www.cnn.com/2007/WORLD/asiapcf/12/03/eco.myth.ewaste/index.html)
+stating that it's true that "Switching from a Windows-operated computer
+to a Linux-operated one could slash computer-generated e-waste levels by
+50%."
 
-The Register - [Windows vs. Linux Security Report][].
+The Register - [Windows vs. Linux Security
+Report](http://www.theregister.co.uk/security/security_report_windows_vs_linux/).
 
 Some interesting Earthlink (yes, apparently they still exist)
-newsletters talking about [Linux for the Desktop][] and [Open-Source
-Software][].
+newsletters talking about [Linux for the
+Desktop](http://www.earthlink.net/elink/issue136/infocus.html) and
+[Open-Source
+Software](http://www.earthlink.net/elink/issue96/focus_archive.html).
 
 Stay tuned. More updates to come...
-
-  [Midland Park (Volunteer) Ambulance Corps]: http://www.midlandparkambulance.com/
-  [Solaris Tips]: http://www.jasonantman.com/wiki/index.php/Solaris_Tips
-  [Wiki]: http://www.jasonantman.com
-  [Bluetooth Plugin]: http://770.fs-security.com/maemo-bt-plugin/
-  [New York Times blog]: http://pogue.blogs.nytimes.com/2007/12/20/the-generational-divide-in-copyright-morality/
-  [Groklaw article]: http://www.groklaw.net/article.php?story=20071211055139790&mode=nested
-  [noOOXML.org]: http://www.noooxml.org/
-  [petition]: http://www.noooxml.org/petition
-  [CNN article]: http://www.cnn.com/2007/WORLD/asiapcf/12/03/eco.myth.ewaste/index.html
-  [Windows vs. Linux Security Report]: http://www.theregister.co.uk/security/security_report_windows_vs_linux/
-  [Linux for the Desktop]: http://www.earthlink.net/elink/issue136/infocus.html
-  [Open-Source Software]: http://www.earthlink.net/elink/issue96/focus_archive.html

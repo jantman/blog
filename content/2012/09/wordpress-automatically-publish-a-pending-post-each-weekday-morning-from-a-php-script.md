@@ -6,22 +6,26 @@ Tags: cron, PHP, wordpress
 Slug: wordpress-automatically-publish-a-pending-post-each-weekday-morning-from-a-php-script
 
 In an earlier post, [Piwik Web Analytics, and some unfortunate stats
-about my blog][], I mentioned that the [Feedburner][] stats for this
-blog show a relatively high subscribe/unsubscribe rate for this blog. I
-think a large part of that is my tendency to blog in spurts, and even
-worse, my tendency to write drafts and not publish them. In an effort to
-combat this, I've been trying to finish blog posts and then set them to
-"Pending" status, and go back and publish one every day (well, every day
-that I have some still sitting unpublished). Of course, that counts on
-me logging in to Wordpress every day, which isn't something I do. The
-following script is, at least for now, the answer for me.
+about my
+blog](/2012/08/piwik-web-analytics-and-some-unfortunate-stats-about-my-blog/),
+I mentioned that the [Feedburner](http://feedburner.google.com/) stats
+for this blog show a relatively high subscribe/unsubscribe rate for this
+blog. I think a large part of that is my tendency to blog in spurts, and
+even worse, my tendency to write drafts and not publish them. In an
+effort to combat this, I've been trying to finish blog posts and then
+set them to "Pending" status, and go back and publish one every day
+(well, every day that I have some still sitting unpublished). Of course,
+that counts on me logging in to Wordpress every day, which isn't
+something I do. The following script is, at least for now, the answer
+for me.
 
-This script (a standalone PHP script) uses [`wp-load.php`][] to load the
-wordpress environment, and then finds the oldest post with a given
-status ("pending" in my case) and attempts to publish it. It only does
-this if there has not been another post published in the last 24 hours.
-The following script can be found in subversion at
-[http://svn.jasonantman.com/misc-scripts/wordpress\_daily\_post.php][]:
+This script (a standalone PHP script) uses
+[`wp-load.php`](http://core.trac.wordpress.org/browser/trunk/wp-load.php)
+to load the wordpress environment, and then finds the oldest post with a
+given status ("pending" in my case) and attempts to publish it. It only
+does this if there has not been another post published in the last 24
+hours. The following script can be found in subversion at
+[http://svn.jasonantman.com/misc-scripts/wordpress\_daily\_post.php](http://svn.jasonantman.com/misc-scripts/wordpress_daily_post.php):
 
 ~~~~{.php}
 #!/usr/bin/php
@@ -153,8 +157,3 @@ like:
 so that it runs at 6AM (local time) each weekday. Assuming you have cron
 setup to send you mail, you'll get a daily message saying what was (or
 wasn't) done.
-
-  [Piwik Web Analytics, and some unfortunate stats about my blog]: /2012/08/piwik-web-analytics-and-some-unfortunate-stats-about-my-blog/
-  [Feedburner]: http://feedburner.google.com/
-  [`wp-load.php`]: http://core.trac.wordpress.org/browser/trunk/wp-load.php
-  [http://svn.jasonantman.com/misc-scripts/wordpress\_daily\_post.php]: http://svn.jasonantman.com/misc-scripts/wordpress_daily_post.php

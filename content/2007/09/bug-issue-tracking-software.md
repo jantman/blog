@@ -58,14 +58,14 @@ especially efficient."
 We'll see what happens out of it.
 
 I recently received a few emails from someone attempting to get [PHP EMS
-Tools][] up and running for his EMS agency. I did a lot of
-correspondence via email, and ended up in a bit of a predicament. First
-off, since CVS is down, I had to make a copy of the latest development
-sources from their live location on my web server, and revert to using
-RCS for the development work. Secondly, he wasn't familiar with the
-SourceForge trackers and didn't have an account with them, so I had to
-manually enter the bug reports. This was not good. I need something
-better.
+Tools](http://www.php-ems-tools.com) up and running for his EMS agency.
+I did a lot of correspondence via email, and ended up in a bit of a
+predicament. First off, since CVS is down, I had to make a copy of the
+latest development sources from their live location on my web server,
+and revert to using RCS for the development work. Secondly, he wasn't
+familiar with the SourceForge trackers and didn't have an account with
+them, so I had to manually enter the bug reports. This was not good. I
+need something better.
 
 I know that a lot of ticketing systems use e-mail interfaces, but I have
 no interest in that - I want to be able to require certain information
@@ -108,5 +108,3 @@ good things about it, but I can't seem to find a web-based demo. Most
 likely, I'll probably give two or three of them a whirl, and then add in
 the custom code to do what I need. Of course, none of this will happen
 until I either get CVS back up or migrate to SVN.
-
-  [PHP EMS Tools]: http://www.php-ems-tools.com

@@ -9,10 +9,11 @@ Well, despite what's been said elsewhere, it *IS* possible! It's a bit
 error-ridden at first, but here is the procedure that I used to compile
 and install the PVR-150 patched LIRC 0.8.3-CVS.
 
-First, Download the tarball mentioned in the [Version 3 blog post][] at
-[Marks Braindump][]. You can pretty much follow his instructions on the
-installation in the blog post, with some changes that are specific to
-getting it to compile on OpenSuSE 11.
+First, Download the tarball mentioned in the [Version 3 blog
+post](http://www.blushingpenguin.com/mark/blog/?p=24) at [Marks
+Braindump](http://www.blushingpenguin.com/mark/blog/). You can pretty
+much follow his instructions on the installation in the blog post, with
+some changes that are specific to getting it to compile on OpenSuSE 11.
 
 1.  First, remove all traces of the OpenSuSE LIRC from you system.
     Uninstall the RPMS and everything else that goes with them. Then
@@ -53,8 +54,4 @@ dumps. If this doesn't seem to work for you, please drop an email to
 jason AT jason antman DOT com, with as much information as you have, and
 I'll figure it out and update the instructions.
 
-Now, finally, an up-to-date system AND [MythTV][].
-
-  [Version 3 blog post]: http://www.blushingpenguin.com/mark/blog/?p=24
-  [Marks Braindump]: http://www.blushingpenguin.com/mark/blog/
-  [MythTV]: http://www.mythtv.org
+Now, finally, an up-to-date system AND [MythTV](http://www.mythtv.org).

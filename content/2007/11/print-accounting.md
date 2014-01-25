@@ -15,11 +15,12 @@ accounting of who prints what on each printer.
 I setup a Dell PowerEdge 650 running openSuSE 10.3, Xen and 2 NICs, one
 on our main network and one with a static IP in a separate subnet hooked
 up to a small 5-port switch. I setup a Xen VM (also openSuSE 10.3) to
-act as a CUPS server. I then installed [tea4cups][] which allows
+act as a CUPS server. I then installed
+[tea4cups](http://www.pykota.com/software/tea4cups) which allows
 outgoing CUPS jobs to be read via a pseudo-backend while they're
 processing. tea4cups calls some PHP scripts that update a MySQL database
 with job information, including page counts and ink coverage amounts
-calculated by [pkpgcounter][].
+calculated by [pkpgcounter](http://www.pykota.com/software/pkpgcounter).
 
 This is all done with a kludge of custom scripts, which I'll put in my
 CVS repo (and comment on here) sometime this week.
@@ -40,7 +41,8 @@ RGB individually). I know it's overkill - all I want to really know is
 enough data to fairly split the costs of paper, toner, etc. - but I
 thought it would be a fun project.
 
-I originally thought about using [PyKota][] for the accounting, but
+I originally thought about using
+[PyKota](http://www.pykota.com/software/pykota) for the accounting, but
 found it to be way too heavy-weight. My current kludge, done up in one
 night (before writing an essay), is based on CUPS and tea4cups, which
 calls PHP backend prehooks and posthooks, which in turn make use of a
@@ -49,7 +51,3 @@ information from the printer (IPP) and local files.
 
 All in all, for something that didn't exist 24 hours ago, I think it's
 working pretty well so far.
-
-  [tea4cups]: http://www.pykota.com/software/tea4cups
-  [pkpgcounter]: http://www.pykota.com/software/pkpgcounter
-  [PyKota]: http://www.pykota.com/software/pykota

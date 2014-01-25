@@ -20,10 +20,10 @@ tuned. Some of them include:
     and cached locally), hopefully including an image of my software as
     well as some conduit to an RSS reader program, and ability to email
     a list of "flagged" articles on sync (RSS update over network).
--   A vast update of my [Code Repo][] with most of my home-grown F/OSS
-    programs, including my (very basic) web-based budget/finance
-    program.
--   An update to [PHP EMS Tools][]
+-   A vast update of my [Code Repo](http://repo.jasonantman.com) with
+    most of my home-grown F/OSS programs, including my (very basic)
+    web-based budget/finance program.
+-   An update to [PHP EMS Tools](http://php-ems-tools.com)
 -   Notes on my experience with MythTV, an integrating it with IR
     controls, Cablevision SA set-top box, and ultimately a "smart room".
 -   My never-ending quest to find a way to interface a CDMA handset to a
@@ -45,5 +45,4 @@ tuned. Some of them include:
     -   Releasing most of my web-based kludges under GPL for anyone who
         may be interested.
 
-  [Code Repo]: http://repo.jasonantman.com
-  [PHP EMS Tools]: http://php-ems-tools.com
+

@@ -23,8 +23,9 @@ when you're done.
     `TestUser_private.key`. We're assuming that you KNOW, BEYOND A DOUBT
     that these are your keys (i.e. you got them from a secure offline
     backup medium, you've verified against a printed key fingerprint,
-    you've verified the fingerprints against a [keyserver][] that you
-    know is authoritative for your keys, etc.).
+    you've verified the fingerprints against a
+    [keyserver](http://pgp.mit.edu/) that you know is authoritative for
+    your keys, etc.).
 3.  First, we import the public and private keys to GPG:
 
         testuser:~$ cd .gnupg
@@ -143,5 +144,3 @@ passphrases file.
 I hope I wouldn't have to say this for anyone who's reading my blog, but
 this information (as easy as it is to be figured out), is not to be used
 for unethical purposes.
-
-  [keyserver]: http://pgp.mit.edu/

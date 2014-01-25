@@ -11,27 +11,30 @@ all on top of having my truck stolen, dealing with insurance and the
 police, and then recovering it, and dealing with insurance again. It's a
 long long story, which I posted as a Note on facebook.
 
-[PHP EMS Tools][] is due for a major revision, and hopefully this will
-include, among other things, the following new features:
+[PHP EMS Tools](http://www.php-ems-tools.com) is due for a major
+revision, and hopefully this will include, among other things, the
+following new features:
 
-1.  Support for [i18n][].
+1.  Support for [i18n](http://en.wikipedia.org/wiki/I18n).
 2.  Install-time choice of using MySQL or LDAP as a roster and
     authentication storage system.
 3.  Some vastly more efficient changes to the database schema,
     specifically dealing with scheduling.
 
 I'm still working on some other big projects, namely the migration of
-this blog to [WordPress][], the migration of [JasonAntman.com][] to some
-real CMS (Joomla, Drupal, etc.), and migration of my home internet
-connection from residential FiOS to "business-grade" Optimum Online
-(cable) - which will probably see a slight decrease in reliability from
-the amazing levels of FiOS, but will give me five static IPs and no
-ports blocked.
+this blog to [WordPress](http://wordpress.org/), the migration of
+[JasonAntman.com](http://www.jasonantman.com) to some real CMS (Joomla,
+Drupal, etc.), and migration of my home internet connection from
+residential FiOS to "business-grade" Optimum Online (cable) - which will
+probably see a slight decrease in reliability from the amazing levels of
+FiOS, but will give me five static IPs and no ports blocked.
 
 On the other hand, there's been a wrench thrown into all of my plans for
 big projects (not even mentioning the projects that have been cast aside
-- [TuxTruck][], [tuxOstat][] which is now down, and a bunch of others.
-That wrench is the [T-Mobile G1][], the GooglePhone finally come to
+- [TuxTruck](http://www.tuctruck.org),
+[tuxOstat](http://jantman.dyndns.org:10011/tuxostat/) which is now down,
+and a bunch of others. That wrench is the [T-Mobile
+G1](http://www.t-mobileg1.com/), the GooglePhone finally come to
 fruition. I was psyched about Android when I first heard about it, and
 the idea of finally having a phone that I can develop for without
 learning a new language sounds amazing. I'll admit that at $180 with a
@@ -54,11 +57,3 @@ the web-based fuel log I keep for my car(s) to a dedicated Java-based
 form on my phone.
 
 Stay tuned...
-
-  [PHP EMS Tools]: http://www.php-ems-tools.com
-  [i18n]: http://en.wikipedia.org/wiki/I18n
-  [WordPress]: http://wordpress.org/
-  [JasonAntman.com]: http://www.jasonantman.com
-  [TuxTruck]: http://www.tuctruck.org
-  [tuxOstat]: http://jantman.dyndns.org:10011/tuxostat/
-  [T-Mobile G1]: http://www.t-mobileg1.com/

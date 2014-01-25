@@ -7,17 +7,20 @@ Slug: vyatta-networkos-routerfirewall-on-alix-board-compact-flash
 
 With the impending move to an apartment in Georgia and the migration of
 my rack full of servers to a hosting provider, there's no longer a need
-for me to run my [Vyatta VC][] router on a beefy dual-CPU RAIDed [DL360
-G3][] HP Proliant server chassis. I found an older PCEngines [Alix
-2c1][] single board computer (433 MHz AMD Geode LX700 , 128MB DDR DRAM,
-CompactFlash (CF) card socket, MiniPCI, 3x 10/100 ethernet) lying
-around, and decided to turn that into the new router. But I've been so
-spoiled by Vyatta's good performance (well, at least on an x86 server)
-and the *real* CLI, so I don't think I can go back to something like
-[m0n0wall][] or [pfSense][], and since it's going to be my only network
-services box (also doing DNS, DHCP, firewalling, NAT, and maybe IPsec
-VPN) it's not viable to use the type of older Cisco or Juniper hardware
-that I can afford.
+for me to run my [Vyatta VC](http://www.vyatta.org/) router on a beefy
+dual-CPU RAIDed [DL360
+G3](http://h18000.www1.hp.com/products/quickspecs/11504_na/11504_na.HTML)
+HP Proliant server chassis. I found an older PCEngines [Alix
+2c1](http://pcengines.ch/alix2c1.htm) single board computer (433 MHz AMD
+Geode LX700 , 128MB DDR DRAM, CompactFlash (CF) card socket, MiniPCI, 3x
+10/100 ethernet) lying around, and decided to turn that into the new
+router. But I've been so spoiled by Vyatta's good performance (well, at
+least on an x86 server) and the *real* CLI, so I don't think I can go
+back to something like [m0n0wall](http://m0n0.ch/wall/) or
+[pfSense](http://www.pfsense.org/), and since it's going to be my only
+network services box (also doing DNS, DHCP, firewalling, NAT, and maybe
+IPsec VPN) it's not viable to use the type of older Cisco or Juniper
+hardware that I can afford.
 
 The down side is that Vyatta isn't really designed or tuned for small
 systems, let alone CF media that doesn't take too well to lots of
@@ -26,12 +29,16 @@ of the current Vyatta Core 6.3, and we'll see how it goes and what
 tuning I do over time.
 
 I found two relatively good references; a [post on the vyatta.org
-forum][] from 2008, relating to Vyatta version 4 (also on the author's
-[blog][]), and a [blog post][] detailing a more complex
-[SquashFS][]/[tmpfs][]/[UnionFS][] read-only Vyatta install. Given my
-relatively short timeframe and little free time, I decided to try the
-former approach for now, and plan to make a more customized and tuned CF
-version of Vyatta in the future.
+forum](http://www.vyatta.org/forum/viewtopic.php?t=502) from 2008,
+relating to Vyatta version 4 (also on the author's
+[blog](http://dataflip.blogspot.com/2008/06/optimizing-vyatta-for-compact-flash.html)),
+and a [blog
+post](http://peytongroup.wordpress.com/2010/02/16/vyatta-community-on-a-compact-flash/)
+detailing a more complex
+[SquashFS](http://squashfs.sourceforge.net/)/[tmpfs](http://en.wikipedia.org/wiki/Tmpfs)/[UnionFS](http://unionfs.filesystems.org/)
+read-only Vyatta install. Given my relatively short timeframe and little
+free time, I decided to try the former approach for now, and plan to
+make a more customized and tuned CF version of Vyatta in the future.
 
 **Creating the actual disk image:**
 
@@ -133,15 +140,3 @@ configure right away:
 And that's it - this should give you a working Vyatta system on CF on an
 Alix board. Stay tuned, hopefully in a month or so I'll get around to
 customizing it a bit more, based on the second blog entry linked above.
-
-  [Vyatta VC]: http://www.vyatta.org/
-  [DL360 G3]: http://h18000.www1.hp.com/products/quickspecs/11504_na/11504_na.HTML
-  [Alix 2c1]: http://pcengines.ch/alix2c1.htm
-  [m0n0wall]: http://m0n0.ch/wall/
-  [pfSense]: http://www.pfsense.org/
-  [post on the vyatta.org forum]: http://www.vyatta.org/forum/viewtopic.php?t=502
-  [blog]: http://dataflip.blogspot.com/2008/06/optimizing-vyatta-for-compact-flash.html
-  [blog post]: http://peytongroup.wordpress.com/2010/02/16/vyatta-community-on-a-compact-flash/
-  [SquashFS]: http://squashfs.sourceforge.net/
-  [tmpfs]: http://en.wikipedia.org/wiki/Tmpfs
-  [UnionFS]: http://unionfs.filesystems.org/

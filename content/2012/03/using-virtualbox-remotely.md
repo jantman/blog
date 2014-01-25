@@ -15,14 +15,17 @@ from home and need to setup a new development environment, so here's how
 to get VirtualBox working nicely assuming you've never set it up for
 VRDP (its Virtual Remote Desktop Protocol) before, and have a network
 connection (LAN or VPN or something) to the machine running VirtualBox.
-I currently have VirtualBox OSE 4.1.8 installed from [rpmfusion][] RPM.
-Most of this can be found in [Chapter 7 of the VirtualBox manual][], but
-here's a step-by-step method.
+I currently have VirtualBox OSE 4.1.8 installed from
+[rpmfusion](http://nonfree.rpmfusion.org/) RPM. Most of this can be
+found in [Chapter 7 of the VirtualBox
+manual](http://www.virtualbox.org/manual/ch07.html), but here's a
+step-by-step method.
 
 <ol>
 <li>
 First, download the Oracle (non-free) Oracle VirtualBox VM Extension
-Pack tarball from the [VirtualBox Downloads Page][], which provides VRDP
+Pack tarball from the [VirtualBox Downloads
+Page](https://www.virtualbox.org/wiki/Downloads), which provides VRDP
 support (as well as support for the virtual USB 2.0 device, Intel PXE
 Boot ROM support for the E1000 NIC driver, and experimental Linux host
 PCI passthrough suport). Then install it using:
@@ -43,9 +46,9 @@ VBoxManage modifyvm "VM name" --vrde on
 </li>
 <li>
 I like to assign specific ports to VRDP on each VM so I can "bookmark"
-them in my [KRDC][] client by VM name. I generally start with 10011, as
-the 10011-10049 range is both unassigned and doesn't appear in my
-`/etc/services`:
+them in my [KRDC](http://kde.org/applications/internet/krdc/) client by
+VM name. I generally start with 10011, as the 10011-10049 range is both
+unassigned and doesn't appear in my `/etc/services`:
 
 ~~~~{.text}
 VBoxManage modifyvm "VM name" --vrdeport 10011
@@ -54,8 +57,8 @@ VBoxManage modifyvm "VM name" --vrdeport 10011
 </li>
 <li>
 Start the VM, using VBoxHeadless (shows more debugging/errors, but also
-stays in the foreground, so you'll want to use [screen][] or something
-like it):
+stays in the foreground, so you'll want to use
+[screen](http://www.gnu.org/software/screen/) or something like it):
 
 ~~~~{.text}
 VBoxHeadless --startvm "VM name"
@@ -74,12 +77,7 @@ VRDE server is listening on port 3389.
 
 </li>
 </ul>
-That's it. Assuming you're using something like [screen][], you can
-start a whole bunch of new VMs, and still keep the VBoxHeadless output
-in case of an error.
-
-  [rpmfusion]: http://nonfree.rpmfusion.org/
-  [Chapter 7 of the VirtualBox manual]: http://www.virtualbox.org/manual/ch07.html
-  [VirtualBox Downloads Page]: https://www.virtualbox.org/wiki/Downloads
-  [KRDC]: http://kde.org/applications/internet/krdc/
-  [screen]: http://www.gnu.org/software/screen/
+That's it. Assuming you're using something like
+[screen](http://www.gnu.org/software/screen/), you can start a whole
+bunch of new VMs, and still keep the VBoxHeadless output in case of an
+error.

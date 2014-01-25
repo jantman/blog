@@ -157,6 +157,5 @@ this until you try and build a new box.
 
 To solve this, just remove any offending lines from autosign.conf.
 
-I've filed a bug report on the Puppet Trac: [Issue 2723][].
-
-  [Issue 2723]: http://projects.reductivelabs.com/issues/2723
+I've filed a bug report on the Puppet Trac: [Issue
+2723](http://projects.reductivelabs.com/issues/2723).

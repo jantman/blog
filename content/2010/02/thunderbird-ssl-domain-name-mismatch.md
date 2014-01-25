@@ -11,14 +11,13 @@ for the CNAME used for my mail server, not the actual hostname. Of
 course, this means that Thunderbird gives me some annoying errors
 because they're worried:
 
-![Domain Name Mismatch in Thunderbird][]
+![Domain Name Mismatch in Thunderbird](/GFX/Domain_Name_Mismatch.png)
 
-Luckily, there's an [add-on][] called "Remember Mismatched Domains" that
-adds a simple "remember this decision" check box, much like the one now
-found in Firefox. Problem solved!
+Luckily, there's an
+[add-on](https://addons.mozilla.org/en-US/thunderbird/addon/2131) called
+"Remember Mismatched Domains" that adds a simple "remember this
+decision" check box, much like the one now found in Firefox. Problem
+solved!
 
-![Thunderbird Domain Name Mismatch after add-on][]
-
-  [Domain Name Mismatch in Thunderbird]: /GFX/Domain_Name_Mismatch.png
-  [add-on]: https://addons.mozilla.org/en-US/thunderbird/addon/2131
-  [Thunderbird Domain Name Mismatch after add-on]: /GFX/Domain_Name_Mismatch2.png
+![Thunderbird Domain Name Mismatch after
+add-on](/GFX/Domain_Name_Mismatch2.png)

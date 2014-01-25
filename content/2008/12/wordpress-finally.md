@@ -24,19 +24,20 @@ hoops to get that data. Though I'm not quite sure whether the GData API
 really doesn't give access to posts if self-hosted.
 
 I migrated publishing of Blogger to BlogSpot.com
-([foobarthudgrunt][].blogspot.com), despite worries about confusing
-Google or messing up the little bit of ranking I've been able to gain.
-It successfully imported all 128 of my entries, and the few comments.
-But, as I navigated to the "Edit" page to have a look, an even bigger
-problem was apparent. All of the tags from Blogger had ended up as
-categories in WP. So I had no tags for any of my posts, and a gazillion
-categories with only one post in them. Luckily, the DB schema is pretty
-sane, and I qickly figured out that both categories and tags are stored
-in the `wp_term_taxonomy` table, and the difference between a category
-and a tag is simply that the `taxonomy` field is either "category" or
-"post\_tag", respectively. So, since I hadn't added any posts in WP yet,
-I just changed `taxonomy` to "post\_tag" for anything with an ID past
-the categories I'd added. And it seems to have worked beautifully.
+([foobarthudgrunt](http://www.jasonantman.com/jargon/entry.php?id=metasyntactic-variable).blogspot.com),
+despite worries about confusing Google or messing up the little bit of
+ranking I've been able to gain. It successfully imported all 128 of my
+entries, and the few comments. But, as I navigated to the "Edit" page to
+have a look, an even bigger problem was apparent. All of the tags from
+Blogger had ended up as categories in WP. So I had no tags for any of my
+posts, and a gazillion categories with only one post in them. Luckily,
+the DB schema is pretty sane, and I qickly figured out that both
+categories and tags are stored in the `wp_term_taxonomy` table, and the
+difference between a category and a tag is simply that the `taxonomy`
+field is either "category" or "post\_tag", respectively. So, since I
+hadn't added any posts in WP yet, I just changed `taxonomy` to
+"post\_tag" for anything with an ID past the categories I'd added. And
+it seems to have worked beautifully.
 
 Up next, however, was the hard part: sitting down with my list of
 categories and sifting through 128 posts to categorize them. The biggest
@@ -81,9 +82,13 @@ selected a new template for my blog (though I'm planning on doing some
 heavy customization). I didn't want to leave the default template up for
 too long, in case Google's heavy crawling of my site picked up all of
 the new content somehow... I ended up narrowing it down to three themes,
-coincidentally all designed by [mg12][]: [Blocks2][], [iNove][] or
-[ElegantBox][]. I installed them all on my box and looked at iNove
-first, and it was love at first sight.
+coincidentally all designed by
+[mg12](http://wordpress.org/extend/themes/profile/mg12):
+[Blocks2](http://wordpress.org/extend/themes/blocks2),
+[iNove](http://wordpress.org/extend/themes/inove#post-668) or
+[ElegantBox](http://wordpress.org/extend/themes/elegant-box). I
+installed them all on my box and looked at iNove first, and it was love
+at first sight.
 
 So, that's where it stands right now. I finally have my blog on
 WordPress and running, and have a theme. The action plan for tonight
@@ -99,8 +104,3 @@ includes:
 -   Redirecting my main blog page to WordPress.
 -   Redirecting or linking my old feed locations to WordPress.
 
-  [foobarthudgrunt]: http://www.jasonantman.com/jargon/entry.php?id=metasyntactic-variable
-  [mg12]: http://wordpress.org/extend/themes/profile/mg12
-  [Blocks2]: http://wordpress.org/extend/themes/blocks2
-  [iNove]: http://wordpress.org/extend/themes/inove#post-668
-  [ElegantBox]: http://wordpress.org/extend/themes/elegant-box

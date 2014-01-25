@@ -19,16 +19,14 @@ in relation to my stolen truck, as well as looking around and trying to
 figure out what my next vehicle will be, and how much I can spend on it.
 
 Anyway, I've decided that at some point in the future, I'll be migrating
-to [WordPress][] for the blog. It will, of course, be hosted on my own
-machine, and will hopefully also include a migration of everything from
-this Blogger account. And, somehow, will include some sort of
-redirection from old posts to the relevant new ones. Most importantly,
-though, I plan on deferring the project until I get my multiple static
-IP service from [Optimum Online][], as the new blog (and the rest of my
+to [WordPress](http://www.wordpress.org) for the blog. It will, of
+course, be hosted on my own machine, and will hopefully also include a
+migration of everything from this Blogger account. And, somehow, will
+include some sort of redirection from old posts to the relevant new
+ones. Most importantly, though, I plan on deferring the project until I
+get my multiple static IP service from [Optimum
+Online](http://www.optimum.com), as the new blog (and the rest of my
 subdomains) will be moved from GoDaddy forwarding to their own
 subdomains setup as Apache name-based VHosts.
 
 Stay tuned for progress updates...
-
-  [WordPress]: http://www.wordpress.org
-  [Optimum Online]: http://www.optimum.com

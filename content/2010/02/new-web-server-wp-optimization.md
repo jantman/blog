@@ -9,10 +9,12 @@ Tonight, more or less on a whim, I moved my blog from my older (dual
 1GHz Pentium III Coppermine, 1GB RAM, 10k RPM SCSI disks, Compaq
 Proliant DL360 G1, OpenSuSE 10.2 32-bit) web server to my newer one
 (dual 1.4GHz Pentium III, 2GB RAM, 10k RPM SCSI disks, HP Proliant DL360
-G2, CentOS 5.3 32-bit). I did some profiling with [ab][] (ApacheBench),
+G2, CentOS 5.3 32-bit). I did some profiling with
+[ab](http://httpd.apache.org/docs/2.0/programs/ab.html) (ApacheBench),
 and just moving from one server to the other got some serious
 performance gains (I was profiling with runs of 1000 requests total, 10
-concurrent requests). I also added the [W3 Total Cache][] Wordpress
+concurrent requests). I also added the [W3 Total
+Cache](http://wordpress.org/extend/plugins/w3-total-cache/) Wordpress
 plugin, which got the numbers to look even better!
 
 As a side note, this was all done pretty quickly (moving the database
@@ -118,6 +120,3 @@ connected via a 1Gbps copper Ethernet link and the web-serving
 interfaces of the servers connected via 100Mbps (There's a trunk in
 between, from the gigabit aggregation switch to the 100Mbps distribution
 switch).
-
-  [ab]: http://httpd.apache.org/docs/2.0/programs/ab.html
-  [W3 Total Cache]: http://wordpress.org/extend/plugins/w3-total-cache/

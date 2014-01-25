@@ -10,8 +10,8 @@ presentation on "patch management". While I'm obligated to cover Windows
 - and, of course, will talk about MacOS - I'll obviously be spending a
 good deal of time on the Unix/Linux side of things. This has gotten me
 thinking about one of my biggest problems with Linux (and specifically
-[OpenSuSE][], my usual default distro. Patch management is utterly
-awful.
+[OpenSuSE](http://www.opensuse.org), my usual default distro. Patch
+management is utterly awful.
 
 Here's the problem: I have about a dozen machines under my control. I
 need to keep them all up-to-date. Currently, I manually do patches and
@@ -76,5 +76,3 @@ yyyy-mm-dd, Change ID 1234" and then, to rollback, simply issue a
 command like "patchmgt rollback 1234" on the effected machine.
 
 Just some ideas, and a little rant.
-
-  [OpenSuSE]: http://www.opensuse.org

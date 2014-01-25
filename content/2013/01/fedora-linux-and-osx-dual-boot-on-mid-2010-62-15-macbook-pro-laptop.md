@@ -6,11 +6,15 @@ Tags: bootloader, efi, fedora, gpt, grub, installation, laptop, mac, macbook, os
 Slug: fedora-linux-and-osx-dual-boot-on-mid-2010-62-15-macbook-pro-laptop
 
 As part of the transition from a contractor to a full-time employee of
-[Cox Media Group Digital & Strategy][] (check out our [github][]), I've
-been issued a [Mid-2010 (6,2)][] 15" [MacBook Pro][] laptop, to replace
-my current [Early-2008 (3,1)][] MacPro desktop. The desktop is currently
-running [Fedora][] 17, dual-boot with with Mac OS X (left in place for
-firmware updates and emergencies) using the [rEFInd boot manager][] to
+[Cox Media Group Digital & Strategy](http://www.cmgdigital.com) (check
+out our [github](https://github.com/cmgdigital)), I've been issued a
+[Mid-2010 (6,2)](http://support.apple.com/kb/SP582) 15" [MacBook
+Pro](http://en.wikipedia.org/wiki/Macbook_pro#Technical_specifications_2)
+laptop, to replace my current [Early-2008
+(3,1)](http://support.apple.com/kb/SP11) MacPro desktop. The desktop is
+currently running [Fedora](http://fedoraproject.org/) 17, dual-boot with
+with Mac OS X (left in place for firmware updates and emergencies) using
+the [rEFInd boot manager](http://www.rodsbooks.com/refind/index.html) to
 choose between the two OSes. It took me two days to get this working
 right on my desktop, but it had been my plan to duplicate this setup on
 my laptop. I found a lot of conflicting information online, but I
@@ -32,30 +36,35 @@ on earlier versions.
 **How to get it working:**
 
 Forget about rEFInd. This had been the original advice from [Matthew
-Garrett][], [@mjg59][], kernel coder, contributor to the Anaconda
-project, and all-around authority on booting Linux on EFI/UEFI hardware.
-My advice, and the method that worked for me:
+Garrett](http://mjg59.dreamwidth.org/),
+[@mjg59](https://twitter.com/mjg59), kernel coder, contributor to the
+Anaconda project, and all-around authority on booting Linux on EFI/UEFI
+hardware. My advice, and the method that worked for me:
 
 1.  Shrink your Mac partitions and leave as much free space as you want
     for Fedora. using the Disk Utility tool in OS X (I also created an
     8GB VFAT partition that both OSes can read/write to).
-2.  [Download Fedora 18][] 64-bit DVD image, I chose the KDE version.
-    Verify the sha256 sum if you want (they don't have a readily visible
-    link to the checksum file. Copy the download link, paste it into
-    your address bar and remove the filename. You should get a directory
-    index that includes a `-CHECKSUM` file.
-3.  Per the Installation Guide's [Making Fedora USB Media page][], use
-    `liveusb-creator` to setup the installation image on the USB flash
-    drive (I needed to start it with the `--reset-mbr` option). You can
-    also use other tools (dd if you're not on a Fedora-based distro), or
-    a DVD, but this is the method I chose.
-4.  Due to a [bug in liveusb-creator][], you may need to manually edit
-    `/EFI/boot/grub.cfg` on the created USB stick if grub gives you a
-    file not found error. If that happens, please see my bug report
-    above for the action to take (in short, you need to mount the USB
-    stick, `chmod u+w /EFI/boot/grub.cfg` then edit that file and
-    replace every occurrence of "isolinux" with "syslinux" and every
-    occurrence of "root=live:LABEL=Fedora-18-x86\_64-Live-KDE.iso" with
+2.  [Download Fedora 18](http://fedoraproject.org/en/get-fedora) 64-bit
+    DVD image, I chose the KDE version. Verify the sha256 sum if you
+    want (they don't have a readily visible link to the checksum file.
+    Copy the download link, paste it into your address bar and remove
+    the filename. You should get a directory index that includes a
+    `-CHECKSUM` file.
+3.  Per the Installation Guide's [Making Fedora USB Media
+    page](http://docs.fedoraproject.org/en-US/Fedora/18/html/Installation_Guide/Making_USB_Media-UNIX_Linux.html),
+    use `liveusb-creator` to setup the installation image on the USB
+    flash drive (I needed to start it with the `--reset-mbr` option).
+    You can also use other tools (dd if you're not on a Fedora-based
+    distro), or a DVD, but this is the method I chose.
+4.  Due to a [bug in
+    liveusb-creator](https://fedorahosted.org/liveusb-creator/ticket/810),
+    you may need to manually edit `/EFI/boot/grub.cfg` on the created
+    USB stick if grub gives you a file not found error. If that happens,
+    please see my bug report above for the action to take (in short, you
+    need to mount the USB stick, `chmod u+w /EFI/boot/grub.cfg` then
+    edit that file and replace every occurrence of "isolinux" with
+    "syslinux" and every occurrence of
+    "root=live:LABEL=Fedora-18-x86\_64-Live-KDE.iso" with
     "root=live:LABEL=LIVE").
 5.  Boot the USB drive (use the alt key when you turn on the laptop to
     select the USB drive) and just install Fedora normally, letting it
@@ -149,42 +158,27 @@ Below are some screenshots from the Fedora 17 and Fedora 18 Installation
 Guides, which contrast both the overview of all partitions and the
 individual partition settings:
 
-Fedora 18 Overview, from [9.13. Creating a Custom Partition Layout][]:  
+Fedora 18 Overview, from [9.13. Creating a Custom Partition
+Layout](http://docs.fedoraproject.org/en-US/Fedora/18/html/Installation_Guide/s1-diskpartitioning-x86.html):  
   
-![image][]  
+
+![image](http://www.dedoimedo.com/images/computers_years/2013_1/fedora-18-installer-configure-partitions.jpg)  
   
 Fedora 17 Overview, from [9.14. Creating a Custom Layout or Modifying
-the Default Layout][]:  
+the Default
+Layout](http://docs.fedoraproject.org/en-US/Fedora/17/html/Installation_Guide/s1-diskpartitioning-x86.html):  
   
-![image][1]  
+
+![image](http://docs.fedoraproject.org/en-US/Fedora/17/html/Installation_Guide/images/diskpartitioning/ddmain.png)  
   
 Fedora 18 Partition Creation/Editing, from [9.13.3. Create LVM Logical
-Volume][]:  
+Volume](http://docs.fedoraproject.org/en-US/Fedora/18/html/Installation_Guide/Create_LVM-x86.html):  
   
-![image][2]  
+
+![image](http://docs.fedoraproject.org/en-US/Fedora/18/html/Installation_Guide/images/diskpartitioning/lvm-pv.png)  
   
 Fedora 17 Partition Creation/Editing, from [9.14.2. Adding
-Partitions][]:  
+Partitions](http://docs.fedoraproject.org/en-US/Fedora/17/html/Installation_Guide/Adding_Partitions-x86.html):  
   
-![image][3]
 
-  [Cox Media Group Digital & Strategy]: http://www.cmgdigital.com
-  [github]: https://github.com/cmgdigital
-  [Mid-2010 (6,2)]: http://support.apple.com/kb/SP582
-  [MacBook Pro]: http://en.wikipedia.org/wiki/Macbook_pro#Technical_specifications_2
-  [Early-2008 (3,1)]: http://support.apple.com/kb/SP11
-  [Fedora]: http://fedoraproject.org/
-  [rEFInd boot manager]: http://www.rodsbooks.com/refind/index.html
-  [Matthew Garrett]: http://mjg59.dreamwidth.org/
-  [@mjg59]: https://twitter.com/mjg59
-  [Download Fedora 18]: http://fedoraproject.org/en/get-fedora
-  [Making Fedora USB Media page]: http://docs.fedoraproject.org/en-US/Fedora/18/html/Installation_Guide/Making_USB_Media-UNIX_Linux.html
-  [bug in liveusb-creator]: https://fedorahosted.org/liveusb-creator/ticket/810
-  [9.13. Creating a Custom Partition Layout]: http://docs.fedoraproject.org/en-US/Fedora/18/html/Installation_Guide/s1-diskpartitioning-x86.html
-  [image]: http://www.dedoimedo.com/images/computers_years/2013_1/fedora-18-installer-configure-partitions.jpg
-  [9.14. Creating a Custom Layout or Modifying the Default Layout]: http://docs.fedoraproject.org/en-US/Fedora/17/html/Installation_Guide/s1-diskpartitioning-x86.html
-  [1]: http://docs.fedoraproject.org/en-US/Fedora/17/html/Installation_Guide/images/diskpartitioning/ddmain.png
-  [9.13.3. Create LVM Logical Volume]: http://docs.fedoraproject.org/en-US/Fedora/18/html/Installation_Guide/Create_LVM-x86.html
-  [2]: http://docs.fedoraproject.org/en-US/Fedora/18/html/Installation_Guide/images/diskpartitioning/lvm-pv.png
-  [9.14.2. Adding Partitions]: http://docs.fedoraproject.org/en-US/Fedora/17/html/Installation_Guide/Adding_Partitions-x86.html
-  [3]: http://docs.fedoraproject.org/en-US/Fedora/17/html/Installation_Guide/images/diskpartitioning/part-add.png
+![image](http://docs.fedoraproject.org/en-US/Fedora/17/html/Installation_Guide/images/diskpartitioning/part-add.png)

@@ -5,7 +5,5 @@ Category: Miscellaneous
 Slug: interesting-links-for-2008-05-08
 
 -   [Free eBooks Tag: Internet/Networking list - Free Download eBooks
-    Engine!][]
+    Engine!](http://www.ebookee.com/index.php?tag=3)
 
-  [Free eBooks Tag: Internet/Networking list - Free Download eBooks
-  Engine!]: http://www.ebookee.com/index.php?tag=3

@@ -44,21 +44,29 @@ couldn't find any reference to it online, and couldn't figure out the
 FORTH commands from the reference docs.
 
 Some helpful links for the above problems include the OpenBoot 4.x
-Command Reference Manual, currently found [here][], as well as the Sun
-Blade 150 Service Manual (from [docs.sun.com][]), document 816-4379-10,
-currently indexed with the Sun Blade 150 docs [here][1]. It was also
+Command Reference Manual, currently found
+[here](http://dlc.sun.com/pdf/816-1177-10/816-1177-10.pdf), as well as
+the Sun Blade 150 Service Manual (from
+[docs.sun.com](http://docs.sun.com/)), document 816-4379-10, currently
+indexed with the Sun Blade 150 docs
+[here](http://docs.sun.com/app/docs/coll/sb150). It was also
 interesting, in my search for help, to look at the OpenBoot 3.x Command
 Manual, and see how easy it was to re-write the IDprom on older Sun
 Blade workstations.
 
 Pleaese note that the advice given in the [Unofficial SunBlade 100
-FAQ][] and the [squirrel.com Sun NVRAM FAQ][] doesn't seem to work on
-the 150 with OpenBoot 4.x. From what I can tell, all of that advice
-applies only to OpenBoot 3.x!
+FAQ](http://040.digital-bless.com/texts/Unofficial_Sun_Blade_100_FAQ.htm)
+and the [squirrel.com Sun NVRAM
+FAQ](http://www.squirrel.com/sun-nvram-hostid.faq.html) doesn't seem to
+work on the 150 with OpenBoot 4.x. From what I can tell, all of that
+advice applies only to OpenBoot 3.x!
 
 Some other helpful links included an ITworld.com article on [Sun NVRAM
-passwords][], [this][] Sun Developer Forum post, and [this][] post on
-password recovery.
+passwords](http://open.itworld.com/5040/nlsunixfirmware070111/page_1.html),
+[this](http://forum.java.sun.com/thread.jspa?threadID=5093819&messageID=9329080)
+Sun Developer Forum post, and
+[this](http://forum.java.sun.com/thread.jspa?threadID=5093819&messageID=9329080)
+post on password recovery.
 
 <span style="font-weight: bold;">Problem 3 - MAC / Ethernet address is
 00:00:00:00:00:00</span>  
@@ -89,8 +97,9 @@ local machine, and connected. When I clicked on the "users" module and
 entered my root password, I got an invalid password / login failed
 message. I tried again and again, even checking against the post-it that
 I wrote the password on until I memorize it. Nothing. Searching the
-forums, I came by this [post][], but the value in
-/etc/security/policy.conf was correctly set to "
+forums, I came by this
+[post](http://forum.java.sun.com/thread.jspa?threadID=5104081&messageID=9354742),
+but the value in /etc/security/policy.conf was correctly set to "
 CRYPT\_DEFAULT=\_\_unix\_\_". So, on a wild hunch, I used "passwd" to
 reset my password to a shorter one, which I use on a few other
 (unimportant) workstations. Magic!
@@ -100,12 +109,3 @@ have a good OS install, in order to get the other box working, I
 \*should\* just be able to swap HDDs, boot, login as root, and use the
 "eeprom" command to set "security-mode" to "none", bypassing all of this
 bull\*\*\*\*.
-
-  [here]: http://dlc.sun.com/pdf/816-1177-10/816-1177-10.pdf
-  [docs.sun.com]: http://docs.sun.com/
-  [1]: http://docs.sun.com/app/docs/coll/sb150
-  [Unofficial SunBlade 100 FAQ]: http://040.digital-bless.com/texts/Unofficial_Sun_Blade_100_FAQ.htm
-  [squirrel.com Sun NVRAM FAQ]: http://www.squirrel.com/sun-nvram-hostid.faq.html
-  [Sun NVRAM passwords]: http://open.itworld.com/5040/nlsunixfirmware070111/page_1.html
-  [this]: http://forum.java.sun.com/thread.jspa?threadID=5093819&messageID=9329080
-  [post]: http://forum.java.sun.com/thread.jspa?threadID=5104081&messageID=9354742

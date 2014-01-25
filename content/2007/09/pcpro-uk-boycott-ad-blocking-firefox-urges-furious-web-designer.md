@@ -5,12 +5,12 @@ Category: Ideas and Rants
 Tags: ad blocker, firefox, internet, standards
 Slug: pcpro-uk-boycott-ad-blocking-firefox-urges-furious-web-designer
 
-When browsing through [Digg][] this morning, I came by a story at PCpro
-UK entitled "[Boycott ad-blocking Firefox, urges furious web
-designer][]". This gentleman stated that,
-<span name="intelliTxt" id="intelliTXT">Software that blocks all
-advertisement is an infringement of the rights of website owners and
-developers."
+When browsing through [Digg](http://digg.com/) this morning, I came by a
+story at PCpro UK entitled "[Boycott ad-blocking Firefox, urges furious
+web designer](http://www.pcpro.co.uk/news/news/124719/)". This gentleman
+stated that, <span name="intelliTxt" id="intelliTXT">Software that
+blocks all advertisement is an infringement of the rights of website
+owners and developers."
 
 While I don't like giving press to such a story, I found it alarming on
 many levels.
@@ -112,6 +112,3 @@ labels/artists/networks for the copy that it would be used to make. Why
 can't they just tack $3 onto every blank DVD and CD, $20 on every blank
 hard drive, and stop suing college kids?  
 </span>
-
-  [Digg]: http://digg.com/
-  [Boycott ad-blocking Firefox, urges furious web designer]: http://www.pcpro.co.uk/news/news/124719/

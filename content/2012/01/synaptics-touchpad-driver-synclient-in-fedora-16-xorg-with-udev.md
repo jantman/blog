@@ -5,11 +5,13 @@ Category: Tech HowTos
 Tags: synaptics, synclient, thinkpad, touchpad, xorg
 Slug: synaptics-touchpad-driver-synclient-in-fedora-16-xorg-with-udev
 
-I just installed [Fedora 16][] on an older IBM [ThinkPad T42][] laptop.
-Unfortunately, the two mouse buttons below the [UltraNav][] touchpad
-just won't work at all. Before opening up the case and fiddling around,
-I decided to try a software solution. Even after fairly exhaustive
-research, I couldn't find anyone with a similar problem.
+I just installed [Fedora 16](http://fedoraproject.org) on an older IBM
+[ThinkPad T42](http://www.thinkwiki.org/wiki/Category:T42) laptop.
+Unfortunately, the two mouse buttons below the
+[UltraNav](http://www.thinkwiki.org/wiki/UltraNav) touchpad just won't
+work at all. Before opening up the case and fiddling around, I decided
+to try a software solution. Even after fairly exhaustive research, I
+couldn't find anyone with a similar problem.
 
 I did, however, find out that the synaptics touchpad driver has a
 `synclient` tool that can output the hardware events read directly from
@@ -37,12 +39,8 @@ EndSection
 and then restart your X server. Now, running `synclient -m` should work
 fine.
 
-I have to thank Red Hat's [Kevin Fenzi][] (nirik on [\#fedora on
-irc.freenode.org][]) for putting another set of eyeballs on the problem,
-and throwing out some ideas that finally led me to the solution.
-
-  [Fedora 16]: http://fedoraproject.org
-  [ThinkPad T42]: http://www.thinkwiki.org/wiki/Category:T42
-  [UltraNav]: http://www.thinkwiki.org/wiki/UltraNav
-  [Kevin Fenzi]: http://fedoraproject.org/wiki/User:Kevin
-  [\#fedora on irc.freenode.org]: http://webchat.freenode.net/?randomnick=1&channels=fedora&uio=d4
+I have to thank Red Hat's [Kevin
+Fenzi](http://fedoraproject.org/wiki/User:Kevin) (nirik on [\#fedora on
+irc.freenode.org](http://webchat.freenode.net/?randomnick=1&channels=fedora&uio=d4))
+for putting another set of eyeballs on the problem, and throwing out
+some ideas that finally led me to the solution.

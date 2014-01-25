@@ -5,7 +5,5 @@ Category: Miscellaneous
 Slug: links-for-thursday-april-28-2011
 
 -   [Inside Facebook’s Not-So-Secret New Data Center - Technology
-    Review][]
+    Review](http://www.technologyreview.com/computing/37295/page1/#photo)
 
-  [Inside Facebook’s Not-So-Secret New Data Center - Technology Review]:
-    http://www.technologyreview.com/computing/37295/page1/#photo

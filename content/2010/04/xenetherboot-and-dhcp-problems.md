@@ -8,12 +8,15 @@ Slug: xenetherboot-and-dhcp-problems
 Well, I've spend the better part of the last week or so debugging a
 problem with out new Xen VMs (on one host) not getting DHCP leases.
 Since our DHCP servers (ISC DHCPd 3.0.6) are using Brian Masney's [LDAP
-patch][] (which has recently been included in [mainline DHCPd][]), I
-assumed that this might be the source of some of the problems.
+patch](http://personal.cfw.com/~masneyb/) (which has recently been
+included in [mainline
+DHCPd](http://www.isc.org/files/release-notes/42b2_0.html)), I assumed
+that this might be the source of some of the problems.
 
-The Xen client booting process uses [Etherboot][] (specifically 5.4.2 on
-my machines) to get DHCP and PXE for the client. The Etherboot ROM is
-generated online with [ROM-o-Matic][] (by the Xen devs) and is then
+The Xen client booting process uses [Etherboot](http://etherboot.org/)
+(specifically 5.4.2 on my machines) to get DHCP and PXE for the client.
+The Etherboot ROM is generated online with
+[ROM-o-Matic](http://rom-o-matic.net/) (by the Xen devs) and is then
 packaged into `hvmloader` (though I would not find this out until much
 later in my investigation, given the piss-poor documentation about it).
 So, aside from pulling the SRPM for Xen and looking around, I decided I
@@ -30,20 +33,23 @@ did some captures of the laptop (which worked correctly) and the problem
 VM.
 
 Sometime around 10:00 PM, long after I'd gotten home, I had opened
-captures of both the good and bad hosts in separate [Wireshark][]
-windows, and was going through them line-by-line. I'd also written a
-nifty little [Perl script][] (my weakest language) using
-[Net::DHCP::Packet][] to craft packets identical to the ones from the
-working and FUBAR hosts, and inject them into the network. The only
-thing I could find different was the value of the "secs" field of the
-DHCPDISCOVER packets (octets 9 and 10), which are supposed to contain
-the number of seconds that have passed since the host started booting
-([RFC 1541][]). My laptop (the working host) started getting replies
-from the server at 21 seconds. I took my Perl packet-injecting script,
-and started adjusting the "secs" values of both the working and bad
-packets. Sure enough, with identical packets from each host, the values
-converged. Anything with "secs" below 2 got no response from the DHCP
-server, anything with 2 or greater got a correct lease.
+captures of both the good and bad hosts in separate
+[Wireshark](http://www.wireshark.org/) windows, and was going through
+them line-by-line. I'd also written a nifty little [Perl
+script](/GFX/dhcptest.pl) (my weakest language) using
+[Net::DHCP::Packet](http://search.cpan.org/~fvandun/Net-DHCP-0.11/lib/Net/DHCP/Packet.pm)
+to craft packets identical to the ones from the working and FUBAR hosts,
+and inject them into the network. The only thing I could find different
+was the value of the "secs" field of the DHCPDISCOVER packets (octets 9
+and 10), which are supposed to contain the number of seconds that have
+passed since the host started booting ([RFC
+1541](http://www.faqs.org/rfcs/rfc1541.html)). My laptop (the working
+host) started getting replies from the server at 21 seconds. I took my
+Perl packet-injecting script, and started adjusting the "secs" values of
+both the working and bad packets. Sure enough, with identical packets
+from each host, the values converged. Anything with "secs" below 2 got
+no response from the DHCP server, anything with 2 or greater got a
+correct lease.
 
 Then it hit me. When we used to have a primary/secondary DHCP server
 setup (with manual failover), we'd configured the secondary server with
@@ -59,9 +65,10 @@ on.
 This experience highlighted that one small "bug" can confuse 3 people
 for the better part of a week:
 
-[Etherboot][] (at least 5.4.2) doesn't increment the "secs" field in its
-DISCOVER packets as RFC 1541 suggests. Therefore anyone with "min-secs"
-in their dhcpd configuration won't ever give out a lease.
+[Etherboot](http://etherboot.org/) (at least 5.4.2) doesn't increment
+the "secs" field in its DISCOVER packets as RFC 1541 suggests. Therefore
+anyone with "min-secs" in their dhcpd configuration won't ever give out
+a lease.
 
 In hindsight, it really was a brain-dead moment. There was a little note
 in the dhcpd logs that I, and the others, totally overlooked:
@@ -69,12 +76,3 @@ in the dhcpd logs that I, and the others, totally overlooked:
 on and realized that those few characters were probably important, and
 there for a reason, no matter how unassuming (and un-error-like) they
 may be...
-
-  [LDAP patch]: http://personal.cfw.com/~masneyb/
-  [mainline DHCPd]: http://www.isc.org/files/release-notes/42b2_0.html
-  [Etherboot]: http://etherboot.org/
-  [ROM-o-Matic]: http://rom-o-matic.net/
-  [Wireshark]: http://www.wireshark.org/
-  [Perl script]: /GFX/dhcptest.pl
-  [Net::DHCP::Packet]: http://search.cpan.org/~fvandun/Net-DHCP-0.11/lib/Net/DHCP/Packet.pm
-  [RFC 1541]: http://www.faqs.org/rfcs/rfc1541.html

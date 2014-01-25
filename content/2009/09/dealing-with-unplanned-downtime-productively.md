@@ -5,10 +5,12 @@ Category: Miscellaneous
 Tags: sysadmin, time management
 Slug: dealing-with-unplanned-downtime-productively
 
-While I've read and really appreciate [Tom Limoncelli][]'s [Time
-Management for System Administrators][], the current state of my life
-(mainly that it's split between work, personal projects, a freelance
-client, administering the systems of a the [ambulance corps][] and real
+While I've read and really appreciate [Tom
+Limoncelli](http://whatexit.org/tal/)'s [Time Management for System
+Administrators](http://www.amazon.com/o/ASIN/0596007833/tomontime-20),
+the current state of my life (mainly that it's split between work,
+personal projects, a freelance client, administering the systems of a
+the [ambulance corps](http://www.midlandparkambulance.com) and real
 people, and that my "work day" is whenever I'm awake) has prevented me
 from really implementing most of the advice. However, I do try to be as
 productive as I can.
@@ -41,7 +43,3 @@ anything else, eventually you (depending on the environment that you
 work in) might have one of those times when the solution to the problem
 is out of your hands and there's nothing else to do. Use this time
 productively.
-
-  [Tom Limoncelli]: http://whatexit.org/tal/
-  [Time Management for System Administrators]: http://www.amazon.com/o/ASIN/0596007833/tomontime-20
-  [ambulance corps]: http://www.midlandparkambulance.com

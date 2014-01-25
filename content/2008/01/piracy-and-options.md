@@ -8,7 +8,8 @@ Well, the semester is starting to heat up, and I have a bunch of
 personal stuff I haven't posted yet. But I'll get to it this weekend.
 
 In the mean time, I feel the need to comment on an article I read
-online, in Conde Nast Portfolio. It's a [lengthy piece about "Ethan"][],
+online, in Conde Nast Portfolio. It's a [lengthy piece about
+"Ethan"](http://www.portfolio.com/news-markets/national-news/portfolio/2008/01/14/Media-Defenders-Profile#page1),
 the malicious user (I take great offense to the article using the term
 "hacker" in the media-popularized sense) who broke into MediaDefender's
 network and publicly released internal emails and even phone calls (I
@@ -29,11 +30,12 @@ the entertainment industry execs flat-out says that P2P file sharing,
 and BitTorrent specifically, have no positive qualities. Obviously, he's
 not a Linux user. But the very idea that there are companies out there
 trying to unilaterally crush the medium (BitTorrent) which lets me
-download an [OpenSuSE][] image in record time is disturbing. But I guess
-nobody takes the time to tell these people that there's lots of software
-on BitTorrent and, believe it or not, much contrary to the Microsoft and
-entertainment industry view, there are actually people out there who
-produce software and \*want\* people to be able to get it for free.
+download an [OpenSuSE](http://www.opensuse.org) image in record time is
+disturbing. But I guess nobody takes the time to tell these people that
+there's lots of software on BitTorrent and, believe it or not, much
+contrary to the Microsoft and entertainment industry view, there are
+actually people out there who produce software and \*want\* people to be
+able to get it for free.
 
 Secondly, and most importantly, is the flat-out ignorance of the
 entertainment industry. Traditionally, it's an industry that's been full
@@ -62,13 +64,14 @@ being able to use what they buy however they buy it. I've heard many
 times that the recording industry tries to push the FALSE notion that
 simply ripping an MP3 from a CD - for your own use, or for backup
 purposes - is illegal. More to the point, I use Linux. I can't buy music
-from iTunes, or any other source that includes [DRM][]. By including
-DRM, I'm being told that whoever sells that music doesn't want my
-business. It's that simple. But this isn't an issue that's just limited
-to Linux users. What if you own (gasp) MP3 player that's not an iPod,
-and just shows up on your computer as a USB mass storage device? What if
-your car stereo plays MP3 CDs? DRM is designed to tell these people that
-their money isn't wanted.
+from iTunes, or any other source that includes
+[DRM](http://defectivebydesign.org/). By including DRM, I'm being told
+that whoever sells that music doesn't want my business. It's that
+simple. But this isn't an issue that's just limited to Linux users. What
+if you own (gasp) MP3 player that's not an iPod, and just shows up on
+your computer as a USB mass storage device? What if your car stereo
+plays MP3 CDs? DRM is designed to tell these people that their money
+isn't wanted.
 
 If I could pay $5, or even a bit more, for a movie or TV episode that I
 could download, copy to my laptop or cell phone (I have a Treo 700p) or
@@ -81,7 +84,3 @@ instant (one viewer at one time = fair use). When will the entertainment
 industry wake up and realize that a new distribution medium - the
 Internet - will \*help\* them... if they realize what people want, and
 provide it?
-
-  [lengthy piece about "Ethan"]: http://www.portfolio.com/news-markets/national-news/portfolio/2008/01/14/Media-Defenders-Profile#page1
-  [OpenSuSE]: http://www.opensuse.org
-  [DRM]: http://defectivebydesign.org/

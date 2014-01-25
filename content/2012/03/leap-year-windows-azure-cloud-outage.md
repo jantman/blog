@@ -7,14 +7,16 @@ Slug: leap-year-windows-azure-cloud-outage
 
 I haven't talked about Microsoft in quite a while (mainly because I
 don't follow mainstream tech news as much anymore), but I happened by a
-very interesting [post on the Windows Azure blog][] the other day. It's
-a very detailed postmortem of the major outage of the Windows Azure
-cloud service which occurred from 4:00 PM PST on February 28^th^ through
-2:15 AM on March 1^st^. Before I get into any of the details, I should
-say that it really is a nice, well-done post. And the fact that they're
-willing to do such a detailed, public postmortem - and admit the
-failures that they did - is a step in the right direction for Microsoft
-(a company that I don't particularly care for, to put it lightly.
+very interesting [post on the Windows Azure
+blog](http://blogs.msdn.com/b/windowsazure/archive/2012/03/09/summary-of-windows-azure-service-disruption-on-feb-29th-2012.aspx)
+the other day. It's a very detailed postmortem of the major outage of
+the Windows Azure cloud service which occurred from 4:00 PM PST on
+February 28^th^ through 2:15 AM on March 1^st^. Before I get into any of
+the details, I should say that it really is a nice, well-done post. And
+the fact that they're willing to do such a detailed, public postmortem -
+and admit the failures that they did - is a step in the right direction
+for Microsoft (a company that I don't particularly care for, to put it
+lightly.
 
 I'm going to glance over the majority of the post, though I highly
 recommend that anyone interested in running web-scale services,
@@ -121,5 +123,3 @@ all to learn from a major incident at a "pretty well known" company.
 
 release procedures are most important when things are already going
 wrong
-
-  [post on the Windows Azure blog]: http://blogs.msdn.com/b/windowsazure/archive/2012/03/09/summary-of-windows-azure-service-disruption-on-feb-29th-2012.aspx

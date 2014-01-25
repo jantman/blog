@@ -5,20 +5,24 @@ Category: Monitoring
 Tags: aim, aol, icinga, instant messenger, Nagios, notifications, perl
 Slug: sending-aim-messages-from-a-perl-script
 
-I've been doing some work on [icinga][] (a Nagios fork) and wanted to
-implement notification via AOL Instant Messenger (AIM), since I'm almost
-always signed on when I'm at a computer. Unfortunately, most of the
-[scripts][] that I could find use [Net::AIM::TOC][] which implements a
-now-defunct protocol. So, I found Perl's [Net::OSCAR][] and [James
-Nonnemaker's script][], and decided to rework them into something a bit
-more full-featured.
+I've been doing some work on [icinga](http://www.icinga.org) (a Nagios
+fork) and wanted to implement notification via AOL Instant Messenger
+(AIM), since I'm almost always signed on when I'm at a computer.
+Unfortunately, most of the
+[scripts](http://vuksan.com/linux/nagios_scripts.html#send_aim_messages)
+that I could find use
+[Net::AIM::TOC](http://search.cpan.org/~friffin/Net-AIM-TOC-0.97/TOC.pm)
+which implements a now-defunct protocol. So, I found Perl's
+[Net::OSCAR](http://search.cpan.org/~toddr/Net-OSCAR-1.928/lib/Net/OSCAR.pm)
+and [James Nonnemaker's script](http://moo.net/code/aim.html), and
+decided to rework them into something a bit more full-featured.
 
 The below script sends a single IM to a single contact via the command
 line (using a specified AIM username and password). It's intended to be
 a Nagios notification script (using the configurations shown below), but
 could be used for any purpose. The most up-to-date version of the script
 will be available at:
-[github.com/jantman/public-nagios/master/send\_aim.pl][]
+[github.com/jantman/public-nagios/master/send\_aim.pl](https://github.com/jantman/nagios-scripts/blob/master/send_aim.pl)
 
 ~~~~{.perl}
 #!/usr/bin/perl
@@ -128,10 +132,3 @@ define contact{
         address1                        joeAdminSN ; AIM screen name
 }
 ~~~~
-
-  [icinga]: http://www.icinga.org
-  [scripts]: http://vuksan.com/linux/nagios_scripts.html#send_aim_messages
-  [Net::AIM::TOC]: http://search.cpan.org/~friffin/Net-AIM-TOC-0.97/TOC.pm
-  [Net::OSCAR]: http://search.cpan.org/~toddr/Net-OSCAR-1.928/lib/Net/OSCAR.pm
-  [James Nonnemaker's script]: http://moo.net/code/aim.html
-  [github.com/jantman/public-nagios/master/send\_aim.pl]: https://github.com/jantman/nagios-scripts/blob/master/send_aim.pl

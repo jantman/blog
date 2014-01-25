@@ -5,21 +5,27 @@ Category: Monitoring
 Tags: linode, monitoring, Nagios, plugin
 Slug: nagios-check-plugin-for-linode-monthly-bandwidth-usage
 
-Since I have most of my public-facing stuff hosted with [Linode][], and
-I have a monthly bandwidth cap (albeit one that I'll probably never come
-close to), I decided that it would be a good idea to add my monthly
+Since I have most of my public-facing stuff hosted with
+[Linode](http://www.linode.com/?r=5c8ad2931b410b55455aadbcf0a8d86d6f698a91),
+and I have a monthly bandwidth cap (albeit one that I'll probably never
+come close to), I decided that it would be a good idea to add my monthly
 bandwidth usage to my monitoring system. Luckily, Linode offers this
 (their billing view of it - which is, of course, what I'm concerned
-about) via their [API][], and it's very nicely implemented in [Michael
-Greb's][] [WebService::Linode][] Perl (CPAN) module.
+about) via their [API](http://www.linode.com/api/), and it's very nicely
+implemented in [Michael Greb's](http://michael.thegrebs.com/)
+[WebService::Linode](http://search.cpan.org/~mikegrb/WebService-Linode/)
+Perl (CPAN) module.
 
-Using Michael's Perl module, I wrote [check\_linode\_transfer.pl][]
+Using Michael's Perl module, I wrote
+[check\_linode\_transfer.pl](https://github.com/jantman/nagios-scripts/blob/master/check_linode_transfer.pl)
 (github link) as a Nagios check plugin. It seems to be working fine for
 me, and runs with the embedded perl interpreter, though it may not be
 100% up to par with the Nagios plugin spec (for one, I used utils.pm
-instead of [Nagios::Plugin][]). About the only thing unusual is that I
-store my API keys in a perl module, so you'll need to create something
-like this in your plugin directory (usually `/usr/lib/nagios/plugins`:
+instead of
+[Nagios::Plugin](http://search.cpan.org/~tonvoon/Nagios-Plugin-0.36/lib/Nagios/Plugin.pm)).
+About the only thing unusual is that I store my API keys in a perl
+module, so you'll need to create something like this in your plugin
+directory (usually `/usr/lib/nagios/plugins`:
 
 ~~~~{.perl}
 package api_keys;
@@ -35,11 +41,11 @@ $API_KEY_LINODE = "yourApiKeyGoesHere";
 
 </p>
 The latest version of the plugin will always be available at
-[https://github.com/jantman/nagios-scripts/blob/master/check\_linode\_transfer.pl][check\_linode\_transfer.pl].
+[https://github.com/jantman/nagios-scripts/blob/master/check\_linode\_transfer.pl](https://github.com/jantman/nagios-scripts/blob/master/check_linode_transfer.pl).
 The current version is also below. It's free for anyone to use under the
-terms of [GNU GPLv3][], though I would really like it if any
-changes/patches/updates are sent back to me for inclusion in the latest
-version.
+terms of [GNU GPLv3](http://www.gnu.org/licenses/gpl.html), though I
+would really like it if any changes/patches/updates are sent back to me
+for inclusion in the latest version.
 
 ~~~~{.perl}
 #! /usr/bin/perl -w
@@ -161,11 +167,3 @@ sub print_help () {
     support();
 }
 ~~~~
-
-  [Linode]: http://www.linode.com/?r=5c8ad2931b410b55455aadbcf0a8d86d6f698a91
-  [API]: http://www.linode.com/api/
-  [Michael Greb's]: http://michael.thegrebs.com/
-  [WebService::Linode]: http://search.cpan.org/~mikegrb/WebService-Linode/
-  [check\_linode\_transfer.pl]: https://github.com/jantman/nagios-scripts/blob/master/check_linode_transfer.pl
-  [Nagios::Plugin]: http://search.cpan.org/~tonvoon/Nagios-Plugin-0.36/lib/Nagios/Plugin.pm
-  [GNU GPLv3]: http://www.gnu.org/licenses/gpl.html

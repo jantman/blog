@@ -5,7 +5,8 @@ Category: Tech HowTos
 Tags: debian, helpdesk, netgear, readynas
 Slug: netgear-readynas-1100-and-long-uid-numbers
 
-I spent part of the day installing a [Netgear ReadyNAS 1100][] for
+I spent part of the day installing a [Netgear ReadyNAS
+1100](http://www.netgear.com/Products/Storage/ReadyNAS1100.aspx) for
 backup storage. It's a cute little 1U storage appliance with 4 SATA disk
 bays, two Gig copper ports and about every sort of hokey service you
 could possibly want in something that's billed as a small business
@@ -18,8 +19,9 @@ trying to do things that weren't clearly documented rather than problems
 with the unit). NetGear tech support ("ProSupport Labs") was quite good
 once I got past the first level or two, and Mark H. who helped me with
 most of my issues was one of the best tech support people I've ever
-spoken to. In fact, he probably ties with [Paulo from HP][] for the best
-tech support person I've ever dealt with.
+spoken to. In fact, he probably ties with [Paulo from
+HP](http://blog.jasonantman.com/2007/03/managing-g1-proliant-servers-with-modern-linux/)
+for the best tech support person I've ever dealt with.
 
 Anyway, the only issue with the NetGear installation that we weren't
 able to resolve was the fact that the web configuration tool
@@ -63,5 +65,3 @@ the \>2\^16 UID correctly, and NFS.*
 5.  Re-zip the directory tree and re-upload to ReadyNAS.
 6.  Enjoy.
 
-  [Netgear ReadyNAS 1100]: http://www.netgear.com/Products/Storage/ReadyNAS1100.aspx
-  [Paulo from HP]: http://blog.jasonantman.com/2007/03/managing-g1-proliant-servers-with-modern-linux/

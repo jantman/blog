@@ -6,27 +6,31 @@ Tags: bigip, cookies, debugging, f5, load balancer, perl, persistence, web app
 Slug: f5-bigip-manually-changing-session-persistence-cookies-on-the-client-side
 
 Yesterday I was asked to help out a bit debugging issues with a site
-that sits behind a [F5 BIG-IP][] load balancer (LB). It's a pretty
-simple site, load balanced between two web servers. The developers were
-complaining about intermittent page load issues, so I immediately
-considered a problem with one of the two servers (*ass*uming that the
-devs were clearing cookies and cache between attempts). The LB is using
-HTTP Cookies for client session persistence, but no matter how many
-times I cleared my cookies, I kept being sent to the same back-end
-server. I know I could have added an iRule to the LB, but it seems like
-bad practice to change a production configuration for debugging
-something like this.
+that sits behind a [F5 BIG-IP](http://www.f5.com/products/big-ip/) load
+balancer (LB). It's a pretty simple site, load balanced between two web
+servers. The developers were complaining about intermittent page load
+issues, so I immediately considered a problem with one of the two
+servers (*ass*uming that the devs were clearing cookies and cache
+between attempts). The LB is using HTTP Cookies for client session
+persistence, but no matter how many times I cleared my cookies, I kept
+being sent to the same back-end server. I know I could have added an
+iRule to the LB, but it seems like bad practice to change a production
+configuration for debugging something like this.
 
 If your site uses a BigIp with cookies for persistence, it's no problem
 to edit the cookies manually to force yourself to another back-end
 server. Simply look through the cookies for a given site using something
-like the [Web Developer addon for Firefox][]; the BigIp cookie is named
-like "BigIpServer<poolname\>". The encoding information is specified by
-F5 in their knowledge base [sol6917: Overview of BIG-IP persistence
-cookie encoding][]. I also managed to find a Perl one-liner from Tyler
-Krpata, Manger of Security Engineering at Constant Contact, [in a post
-on his blog][]. I built on that work to develop the following perl
-script, which can both encode and decode BigIP cookie IP/port values.
+like the [Web Developer addon for
+Firefox](https://addons.mozilla.org/en-US/firefox/addon/web-developer/);
+the BigIp cookie is named like "BigIpServer<poolname\>". The encoding
+information is specified by F5 in their knowledge base [sol6917:
+Overview of BIG-IP persistence cookie
+encoding](http://support.f5.com/kb/en-us/solutions/public/6000/900/sol6917.html).
+I also managed to find a Perl one-liner from Tyler Krpata, Manger of
+Security Engineering at Constant Contact, [in a post on his
+blog](http://www.tylerkrpata.com/2009/06/decode-f5-bigip-cookie-in-one-line-of.html).
+I built on that work to develop the following perl script, which can
+both encode and decode BigIP cookie IP/port values.
 
 ~~~~{.perl}
 #!/usr/bin/perl
@@ -118,8 +122,3 @@ On a side note for those of your who are security-conscious: yes, of
 course, this means that if you're using BigIp with cookie persistence,
 it is disclosing the internal IP and port of your server to your end
 users.
-
-  [F5 BIG-IP]: http://www.f5.com/products/big-ip/
-  [Web Developer addon for Firefox]: https://addons.mozilla.org/en-US/firefox/addon/web-developer/
-  [sol6917: Overview of BIG-IP persistence cookie encoding]: http://support.f5.com/kb/en-us/solutions/public/6000/900/sol6917.html
-  [in a post on his blog]: http://www.tylerkrpata.com/2009/06/decode-f5-bigip-cookie-in-one-line-of.html

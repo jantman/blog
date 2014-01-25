@@ -11,8 +11,10 @@ One of the first things I do when (eek) building out or working on a
 one-off machine (or setting up a new laptop/desktop, as I am right now)
 is set this in bashrc for my user and root, so I can go back and
 document the setup process with a little more ease and sanity. Just add
-this (it's just a [strftime (3)][] format string [according to the
-docs][], so adjust as desired) to `.bashrc`:
+this (it's just a [strftime (3)](http://linux.die.net/man/3/strftime)
+format string [according to the
+docs](http://www.gnu.org/software/bash/manual/bashref.html#index-HISTTIMEFORMAT),
+so adjust as desired) to `.bashrc`:
 
 ~~~~{.bash}
 export HISTTIMEFORMAT="%F %T "
@@ -41,5 +43,3 @@ the output of `history` now uses the specified time format:
 
 </p>
 
-  [strftime (3)]: http://linux.die.net/man/3/strftime
-  [according to the docs]: http://www.gnu.org/software/bash/manual/bashref.html#index-HISTTIMEFORMAT

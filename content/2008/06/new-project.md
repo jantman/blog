@@ -27,27 +27,33 @@ Thursday, version 1 should be up and running next week.
 
 In terms of hardware:
 
-1.  Originally I had planned on using a [Soekris net4526][] that I had
-    lying around. However, the added cost of a MiniPCI USB card seemed
+1.  Originally I had planned on using a [Soekris
+    net4526](http://www.soekris.com/net4526.htm) that I had lying
+    around. However, the added cost of a MiniPCI USB card seemed
     prohibitive for a one-off project. Instead, I'm using an old HP
     OmniBook laptop that was already lying behind my servers. It's
     running Debian 4.0.
 2.  I've ordered (just 15 minutes ago) a [Phidgets InterfaceKit
-    0/0/4][], which connects via USB and provides 4 relays. One will
-    control the fan, one for the A/C compressor, one for the heat, and
-    one unused (for now).
-3.  I already had a [DS9490][] Dallas 1-wire USB adapter from
-    [Hobby-Boards.com][] along with five [DS18S20P][] 1-wire parasite
-    power temperature sensors. I've wired those up with one in the
-    living room near the existing thermostat, one in my bedroom, and one
-    stuck about five feet up one of the A/C conduits, to sense when the
-    system is actually putting out cold air. I've had them logging to
-    MySQL since 0200 today.
+    0/0/4](http://www.phidgets.com/products.php?product_id=1014), which
+    connects via USB and provides 4 relays. One will control the fan,
+    one for the A/C compressor, one for the heat, and one unused (for
+    now).
+3.  I already had a
+    [DS9490](http://www.hobby-boards.com/catalog/product_info.php?cPath=23&products_id=1503)
+    Dallas 1-wire USB adapter from
+    [Hobby-Boards.com](http://www.hobby-boards.com/) along with five
+    [DS18S20P](http://www.hobby-boards.com/catalog/product_info.php?products_id=93)
+    1-wire parasite power temperature sensors. I've wired those up with
+    one in the living room near the existing thermostat, one in my
+    bedroom, and one stuck about five feet up one of the A/C conduits,
+    to sense when the system is actually putting out cold air. I've had
+    them logging to MySQL since 0200 today.
 4.  I decided to bite the bullet and order a beautiful [CrystalFontz
-    XES635BK-TMF-KU][] for the physical interface. It's a little backlit
-    LCD display, in a surface-mount box, along with four bi-color LEDs
-    and a 6-button keypad. That should handle the interface for anyone
-    who doesn't want to grab a console.
+    XES635BK-TMF-KU](http://www.crystalfontz.com/products/635xes/index.html)
+    for the physical interface. It's a little backlit LCD display, in a
+    surface-mount box, along with four bi-color LEDs and a 6-button
+    keypad. That should handle the interface for anyone who doesn't want
+    to grab a console.
 5.  I'll be looking for a eight-pin header so that the relays will plug
     right in to the screw-terminal block that the thermostat uses, to
     make for easy switching to the original thermostat if needed (or
@@ -71,9 +77,3 @@ Now, in terms of software:
     single-instance basis, i.e. "system completely off from 2008-06-06
     18:00 to 2008-06-08 15:00".
 
-  [Soekris net4526]: http://www.soekris.com/net4526.htm
-  [Phidgets InterfaceKit 0/0/4]: http://www.phidgets.com/products.php?product_id=1014
-  [DS9490]: http://www.hobby-boards.com/catalog/product_info.php?cPath=23&products_id=1503
-  [Hobby-Boards.com]: http://www.hobby-boards.com/
-  [DS18S20P]: http://www.hobby-boards.com/catalog/product_info.php?products_id=93
-  [CrystalFontz XES635BK-TMF-KU]: http://www.crystalfontz.com/products/635xes/index.html

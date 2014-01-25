@@ -6,18 +6,19 @@ Tags: backups, linode, rsnapshot, rsync, security, ssh, wrapper
 Slug: secure-rsnapshot-backups-over-the-wan-via-ssh
 
 Since I moved all of my WAN-facing stuff (mail, web, this blog, svn
-etc.) to a virtual server with [Linode][], and just have a desktop at
-home, it's no longer practical to use [Bacula][] for backups. Linode
-manages daily and weekly backups through their backup service, but
-they'll only restore a full filesystem at a time. I wanted something
-that would keep daily and weekly incremental backups long enough that I
-could find a file changed (or accidentally deleted) a few days or weeks
-ago. Since I'd be backing up to my desktop at home (which is on a
-residential dynamic IP connection), the logical solution was something
-using [rsync][]. Even better than that is the [rsnapshot][] tool, which
-builds upon rsync and hard links to manage incremental backups with as
-little disk usage as possible (though I'd certainly recommend excluding
-log files).
+etc.) to a virtual server with [Linode](http://www.linode.com), and just
+have a desktop at home, it's no longer practical to use
+[Bacula](http://www.bacula.org/) for backups. Linode manages daily and
+weekly backups through their backup service, but they'll only restore a
+full filesystem at a time. I wanted something that would keep daily and
+weekly incremental backups long enough that I could find a file changed
+(or accidentally deleted) a few days or weeks ago. Since I'd be backing
+up to my desktop at home (which is on a residential dynamic IP
+connection), the logical solution was something using
+[rsync](http://rsync.samba.org/). Even better than that is the
+[rsnapshot](http://rsnapshot.org/) tool, which builds upon rsync and
+hard links to manage incremental backups with as little disk usage as
+possible (though I'd certainly recommend excluding log files).
 
 I'm pretty strict about security. Since my home connection has a dynamic
 IP, things are a bit more complicated - I can't push from the server, I
@@ -59,22 +60,25 @@ the local machine which triggers the backup and stores the data as the
 5.  Now comes the first fun part. Let's assume that your pre- and
     post-backup scripts are `/root/bin/rsnapshot-pre.sh` and
     `/root/bin/rsnapshot-post.sh`, respectively. As root, grab a copy of
-    cmd-wrapper.c (from [subversion][] or at the bottom of this post).
-    Modify for your use - the only thing likely to change is line 38,
-    which ensures it will only run for a member of GID 502. Change this
-    to rsyncuser's GID. Compile the wrapper with
-    `gcc -o cmd-wrapper cmd-wrapper.c`. Copy it to rsyncuser's home
-    directory (/home/rsyncuser), `chown root:rsyncuser` and
-    `chmod 4750`. Yes, this sets the SUID bit. The program will now be
-    owned by root, and runnable *as root* by rsyncuser (or, more
+    cmd-wrapper.c (from
+    [subversion](http://svn.jasonantman.com/misc-scripts/cmd-wrapper.c)
+    or at the bottom of this post). Modify for your use - the only thing
+    likely to change is line 38, which ensures it will only run for a
+    member of GID 502. Change this to rsyncuser's GID. Compile the
+    wrapper with `gcc -o cmd-wrapper cmd-wrapper.c`. Copy it to
+    rsyncuser's home directory (/home/rsyncuser), `chown root:rsyncuser`
+    and `chmod 4750`. Yes, this sets the SUID bit. The program will now
+    be owned by root, and runnable *as root* by rsyncuser (or, more
     specifically, any member of the rsyncuser group).
 6.  Open rsyncuser's `.ssh/authorized_keys` file in a text editor. At
     the beginning of the "remoteHostname\_remoteBackupUsername\_cmd" key
     line, prepend `command="/home/rsyncuser/cmd-wrapper"`. This sets up
     SSH forced command (there's a good overview in [O'Reilly's SSH: The
-    Definitive Guide][]) so that when this key is used to login, it will
-    directly execute `/home/rsyncuser/cmd-wrapper` and then exit,
-    without allowing access to anything else.
+    Definitive
+    Guide](http://oreilly.com/catalog/sshtdg/chapter/ch08.html)) so that
+    when this key is used to login, it will directly execute
+    `/home/rsyncuser/cmd-wrapper` and then exit, without allowing access
+    to anything else.
 7.  Add rsyncuser to `AllowUsers` in `/etc/ssh/sshd_config` (you *do*
     limit user access via SSH, right?) and then reload sshd.
 8.  Now, if you SSH to rsyncuser@remoteHost from the local host, using
@@ -89,8 +93,9 @@ the local machine which triggers the backup and stores the data as the
     work better with rsnapshot backups of multiple remote hosts.)*
 10. Cat the "remoteHostname\_remoteBackupUsername\_rsync" public key
     into the backup user's `~/.ssh/authorized_keys` file.
-11. As root, grab a copy of rsync-wrapper.c (from [subversion][1] or at
-    the bottom of this post). Modify for your use - the only thing
+11. As root, grab a copy of rsync-wrapper.c (from
+    [subversion](http://svn.jasonantman.com/misc-scripts/rsync-wrapper.c)
+    or at the bottom of this post). Modify for your use - the only thing
     likely to change is line 38, which ensures it will only run for a
     member of GID 502 (change this to rsyncuser's GID), and perhaps the
     path of or arguments passed to rsync (the wrapper will call
@@ -215,13 +220,15 @@ backup  rsyncuser@remoteHostName:/      remoteHostName/
     messed up. If you have issues with rsync, aside from the usual
     troubleshooting, check that rsync-wrapper.c is calling rsync with
     the same arguments that rsnapshot is sending. It may be useful to
-    use my [print-cmd.sh][] script in place of the "rsync-wrapper"
-    forced command. This script will simply log the command rsnapshot
-    calls via SSH.
+    use my
+    [print-cmd.sh](http://svn.jasonantman.com/misc-scripts/print-cmd.sh)
+    script in place of the "rsync-wrapper" forced command. This script
+    will simply log the command rsnapshot calls via SSH.
 
 Assuming all of this worked, you should now have a fairly secure
 SSH-based remotely-triggered backup system. In a follow-up post I
-provide my [Nagios Check Plugin for Rsnapshot Backups][].
+provide my [Nagios Check Plugin for Rsnapshot
+Backups](/2012/02/nagios-check-plugin-for-rsnapshot-backups/).
 
 The referenced scripts, config files, etc. are below:
 
@@ -406,13 +413,3 @@ int main(int argc, char **argv)
 - /tmp/
 - /var/log/*
 ~~~~
-
-  [Linode]: http://www.linode.com
-  [Bacula]: http://www.bacula.org/
-  [rsync]: http://rsync.samba.org/
-  [rsnapshot]: http://rsnapshot.org/
-  [subversion]: http://svn.jasonantman.com/misc-scripts/cmd-wrapper.c
-  [O'Reilly's SSH: The Definitive Guide]: http://oreilly.com/catalog/sshtdg/chapter/ch08.html
-  [1]: http://svn.jasonantman.com/misc-scripts/rsync-wrapper.c
-  [print-cmd.sh]: http://svn.jasonantman.com/misc-scripts/print-cmd.sh
-  [Nagios Check Plugin for Rsnapshot Backups]: /2012/02/nagios-check-plugin-for-rsnapshot-backups/

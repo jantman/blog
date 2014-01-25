@@ -6,16 +6,17 @@ Tags: awk, database, logging, mysql
 Slug: mysql-general-query-log-and-awk-trimming-columns
 
 So today I started to implement a number of complex regex-based rules
-and templates to get [rsyslog][] to parse ISC DHCPd logs in realtime.
-Unfortunately one of my templates must have been wrong, because I
-started seeing some errors about a field that cannot be blank in
-`/var/log/messages`. Unfortunately, rsyslog doesn't log the query that
-raised the error, or the name of the template, or anything else useful -
-just that there was a database error. With over a dozen new templates,
-this didn't help much. But the following technique did:
+and templates to get [rsyslog](http://www.rsyslog.com) to parse ISC
+DHCPd logs in realtime. Unfortunately one of my templates must have been
+wrong, because I started seeing some errors about a field that cannot be
+blank in `/var/log/messages`. Unfortunately, rsyslog doesn't log the
+query that raised the error, or the name of the template, or anything
+else useful - just that there was a database error. With over a dozen
+new templates, this didn't help much. But the following technique did:
 
-MySQLd has a [General Query Log][] that can be activated by addling a
-line like:  
+MySQLd has a [General Query
+Log](http://dev.mysql.com/doc/refman/5.1/en/query-log.html) that can be
+activated by addling a line like:  
   
 `log=/tmp/query.log`  
 to `/etc/my.cnf` under the `[mysqld]` section. This will log \*all\*
@@ -33,6 +34,3 @@ first two columns (the number and "Query"):
   
 For easy analysis, the output of that can be piped into `sort` and then
 `uniq`.
-
-  [rsyslog]: http://www.rsyslog.com
-  [General Query Log]: http://dev.mysql.com/doc/refman/5.1/en/query-log.html

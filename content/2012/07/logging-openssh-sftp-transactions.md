@@ -5,11 +5,13 @@ Category: Tech HowTos
 Tags: logging, openssh, sftp, ssh
 Slug: logging-openssh-sftp-transactions
 
-I just came across a really handy post on [David Busby][]'s blog:
-[Enable logging in the SFTP subsystem - Oneiroi][]. From OpenSSH 4.4 on,
-you can pass arguments to Subsystem calls, and the sftp subsystem
-supports logging to an aribtrary syslog facility and priority. Simply
-adding a line like:
+I just came across a really handy post on [David
+Busby](https://plus.google.com/117561367404774597588/posts)'s blog:
+[Enable logging in the SFTP subsystem -
+Oneiroi](http://blog.oneiroi.co.uk/linux/enable-logging-in-the-sftp-subsystem/).
+From OpenSSH 4.4 on, you can pass arguments to Subsystem calls, and the
+sftp subsystem supports logging to an aribtrary syslog facility and
+priority. Simply adding a line like:
 
 ~~~~{.text}
 Subsystem       sftp    /usr/libexec/openssh/sftp-server -f LOCAL5 -l INFO
@@ -31,6 +33,3 @@ If you have syslog write these logs to their own file, remember to setup
 log rotation for them.
 
 Unfortunately, I'm not aware of any way to log SCP file transfers.
-
-  [David Busby]: https://plus.google.com/117561367404774597588/posts
-  [Enable logging in the SFTP subsystem - Oneiroi]: http://blog.oneiroi.co.uk/linux/enable-logging-in-the-sftp-subsystem/

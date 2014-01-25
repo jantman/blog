@@ -12,18 +12,18 @@ apartment, swapping out my 24-port Linksys switch in my room for the
 5-port Netgear previously used for printing. I threw all of the printers
 and the print server on their own VLAN on the main 3com switch.
 
-I've also started thinking more about [MythTV][] - I use it for TV in my
-room (feeding a grossly insufficient 21" CRT monitor), and my roommate
-has a Dell GX270 by the big TV in the living room, though it was running
-Freevo (and now has a dead tuner and no RAM, or something like that).
-So, I decided that I might do things right - drop a 5- or 8-port GigE
-switch in the apartment, put GigE NICs in the two boxes with tuners
-(putting MythTV on the GX270 also), and setting up a centralized system.
-The problem is that the ideal solution would be a single dedicated
-back-end system for storage and control, with the two tuner/video out
-boxes just providing A/V I/O. Unfortunately, the two boxes with tuners
-are both high-spec'ed P4's, and I'm not sure what I can come up with in
-terms of a server for the backend.
+I've also started thinking more about [MythTV](http://www.mythtv.org/) -
+I use it for TV in my room (feeding a grossly insufficient 21" CRT
+monitor), and my roommate has a Dell GX270 by the big TV in the living
+room, though it was running Freevo (and now has a dead tuner and no RAM,
+or something like that). So, I decided that I might do things right -
+drop a 5- or 8-port GigE switch in the apartment, put GigE NICs in the
+two boxes with tuners (putting MythTV on the GX270 also), and setting up
+a centralized system. The problem is that the ideal solution would be a
+single dedicated back-end system for storage and control, with the two
+tuner/video out boxes just providing A/V I/O. Unfortunately, the two
+boxes with tuners are both high-spec'ed P4's, and I'm not sure what I
+can come up with in terms of a server for the backend.
 
 Now, <span style="font-weight: bold;">the question for anyone who may be
 reading</span> - I'd like to setup a good amount (1-2TB) of storage for
@@ -54,8 +54,10 @@ something with Telnet, SNMP, VLANs, the works.
 
 <p>
 In other news, I highly recommend reading the [Groklaw story on
-Microsoft's latest pledge for interoperability][]. I especially liked
-the one quote from the [ECIS][] statement:  
+Microsoft's latest pledge for
+interoperability](http://www.groklaw.net/article.php?story=20080221184924826).
+I especially liked the one quote from the [ECIS](http://www.ecis.eu/)
+statement:  
 
 > For years now, Microsoft has either failed to implement or has
 > actively corrupted a range of truly open standards adopted and
@@ -128,7 +130,3 @@ From Michael Cunningham, VP and General Counsel of Red Hat:
 >     software products.
 
 Amen!!!
-
-  [MythTV]: http://www.mythtv.org/
-  [Groklaw story on Microsoft's latest pledge for interoperability]: http://www.groklaw.net/article.php?story=20080221184924826
-  [ECIS]: http://www.ecis.eu/

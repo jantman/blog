@@ -6,34 +6,37 @@ Tags: dns, godaddy, hosting, routhost, security through obscurity, support
 Slug: routhost-dns-problems-godaddy-and-security-through-obscurity
 
 The external-facing web site and (internal use) mailing list for the
-[ambulance corps][] is hosted by [ROUThost][]. Not my choice, it was
-inherited. ROUThost, first off, appears to be a fly-by-night hosting
-provider that just buys a few boxes in a colo facility. I should have
-known to raise a stink when they say you need to fax a copy of your
-driver's license to get SSH turned on, and that you have to agree - in
-legalese - not to mess with anyone else's configs. Well, last night, DNS
-for the site went down. As in nothing, wouldn't resolve at all. I
-submitted a ticket online for ROUThost's "24x7" support - by the way,
-they don't have a phone number, only an online ticket form. After 2h 34m
-40s of downtime, the issue resolved itself and I downgraded the ticket
-from "critical" to medium. Now, 11 hours later, it still hasn't been
-replied to. And my emails to support and management - 2 hours ago - are
-unanswered.
+[ambulance corps](http://www.midlandparkambulance.com) is hosted by
+[ROUThost](http://www.routhost.com). Not my choice, it was inherited.
+ROUThost, first off, appears to be a fly-by-night hosting provider that
+just buys a few boxes in a colo facility. I should have known to raise a
+stink when they say you need to fax a copy of your driver's license to
+get SSH turned on, and that you have to agree - in legalese - not to
+mess with anyone else's configs. Well, last night, DNS for the site went
+down. As in nothing, wouldn't resolve at all. I submitted a ticket
+online for ROUThost's "24x7" support - by the way, they don't have a
+phone number, only an online ticket form. After 2h 34m 40s of downtime,
+the issue resolved itself and I downgraded the ticket from "critical" to
+medium. Now, 11 hours later, it still hasn't been replied to. And my
+emails to support and management - 2 hours ago - are unanswered.
 
 Once the problem started, I knew the yearly contract with ROUThost was a
 bad idea - even at $35/year USD. So, given the great experience I've had
-with them as registrar for my myriad domains, I took a look at [][]
-\>GoDaddy's site</a>. They offer shared hosting at around $4/month (for
-shared on a Linux box) and are currently offering some deals, so I
-figured it would be a good idea. I know and trust GoDaddy's support, and
-have had an account with them for *quite some time*.
+with them as registrar for my myriad domains, I took a look at
+[](http://www.godaddy.com) \>GoDaddy's site</a>. They offer shared
+hosting at around $4/month (for shared on a Linux box) and are currently
+offering some deals, so I figured it would be a good idea. I know and
+trust GoDaddy's support, and have had an account with them for *quite
+some time*.
 
 The ambulance corp's web site, hosted through ROUThost, does essentially
 three things; provide a minimal web presence (the whole web root is
 probably < 1Mb minus the photo albums), five e-mail forwarders for the
-officers and a [GNU MailMan][] mailing list for internal business.
-Unfortunately, I couldn't find anything in their "features" list
-mentioning MialMan or any other listserv, or even what MTA/MDA they run.
+officers and a [GNU
+MailMan](http://www.gnu.org/software/mailman/index.html) mailing list
+for internal business. Unfortunately, I couldn't find anything in their
+"features" list mentioning MialMan or any other listserv, or even what
+MTA/MDA they run.
 
 I put a call in to GoDaddy "Sales/Support". The poor guy had never heard
 of MailMan, but asked "one of the hosting guys" and was told it would
@@ -68,8 +71,3 @@ So what's left? I guess waiting until (hopefully some time within the
 next few weeks) I upgrade to Optimum static IP at home, and consider
 running it all there (and hope mains power never goes out for more than
 30 minutes?)
-
-  [ambulance corps]: http://www.midlandparkambulance.com
-  [ROUThost]: http://www.routhost.com
-  []: http://www.godaddy.com
-  [GNU MailMan]: http://www.gnu.org/software/mailman/index.html

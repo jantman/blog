@@ -4,30 +4,40 @@ Author: admin
 Category: Miscellaneous
 Slug: network-monitoring
 
-I was reading [Ben Rockwood's blog][] before (as I do every day, thanks
-to the magic of [Google Reader][]), where he had an [article praising][]
-[up.time network monitoring software][]. Now, up.time (have I ever
-mentioned that I \*hate\* names with punctuation in them?) is
-proprietary software. And, given their support options, level of
-integration, and fancy web site, I assume it's probably not cheap. They
-bill it as turnkey monitoring - they claim to be "up and monitoring"
-within 15 minutes "including the download". They also have an
-[impressive list of clients][], including JP Morgan, Merrill Lynch,
-Cingular Wireless, Verizon Wireless, T-Mobile, Wyeth Medica,
-Hewlett-Packard (how ironic - did the OpenView team hear about this?),
-and a whole slew of other clients including major hospitals. Aside from
-the irony of HP using their product, I wonder to what extent these
-clients use up.time. Surely the likes of Merrill Lynch can afford more
-than a turnkey solution. And I'd bet that Verizon Wireless doesn't use
-anything 100% off-the-shelf to monitor their communications systems.
+I was reading [Ben Rockwood's
+blog](http://www.cuddletech.com/blog/index.php) before (as I do every
+day, thanks to the magic of [Google
+Reader](http://www.google.com/reader)), where he had an [article
+praising](http://www.cuddletech.com/blog/pivot/entry.php?id=893)
+[up.time network monitoring software](http://www.uptimesoftware.com/).
+Now, up.time (have I ever mentioned that I \*hate\* names with
+punctuation in them?) is proprietary software. And, given their support
+options, level of integration, and fancy web site, I assume it's
+probably not cheap. They bill it as turnkey monitoring - they claim to
+be "up and monitoring" within 15 minutes "including the download". They
+also have an [impressive list of
+clients](http://www.uptimesoftware.com/clients.php), including JP
+Morgan, Merrill Lynch, Cingular Wireless, Verizon Wireless, T-Mobile,
+Wyeth Medica, Hewlett-Packard (how ironic - did the OpenView team hear
+about this?), and a whole slew of other clients including major
+hospitals. Aside from the irony of HP using their product, I wonder to
+what extent these clients use up.time. Surely the likes of Merrill Lynch
+can afford more than a turnkey solution. And I'd bet that Verizon
+Wireless doesn't use anything 100% off-the-shelf to monitor their
+communications systems.
 
 Anyway, this got me thinking about network monitoring systems. Well,
 open-source ones, since I like the idea of having control over
-infrastructure. The forerunners seem to be [Nagios][] (my personal
-choice), [GroundWork Monitor][] (available in both open-source and
-proprietary versions), [Zenoss][] ("Core" free version and a paid-for
-Enterprise version), [Zabbix][], [OpenNMS][], and [Munin][], [Cacti][],
-or one of the other [MRTG][]-/RRD-based applications for
+infrastructure. The forerunners seem to be
+[Nagios](http://www.nagios.org/) (my personal choice), [GroundWork
+Monitor](http://www.groundworkopensource.com/products/os-overview.html)
+(available in both open-source and proprietary versions),
+[Zenoss](http://www.zenoss.com/product/core) ("Core" free version and a
+paid-for Enterprise version), [Zabbix](http://www.zabbix.com/),
+[OpenNMS](http://www.opennms.org), and
+[Munin](http://munin.projects.linpro.no/),
+[Cacti](http://www.cacti.net/), or one of the other
+[MRTG](http://oss.oetiker.ch/mrtg/)-/RRD-based applications for
 graphing/trending.
 
 As stated, I've always been a Nagios man. I've been running it for 3+
@@ -54,17 +64,3 @@ concept of device detection is especially intriguing) or whether I'll
 just end up building myself a Nagios front-end that pulls various bits
 of data (text, graphs, pictures, HTML, etc.) from various other sources
 such as Munin, Cacti, an inventory system, log parsing, etc.
-
-  [Ben Rockwood's blog]: http://www.cuddletech.com/blog/index.php
-  [Google Reader]: http://www.google.com/reader
-  [article praising]: http://www.cuddletech.com/blog/pivot/entry.php?id=893
-  [up.time network monitoring software]: http://www.uptimesoftware.com/
-  [impressive list of clients]: http://www.uptimesoftware.com/clients.php
-  [Nagios]: http://www.nagios.org/
-  [GroundWork Monitor]: http://www.groundworkopensource.com/products/os-overview.html
-  [Zenoss]: http://www.zenoss.com/product/core
-  [Zabbix]: http://www.zabbix.com/
-  [OpenNMS]: http://www.opennms.org
-  [Munin]: http://munin.projects.linpro.no/
-  [Cacti]: http://www.cacti.net/
-  [MRTG]: http://oss.oetiker.ch/mrtg/

@@ -5,9 +5,10 @@ Category: Tech HowTos
 Tags: apache, configuration, linux
 Slug: apache2-list-name-based-virtual-hosts
 
-Here's a little tidbit that I never knew until I had an [Apache2][]
-name-based virtual host problem: `httpd -S` lists the vhosts that are
-being served by Apache, and how they were parsed from the config files.
+Here's a little tidbit that I never knew until I had an
+[Apache2](http://httpd.apache.org/) name-based virtual host problem:
+`httpd -S` lists the vhosts that are being served by Apache, and how
+they were parsed from the config files.
 
 The output on one of my servers looks something like:
 
@@ -28,5 +29,3 @@ This is quite useful in debugging vhost problems, especially those pesky
 times when a request that should go to a specific vhost is being served
 by the default (in my case at this time, I had two ServerName directives
 instead of a ServerName and a ServerAlias).
-
-  [Apache2]: http://httpd.apache.org/

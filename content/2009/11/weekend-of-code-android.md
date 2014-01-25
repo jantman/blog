@@ -16,17 +16,16 @@ development.
 I've got the ADK installed and running, and the emulator is wonderful
 (especially with the Droid skin). And I know it's wrong, but I think I'm
 going to be developing the first app for Android 2.0 (especially given
-the new [ContactsContract][] API in 5).
+the new
+[ContactsContract](http://developer.android.com/reference/android/provider/ContactsContract.html)
+API in 5).
 
-I'm having a few issues with [Subclipse][], even on the latest OpenSuSE
-11.1, and still have a few things I want to do on the phone... but
-hopefully I'll have a beta build of the app by the end of the weekend.
-I've already done most of the data modeling and sketched out the
-storyboard.
+I'm having a few issues with [Subclipse](http://subclipse.tigris.org/),
+even on the latest OpenSuSE 11.1, and still have a few things I want to
+do on the phone... but hopefully I'll have a beta build of the app by
+the end of the weekend. I've already done most of the data modeling and
+sketched out the storyboard.
 
 I'm not going to say much about what the app is until it's ready, but
 it's something targeted at people like me - SysAdmins with way too many
 things on their plate for their number of waking hours.
-
-  [ContactsContract]: http://developer.android.com/reference/android/provider/ContactsContract.html
-  [Subclipse]: http://subclipse.tigris.org/

@@ -8,23 +8,28 @@ Slug: nix
 First off, my Sun blog should be coming sometime this weekend/early next
 week. If I post anything interesting there, I'll be sure to cross-post
 it.  
-This morning at work, while reading [Digg][], I came by two interesting
-links that got me thinking:  
-[5 Reasons Your Parents Should Use Linux][] and [Ten Things Linux
-Distros Get Right (That MS Doesn't)][].  
+This morning at work, while reading [Digg](http://digg.com), I came by
+two interesting links that got me thinking:  
+[5 Reasons Your Parents Should Use
+Linux](http://www.foogazi.com/2007/09/27/5-reasons-your-parents-should-use-linux/)
+and [Ten Things Linux Distros Get Right (That MS
+Doesn't)](http://warpedvisions.org/2006/12/30/ten-things-linux-distros-get-right-that-ms-doesnt/).  
 Now, I'll admit, my \*nix experience is pretty much limited to Linux.
 I've used BSD a few times, but only as pre-built images for embedded
-systems like my [Soekris][] boxen. I've used Solaris mainly just as a
-user/web developer in SSH at work. And while I now have a work computer
-running Solaris 10 and a SXDE image on my laptop, I'm still relatively
-new - and, given that I'm now doing hardware support and wireless work,
-I don't even know what I need another machine in the office for.  
+systems like my [Soekris](http://www.soekris.com) boxen. I've used
+Solaris mainly just as a user/web developer in SSH at work. And while I
+now have a work computer running Solaris 10 and a SXDE image on my
+laptop, I'm still relatively new - and, given that I'm now doing
+hardware support and wireless work, I don't even know what I need
+another machine in the office for.  
 That being said, the second link got me thinking. Specifically, about
-something I read in [The Art of Unix Programming][] [Wikipedia] by Eric
-S. Raymond (available online [here][]) with regards to interface design.
-One quote that I was able to find in the online version, comes from
-Chapter 11, under the subtitle "Tradeoffs between CLI and Visual
-Interfaces",  
+something I read in [The Art of Unix
+Programming](http://www.catb.org/~esr/writings/taoup/) [Wikipedia] by
+Eric S. Raymond (available online
+[here](http://www.catb.org/~esr/writings/taoup/html/)) with regards to
+interface design. One quote that I was able to find in the online
+version, comes from Chapter 11, under the subtitle "Tradeoffs between
+CLI and Visual Interfaces",  
 <span style="font-style: italic;">"Resistance to CLI interfaces tends to
 decrease as users become more expert. In many problem domains, users
 (especially
@@ -42,7 +47,8 @@ personal use for it is to control an ancient Umax Mirage IIse SCSI
 scanner (with only Windows and Mac drivers), I ultimately need to touch
 it now and then - whether on my mother's box (she claims she has to have
 Windows and MS Office because "that's what businesses use") or as admin
-of the four boxes at the [Ambulance Corps][] where I volunteer.  
+of the four boxes at the [Ambulance
+Corps](http://www.midlandparkambulance.com) where I volunteer.  
 However, whenever I am (unfortunately) pushed into the task of working
 on a Windows box, I always feel something lacking. To be blunt, I don't
 see how experienced users can deal with it. And this isn't just an issue
@@ -95,11 +101,3 @@ To be totally honest, the question running through my mind is something
 like "everything is so much quicker on Linux. How do experts deal with
 Windows?"<span style="font-style: italic;"><span style="font-style: italic;"></span>  
 </span>
-
-  [Digg]: http://digg.com
-  [5 Reasons Your Parents Should Use Linux]: http://www.foogazi.com/2007/09/27/5-reasons-your-parents-should-use-linux/
-  [Ten Things Linux Distros Get Right (That MS Doesn't)]: http://warpedvisions.org/2006/12/30/ten-things-linux-distros-get-right-that-ms-doesnt/
-  [Soekris]: http://www.soekris.com
-  [The Art of Unix Programming]: http://www.catb.org/~esr/writings/taoup/
-  [here]: http://www.catb.org/~esr/writings/taoup/html/
-  [Ambulance Corps]: http://www.midlandparkambulance.com

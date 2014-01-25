@@ -10,10 +10,11 @@ to those proportions yet. But any new platform will have its hiccups,
 and Google is relatively new to the OS world.
 
 So, here's the news. Google issued a legal Cease and Desist order to a
-developer Steve Kondik (known as [Cyanogen][]). The story goes something
-like this... Steve is an active Android developer, doing a lot of work
-on the lower-level stuff (lower level than apps), including multi-touch
-and more home screens. His changes are essentially at the OS-level, and
+developer Steve Kondik (known as
+[Cyanogen](http://twitter.com/cyanogen)). The story goes something like
+this... Steve is an active Android developer, doing a lot of work on the
+lower-level stuff (lower level than apps), including multi-touch and
+more home screens. His changes are essentially at the OS-level, and
 Android doesn't have a full-fledged package management/patching
 mechanism like Linux distros, so making use of them requires recompiling
 stuff and re-flashing the device with a new ROM image (since the
@@ -24,11 +25,14 @@ While these apps and drivers are available for download, the license
 terms prohibit redistribution. But in order for Steve to create a
 fully-functional ROM image, he has to include the closed code.
 
-There are some writeups on this at [Linux Magazine][] and a good, timely
-analysis at [Linux Insider][].
+There are some writeups on this at [Linux
+Magazine](http://www.linux-mag.com/cache/7544/1.html) and a good, timely
+analysis at [Linux
+Insider](http://www.linuxinsider.com/rsstory/68237.html?wlc=1254230361).
 
 There's also a clarification by Google's Dan Morrill on the [Android
-Developers][] blog.
+Developers](http://android-developers.blogspot.com/2009/09/note-on-google-apps-for-android.html)
+blog.
 
 So, what's my take on all this (not that another guy taking about this
 is needed)?
@@ -67,8 +71,3 @@ control over their own closed apps. But they should provide an avenue
 for non-technical end-users to easily upgrade a community (i.e. Free)
 ROM image with the expected Google Apps and device manufacturer
 software.
-
-  [Cyanogen]: http://twitter.com/cyanogen
-  [Linux Magazine]: http://www.linux-mag.com/cache/7544/1.html
-  [Linux Insider]: http://www.linuxinsider.com/rsstory/68237.html?wlc=1254230361
-  [Android Developers]: http://android-developers.blogspot.com/2009/09/note-on-google-apps-for-android.html

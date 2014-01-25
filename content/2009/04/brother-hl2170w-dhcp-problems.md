@@ -5,15 +5,17 @@ Category: Miscellaneous
 Tags: dhcp, hl2170w, printer, vlan
 Slug: brother-hl2170w-dhcp-problems
 
-Two weeks ago, I [wrote about the Brother HL-2170W][] that I got for my
-mother. It seemed absolutely wonderful. Until the night of March 31st,
-just before Conficker was supposed to strike. Being that mom's computer
-is the only one at home running Windows, I finished up a long-standing
-project - and moved her desktop, printer, and AppleTV over to a separate
-VLAN that's not routable to anything else internal (i.e. anything
-important, or anything of mine). I'd already had the "client" VLAN setup
-for a while, so it was just a matter of tweaking the firewall rules and
-moving the static DHCP assignments from one subnet to the other.
+Two weeks ago, I [wrote about the Brother
+HL-2170W](/2009/03/brother-hl-2170w-great-features-from-a-personal-laser-printer/)
+that I got for my mother. It seemed absolutely wonderful. Until the
+night of March 31st, just before Conficker was supposed to strike. Being
+that mom's computer is the only one at home running Windows, I finished
+up a long-standing project - and moved her desktop, printer, and AppleTV
+over to a separate VLAN that's not routable to anything else internal
+(i.e. anything important, or anything of mine). I'd already had the
+"client" VLAN setup for a while, so it was just a matter of tweaking the
+firewall rules and moving the static DHCP assignments from one subnet to
+the other.
 
 Well, that's where the problems started. While her Windows XP desktop
 and AppleTV coped nicely, and got their new addresses in DHCP as they
@@ -32,10 +34,10 @@ infuriated - I've rolled the printer dozens of times, and not a single
 event in the DHCP log. I know it's sending traffic from the port - I've
 reset the counters and they're changing. I tried moving it back to the
 original VLAN and confirmed that it still has its' original IP. I could
-get into the web interface via [lynx][] and \*tell it\* to refresh DHCP,
-but this seemed quite pointless - there's no way it's physically
-possible to send the web request and then switch the port to the new
-VLAN before it gets DHCP.
+get into the web interface via [lynx](http://lynx.isc.org/) and \*tell
+it\* to refresh DHCP, but this seemed quite pointless - there's no way
+it's physically possible to send the web request and then switch the
+port to the new VLAN before it gets DHCP.
 
 So, I'm ready to call Brother Support. I then notice that the printer is
 turned off at the moment. From the switch log, it looks as though it's
@@ -51,6 +53,3 @@ address on the new VLAN until it was powered off for a \*long\* time.
 Even reboots wouldn't trigger a request, until the box had been powered
 off for *days*. More importantly, though, it seems that it only gets
 DHCP ***once*** when it boots, and totally disregards the lease time!
-
-  [wrote about the Brother HL-2170W]: /2009/03/brother-hl-2170w-great-features-from-a-personal-laser-printer/
-  [lynx]: http://lynx.isc.org/

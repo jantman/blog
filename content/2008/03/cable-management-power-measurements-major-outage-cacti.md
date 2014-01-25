@@ -79,21 +79,21 @@ confirmed by someone on-site), it's dead. No ping, nothing out. I'll
 have to look into it, but it made me realize that this really is my only
 way of analyzing problems. That needs to stop.
 
-Maybe one day I'll have the money for a nice [SmartUPS RT][] or even a
-[Symmetra][] - though getting 208V into my basement is even more of a
-dream than spending $4000 on a UPS.
+Maybe one day I'll have the money for a nice [SmartUPS
+RT](http://www.apc.com/products/family/index.cfm?id=223) or even a
+[Symmetra](http://www.apc.com/products/family/index.cfm?id=189) - though
+getting 208V into my basement is even more of a dream than spending
+$4000 on a UPS.
 
 Also, I decided (after all this) to setup graphing of UPS data (load,
 voltage in and out, temp, capacity, run time, etc.). While I haven't
-gotten around to setting up [Zenoss][] yet, I did a quick (well, 4 hours
-later I'm done configuring it) [Cacti][]installation on my web server (I
-should already have it running on the monitoring box, but who knows what
-that will look like when I get home). I also dropped a [Cacti host
-template in CVS][] for the [AP9605 PowerNet SNMP card][] in my UPSs.
-
-  [SmartUPS RT]: http://www.apc.com/products/family/index.cfm?id=223
-  [Symmetra]: http://www.apc.com/products/family/index.cfm?id=189
-  [Zenoss]: http://www.zenoss.com/
-  [Cacti]: http://www.cacti.net/
-  [Cacti host template in CVS]: http://cvs.jasonantman.com/cvs/misc-scripts/cacti_host_template_apc_powernet_ap9605.xml?view=log
-  [AP9605 PowerNet SNMP card]: http://www.jasonantman.com/blog/2007/03/apc-ap9605-powernet-snmp-card.html
+gotten around to setting up [Zenoss](http://www.zenoss.com/) yet, I did
+a quick (well, 4 hours later I'm done configuring it)
+[Cacti](http://www.cacti.net/)installation on my web server (I should
+already have it running on the monitoring box, but who knows what that
+will look like when I get home). I also dropped a [Cacti host template
+in
+CVS](http://cvs.jasonantman.com/cvs/misc-scripts/cacti_host_template_apc_powernet_ap9605.xml?view=log)
+for the [AP9605 PowerNet SNMP
+card](http://www.jasonantman.com/blog/2007/03/apc-ap9605-powernet-snmp-card.html)
+in my UPSs.

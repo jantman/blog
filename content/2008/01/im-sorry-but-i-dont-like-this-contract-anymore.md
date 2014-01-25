@@ -4,10 +4,14 @@ Author: admin
 Category: Ideas and Rants
 Slug: im-sorry-but-i-dont-like-this-contract-anymore
 
-The other big news in tech today - as posted on [slashdot][], the author
-of the pchdtvr/atscap package previously on SourceForge has [announced
-his attempt to <span style="font-weight: bold;">retroactively</span>
-remove his package from GPL coverage][]. His post states, in part,
+The other big news in tech today - as posted on
+[slashdot](http://yro.slashdot.org/article.pl?sid=08/01/26/0341210&from=rss),
+the author of the pchdtvr/atscap package previously on SourceForge has
+[announced his attempt to
+<span style="font-weight: bold;">retroactively</span> remove his package
+from GPL
+coverage](http://sourceforge.net/developer/diary.php?diary_id=26407&diary_user=147583).
+His post states, in part,
 
 > I have revoked the licensing under the GNU General Public  
 > License (herein after referred to as "the GPL") for the  
@@ -35,7 +39,8 @@ So not only is this guy trying to retroactively unassign rights that he
 has previously irrecovably assigned, but he's
 <span style="font-weight: bold;">asking developers to pull his code from
 their codebase</span>???? I mean, that's not just an inconvenience. Does
-he comprehend what he's asking? To pull a few excerpts from [GPLv2][]:  
+he comprehend what he's asking? To pull a few excerpts from
+[GPLv2](http://www.gnu.org/licenses/old-licenses/gpl-2.0.html):  
 
 > 1. You may copy and distribute verbatim copies of the Program's source
 > code as you receive it, in any medium, provided that you conspicuously
@@ -51,7 +56,8 @@ he comprehend what he's asking? To pull a few excerpts from [GPLv2][]:
 > restrictions on the recipients' exercise of the rights granted herein.
 > </p>
 
-Apparently this is being [discussed at length over at GrokLaw,][]
+Apparently this is being [discussed at length over at
+GrokLaw,](http://www.groklaw.net/article.php?story=2006062204552163)
 including the analysis, "If you change your mind and don't want to use
 the GPL any more, you can stop and use something else on new code going
 forward, and you can dual license your own code, but you can't redo the
@@ -59,7 +65,9 @@ past and pull back GPL'd code". The developer is telling people to
 delete their copies, and to cease distribution. Now, I'm not a lawyer,
 and I'm not an expert on copyright law. But I didn't think that one
 party to a contract could unilaterally alter it if there weren't any
-terms allowing such an action, and the [GPL FAQ][]seems to support this.
+terms allowing such an action, and the [GPL
+FAQ](http://www.fsf.org/licensing/licenses/gpl-faq.html#CanDeveloperThirdParty)seems
+to support this.
 
 Take an example: Your car breaks down. You have planned a family
 vacation tomorrow. The car dealer, out of the kindness of their hearts
@@ -77,11 +85,3 @@ using the SourceForge account "inkling", but it seems like both of his
 previous projects are now gone, along with any other relevant
 information. I'd sure like to see his response to the community
 regarding this incident.
-
-  [slashdot]: http://yro.slashdot.org/article.pl?sid=08/01/26/0341210&from=rss
-  [announced his attempt to
-  <span style="font-weight: bold;">retroactively</span> remove his
-  package from GPL coverage]: http://sourceforge.net/developer/diary.php?diary_id=26407&diary_user=147583
-  [GPLv2]: http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
-  [discussed at length over at GrokLaw,]: http://www.groklaw.net/article.php?story=2006062204552163
-  [GPL FAQ]: http://www.fsf.org/licensing/licenses/gpl-faq.html#CanDeveloperThirdParty

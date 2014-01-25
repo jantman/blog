@@ -33,6 +33,5 @@ about STOR1:
 
 So, in the future, you will not only read about data recovery operations
 using a LiveCD, bare metal recovery of the system, but you can also
-expect my [wiki][] to include a page on implementation of Bacula.
-
-  [wiki]: http://wiki.jasonantman.com
+expect my [wiki](http://wiki.jasonantman.com) to include a page on
+implementation of Bacula.

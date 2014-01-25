@@ -27,8 +27,8 @@ First minutes/day:
     out that the default apps can't be removed. The app screen, by
     default, is pretty full...
 4.  Export my contacts from my Palm (no sync cable, had to use
-    [php-pdb][] to export a CSV, then manually edit ALL of them in
-    Gmail.
+    [php-pdb](http://php-pdb.sourceforge.net/) to export a CSV, then
+    manually edit ALL of them in Gmail.
 
 So after having the phone for about 12 hours, here's what I've installed
 on it:
@@ -46,7 +46,7 @@ on it:
     temperature, capacity over time and also stores a simple CSV log
     (which I intend to parse out later for historical data).
 -   **Bookmarking for Delicious** - Allows saving of bookmarks to
-    [del.icio.us][] (but not retrieval).
+    [del.icio.us](del.icio.us) (but not retrieval).
 -   **To Do List** - A very simple To Do list app, until I find
     something that works with Google Tasks. No syncing.
 -   **VoiceMemo (JavaCodeLand.com)** - A really simple voice memo app.
@@ -67,7 +67,7 @@ My list for future research/development:
 -   WAP pages for my web-based personal finance app, fuel log, etc.
 -   IMAP IDLE
 -   Tasks/to do app that syncs with Google Tasks.
--   A [Cycle System][] app.
+-   A [Cycle System](http://oreilly.com/catalog/9780596007836) app.
 -   How to quickly mute all sounds on the phone.
 -   How to do tones by person or group for not only ringtones (phone)
     but also SMS, Email, etc. Also, a way to set certain hours of the
@@ -78,11 +78,12 @@ My list for future research/development:
 -   Console on the phone?
 -   SCP/SFTP program.
 -   TV listings (perhaps a WAP version of my script that pulls from
-    [SchedulesDirect][] (unfortunately, due to their redistribution
-    policy, this is a private, authenticated page).
+    [SchedulesDirect](http://www.schedulesdirect.org/) (unfortunately,
+    due to their redistribution policy, this is a private, authenticated
+    page).
 -   Nagios checker/notifier
 -   RSS reader
--   WAP page for [PHP EMS Tools][] callin.
+-   WAP page for [PHP EMS Tools](http://www.php-ems-tools.com) callin.
 -   How to handle IMAP folders?
 -   Script to backup Gmail contacts, other data stored with Google.
 -   Thunderbird Gmail contact sync.
@@ -90,8 +91,3 @@ My list for future research/development:
     like signal strength in dbm, noise floor, etc.
 -   Something like kismet that integrates the GPS and wifi scanning.
 
-  [php-pdb]: http://php-pdb.sourceforge.net/
-  [del.icio.us]: del.icio.us
-  [Cycle System]: http://oreilly.com/catalog/9780596007836
-  [SchedulesDirect]: http://www.schedulesdirect.org/
-  [PHP EMS Tools]: http://www.php-ems-tools.com

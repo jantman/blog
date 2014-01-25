@@ -5,7 +5,8 @@ Category: Ideas and Rants
 Tags: iso, microsoft, ooxml
 Slug: microsoft-again
 
-Here's [another Groklaw article on recent Microsoft tribulations][].
+Here's [another Groklaw article on recent Microsoft
+tribulations](http://www.groklaw.net/article.php?story=20080227031234460).
 This really is starting to get disgusting. It's not that I hate
 Microsoft, I don't. What I hate is their attitude, and their business
 practices. Everyone else - I mean
@@ -37,15 +38,12 @@ How can it be that the ISO - the International
 <span style="font-style: italic;">Standardization</span> - would
 actually consider a <span style="font-style: italic;">second</span>,
 competing standard for document formats. And one that's [as flawed as
-OOXML][]? These guys are the ISO. They practically run the world, at
-least technically. Why don't they have the balls to look Microsoft in
-the eye and say, "Hey, moron. We already
+OOXML](http://www.noooxml.org/argu-brief)? These guys are the ISO. They
+practically run the world, at least technically. Why don't they have the
+balls to look Microsoft in the eye and say, "Hey, moron. We already
 <span style="font-style: italic;">have</span> a document format
 standard. It's called ISO 26300. If you want to have anything to do with
 the ISO, which sets <span style="font-style: italic;">standards</span>,
 you can take your 6,000 page specification, put it through a crosscut
 paper-burning radiation-producing shredder, pay the $320 for a copy of
 ISO26300, and implement it!"
-
-  [another Groklaw article on recent Microsoft tribulations]: http://www.groklaw.net/article.php?story=20080227031234460
-  [as flawed as OOXML]: http://www.noooxml.org/argu-brief

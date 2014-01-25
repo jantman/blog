@@ -6,17 +6,20 @@ Tags: centos, logging, rsyslog, syslog
 Slug: rsyslog-on-centos5
 
 **Update July 2011** - We've been using rsyslog for our centralized
-syslog infrastructure at [work][] (site being redesigned at the moment)
-for about a year now. As a result, our colleagues at [Rutgers University
-Open System Solutions][] have been nice enough to include rsyslog in
-their [koji][] build system. Updated packages of rsyslog for CentOS 5
-x86 and x86\_64 are available [here][]. Please be aware that they have
-some dependencies of specific RU versions. It's probably best if you
-download the source RPM and build it yourself using rpmbuild. The
-current [5.6.2 source package][] includes a CentOS 5 spec file and other
-related scripts. This RPM repository is only open to the public as a
-courtesy, so please download once at most and distribute it to your
-servers yourself.
+syslog infrastructure at [work](http://services.rutgers.edu/) (site
+being redesigned at the moment) for about a year now. As a result, our
+colleagues at [Rutgers University Open System
+Solutions](http://oss.rutgers.edu) have been nice enough to include
+rsyslog in their [koji](http://koji.rutgers.edu) build system. Updated
+packages of rsyslog for CentOS 5 x86 and x86\_64 are available
+[here](http://koji.rutgers.edu/koji/buildinfo?buildID=2140). Please be
+aware that they have some dependencies of specific RU versions. It's
+probably best if you download the source RPM and build it yourself using
+rpmbuild. The current [5.6.2 source
+package](http://koji.rutgers.edu/koji/rpminfo?rpmID=14051) includes a
+CentOS 5 spec file and other related scripts. This RPM repository is
+only open to the public as a courtesy, so please download once at most
+and distribute it to your servers yourself.
 
 Having finally setup my storage server (I know it's not much, but for me
 starting with 1TB is wonderful), I actually got around to redoing my
@@ -34,7 +37,8 @@ have to handle:
 I'd previously had most of the boxes logging to an older host with low
 disk space, but had to discontinue this due to lack of storage. Having
 assessed the options, and with definite plans to log to a database, I
-decided to go with [rsyslog][] for the centralized host.
+decided to go with [rsyslog](http://www.rsyslog.com) for the centralized
+host.
 
 Unfortunately, stable rsyslog is up to 4.4.x, with 5.x in development,
 and the newest package I could find for CentOS was 2.something. So, I
@@ -47,8 +51,9 @@ it:
     install rpmforge-release</span>
 2.  <span style="font-family: courier new;">yum install gnutls-devel
     gnutls libatomic\_ops-devel gcc43 java-1.6.0-openjdk-devel</span>
-3.  Download [rsyslog-4.5.2][] (currently Beta). Extract, cd into the
-    directory.
+3.  Download
+    [rsyslog-4.5.2](http://rsyslog.com/Downloads-index-req-viewdownload-cid-1-orderby-dateD.phtml)
+    (currently Beta). Extract, cd into the directory.
 4.  To test the performance difference from MySQL,
     <span style="font-family: courier new;">yum install php-pgsql
     postgresql postgresql-devel postgresql-libs postgresql-server</span>
@@ -268,11 +273,3 @@ $UDPServerRun 5000
 # END remote logging
 #
 ~~~~
-
-  [work]: http://services.rutgers.edu/
-  [Rutgers University Open System Solutions]: http://oss.rutgers.edu
-  [koji]: http://koji.rutgers.edu
-  [here]: http://koji.rutgers.edu/koji/buildinfo?buildID=2140
-  [5.6.2 source package]: http://koji.rutgers.edu/koji/rpminfo?rpmID=14051
-  [rsyslog]: http://www.rsyslog.com
-  [rsyslog-4.5.2]: http://rsyslog.com/Downloads-index-req-viewdownload-cid-1-orderby-dateD.phtml

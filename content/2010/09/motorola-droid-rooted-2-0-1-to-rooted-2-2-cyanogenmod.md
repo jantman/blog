@@ -18,9 +18,9 @@ that didn't include a wipe/reset, so I decided to keep putting it off.
 
 Well, after yesterday's bug (and after I played with the Camera app on
 an Incredible and saw how much nicer it is), I decided it was time to
-bite the bullet and move to [CyanogenMod][] ROMS. I performed the
-upgrade this morning, and it seems to have worked OK, though I haven't
-been using the phone very much since it finished.
+bite the bullet and move to [CyanogenMod](http://www.cyanogenmod.com/)
+ROMS. I performed the upgrade this morning, and it seems to have worked
+OK, though I haven't been using the phone very much since it finished.
 
 **Rooted 2.0.1 to CyanogenMod 2.2 procedure:**
 
@@ -28,19 +28,30 @@ I'm starting with a Motorola Droid, 2.0.1 (build ESD56), rooted,
 baseband C\_01.3E.01P, with SPRecovery 0.99.2b
 
 1.  Perform full Nandroid backup through SPRecovery.
-2.  Run [Call Logs Backup & Restore][] (v1.8) to backup call log.
-3.  Run [SMS Backup & Restore][] (v3.4) to backup SMS data.
-4.  Run [MyAppsList][] to make a list of all installed apps as HTML,
-    including market links. Save to SD card.
-5.  Run [Bookmark Sort & Backup Free][] to backup bookmarks to SD card.
-6.  Run [ASTRO][] file manager and backup ALL apps to SD card.
+2.  Run [Call Logs Backup &
+    Restore](market://search?q=com.riteshsahu.CallLogBackupRestore)
+    (v1.8) to backup call log.
+3.  Run [SMS Backup &
+    Restore](market://search?q=com.riteshsahu.SMSBackupRestore) (v3.4)
+    to backup SMS data.
+4.  Run [MyAppsList](market://search?q=com.boots.MyAppsList) to make a
+    list of all installed apps as HTML, including market links. Save to
+    SD card.
+5.  Run [Bookmark Sort & Backup
+    Free](market://search?q=com.happydroid.bookmarks) to backup
+    bookmarks to SD card.
+6.  Run [ASTRO](market://search?q=com.metago.astro) file manager and
+    backup ALL apps to SD card.
 7.  Mount the SD card on another computer and copy all the backups you
     just made to somewhere safe.
 
 For the rest of the procedure, I more or less followed the [CyanogenMod
-Droid Full Update][] guide.
+Droid Full
+Update](http://wiki.cyanogenmod.com/index.php?title=Full_Update_Guide_-_Motorola_Droid)
+guide.
 
-1.  Buy & install [ROM Manager][] Premium.
+1.  Buy & install [ROM
+    Manager](market://search?q=com.koushikdutta.rommanager) Premium.
 2.  Flash ClockworkMod Recovery.
 3.  Use ROM Manager to backup current ROM to SD card, copy the backup
     somewhere safe on another computer.
@@ -67,39 +78,42 @@ found (if any) in no particular order...
     as well as anything else I'd done in the boot settings file.
 -   I apparently lost the following apps (not restored when the phone
     synced with Google):
-    -   [Package Tracking][]
-    -   [Python for Android][]
-    -   [SL4A][]
-    -   [Tetronimo][]
+    -   [Package Tracking](market://search?q=com.ztech.packagetracking)
+    -   [Python for
+        Android](market://search?q=com.googlecode.pythonforandroid)
+    -   [SL4A](market://search?q=com.googlecode.android_scripting)
+    -   [Tetronimo](market://search?q=com.mahoney.tetronimo)
 
 -   The following apps were added by CyanogenMod (or are new since
     2.0.1):
-    -   [Chrome to Phone][] - [chrometophone][] - send links from Chrome
-        browser to your phone using some Google messaging service
-    -   [Dev Tools][Chrome to Phone] -
-    -   [DPSManager][Chrome to Phone] -
-    -   [News and Weather][Chrome to Phone]
-    -   [Places][Chrome to Phone] - [Google Places][]
-    -   [Spare Parts][Chrome to Phone] - apparently allows access to
-        some settings not available through the Settings menu
-    -   [Speech Recorder][Chrome to Phone]
-    -   [Superuser][Chrome to Phone] - App to graphically manage root
-        access
-    -   [Talk][Chrome to Phone] - [Google Talk][]
-    -   [Terminal Emulator][Chrome to Phone] (somehow I have two
-        installed...?)
-    -   [Twitter][Chrome to Phone]
-    -   [Videos][Chrome to Phone]
-    -   [Voice][Chrome to Phone] - [Google Voice mobile][]
+    -   [Chrome to Phone]() -
+        [chrometophone](http://code.google.com/p/chrometophone/) - send
+        links from Chrome browser to your phone using some Google
+        messaging service
+    -   [Dev Tools]() -
+    -   [DPSManager]() -
+    -   [News and Weather]()
+    -   [Places]() - [Google
+        Places](http://googleblog.blogspot.com/2010/04/introducing-google-places.html)
+    -   [Spare Parts]() - apparently allows access to some settings not
+        available through the Settings menu
+    -   [Speech Recorder]()
+    -   [Superuser]() - App to graphically manage root access
+    -   [Talk]() - [Google Talk](http://www.google.com/talk/)
+    -   [Terminal Emulator]() (somehow I have two installed...?)
+    -   [Twitter]()
+    -   [Videos]()
+    -   [Voice]() - [Google Voice
+        mobile](http://www.google.com/mobile/voice/)
 
 -   These apps had data associated with them which was somewhat
     important (I wrote the script below to handle the move):
-    -   [Alarm Clock Plus][Chrome to Phone]
-    -   [Barnacle WiFi Tether][Chrome to Phone]
-    -   [ConnectBot][Chrome to Phone]
-    -   [gReader][Chrome to Phone]
-    -   [Jewles][Chrome to Phone]
-    -   [Nagroid][Chrome to Phone]
+    -   [Alarm Clock Plus]()
+    -   [Barnacle WiFi Tether]()
+    -   [ConnectBot]()
+    -   [gReader]()
+    -   [Jewles]()
+    -   [Nagroid]()
 
 -   Had to re-set my notification sounds - Flutey Phone for incoming
     calls, Look at Me for messaging and Highwire for other
@@ -169,21 +183,3 @@ echo "DONE."
 ~~~~
 
 I'll update this now and then as I have more to add to it...
-
-  [CyanogenMod]: http://www.cyanogenmod.com/
-  [Call Logs Backup & Restore]: market://search?q=com.riteshsahu.CallLogBackupRestore
-  [SMS Backup & Restore]: market://search?q=com.riteshsahu.SMSBackupRestore
-  [MyAppsList]: market://search?q=com.boots.MyAppsList
-  [Bookmark Sort & Backup Free]: market://search?q=com.happydroid.bookmarks
-  [ASTRO]: market://search?q=com.metago.astro
-  [CyanogenMod Droid Full Update]: http://wiki.cyanogenmod.com/index.php?title=Full_Update_Guide_-_Motorola_Droid
-  [ROM Manager]: market://search?q=com.koushikdutta.rommanager
-  [Package Tracking]: market://search?q=com.ztech.packagetracking
-  [Python for Android]: market://search?q=com.googlecode.pythonforandroid
-  [SL4A]: market://search?q=com.googlecode.android_scripting
-  [Tetronimo]: market://search?q=com.mahoney.tetronimo
-  [Chrome to Phone]: 
-  [chrometophone]: http://code.google.com/p/chrometophone/
-  [Google Places]: http://googleblog.blogspot.com/2010/04/introducing-google-places.html
-  [Google Talk]: http://www.google.com/talk/
-  [Google Voice mobile]: http://www.google.com/mobile/voice/

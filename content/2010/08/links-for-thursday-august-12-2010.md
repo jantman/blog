@@ -5,7 +5,6 @@ Category: Miscellaneous
 Slug: links-for-thursday-august-12-2010
 
 -   [Washington State Board for Community & Technical Colleges Adopts CC
-    BY for All Competitive Grants - Creative Commons][]
+    BY for All Competitive Grants - Creative
+    Commons](http://creativecommons.org/weblog/entry/22712)
 
-  [Washington State Board for Community & Technical Colleges Adopts CC
-  BY for All Competitive Grants - Creative Commons]: http://creativecommons.org/weblog/entry/22712

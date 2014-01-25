@@ -6,10 +6,11 @@ Tags: microsoft, novell, suse, virtualization
 Slug: microsoft-and-novell-deliver-joint-virtualization-solution-or-do-they
 
 From PRNewsWire: [Microsoft and Novell Deliver Joint Virtualization
-Solution Through Partners][]. The headline of the press release:
-"Supported by Dell and other channel partners, solution includes SUSE
-Linux Enterprise Server running as optimized guest on Windows Server
-2008 Hyper-V."
+Solution Through
+Partners](http://www.prnewswire.com/cgi-bin/stories.pl?ACCT=104&STORY=/www/story/09-11-2008/0004883058&EDATE=).
+The headline of the press release: "Supported by Dell and other channel
+partners, solution includes SUSE Linux Enterprise Server running as
+optimized guest on Windows Server 2008 Hyper-V."
 
 Now, maybe I'm not up on the news regarding my favorite distribution,
 but it seems to me that a deal allowing SuSE to be virtualized as a
@@ -48,5 +49,4 @@ the virtualization arena, here's a few "simple" steps:
     guest) from a dual-core Pentium to an 8-core Xeon, or even a 16
     processor SPARC? Sure, no problem.
 
-  [Microsoft and Novell Deliver Joint Virtualization Solution Through
-  Partners]: http://www.prnewswire.com/cgi-bin/stories.pl?ACCT=104&STORY=/www/story/09-11-2008/0004883058&EDATE=
+

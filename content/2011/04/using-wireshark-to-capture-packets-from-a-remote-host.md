@@ -11,12 +11,16 @@ center (yes, just downstairs, but still not quite as comfortable as my
 office), and they're all command-line only - no sense in using up RAM
 and CPU to run a graphical UI on a box that should just be serving
 remote clients. I used to go through the arduous task of running a
-command line [`tcpdump`][] session on the server until I thought I had
-enough packets, then SCPing it over to my workstation and opening the
-file in [wireshark][] (formerly Ethereal). Fortunately, thanks to a
-[post][] on Rahul Panwar's [Linux Explore blog][] (which seems to be
-sadly neglected), I found a much easier way to do it. I've summarized
-that post here, added a little explanation, and also made some useful
+command line [`tcpdump`](http://www.tcpdump.org/) session on the server
+until I thought I had enough packets, then SCPing it over to my
+workstation and opening the file in
+[wireshark](http://www.wireshark.org/) (formerly Ethereal). Fortunately,
+thanks to a
+[post](http://linuxexplore.wordpress.com/2010/05/30/remote-packet-capture-using-wireshark-tcpdump/)
+on Rahul Panwar's [Linux Explore
+blog](http://linuxexplore.wordpress.com/) (which seems to be sadly
+neglected), I found a much easier way to do it. I've summarized that
+post here, added a little explanation, and also made some useful
 comments for people working on Red Hat/CentOS and OpenSuSE.
 
 **What you need:**
@@ -36,10 +40,10 @@ mkfifo /tmp/packet_capture
 ~~~~
 
     <p>
-    This creates a [named pipe][] where the source packet data (via ssh)
-    will be written and Wireshark will read it from. You can use any
-    name or location you want, but `/tmp/packet_capture` is pretty
-    logical.
+    This creates a [named pipe](http://en.wikipedia.org/wiki/Named_pipe)
+    where the source packet data (via ssh) will be written and Wireshark
+    will read it from. You can use any name or location you want, but
+    `/tmp/packet_capture` is pretty logical.
 
 2.  On your destination system, open up Wireshark (we do this now, since
     on many systems it required the root password to start). In the
@@ -91,9 +95,3 @@ the data you need. If you can replace it with a filter for specific
 ports (i.e. `'(port 67 or port 68)'` for DHCP) or specific hosts, that
 should cut down on the amount of data you actually have to pass through
 the tunnel.
-
-  [`tcpdump`]: http://www.tcpdump.org/
-  [wireshark]: http://www.wireshark.org/
-  [post]: http://linuxexplore.wordpress.com/2010/05/30/remote-packet-capture-using-wireshark-tcpdump/
-  [Linux Explore blog]: http://linuxexplore.wordpress.com/
-  [named pipe]: http://en.wikipedia.org/wiki/Named_pipe

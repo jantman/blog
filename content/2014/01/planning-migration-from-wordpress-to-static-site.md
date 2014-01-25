@@ -6,27 +6,28 @@ Tags: blog, jekyll, pelican, python, static site, wordpress
 Slug: planning-migration-from-wordpress-to-static-site
 
 Right now, this blog, my email, and a whole bunch of other services are
-hosted on a [Linode][] Xen VM. I don't really keep up to date with
-administration and upgrades the way I used to, and honestly, I'd rather
-spend my time working on other things (like actually writing all of the
-blog posts that I've been planning to. The first thing I've identified
-for migration is this blog itself. It's currently on WordPress and,
-frankly, I don't either need nor like it. But there are some features I
-like. I'd like to end up with a static site generator, hosted from
-either S3 or GitHub Pages. I know that means I'll lost comments (unless
-I move to a third-party, JS-based comment system like [Disqus][], which
-means I'll lose *control* over my comments) but I suppose I can live
-with that. What I really want is something simple, static, cheap or free
-(that I'll likely put behind a small ec2 instance running nginx for
-redirects/rewrites).
+hosted on a [Linode](http://linode.com) Xen VM. I don't really keep up
+to date with administration and upgrades the way I used to, and
+honestly, I'd rather spend my time working on other things (like
+actually writing all of the blog posts that I've been planning to. The
+first thing I've identified for migration is this blog itself. It's
+currently on WordPress and, frankly, I don't either need nor like it.
+But there are some features I like. I'd like to end up with a static
+site generator, hosted from either S3 or GitHub Pages. I know that means
+I'll lost comments (unless I move to a third-party, JS-based comment
+system like [Disqus](http://disqus.com/), which means I'll lose
+*control* over my comments) but I suppose I can live with that. What I
+really want is something simple, static, cheap or free (that I'll likely
+put behind a small ec2 instance running nginx for redirects/rewrites).
 
 I'm still in the planning phase, and trying to come up with a
 feature-by-feature comparison of my options. I'll likely post that when
 I finally have it done (at the moment it's in a very rough [Google Docs
-spreadsheet][]). I'm trying to round up my static site generator options
-and see which ones will do most, if not all, of what I want (though I
-still haven't discounted using hosted wordpress if it comes down to it).
-Here are the features I currently "use" (have) on my WordPress blog:
+spreadsheet](https://docs.google.com/spreadsheet/ccc?key=0AnHh-ye5DNiNdF9DWkJrT2kzSkNsNVp6cjMzLXJ6VEE&usp=sharing)).
+I'm trying to round up my static site generator options and see which
+ones will do most, if not all, of what I want (though I still haven't
+discounted using hosted wordpress if it comes down to it). Here are the
+features I currently "use" (have) on my WordPress blog:
 
 -   User-defined permalinks to posts
 -   Overall RSS feed of blog (currently powered by FeedBurner) and of
@@ -37,8 +38,8 @@ Here are the features I currently "use" (have) on my WordPress blog:
 -   per-Category and per-Tag feeds (RSS)
 -   Tag cloud "widget" in sidebar
 -   Themes. I actually like my current WP theme...
--   Visitor statistics (currently self-hosted [Piwik][], formerly Google
-    Analytics)
+-   Visitor statistics (currently self-hosted
+    [Piwik](http://piwik.org/), formerly Google Analytics)
 -   Post publishing via cron'ed script (*see below*)
 -   Draft/Pending status (i.e. let me save a partial post, and let me
     save a complete post but mark it "pending" so I can just publish it
@@ -71,8 +72,3 @@ readers after the death of Google Reader. So I set the posts to
 "Pending" status, and I have a cron'ed script that runs every weekday
 morning and publishes the one oldest "pending" post. Who knows if this
 actually does any good or not...
-
-  [Linode]: http://linode.com
-  [Disqus]: http://disqus.com/
-  [Google Docs spreadsheet]: https://docs.google.com/spreadsheet/ccc?key=0AnHh-ye5DNiNdF9DWkJrT2kzSkNsNVp6cjMzLXJ6VEE&usp=sharing
-  [Piwik]: http://piwik.org/

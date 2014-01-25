@@ -13,15 +13,14 @@ Maps Navigation, everything seems to be playing through the speaker at
 the regular in-call volume - i.e. the volume that it should be at if the
 handset is up to my ear.
 
-I happened by one [blog post][] mentioning this issue. The two
-resolutions mentioned were a soft reset and a replacement of the phone.
-Hoping for the former, I performed a soft reset - using the good 'ol
-Ctrl + Alt + Del sequence - and this seems to have fixed it. Now I just
-have to hope that it stays fixed...
+I happened by one [blog
+post](http://pocketnow.com/tech-news/droid-can-you-hear-me-now)
+mentioning this issue. The two resolutions mentioned were a soft reset
+and a replacement of the phone. Hoping for the former, I performed a
+soft reset - using the good 'ol Ctrl + Alt + Del sequence - and this
+seems to have fixed it. Now I just have to hope that it stays fixed...
 
 My personal theory is that some application - whether a code problem or
 a crash - left the speaker in a low-volume state. Most likely was my
 poking around in the hidden menus which, at one point, killed the Phone
 app process.
-
-  [blog post]: http://pocketnow.com/tech-news/droid-can-you-hear-me-now

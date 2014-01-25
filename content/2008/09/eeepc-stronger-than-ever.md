@@ -5,13 +5,14 @@ Category: Miscellaneous
 Tags: asus, eeepc, linux
 Slug: eeepc-stronger-than-ever
 
-It seems like every time I open up my [Google Reader][] account, there's
-news about another company that released a knock-off of my beloved [Asus
-eeePC 4G Surf (701)][] (interestingly, it looks like eeepc.asus.com is
-down at the moment of writing). Even Asus has released numerous (I think
-the product like is now up to about 10 variations) follow-ups to the 7"
-beauty, now up to 10" in size (though, admittedly, I'm
-less-than-enthused about their Windows models).
+It seems like every time I open up my [Google
+Reader](http://reader.google.com) account, there's news about another
+company that released a knock-off of my beloved [Asus eeePC 4G Surf
+(701)](http://eeepc.asus.com/global/700.htm) (interestingly, it looks
+like eeepc.asus.com is down at the moment of writing). Even Asus has
+released numerous (I think the product like is now up to about 10
+variations) follow-ups to the 7" beauty, now up to 10" in size (though,
+admittedly, I'm less-than-enthused about their Windows models).
 
 With the new semester here, I am (unfortunately) back in class. And I'm
 very happy to report that I'm starting to see eeePCs in more and more
@@ -32,6 +33,3 @@ definitely a good omen. Seeing non-geek, and perhaps even non-CS and
 non-Engineering, students using Linux speaks quite well for the
 expansion of the Linux user base when these students graduate and enter
 the "real world"
-
-  [Google Reader]: http://reader.google.com
-  [Asus eeePC 4G Surf (701)]: http://eeepc.asus.com/global/700.htm

@@ -39,18 +39,19 @@ our creations, some documentation of the decisions we made - and the
 reasoning behind them - will be extremely useful.
 
 Case in point: My latest project started as performance analysis of a
-large DHCP server using the [Masney LDAP patch][] to [ISC DHCPd][].
-After over a week of performance testing and trying different
-configurations and theories (all of which I "documented" in my text file
-lab notebook), we ended up deciding to totally remove LDAP from the
-system, move to configuration files generated from MySQL, and keep
-everything (including the logs) in ramdisk. We found performance
-bottlenecks in both the LDAP communication and disk IO. We have the
-performance test output to prove it. We have the results of dozens of
-tests with different configurations, as well as a number of problems we
-identified with the LDAP patch. And from testing, we have a handful of
-issues identified and fixed in the new system, whose fixes aren't
-exactly intuitive.
+large DHCP server using the [Masney LDAP
+patch](http://personal.cfw.com/~masneyb/) to [ISC
+DHCPd](http://www.isc.org/software/dhcp). After over a week of
+performance testing and trying different configurations and theories
+(all of which I "documented" in my text file lab notebook), we ended up
+deciding to totally remove LDAP from the system, move to configuration
+files generated from MySQL, and keep everything (including the logs) in
+ramdisk. We found performance bottlenecks in both the LDAP communication
+and disk IO. We have the performance test output to prove it. We have
+the results of dozens of tests with different configurations, as well as
+a number of problems we identified with the LDAP patch. And from
+testing, we have a handful of issues identified and fixed in the new
+system, whose fixes aren't exactly intuitive.
 
 The previous system had pretty poor documentation, but even worse, it
 was only functional documentation - what the system does, and how it
@@ -65,6 +66,3 @@ The next time someone needs to fix or tweak or re-engineer the system,
 they'll be able to figure out what happens on line 123 of the init
 script themselves. But it might take them hours to figure out *why* it's
 done, or *why* it's done *that way*.
-
-  [Masney LDAP patch]: http://personal.cfw.com/~masneyb/
-  [ISC DHCPd]: http://www.isc.org/software/dhcp

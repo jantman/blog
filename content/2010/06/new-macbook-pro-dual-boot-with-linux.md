@@ -15,10 +15,11 @@ side, my new laptop just came in - a shiny new 13" MacBook Pro, 2.4GHz
 Core2 Duo, 4GB RAM, 250GB HDD. Every time I see Mac packaging, I
 remember why they cost so much - the box must be half the price!
 
-![MacBook Pro][]
+![MacBook Pro](/GFX/newMacBookPro.jpg)
 
 If all goes well, I'll have the machine setup to dual-boot OSX and Linux
-(specifically [OpenSuSE][] 11.2. I'll post notes when I have it done.
+(specifically [OpenSuSE](http://www.opensuse.org) 11.2. I'll post notes
+when I have it done.
 
 The list of things I have to figure out beyond just getting both OSes
 running:
@@ -32,6 +33,3 @@ running:
 -   Is there a way to select the boot OS (rEFIt) from Linux?
 
 Stay tuned...
-
-  [MacBook Pro]: /GFX/newMacBookPro.jpg
-  [OpenSuSE]: http://www.opensuse.org

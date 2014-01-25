@@ -11,7 +11,7 @@ The page you are looking for is best found at:
 
 '; echo '
 
-**['.$newURL.'][]**
+**['.$newURL.']('.$newURL.')**
 
 '; echo '
 
@@ -30,4 +30,3 @@ This script takes two distinct actions:
 -   Otherwise, it displays a "page moved to" message and uses a
     Meta-Refresh to redirect after 5 seconds.
 
-  ['.$newURL.']: '.$newURL.'

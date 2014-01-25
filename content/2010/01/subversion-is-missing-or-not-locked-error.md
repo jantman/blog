@@ -14,14 +14,14 @@ svn: Working copy '/srv/www/htdocs/newcall/stats/generated' is missing or not lo
 ~~~~
 
 The problem was a directory, "generated". This particular app makes use
-of [libchart][] to draw simple charts in PHP. Libchart writes the charts
-to files, and therefore needs a directory writable by the Apache user.
-So, I created the `generated/` directory for these output files, and
-`chown`ed `wwwrun:www`. Now, apparently, the subversion `svn add`
-command doesn't check ownership/writable permissions before adding a
-directory. So, it added `generated/` to the main list of files, but
-couldn't write the `.svn` directory and add a lock. IMHO, this is an
-error in the svn client.
+of [libchart](http://naku.dohcrew.com/libchart) to draw simple charts in
+PHP. Libchart writes the charts to files, and therefore needs a
+directory writable by the Apache user. So, I created the `generated/`
+directory for these output files, and `chown`ed `wwwrun:www`. Now,
+apparently, the subversion `svn add` command doesn't check
+ownership/writable permissions before adding a directory. So, it added
+`generated/` to the main list of files, but couldn't write the `.svn`
+directory and add a lock. IMHO, this is an error in the svn client.
 
 I couldn't find any solutions to the problem online. Essentially, I have
 an empty directory (or at least nothing useful in it) that got partially
@@ -51,4 +51,3 @@ heart. Be sure you don't screw anything up.
     svn before setting the ownership.
 8.  Commit. It should now work.
 
-  [libchart]: http://naku.dohcrew.com/libchart

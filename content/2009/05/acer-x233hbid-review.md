@@ -5,11 +5,13 @@ Category: Miscellaneous
 Tags: acer, cant fix stupid, monitor, review
 Slug: acer-x233hbid-review
 
-I just bought myself a new monitor for my [MythTV][] box, as I've moved
-my beautiful Acer AL2416W 24"er to my new desktop. The chosen monitor,
-based on price, reviews and features, is the Acer X233Hbid. It's a 23"
-16:9 (not 16:10) monitor that runs at 1920x1080, provides true 1080p,
-and has an HDMI input (not that I'd ever use a [restricted][]
+I just bought myself a new monitor for my
+[MythTV](http://www.mythtv.org) box, as I've moved my beautiful Acer
+AL2416W 24"er to my new desktop. The chosen monitor, based on price,
+reviews and features, is the Acer X233Hbid. It's a 23" 16:9 (not 16:10)
+monitor that runs at 1920x1080, provides true 1080p, and has an HDMI
+input (not that I'd ever use a
+[restricted](http://www.eff.org/deeplinks/2007/01/hdcp-screwing-fans-more-ways-ever)
 connection). After a few minutes of having it turned on and running, the
 picture quality is quite nice, even with quite a bit of glare.
 
@@ -25,9 +27,10 @@ unboxing it:
     a bad decision. But why, you ask, would I need a manual for my
     monitor?
 2.  **No VESA mounting instructions** One of my main criteria in
-    choosing a monitor was that it allow [VESA][] mounting, as I have my
-    MythTV monitor on a monitor arm (easily adjustable angle so others
-    in the room can see). The Acer X233Hbid has a 100x100mm VESA
+    choosing a monitor was that it allow
+    [VESA](http://en.wikipedia.org/wiki/VESA_mount) mounting, as I have
+    my MythTV monitor on a monitor arm (easily adjustable angle so
+    others in the room can see). The Acer X233Hbid has a 100x100mm VESA
     mounting space on the back. However, in a rare design mistake
     (unlike my 24" Acer AL2416W), the monitor stand is two parts - one
     rectangular column about 4" long attached to the back of the
@@ -44,7 +47,3 @@ appeared to be snap-in trim pieces. Prying them off with a screwdriver
 revealed four screws which hold this piece to the monitor. Not only was
 removal easy, but the trim pieces snapped back into place for a nice
 clean look.
-
-  [MythTV]: http://www.mythtv.org
-  [restricted]: http://www.eff.org/deeplinks/2007/01/hdcp-screwing-fans-more-ways-ever
-  [VESA]: http://en.wikipedia.org/wiki/VESA_mount

@@ -11,7 +11,8 @@ grabs that version (by parsing the cached YAML catalog) and sets it as a
 fact called "catalog\_config\_version". It can then be used for
 sanity-checking your nodes, looking up via the Inventory Service, or you
 can display it in the Dashboard using my patch: [Patch to Puppet
-Dashboard 1.2.10 to show arbitrary facts in the main node table][].
+Dashboard 1.2.10 to show arbitrary facts in the main node
+table](http://blog.jasonantman.com/2012/08/patch-to-puppet-dashboard-1-2-10-to-show-arbitrary-facts-in-the-main-node-table/).
 
 ~~~~{.ruby}
 #
@@ -55,8 +56,4 @@ end
 ~~~~
 
 All of my facts are now available in a GitHub repository:
-[https://github.com/jantman/puppet-facter-facts][].
-
-  [Patch to Puppet Dashboard 1.2.10 to show arbitrary facts in the main
-  node table]: http://blog.jasonantman.com/2012/08/patch-to-puppet-dashboard-1-2-10-to-show-arbitrary-facts-in-the-main-node-table/
-  [https://github.com/jantman/puppet-facter-facts]: https://github.com/jantman/puppet-facter-facts
+[https://github.com/jantman/puppet-facter-facts](https://github.com/jantman/puppet-facter-facts).

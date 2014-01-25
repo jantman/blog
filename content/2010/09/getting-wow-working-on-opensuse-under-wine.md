@@ -5,22 +5,24 @@ Category: Tech HowTos
 Tags: warcraft, wine, wow
 Slug: getting-wow-working-on-opensuse-under-wine
 
-Ok, I'll admit it, I've been playing [WoW][]. I'm not usually the gamer
-type, but my girlfriend pressured me into it a bit and, hey, if a
-woman's idea of quality time is sitting in the same room in front of
-computers playing a [MMORPG][], who am I to complain? My non-work-hours
-productivity had suffered quite a bit, but I'm not yet at risk of
-becoming a full-on addict.
+Ok, I'll admit it, I've been playing
+[WoW](http://www.worldofwarcraft.com). I'm not usually the gamer type,
+but my girlfriend pressured me into it a bit and, hey, if a woman's idea
+of quality time is sitting in the same room in front of computers
+playing a [MMORPG](http://en.wikipedia.org/wiki/Mmorpg), who am I to
+complain? My non-work-hours productivity had suffered quite a bit, but
+I'm not yet at risk of becoming a full-on addict.
 
 So, for a slight diversion from the usual content...
 
 Of course, I'm not going to run Windows just to play a game, and the
 screen on my MacBook Pro is pitifully small compared to the 24" LCD on
-my desktop. So I've been running WoW through [Wine][] on an admittedly
-out of date [OpenSuSE][] 11.1 install on my workstation (a Dell
-Precision 470 - 2 Gb 400Mhz DDR ECC RAM, 16 Gb swap, dual 2.8GHz Xeons
-with HT, 16 KB L1 cache, 1 MB L2 cache, and a pitiful ATI Radeon 3600
-HD, and everything in /home (including the game) on a 7200 RPM SATA
+my desktop. So I've been running WoW through
+[Wine](http://www.winehq.org/) on an admittedly out of date
+[OpenSuSE](http://www.opensuse.org/) 11.1 install on my workstation (a
+Dell Precision 470 - 2 Gb 400Mhz DDR ECC RAM, 16 Gb swap, dual 2.8GHz
+Xeons with HT, 16 KB L1 cache, 1 MB L2 cache, and a pitiful ATI Radeon
+3600 HD, and everything in /home (including the game) on a 7200 RPM SATA
 disk).
 
 With my recent need to upgrade to Burning Crusade, I hit a few bumps. I
@@ -51,8 +53,8 @@ process. But here's the final state of all the things I tweaked.
 
 I'm running OpenSuSE 11.1, kernel 2.6.27.45-0.1-default (SMP x86\_64),
 wine 1.3.1 (1.3.1-1.1 from the OpenSuSE
-[Emulators:/Wine/openSUSE\_11.1][] repo) running under WindowMaker
-0.92.0-204.6.
+[Emulators:/Wine/openSUSE\_11.1](http://download.opensuse.org/repositories/Emulators:/Wine/openSUSE_11.1/)
+repo) running under WindowMaker 0.92.0-204.6.
 
 If you happen to find this post and give it a shot, please comment if it
 worked, or what you did differently. If it will be of help, drop me a
@@ -80,8 +82,3 @@ a good starting point for troubleshooting.
     decorate the windows" and "Allow the window manager to control the
     windows" (fixed my last hang at patch 3.3.5-12340)
 
-  [WoW]: http://www.worldofwarcraft.com
-  [MMORPG]: http://en.wikipedia.org/wiki/Mmorpg
-  [Wine]: http://www.winehq.org/
-  [OpenSuSE]: http://www.opensuse.org/
-  [Emulators:/Wine/openSUSE\_11.1]: http://download.opensuse.org/repositories/Emulators:/Wine/openSUSE_11.1/

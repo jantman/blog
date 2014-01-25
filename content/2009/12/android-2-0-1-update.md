@@ -35,7 +35,7 @@ the only release notes for the update, states:
 > device or make emergency calls for the duration of the install. The
 > software updates automatically, and your DROID will power off and on
 > as part of this software update. For more information please visit:
-> [www.verizonwireless.com/droidsupport][]
+> [www.verizonwireless.com/droidsupport](www.verizonwireless.com/droidsupport)
 
 Not too helpful. And pretty cryptic.
 
@@ -46,13 +46,17 @@ I also noticed that the on screen keyboard seems to react better to
 quick keypresses - perhaps they've enabled multitouch for this?
 
 Unfortunately, I wasn't able to find much release documentation from
-Google other than the [API changes][] - no full release notes or
-changelog like I'd like. And not even a summary of changes that I could
-find.
+Google other than the [API
+changes](http://developer.android.com/sdk/android-2.0.1.html) - no full
+release notes or changelog like I'd like. And not even a summary of
+changes that I could find.
 
-At the VZW droid support site, I found a [link to a PDF][] of "Why to
-Update" ([local copy][]). This sheet lists the enhancements made by the
-update ("AP:ESD56/BP:C\_01.3E.01P", build ESD56) as:
+At the VZW droid support site, I found a [link to a
+PDF](http://learning.verizonwireless.com/learning/Droid_Motorola_Software_Update.pdf)
+of "Why to Update" ([local
+copy](http://blog.jasonantman.com/GFX/Droid_Motorola_Software_Update.pdf)).
+This sheet lists the enhancements made by the update
+("AP:ESD56/BP:C\_01.3E.01P", build ESD56) as:
 
 -   OS stability is improved.
 -   Battery life is improved.
@@ -93,7 +97,3 @@ found:
 -   I haven't checked yet, but I've seen some forum posts about lost
     contacts and Facebook sync issues.
 
-  [www.verizonwireless.com/droidsupport]: www.verizonwireless.com/droidsupport
-  [API changes]: http://developer.android.com/sdk/android-2.0.1.html
-  [link to a PDF]: http://learning.verizonwireless.com/learning/Droid_Motorola_Software_Update.pdf
-  [local copy]: http://blog.jasonantman.com/GFX/Droid_Motorola_Software_Update.pdf

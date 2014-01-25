@@ -5,12 +5,15 @@ Category: Miscellaneous
 Tags: geek, interaction, jargon, social
 Slug: geeks-use-of-jargon-around-non-geeks
 
-In my daily reading of [Tom Limoncelli's blog][], I happened by a
-[post][] with a link to an article, ["Geek behaviors present during
-conversations" by Phillip Guo][]. The article is quite interesting, and
-describes quite a few phenomena that can be noticed when conversing with
-a [geek][]. One of the parts that immediately stuck out in my mind,
-though, was:
+In my daily reading of [Tom Limoncelli's
+blog](http://blog.whatexit.org/), I happened by a
+[post](http://yesthattom.livejournal.com/1020557.html) with a link to an
+article, ["Geek behaviors present during conversations" by Phillip
+Guo](http://www.stanford.edu/~pgbovine/geek-behaviors.htm). The article
+is quite interesting, and describes quite a few phenomena that can be
+noticed when conversing with a
+[geek](http://www.jasonantman.com/jargon/entry.php?id=geek). One of the
+parts that immediately stuck out in my mind, though, was:
 
 > **Using technical terms without checking for understanding**
 >
@@ -73,8 +76,3 @@ I'm describing a project, I don't want whoever I'm talking to to ask
 questions when I'm done describing it. It's like documentation - if I
 were writing a man page, whoever reads it shouldn't be left with major
 questions to ask when they finish.
-
-  [Tom Limoncelli's blog]: http://blog.whatexit.org/
-  [post]: http://yesthattom.livejournal.com/1020557.html
-  ["Geek behaviors present during conversations" by Phillip Guo]: http://www.stanford.edu/~pgbovine/geek-behaviors.htm
-  [geek]: http://www.jasonantman.com/jargon/entry.php?id=geek

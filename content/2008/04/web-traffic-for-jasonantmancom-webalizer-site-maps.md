@@ -6,12 +6,13 @@ Tags: bacula, bandwidth, connectivity, ISP, Nagios, webalizer
 Slug: web-traffic-for-jasonantmancom-webalizer-site-maps
 
 I've been working on the design of a town council campaign site for a
-friend - [www.mikennick08.com][]. It's hosted by an additional Apache
-vhost on my personal server (and running off of port 10015 - ugh). I
-setup [Webalizer][] for him, so I figured I'd give my own webalizer
-installation a check. Wow - 30,215 hits this month alone. That reminded
-me of a problem with my ignored hosts - 17,600 of those hits were
-Googlebot, and another 2,065 were Yandex (a Russian search engine).
+friend - [www.mikennick08.com](http://www.mikennick08.com/). It's hosted
+by an additional Apache vhost on my personal server (and running off of
+port 10015 - ugh). I setup [Webalizer](http://www.mrunix.net/webalizer/)
+for him, so I figured I'd give my own webalizer installation a check.
+Wow - 30,215 hits this month alone. That reminded me of a problem with
+my ignored hosts - 17,600 of those hits were Googlebot, and another
+2,065 were Yandex (a Russian search engine).
 
 Amazingly, though, it seems like Google is only indexing my blog. My
 precious wiki seems out of whack, not to metion my CVS repository.
@@ -54,6 +55,3 @@ Most of the previous projects have been put on hold for the time being
 (mainly because of impending final exams at school) - the new Gigabit
 Ethernet switch for backups, testing Zenoss and upgrading monitoring (to
 a new product or Nagios 3), etc.
-
-  [www.mikennick08.com]: http://www.mikennick08.com/
-  [Webalizer]: http://www.mrunix.net/webalizer/

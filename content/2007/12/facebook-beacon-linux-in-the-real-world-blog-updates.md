@@ -20,12 +20,14 @@ this, it would be easiest to handle the blog with software on my server,
 probably something slightly custom.
 
 <span style="font-weight: bold;">Facebook Beacon</span>  
-In an update on Facebook Beacon, I came by [this][] post on Slashdot,
-referencing a [ComputerWorld article][] questioning whether Facebook
-Beacon could possibly be sued, as it appears to violate the Video
-Privacy Protection Act of 1988, which prevents video rental agencies
-from disclosing the rental history of their customers without a written
-release. Interesting stuff.
+In an update on Facebook Beacon, I came by
+[this](http://yro.slashdot.org/article.pl?sid=07/12/14/1620258&from=rss)
+post on Slashdot, referencing a [ComputerWorld
+article](http://www.computerworld.com/action/article.do?command=viewArticleBasic&articleId=9053002&intsrc=hm_list)
+questioning whether Facebook Beacon could possibly be sued, as it
+appears to violate the Video Privacy Protection Act of 1988, which
+prevents video rental agencies from disclosing the rental history of
+their customers without a written release. Interesting stuff.
 
 <span style="font-weight: bold;">Linux in the Real World</span>  
 Being an avid Linux user, and a fan of both the functionality (from the
@@ -38,18 +40,16 @@ customer, I doubt that will happen until they move to GSM in a few
 years. Some people accuse me of being anti-Microsoft. Sure, I am. Why
 would I pay $200 for Windows when it doesn't do half of what my free
 Linux does? I'm not even going to touch on the moral aspects. But just
-look at the [arguments against the OOXML standard][]. Microsoft sure
-does do some stupid stuff, and seems to miss the whole idea of the
-workings of standards. If it only exists in ONE proprietary product, I
-don't see how you can call it a standard.
+look at the [arguments against the OOXML
+standard](http://www.noooxml.org/petition). Microsoft sure does do some
+stupid stuff, and seems to miss the whole idea of the workings of
+standards. If it only exists in ONE proprietary product, I don't see how
+you can call it a standard.
 
-Anyway, I found [this][1] article from the New York Times, talking about
-how the New York Stock Exchange is "investing heavily" in Linux on
-commodity x86 hardware, replacing Unix mainframes, nonetheless. And what
-hardware are they using? My beloved HP
+Anyway, I found
+[this](http://www.nytimes.com/idg/IDG_002570DE00740E18002573B100020F62.html?ex=1355288400&en=1a1c847788830aeb&ei=5088&partner=rssnyt&emc=rss/ru/)
+article from the New York Times, talking about how the New York Stock
+Exchange is "investing heavily" in Linux on commodity x86 hardware,
+replacing Unix mainframes, nonetheless. And what hardware are they
+using? My beloved HP
 Proliants.<span style="display: block;" id="formatbar_Buttons"><span class="down" style="display: block;" id="formatbar_CreateLink" title="Link" onmouseover="ButtonHoverOn(this);" onmouseout="ButtonHoverOff(this);" onmouseup onmousedown="CheckFormatting(event);FormatbarButton('richeditorframe', this, 8);ButtonMouseDown(this);"></span></span>
-
-  [this]: http://yro.slashdot.org/article.pl?sid=07/12/14/1620258&from=rss
-  [ComputerWorld article]: http://www.computerworld.com/action/article.do?command=viewArticleBasic&articleId=9053002&intsrc=hm_list
-  [arguments against the OOXML standard]: http://www.noooxml.org/petition
-  [1]: http://www.nytimes.com/idg/IDG_002570DE00740E18002573B100020F62.html?ex=1355288400&en=1a1c847788830aeb&ei=5088&partner=rssnyt&emc=rss/ru/

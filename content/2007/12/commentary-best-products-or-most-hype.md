@@ -5,23 +5,24 @@ Category: Ideas and Rants
 Tags: important businessweek vista iphone products
 Slug: commentary-best-products-or-most-hype
 
-In my usual lunchtime [Digg][] reading, I came by a link to the
-[BusinessWeek Most Important Products of 2007][]. Given the number of
-cars, it's apparent that this is a very consumer-oriented listing. But I
-was a bit surprised - the first four products were all from Apple - the
-iPhone, MacBook Pro, OS X Leopard, and Apple TV. While some of these are
-definitely interesting, I really don't think that any other than the
-iPhone could be considered truly important or groundbreaking. OS X
-Leopard and the MacBook Pro may be wonderful for Mac users, but they're
-not really anything "new" in the sense of ideas - they're just updated
-versions with more/better features. Given the amount of hype that
-surrounded it, it was clear that the iPhone would be on this list. And I
-will admit that, despite my moral objections to it (bricking phones that
-innocent users unlocked), the iPhone is very nicely done. But it's not
-anything truly NEW. It's a step in progression. There were phones with
-cameras, phones that were thin, phones with touchscreens, and phones
-that played MP3s. Apple just pulled all - and some extra - into a very
-nice package.
+In my usual lunchtime [Digg](http://www.digg.com) reading, I came by a
+link to the [BusinessWeek Most Important Products of
+2007](http://images.businessweek.com/ss/07/12/1210_bestworst_products/index_01.htm).
+Given the number of cars, it's apparent that this is a very
+consumer-oriented listing. But I was a bit surprised - the first four
+products were all from Apple - the iPhone, MacBook Pro, OS X Leopard,
+and Apple TV. While some of these are definitely interesting, I really
+don't think that any other than the iPhone could be considered truly
+important or groundbreaking. OS X Leopard and the MacBook Pro may be
+wonderful for Mac users, but they're not really anything "new" in the
+sense of ideas - they're just updated versions with more/better
+features. Given the amount of hype that surrounded it, it was clear that
+the iPhone would be on this list. And I will admit that, despite my
+moral objections to it (bricking phones that innocent users unlocked),
+the iPhone is very nicely done. But it's not anything truly NEW. It's a
+step in progression. There were phones with cameras, phones that were
+thin, phones with touchscreens, and phones that played MP3s. Apple just
+pulled all - and some extra - into a very nice package.
 
 So what else was mentioned? The Dell XPS One, some Mac-ish all-in-one
 Media Center PC. It puts everything my computer has in one OEM package,
@@ -57,6 +58,3 @@ machines.
 7) The portion of the 700-MHz spectrum set for auction by the FCC.
 (well, not a consumer product, but it could revolutionize mobile
 communications if it falls into the right hands).
-
-  [Digg]: http://www.digg.com
-  [BusinessWeek Most Important Products of 2007]: http://images.businessweek.com/ss/07/12/1210_bestworst_products/index_01.htm

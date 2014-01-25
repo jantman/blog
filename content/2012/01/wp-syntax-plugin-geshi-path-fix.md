@@ -5,14 +5,17 @@ Category: Tech HowTos
 Tags: GeSHi, PHP, syntax highlighting, wordpress
 Slug: wp-syntax-plugin-geshi-path-fix
 
-The [Wp-Syntax][] plugin for [WordPress][] provides syntax highlighting
-for WordPress blogs via the [GeSHi][] PHP syntax highlighter.
-Unfortunately, the plugin includes a builtin version of GeSHi (currently
-1.0.8.9) in `geshi/`. As a result, not only are users of the plugin not
-instructed to use the latest version of GeSHi, but it won't use a
-host-wide GeSHi installation that's already in the PHP include path
-(i.e. `/usr/share/php/`), like the the many [php-geshi packages][]
-offered by repositories including [EPEL][] (for Fedora, CentOS and
+The [Wp-Syntax](http://wordpress.org/extend/plugins/wp-syntax/) plugin
+for [WordPress](http://wordpress.org) provides syntax highlighting for
+WordPress blogs via the [GeSHi](http://qbnz.com/highlighter) PHP syntax
+highlighter. Unfortunately, the plugin includes a builtin version of
+GeSHi (currently 1.0.8.9) in `geshi/`. As a result, not only are users
+of the plugin not instructed to use the latest version of GeSHi, but it
+won't use a host-wide GeSHi installation that's already in the PHP
+include path (i.e. `/usr/share/php/`), like the the many [php-geshi
+packages](http://pkgs.org/search/?keyword=php-geshi&search_on=name&distro=0&arch=32-bit)
+offered by repositories including
+[EPEL](http://fedoraproject.org/wiki/EPEL) (for Fedora, CentOS and
 RHEL).
 
 The fix is quite simple. Just open `wp-syntax.php` in the `wp-syntax/`
@@ -45,12 +48,7 @@ Note - if you're in a shared hosting environment, or are otherwise not
 able to upgrade the php-geshi package on your server yourself, you might
 not want to do this.
 
-I also [posted about this in the WordPress support forums][]. Hopefully
-the WP-Syntax devs will include this change in the next version...
-
-  [Wp-Syntax]: http://wordpress.org/extend/plugins/wp-syntax/
-  [WordPress]: http://wordpress.org
-  [GeSHi]: http://qbnz.com/highlighter
-  [php-geshi packages]: http://pkgs.org/search/?keyword=php-geshi&search_on=name&distro=0&arch=32-bit
-  [EPEL]: http://fedoraproject.org/wiki/EPEL
-  [posted about this in the WordPress support forums]: http://wordpress.org/support/topic/wp-syntax-move-geshi-include-path-to-allow-use-with-host-wide-geshi?replies=1#post-2556903
+I also [posted about this in the WordPress support
+forums](http://wordpress.org/support/topic/wp-syntax-move-geshi-include-path-to-allow-use-with-host-wide-geshi?replies=1#post-2556903).
+Hopefully the WP-Syntax devs will include this change in the next
+version...

@@ -5,7 +5,6 @@ Category: Miscellaneous
 Slug: interesting-links-for-2008-07-31
 
 -   [Teenager hacks together hardware for controlling your car via phone
-    - Engadget Mobile][]
+    - Engadget
+    Mobile](http://www.engadgetmobile.com/2008/07/28/teenager-hacks-together-hardware-for-controlling-your-car-via-ph/)
 
-  [Teenager hacks together hardware for controlling your car via phone -
-  Engadget Mobile]: http://www.engadgetmobile.com/2008/07/28/teenager-hacks-together-hardware-for-controlling-your-car-via-ph/

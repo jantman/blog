@@ -5,17 +5,19 @@ Category: Tech HowTos
 Tags: catrography, emergency, EMS, google, maps, PHP
 Slug: using-google-maps-to-produce-usable-printable-maps
 
-This is a follow-up to my [Making maps from GIS data with Inkscape][]
-post. After playing around with Inkscape for quite a while, and coming
-up with the dismal results seen in that post, I decided there has to be
-an easier way. A little Googling turned up [this video tutorial][] on
+This is a follow-up to my [Making maps from GIS data with
+Inkscape](/2009/11/making-maps-from-gis-data-with-inkscape/) post. After
+playing around with Inkscape for quite a while, and coming up with the
+dismal results seen in that post, I decided there has to be an easier
+way. A little Googling turned up [this video
+tutorial](http://www.wipeout44.com/video/misc/google_maps_large.asp) on
 how to print large scale maps from Google Maps. It turns out that the
 Google Maps API will honor almost any pixel resolution that it's passed.
-The [Screengrab][] add-on for Firefox has the wonderful capability of
-being able to capture a screengrab of page content, at actual
-resolution, regardless of screen resolution. So load up a 5000x5000
-pixel Google Map, use the Screengrab addon, and end up with a full
-5000x5000 pixel image file.
+The [Screengrab](https://addons.mozilla.org/en-US/firefox/addon/1146)
+add-on for Firefox has the wonderful capability of being able to capture
+a screengrab of page content, at actual resolution, regardless of screen
+resolution. So load up a 5000x5000 pixel Google Map, use the Screengrab
+addon, and end up with a full 5000x5000 pixel image file.
 
 After testing this a bit, I decided to go the Google Maps route. This
 also has a lot of other added bonuses - I can store my overlay data in
@@ -26,7 +28,7 @@ maps as a last resort, and providing the Fire Department with live
 hydrant maps on GPS-enabled handheld devices and phones.
 
 The quirks, however, may need some serious photoshopping (err, rather,
-[gimp][]ing) to fix:
+[gimp](http://www.gimp.org/)ing) to fix:
 
 1.  With all of the background color, how will this look when printed?
 2.  How do I make the town borders easily defined? It would be a *lot*
@@ -35,17 +37,20 @@ The quirks, however, may need some serious photoshopping (err, rather,
 3.  How do I overlay a grid for a street name index?
 
 The first step was to setup a large Google Map to develop with. I used
-PHP and Monte Ohrt's [GoogleMapAPI][] PHP wrapper class. It was simple
-enough to setup a big (3300x5100px) map, zoom out in Firefox, and start
-adding some stuff. My examples and development pages, if you want to
-take a peek at the code, are [here][].
+PHP and Monte Ohrt's
+[GoogleMapAPI](http://www.phpinsider.com/php/code/GoogleMapAPI/) PHP
+wrapper class. It was simple enough to setup a big (3300x5100px) map,
+zoom out in Firefox, and start adding some stuff. My examples and
+development pages, if you want to take a peek at the code, are
+[here](http://www.jasonantman.com/indexed/googleMaps/).
 
 The first step was to draw a polygon for the outline of the town. I
 found some very detailed information on how to get zip code boundary
-lines on Matt Cutts' [blog][]. Apparently, he's a Google software
-engineer, heading up their webspam team. I grabbed the files from the
-Census, as described, and came up with the boundary for my zip code
-looking like:
+lines on Matt Cutts'
+[blog](http://www.mattcutts.com/blog/fun-with-zip-codes/). Apparently,
+he's a Google software engineer, heading up their webspam team. I
+grabbed the files from the Census, as described, and came up with the
+boundary for my zip code looking like:
 
 ~~~~{.text}
         60      -0.741427638843858E+02       0.409963180802469E+02
@@ -114,11 +119,3 @@ knowledge of the town, and every map I can find) it's quite close and a
 very good start.
 
 I'll update later this week when I have some more done...
-
-  [Making maps from GIS data with Inkscape]: /2009/11/making-maps-from-gis-data-with-inkscape/
-  [this video tutorial]: http://www.wipeout44.com/video/misc/google_maps_large.asp
-  [Screengrab]: https://addons.mozilla.org/en-US/firefox/addon/1146
-  [gimp]: http://www.gimp.org/
-  [GoogleMapAPI]: http://www.phpinsider.com/php/code/GoogleMapAPI/
-  [here]: http://www.jasonantman.com/indexed/googleMaps/
-  [blog]: http://www.mattcutts.com/blog/fun-with-zip-codes/

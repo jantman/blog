@@ -8,11 +8,12 @@ Slug: book-comments-the-future-of-the-internet-and-how-to-stop-it-by-jonathan-zi
 Last week I happened to find a Barnes & Noble gift card in my wallet,
 with $75 left on it. What a wonderful discovery! One of the pile of
 books that I ordered was [The Future of the Internet--And How to Stop
-It][] [by Jonathan Zittrain][]. I'd fully intended to read the book
-cover-to-cover, perhaps even digest the content a little, before
-throwing my thoughts out there (presumably to get lost into the vast sea
-of crap that makes up the "blogosphere"). But I just have to get some
-thoughts down on paper...err...LCD.
+It](http://futureoftheinternet.org/) [by Jonathan
+Zittrain](http://futureoftheinternet.org/blog). I'd fully intended to
+read the book cover-to-cover, perhaps even digest the content a little,
+before throwing my thoughts out there (presumably to get lost into the
+vast sea of crap that makes up the "blogosphere"). But I just have to
+get some thoughts down on paper...err...LCD.
 
 First off, when I found out that Zittrain is a professor of Internet Law
 at Harvard, it immediately told me two things. First, that he probably
@@ -48,13 +49,17 @@ with the book. The thought currently in my mind is a very specific one:
 Oh, wow, is it 2004 again? I thought we'd given up on the "market share"
 argument. When Apache had 10% of the market share of web servers, people
 said it wasn't attacked as often because of low market share. Well,
-Apache [currently][] has a 47% share of the market, compared to
-Microsoft's 21%, and it's still more secure, more stable, and has fewer
-critical vulnerabilities\*. The same market share argument was made
-about Firefox when it had 5% market share. Now, the share is projected
-between [31.85%][] and [47%][], and it still has less serious
-vulnerabilities (ones that can actually damage your computer) than
-Windows). I thought this "market share" argument was done with.
+Apache
+[currently](http://news.netcraft.com/archives/2009/11/10/november_2009_web_server_survey.html)
+has a 47% share of the market, compared to Microsoft's 21%, and it's
+still more secure, more stable, and has fewer critical
+vulnerabilities\*. The same market share argument was made about Firefox
+when it had 5% market share. Now, the share is projected between
+[31.85%](http://www.w3counter.com/globalstats.php) and
+[47%](http://www.w3schools.com/browsers/browsers_stats.asp), and it
+still has less serious vulnerabilities (ones that can actually damage
+your computer) than Windows). I thought this "market share" argument was
+done with.
 
 Most important is the thing that most Microsoft-biased pundits (and, of
 course, Microsoft themselves) don't ever talk about: an amazingly large
@@ -86,13 +91,13 @@ random code do, it simply can't escape the confines of my user account.
 Ok, ok, I know what you're all saying right now. I can hear it from
 here: "but what if the moron does everything as root? what if they just
 sudo anything that they're asked about?" Well, I have answers to that,
-too. My own distro of choice, [OpenSuSE][] greatly upset me when I went
-to install 11.1, and the installer showed a default of one user account,
-automatic login, and the same password for the user and root. That's
-just stupid. In fact, it's braindead, plain and simple. I don't care how
-wonderful it would be to get Linux on every desktop in the world, if we
-have to destroy every advantage that Linux has over other OSes, it will
-be worthless.
+too. My own distro of choice, [OpenSuSE](http://www.opensuse.org)
+greatly upset me when I went to install 11.1, and the installer showed a
+default of one user account, automatic login, and the same password for
+the user and root. That's just stupid. In fact, it's braindead, plain
+and simple. I don't care how wonderful it would be to get Linux on every
+desktop in the world, if we have to destroy every advantage that Linux
+has over other OSes, it will be worthless.
 
 I digress. In the end, it boils down to user education. And, in some
 respects, I think that Linux has become too dumbed-down. There are
@@ -226,10 +231,3 @@ simple terms for the user to examine and approve. Finally, have a
 Any F/OSS packages that aren't already in the repo can be requested by a
 customer, and for a flat fee for the first requesting customer (say,
 $10) will be examined, approved, packaged, and added to the repo.
-
-  [The Future of the Internet--And How to Stop It]: http://futureoftheinternet.org/
-  [by Jonathan Zittrain]: http://futureoftheinternet.org/blog
-  [currently]: http://news.netcraft.com/archives/2009/11/10/november_2009_web_server_survey.html
-  [31.85%]: http://www.w3counter.com/globalstats.php
-  [47%]: http://www.w3schools.com/browsers/browsers_stats.asp
-  [OpenSuSE]: http://www.opensuse.org

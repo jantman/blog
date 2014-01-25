@@ -5,8 +5,11 @@ Category: Miscellaneous
 Tags: collaboration, documentation, project management, Projects, wiki
 Slug: web-based-collaborationdocumentation-software
 
-This question was posted both to the [SAGE-members][] list ([thread][])
-and to [ServerFault][]:
+This question was posted both to the
+[SAGE-members](http://www.sage.org/lists/) list
+([thread](http://mailman.sage.org/pipermail/sage-members/2010/msg00788.html))
+and to
+[ServerFault](http://serverfault.com/questions/136416/free-web-based-software-for-team-collaboration-documentation):
 
 > Looking for some advice here, as my search has turned up to be pretty
 > fruitless.
@@ -24,10 +27,10 @@ and to [ServerFault][]:
 >  Wants to be able to track project status, who's doing what, whether
 > deadlines are being met, etc. Doesn't want full-fledged "project
 > management" app, just something where we can update "yeah this was
-> done" or "waiting for Bob to configure the widgets". [TeamBox][] was
-> suggested, but it seems almost too gimmicky (Twitter/Facebook
-> ripoff?), and doesn't seem to meet any of the other requirements that
-> I see coming up:
+> done" or "waiting for Bob to configure the widgets".
+> [TeamBox](http://www.teambox.com) was suggested, but it seems almost
+> too gimmicky (Twitter/Facebook ripoff?), and doesn't seem to meet any
+> of the other requirements that I see coming up:
 >
 > Non-management side:  
 >  - flexible, powerful wiki for all documentation (i.e. includes good
@@ -76,8 +79,3 @@ with, we'll need to spend quite a bit of time bolting on whatever else
 we need. Adding a full-featured wiki to another package isn't going to
 be very easy... especially since TeamBox is written in RoR, and we're
 mostly PHP guys.
-
-  [SAGE-members]: http://www.sage.org/lists/
-  [thread]: http://mailman.sage.org/pipermail/sage-members/2010/msg00788.html
-  [ServerFault]: http://serverfault.com/questions/136416/free-web-based-software-for-team-collaboration-documentation
-  [TeamBox]: http://www.teambox.com

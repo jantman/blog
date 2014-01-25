@@ -27,39 +27,31 @@ people will stumble by and also find them useful.
 
 So, what have I been up to lately? Let's start with the past two days:
 
--   Trying to get [FreeRADIUS][] to authenticate with groupOfNames
-    objects in [OpenLDAP][], the intended end result being centralized
-    authentication for [m0n0wall][]'s captive portal.
+-   Trying to get [FreeRADIUS](http://freeradius.org/) to authenticate
+    with groupOfNames objects in [OpenLDAP](http://www.openldap.org/),
+    the intended end result being centralized authentication for
+    [m0n0wall](http://m0n0.ch/wall/)'s captive portal.
 -   At work, designing a system to test the client-visible functionality
     of a *large* captive portal system (on the order of 700 AP's and 50k
     users) - essentially, sitting on a client VLAN and checking DHCP,
     DNS, HTTP redirects, and the validity of the login page.
 -   Security auditing of everything at home, and trying to find a
-    working [Nessus][] web interface.
+    working [Nessus](http://www.nessus.org) web interface.
 -   Continuing on my move over to static IP - specifically starting to
     roll out HTTPS for some internal stuff.
--   Trying to get [Vyatta][]'s VPN to work with a dynamically-IPed
-    m0n0wall endpoint (in network-to-network).
--   Some cabling upgrades at home and at [the ambulance corps][].
+-   Trying to get [Vyatta](http://www.vyatta.org)'s VPN to work with a
+    dynamically-IPed m0n0wall endpoint (in network-to-network).
+-   Some cabling upgrades at home and at [the ambulance
+    corps](http://www.midlandparkambulance.com).
 -   Slowly but surely trying to make major changes and release a new
-    version of [PHP EMS Tools][].
--   Get [Bacula][] working better.
+    version of [PHP EMS Tools](http://www.php-ems-tools.com).
+-   Get [Bacula](http://www.bacula.org) working better.
 -   Load test this web server, and decide if it's time for new hardware.
 -   Some new stuff for my truck.
--   Get rid of [MediaWiki][] as my [homepage][] and replace it with a
-    CMS.
+-   Get rid of [MediaWiki](http://www.mediawiki.org) as my
+    [homepage](http://www.jasonantman.com) and replace it with a CMS.
 -   Continue my move to SubVersion and setup ViewVC for it.
 -   Rewrite my resume and start looking for jobs, as I'm finishing
     classes in July.
 -   Try to get some sleep and keep my sanity.
 
-  [FreeRADIUS]: http://freeradius.org/
-  [OpenLDAP]: http://www.openldap.org/
-  [m0n0wall]: http://m0n0.ch/wall/
-  [Nessus]: http://www.nessus.org
-  [Vyatta]: http://www.vyatta.org
-  [the ambulance corps]: http://www.midlandparkambulance.com
-  [PHP EMS Tools]: http://www.php-ems-tools.com
-  [Bacula]: http://www.bacula.org
-  [MediaWiki]: http://www.mediawiki.org
-  [homepage]: http://www.jasonantman.com

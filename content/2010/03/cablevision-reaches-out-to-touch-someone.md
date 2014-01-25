@@ -22,8 +22,10 @@ to channel 47 and is setup to resume on the last channel it was tuned to
 - it also started up to the Cablevision ad on channel 1999.
 
 To anyone who's read Jonathan Zittrain's [The Future of the Internet and
-How to Stop It][], this is as clear an indication of the problems with
-appliancization as anything.
+How to Stop
+It](http://www.amazon.com/Future-Internet-How-Stop/dp/0300151241/ref=sr_1_1?ie=UTF8&s=books&qid=1267669057&sr=8-1),
+this is as clear an indication of the problems with appliancization as
+anything.
 
 Don't take this lightly. It has some serious implications. Specifically,
 the basics of what Cablevision did:
@@ -40,10 +42,7 @@ that it's more or less a full computer (the "channels" are actually
 streaming media over IP) and the amount of control that Cablevision has
 is virtually limitless.
 
-*(The automatic channel change has been confirmed by a number [of][]
-[other][] [people][].)*
-
-  [The Future of the Internet and How to Stop It]: http://www.amazon.com/Future-Internet-How-Stop/dp/0300151241/ref=sr_1_1?ie=UTF8&s=books&qid=1267669057&sr=8-1
-  [of]: http://bumped.org/tek/2010/03/03/abc7-vs-cablevision-abc-may-go-off-the-air-march-7th-here-we-go-again/
-  [other]: http://www.northjersey.com/arts_entertainment/030110_Disney_ABC_may_go_dark_on_Cablevision_in_New_York.html
-  [people]: http://blogs.app.com/inthemoney/2010/03/02/attention-cablevision-customers-here-we-go-again/comment-page-1/
+*(The automatic channel change has been confirmed by a number
+[of](http://bumped.org/tek/2010/03/03/abc7-vs-cablevision-abc-may-go-off-the-air-march-7th-here-we-go-again/)
+[other](http://www.northjersey.com/arts_entertainment/030110_Disney_ABC_may_go_dark_on_Cablevision_in_New_York.html)
+[people](http://blogs.app.com/inthemoney/2010/03/02/attention-cablevision-customers-here-we-go-again/comment-page-1/).)*

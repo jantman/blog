@@ -5,8 +5,10 @@ Category: Ideas and Rants
 Tags: gpl, kernel, linux, microsoft
 Slug: microsoft-submits-driver-code-for-linux-kernel
 
-I read a very interesting [article on Linux-Mag.com][] today. The gist
-of it is that Microsoft (as happily announced in a [press release][])
+I read a very interesting [article on
+Linux-Mag.com](http://www.linux-mag.com/cache/7439/1.html) today. The
+gist of it is that Microsoft (as happily announced in a [press
+release](http://www.microsoft.com/presspass/features/2009/Jul09/07-20LinuxQA.mspx))
 has submitted 20,000 lines of code for inclusion into the kernel.
 Specifically, the code is comprised of a number of drivers that will
 enable Linux to run better under Microsoft Hyper-V.
@@ -17,9 +19,12 @@ it to be put in Linux. They released it under the license that they call
 project to run well as a guest under our hypervisor.
 
 The Linux Mag article did touch on some recent news, such as Microsoft's
-[lawsuit against TomTom][] ([settled in late March][]) claiming that the
-Linux kernel infringes their VFAT patents and the 2004 [EU antitrust
-case (PDF)][].
+[lawsuit against TomTom](http://www.linux-mag.com/id/7325) ([settled in
+late
+March](http://arstechnica.com/microsoft/news/2009/03/microsoft-and-tomtom-settle-patent-dispute.ars))
+claiming that the Linux kernel infringes their VFAT patents and the 2004
+[EU antitrust case
+(PDF)](http://ec.europa.eu/comm/competition/antitrust/cases/decisions/37792/en.pdf).
 
 A number of things are immediately apparent to me:
 
@@ -33,16 +38,21 @@ A number of things are immediately apparent to me:
     to indemnify the Linux community at large.
 -   This is **not** a Microsoft endorsement (or even recognition) of the
     GPL.
--   Microsoft [made threats][] about Linux violating "over 228" of its
-    patents in 2007.
+-   Microsoft [made
+    threats](http://www.linux-watch.com/news/NS6670466370.html) about
+    Linux violating "over 228" of its patents in 2007.
 
-There's a [post][] on [Greg Kroah-Hartman's blog][] (he's the kernel
-maintainer who will - or will not - eventually be in charge of the
-inclusion of the code). It should be noted that **this all started** due
-to a guy who I really admire, [Stephen Hemminger][], the principal
+There's a
+[post](http://www.kroah.com/log/linux/microsoft-linux-hyper-v-drivers.html)
+on [Greg Kroah-Hartman's blog](http://www.kroah.com/log/) (he's the
+kernel maintainer who will - or will not - eventually be in charge of
+the inclusion of the code). It should be noted that **this all started**
+due to a guy who I really admire, [Stephen
+Hemminger](http://linux-network-plumber.blogspot.com/), the principal
 engineer at Vyatta (whose router product I absolutely love, and their
 mock advertisements are just as wonderful). Steve has a [post on his
-blog][] giving the background.
+blog](http://linux-network-plumber.blogspot.com/2009/07/congratulations-microsoft.html)
+giving the background.
 
 So what do *I* think should be done? Include the code. But first... (I
 know Microsoft doing all of this at once would be a dream, but maybe one
@@ -59,13 +69,3 @@ or two of them would be nice)
 4.  Microsoft pledges to allow, support, and actively develop for
     Windows as a guest under Xen and KVM.
 
-  [article on Linux-Mag.com]: http://www.linux-mag.com/cache/7439/1.html
-  [press release]: http://www.microsoft.com/presspass/features/2009/Jul09/07-20LinuxQA.mspx
-  [lawsuit against TomTom]: http://www.linux-mag.com/id/7325
-  [settled in late March]: http://arstechnica.com/microsoft/news/2009/03/microsoft-and-tomtom-settle-patent-dispute.ars
-  [EU antitrust case (PDF)]: http://ec.europa.eu/comm/competition/antitrust/cases/decisions/37792/en.pdf
-  [made threats]: http://www.linux-watch.com/news/NS6670466370.html
-  [post]: http://www.kroah.com/log/linux/microsoft-linux-hyper-v-drivers.html
-  [Greg Kroah-Hartman's blog]: http://www.kroah.com/log/
-  [Stephen Hemminger]: http://linux-network-plumber.blogspot.com/
-  [post on his blog]: http://linux-network-plumber.blogspot.com/2009/07/congratulations-microsoft.html

@@ -13,26 +13,29 @@ Foreman has certainly been developed at warp speed. I'll try to write an
 update to this sometime soon, but be advised that the information here
 is somewhat dated.
 
-At work, we're in the process of rolling out [puppet][] for
+At work, we're in the process of rolling out
+[puppet](http://projects.puppetlabs.com/projects/puppet) for
 configuration management of our servers. It will be an integral part of
 the provisioning process of all new physical and virtual hosts, and will
 also be phased in on existing hosts as possible. Right now, we have an
 initial puppet install that was "development", but we're about to move
 to "production" (new puppetmaster in our production infrastructure,
-production MySQL, etc.). We've been using [Dashboard][], but just as a
-report viewer. Up until now, we've been using nodes.pp and per-node
-flat-file manifests. I've got a few issues with this, but the biggest is
-that all of our node definitions (and their classes and parameters) live
-in the same SVN repository as our modules and other puppet
-configuration. Not only does this mean a checkout and commit just to
-change a node parameter or add a module/class to a node, but it also
+production MySQL, etc.). We've been using
+[Dashboard](http://puppetlabs.com/puppet/related-projects/dashboard/),
+but just as a report viewer. Up until now, we've been using nodes.pp and
+per-node flat-file manifests. I've got a few issues with this, but the
+biggest is that all of our node definitions (and their classes and
+parameters) live in the same SVN repository as our modules and other
+puppet configuration. Not only does this mean a checkout and commit just
+to change a node parameter or add a module/class to a node, but it also
 means that for my team members who don't have previous puppet
 experience, it greatly blurs the line between administering puppet
 (developing and maintaining modules) and using puppet (building a node,
 changing node params or modules/classes), since both tasks are
 accomplished in the same SVN repository.
 
-So, I've been pushing an [External Node Classifier (ENC)][] with a web
+So, I've been pushing an [External Node Classifier
+(ENC)](http://docs.puppetlabs.com/guides/external_nodes.html) with a web
 interface as one of the biggest feature enhancements we need for our
 puppet install. The complicating factor is that I've been given a time
 frame of approximately 1 week to get the "production" puppetmaster
@@ -88,24 +91,28 @@ projects without an immediate impact).
 So, I spent hours looking around online trying to find existing
 web-based ENC projects, and came up with a pretty small list:
 
--   [Dashboard][], the Puppet Labs web UI. It's the most common
-    web-based puppet ENC as far as I know, and since it's an official
-    Puppet Labs project (and the basis for their Puppet Enterprise UI),
-    its future is pretty secure. But it's still very basic (let alone
-    enterprise features), and has a plugin system that is very young.
--   [The Foreman][] is probably the second-most-common puppet ENC, and
-    has also been around about as long as Dashboard. Its features are
-    nice, and it includes support for Kickstart (management of TFTP and
-    DHCP) and DNS, as well as some virtual machine management.
-    Unfortunately, we already have DHCP and DNS infrastructure so I'm
-    sure it would be quite a bit of effort to integrate it with our
-    environment, and for a non-Ruby shop, it has the same problem with
-    maintainability of custom code.
--   [initr][], a [Redmine][] plugin that functions as an ENC and manages
-    modules. It includes RBAC and leverages Redmine. But since we don't
-    use Redmine, it's not much of an advantage.
--   [OpenNMS Puppet Node Pusher][]An ENC script for [OpenNMS][], which
-    we also don't use.
+-   [Dashboard](http://puppetlabs.com/puppet/related-projects/dashboard/),
+    the Puppet Labs web UI. It's the most common web-based puppet ENC as
+    far as I know, and since it's an official Puppet Labs project (and
+    the basis for their Puppet Enterprise UI), its future is pretty
+    secure. But it's still very basic (let alone enterprise features),
+    and has a plugin system that is very young.
+-   [The Foreman](http://theforeman.org/projects/foreman) is probably
+    the second-most-common puppet ENC, and has also been around about as
+    long as Dashboard. Its features are nice, and it includes support
+    for Kickstart (management of TFTP and DHCP) and DNS, as well as some
+    virtual machine management. Unfortunately, we already have DHCP and
+    DNS infrastructure so I'm sure it would be quite a bit of effort to
+    integrate it with our environment, and for a non-Ruby shop, it has
+    the same problem with maintainability of custom code.
+-   [initr](http://www.ingent.net/projects/initr/wiki), a
+    [Redmine](http://www.redmine.org/) plugin that functions as an ENC
+    and manages modules. It includes RBAC and leverages Redmine. But
+    since we don't use Redmine, it's not much of an advantage.
+-   [OpenNMS Puppet Node
+    Pusher](http://www.gitorious.org/opennms-puppet-node-pusher)An ENC
+    script for [OpenNMS](http://www.opennms.org/), which we also don't
+    use.
 
 I was pretty amazed to see that nobody had written a puppet web UI/ENC
 in PHP (or Perl or Python), especially since Puppet is now quite
@@ -128,12 +135,3 @@ up some Ruby (as they're all written in Ruby anyway). I'll also discuss
 these options with the team and see how opinions go (keeping in mind
 that the higher the likelihood of the community picking up/merging my
 changes, the better).
-
-  [puppet]: http://projects.puppetlabs.com/projects/puppet
-  [Dashboard]: http://puppetlabs.com/puppet/related-projects/dashboard/
-  [External Node Classifier (ENC)]: http://docs.puppetlabs.com/guides/external_nodes.html
-  [The Foreman]: http://theforeman.org/projects/foreman
-  [initr]: http://www.ingent.net/projects/initr/wiki
-  [Redmine]: http://www.redmine.org/
-  [OpenNMS Puppet Node Pusher]: http://www.gitorious.org/opennms-puppet-node-pusher
-  [OpenNMS]: http://www.opennms.org/

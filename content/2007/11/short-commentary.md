@@ -10,43 +10,46 @@ finishing up the web GUI for my print accounting system (previously
 mentioned) and had to dive into CUPS/IPP to pull out information on
 whether or not a print job is printed in duplex. I've also been going
 crazy with raw PJL queries to get some information that doesn't appear
-to be found in [Printer-MIB][]. In other news, I have an exam Monday
-moring in a class (Religions of the Eastern World - my non-western
-requirement) that I'm getting a D in. Then I have an essay for US
-History II due Thursday - I haven't even read the books yet.
+to be found in [Printer-MIB](http://www.faqs.org/rfcs/rfc1759.html). In
+other news, I have an exam Monday moring in a class (Religions of the
+Eastern World - my non-western requirement) that I'm getting a D in.
+Then I have an essay for US History II due Thursday - I haven't even
+read the books yet.
 
 And Tuesday night, I have my first tech demo as a Sun Campus Ambassador,
-a short OpenSolaris overview for [RUSLUG][] that should touch on the
-coll facets of DTrace, Zones, ZFS, etc. as well as the new installer. So
-it's going to be a pretty busy weekend. And I'm hard set on doing a
-kick-ass demo, despite some of the [disturbing things][] I've been
-hearing about Sun lately. If I can get OpenSolaris to boot on my laptop
-by then, I'll use that. If not, I guess I'll be dragging the PowerEdge
-2550 over there.
+a short OpenSolaris overview for [RUSLUG](http://ruslug.rutgers.edu/w/)
+that should touch on the coll facets of DTrace, Zones, ZFS, etc. as well
+as the new installer. So it's going to be a pretty busy weekend. And I'm
+hard set on doing a kick-ass demo, despite some of the [disturbing
+things](http://directorymanager.wordpress.com/2007/11/28/an-open-letter-to-the-opends-community-and-to-sun-microsystems/)
+I've been hearing about Sun lately. If I can get OpenSolaris to boot on
+my laptop by then, I'll use that. If not, I guess I'll be dragging the
+PowerEdge 2550 over there.
 
 That being said, I was looking through Google Reader this morining (my
 only source for news) and came by a LinuxInsider article on the
-[upcoming KDE release][]. Being a user of KDE since 2000, this
-interested me. However, what struck me was a comment about the new
-KOffice.
+[upcoming KDE release](http://www.linuxinsider.com/rsstory/60447.html).
+Being a user of KDE since 2000, this interested me. However, what struck
+me was a comment about the new KOffice.
 
 I was speaking with a supervisor at the Rutgers University student
 computer labs the other day, and was pretty astonished to realize that
-[OpenOffice][] isn't loaded on the lab computers. Why? Because 99% of
-their "patrons" wouldn't know what it is, and can't handle choices.
-<span style="font-weight: bold;">Can't handle choices</span>. Or, at
-least, don't want them. It's attitudes like this that lead to a world
-where you have ONE cable company, ONE phone company, ONE high-bandwidth
-ISP, and can only use ONE cellular provider's equipment on a network. I
-wonder how those same "patrons" would feel if they went to a car dealer
-and were offered the option to buy a Honda Accord, a Honda Accord, or
-maybe a Honda Accord.
+[OpenOffice](http://www.openoffice.org/) isn't loaded on the lab
+computers. Why? Because 99% of their "patrons" wouldn't know what it is,
+and can't handle choices. <span style="font-weight: bold;">Can't handle
+choices</span>. Or, at least, don't want them. It's attitudes like this
+that lead to a world where you have ONE cable company, ONE phone
+company, ONE high-bandwidth ISP, and can only use ONE cellular
+provider's equipment on a network. I wonder how those same "patrons"
+would feel if they went to a car dealer and were offered the option to
+buy a Honda Accord, a Honda Accord, or maybe a Honda Accord.
 
 As far as I'm concerned, the biggest issue is publicity. The users don't
 want choices because they don't know about them. And I thought that a
 University was supposed to educate people? How naive of me.
 
-I was hanging out at the [ambulance corps][] that I volunteer with (I
+I was hanging out at the [ambulance
+corps](http://www.midlandparkambulance.com/) that I volunteer with (I
 have nothing to do with the front-end web site) the other weekend, and
 one of the women asked whether I had Microsoft Office, since she needed
 Word for a project. She said she didn't want to pay $250. I asked her
@@ -78,10 +81,3 @@ even better, Free) package out there that does almost everything a
 $150-300 package does, users should have the right to try it and see if
 it works for them. And I can think of few places where that's more
 important than cash-starved college kids.
-
-  [Printer-MIB]: http://www.faqs.org/rfcs/rfc1759.html
-  [RUSLUG]: http://ruslug.rutgers.edu/w/
-  [disturbing things]: http://directorymanager.wordpress.com/2007/11/28/an-open-letter-to-the-opends-community-and-to-sun-microsystems/
-  [upcoming KDE release]: http://www.linuxinsider.com/rsstory/60447.html
-  [OpenOffice]: http://www.openoffice.org/
-  [ambulance corps]: http://www.midlandparkambulance.com/

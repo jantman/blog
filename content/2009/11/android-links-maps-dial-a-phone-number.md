@@ -10,8 +10,10 @@ business, you've probably noticed the two interesting "buttons" to the
 right of the search listing - "Get Directions" and a button for the
 phone number. It turns out, these are pretty easy to implement.
 
-The "Get Directions" link is a simple link to [Google Maps][] like [This
-One][]. The links are actually pretty simple:
+The "Get Directions" link is a simple link to [Google
+Maps](http://maps.google.com) like [This
+One](http://maps.google.com/maps?daddr=42+Pierce+Ave,+Midland+Park,+NJ+07432).
+The links are actually pretty simple:
 
 ~~~~{.html}
 Get Directions
@@ -27,7 +29,8 @@ navigation.
 
 The telephone links are a bit more interesting. Apparently, the Android
 browser uses the Phone app to handle the "tel" scheme, as defined by
-[RFC 3966][].Therefore, clicking a link like:
+[RFC 3966](http://tools.ietf.org/html/rfc3966).Therefore, clicking a
+link like:
 
 ~~~~{.html}
 201-555-5555
@@ -35,7 +38,8 @@ browser uses the Phone app to handle the "tel" scheme, as defined by
 
 on Android will bring up the Phone app and pre-enter the digits for
 2015555555. Luckily, it doesn't automatically dial the number. If you
-want to give it a try and are using Android: [201-555-5555][].
+want to give it a try and are using Android:
+[201-555-5555](tel:2015555555).
 
 The final step is how to implement this. I don't know if most mobile
 browsers (Blackberry? iPhone?) also support the "tel" URI scheme, or how
@@ -48,19 +52,13 @@ Mozilla/5.0 (Linux; U;Android 2.0; en-us; Droid Build/ESD20) AppleWebKit/530.17 
 ~~~~
 
 I know that there are a number of PHP classes out there to detect
-browsers (like [Chris Schuld's browser.php][]) and some things to detect
-mobile device capabilities (like [WURFL][] or [Tera WURFL][], both using
-the [WURFL][1] data). However, if you just need to know whether your
-user is on Android or not, I'd personally recommend just checking the
-user agent string for "Linux", "Android" and "WebKit" until a better
-browser identification system is found, as these are not likely to
-change in the near future.
-
-  [Google Maps]: http://maps.google.com
-  [This One]: http://maps.google.com/maps?daddr=42+Pierce+Ave,+Midland+Park,+NJ+07432
-  [RFC 3966]: http://tools.ietf.org/html/rfc3966
-  [201-555-5555]: tel:2015555555
-  [Chris Schuld's browser.php]: http://chrisschuld.com/projects/browser-php-detecting-a-users-browser-from-php/
-  [WURFL]: http://wurfl.sourceforge.net/nphp/
-  [Tera WURFL]: http://freshmeat.net/projects/tera_wurfl/
-  [1]: http://en.wikipedia.org/wiki/Wurfl
+browsers (like [Chris Schuld's
+browser.php](http://chrisschuld.com/projects/browser-php-detecting-a-users-browser-from-php/))
+and some things to detect mobile device capabilities (like
+[WURFL](http://wurfl.sourceforge.net/nphp/) or [Tera
+WURFL](http://freshmeat.net/projects/tera_wurfl/), both using the
+[WURFL](http://en.wikipedia.org/wiki/Wurfl) data). However, if you just
+need to know whether your user is on Android or not, I'd personally
+recommend just checking the user agent string for "Linux", "Android" and
+"WebKit" until a better browser identification system is found, as these
+are not likely to change in the near future.

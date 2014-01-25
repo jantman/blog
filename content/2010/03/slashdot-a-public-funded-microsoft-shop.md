@@ -6,8 +6,10 @@ Tags: microsoft
 Slug: slashdot-a-public-funded-microsoft-shop
 
 I just came by an interesting post on Slashdot, [A Public Funded
-"Microsoft Shop?"][]. The author works at a publicly-funded hospital and
-comments that he received an email from management stating:
+"Microsoft
+Shop?"](http://science.slashdot.org/story/10/03/04/1416226/A-Public-Funded-Microsoft-Shop).
+The author works at a publicly-funded hospital and comments that he
+received an email from management stating:
 
 > Information Services is strategically a Microsoft shop and when
 > talking to staff / customers we are to support this strategy. I no
@@ -28,10 +30,10 @@ those companies make a simple pipe wrench? "Use a hammer"? Secondly, as
 is evidenced by history, popularity is a relatively poor indicator of
 quality, and always ephemeral. Wigs were popular for wealthy men. The
 telegraph was popular, and many thought the telephone would never catch
-on. The [fluoroscope][] was popular for shoe fitting. Racism was
-popular. Smoking was popular. BASIC was the greatest programming
-language ever. Decisions based solely on popularity are rarely good in
-the long term.
+on. The [fluoroscope](http://en.wikipedia.org/wiki/Fluoroscope) was
+popular for shoe fitting. Racism was popular. Smoking was popular. BASIC
+was the greatest programming language ever. Decisions based solely on
+popularity are rarely good in the long term.
 
 But, alas, enough of the Microsoft-bashing. What struck me more was the
 prohibition against Firefox, and what it means for technically-apt
@@ -87,6 +89,3 @@ in lower productivity and some amount of frustration. I know that I, for
 one, have almost laughed when people advertising for Linux admin jobs
 said I'd be using the same Windows desktop environment as all of the
 users.
-
-  [A Public Funded "Microsoft Shop?"]: http://science.slashdot.org/story/10/03/04/1416226/A-Public-Funded-Microsoft-Shop
-  [fluoroscope]: http://en.wikipedia.org/wiki/Fluoroscope

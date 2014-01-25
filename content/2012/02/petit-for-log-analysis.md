@@ -5,11 +5,12 @@ Category: Miscellaneous
 Tags: analysis, log, logging, petit, syslog
 Slug: petit-for-log-analysis
 
-I recently discovered the [petit][] program for log analysis. It's a
-simple tool to pull out useful information from syslog logs in a variety
-of ways. I've only used it a few times so far, mainly on logs from
-problems I've already solved but didn't know the cause of at first. So
-far, it's proven quite useful. Here are a few examples:
+I recently discovered the
+[petit](http://crunchtools.com/software/petit/) program for log
+analysis. It's a simple tool to pull out useful information from syslog
+logs in a variety of ways. I've only used it a few times so far, mainly
+on logs from problems I've already solved but didn't know the cause of
+at first. So far, it's proven quite useful. Here are a few examples:
 
 -   `petit --wordcount /var/log/messages` - displays ordered count of
     words appearing in the log. My first step, especially if "warning",
@@ -31,5 +32,3 @@ into the log (i.e. someone used echo \>\> logfile instead of `logger`),
 it will choke.
 
 Many thanks to Scott McCarty for this wonderful tool!</a>
-
-  [petit]: http://crunchtools.com/software/petit/

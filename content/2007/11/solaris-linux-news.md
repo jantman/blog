@@ -12,17 +12,19 @@ down from programming web apps, but quite refreshing to have a job that
 gets me out of the dungeon now and then.
 
 I'm also planning my first tech demo as the Sun Campus Ambassador, which
-will tentatively be held on December 4th at the [RUSLUG][] meeting. Stay
-tuned for more.
+will tentatively be held on December 4th at the
+[RUSLUG](http://ruslug.rutgers.edu) meeting. Stay tuned for more.
 
 In other news, unfortunately, I haven't gotten my surplus from Rutgers
 yet. I'm sitting here in my cube, staring at a pile of equipment with
 nowhere to go. I just hope that this works out next week so I'll have
 some time to play around on Thanksgiving weekend.
 
-Anyway, I was reading an [article][] that I saw on Digg about WalMart's
-$200 Linux-based computer. What a great idea. Admittedly, I shop at
-WalMart now and then (well, I'm in college) and one line got me a bit:  
+Anyway, I was reading an
+[article](http://blogs.zdnet.com/hardware/?p=926) that I saw on Digg
+about WalMart's $200 Linux-based computer. What a great idea.
+Admittedly, I shop at WalMart now and then (well, I'm in college) and
+one line got me a bit:  
 "The gPC is built using tiny components, but put inside a full-size case
 because research indicates that Wal-Mart shoppers are so unsophisticated
 they equate physical size with capability."  
@@ -72,11 +74,12 @@ take(s) for granted. I'd hope that Ubuntu doesn't enable SSH by default,
 but I don't know. But, realistically, how people who "try" Ubuntu
 because it's "free" (as in free beer) understand administration and
 security of Linux systems? If they run SSH, do they know to run
-something like [denyhosts][]? Do they even know what system logs are or
-where they are found, let alone check them? Do they understand file
-checksumming, and something like [Tripwire][]? More importantly, do they
-understand the power of their system, and how much it could do without
-their knowledge?
+something like [denyhosts](http://denyhosts.sourceforge.net/)? Do they
+even know what system logs are or where they are found, let alone check
+them? Do they understand file checksumming, and something like
+[Tripwire](http://sourceforge.net/projects/tripwire/)? More importantly,
+do they understand the power of their system, and how much it could do
+without their knowledge?
 
 Many security experts have conjectured that the lack of Linux viruses is
 simply because Linux has such a low market share. However, with no user
@@ -124,17 +127,10 @@ If you haven't tried Linux, give it a shot. It doesn't cost anything,
 it's secure, stable, and fast, it runs on half the machine that Vista
 needs, and best of all, it promotes Free Software ("open source") which,
 after all, is in the interest of everyone who uses a computer.
-[Ubuntu][] will even mail you a CD for free! If you're not ready to give
-up Windows, download [OpenOffice][]. And, if you're already a Linux
-guru, have a look at [OpenSolaris][] - if you're a developer or a
-SysAdmin, you'll thank me for suggesting it (and Sun will mail you a
-free CD or DVD, too!). They even have LiveCD Solaris
+[Ubuntu](http://www.ubuntu.com) will even mail you a CD for free! If
+you're not ready to give up Windows, download
+[OpenOffice](http://www.openoffice.org). And, if you're already a Linux
+guru, have a look at [OpenSolaris](http://www.opensolaris.org) - if
+you're a developer or a SysAdmin, you'll thank me for suggesting it (and
+Sun will mail you a free CD or DVD, too!). They even have LiveCD Solaris
 versions.<span style="display: block;" id="formatbar_Buttons"><span class="down" style="display: block;" id="formatbar_CreateLink" title="Link" onmouseover="ButtonHoverOn(this);" onmouseout="ButtonHoverOff(this);" onmouseup onmousedown="CheckFormatting(event);FormatbarButton('richeditorframe', this, 8);ButtonMouseDown(this);"></span></span>
-
-  [RUSLUG]: http://ruslug.rutgers.edu
-  [article]: http://blogs.zdnet.com/hardware/?p=926
-  [denyhosts]: http://denyhosts.sourceforge.net/
-  [Tripwire]: http://sourceforge.net/projects/tripwire/
-  [Ubuntu]: http://www.ubuntu.com
-  [OpenOffice]: http://www.openoffice.org
-  [OpenSolaris]: http://www.opensolaris.org

@@ -124,35 +124,35 @@ hasn't taken a lesson from RIAA. While options are starting to appear -
 NetFlix streaming and others - they still haven't made the realization
 that customers will continue to choose "other" until offered the choice
 they want. I still can't buy and download movies on Linux, and since I
-use [MythTV][] for my home theater, it's no use to get a NetFlix box.
-Until offered what they want - a download of an unencumbered, DRM-free
-movie file, or full DVD image, people will keep sharing movies, and will
-keep renting them and ripping full-resolution copies.
+use [MythTV](http://www.mythtv.org) for my home theater, it's no use to
+get a NetFlix box. Until offered what they want - a download of an
+unencumbered, DRM-free movie file, or full DVD image, people will keep
+sharing movies, and will keep renting them and ripping full-resolution
+copies.
 
 Finally, it's worth mention that the secret Anti-Counterfitting Trade
-Agreement ([ACTA][]) is obviously tilted in the favor of content
-producers, and has a number of [chilling][] provisions for the Internet.
-Most importantly, it seeks to reverse previous law and hold ISPs liable
-for infringement by their customers. Firstly, and I say this with all my
-heart, this is wrong. *Until publishers start successfully suing Xerox
-for every copy of a page of a book ever made, don't try and hold ISPs
-responsible for what their customers do.* But more importantly, this is
-braindead - we should know by now that copyright holders can't win the
-cat-and-mouse game. We saw it with p2p and random ports, etc. Trying to
-detect transmission of infringing material is impossible. Once a new
-method is invented, it will be bypassed. No matter how many millions the
-media industry spends on trying to detect violations, there's simply
-more people working on the other side, and they're probably smarter and
-better motivated as well. If the media industry pushes for ISPs to use
-deep packet inspection (DPI) technology, the users will just turn to PKI
-and encryption to hide their data. If ISPs just look at traffic
-patterns, the users will accept slower download times and shape their
-traffic to look like web browsing.
+Agreement
+([ACTA](http://www.boingboing.net/2010/02/21/acta-internet-enforc.html))
+is obviously tilted in the favor of content producers, and has a number
+of [chilling](http://www.michaelgeist.ca/content/view/4808/125/)
+provisions for the Internet. Most importantly, it seeks to reverse
+previous law and hold ISPs liable for infringement by their customers.
+Firstly, and I say this with all my heart, this is wrong. *Until
+publishers start successfully suing Xerox for every copy of a page of a
+book ever made, don't try and hold ISPs responsible for what their
+customers do.* But more importantly, this is braindead - we should know
+by now that copyright holders can't win the cat-and-mouse game. We saw
+it with p2p and random ports, etc. Trying to detect transmission of
+infringing material is impossible. Once a new method is invented, it
+will be bypassed. No matter how many millions the media industry spends
+on trying to detect violations, there's simply more people working on
+the other side, and they're probably smarter and better motivated as
+well. If the media industry pushes for ISPs to use deep packet
+inspection (DPI) technology, the users will just turn to PKI and
+encryption to hide their data. If ISPs just look at traffic patterns,
+the users will accept slower download times and shape their traffic to
+look like web browsing.
 
 If the media industry really wants to stop file sharing of their content
 (instead of just benefiting from lawsuits) the solution is simple - let
 consumers buy it the way they want.
-
-  [MythTV]: http://www.mythtv.org
-  [ACTA]: http://www.boingboing.net/2010/02/21/acta-internet-enforc.html
-  [chilling]: http://www.michaelgeist.ca/content/view/4808/125/

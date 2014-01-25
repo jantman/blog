@@ -9,11 +9,12 @@ I've been planning a lot of administrative work lately... I have a few
 machines that need OS upgrades, my backup system is barely functional
 (it needs both a new, large disk and a configuration overhaul), and I'm
 planning a switch to static IP service - which means not only a new
-[router/firewall][] to design, configure and monitor, as well as moving
-some services previously run by [IPcop][] over to a dedicated box, but
-also finally adding three IPsec VPNs, monitoring them and tunneling all
-sorts of stuff over them, and reconfiguring all of my DNS, finding any
-hard-coded URLs, and a slew of other projects.
+[router/firewall](http://www.vyatta.com/) to design, configure and
+monitor, as well as moving some services previously run by
+[IPcop](http://www.ipcop.org/) over to a dedicated box, but also finally
+adding three IPsec VPNs, monitoring them and tunneling all sorts of
+stuff over them, and reconfiguring all of my DNS, finding any hard-coded
+URLs, and a slew of other projects.
 
 So this got me thinking. While there are a number of reasons why I run
 such a complex network at home (mainly including maintaining my presence
@@ -22,15 +23,16 @@ the convenience of file access from anywhere, the breadth of
 administrative experience it gives me, and a way to test new
 technologies) there are some parts of it that I just don't like dealing
 with. I've never been a really network-centric guy, and the idea of
-having to setup a router/firewall (I'm going with [Vyatta][] as it seems
-to be the *only* thing that will deal with the complex configuration I
-want) for all this just to get 5 static IPs seems a bit much. Not to
-mention there's just too much running on all those boxen (8 at home, 2
-at school, plus 3 others at 2 other locations) for me to keep a handle
-on all of it and still be a full-time student, work 30 hours/week, and
-do freelance work. Something's always bound to get ignored - sometimes
-backups stop for a week, sometimes Nagios goes haywire, and sometimes
-Cacti stops graphing for a month before I notice it.
+having to setup a router/firewall (I'm going with
+[Vyatta](http://www.vyatta.com) as it seems to be the *only* thing that
+will deal with the complex configuration I want) for all this just to
+get 5 static IPs seems a bit much. Not to mention there's just too much
+running on all those boxen (8 at home, 2 at school, plus 3 others at 2
+other locations) for me to keep a handle on all of it and still be a
+full-time student, work 30 hours/week, and do freelance work.
+Something's always bound to get ignored - sometimes backups stop for a
+week, sometimes Nagios goes haywire, and sometimes Cacti stops graphing
+for a month before I notice it.
 
 The biggest thing I learned from running all of these systems for
 personal use is to start everything consistently and with a plan. My
@@ -45,8 +47,10 @@ standardize on one distribution, but also making a local image that
 includes the standard packages, configurations, and other important
 stuff - like the Nagios user account and local plugins and maybe even
 the public SSH key of the Nagios box. Even better would be a
-configuration management system like [Puppet][] or [CFengine][], or even
-manually keeping all of the distros updated to a common version.
+configuration management system like
+[Puppet](http://reductivelabs.com/trac/puppet) or
+[CFengine](http://www.cfengine.org/), or even manually keeping all of
+the distros updated to a common version.
 
 But, I digress. The real point of this post was supposed to be a simple
 idea: I have all of this running at home, and I know quite a few IT
@@ -70,9 +74,3 @@ help read through logs or setup a HTTPS VPN, if it weren't for the
 archaic equipment I'm running.
 
 Just a thought...
-
-  [router/firewall]: http://www.vyatta.com/
-  [IPcop]: http://www.ipcop.org/
-  [Vyatta]: http://www.vyatta.com
-  [Puppet]: http://reductivelabs.com/trac/puppet
-  [CFengine]: http://www.cfengine.org/

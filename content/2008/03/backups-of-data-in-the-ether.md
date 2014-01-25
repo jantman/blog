@@ -15,8 +15,9 @@ hack of a PHP script to keep track of what applications I use a lot
 of). After a day of trying to click the little "update" boxes on a
 simple page when I used something, I realized how much of my data is
 actually out of my own control. Maybe not anything critical, but
-convenience stuff like [Google Reader][], [del.icio.us][] for \*all\* of
-my bookmarks, and occasionally [Google Docs][] when I'm going to be
+convenience stuff like [Google Reader](http://reader.google.com/),
+[del.icio.us](http://del.icio.us/) for \*all\* of my bookmarks, and
+occasionally [Google Docs](http://docs.google.com/) when I'm going to be
 hopping from place to place, or may be using a machine that I don't
 trust to SFTP something back home.
 
@@ -25,10 +26,11 @@ for was simple - a BASH script that runs nightly via cron, and dumps the
 data into my home directory on my main storage/backup server.
 
 Google Reader seemed to be one of the most difficult - no easy URL
-scheme, but I found a [simple script][] that makes use of Perl CPAN's
-[WebService::Google::Reader][]module to grab a complete feed list. After
-seemingly an hour of CPAN updates and dependencies scrolling down my
-screen,
+scheme, but I found a [simple script](http://blog.tobez.org/?p=49) that
+makes use of Perl CPAN's
+[WebService::Google::Reader](http://search.cpan.org/~gray/WebService-Google-Reader-0.07/)module
+to grab a complete feed list. After seemingly an hour of CPAN updates
+and dependencies scrolling down my screen,
 
 Google Calendar Backup:  
 Wonderfully simple. Go into Settings, copy the URLs to the private
@@ -44,9 +46,3 @@ Still in the works - Perl problems on my backup machine.
 
 Google Docs Backup:  
 Hopefully soon, though nothing important lives there.
-
-  [Google Reader]: http://reader.google.com/
-  [del.icio.us]: http://del.icio.us/
-  [Google Docs]: http://docs.google.com/
-  [simple script]: http://blog.tobez.org/?p=49
-  [WebService::Google::Reader]: http://search.cpan.org/~gray/WebService-Google-Reader-0.07/

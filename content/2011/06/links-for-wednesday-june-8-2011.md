@@ -4,6 +4,6 @@ Author: admin
 Category: Miscellaneous
 Slug: links-for-wednesday-june-8-2011
 
--   [What is a Systems Architect?][]
+-   [What is a Systems
+    Architect?](http://it.toolbox.com/blogs/bridging-gaps/what-is-a-systems-architect-9995)
 
-  [What is a Systems Architect?]: http://it.toolbox.com/blogs/bridging-gaps/what-is-a-systems-architect-9995

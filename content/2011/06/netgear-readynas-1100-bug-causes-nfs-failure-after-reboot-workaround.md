@@ -5,14 +5,15 @@ Category: Tech HowTos
 Tags: appliance, embedded, linux, nas, netgear, nfs, readynas
 Slug: netgear-readynas-1100-bug-causes-nfs-failure-after-reboot-workaround
 
-At work, we have a [Netgear ReadyNAS 1100][]. It's a 4TB NAS appliance,
-a cute little 1U half-depth Linux box with 4 SATA disks, a RAID
-controller, and some firmware to do a whole bunch of fancy stuff (mainly
-geared towards consumers and very small shops - all configuration is
-point-and-click web UI). We've been using it for storing archived log
-data and low-priority backups. At the beginning of this problem, it was
-running RAIDiator 4.1.6 firmware since December of last year (over 6
-months), and hadn't had any configuration changes in at least 4 months.
+At work, we have a [Netgear ReadyNAS
+1100](http://www.readynas.com/?cat=23). It's a 4TB NAS appliance, a cute
+little 1U half-depth Linux box with 4 SATA disks, a RAID controller, and
+some firmware to do a whole bunch of fancy stuff (mainly geared towards
+consumers and very small shops - all configuration is point-and-click
+web UI). We've been using it for storing archived log data and
+low-priority backups. At the beginning of this problem, it was running
+RAIDiator 4.1.6 firmware since December of last year (over 6 months),
+and hadn't had any configuration changes in at least 4 months.
 
 Last week, I had to power off the unit and remove the power cables for
 some rack maintenance. I went through the usual full shutdown procedure
@@ -71,15 +72,17 @@ configuration and went through a few reboot cycles, with no change. I
 then started tweaking everything I could that I thought would restart
 the NFS server - I added and removed allowed hosts for the NFS share,
 enabled and disabled sync mode, etc. I started searching the [ReadyNAS
-Forum][] and found a post that reported a very similar problem - [upnpd
-grabbing nfsd port][]. The user reported that he was getting the same
-"RPC Error: Program not registered" message, and in `daemon.log` on the
-ReadyNAS, found a line including "storage nfsd[1087]: nfssvc: Address
-already in use". I remembered that I'd setup the ReadyNAS to forward all
-logs to our central syslog server and, sure enough, found an identical
-message that something had already bound to UDP port 2049 when NFS was
-starting. I tried confirming that upnpd was disabled and rebooting, but
-that didn't help. Grepping my logs for "nfs" returned:
+Forum](http://www.readynas.com/forum/) and found a post that reported a
+very similar problem - [upnpd grabbing nfsd
+port](http://www.readynas.com/forum/viewtopic.php?f=20&t=23139). The
+user reported that he was getting the same "RPC Error: Program not
+registered" message, and in `daemon.log` on the ReadyNAS, found a line
+including "storage nfsd[1087]: nfssvc: Address already in use". I
+remembered that I'd setup the ReadyNAS to forward all logs to our
+central syslog server and, sure enough, found an identical message that
+something had already bound to UDP port 2049 when NFS was starting. I
+tried confirming that upnpd was disabled and rebooting, but that didn't
+help. Grepping my logs for "nfs" returned:
 
 ~~~~{.bash}
 daemon.log:Jun 23 12:43:43 css-readynas nfsd[2331]: nfssvc: Address already in use
@@ -96,7 +99,8 @@ kern.log:Jun 23 15:26:33 css-readynas kernel: NFSD: starting 90-second grace per
 </p>
 My next step was a few more reboots, with no change. I then upgraded the
 RAIDiator firmware to the latest, 4.1.7. Still no luck. I installed the
-[Enable root SSH][] addon, and that's when things became very clear:
+[Enable root SSH](http://www.readynas.com/?p=4203) addon, and that's
+when things became very clear:
 
 ~~~~{.bash}
 css-readynas:/var/log# netstat -unlp
@@ -210,8 +214,3 @@ the client successfully mounts the NFS share.
 We'll see what happens next time I have to reboot the ReadyNAS. In the
 mean time, I'm going to try to bring this to the attention of Netgear
 support and hope they do something about it.
-
-  [Netgear ReadyNAS 1100]: http://www.readynas.com/?cat=23
-  [ReadyNAS Forum]: http://www.readynas.com/forum/
-  [upnpd grabbing nfsd port]: http://www.readynas.com/forum/viewtopic.php?f=20&t=23139
-  [Enable root SSH]: http://www.readynas.com/?p=4203

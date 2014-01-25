@@ -17,20 +17,20 @@ I've never been a real fan of GUI IDEs - I do pretty much all of my
 development (admittedly, very little in Java, most of my work is simple
 PHP stuff) on Emacs. That being said, I'm really pyched about trying
 some new stuff like J2EE and maybe some Ruby. However, I also looked
-over some of our training materials on the upcoming [NetBean][]s 6.0,
-and truthfully, I'm damn interested. I haven't used a Java IDE since
-three years ago in high school, and it looks as though they've come a
-very long way.
+over some of our training materials on the upcoming
+[NetBean](http://www.netbeans.org/)s 6.0, and truthfully, I'm damn
+interested. I haven't used a Java IDE since three years ago in high
+school, and it looks as though they've come a very long way.
 
-I'm also really getting into Solaris. The new [openSolaris][] / Solaris
-Express releases have a lot of great features - and I can't want to get
-my hands on a machine running Zones, Containers, and ZFS, just to
-mention a few technologies. I setup Solaris 10 on one of my work
-computers, and I'm hooked. It's fine for a desktop, but I can honestly
-say that after a few minutes playing around with the Solaris Management
-Console, I'm seriously considering ditching SuSE (now OpenSuSE) which
-I've been using as a server OS for some 7 years, and switching over to
-Solaris.
+I'm also really getting into Solaris. The new
+[openSolaris](http://www.opensolaris.org) / Solaris Express releases
+have a lot of great features - and I can't want to get my hands on a
+machine running Zones, Containers, and ZFS, just to mention a few
+technologies. I setup Solaris 10 on one of my work computers, and I'm
+hooked. It's fine for a desktop, but I can honestly say that after a few
+minutes playing around with the Solaris Management Console, I'm
+seriously considering ditching SuSE (now OpenSuSE) which I've been using
+as a server OS for some 7 years, and switching over to Solaris.
 
 Unfortunately, Solaris is really an enterprise OS. That means it has
 loads of wonderful features that are also rock-solid, and was designed
@@ -46,11 +46,8 @@ you might have some issues. It appears that the 'smartii' RAID driver
 I'm going to be looking into buying a bunch of new systems, possibly
 Dell PowerEdge servers and, if I can get the cash, a few Sun systems.
 
-Lastly, within the week, I'll be setting up a blog at [blogs.sun.com][].
-This will probably contain a lot of Rutgers-specific information, but
-will also most definitely include my notes on Sun products, and a
-healthy amount of Solaris-related information.
-
-  [NetBean]: http://www.netbeans.org/
-  [openSolaris]: http://www.opensolaris.org
-  [blogs.sun.com]: http://blogs.sun.com
+Lastly, within the week, I'll be setting up a blog at
+[blogs.sun.com](http://blogs.sun.com). This will probably contain a lot
+of Rutgers-specific information, but will also most definitely include
+my notes on Sun products, and a healthy amount of Solaris-related
+information.

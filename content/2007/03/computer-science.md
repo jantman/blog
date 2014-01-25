@@ -9,19 +9,20 @@ And *WHY* is it my major?
 
 I was recently reading an excellent article online, by Neil McBride, a
 principal lecturer in the School of Computing, De Montfort University,
-UK. [The Death of Computing][] essentially speaks to the fact that the
-IT industry is different now than it ever was in the past - IT is no
-longer a *programing*discipline. Just look at job listings in IT,
-whether as upper-level managers or summer interns. How many of them
-demand the degree of skills in, say, Java, that are taught in CS
-classes? Most of them ask for Python, Ruby, PHP, maybe some Java. But
-more importantly, the jobs aren't programming-centric. As many have
-said, all of the software that's needed is already out there. The modern
-emphasis in IT is on providing a service - on SLAs, uptime,
-optimization, security, and incident response. Not on developing new
-systems in low-level languages, but in synthesizing many assets into a
-coherent, high-availability system with as much transparency to the user
-as possible.
+UK. [The Death of
+Computing](http://www.bcs.org/server.php?show=ConWebDoc.9662)
+essentially speaks to the fact that the IT industry is different now
+than it ever was in the past - IT is no longer a *programing*discipline.
+Just look at job listings in IT, whether as upper-level managers or
+summer interns. How many of them demand the degree of skills in, say,
+Java, that are taught in CS classes? Most of them ask for Python, Ruby,
+PHP, maybe some Java. But more importantly, the jobs aren't
+programming-centric. As many have said, all of the software that's
+needed is already out there. The modern emphasis in IT is on providing a
+service - on SLAs, uptime, optimization, security, and incident
+response. Not on developing new systems in low-level languages, but in
+synthesizing many assets into a coherent, high-availability system with
+as much transparency to the user as possible.
 
 Just have a look at the Rutgers CS course catalog: Data structures,
 Discreet structures, numerical methods, design and analysis of
@@ -58,5 +59,3 @@ comparisons? There's not even an introductory systems course. Are we
 really aiming to educate programmers who have never seen a tape drive,
 who have never had an introduction to scripting languages, how to
 perform a good system backup, or how to secure their workstations?
-
-  [The Death of Computing]: http://www.bcs.org/server.php?show=ConWebDoc.9662

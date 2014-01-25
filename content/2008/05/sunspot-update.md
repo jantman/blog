@@ -34,6 +34,6 @@ it worked.
 
 Also, I tried my hand at a first demo - horribly simple, it just reads
 light, temperature, and accelerometer data from a USB-connected SPOT.
-The code is in my [CVS repository][], as a netbeans project (NB 6.1).
-
-  [CVS repository]: http://cvs.jasonantman.com/SunSPOTs/AllSensorsOnSpot/
+The code is in my [CVS
+repository](http://cvs.jasonantman.com/SunSPOTs/AllSensorsOnSpot/), as a
+netbeans project (NB 6.1).

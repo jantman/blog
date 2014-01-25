@@ -7,10 +7,11 @@ Slug: bugissue-tracking-update-review-of-eventum
 
 So, after many hours of investigating potential bug/issue tracking
 packages, I have chosen one. And gone live with it, all in one weekend.
-After much evaluation, my final choice was [Eventum][] from MySQL (I'm
-using the current version, 2.0.1). I will admit that it is not perfect.
-There are some features I wanted that weren't there, and the
-documentation is awful. But it's written in PHP.
+After much evaluation, my final choice was
+[Eventum](http://eventum.mysql.com/) from MySQL (I'm using the current
+version, 2.0.1). I will admit that it is not perfect. There are some
+features I wanted that weren't there, and the documentation is awful.
+But it's written in PHP.
 
 That being said, it is very much a community-driven project. The support
 on the mailing list, both from other community members and from Bryan
@@ -93,5 +94,3 @@ project which I'd recommend to anyone, though if you want more advanced
 features (like integration with CVS, or things not offered such as
 anonymous issue viewing) you should be comfortable with coding in PHP
 until someone makes patches available.
-
-  [Eventum]: http://eventum.mysql.com/

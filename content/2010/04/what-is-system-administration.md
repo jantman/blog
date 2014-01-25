@@ -6,12 +6,14 @@ Tags: sysadmin, system administration
 Slug: what-is-system-administration
 
 I was recently reading an interesting article, "from tasks to
-assurances: redefining system administration", by [Alva L. Couch][], in
-the April 2010 issue of [;LOGIN:][]. He makes a lot of good points,
-mainly that system administration has been defined by tasks, but should
-really be defined by assurances (a much more abstract concept). This
-does make a lot more sense, and perhaps will aid me in finally coming up
-with a succinct (but complete) answer for when people ask me what I do.
+assurances: redefining system administration", by [Alva L.
+Couch](http://www.cs.tufts.edu/~couch/), in the April 2010 issue of
+[;LOGIN:](http://www.usenix.org/publications/login/). He makes a lot of
+good points, mainly that system administration has been defined by
+tasks, but should really be defined by assurances (a much more abstract
+concept). This does make a lot more sense, and perhaps will aid me in
+finally coming up with a succinct (but complete) answer for when people
+ask me what I do.
 
 It bears mention that my role as an SA probably isn't the same as many
 others. Working at a University has its perks - and one is definitely
@@ -72,6 +74,3 @@ SAs in my group do. There's the work in progress so far:
 > emerges that may increase the quality, reliability or security of a
 > service we offer, it's my job to evaluate it and, if it is found to be
 > worthy, implement it.
-
-  [Alva L. Couch]: http://www.cs.tufts.edu/~couch/
-  [;LOGIN:]: http://www.usenix.org/publications/login/

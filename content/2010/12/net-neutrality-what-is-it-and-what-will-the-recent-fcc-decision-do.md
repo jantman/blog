@@ -5,24 +5,24 @@ Category: Miscellaneous
 Tags: free speech, freedom, internet, net neutrality
 Slug: net-neutrality-what-is-it-and-what-will-the-recent-fcc-decision-do
 
-[Net Neutrality][] is a **big** issue these days, and one that's
-exploded out of the geek circles into mainstream media. I'll admit that
-it seems like there are endless variations on exactly what people
-consider Net Neutrality to be (or what it *should* be). The general goal
-of Net Neutrality is to ensure that Internet Service Providers (ISPs)
-provide (relatively) unfiltered access to the Internet to their
-customers. Specifically, that if a given customer pays for a level of
-service - i.e. 10 Mbps downstream speed and 2.5 Mbps upstream speed -
-they receive that speed no matter what they are accessing. The goal of
-Net Neutrality is to require ISPs to treat their connections as a
-"common carrier", much like telephone companies or freight trucks.
-Within reason (excepting explosives and other hazardous materials), UPS
-will ship a package for a given rate based only on what it weighs and
-how far it's going (since the Internet is run by many companies, and
-data passes from one to another, the distance portion of this analogy is
-constant). They don't charge more based on what's in the box, and they
-don't ship come boxes faster than others based simply on who sent it or
-what's inside.
+[Net Neutrality](http://en.wikipedia.org/wiki/Network_neutrality) is a
+**big** issue these days, and one that's exploded out of the geek
+circles into mainstream media. I'll admit that it seems like there are
+endless variations on exactly what people consider Net Neutrality to be
+(or what it *should* be). The general goal of Net Neutrality is to
+ensure that Internet Service Providers (ISPs) provide (relatively)
+unfiltered access to the Internet to their customers. Specifically, that
+if a given customer pays for a level of service - i.e. 10 Mbps
+downstream speed and 2.5 Mbps upstream speed - they receive that speed
+no matter what they are accessing. The goal of Net Neutrality is to
+require ISPs to treat their connections as a "common carrier", much like
+telephone companies or freight trucks. Within reason (excepting
+explosives and other hazardous materials), UPS will ship a package for a
+given rate based only on what it weighs and how far it's going (since
+the Internet is run by many companies, and data passes from one to
+another, the distance portion of this analogy is constant). They don't
+charge more based on what's in the box, and they don't ship come boxes
+faster than others based simply on who sent it or what's inside.
 
 Likewise, over the past century, many laws have been created that
 regulate the telephone industry. While there was a time when customers
@@ -62,9 +62,10 @@ enforced:
     Netflix offer the same service, for free or a much cheaper rate.
     Without Net Neutrality, your ISP could intentionally slow down or
     block sites like Hulu or Netflix to force you to buy their more
-    expensive service. Comcast has [already tried][] to do something
-    like this, asking Netflix's ISP for a substantial fee to allow
-    Comcast customers to access Netfix (that's a bit of an
+    expensive service. Comcast has [already
+    tried](http://www.computerworld.com/s/article/9198498/Comcast_demands_fees_for_Web_movie_viewing_Level_3_says)
+    to do something like this, asking Netflix's ISP for a substantial
+    fee to allow Comcast customers to access Netfix (that's a bit of an
     oversimplification, but gets the point). If this happens, it's most
     likely that Netfix will have to increase their fees substantially.
     Net Neutrality legislation would require ISPs like Comcast to treat
@@ -160,23 +161,21 @@ the country to be viewed, the days of wonderful free services sustained
 by advertising revenue only will be long gone.
 
 In closing, I highly recommend reading an [open letter on Net Neutrality
-by Steve Wozniak][], co-founder of Apple, genius, and guy who helped
-change the world as we know it.
+by Steve
+Wozniak](http://www.theatlantic.com/technology/archive/2010/12/steve-wozniak-to-the-fcc-keep-the-internet-free/68294/),
+co-founder of Apple, genius, and guy who helped change the world as we
+know it.
 
 Some other interesting links:
 
--   [Obama FCC Caves on Net Neutrality -- Tuesday Betrayal Assured][] -
-    Huffington Post
+-   [Obama FCC Caves on Net Neutrality -- Tuesday Betrayal
+    Assured](http://www.huffingtonpost.com/timothy-karr/obama-fcc-caves-on-net-ne_b_799435.html)
+    - Huffington Post
 -   [FCC: We didn't impose stricter net neutrality regulations on
-    wireless because Android is open][] - Engadget
+    wireless because Android is
+    open](http://www.engadget.com/2010/12/21/fcc-we-didnt-impose-stricter-net-neutrality-regulations-on-wir/)
+    - Engadget
 -   [FCC breaks Obama's promise on Net Neutrality: 3 things you need to
-    know][] - BoldProgressives.org
+    know](http://act.boldprogressives.org/sign/sign_netneutrality_3things/?akid=3050.937978.xH20je&rd=1&source=e1-netflix-fin&t=3)
+    - BoldProgressives.org
 
-  [Net Neutrality]: http://en.wikipedia.org/wiki/Network_neutrality
-  [already tried]: http://www.computerworld.com/s/article/9198498/Comcast_demands_fees_for_Web_movie_viewing_Level_3_says
-  [open letter on Net Neutrality by Steve Wozniak]: http://www.theatlantic.com/technology/archive/2010/12/steve-wozniak-to-the-fcc-keep-the-internet-free/68294/
-  [Obama FCC Caves on Net Neutrality -- Tuesday Betrayal Assured]: http://www.huffingtonpost.com/timothy-karr/obama-fcc-caves-on-net-ne_b_799435.html
-  [FCC: We didn't impose stricter net neutrality regulations on wireless
-  because Android is open]: http://www.engadget.com/2010/12/21/fcc-we-didnt-impose-stricter-net-neutrality-regulations-on-wir/
-  [FCC breaks Obama's promise on Net Neutrality: 3 things you need to
-  know]: http://act.boldprogressives.org/sign/sign_netneutrality_3things/?akid=3050.937978.xH20je&rd=1&source=e1-netflix-fin&t=3

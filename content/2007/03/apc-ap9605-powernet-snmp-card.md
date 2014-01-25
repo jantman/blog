@@ -24,13 +24,13 @@ The general setup goes like this:
 
 1.  Connect network cable to card.
 2.  Connect serial cable between a computer and the UPS's serial port.
-3.  Get a terminal emulator, like [minicom][]. Speed is 2400bps.
+3.  Get a terminal emulator, like
+    [minicom](http://alioth.debian.org/projects/minicom). Speed is
+    2400bps.
 4.  connect and press enter. You'll be asked for a username and
     password. Use "apc" for both.
 5.  5) Setup the network - IP, mask, gateway, etc.
 6.  Ready-to-go!
 
-I also have some information about the card on my wiki at: [AP9605][].
-
-  [minicom]: http://alioth.debian.org/projects/minicom
-  [AP9605]: http://wiki.jasonantman.com/index.php/AP9605
+I also have some information about the card on my wiki at:
+[AP9605](http://wiki.jasonantman.com/index.php/AP9605).

@@ -15,22 +15,24 @@ them. Since there were 24 of them, it wasn't exactly going to be the
 quickest task. Moreover, the GX280's we used don't have *any* removable
 media drives.
 
-A few people mentioned [Darik's Boot And Nuke][] (DBAN), which is a
-bootable Linux distro (CD or floppy) aimed at wiping all of the fixed
-disks attached to a machine. While they do offer an "Enterprise" version
-that supports network booting (and logging wipe verifications to a
-central machine), the pricing isn't exactly favorable for a small
-project (or something that just needs Windows to go away, not a
-DoD-grade 7-pass overwrite with random data). Between the lack of a CD
-drive and the apparent need to select wiping options at boot, this
+A few people mentioned [Darik's Boot And Nuke](http://www.dban.org/)
+(DBAN), which is a bootable Linux distro (CD or floppy) aimed at wiping
+all of the fixed disks attached to a machine. While they do offer an
+"Enterprise" version that supports network booting (and logging wipe
+verifications to a central machine), the pricing isn't exactly favorable
+for a small project (or something that just needs Windows to go away,
+not a DoD-grade 7-pass overwrite with random data). Between the lack of
+a CD drive and the apparent need to select wiping options at boot, this
 didn't seem to be the best method for me.
 
-Luckily, with a little googling, I came by the [Cobbler][] project, a
-ready-to-run install server aimed at automating network-based OS
-installation. It turns out that Cobbler has a wiki article on [system
-retirement][] that deals with using Cobbler to automate a network boot
-of DBAN. Cobbler takes control of DHCP and TFTP, boots the machine(s) to
-a PXE boot menu, and allows selection of one of the cobbler "profiles".
+Luckily, with a little googling, I came by the
+[Cobbler](https://fedorahosted.org/cobbler/) project, a ready-to-run
+install server aimed at automating network-based OS installation. It
+turns out that Cobbler has a wiki article on [system
+retirement](https://fedorahosted.org/cobbler/wiki/SystemRetirement) that
+deals with using Cobbler to automate a network boot of DBAN. Cobbler
+takes control of DHCP and TFTP, boots the machine(s) to a PXE boot menu,
+and allows selection of one of the cobbler "profiles".
 
 The general procedure is something along these lines:
 
@@ -81,19 +83,15 @@ the wipe method. This means that if we PXE boot with kernel options set
 to `nuke="dwipe --autonuke --method=zero"` we should go straight to the
 dwipe utility (the heart of DBAN) and automatically wipe all disks by
 writing zeros once - without operator intervention. Unfortunately,
-there's a [bug][] in the current (1.4.0) Cobbler which prevents
-quote-encapsulated strings in kopts, meaning that we can't set one
-kernel option to a string with whitespace as needed here. If this bug is
-fixed, it should allow this process to work without any operator
-intervention, assuming the clients will PXE boot.
+there's a [bug](https://fedorahosted.org/cobbler/ticket/148) in the
+current (1.4.0) Cobbler which prevents quote-encapsulated strings in
+kopts, meaning that we can't set one kernel option to a string with
+whitespace as needed here. If this bug is fixed, it should allow this
+process to work without any operator intervention, assuming the clients
+will PXE boot.
 
 **Updated 2009-03-05** I haven't tested it yet, but apparently the
-Cobbler bug preventing complex kernel options has [been fixed][]. The
-fix should be included in the 1.4.3 release and is currently in the
+Cobbler bug preventing complex kernel options has [been
+fixed](https://fedorahosted.org/pipermail/cobbler/2009-February/002874.html).
+The fix should be included in the 1.4.3 release and is currently in the
 development tree.
-
-  [Darik's Boot And Nuke]: http://www.dban.org/
-  [Cobbler]: https://fedorahosted.org/cobbler/
-  [system retirement]: https://fedorahosted.org/cobbler/wiki/SystemRetirement
-  [bug]: https://fedorahosted.org/cobbler/ticket/148
-  [been fixed]: https://fedorahosted.org/pipermail/cobbler/2009-February/002874.html

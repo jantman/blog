@@ -6,29 +6,32 @@ Tags: api, dns, linode, PHP, sysadmin
 Slug: php-script-to-query-linode-dns-manager-api
 
 I'm in the process of moving all of my public-facing services, currently
-hosted on a single [Linode][], to a new virtual machine (still with
-Linode, of course, just a new CentOS 6 VM). Of course, I've got a *lot*
-(about 60) of DNS records, spread across 8 domains, that point at the
-old machine. For name-based vhosts in Apache, my usual procedure is to
-migrate everything over to the new host and then change DNS, and once
-the change propagates (I'm using Linode's DNS hosting, so it makes
-things a LOT easier but I don't have `rndc reload` anymore) I test in a
-browser and, assuming all is well, disable the vhost on the old server.
-To do all this, I need an easy way to get a list of all the DNS records
-that still point to the old machine.
+hosted on a single
+[Linode](http://www.linode.com/?r=5c8ad2931b410b55455aadbcf0a8d86d6f698a91),
+to a new virtual machine (still with Linode, of course, just a new
+CentOS 6 VM). Of course, I've got a *lot* (about 60) of DNS records,
+spread across 8 domains, that point at the old machine. For name-based
+vhosts in Apache, my usual procedure is to migrate everything over to
+the new host and then change DNS, and once the change propagates (I'm
+using Linode's DNS hosting, so it makes things a LOT easier but I don't
+have `rndc reload` anymore) I test in a browser and, assuming all is
+well, disable the vhost on the old server. To do all this, I need an
+easy way to get a list of all the DNS records that still point to the
+old machine.
 
 Luckily, to augment their web-based control panel (Linode Manager),
-Linode has a pretty full-featured [API][] with bindings for Python,
-Perl, PHP, Ruby, Java and others. While I like Python and I'm starting
-to learn Perl (by trying to shift most of my non-time-sensitive
-scripting to it) for my new job, PHP is still my strongest language (and
-the majority of my existing administrative scripting is written in it,
-especially handy when it comes time to add a web front-end to things).
-So I wrote the following script to query Linode's [DNS Manager API][]
-using [Kerem Durmus' Linode API PHP wrapper][] (installation
-instructions and info at that Github link). The script simply writes all
-Linode DNS records for all zones to a CSV file (this could take a while
-if you have a lot of records...).
+Linode has a pretty full-featured [API](http://www.linode.com/api/) with
+bindings for Python, Perl, PHP, Ruby, Java and others. While I like
+Python and I'm starting to learn Perl (by trying to shift most of my
+non-time-sensitive scripting to it) for my new job, PHP is still my
+strongest language (and the majority of my existing administrative
+scripting is written in it, especially handy when it comes time to add a
+web front-end to things). So I wrote the following script to query
+Linode's [DNS Manager API](http://www.linode.com/api/dns) using [Kerem
+Durmus' Linode API PHP wrapper](https://github.com/krmdrms/linode/)
+(installation instructions and info at that Github link). The script
+simply writes all Linode DNS records for all zones to a CSV file (this
+could take a while if you have a lot of records...).
 
 ~~~~{.php}
 , many thanks to him for releasing this.
@@ -138,8 +141,3 @@ php linodeDnsToCsv.php | grep linode1 | grep -v '"linode1","a"' | awk -F , '{pri
 
 I hope this helps someone else out, and saves them a few minutes of
 coding...
-
-  [Linode]: http://www.linode.com/?r=5c8ad2931b410b55455aadbcf0a8d86d6f698a91
-  [API]: http://www.linode.com/api/
-  [DNS Manager API]: http://www.linode.com/api/dns
-  [Kerem Durmus' Linode API PHP wrapper]: https://github.com/krmdrms/linode/

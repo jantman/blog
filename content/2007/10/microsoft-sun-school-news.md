@@ -6,8 +6,10 @@ Tags: rutgers school iti it microsoft comparison sun solaris java
 Slug: microsoft-sun-school-news
 
 Well, I'm currently applying to the [Information Technology and
-Informatics (ITI)][] major at Rutgers. I'm in my third year of college
-(transferred in from [RIT][] after a trimester there freshman year. This
+Informatics
+(ITI)](http://www.scils.rutgers.edu/information-technology-and-informatics-major/program-information.html)
+major at Rutgers. I'm in my third year of college (transferred in from
+[RIT](http://www.rit.edu) after a trimester there freshman year. This
 will also be my fourth prospective major - hopefully this one will
 stick. If you're interested in the list, it was a trimester (10 weeks)
 at RIT for Fine Art Photography (probably the most fun I ever had in
@@ -74,7 +76,7 @@ and Microsoft happens to be the most publicly visible company with such
 policies. Some of these Include:
 
 1.  The lack of software openness. Both the ethical implications of  
-   software that isn't [Free Software][], and  
+   software that isn't [Free Software](http://www.fsf.org), and  
    functional issues with software that I can't modify to do what I
     want,  
    distribute to others, or (if I were a large corporation) have an  
@@ -103,8 +105,8 @@ policies. Some of these Include:
    these options (such as \*good\* remote administration) should
     require  
    expensive server versions.
-3.  I want an operating system that recognizes [Free Software][] and
-    doesn't attempt to  
+3.  I want an operating system that recognizes [Free
+    Software](http://www.fsf.org) and doesn't attempt to  
    cripple it.
 4.  I'm a programmer. I like standards. Things work because of
     standards.  
@@ -215,6 +217,4 @@ policies. Some of these Include:
    that will install, if not out-of-the-box then with some simple  
    customization, on the type of computer that I'd find at the curb.
 
-  [Information Technology and Informatics (ITI)]: http://www.scils.rutgers.edu/information-technology-and-informatics-major/program-information.html
-  [RIT]: http://www.rit.edu
-  [Free Software]: http://www.fsf.org
+

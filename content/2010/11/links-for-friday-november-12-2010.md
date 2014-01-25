@@ -4,9 +4,8 @@ Author: admin
 Category: Miscellaneous
 Slug: links-for-friday-november-12-2010
 
--   [How will we know when the Internet is dead?][]
+-   [How will we know when the Internet is
+    dead?](http://arstechnica.com/tech-policy/news/2010/11/are-you-on-the-internet-or-something-else.ars)
 -   [Red Hat announces Red Hat Enterprise Linux 6 - Computerworld
-    Blogs][]
+    Blogs](http://blogs.computerworld.com/17335/red_hat_announces_red_hat_enterprise_linux_6)
 
-  [How will we know when the Internet is dead?]: http://arstechnica.com/tech-policy/news/2010/11/are-you-on-the-internet-or-something-else.ars
-  [Red Hat announces Red Hat Enterprise Linux 6 - Computerworld Blogs]: http://blogs.computerworld.com/17335/red_hat_announces_red_hat_enterprise_linux_6

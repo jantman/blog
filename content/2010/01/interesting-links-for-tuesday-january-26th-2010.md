@@ -6,28 +6,37 @@ Slug: interesting-links-for-tuesday-january-26th-2010
 
 **Interesting Links for Tuesday, January 26^th^ 2010**
 
--   [Jan. 25, 1979: Robot Kills Human][]
--   [Lawyers Challenge $54,000 P2P Fine As Unconstitutional][]
--   [Verizon Terminating Copyright Infringers’ Internet Access][]
--   [Linux performance: is Linux becoming just too slow and bloated?][]
+-   [Jan. 25, 1979: Robot Kills
+    Human](http://www.wired.com/thisdayintech/2010/01/0125robot-kills-worker/)
+-   [Lawyers Challenge $54,000 P2P Fine As
+    Unconstitutional](http://www.wired.com/threatlevel/2010/01/lawyers-challenge-filesharing-verdict/)
+-   [Verizon Terminating Copyright Infringers’ Internet
+    Access](http://www.wired.com/threatlevel/2010/01/verizon-terminating-internet-accessinternet-access/)
+-   [Linux performance: is Linux becoming just too slow and
+    bloated?](http://www.freesoftwaremagazine.com/columns/linux_performance_linux_slow_bloated)
 -   [Mr. Edison’s Kindle: Fifteen amazing gadget ideas that were way,
-    way ahead of their time][] *(though, I must say, the author of this
-    blog is really looking at things from a modern-day perspective, and
-    his commentary seems to miss how truly brilliant these ideas were at
-    the time)*
+    way ahead of their
+    time](http://technologizer.com/2010/01/24/edisons-kindle/) *(though,
+    I must say, the author of this blog is really looking at things from
+    a modern-day perspective, and his commentary seems to miss how truly
+    brilliant these ideas were at the time)*
 -   [EFF: Blogging ACTA Across the Globe: CIPPIC's David Fewer on What
-    ACTA Means for Canadian Citizens][]
+    ACTA Means for Canadian
+    Citizens](http://www.eff.org/deeplinks/2010/01/blogging-acta-across-globe-cippics-david-fewer-wha)
 -   [Clarifying SourceForge.net’s denial of site access for certain
-    persons in accordance with US law][]
--   [EFF: Clinton on Internet Freedom, and Principled Stands][]
+    persons in accordance with US
+    law](http://sourceforge.net/blog/clarifying-sourceforgenets-denial-of-site-access-for-certain-persons-in-accordance-with-us-law/)
+-   [EFF: Clinton on Internet Freedom, and Principled
+    Stands](http://www.eff.org/deeplinks/2010/01/clinton-internet-freedom-and-principled-stands)
 
 And, most importantly... [Report: Linux Gains Ground, Windows
-Stumbles][]. Apparently, according to Net Applications, Linux's market
-share rose from 1 to 1.02 percent in December 2009, a small but hopeful
-increase. Windows marketshare fell from 92.52% to 92.21%.
+Stumbles](http://www.linuxinsider.com/rsstory/69193.html). Apparently,
+according to Net Applications, Linux's market share rose from 1 to 1.02
+percent in December 2009, a small but hopeful increase. Windows
+marketshare fell from 92.52% to 92.21%.
 
 Like any statistic, there are always multiple sources. The
-[W3Counter.com][] reports are a bit brighter for Linux:
+[W3Counter.com](www.w3counter.com) reports are a bit brighter for Linux:
 
 <table>
 <tr>
@@ -245,17 +254,3 @@ stride for the brand new Firefox version. While IE8 has been out
 considerably longer than Firefox 3.5, they're already almost tied in
 market share (and if another jump like that happens, Firefox 3.5 will be
 in the lead next month).
-
-  [Jan. 25, 1979: Robot Kills Human]: http://www.wired.com/thisdayintech/2010/01/0125robot-kills-worker/
-  [Lawyers Challenge $54,000 P2P Fine As Unconstitutional]: http://www.wired.com/threatlevel/2010/01/lawyers-challenge-filesharing-verdict/
-  [Verizon Terminating Copyright Infringers’ Internet Access]: http://www.wired.com/threatlevel/2010/01/verizon-terminating-internet-accessinternet-access/
-  [Linux performance: is Linux becoming just too slow and bloated?]: http://www.freesoftwaremagazine.com/columns/linux_performance_linux_slow_bloated
-  [Mr. Edison’s Kindle: Fifteen amazing gadget ideas that were way, way
-  ahead of their time]: http://technologizer.com/2010/01/24/edisons-kindle/
-  [EFF: Blogging ACTA Across the Globe: CIPPIC's David Fewer on What
-  ACTA Means for Canadian Citizens]: http://www.eff.org/deeplinks/2010/01/blogging-acta-across-globe-cippics-david-fewer-wha
-  [Clarifying SourceForge.net’s denial of site access for certain
-  persons in accordance with US law]: http://sourceforge.net/blog/clarifying-sourceforgenets-denial-of-site-access-for-certain-persons-in-accordance-with-us-law/
-  [EFF: Clinton on Internet Freedom, and Principled Stands]: http://www.eff.org/deeplinks/2010/01/clinton-internet-freedom-and-principled-stands
-  [Report: Linux Gains Ground, Windows Stumbles]: http://www.linuxinsider.com/rsstory/69193.html
-  [W3Counter.com]: www.w3counter.com

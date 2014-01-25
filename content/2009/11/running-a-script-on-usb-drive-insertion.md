@@ -82,6 +82,4 @@ fi
 cp -R "$DEVICE"/* "$DEST"
 ~~~~
 
-This was tested on [OpenSuSE][] 10.3.
-
-  [OpenSuSE]: http://www.opensuse.org
+This was tested on [OpenSuSE](http://www.opensuse.org) 10.3.

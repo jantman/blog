@@ -12,24 +12,28 @@ working on a few projects - centralized logging and analysis, some way
 to easily tie Nagios, log analysis, traffic analysis, etc. into a
 one-look heads-up display, and a few other things. I even got the power
 adapter for my LCD so that I can have a try at the [giant wall-size LCD
-projector][]. However, reading through my usual RSS feeds today, I felt
-the urge to comment on a few things.
+projector](http://www.tomsguide.com/us/supersize-your-tv-for,review-342.html).
+However, reading through my usual RSS feeds today, I felt the urge to
+comment on a few things.
 
 First, for those who haven't heard, the SFLC and the BusyBox developers
-have filed [another lawsuit][] alleging GPL violations, this time
-against Verizon for distributing an Actiontec router to FiOS customers,
-sans source code. I'm a FiOS customer (in fact, the very text you're
-looking at is coming to you courtesy of residential fiber) but got in on
-the wagon before they were giving away these "fancy" routers. It's good
-to see, though, that the F/OSS world is standing up for its' values, and
-perhaps the mainstream proprietary world will start to understand that
-just because you can give a copy of BusyBox to your friends doesn't mean
-they can disregard the license.
+have filed [another
+lawsuit](http://www.softwarefreedom.org/news/2007/dec/07/busybox/)
+alleging GPL violations, this time against Verizon for distributing an
+Actiontec router to FiOS customers, sans source code. I'm a FiOS
+customer (in fact, the very text you're looking at is coming to you
+courtesy of residential fiber) but got in on the wagon before they were
+giving away these "fancy" routers. It's good to see, though, that the
+F/OSS world is standing up for its' values, and perhaps the mainstream
+proprietary world will start to understand that just because you can
+give a copy of BusyBox to your friends doesn't mean they can disregard
+the license.
 
 <span style="font-weight: bold;">Windows Advances?</span>  
-I came by [this blog post][] discussing the fact that, apparently,
-Windows 2008 is going to be able to be installed in a CLI-only (yes,
-that's right, no GUI) mode.
+I came by [this blog
+post](http://blogs.ittoolbox.com/linux/locutus/archives/if-the-gui-is-so-good-then-why-is-microsoft-dropping-it-20951?e=unrec#commentsForm)
+discussing the fact that, apparently, Windows 2008 is going to be able
+to be installed in a CLI-only (yes, that's right, no GUI) mode.
 
 I'm not going to preach about Microsoft turning unix-y. Rather, I think
 it just reiterates something that I've said time and time
@@ -47,7 +51,9 @@ mysteriously, that not everyone wants to have to buy the newest hardware
 just to run an OS.
 
 <span style="font-weight: bold;">Cutting out the Middle Man:</span>  
-I found and [article at internetnews.com][] entitled
+I found and [article at
+internetnews.com](http://www.internetnews.com/stats/article.php/3655796)
+entitled
 "<span style="font-family:Verdana, Arial, Helvetica, sans-serif;font-size:-1;"><span>The
 Young, Smart And Loaded Watch Online TV</span> ". Many parts of it
 saddened me - like the thought of allowing providers to push
@@ -55,11 +61,12 @@ advertisement through my computer, or tracking my viewing habits in
 great detail.
 
 However, this is something that's occurred to me many times. Firstly, I
-already use [MythTV][] to watch tv. So, realistically, I'm already
-watching TV on a computer. I have broadband in both my home and
-apartment (and anywhere else I'd want to be). I have a coaxial cable
-coming from the wall, plugged into my computer. And I have to hook a
-tuner up and capture the video. Why not cut out the middle man?
+already use [MythTV](http://www.mythtv.org/) to watch tv. So,
+realistically, I'm already watching TV on a computer. I have broadband
+in both my home and apartment (and anywhere else I'd want to be). I have
+a coaxial cable coming from the wall, plugged into my computer. And I
+have to hook a tuner up and capture the video. Why not cut out the
+middle man?
 
 I pay Cablevision somewhere around $30/month for TV. That covers not
 only the content, but also the costs for them to maintain a vast network
@@ -91,9 +98,3 @@ a company embracing a standardized technology (like just streaming
 everything over the web and depending on SSL and HTTP-based
 authentication) that will run on my Linux boxen is pretty slim.  
 </span><span style="font-style: italic;"></span>
-
-  [giant wall-size LCD projector]: http://www.tomsguide.com/us/supersize-your-tv-for,review-342.html
-  [another lawsuit]: http://www.softwarefreedom.org/news/2007/dec/07/busybox/
-  [this blog post]: http://blogs.ittoolbox.com/linux/locutus/archives/if-the-gui-is-so-good-then-why-is-microsoft-dropping-it-20951?e=unrec#commentsForm
-  [article at internetnews.com]: http://www.internetnews.com/stats/article.php/3655796
-  [MythTV]: http://www.mythtv.org/

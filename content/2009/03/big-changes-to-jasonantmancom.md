@@ -17,10 +17,11 @@ for home to replace the Sears shelving unit my boxes are currently on.
 Cablevision is supposed to be here between 2-5 PM to do the install
 (yes, they insist that for Business they do the install, even though
 it's only a 4-foot coax run from the first splitter to the demarc). I've
-got [Vyatta][] CE5 Beta installed on a [Proliant DL360G2][] as the new
-router, ready to go (after some configuration). I'll probably keep FiOS
-up until I know the new router is working correctly (I'll do a test on
-my management VLAN).
+got [Vyatta](http://www.vyatta.org) CE5 Beta installed on a [Proliant
+DL360G2](http://h18000.www1.hp.com/products/quickspecs/11049_na/11049_na.HTML)
+as the new router, ready to go (after some configuration). I'll probably
+keep FiOS up until I know the new router is working correctly (I'll do a
+test on my management VLAN).
 
 Once Optimum and the new router is up, the fun starts:
 
@@ -64,6 +65,3 @@ Once Optimum and the new router is up, the fun starts:
 
 So I might have some downtime this weekend, but when things come back
 up, I'll be done with this DynDNS and Port 10011 crap.
-
-  [Vyatta]: http://www.vyatta.org
-  [Proliant DL360G2]: http://h18000.www1.hp.com/products/quickspecs/11049_na/11049_na.HTML

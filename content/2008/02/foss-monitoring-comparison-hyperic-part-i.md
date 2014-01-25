@@ -10,7 +10,8 @@ and partly configured, albeit without email alerts yet. I've found some
 serious features that I need missing, but I'm going to give it a full
 run before I move on to another.
 
-The full text, updated a few times a day, is available on [my wiki][].
+The full text, updated a few times a day, is available on [my
+wiki](http://www.jasonantman.com/wiki/index.php/Network_Monitoring_Comparison).
 Here's a bit of an excerpt:  
 <a name="Part_I_-_Installation"></a>  
 
@@ -20,9 +21,10 @@ Here's a bit of an excerpt:
     hours, some server problems, some Xen problems, and some time
     learning Xen administration from the CLI)
 2.  Download `hyperic-hq-installer-3.2.0-607-x86-linux.tgz` from
-    [Hyperic][] and extract.
+    [Hyperic](http://www.hyperic.com/downloads/dl-hq-oss.html "http://www.hyperic.com/downloads/dl-hq-oss.html")
+    and extract.
 3.  Browse to
-    [http://support.hyperic.com/confluence/display/DOC/Full+Installation+Guide][]
+    [http://support.hyperic.com/confluence/display/DOC/Full+Installation+Guide](http://support.hyperic.com/confluence/display/DOC/Full+Installation+Guide "http://support.hyperic.com/confluence/display/DOC/Full+Installation+Guide")
 4.  `cd` into `hyperic-hq-installer` and run `./setup.sh -full`
     1.  The installation can't be run as root (though I assumed it would
         need root privileges).
@@ -53,7 +55,7 @@ Here's a bit of an excerpt:
     12. How will it start the builtin database? As my user???? Yup.
         postgres is running as my user. Wonderful. Nothing in the
         [install
-        document][http://support.hyperic.com/confluence/display/DOC/Full+Installation+Guide]
+        document](http://support.hyperic.com/confluence/display/DOC/Full+Installation+Guide "http://support.hyperic.com/confluence/display/DOC/Full+Installation+Guide")
         mentioned user creation. Was this just assumed? Because in the
         naive world I live in, most installer scripts (think Nagios)
         create a user for you, or tell you to.
@@ -62,10 +64,13 @@ Here's a bit of an excerpt:
 5.  Run `/home/hyperic/server-3.2.0/bin/hq-server.sh start`... as my
     user. *Note to self:* setup a user for Postgres and Hyperic. Believe
     it or not, but it booted - but followed with the message, "Login to
-    HQ at: [http://127.0.0.1:7080/][]"
-6.  Browsed to [http://devel-hyperic1:7080][] and was greeted by a
-    startup page, saying that the server was 18% finished booting. My, I
-    yearn for little C binaries and a PHP frontend.
+    HQ at:
+    [http://127.0.0.1:7080/](http://127.0.0.1:7080/ "http://127.0.0.1:7080/")"
+6.  Browsed to
+    [http://devel-hyperic1:7080](http://devel-hyperic1:7080/ "http://devel-hyperic1:7080")
+    and was greeted by a startup page, saying that the server was 18%
+    finished booting. My, I yearn for little C binaries and a PHP
+    frontend.
 7.  Page turns blank and stops there. I refresh, and get a login page. I
     enter my username and password, and get a little message box where
     the "invalid password" box usually is - says "Server is still
@@ -99,21 +104,26 @@ Here's a bit of an excerpt:
     time to give Part I a rest. But first...
 15. Go to the "Platform" page for my one machine and... YES! Graphs are
     starting to appear!
-16. Following the suggestion [here][], I enable log and config tracking
-    on the platform for `/var/log/warn` and `/etc/hosts`, respecitvely.
+16. Following the suggestion
+    [here](http://support.hyperic.com/confluence/display/DOC/HQ+Quick+Start#HQQuickStart-enableTracking "http://support.hyperic.com/confluence/display/DOC/HQ+Quick+Start#HQQuickStart-enableTracking"),
+    I enable log and config tracking on the platform for `/var/log/warn`
+    and `/etc/hosts`, respecitvely.
 17. Before I call it a night (now 03:42), I stop back at the [downloads
-    page][Hyperic] and grab the Linux x86 Agent for the dom0 machine,
-    hoping to get some physical information as well. While I'm at it, I
-    grab the Linux AMD64 Agent to try on my laptop. I create "hyperic"
-    users on each system. On the base Xen server, I give it a shot and
-    get "Unable to register agent: Error communicating with agent:
-    Unauthorized". Same thing on the laptop.
-18. Did a little reading [here][1]. As to keeping all of the defaults,
-    it turns out that both clients had firewalls blocking TCP port 2144.
-    I opened it up on both, and also set the IP address (that the server
-    uses to contact the client) to the correct ones. Viola! Now I have 3
-    clients connected, and gatheirng data for the next \~16 hours until
-    I have time to check it out agian.
+    page](http://www.hyperic.com/downloads/dl-hq-oss.html "http://www.hyperic.com/downloads/dl-hq-oss.html")
+    and grab the Linux x86 Agent for the dom0 machine, hoping to get
+    some physical information as well. While I'm at it, I grab the Linux
+    AMD64 Agent to try on my laptop. I create "hyperic" users on each
+    system. On the base Xen server, I give it a shot and get "Unable to
+    register agent: Error communicating with agent: Unauthorized". Same
+    thing on the laptop.
+18. Did a little reading
+    [here](http://support.hyperic.com/confluence/display/DOC/Installation+Non-Windows#InstallationNon-Windows-install "http://support.hyperic.com/confluence/display/DOC/Installation+Non-Windows#InstallationNon-Windows-install").
+    As to keeping all of the defaults, it turns out that both clients
+    had firewalls blocking TCP port 2144. I opened it up on both, and
+    also set the IP address (that the server uses to contact the client)
+    to the correct ones. Viola! Now I have 3 clients connected, and
+    gatheirng data for the next \~16 hours until I have time to check it
+    out agian.
 
 More to come in Part II tomorrow - actually doing something with
 Hyperic. For  
@@ -154,7 +164,7 @@ see metrics - Availability, IP Forwards, IP In Receives, an IP In
 Received per  
 Second. While it's quite basic, that's good for a starting point. While
 the  
-[[http://support.hyperic.com/confluence/display/DOCSHQ30/Network+Device+platform][]  
+[[http://support.hyperic.com/confluence/display/DOCSHQ30/Network+Device+platform](http://support.hyperic.com/confluence/display/DOCSHQ30/Network+Device+platform "http://support.hyperic.com/confluence/display/DOCSHQ30/Network+Device+platform")  
 Network Device Platform] documentation lists lots of metrics that can
 be  
 enabled, I'd also like telnet availability and - my big one since I use
@@ -241,25 +251,8 @@ platform page as well as the services and servers pages, and each metric
 therein.
 
 I'll be posting some more in the days to come. From a [post at the
-Hyperic Forums][], I was able to find out that a Xen plugin is in the
-works, but for the Open Source version, the only way to trigger a script
-is to send an email and have it handled by a filter such as Procmail.
-
-  [my wiki]: http://www.jasonantman.com/wiki/index.php/Network_Monitoring_Comparison
-  [Hyperic]: http://www.hyperic.com/downloads/dl-hq-oss.html
-    "http://www.hyperic.com/downloads/dl-hq-oss.html"
-  [http://support.hyperic.com/confluence/display/DOC/Full+Installation+Guide]:
-    http://support.hyperic.com/confluence/display/DOC/Full+Installation+Guide
-    "http://support.hyperic.com/confluence/display/DOC/Full+Installation+Guide"
-  [http://127.0.0.1:7080/]: http://127.0.0.1:7080/
-    "http://127.0.0.1:7080/"
-  [http://devel-hyperic1:7080]: http://devel-hyperic1:7080/
-    "http://devel-hyperic1:7080"
-  [here]: http://support.hyperic.com/confluence/display/DOC/HQ+Quick+Start#HQQuickStart-enableTracking
-    "http://support.hyperic.com/confluence/display/DOC/HQ+Quick+Start#HQQuickStart-enableTracking"
-  [1]: http://support.hyperic.com/confluence/display/DOC/Installation+Non-Windows#InstallationNon-Windows-install
-    "http://support.hyperic.com/confluence/display/DOC/Installation+Non-Windows#InstallationNon-Windows-install"
-  [http://support.hyperic.com/confluence/display/DOCSHQ30/Network+Device+platform]:
-    http://support.hyperic.com/confluence/display/DOCSHQ30/Network+Device+platform
-    "http://support.hyperic.com/confluence/display/DOCSHQ30/Network+Device+platform"
-  [post at the Hyperic Forums]: http://forums.hyperic.com/jiveforums/thread.jspa?messageID=14561&#14561
+Hyperic
+Forums](http://forums.hyperic.com/jiveforums/thread.jspa?messageID=14561&#14561),
+I was able to find out that a Xen plugin is in the works, but for the
+Open Source version, the only way to trigger a script is to send an
+email and have it handled by a filter such as Procmail.

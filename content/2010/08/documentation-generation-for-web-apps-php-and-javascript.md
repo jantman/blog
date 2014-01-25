@@ -7,19 +7,21 @@ Slug: documentation-generation-for-web-apps-php-and-javascript
 
 Recently I've been making some changes to a relatively complex ePCR
 (electronic patient care report) program that I wrote for the [ambulance
-corps][]. It's a web application (available only on our LAN, of course)
-written in PHP, with a relatively large chunk of custom javascript to
-provide Ajax/DHTML functions. Most of the PHP code was already
-documented and processed with [phpDocumentor][] (phpdoc) to generate API
+corps](http://www.midlandparkambulance.com). It's a web application
+(available only on our LAN, of course) written in PHP, with a relatively
+large chunk of custom javascript to provide Ajax/DHTML functions. Most
+of the PHP code was already documented and processed with
+[phpDocumentor](http://www.phpdoc.org/) (phpdoc) to generate API
 documentation. However, since so much of the functionality is
 DHTML-based, there was a lot of looking back to the JavaScript source to
 figure out what was called where.
 
 My search for a true multi-language documentation generator was
-relatively fruitless. There's [doxygen][] but that needed a Perl helper
-script for javascript files. Since virtually all of the code, both PHP
-and JavaScript, is purely procedural, I was really only concerned about
-docblocks and the functions they precede.
+relatively fruitless. There's
+[doxygen](http://www.stack.nl/~dimitri/doxygen/) but that needed a Perl
+helper script for javascript files. Since virtually all of the code,
+both PHP and JavaScript, is purely procedural, I was really only
+concerned about docblocks and the functions they precede.
 
 Luckily, it occurred to me that JavaScript is pretty close in syntax to
 PHP, and I tend to write them with exactly the same style. A little
@@ -50,10 +52,10 @@ files. I also added explicit package names (like "-PHP" and "-JS") to
 keep things separated a little.
 
 The script can be found at:
-[http://svn.jasonantman.com/misc-scripts/js2phpdoc.php][]. It's
-(obviously) free for any use, provided that you follow the license terms
-(leave copyrights intact, send modifications back to me, and update the
-changelog if you modify it).
+[http://svn.jasonantman.com/misc-scripts/js2phpdoc.php](http://svn.jasonantman.com/misc-scripts/js2phpdoc.php).
+It's (obviously) free for any use, provided that you follow the license
+terms (leave copyrights intact, send modifications back to me, and
+update the changelog if you modify it).
 
 My Makefile rule (which uses a temp directory to both keep the generated
 files separate from the source and keep the file paths as seen by phpdoc
@@ -68,8 +70,3 @@ cp \*.php temp/
 phpdoc -c docs/default.ini  
 rm -Rf temp  
 </code>
-
-  [ambulance corps]: http://www.midlandparkambulance.com
-  [phpDocumentor]: http://www.phpdoc.org/
-  [doxygen]: http://www.stack.nl/~dimitri/doxygen/
-  [http://svn.jasonantman.com/misc-scripts/js2phpdoc.php]: http://svn.jasonantman.com/misc-scripts/js2phpdoc.php

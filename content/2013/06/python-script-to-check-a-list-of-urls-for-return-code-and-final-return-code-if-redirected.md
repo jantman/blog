@@ -13,7 +13,7 @@ Pretty useful when you've just added a bunch of redirects and want to
 make sure none of them 404.
 
 The latest source of this script lives at
-[https://github.com/jantman/misc-scripts/blob/master/check\_url\_list.py][].
+[https://github.com/jantman/misc-scripts/blob/master/check\_url\_list.py](https://github.com/jantman/misc-scripts/blob/master/check_url_list.py).
 
 ~~~~{.python}
 #!/usr/bin/env python
@@ -63,6 +63,3 @@ def main():
 if __name__ == "__main__":
     main()
 ~~~~
-
-  [https://github.com/jantman/misc-scripts/blob/master/check\_url\_list.py]:
-    https://github.com/jantman/misc-scripts/blob/master/check_url_list.py

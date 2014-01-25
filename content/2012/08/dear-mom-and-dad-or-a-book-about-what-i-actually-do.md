@@ -5,25 +5,26 @@ Category: SysAdmin
 Tags: books, limoncelli, sysadmin
 Slug: dear-mom-and-dad-or-a-book-about-what-i-actually-do
 
-I've followed [Tom Limoncelli's blog][] for quite a while; his books
-[The Practice of System and Network Administration][] and [Time
-Management for System Administrators][] were infinitely helpful in the
-early days of my professional life, and are among the few (literally, 4
-or 5) books that live on my desk. His insight and information into the
-soft skills of SA work - time management, hiring, working in teams, etc.
-- is not only excellent, but also all too rare in a largely technical
-field.
+I've followed [Tom Limoncelli's blog](http://everythingsysadmin.com/)
+for quite a while; his books [The Practice of System and Network
+Administration](http://everythingsysadmin.com/aboutbook.html) and [Time
+Management for System Administrators](http://www.tomontime.com/) were
+infinitely helpful in the early days of my professional life, and are
+among the few (literally, 4 or 5) books that live on my desk. His
+insight and information into the soft skills of SA work - time
+management, hiring, working in teams, etc. - is not only excellent, but
+also all too rare in a largely technical field.
 
 Anyway, Tom posted the below article to his blog about a book that
 recently came out, ["Taming Information Technology: Lessons from Studies
 of System Administrators" by Eser Kandogan, Paul Maglio, Eben Haber and
-John Bailey][]. I haven't read the book yet, and at $56, it's going to
-be a while before my book budget recovers enough to justify it. But
-going on what I've read from Tom and others, I want it. Not only do I
-want to read it, but I want to pass it around to my parents and in-laws
-and everyone else who has asked what I do for a living, and I found
-myself at a loss for a less-than-6-hour-long explanation. So, here's
-what Tom wrote on it:
+John Bailey](http://www.amazon.com/dp/0195374126/tomontime-20). I
+haven't read the book yet, and at $56, it's going to be a while before
+my book budget recovers enough to justify it. But going on what I've
+read from Tom and others, I want it. Not only do I want to read it, but
+I want to pass it around to my parents and in-laws and everyone else who
+has asked what I do for a living, and I found myself at a loss for a
+less-than-6-hour-long explanation. So, here's what Tom wrote on it:
 
 > Dear Mom And Dad,
 >
@@ -54,9 +55,7 @@ what Tom wrote on it:
 > I hope you enjoy reading this book. I know I did.
 >
 > Pre-order it here:
-> [http://www.amazon.com/dp/0195374126/tomontime-20]["Taming Information
-> Technology: Lessons from Studies of System Administrators" by Eser
-> Kandogan, Paul Maglio, Eben Haber and John Bailey]
+> [http://www.amazon.com/dp/0195374126/tomontime-20](http://www.amazon.com/dp/0195374126/tomontime-20)
 >
 > Sincerely your son,  
 >  Tom
@@ -70,10 +69,11 @@ what Tom wrote on it:
 > what we do, I highly recommend you pre-order this book and share it.
 > You can pre-order it here: ["Taming Information Technology: Lessons
 > from Studies of System Administrators" by Eser Kandogan, Paul Maglio,
-> Eben Haber and John Bailey][]
+> Eben Haber and John
+> Bailey](http://www.amazon.com/dp/0195374126/tomontime-20)
 >
 > More about the book here:
-> [http://everythingsysadmin.com/2012/07/kandogan.html][]
+> [http://everythingsysadmin.com/2012/07/kandogan.html](http://everythingsysadmin.com/2012/07/kandogan.html)
 
 If you have any interest, I encourage you to go out and buy the book. If
 you know someone who's an SA, you should buy them the book. If you can
@@ -82,11 +82,3 @@ while you're at it, if you haven't read Tom's other books, you should
 buy those too. You might be in the unfortunate position - like I am - of
 probably never being able to implement most of his suggestions at work,
 but at least you'll be aware of them...
-
-  [Tom Limoncelli's blog]: http://everythingsysadmin.com/
-  [The Practice of System and Network Administration]: http://everythingsysadmin.com/aboutbook.html
-  [Time Management for System Administrators]: http://www.tomontime.com/
-  ["Taming Information Technology: Lessons from Studies of System
-  Administrators" by Eser Kandogan, Paul Maglio, Eben Haber and John
-  Bailey]: http://www.amazon.com/dp/0195374126/tomontime-20
-  [http://everythingsysadmin.com/2012/07/kandogan.html]: http://everythingsysadmin.com/2012/07/kandogan.html

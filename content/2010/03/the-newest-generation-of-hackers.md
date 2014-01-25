@@ -9,28 +9,33 @@ Slug: the-newest-generation-of-hackers
 The title of this post includes the word "hacker". If you think that has
 anything to do with illegal acts or unethical behavior, you've fallen
 victim to what happens when the mainstream media latches on to a term
-they don't understand. The [definition][] of this word is far from
-negative. Within the geek community, the title "hacker" is the utmost
-compliment - something like Grand Master in the martial arts, or perhaps
-whatever title is given to an eminent artist. It both describes someone
-who is an expert in their field. Or, more generally, someone who enjoys
-seeking knowledge simply for the sake of knowledge - figuring out how
-things work, how to make them, and how to make them better. If you're
-looking for a term that describes a criminal, "attacker", "malicious
-user" or "computer criminal" work fine. While I wouldn't by any extent
-consider myself a hacker in the super-genius-wizard sense of the term, I
-do definitely subscribe to the hacker ethic - the burning need to figure
-out how things work and make them better.*
+they don't understand. The
+[definition](http://www.jasonantman.com/jargon/entry.php?id=hacker) of
+this word is far from negative. Within the geek community, the title
+"hacker" is the utmost compliment - something like Grand Master in the
+martial arts, or perhaps whatever title is given to an eminent artist.
+It both describes someone who is an expert in their field. Or, more
+generally, someone who enjoys seeking knowledge simply for the sake of
+knowledge - figuring out how things work, how to make them, and how to
+make them better. If you're looking for a term that describes a
+criminal, "attacker", "malicious user" or "computer criminal" work fine.
+While I wouldn't by any extent consider myself a hacker in the
+super-genius-wizard sense of the term, I do definitely subscribe to the
+hacker ethic - the burning need to figure out how things work and make
+them better.*
 
 Thanks to the snow at the end of last week, and a long weekend, I
 actually got to do some reading that didn't involve man pages or books
 strictly about software. I finally finished [The Daemon, the Gnu, and
-the Penguin][] by Peter H. Salus, a wonderful book (with a great
-foreword by maddog Hall). I also *finally* got a chance to start reading
-[The Cathedral & the Bazaar: Musings on Linux and Open Source by an
-Accidental Revolutionary][] by Eric S. Raymond (ESR). I'm only up to
-page 50 or so, but it's an equally good book, and I've been looking
-forward to reading it for years.
+the
+Penguin](http://www.amazon.com/Daemon-Gnu-Penguin-Peter-Salus/dp/097903423X)
+by Peter H. Salus, a wonderful book (with a great foreword by maddog
+Hall). I also *finally* got a chance to start reading [The Cathedral &
+the Bazaar: Musings on Linux and Open Source by an Accidental
+Revolutionary](http://www.amazon.com/Cathedral-Bazaar-Musings-Accidental-Revolutionary/dp/0596001088/)
+by Eric S. Raymond (ESR). I'm only up to page 50 or so, but it's an
+equally good book, and I've been looking forward to reading it for
+years.
 
 I've always been very interested in history (heck, I have a minor in
 it), and specifically the history of my other interests. When
@@ -121,8 +126,3 @@ As a side note, I'd be very interested to see how open source use
 compares to demographics. I know that Linux use (on student-owned
 computers) at most colleges is way above the global average, and the
 same goes for Firefox.
-
-  [definition]: http://www.jasonantman.com/jargon/entry.php?id=hacker
-  [The Daemon, the Gnu, and the Penguin]: http://www.amazon.com/Daemon-Gnu-Penguin-Peter-Salus/dp/097903423X
-  [The Cathedral & the Bazaar: Musings on Linux and Open Source by an
-  Accidental Revolutionary]: http://www.amazon.com/Cathedral-Bazaar-Musings-Accidental-Revolutionary/dp/0596001088/

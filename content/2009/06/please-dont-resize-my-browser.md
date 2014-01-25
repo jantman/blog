@@ -9,16 +9,16 @@ It always amazes me to see how much "old school" web design practice is
 still out there. I'm talking about commercial sites (not MySpace pages)
 that blatantly ignore web standards about both content and user
 experience. This isn't just a Linux thing, though some aspect of it
-certainly is. The web site of my home town, [mpnj.com][] uses a
-Flash-based navigation menu that even the official, proprietary Flash
-player for Linux won't support - the transparency renders as white,
-obscuring the text beneath the fully extended size of the menu. I
-emailed the developer about this on the launch day, and was told in no
-uncertain terms that - despite the fact that he had a fully-functional
-alternate version - Linux wasn't important enough to fix the site.
-Ironically for a town government web page, it also doesn't incorporate
-any accessibility features, which seems to be standard for most of these
-poor designs.
+certainly is. The web site of my home town,
+[mpnj.com](http://www.mpnj.com) uses a Flash-based navigation menu that
+even the official, proprietary Flash player for Linux won't support -
+the transparency renders as white, obscuring the text beneath the fully
+extended size of the menu. I emailed the developer about this on the
+launch day, and was told in no uncertain terms that - despite the fact
+that he had a fully-functional alternate version - Linux wasn't
+important enough to fix the site. Ironically for a town government web
+page, it also doesn't incorporate any accessibility features, which
+seems to be standard for most of these poor designs.
 
 There are still countless large news sites whose Flash-based video
 players won't run under Linux, and even CitiBank's credit card site has
@@ -71,5 +71,3 @@ they had to design the whole thing in Emacs). If they're somewhere in
 the middle (just found Ctrl+click in Firefox), you'll confuse them. And
 God forbid they're blind and using a page reader... good luck with
 JavaScript or Flash navigation.
-
-  [mpnj.com]: http://www.mpnj.com

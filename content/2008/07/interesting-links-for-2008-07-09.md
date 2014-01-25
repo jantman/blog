@@ -5,7 +5,6 @@ Category: Miscellaneous
 Slug: interesting-links-for-2008-07-09
 
 -   [Flickr Photo Download: Comparison of file systems - Wikipedia
-    (Reiser4 kills your wife)][]
+    (Reiser4 kills your
+    wife)](http://www.flickr.com/photos/ronocdh/2651155110/sizes/o/)
 
-  [Flickr Photo Download: Comparison of file systems - Wikipedia
-  (Reiser4 kills your wife)]: http://www.flickr.com/photos/ronocdh/2651155110/sizes/o/

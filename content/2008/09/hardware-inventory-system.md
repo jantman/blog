@@ -7,10 +7,10 @@ Slug: hardware-inventory-system
 
 After a few crazy weeks at work, the pay check is finally here, and I've
 decided to allocate some of the money to hardware upgrades of my
-personal machines. While [Nagios][] gives me a good idea of where
-performance is a problem, I'm still running a large amount of "legacy"
-hardware (my home router/firewall is a 350MHz P-II desktop) and hardware
-age is a significant factor in my upgrade plans.
+personal machines. While [Nagios](http://www.nagios.org) gives me a good
+idea of where performance is a problem, I'm still running a large amount
+of "legacy" hardware (my home router/firewall is a 350MHz P-II desktop)
+and hardware age is a significant factor in my upgrade plans.
 
 So, I set out looking for a program (most likely some backend scripts
 that dump data to MySQL, and then a PHP front-end) to perform a hardware
@@ -61,7 +61,7 @@ Some of the data that I'd like collected:
 I'd also like some level of software inventory, especially for those
 machines that may be running "forgotten" services:
 
--   [nmap][] scan results.
+-   [nmap](http://nmap.org/) scan results.
 -   OS-generated list of running services, with GUI including a
     blacklist of "default" services not to be displayed, and possibly
     also cross-links to Nagios status.
@@ -71,6 +71,3 @@ machines that may be running "forgotten" services:
 I'll be checking out some options today. Unfortunately, I have a feeling
 that there's most likely nothing that supports my requirements, and I'll
 probably end up implementing a lot of this myself.
-
-  [Nagios]: http://www.nagios.org
-  [nmap]: http://nmap.org/

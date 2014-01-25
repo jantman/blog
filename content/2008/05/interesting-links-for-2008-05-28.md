@@ -5,7 +5,6 @@ Category: Miscellaneous
 Slug: interesting-links-for-2008-05-28
 
 -   [Gallery: 10 most annoying programs on the Internet | TechRepublic
-    Photo Gallery][]
+    Photo
+    Gallery](http://content.techrepublic.com.com/2346-3513_11-202392-1.html)
 
-  [Gallery: 10 most annoying programs on the Internet | TechRepublic
-  Photo Gallery]: http://content.techrepublic.com.com/2346-3513_11-202392-1.html

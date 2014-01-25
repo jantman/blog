@@ -14,7 +14,7 @@ because tar on CentOS 5 doesn't support xz.
 Here's a quick and dirty little script to use `rpm2cpio` to rebuild a
 SRPM using the host's native RPM compression. The latest version will
 live at
-[https://github.com/jantman/misc-scripts/blob/master/rebuild\_srpm.sh][]
+[https://github.com/jantman/misc-scripts/blob/master/rebuild\_srpm.sh](https://github.com/jantman/misc-scripts/blob/master/rebuild_srpm.sh)
 
 ~~~~{.bash}
 #!/bin/bash
@@ -95,6 +95,3 @@ echo "Wrote file to $OUTDIR/`basename $NEW_SRPM`"
 cd $STARTPWD
 rm -Rf $TEMPDIR
 ~~~~
-
-  [https://github.com/jantman/misc-scripts/blob/master/rebuild\_srpm.sh]:
-    https://github.com/jantman/misc-scripts/blob/master/rebuild_srpm.sh

@@ -5,21 +5,22 @@ Category: SysAdmin
 Slug: what-i-look-for-when-interviwing-sysadmin-candidates
 
 I recently came by a question on ServerFault, [Listing side projects in
-a jr. sysadmin resume][] asking whether people (hiring managers) think
-it's appropriate to put "side projects" (running your own web and mail
-servers, freelance web work, etc.) on your resume. Since I've been
-interviewing candidates for a few SysAdmin positions lately, I thought
-I'd take the time to write down a few of my ideas on this. Two
-disclaimers first, though. 1) I tend to be pretty geeky, progressive,
-and very open source/DevOps focused at heart. Not everyone I work with
-will agree with what I say here. As a candidate, remember that you'll
-probably interview with all types, and what I say here won't be the best
-advice with Enterprise types. I'm very open source centric, and have
-always held SA jobs where the majority of the software I run is open
-source and not vendor supported. 2) If you happen to actually interview
-with me, don't make the mistake of reading this and tailoring your
-resume/responses to fit if that's not accurate. I'm not a manager, I'm a
-line SA.
+a jr. sysadmin
+resume](http://serverfault.com/questions/210218/listing-side-projects-in-a-jr-sysadmin-resume/405054#405054)
+asking whether people (hiring managers) think it's appropriate to put
+"side projects" (running your own web and mail servers, freelance web
+work, etc.) on your resume. Since I've been interviewing candidates for
+a few SysAdmin positions lately, I thought I'd take the time to write
+down a few of my ideas on this. Two disclaimers first, though. 1) I tend
+to be pretty geeky, progressive, and very open source/DevOps focused at
+heart. Not everyone I work with will agree with what I say here. As a
+candidate, remember that you'll probably interview with all types, and
+what I say here won't be the best advice with Enterprise types. I'm very
+open source centric, and have always held SA jobs where the majority of
+the software I run is open source and not vendor supported. 2) If you
+happen to actually interview with me, don't make the mistake of reading
+this and tailoring your resume/responses to fit if that's not accurate.
+I'm not a manager, I'm a line SA.
 
 **First, my response to the ServerFault question:**
 
@@ -46,9 +47,10 @@ line SA.
 **Some things I look for:**
 
 -   Not in all cases, but I like to see a website or blog listed on a
-    resume. It's a big plus. I have [resume.jasonantman.com][] with
-    copies of my resume in various formats, as well as a bunch of links
-    I'd like employers to see.
+    resume. It's a big plus. I have
+    [resume.jasonantman.com](http://resume.jasonantman.com) with copies
+    of my resume in various formats, as well as a bunch of links I'd
+    like employers to see.
 -   If you're a working SA, I should be able to find you on Google.
     Either by name or email address, I expect to google the contact
     information I find on your resume and find at least some mailing
@@ -84,6 +86,3 @@ line SA.
     </p>
 
 I'm sure I'll update this over time as I distill more of my ideas.
-
-  [Listing side projects in a jr. sysadmin resume]: http://serverfault.com/questions/210218/listing-side-projects-in-a-jr-sysadmin-resume/405054#405054
-  [resume.jasonantman.com]: http://resume.jasonantman.com

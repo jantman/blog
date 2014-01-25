@@ -19,10 +19,11 @@ re-opened firefox, ... well, you get the idea.
 
 But that sounds like a really sub-optimal solution. So I started looking
 around a bit. It seems that sessionstore.js is *almost* JSON, but as per
-[Mozilla bug 407110][], it's not quite standards-compliant. Luckily, it
-seems that PHP's JSON module is quite tolerant, so once I stripped off
-the leading and trailing parens from the file contents, it parsed quite
-nicely.
+[Mozilla bug
+407110](https://bugzilla.mozilla.org/show_bug.cgi?id=407110#c2), it's
+not quite standards-compliant. Luckily, it seems that PHP's JSON module
+is quite tolerant, so once I stripped off the leading and trailing
+parens from the file contents, it parsed quite nicely.
 
 I've written a small `dumpFirefoxSession.php` script that reads the
 sessionstore.js file (in cwd or a specified path), unserializes the JSON
@@ -33,8 +34,6 @@ the current content (sessionstore.js also holds history for each tab,
 but I don't need this), and it shows which tab is currently selected.
 
 You can grab the script from subversion at:
-[http://svn.jasonantman.com/misc-scripts/dumpFirefoxSession.php][]. The
-current version is 3. You'll need PHP (probably 5) with JSON support.
-
-  [Mozilla bug 407110]: https://bugzilla.mozilla.org/show_bug.cgi?id=407110#c2
-  [http://svn.jasonantman.com/misc-scripts/dumpFirefoxSession.php]: http://svn.jasonantman.com/misc-scripts/dumpFirefoxSession.php
+[http://svn.jasonantman.com/misc-scripts/dumpFirefoxSession.php](http://svn.jasonantman.com/misc-scripts/dumpFirefoxSession.php).
+The current version is 3. You'll need PHP (probably 5) with JSON
+support.

@@ -8,11 +8,15 @@ Slug: switch-shopping-the-law-of-gross-tonnage
 <p>
 Well, I'm shopping for a new switch. But first, a small aside:  
 
-> I drive a [Ford F-250][]. It's a pretty big truck. And every once in a
-> while, someone cuts me off in something like a [Honda Fit][]. It
-> really makes me stop and wonder - how stupid are they? I'll admit that
-> after two and a half years of driving a 13,000 pound [ambulance][] in
-> my spare time, I know a bit about the maneuverability problems of
+> I drive a [Ford
+> F-250](http://www.jasonantman.com/wiki/index.php/Image:TruckMed.jpg).
+> It's a pretty big truck. And every once in a while, someone cuts me
+> off in something like a [Honda
+> Fit](http://automobiles.honda.com/fit/). It really makes me stop and
+> wonder - how stupid are they? I'll admit that after two and a half
+> years of driving a 13,000 pound
+> [ambulance](http://www.midlandparkambulance.com/albums/The%20New%20588.php)
+> in my spare time, I know a bit about the maneuverability problems of
 > large vehicles. But I have to assume that the average driver, when
 > confronted with something like my truck - 6500 pounds empty, 21 feet
 > long and tall enough that the hood is at the level of the roof of most
@@ -24,22 +28,22 @@ Well, I'm shopping for a new switch. But first, a small aside:
 > I've spent a bit of time on the water throughout my life. Piloting a
 > boat isn't especially difficult, but there are a few things you learn
 > about navigation. One of them is affectionately known as [The Law of
-> Gross Tonnage][]. It's really simple. Big things take a long time to
-> stop, and can't maneuver very well. So stay out of their way. So I
-> have to wonder, why don't they include this in driver's manuals? Sure,
-> people do stupid things. Some people just have to, it's part of their
-> nature. But if they're going to, why can't they be smart, and choose
-> to do it in front (or behind) of a vehicle that actually has a chance
-> of stopping?
+> Gross Tonnage](http://www.auxguidanceskills.info/press/bigger.html).
+> It's really simple. Big things take a long time to stop, and can't
+> maneuver very well. So stay out of their way. So I have to wonder, why
+> don't they include this in driver's manuals? Sure, people do stupid
+> things. Some people just have to, it's part of their nature. But if
+> they're going to, why can't they be smart, and choose to do it in
+> front (or behind) of a vehicle that actually has a chance of stopping?
 
 In other news, I'm starting to shop for a new switch. At the moment, my
 network at home (hosting this blog/site and everything else) is running
 on a single, ancient, Rutgers University surplus [Bay Networks BaySTack
-450-24T][]. It's served me well (and it server Rutgers well before me)
-but it's time for an upgrade. While it's a manageable switch, it's only
-capable of 100Base-TX. And streaming a few gigs of backups over it every
-night isn't fun, not to mention attempting a network install of a full
-OS.
+450-24T](http://www.jasonantman.com/wiki/index.php/BayStack_450-24T).
+It's served me well (and it server Rutgers well before me) but it's time
+for an upgrade. While it's a manageable switch, it's only capable of
+100Base-TX. And streaming a few gigs of backups over it every night
+isn't fun, not to mention attempting a network install of a full OS.
 
 So, it's time to shop for a new switch. Depending on budget, I've
 identified two possible configurations:
@@ -92,9 +96,3 @@ but it would take a lot to get me to spend that much. I'm probably
 looking for something closer to the $300 range, probably lightly used or
 refurbished. If anyone happens to see this and has a suggestion, feel
 free to share!
-
-  [Ford F-250]: http://www.jasonantman.com/wiki/index.php/Image:TruckMed.jpg
-  [Honda Fit]: http://automobiles.honda.com/fit/
-  [ambulance]: http://www.midlandparkambulance.com/albums/The%20New%20588.php
-  [The Law of Gross Tonnage]: http://www.auxguidanceskills.info/press/bigger.html
-  [Bay Networks BaySTack 450-24T]: http://www.jasonantman.com/wiki/index.php/BayStack_450-24T

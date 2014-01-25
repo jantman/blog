@@ -6,10 +6,13 @@ Tags: blackberry, outage
 Slug: blackberry-oops
 
 If you've been following the tech news lately, you've probably heard at
-least a bit about the [massive][] [blackberry][] [outage][] over the
-past three days. While yes, it's the first truly grand failure of RIM's
-infrastructure in their 12-year history, it's also a wonderful case
-study.
+least a bit about the
+[massive](http://www.cnn.com/2011/10/12/tech/mobile/blackberry-outage/)
+[blackberry](http://abcnews.go.com/blogs/technology/2011/10/blackberry-outage-spreads-to-u-s/)
+[outage](http://www.nytimes.com/2011/10/14/technology/rim-struggles-to-overcome-blackberry-outages.html?_r=1)
+over the past three days. While yes, it's the first truly grand failure
+of RIM's infrastructure in their 12-year history, it's also a wonderful
+case study.
 
 Apparently the outage started Monday morning with RIM infrastructure in
 Europe, the Middle East and Asia. However, by Wednesday, it had become a
@@ -20,8 +23,9 @@ Android's rapidly growing (and Android slowly becoming a viable
 enterprise option), and the launch of the iPhone 4S just around the
 corner, the timing of this couldn't be worse for RIM.
 
-RIM's original [statement][] about the problem, at 21:30 on Tuesday
-October 11th, was,
+RIM's original
+[statement](http://www.rim.com/newsroom/service-update.shtml) about the
+problem, at 21:30 on Tuesday October 11th, was,
 
 > The messaging and browsing delays that some of you are still
 > experiencing were caused by a core switch failure within RIM’s
@@ -33,17 +37,20 @@ October 11th, was,
 > of you and we will continue to keep you informed.
 
 I haven't been able to find much more technical information than that -
-a [CNET article from Tuesday][] goes into as much depth as anything I
-could find. I did find one mention (misplaced the link) that the core
-switch in question uses technology from "multiple vendors". So what
-follows is part common sense (for me... why not for a multi-national
-corporation?) and part speculation. If you're unfamiliar with RIM's
-architecture, the pertinent points are that all Internet-bound traffic
-(browsing, email, and BBM) is piped through RIM's data centers, where
-it's encypted and who-knows-what-else'ed (perhaps [monitored][]) before
-going back out onto the 'net. In the Enterprise market, their big claim
-is encryption/security, and monitoring/management/policy enforcement on
-handsets.
+a [CNET article from
+Tuesday](http://www.computerworld.com/s/article/9220736/RIM_global_outage_caused_by_core_switch_failure_fix_under_way)
+goes into as much depth as anything I could find. I did find one mention
+(misplaced the link) that the core switch in question uses technology
+from "multiple vendors". So what follows is part common sense (for me...
+why not for a multi-national corporation?) and part speculation. If
+you're unfamiliar with RIM's architecture, the pertinent points are that
+all Internet-bound traffic (browsing, email, and BBM) is piped through
+RIM's data centers, where it's encypted and who-knows-what-else'ed
+(perhaps
+[monitored](http://online.wsj.com/article/SB10001424052970204612504576608561811929654.html))
+before going back out onto the 'net. In the Enterprise market, their big
+claim is encryption/security, and monitoring/management/policy
+enforcement on handsets.
 
 First main point: RIM is a *big* company. The thought that they rely on
 an (apparently custom) core switch - a *single* core switch for multiple
@@ -112,10 +119,3 @@ So what are my (admittedly poorly-informed) thoughts on this?
 
 For a company whose business is so telecom-focused, this seems like a
 glaringly bad design that shouldn't be acceptable in a telecom.
-
-  [massive]: http://www.cnn.com/2011/10/12/tech/mobile/blackberry-outage/
-  [blackberry]: http://abcnews.go.com/blogs/technology/2011/10/blackberry-outage-spreads-to-u-s/
-  [outage]: http://www.nytimes.com/2011/10/14/technology/rim-struggles-to-overcome-blackberry-outages.html?_r=1
-  [statement]: http://www.rim.com/newsroom/service-update.shtml
-  [CNET article from Tuesday]: http://www.computerworld.com/s/article/9220736/RIM_global_outage_caused_by_core_switch_failure_fix_under_way
-  [monitored]: http://online.wsj.com/article/SB10001424052970204612504576608561811929654.html

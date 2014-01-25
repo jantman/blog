@@ -5,13 +5,13 @@ Category: Tech HowTos
 Tags: documentation, mediawiki, sysadmin
 Slug: using-templates-to-track-outdated-content-in-a-documentation-mediawiki
 
-Both my last and current jobs use [MediaWiki][] for internal
-documentation. As always happens, some of this documentation will
-inevitably get out-of-date, or totally deprecated. As is also the case,
-many times when we're looking for docs in the middle of an incident, we
-don't have the time to go back and fix what's wrong. So, I devised the
-following template/category system to help keep track of these problem
-pages.
+Both my last and current jobs use [MediaWiki](http://www.mediawiki.org/)
+for internal documentation. As always happens, some of this
+documentation will inevitably get out-of-date, or totally deprecated. As
+is also the case, many times when we're looking for docs in the middle
+of an incident, we don't have the time to go back and fix what's wrong.
+So, I devised the following template/category system to help keep track
+of these problem pages.
 
 First, create some templates that you will apply to the problem pages. I
 use three - one for totally deprecated pages, one for pages that need
@@ -50,23 +50,27 @@ This category is for pages that are mostly correct and just need minor correctio
 and save the page.
 
 Now there's a few other changes we need to make. First, upload the
-Cleanup.png graphic, which I got from wikimedia.org [here][] and
-uploaded as Cleanup.png.
+Cleanup.png graphic, which I got from wikimedia.org
+[here](http://upload.wikimedia.org/wikipedia/en/thumb/f/f2/Edit-clear.svg/40px-Edit-clear.svg.png)
+and uploaded as Cleanup.png.
 
 If you refresh the Template:Cleanup page, you should now see the image.
 On a side note, "\_\_HIDDENCAT\_\_" on the category page prevents that
 category from showing up in the category list at the bottom of the pages
 we add to it, but this only works in MediaWiki 1.13 and up.
 
-The last step is to add the [MediaWiki mbox template][] and its
+The last step is to add the [MediaWiki mbox
+template](http://www.mediawiki.org/wiki/Template:Mbox) and its
 dependencies. While I did this once before, I didn't really remember the
-steps, but I found a post on [Glynor's blog][] that details them rather
-nicely:
+steps, but I found a post on [Glynor's
+blog](http://glynor.com/2010/05/the-trouble-with-ambox-and-mbox/) that
+details them rather nicely:
 
-1.  Enable the [ParserFunctions extension][]. There are download and
-    install instructions on the extension page, but you'll want to
-    enable string functions. To do this, include the extension in
-    LocalSettings.php like:
+1.  Enable the [ParserFunctions
+    extension](http://www.mediawiki.org/wiki/Extension:ParserFunctions).
+    There are download and install instructions on the extension page,
+    but you'll want to enable string functions. To do this, include the
+    extension in LocalSettings.php like:
 
 ~~~~{.php}
 require_once( "$IP/extensions/ParserFunctions/ParserFunctions.php" );
@@ -74,17 +78,20 @@ $wgPFEnableStringFunctions = true;
 ~~~~
 
 2.  Create a new page in your wiki called "Mediawiki:Common.css", and
-    paste in the content from [MediaWiki.org MediaWiki:Common.css][].
-3.  Go to [Wikipedia's Special:Export][] page, and enter
-    "Template:Ambox" in the box, check off "Include templates", and
-    export the template (and all dependencies) to a local XML file.
+    paste in the content from [MediaWiki.org
+    MediaWiki:Common.css](http://www.mediawiki.org/wiki/MediaWiki:Common.css).
+3.  Go to [Wikipedia's
+    Special:Export](http://en.wikipedia.org/w/index.php?title=Special:Export)
+    page, and enter "Template:Ambox" in the box, check off "Include
+    templates", and export the template (and all dependencies) to a
+    local XML file.
 4.  Go to the "Special:Import" page of your wiki, and upload the XML
     file you just grabbed from Wikipedia. This will import the Ambox and
     mbox templates, as well as their dependencies.
 5.  Now, if you go back and refresh the Template:Cleanup page you
     created, you should see the icon and a nice message box:
 
-![cleanup message box][]
+![cleanup message box](/GFX/mw_cleanup.png)
 
 Finally, add the template and category pages for update and deprecated:  
   
@@ -146,9 +153,9 @@ This category keeps track of pages that are '''seriously old''' or otherwise des
 ~~~~
 
 And the download the two images -
-[http://upload.wikimedia.org/wikipedia/commons/9/98/Ambox\_deletion.png][]
+[http://upload.wikimedia.org/wikipedia/commons/9/98/Ambox\_deletion.png](http://upload.wikimedia.org/wikipedia/commons/9/98/Ambox_deletion.png)
 gets uploaded as Critical.png and
-[http://upload.wikimedia.org/wikipedia/en/f/f4/Ambox\_content.png][]
+[http://upload.wikimedia.org/wikipedia/en/f/f4/Ambox\_content.png](http://upload.wikimedia.org/wikipedia/en/f/f4/Ambox_content.png)
 gets uploaded as Warning.png.
 
 That's it. To use this, just add `{{cleanup}}`, `{{deprecated}}` or
@@ -159,15 +166,15 @@ page:
   
 Cleanup:  
   
-![cleanup message box][]  
+![cleanup message box](/GFX/mw_cleanup.png)  
   
 Update:  
   
-![update message box][]  
+![update message box](/GFX/mw_update.png)  
   
 Deprecated:  
   
-![deprecated message box][]
+![deprecated message box](/GFX/mw_deprecated.png)
 
 I also add a link to the top of the main wiki page:
 
@@ -177,16 +184,3 @@ Things that need to be done: [[:Category:Pages Needing Updates|Pages Needing Upd
 
 </p>
 
-  [MediaWiki]: http://www.mediawiki.org/
-  [here]: http://upload.wikimedia.org/wikipedia/en/thumb/f/f2/Edit-clear.svg/40px-Edit-clear.svg.png
-  [MediaWiki mbox template]: http://www.mediawiki.org/wiki/Template:Mbox
-  [Glynor's blog]: http://glynor.com/2010/05/the-trouble-with-ambox-and-mbox/
-  [ParserFunctions extension]: http://www.mediawiki.org/wiki/Extension:ParserFunctions
-  [MediaWiki.org MediaWiki:Common.css]: http://www.mediawiki.org/wiki/MediaWiki:Common.css
-  [Wikipedia's Special:Export]: http://en.wikipedia.org/w/index.php?title=Special:Export
-  [cleanup message box]: /GFX/mw_cleanup.png
-  [http://upload.wikimedia.org/wikipedia/commons/9/98/Ambox\_deletion.png]:
-    http://upload.wikimedia.org/wikipedia/commons/9/98/Ambox_deletion.png
-  [http://upload.wikimedia.org/wikipedia/en/f/f4/Ambox\_content.png]: http://upload.wikimedia.org/wikipedia/en/f/f4/Ambox_content.png
-  [update message box]: /GFX/mw_update.png
-  [deprecated message box]: /GFX/mw_deprecated.png

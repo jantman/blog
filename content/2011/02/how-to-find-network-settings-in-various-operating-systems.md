@@ -58,7 +58,7 @@ to f.
 -   **Linux**: `ifconfig`, look for "HWaddr" for the right interface.
 
 **WAN (Internet or External) IP Address)** - Go to
-[whatismyip.jasonantman.com][].
+[whatismyip.jasonantman.com](http://whatismyip.jasonantman.com).
 
 **Ping another host** - A ping test shows (simple explanation) how long
 it takes packets to get from your computer to another. (For you Warcraft
@@ -71,5 +71,3 @@ can't ping the realm servers).
     uses) to stop it.
 
 I'll update this with more when I get time...
-
-  [whatismyip.jasonantman.com]: http://whatismyip.jasonantman.com

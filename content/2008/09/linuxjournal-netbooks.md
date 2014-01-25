@@ -5,10 +5,11 @@ Category: Miscellaneous
 Slug: linuxjournal-netbooks
 
 Shawn Powers wrote an interesting article on LJ, [Where Do YOU Send
-NetBook Users For Help?][], which speaks about the myriad different
-distributions used on NetBooks (like the [eeePC][] and its' brethren),
-many of which are significantly different from the usual mainstream
-distros.
+NetBook Users For
+Help?](http://www.linuxjournal.com/content/where-do-you-send-netbook-users-help-0),
+which speaks about the myriad different distributions used on NetBooks
+(like the [eeePC](http://eee.asus.com) and its' brethren), many of which
+are significantly different from the usual mainstream distros.
 
 My comment:
 
@@ -63,6 +64,3 @@ default user. Things like sed, awk, grep, and an SSH server should be
 instaled on every Linux system. Also, just a theory - set each system to
 have a unique, randomly generated root password, and print it on a label
 on the bottom of the machine.
-
-  [Where Do YOU Send NetBook Users For Help?]: http://www.linuxjournal.com/content/where-do-you-send-netbook-users-help-0
-  [eeePC]: http://eee.asus.com

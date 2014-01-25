@@ -5,18 +5,20 @@ Category: Tech HowTos
 Tags: dhcpd, rsyslog, vyatta
 Slug: vyatta-showing-isc-dhcpd-fixed-address-leases
 
-ISC [dhcpd][] has the ability to always give a specific MAC address the
-same IP address "lease" using the fixed-address configuration option.
-This is configured in [Vyatta][] using the `static-mapping`
-configuration statement. Unfortunately, since dhcpd doesn't store
-fixed-address leases in the `dhcpd.leases` file, the Vyatta
-`show dhcp leases` command doesn't show anything about them - which
-makes it difficult to debug anything dhcp-related if all of the hosts on
-your network are setup for fixed addresses. I found a mention of this on
-the [vyatta forum][], and also an [open bug (1990)][] to fix it, but no
-proposed resolution. Since I came across this problem and happen to know
-a bit about ISC dhcpd, I developed both a workaround for users
-(including a perl script) and a possible solution for the Vyatta
+ISC [dhcpd](http://www.isc.org/software/dhcp) has the ability to always
+give a specific MAC address the same IP address "lease" using the
+fixed-address configuration option. This is configured in
+[Vyatta](http://www.vyatta.org) using the `static-mapping` configuration
+statement. Unfortunately, since dhcpd doesn't store fixed-address leases
+in the `dhcpd.leases` file, the Vyatta `show dhcp leases` command
+doesn't show anything about them - which makes it difficult to debug
+anything dhcp-related if all of the hosts on your network are setup for
+fixed addresses. I found a mention of this on the [vyatta
+forum](http://www.vyatta.org/forum/viewtopic.php?p=121558), and also an
+[open bug (1990)](https://bugzilla.vyatta.com/show_bug.cgi?id=1990) to
+fix it, but no proposed resolution. Since I came across this problem and
+happen to know a bit about ISC dhcpd, I developed both a workaround for
+users (including a perl script) and a possible solution for the Vyatta
 developers to implement.
 
 **Workaround for Users:**
@@ -26,10 +28,11 @@ dhcpd.leases file (though it's been discussed on the dhcpd-users mailing
 list a few times). There is, however, a way to get dhcpd to log every
 time it sends an ACK to a client. The following Vyatta configuration
 commands will get dhcpd to log all transactions to syslog, will have
-[rsyslog][] put that in `/var/log/user/dhcpd`. Since this log can fill
-up very quickly on a busy server, the latter two commands will tell
-[logrotate][] to rotate the log file when it reaches 3000k in size, and
-keep 5 copies (feel free to adjust to your needs):
+[rsyslog](http://rsyslog.com/) put that in `/var/log/user/dhcpd`. Since
+this log can fill up very quickly on a busy server, the latter two
+commands will tell [logrotate](https://fedorahosted.org/logrotate/) to
+rotate the log file when it reaches 3000k in size, and keep 5 copies
+(feel free to adjust to your needs):
 
     set service dhcp-server global-parameters "log-facility local2;"
     set system syslog file dhcpd facility local2 level debug
@@ -39,9 +42,10 @@ keep 5 copies (feel free to adjust to your needs):
 Once this is done, you can `tail -f /var/log/user/dhcpd` to watch DHCP
 discover/request/offer/ack in realtime, or grep through the log file for
 a specific IP or MAC. If you want an easier method, I've written a perl
-script (latest version will always live in [my subversion repo][]) to
-grep through `/var/log/user/dhcpd` and show the most recent DHCPACK for
-each IP address, sorted by IP. Here's the code of the simple script,
+script (latest version will always live in [my subversion
+repo](http://svn.jasonantman.com/misc-scripts/show_dhcp_fixed_ACKs.pl))
+to grep through `/var/log/user/dhcpd` and show the most recent DHCPACK
+for each IP address, sorted by IP. Here's the code of the simple script,
 which is more than half comments. To use it, after performing the above
 steps, all you need to do is login to your Vyatta box,
 `wget http://svn.jasonantman.com/misc-scripts/show_dhcp_fixed_ACKs.pl`
@@ -118,15 +122,16 @@ foreach my $key (@keys) {
 
 **A solution for Vyatta:**
 
-I suggested this to Vyatta in a reply to [bug 1990][open bug (1990)].
-Since they already use [rsyslog][] which has very powerful processing
-capabilities, it would be easy to have rsyslog parse the DHCPACK
-messages in real time and update some data store (flat files or a simple
-database) with the information. While how to store this would be up to
-the Vyatta guys, I have some rsyslog configuration to parse DHCPACK
-messages and update a MySQL database (with two tables; one for most
-recent ACK per IP address and one for most recent ACK per MAC address)
-that might be of some use:
+I suggested this to Vyatta in a reply to [bug
+1990](https://bugzilla.vyatta.com/show_bug.cgi?id=1990). Since they
+already use [rsyslog](http://rsyslog.com/) which has very powerful
+processing capabilities, it would be easy to have rsyslog parse the
+DHCPACK messages in real time and update some data store (flat files or
+a simple database) with the information. While how to store this would
+be up to the Vyatta guys, I have some rsyslog configuration to parse
+DHCPACK messages and update a MySQL database (with two tables; one for
+most recent ACK per IP address and one for most recent ACK per MAC
+address) that might be of some use:
 
 ~~~~{.text}
 $template DHCPACKonIP, "INSERT INTO dhcplog_ip   
@@ -206,11 +211,3 @@ then :ommysql:hostname,database,dbuser,dbpass;DHCPACKtoMAC
 & :ommysql:hostname,database,dbuser,dbpass;DHCPACKtoIP
 & ~ ### DISCARD
 ~~~~
-
-  [dhcpd]: http://www.isc.org/software/dhcp
-  [Vyatta]: http://www.vyatta.org
-  [vyatta forum]: http://www.vyatta.org/forum/viewtopic.php?p=121558
-  [open bug (1990)]: https://bugzilla.vyatta.com/show_bug.cgi?id=1990
-  [rsyslog]: http://rsyslog.com/
-  [logrotate]: https://fedorahosted.org/logrotate/
-  [my subversion repo]: http://svn.jasonantman.com/misc-scripts/show_dhcp_fixed_ACKs.pl

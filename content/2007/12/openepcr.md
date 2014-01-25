@@ -17,7 +17,7 @@ PCRs with electronic submission. This is even worse for the thousands
 (or more) of purely volunteer EMS organizations out there, who have
 little to no budget.
 
-So, I've started a project - [openEPCR][].
+So, I've started a project - [openEPCR](www.openepcr.org).
 
 I know that, for me, this is a \*big\* undertaking. I figured that Java
 is the best option, since it's available on almost all platforms,
@@ -38,27 +38,27 @@ The overall idea is to design a platform that is a base for an EPCR -
 something that can handle data collection, printing a hard copy,
 analysis, administration, security, etc. - and all the while be
 organization-independent. In essence, a framework. Firstly, after having
-this problem with [PHP EMS Tools][], it should all be designed with
-i18n/L10n in mind from the beginning, providing good and easy support
-for translations. More importantly, all settings should be configurable.
-To top off the problem, anything that's obviously organization-specific
-- like the data set, layout of input forms on the screen, reports on the
-data, printed copy (both blank and filled-in), user access rights/RBAC,
-authentication methods, etc. - should all be designed as pluggable
-modules. The end result would be a system where a single organization or
-group of organizations can develop - or pay to have developed - a
-"module" that includes all of this. The license would have additional
-terms stating that any changes to the code, modules, or updates to
-modules \*must\* be given back to the openEPCR community. The general
-idea is something like this scenario: the state of New Jersey decides to
-adopt a standardized PCR and data set. Many volunteer ambulance squads
-don't have the funds for a commercial solution. A bunch of them pool
-their resources or funds and develop a "module" for openEPCR that
-provides everything required to implement a printed and electronic
-version of the NJ state PCR. If a single organization wishes to deviate,
-they can simply "extend" that module as they see fit, building off of
-the main code. OpenEPCR itself remains neutral, but provides a
-repository of modules to use or modify.
+this problem with [PHP EMS Tools](http://www.php-ems-tools.com), it
+should all be designed with i18n/L10n in mind from the beginning,
+providing good and easy support for translations. More importantly, all
+settings should be configurable. To top off the problem, anything that's
+obviously organization-specific - like the data set, layout of input
+forms on the screen, reports on the data, printed copy (both blank and
+filled-in), user access rights/RBAC, authentication methods, etc. -
+should all be designed as pluggable modules. The end result would be a
+system where a single organization or group of organizations can develop
+- or pay to have developed - a "module" that includes all of this. The
+license would have additional terms stating that any changes to the
+code, modules, or updates to modules \*must\* be given back to the
+openEPCR community. The general idea is something like this scenario:
+the state of New Jersey decides to adopt a standardized PCR and data
+set. Many volunteer ambulance squads don't have the funds for a
+commercial solution. A bunch of them pool their resources or funds and
+develop a "module" for openEPCR that provides everything required to
+implement a printed and electronic version of the NJ state PCR. If a
+single organization wishes to deviate, they can simply "extend" that
+module as they see fit, building off of the main code. OpenEPCR itself
+remains neutral, but provides a repository of modules to use or modify.
 
 As I see it, there are three main difficulties:
 
@@ -78,21 +78,23 @@ As I see it, there are three main difficulties:
 
 So, if you think this sounds interesting, or have any suggestions - from
 either the technical or EMS standpoint - please check out the [project
-homepage][] or drop me an [E-Mail][].
+homepage](http://www.openepcr.org) or drop me an
+[E-Mail](mailto:jason@jasonantman.com).
 
 Excerpted from the homepage is a bit of information on my goals:  
 <span style="font-weight: bold;">Project Mission:</span>  
 OpenEPCR aims to provide the Emergency Medical Services sector with a
 Free (as in Freedom, a.k.a. Open-Source) Electronic Patient Care Report
-(EPCR) software solution. Licensed under the [GNU GPL][], it will be
-easily extendable by users' organizations. Such a solution does not
-currently exist. Furthermore, many states and regions are moving to
-electronic data aggregation for EMS. OpenEPCR aims to provide an easy
-way for organizations to adopt a standardized data set and submit their
-data - and only the data that they choose - to a trusted third party.
-The software will attempt to do all of this while paying heed to
-applicable standards on privacy and security, as well as being fully
-platform-independent.
+(EPCR) software solution. Licensed under the [GNU
+GPL](http://www.gnu.org/copyleft/gpl.html "http://www.gnu.org/copyleft/gpl.html"),
+it will be easily extendable by users' organizations. Such a solution
+does not currently exist. Furthermore, many states and regions are
+moving to electronic data aggregation for EMS. OpenEPCR aims to provide
+an easy way for organizations to adopt a standardized data set and
+submit their data - and only the data that they choose - to a trusted
+third party. The software will attempt to do all of this while paying
+heed to applicable standards on privacy and security, as well as being
+fully platform-independent.
 
 <span style="font-weight: bold;">Project Goals:</span>
 
@@ -136,9 +138,3 @@ platform-independent.
 17. Attempt to pull together developers from various disciplines and
     gather suggestions from a vast sampling of the EMS field.
 
-  [openEPCR]: www.openepcr.org
-  [PHP EMS Tools]: http://www.php-ems-tools.com
-  [project homepage]: http://www.openepcr.org
-  [E-Mail]: mailto:jason@jasonantman.com
-  [GNU GPL]: http://www.gnu.org/copyleft/gpl.html
-    "http://www.gnu.org/copyleft/gpl.html"

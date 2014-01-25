@@ -8,21 +8,27 @@ Slug: rsync-on-an-android-phone
 Every once in a while, there are some files that I want kept in sync
 between my Android-based phone and one of my Linux (or Mac, or any Unix,
 or maybe Windows too, but I use Linux...) boxes. Yeah, I can copy them
-over manually via USB or even something a bit simpler like [AndFTP][]
+over manually via USB or even something a bit simpler like
+[AndFTP](https://market.android.com/details?id=lysesoft.andftp)
 (assuming you can SCP to the target machine). But that's a real pain for
-anything like my [KeePass][] (well, actually [KeePassX][] and
-[KeePassDroid][]) password database, that I might add something to at
-any time and forget to sync. I also try to occasionally (waiting in
-line?) backup SMS, call logs, etc. on my phone, and like to have those
-synced back to the desktop automatically.
+anything like my [KeePass](http://keepass.info/) (well, actually
+[KeePassX](http://www.keepassx.org/) and
+[KeePassDroid](https://market.android.com/details?id=com.android.keepass))
+password database, that I might add something to at any time and forget
+to sync. I also try to occasionally (waiting in line?) backup SMS, call
+logs, etc. on my phone, and like to have those synced back to the
+desktop automatically.
 
-Enter the solution: [rsync backup for Android][], a [rsync][] client for
-Android that includes Tasker plugins (there are a few things about the
-app that I don't like, but it seems to be the only option at the
-moment), and [Tasker][], an automation framework for Android.Tasker is
-one of the few Android apps that I've actually bought (i.e. not
-free/no-cost), and is currently selling for $6.49. It's an incredibly
-capable task automator, very much akin to [Locale][] on steroids. On the
+Enter the solution: [rsync backup for
+Android](https://market.android.com/details?id=eu.kowalczuk.rsync4android),
+a [rsync](http://rsync.samba.org/) client for Android that includes
+Tasker plugins (there are a few things about the app that I don't like,
+but it seems to be the only option at the moment), and
+[Tasker](https://market.android.com/details?id=net.dinglisch.android.taskerm),
+an automation framework for Android.Tasker is one of the few Android
+apps that I've actually bought (i.e. not free/no-cost), and is currently
+selling for $6.49. It's an incredibly capable task automator, very much
+akin to [Locale](http://www.twofortyfouram.com/) on steroids. On the
 down side, Tasker can eat up battery life if you don't configure it
 intelligently, and it's not *always* 100% reliable when interacting with
 the system. On the positive side, Tasker can identify practically any
@@ -48,16 +54,20 @@ that can run rsync over SSH, and a directory that's writable
 
 **Setup:**
 
-1.  Buy and install the [Tasker][1] app.
-2.  Install the [rsync backup for Android][2] app.
+1.  Buy and install the
+    [Tasker](https://play.google.com/store/apps/details?id=net.dinglisch.android.taskerm)
+    app.
+2.  Install the [rsync backup for
+    Android](https://play.google.com/store/apps/details?id=eu.kowalczuk.rsync4android)
+    app.
 3.  Configure the rsync stuff on the computer. In the simplest form,
     we'll just need a user that can login and run rsync, and a directory
     to sync from/to *(note: this should be a directory used only for
     syncing the phone...).*
 4.  Open the rsync backup for Android app. Use Menu -\> Generate Keys to
     generate a new pair of SSH keys, and then get the public key setup
-    on the target computer. See [the developer's web site][] for
-    instructions.
+    on the target computer. See [the developer's web
+    site](http://android.kowalczuk.eu/rsync4android/) for instructions.
 5.  Once keys are setup, create a new profile called "PC-droid". Set the
     local directory to a new empty directory (I used `/sdcard/sync`),
     enter the remote host address, port, username, and remote directory,
@@ -102,15 +112,3 @@ Assuming this all went well, the next time the time you specified rolls
 around, your sync should run. If you gave the task a name in step 12,
 you can setup additional profiles to run it at other times (or use the
 repeat logic builtin).
-
-  [AndFTP]: https://market.android.com/details?id=lysesoft.andftp
-  [KeePass]: http://keepass.info/
-  [KeePassX]: http://www.keepassx.org/
-  [KeePassDroid]: https://market.android.com/details?id=com.android.keepass
-  [rsync backup for Android]: https://market.android.com/details?id=eu.kowalczuk.rsync4android
-  [rsync]: http://rsync.samba.org/
-  [Tasker]: https://market.android.com/details?id=net.dinglisch.android.taskerm
-  [Locale]: http://www.twofortyfouram.com/
-  [1]: https://play.google.com/store/apps/details?id=net.dinglisch.android.taskerm
-  [2]: https://play.google.com/store/apps/details?id=eu.kowalczuk.rsync4android
-  [the developer's web site]: http://android.kowalczuk.eu/rsync4android/

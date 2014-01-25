@@ -12,10 +12,11 @@ In the mean time...
 
 So it's been two weeks since classes started again, and that means two
 weeks using my now-beloved eeePC 4G Surf (details in a [previous
-post][]). Granted, I have my "desktop replacement" laptop ([a Linux
-Certified LC2464][]) to use at my desk at home or at my apartment -
-though the "desktop replacement" really means that it's easy to move
-from one desk to another.
+post](http://www.jasonantman.com/blog/2008/01/eeepc-solaris-other-updates.html)).
+Granted, I have my "desktop replacement" laptop ([a Linux Certified
+LC2464](http://www.linuxcertified.com/linux-laptop-lc2464.html)) to use
+at my desk at home or at my apartment - though the "desktop replacement"
+really means that it's easy to move from one desk to another.
 
 So far, I really love it, but I have a few issues:
 
@@ -53,6 +54,3 @@ So far, I really love it, but I have a few issues:
 Stay tuned for more, and some new scripts to automate wireless surveys,
 rogue AP detection, etc. And maybe even some work with autonomics and or
 configuration tools.
-
-  [previous post]: http://www.jasonantman.com/blog/2008/01/eeepc-solaris-other-updates.html
-  [a Linux Certified LC2464]: http://www.linuxcertified.com/linux-laptop-lc2464.html

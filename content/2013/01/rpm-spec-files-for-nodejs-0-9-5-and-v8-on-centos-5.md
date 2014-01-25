@@ -6,19 +6,23 @@ Tags: build, centos, node, nodejs, package, packaging, redhat, RHEL, rpm, specfi
 Slug: rpm-spec-files-for-nodejs-0-9-5-and-v8-on-centos-5
 
 The latest version of nodejs that I could find as an RPM for CentOS was
-0.6.16, from [http://patches.fedorapeople.org/oldnode/stable/][]. That's
-the one that puppetlabs currently uses in their [puppetlabs-nodejs][]
+0.6.16, from
+[http://patches.fedorapeople.org/oldnode/stable/](http://patches.fedorapeople.org/oldnode/stable/).
+That's the one that puppetlabs currently uses in their
+[puppetlabs-nodejs](https://github.com/puppetlabs/puppetlabs-nodejs)
 module. There is, however, a nodejs 0.9.5 RPM in the Fedora Rawhide (19)
 repository. Below are some patches to that specfile, and the specfile
 for its v8 dependency, to get them to build on CentOS 6. You can also
-find the full specfiles on my [github specfile repository][]. I had
-originally wanted to get them built on CentOS 5 as well, but after
-following the dependency tree from nodejs to http-parser to gyp, and
-then finding issues in the gyp source that are incompatible with CentOS
-5's python 2.4, I gave up on that target.
+find the full specfiles on my [github specfile
+repository](https://github.com/jantman/specfiles). I had originally
+wanted to get them built on CentOS 5 as well, but after following the
+dependency tree from nodejs to http-parser to gyp, and then finding
+issues in the gyp source that are incompatible with CentOS 5's python
+2.4, I gave up on that target.
 
 **nodejs.spec**, diff from Fedora Rawhide nodejs-0.9.5-9.fc18.src.rpm,
-buildID=377755 ([full specfile][])
+buildID=377755 ([full
+specfile](https://raw.github.com/jantman/specfiles/master/nodejs.spec))
 
 ~~~~{.diff}
 diff --git a/nodejs.spec b/nodejs.spec
@@ -58,7 +62,8 @@ index 050ed86..86c0f4b 100644
  - fix brown paper bag bug in requires generation script
 ~~~~
 
-**v8.spec**, diff from Fedora Rawhide 3.13.7.5-2 ([full specfile][1])
+**v8.spec**, diff from Fedora Rawhide 3.13.7.5-2 ([full
+specfile](https://raw.github.com/jantman/specfiles/master/v8.spec))
 
 ~~~~{.diff}
 --- v8.spec.orig       2013-01-26 16:03:18.000000000 -0500
@@ -119,9 +124,3 @@ index 050ed86..86c0f4b 100644
  - rebuild for icu-50
  - ignore new GCC 4.8 warning
 ~~~~
-
-  [http://patches.fedorapeople.org/oldnode/stable/]: http://patches.fedorapeople.org/oldnode/stable/
-  [puppetlabs-nodejs]: https://github.com/puppetlabs/puppetlabs-nodejs
-  [github specfile repository]: https://github.com/jantman/specfiles
-  [full specfile]: https://raw.github.com/jantman/specfiles/master/nodejs.spec
-  [1]: https://raw.github.com/jantman/specfiles/master/v8.spec

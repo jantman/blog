@@ -5,14 +5,15 @@ Category: Tech HowTos
 Tags: linux, memory, rsyslog, syslog
 Slug: linux-memory-usage-and-disk-caching
 
-I recently added some [Cacti][]-based graphing to a number of
-Linux-based servers prior to rolling out a new service. When I was
-looking over the performance graphs of the initial testing, I noticed
-that memory usage on our [rsyslog][] server was near 98%. Looking at
-`top(1)`, I saw numbers that agreed, though processor usage was around
-99% idle, and no process appeared to be using more than 1% of memory. It
-took me a minute or two to open my eyes and see past the panic of memory
-usage, and finally look at the complete output from `free(1)`:
+I recently added some [Cacti](http://www.cacti.net)-based graphing to a
+number of Linux-based servers prior to rolling out a new service. When I
+was looking over the performance graphs of the initial testing, I
+noticed that memory usage on our [rsyslog](http://www.rsyslog.com)
+server was near 98%. Looking at `top(1)`, I saw numbers that agreed,
+though processor usage was around 99% idle, and no process appeared to
+be using more than 1% of memory. It took me a minute or two to open my
+eyes and see past the panic of memory usage, and finally look at the
+complete output from `free(1)`:
 
 ~~~~{.bash}
              total       used       free     shared    buffers     cached
@@ -34,8 +35,5 @@ Percent (SNMP) template to either graph cache separately, or remove it
 from the total.
 
 Interestingly, I also found a somewhat cute page entitled "Help! Linux
-ate my RAM!" at [http://www.linuxatemyram.com/][].
-
-  [Cacti]: http://www.cacti.net
-  [rsyslog]: http://www.rsyslog.com
-  [http://www.linuxatemyram.com/]: http://www.linuxatemyram.com/
+ate my RAM!" at
+[http://www.linuxatemyram.com/](http://www.linuxatemyram.com/).

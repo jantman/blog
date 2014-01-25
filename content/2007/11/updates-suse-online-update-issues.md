@@ -73,7 +73,7 @@ very nicely.
 
 <p>
 <center>
-![image][]
+![image](http://www.jasonantman.com/GFX/rack1sm.jpg)
 
 </center>
 </p>
@@ -98,7 +98,7 @@ tuned.
 <span style="font-weight: bold;">PBX.</span> While I was working on VPN
 stuff, Joe took it upon himself to forcibly commandeer one of my spare
 boxes and setup
-[Trixbox][]<http: org><span style="text-decoration: underline;">
+[Trixbox](http://www.trixbox.org/)<http: org><span style="text-decoration: underline;">
 </span>(formerly Asterisk @ Home) on the LAN. At the moment, we're
 waiting for an FXO card to show up in the mail - and for the money to
 get a few SIP phones for testing - but it looks like it'll all be up and
@@ -111,8 +111,9 @@ and speak an alert.
 rack has serial console access - switches, IPcop, routers, development
 stuff, and - hopefully soon - some Sun hardware. So, a terminal server
 sounded great. After some research, I came up with two possibilities - a
-[page][] from 1998 giving an example of a kludge of a console server
-using GNU Screen, and [conserver][], a purpose-built application that
+[page](http://www.eng.auburn.edu/users/doug/console.html) from 1998
+giving an example of a kludge of a console server using GNU Screen, and
+[conserver](http://www.conserver.com/), a purpose-built application that
 can operate in a client-server model over the LAN, and also includes
 good handling of locking on a per-user basis and console locking. I
 planned two incarnations of the console server - the first and current
@@ -120,11 +121,12 @@ development machine is an ancient PII laptop with 192MB RAM, CD drive,
 10Gb HDD, networking, and serial and USB ports. I decided to give serial
 to USB adapters a shot.
 
-My first installation was [Debian][]-based, as [OpenSuSE][] 10.2 won't
-load on such an old machine. However, after grappling with learning a
-new distro, I opted to reinstall with [CentOS][] 5.0, a much more
-natural transition from SuSE. After installing CentOS, it only took me a
-few hours to get everything humming away, and get conserver compiled,
+My first installation was [Debian](http://www.debian.org/)-based, as
+[OpenSuSE](http://www.opensuse.org/) 10.2 won't load on such an old
+machine. However, after grappling with learning a new distro, I opted to
+reinstall with [CentOS](http://www.centos.org/) 5.0, a much more natural
+transition from SuSE. After installing CentOS, it only took me a few
+hours to get everything humming away, and get conserver compiled,
 installed, and running. Configuration is fairly simple though, on my
 next box, I'm going to have it install to the locations I'm used to -
 /bin instead of /usr/local/bin, etc. All in all, it seems to work well.
@@ -161,14 +163,14 @@ Amazingly, I was able to resolve the issue that day, and the refund is
 being processed. However, I don't have my server!  
 </span><http: org>  
 <span style="font-weight: bold;">Nagios.</span> I'm a big fan of
-[Nagios][]. I use it at home to monitor all of my hosts, as well as some
-remote systems that I'm responsible for. I make heavy use of the
-check\_by\_ssh plugin, so that it doesn't require any infrastructure
-past pubkey authentication for the Nagios user. Now that I have a few
-systems running in the apartment also, once I get the VPN setup, I'll be
-installing Nagios down here as well, and probably trying to tackle the
-task of setting up the two servers to jive by passing passive check
-results of the LAN hosts to each other.
+[Nagios](http://www.nagios.org/). I use it at home to monitor all of my
+hosts, as well as some remote systems that I'm responsible for. I make
+heavy use of the check\_by\_ssh plugin, so that it doesn't require any
+infrastructure past pubkey authentication for the Nagios user. Now that
+I have a few systems running in the apartment also, once I get the VPN
+setup, I'll be installing Nagios down here as well, and probably trying
+to tackle the task of setting up the two servers to jive by passing
+passive check results of the LAN hosts to each other.
 
 <span style="font-weight: bold;">Print Quota.</span> We have a shared
 laser printer in the apartment, used by all five people living there.
@@ -226,12 +228,3 @@ N4525, and a few other goodies. I'm already working on putting OpenSuSE
 10.3 as Xen dom0 on the 650 and Solaris SXCE 11 (built 75) on the 2550.
 We'll see what happens with it all soon...  
 <http: org></http:>
-
-  [image]: http://www.jasonantman.com/GFX/rack1sm.jpg
-  [Trixbox]: http://www.trixbox.org/
-  [page]: http://www.eng.auburn.edu/users/doug/console.html
-  [conserver]: http://www.conserver.com/
-  [Debian]: http://www.debian.org/
-  [OpenSuSE]: http://www.opensuse.org/
-  [CentOS]: http://www.centos.org/
-  [Nagios]: http://www.nagios.org/

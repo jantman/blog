@@ -17,39 +17,40 @@ a busy week for class-related stuff, and a bunch of work-related stuff
 too. So, I guess I'll just post some interesting links for the past few
 days...
 
-[Sun Microsystems has announced that we'll be acquiring Innotek][], and
-therefore VirtualBox. This means that Sun's virtualization products will
-now reach to the desktop - and that I should give VirtualBox a shot for
-running OpenSolaris on my laptop. (aside: why is virtualization not in
-my Firefox spell check yet???)
+[Sun Microsystems has announced that we'll be acquiring
+Innotek](http://www.sun.com/aboutsun/pr/2008-02/sunflash.20080212.1.xml),
+and therefore VirtualBox. This means that Sun's virtualization products
+will now reach to the desktop - and that I should give VirtualBox a shot
+for running OpenSolaris on my laptop. (aside: why is virtualization not
+in my Firefox spell check yet???)
 
 Researchers at the Pittsburgh Supercomputing Center have come out with
-[a version of SSH / SCP that uses multi-threading][], for use in
-high-bandwidth applications on multi-core systems.
+[a version of SSH / SCP that uses
+multi-threading](http://www.psc.edu/networking/projects/hpn-ssh/), for
+use in high-bandwidth applications on multi-core systems.
 
-[An ITnews article on why Open Source needs better PR][].
+[An ITnews article on why Open Source needs better
+PR](http://www.itnews.com.au/Feature/4203,linux-we-have-a-pr-problem.aspx).
 
 What? Microsoft sued <span style="font-style: italic;">again</span>?
-[Ars Technica ran an article on the Vista Capable fiasco][], with some
-comments from MS insiders. How is it that such a big company, with such
-a ubiquitous product, can constantly be sued, have MAJOR screwups, screw
-over their customers, and still people come back for more?
+[Ars Technica ran an article on the Vista Capable
+fiasco](http://arstechnica.com/news.ars/post/20080211-vista-capable-scheme-was-panned-at-microsoft.html),
+with some comments from MS insiders. How is it that such a big company,
+with such a ubiquitous product, can constantly be sued, have MAJOR
+screwups, screw over their customers, and still people come back for
+more?
 
-[BBC News - EU Competition Regulators raid Intel offices in Munich][].
+[BBC News - EU Competition Regulators raid Intel offices in
+Munich](http://news.bbc.co.uk/1/hi/business/7241022.stm).
 
-A CNet article (linked from [John M. Willis' ESM Blog][]) on the [US
-Treasury upping its content management budget to $28.2 million][] - no
-wonder why ww have so much debt, nobody told them about Drupal. From the
-article - "tens of millions on a $1 million problem".
+A CNet article (linked from [John M. Willis' ESM
+Blog](http://www.johnmwillis.com/cms/us-treasury-wasting-tens-of-millions-on-a-1-million-problem/))
+on the [US Treasury upping its content management budget to $28.2
+million](http://blogs.cnet.com/8301-13505_1-9870273-16.html?tag=head) -
+no wonder why ww have so much debt, nobody told them about Drupal. From
+the article - "tens of millions on a $1 million problem".
 
-[Roger Rustad's Nagios Wiki][], liked in a [Groundwork blog entry][].
-
-  [Sun Microsystems has announced that we'll be acquiring Innotek]: http://www.sun.com/aboutsun/pr/2008-02/sunflash.20080212.1.xml
-  [a version of SSH / SCP that uses multi-threading]: http://www.psc.edu/networking/projects/hpn-ssh/
-  [An ITnews article on why Open Source needs better PR]: http://www.itnews.com.au/Feature/4203,linux-we-have-a-pr-problem.aspx
-  [Ars Technica ran an article on the Vista Capable fiasco]: http://arstechnica.com/news.ars/post/20080211-vista-capable-scheme-was-panned-at-microsoft.html
-  [BBC News - EU Competition Regulators raid Intel offices in Munich]: http://news.bbc.co.uk/1/hi/business/7241022.stm
-  [John M. Willis' ESM Blog]: http://www.johnmwillis.com/cms/us-treasury-wasting-tens-of-millions-on-a-1-million-problem/
-  [US Treasury upping its content management budget to $28.2 million]: http://blogs.cnet.com/8301-13505_1-9870273-16.html?tag=head
-  [Roger Rustad's Nagios Wiki]: http://nagioswiki.com/wiki/index.php/Main_Page
-  [Groundwork blog entry]: http://www.groundworkopensource.com/community/blog/?p=135
+[Roger Rustad's Nagios
+Wiki](http://nagioswiki.com/wiki/index.php/Main_Page), liked in a
+[Groundwork blog
+entry](http://www.groundworkopensource.com/community/blog/?p=135).

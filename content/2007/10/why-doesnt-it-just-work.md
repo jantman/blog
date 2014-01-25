@@ -5,19 +5,20 @@ Category: Ideas and Rants
 Tags: linux suse printing
 Slug: why-doesnt-it-just-work
 
-Well I just finished a healthy 2-hour session with [Google Reader][] and
-have a few things to comment on, but at the moment, I just wanted to
-make a quick post.
+Well I just finished a healthy 2-hour session with [Google
+Reader](http://reader.google.com) and have a few things to comment on,
+but at the moment, I just wanted to make a quick post.
 
 I've been using Linux for five years. I'm in the process of planning to
 move a lot of my servers and development systems to the openSolaris
 operating system. Overall, I'm a pretty technical person. While I admit
-to occasionally using [Webmin][], I'm perfectly comfortable editing the
-Apache config files by hand. That being said, with all of the recent
-emphasis on Linux as a desktop machine (for end users!) there are some
-things that I expect to "just work". When I upgraded for openSuSE 10.2,
-and now 10.3RC1, I expected some good desktop technology - granted,
-openSuSE isn't the choice for a "just works" end-user desktop.
+to occasionally using [Webmin](http://www.webmin.com), I'm perfectly
+comfortable editing the Apache config files by hand. That being said,
+with all of the recent emphasis on Linux as a desktop machine (for end
+users!) there are some things that I expect to "just work". When I
+upgraded for openSuSE 10.2, and now 10.3RC1, I expected some good
+desktop technology - granted, openSuSE isn't the choice for a "just
+works" end-user desktop.
 
 One word. **Printing.** Despite how I've tried, I still can't get my
 Linux boxen to print well. Printing a webpage from Firefox requires
@@ -31,6 +32,3 @@ this seems like a simple one. The printable area of an 8 1/2x11" piece
 of paper is relatively standard. The actual printable margins for a
 given printer are well known. So why is it the my HP LaserJet or my
 roommate's Brother 5500DN is such a mystery to Linux?
-
-  [Google Reader]: http://reader.google.com
-  [Webmin]: http://www.webmin.com

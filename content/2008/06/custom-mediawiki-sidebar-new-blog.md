@@ -5,12 +5,15 @@ Category: Projects
 Tags: blog, firefox, mediawiki, PHP
 Slug: custom-mediawiki-sidebar-new-blog
 
-As you may have noticed, some [Firefox 3][] [buttons][] have popped up
-not only here on my blog, but also on my [wiki][]. While adding the
-buttons to [Blogger][] was a simple addition to the template, getting
-them in the sidebar of MediaWiki wasn't exactly as easy (yeah, I'm
-considering the arduous project of moving my whole 102+ page wiki to
-[Drupal][] or another good F/OSS CMS).
+As you may have noticed, some [Firefox
+3](http://www.spreadfirefox.com/node&id=238326&t=305)
+[buttons](http://www.spreadfirefox.com/?q=affiliates/homepage) have
+popped up not only here on my blog, but also on my
+[wiki](http://www.jasonantman.com/). While adding the buttons to
+[Blogger](http://www.blogger.com/) was a simple addition to the
+template, getting them in the sidebar of MediaWiki wasn't exactly as
+easy (yeah, I'm considering the arduous project of moving my whole 102+
+page wiki to [Drupal](http://drupal.org/) or another good F/OSS CMS).
 
 After some serious grepping through the source, and adding HTML comments
 to see where they appeared, I finally found a solution to add the button
@@ -45,9 +48,3 @@ So there's going to be a lot of parsing on my future...
 PS - When I get a new blog engine, I'm also going to go for a slightly
 modified template that uses relative widths and placement - so that
 code, like the snippet here, fits the screen correctly.
-
-  [Firefox 3]: http://www.spreadfirefox.com/node&id=238326&t=305
-  [buttons]: http://www.spreadfirefox.com/?q=affiliates/homepage
-  [wiki]: http://www.jasonantman.com/
-  [Blogger]: http://www.blogger.com/
-  [Drupal]: http://drupal.org/

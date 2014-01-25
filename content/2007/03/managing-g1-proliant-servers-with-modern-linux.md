@@ -53,7 +53,8 @@ I do, I'll post as much info as I can on how to make a CLI interface, or
 where one exists if I can find it.
 
 Also, I'll most likely develop a Python check script to use with
-[Nagios][] to monitor most of the hpasm-enabled components.
+[Nagios](http://www.nagios.org) to monitor most of the hpasm-enabled
+components.
 
 For the use of anyone else, here are some of the links that HP Support
 sent me after the call:
@@ -61,20 +62,12 @@ sent me after the call:
 Link for users guide for Proliant Support Pack, which includes
 documentation on HPASM from the CLI:
 
-[http://h18000.www1.hp.com/support/files/server/us/WebDoc/720/psp-users-guide.pdf][]
+[http://h18000.www1.hp.com/support/files/server/us/WebDoc/720/psp-users-guide.pdf](http://h18000.www1.hp.com/support/files/server/us/WebDoc/720/psp-users-guide.pdf)
 
 Product manuals:
 
-[http://h20180.www2.hp.com/apps/Nav?h\_pagetype=s-003&h\_lang=en&h\_cc=us&h\_product=241435&h\_page=hpcom&h\_client=z-a-r1002-3&cc=us〈=en][]
+[http://h20180.www2.hp.com/apps/Nav?h\_pagetype=s-003&h\_lang=en&h\_cc=us&h\_product=241435&h\_page=hpcom&h\_client=z-a-r1002-3&cc=us〈=en](http://h20180.www2.hp.com/apps/Nav?h_pagetype=s-003&h_lang=en&h_cc=us&h_product=241435&h_page=hpcom&h_client=z-a-r1002-3&cc=us〈=en)
 
 ML370 G1
 
-[http://h20000.www2.hp.com/bc/docs/support/UCR/SupportManual/TPM\_143091-004/TPM\_143091-004.pdf][]
-
-  [Nagios]: http://www.nagios.org
-  [http://h18000.www1.hp.com/support/files/server/us/WebDoc/720/psp-users-guide.pdf]:
-    http://h18000.www1.hp.com/support/files/server/us/WebDoc/720/psp-users-guide.pdf
-  [http://h20180.www2.hp.com/apps/Nav?h\_pagetype=s-003&h\_lang=en&h\_cc=us&h\_product=241435&h\_page=hpcom&h\_client=z-a-r1002-3&cc=us〈=en]:
-    http://h20180.www2.hp.com/apps/Nav?h_pagetype=s-003&h_lang=en&h_cc=us&h_product=241435&h_page=hpcom&h_client=z-a-r1002-3&cc=us〈=en
-  [http://h20000.www2.hp.com/bc/docs/support/UCR/SupportManual/TPM\_143091-004/TPM\_143091-004.pdf]:
-    http://h20000.www2.hp.com/bc/docs/support/UCR/SupportManual/TPM_143091-004/TPM_143091-004.pdf
+[http://h20000.www2.hp.com/bc/docs/support/UCR/SupportManual/TPM\_143091-004/TPM\_143091-004.pdf](http://h20000.www2.hp.com/bc/docs/support/UCR/SupportManual/TPM_143091-004/TPM_143091-004.pdf)

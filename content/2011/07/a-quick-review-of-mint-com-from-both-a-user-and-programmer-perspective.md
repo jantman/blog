@@ -5,28 +5,28 @@ Category: Miscellaneous
 Tags: finance, mint, review
 Slug: a-quick-review-of-mint-com-from-both-a-user-and-programmer-perspective
 
-For those of you who are unfamiliar with [Mint.com][], it's a free
-online personal finance site that allows you to track spending across
-all of your bank accounts and manage budgets and financial goals. Once
-upon a time it was a nice little Web 2.0 startup, now it's owned by
-Intuit. The service is free, but it's ad supported, albeit in an
-unintrusive way - "partner" services (credit cards, savings accounts,
-etc.) are recommended. I've been using it for about two weeks now, with
-a goal of tracking my spending, developing a budget and getting a better
-handle on my present and future finances. So here are some of my
-impressions, considering that the service is still growing but has been
-around for a while.
+For those of you who are unfamiliar with
+[Mint.com](http://www.mint.com), it's a free online personal finance
+site that allows you to track spending across all of your bank accounts
+and manage budgets and financial goals. Once upon a time it was a nice
+little Web 2.0 startup, now it's owned by Intuit. The service is free,
+but it's ad supported, albeit in an unintrusive way - "partner" services
+(credit cards, savings accounts, etc.) are recommended. I've been using
+it for about two weeks now, with a goal of tracking my spending,
+developing a budget and getting a better handle on my present and future
+finances. So here are some of my impressions, considering that the
+service is still growing but has been around for a while.
 
 **The Good:**
 
 -   **Account Sync** - Some things I've read online suggest that Mint
-    now uses the [Yodlee][] service to sync transactions from your
-    financial institutions. Whatever they use, they seem to be able to
-    sync transactions and account balances from all of my accounts, even
-    ones at a few small investment companies. The sync is fast, and they
-    do push notifications (low balance, large deposits, etc.) very well.
-    They even seem to support many more institutions than Quicken last
-    time I used it (2010 I think).
+    now uses the [Yodlee](http://yodlee.com) service to sync
+    transactions from your financial institutions. Whatever they use,
+    they seem to be able to sync transactions and account balances from
+    all of my accounts, even ones at a few small investment companies.
+    The sync is fast, and they do push notifications (low balance, large
+    deposits, etc.) very well. They even seem to support many more
+    institutions than Quicken last time I used it (2010 I think).
 -   **Budgets** - Mint has a very nice, clean, simple monthly budget
     implementation. You tell it how much you want to spend in a given
     category in a month, and it shows a nice horizontal bar graph of how
@@ -78,19 +78,20 @@ around for a while.
     Intuit, but to me, they have the feel of an agile Web 2.0 property
     that was bought up by a slow-moving bureaucratic company unable to
     keep up with customer demands or the amount of support requests.
-    They use [GetSatisfaction][], a new-age forum-based customer
-    "community" provider, for customer service. But their forums are
-    filled with feature request threads that have "we'll bring it up to
-    Product Development and get back to you" responses over half a year
-    old. There appears to be very little follow-through or feedback on
-    feature requests, and poor announcement/communication surrounding
-    the one feature that was recently brought in to an invitation-only
-    beta. Unfortunately, I get the general feeling (and I've found this
-    far too many times lately) that they were originally a cutting-edge,
-    agile, fast-paced, "cool" service, developed by a team that probably
-    stayed up all night coding a cool feature their users were asking
-    for, that's now been swallowed up by a behemoth that wants a
-    6-month-long risk assessment before writing a line of code.
+    They use [GetSatisfaction](http://getsatisfaction.com/), a new-age
+    forum-based customer "community" provider, for customer service. But
+    their forums are filled with feature request threads that have
+    "we'll bring it up to Product Development and get back to you"
+    responses over half a year old. There appears to be very little
+    follow-through or feedback on feature requests, and poor
+    announcement/communication surrounding the one feature that was
+    recently brought in to an invitation-only beta. Unfortunately, I get
+    the general feeling (and I've found this far too many times lately)
+    that they were originally a cutting-edge, agile, fast-paced, "cool"
+    service, developed by a team that probably stayed up all night
+    coding a cool feature their users were asking for, that's now been
+    swallowed up by a behemoth that wants a 6-month-long risk assessment
+    before writing a line of code.
 -   **Cash Tracking** - I understand that Mint makes money from
     recommending the services of lenders, banks, etc. But if you want to
     monetize every single feature, you're bound to fail. In this
@@ -193,12 +194,8 @@ need. So, for the time being, I'm going to keep using mint, but also
 explore what other options are available, and look into anyone who
 offers an API for pulling transaction data that might actually be
 powerful enough for me to use to write my own web-based app (since my
-attempts at pulling [OFX][] feeds only worked for about half my
-accounts). If you don't care as much about tracking cash spending/cash
-on hand, and are financially stable enough that you don't need to
-forecast the next month or two, Mint is wonderful.
-
-  [Mint.com]: http://www.mint.com
-  [Yodlee]: http://yodlee.com
-  [GetSatisfaction]: http://getsatisfaction.com/
-  [OFX]: http://en.wikipedia.org/wiki/OFX
+attempts at pulling [OFX](http://en.wikipedia.org/wiki/OFX) feeds only
+worked for about half my accounts). If you don't care as much about
+tracking cash spending/cash on hand, and are financially stable enough
+that you don't need to forecast the next month or two, Mint is
+wonderful.

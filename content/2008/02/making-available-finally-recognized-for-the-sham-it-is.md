@@ -5,7 +5,8 @@ Category: Ideas and Rants
 Tags: copyright, IP, riaa
 Slug: making-available-finally-recognized-for-the-sham-it-is
 
-From A [Groklaw article today][]:
+From A [Groklaw article
+today](http://www.groklaw.net/article.php?story=20080226005921833):
 
 <p>
 In *Atlantic v. Brennan*, the courts have finally recognized RIAA's
@@ -31,9 +32,6 @@ rejected the claims as being speculative, as they all rested on the
 Maybe things will start going in the right direction...
 
 On a side note, if you still haven't read it, check out the [Google Labs
-paper "Failure Trends in a Large Disk Drive Population"][] (USENIX FAST
-'07).
-
-  [Groklaw article today]: http://www.groklaw.net/article.php?story=20080226005921833
-  [Google Labs paper "Failure Trends in a Large Disk Drive Population"]:
-    http://labs.google.com/papers/disk_failures.html
+paper "Failure Trends in a Large Disk Drive
+Population"](http://labs.google.com/papers/disk_failures.html) (USENIX
+FAST '07).
