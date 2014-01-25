@@ -61,7 +61,7 @@ def check_path(path, pdict, old, new, browser, windows):
     two = new + path
     loadPages(browser, windows, one, two)
     # prompt for status
-    resp = ""
+    resp = "invalid"
     while resp not in ['s', 'r', 'o', 'm', '']:
         resp = raw_input("Page Decision: [s=skip, r=review, o=ok, m=markup fix, <Enter>=no change] ").strip()
     if resp == 'r':
