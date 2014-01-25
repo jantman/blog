@@ -32,7 +32,6 @@ do
 done
 ~~~~
 
-</p>
 The `check_rsnapshot.pl` plugin uses `utils.pm` from Nagios, as well as
 [Getopt::Long](http://search.cpan.org/~jv/Getopt-Long-2.38/lib/Getopt/Long.pm),
 [File::stat](http://search.cpan.org/~makoto/File-Stat-0.01/Stat.pm),

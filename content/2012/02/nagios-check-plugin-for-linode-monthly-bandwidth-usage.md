@@ -39,7 +39,6 @@ $API_KEY_LINODE = "yourApiKeyGoesHere";
 1;
 ~~~~
 
-</p>
 The latest version of the plugin will always be available at
 [https://github.com/jantman/nagios-scripts/blob/master/check\_linode\_transfer.pl](https://github.com/jantman/nagios-scripts/blob/master/check_linode_transfer.pl).
 The current version is also below. It's free for anyone to use under the

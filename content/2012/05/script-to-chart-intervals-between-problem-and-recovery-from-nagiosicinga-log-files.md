@@ -20,4 +20,25 @@ github](https://github.com/jantman/nagios-scripts/blob/master/nagios_log_problem
 Below is some sample output, the number of minutes from problem to
 recovery are along the Y axis and the count is along the X axis:
 
-` > nagios_log_problem_interval.pl --archivedir=/var/icinga/archive --match=myhost --backtrack=10 myhost;HTTP         Count      1:########(8)      2:##(2)      3:#(1)      4:##(2)      5:#######(7)      6:(0)      7:(0)      8:#(1)      9:(0)     10:(0)     11:#(1)     12:(0)     13:#(1)     14:(0)     15:(0)  16-29:(0)  30-59:(0)    60+:(0)`{lang="none"}
+~~~~{.console}
+> nagios_log_problem_interval.pl --archivedir=/var/icinga/archive --match=myhost --backtrack=10 myhost;HTTP
+Count      
+1:########(8)
+2:##(2)      
+3:#(1)      
+4:##(2)      
+5:#######(7)      
+6:(0)      
+7:(0)      
+8:#(1)      
+9:(0)     
+10:(0)     
+11:#(1)     
+12:(0)     
+13:#(1)     
+14:(0)     
+15:(0)  
+16-29:(0)  
+30-59:(0)    
+60+:(0)
+~~~~

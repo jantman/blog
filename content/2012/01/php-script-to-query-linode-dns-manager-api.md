@@ -34,7 +34,6 @@ simply writes all Linode DNS records for all zones to a CSV file (this
 could take a while if you have a lot of records...).
 
 ~~~~{.php}
-, many thanks to him for releasing this.
    *
    * INSTALLATION (as per krmdrms README):
    *  pear install Net_URL2-0.3.1

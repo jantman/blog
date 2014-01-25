@@ -17,11 +17,11 @@ this. They have GPL sample code in Perl that uses only
 (as well as Getopt::Long and Pod::Usage) to interact with an F5 BigIp. I
 wrote a simple script to trace a VIP to the appropriate internal pool
 member addresses, assuming you have a simple configuration of VIP -\>
-Single default pool -\> pool members.
+Single default pool -> pool members.
 
 Usage is quite simple:
 
-~~~~{.text}
+~~~~{.console}
 > ./VipToInternalHosts.pl --host=prod-lb1.example.com --user=myname --pass=mypassword --vip=128.6.30.130:80
 VIP 128.6.30.130:80 (f5_vip_name) -> Pool 'pool_name'
 Members of Pool 'pool_name':
@@ -29,7 +29,6 @@ Members of Pool 'pool_name':
     10.145.15.11:80
 ~~~~
 
-</p>
 The code can be found at
 [http://svn.jasonantman.com/misc-scripts/VipToInternalHosts.pl](http://svn.jasonantman.com/misc-scripts/VipToInternalHosts.pl)
 via either HTTP or SVN. I hope it's of use to someone else as well.

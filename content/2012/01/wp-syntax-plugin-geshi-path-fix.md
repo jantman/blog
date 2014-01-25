@@ -43,7 +43,6 @@ the `wp-syntax/` plugin directory:
 mv geshi/geshi.php . && mv geshi/geshi/* geshi/ && rmdir geshi/geshi
 ~~~~
 
-</p>
 Note - if you're in a shared hosting environment, or are otherwise not
 able to upgrade the php-geshi package on your server yourself, you might
 not want to do this.

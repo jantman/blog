@@ -7,7 +7,7 @@ Slug: tools-for-watching-apache-httpd-and-memcached
 
 Recently I was working on a code release on a site running PHP on
 [Apache httpd](http://httpd.apache.org/), and using
-[\>memcached](http://memcached.org/). Without getting into specifics, we
+[memcached](http://memcached.org/). Without getting into specifics, we
 had a number of issues that were both Apache and memcached problems, and
 little visibility into them as it was running on an older server without
 much monitoring in place. I started looking around for simple tools that

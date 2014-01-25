@@ -30,7 +30,7 @@ patch](http://blog.jasonantman.com/GFX/dashboard_after_patch_sm.png)](http://blo
 And here's that the configuration section added to settings.yml looks
 like:
 
-~~~~{.text}
+~~~~{.yaml}
 # Enables display of arbitrary node facts in "home" page node table, between node name and latest report time
 enable_home_facts: true
 

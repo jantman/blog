@@ -111,7 +111,7 @@ else {
 
 An example of the usage:
 
-~~~~{.bash}
+~~~~{.console}
 jantman@palantir:pts/8:~/bin/misc-scripts > ./bigipcookie.pl 192.168.23.50:80
 840411328.20480.0000
 jantman@palantir:pts/8:~/bin/misc-scripts > ./bigipcookie.pl 840411328.20480.0000

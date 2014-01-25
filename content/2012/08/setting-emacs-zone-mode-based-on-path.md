@@ -19,5 +19,5 @@ team's workstations, no matter where we have the svn repo checked out:
 (add-to-list 'auto-mode-alist '("svn/named/zones-internal/" . zone-mode))
 ~~~~
 
-Many thanks to `taylanub` on \#emacs on irc.freenode.net for helping
+Many thanks to `taylanub` on #emacs on irc.freenode.net for helping
 with this.

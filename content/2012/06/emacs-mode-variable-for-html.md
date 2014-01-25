@@ -19,10 +19,11 @@ Transitional-compliant) comment to the first line of the file, which
 tells emacs to load html-mode:
 
 ~~~~{.html}
+<!-- -*- mode: html; -*- -->
 ~~~~
 
 You can also get emacs to do this for you, as per the [Specifying File
 Variables](http://www.gnu.org/software/emacs/manual/html_node/emacs/Specifying-File-Variables.html)
-documentation page. Once in html-mode, simply <tt>M-x
-add-file-local-variable-prop-line</a>, enter "mode" for the variable
+documentation page. Once in html-mode, simply `M-x
+add-file-local-variable-prop-line`, enter "mode" for the variable
 name and use the default of the current mode.

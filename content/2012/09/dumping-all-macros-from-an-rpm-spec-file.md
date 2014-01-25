@@ -23,4 +23,4 @@ you want to view the output nicely, you can pipe it through a pager like
 less: `rpmbuild -ba filename.spec 2>&1 | less`.
 
 Just make sure to remove those two lines when you want to actually build
-the package.</tt>
+the package.

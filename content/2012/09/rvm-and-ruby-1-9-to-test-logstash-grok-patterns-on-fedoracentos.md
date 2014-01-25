@@ -38,15 +38,15 @@ refer back to the RVM documentation.
 1.  Create the isolated user, just to be extra careful. Login as that
     user.
 2.  As per [Installing RVM](https://rvm.io/rvm/install/):
-    `curl https://raw.github.com/wayneeseguin/rvm/master/binscripts/rvm-installer | bash -s stable`
+
+        curl https://raw.github.com/wayneeseguin/rvm/master/binscripts/rvm-installer | bash -s stable
+
 3.  edit your `~/.bashrc` and add:
 
-~~~~{.bash}
-[[ -s "$HOME/.rvm/scripts/rvm" ]] && . "$HOME/.rvm/scripts/rvm"
-[[ -r $rvm_path/scripts/completion ]] && . $rvm_path/scripts/completion
-~~~~
+        :::bash
+        [[ -s "$HOME/.rvm/scripts/rvm" ]] && . "$HOME/.rvm/scripts/rvm"
+        [[ -r $rvm_path/scripts/completion ]] && . $rvm_path/scripts/completion
 
-    <p>
     The first line sets up RVM for your sessions, and the second sources
     in tab-completion for the `rvm` command.
 
@@ -108,7 +108,7 @@ Here's an example using a pattern to capture information from custom
 syslog messages triggered by updating puppet configs. Here's some sample
 messages:
 
-~~~~{.text}
+~~~~{.console}
 [rvmtest@jantmanwork ~]$ cat puppet.log
 Updated 2 files in puppet svn (environment prod) to revision 754
 Updated 3 files in puppet svn (environment prod) to revision 756
@@ -123,7 +123,7 @@ Updated%{SPACE}%{NUMBER:puppet_svn_num_files}%{SPACE}files%{SPACE}in%{SPACE}pupp
 
 And the output of the script:
 
-~~~~{.text}
+~~~~{.console}
 [rvmtest@jantmanwork ~]$ cat puppet.log | ./puppet-update-test.rb 
 PATTERN: Updated%{SPACE}%{NUMBER:puppet_svn_num_files}%{SPACE}files%{SPACE}in%{SPACE}puppet%{SPACE}svn%{SPACE}\(environment%{SPACE}%{WORD:puppet_svn_env}\)%{SPACE}to%{SPACE}revision%{SPACE}%{NUMBER:puppet_svn_revision}
 IN: Updated 2 files in puppet svn (environment prod) to revision 754

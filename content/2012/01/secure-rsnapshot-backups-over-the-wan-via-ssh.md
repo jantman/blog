@@ -34,7 +34,7 @@ referring to the remote machine to be backed up as the "remote host" and
 the local machine which triggers the backup and stores the data as the
 "local host".
 
-**Local Host Setup - Part I**
+## Local Host Setup - Part I
 
 1.  Choose and create a directory to store your backups in. I have a 1TB
     external disk mounted at `/mnt/backup/`, so I chose
@@ -47,7 +47,7 @@ the local machine which triggers the backup and stores the data as the
     "remoteHostname\_remoteBackupUsername\_rsync"). Now, get (scp) the
     public key for each pair to the remote host.
 
-**Remote Host Setup**
+## Remote Host Setup
 
 1.  Ensure that rsync is installed on the host.
 2.  Create a user to run the backups. I called this user "rsyncuser".
@@ -109,33 +109,29 @@ the local machine which triggers the backup and stores the data as the
     will run rsync with the arguments specified in rsync-wrapper.c every
     time this key is used to login.
 
-**Local Host Setup - Part II**
+## Local Host Setup - Part II
 
 I use totally separate configs for each host that I backup, to keep
 things clean and to let me enable, disable, or tweak one remote backup
 without affecting the others.
 
-1.  Create host-specific pre- and post-backup scripts. I put them in
-    `/etc/rsnapshot.d/`.   
+1. Create host-specific pre- and post-backup scripts. I put them in
+   `/etc/rsnapshot.d/`.   
       
-    `/etc/rsnapshot.d/pre-remoteHostName.sh`:
+   `/etc/rsnapshot.d/pre-remoteHostName.sh`:
 
-    </p>
-~~~~{.text}
-#!/bin/bash
+        :::bash
+        #!/bin/bash
 
-# do anything else needed on the local system before a backup
-ssh -i /path/to/remoteHostname_remoteBackupUsername_cmd rsyncuser@remoteHost pre
-~~~~
+        # do anything else needed on the local system before a backup
+        ssh -i /path/to/remoteHostname_remoteBackupUsername_cmd rsyncuser@remoteHost pre
 
     `/etc/rsnapshot.d/post-remoteHostName.sh`:
 
-~~~~{.text}
-#!/bin/bash
+        #!/bin/bash
 
-# do anything else needed on the local system after a backup
-ssh -i /path/to/remoteHostname_remoteBackupUsername_cmd rsyncuser@remoteHost post
-~~~~
+        # do anything else needed on the local system after a backup
+        ssh -i /path/to/remoteHostname_remoteBackupUsername_cmd rsyncuser@remoteHost post
 
 2.  Setup a set of rsync include and exclude files (see `man rsync(1)`,
     `--include-from=` and `--exclude-from=`). I put mine at
@@ -149,69 +145,58 @@ ssh -i /path/to/remoteHostname_remoteBackupUsername_cmd rsyncuser@remoteHost pos
     `cmd_postexec` and `backup`. Here's an example of my config file,
     with comments and blank lines removed:
 
-~~~~{.text}
-config_version  1.2
-snapshot_root   /mnt/backup/rsnapshot/
-cmd_cp          /bin/cp
-cmd_rm          /bin/rm
-cmd_rsync       /usr/bin/rsync
-cmd_ssh         /usr/bin/ssh
-cmd_logger      /bin/logger
-cmd_du          /usr/bin/du
-cmd_rsnapshot_diff      /usr/bin/rsnapshot-diff
-interval        daily   14 # save 14 daily backups
-interval        weekly  6 # save 6 weekly backups
-verbose         2
-loglevel        3
-logfile /var/log/rsnapshot-remoteHostName.log
-lockfile        /var/run/rsnapshot-remoteHostName.pid
-rsync_short_args        -a
-rsync_long_args --delete --numeric-ids --relative --delete-excluded
-ssh_args        -i /path/to/remoteHostname_remoteBackupUsername_rsync
-exclude_file    /etc/rsnapshot.d/rsync-exclude-remoteHostName.txt
-include_file    /etc/rsnapshot.d/rsync-include-remoteHostName.txt
-link_dest       1
-use_lazy_deletes        1
-cmd_preexec     /etc/rsnapshot.d/pre-remoteHostName.sh
-cmd_postexec    /etc/rsnapshot.d/post-remoteHostName.sh
-backup  rsyncuser@remoteHostName:/      remoteHostName/
-~~~~
+        config_version  1.2
+        snapshot_root   /mnt/backup/rsnapshot/
+        cmd_cp          /bin/cp
+        cmd_rm          /bin/rm
+        cmd_rsync       /usr/bin/rsync
+        cmd_ssh         /usr/bin/ssh
+        cmd_logger      /bin/logger
+        cmd_du          /usr/bin/du
+        cmd_rsnapshot_diff      /usr/bin/rsnapshot-diff
+        interval        daily   14 # save 14 daily backups
+        interval        weekly  6 # save 6 weekly backups
+        verbose         2
+        loglevel        3
+        logfile /var/log/rsnapshot-remoteHostName.log
+        lockfile        /var/run/rsnapshot-remoteHostName.pid
+        rsync_short_args        -a
+        rsync_long_args --delete --numeric-ids --relative --delete-excluded
+        ssh_args        -i /path/to/remoteHostname_remoteBackupUsername_rsync
+        exclude_file    /etc/rsnapshot.d/rsync-exclude-remoteHostName.txt
+        include_file    /etc/rsnapshot.d/rsync-include-remoteHostName.txt
+        link_dest       1
+        use_lazy_deletes        1
+        cmd_preexec     /etc/rsnapshot.d/pre-remoteHostName.sh
+        cmd_postexec    /etc/rsnapshot.d/post-remoteHostName.sh
+        backup  rsyncuser@remoteHostName:/      remoteHostName/
 
-    <p>
     The `backup` line is what tells rsync what to back up (`/` on
     remoteHostName, logging in as rsyncuser), and where to back up to
     (snapshot\_root/remoteHostName/).
 
 4.  Create two scripts that will actually trigger the backups, which
-    I'll call `/root/bin/rsnapshot-daily.sh` and
-    `/root/bin/rsnapshot-weekly.sh`:  
+    I'll call `/root/bin/rsnapshot-daily.sh` and `/root/bin/rsnapshot-weekly.sh`:  
       
     `/root/bin/rsnapshot-daily.sh`:
 
-    </p>
-~~~~{.text}
-#!/bin/bash
+        #!/bin/bash
 
-/usr/bin/rsnapshot -c /etc/rsnapshot-remoteHostName.conf daily
-# add other hosts here; note, they'll run in series
-~~~~
+        /usr/bin/rsnapshot -c /etc/rsnapshot-remoteHostName.conf daily
+        # add other hosts here; note, they'll run in series
 
     `/root/bin/rsnapshot-weekly.sh`:
 
-~~~~{.text}
-#!/bin/bash
+        #!/bin/bash
 
-/usr/bin/rsnapshot -c /etc/rsnapshot-remoteHostName.conf weekly
-# add other hosts here; note, they'll run in series
-~~~~
+        /usr/bin/rsnapshot -c /etc/rsnapshot-remoteHostName.conf weekly
+        # add other hosts here; note, they'll run in series
 
 5.  Add two entries to root's croontab to run the rsnapshot backups.
     Adjust the following days and times to your liking:
 
-~~~~{.bash}
-0 1 * * Mon /root/bin/rsnapshot-weekly.sh # run the weekly backups every Monday at 01:00
-30 2 * * * /root/bin/rsnapshot-daily.sh # run the daily backups every day at 02:30, which *should* be after the weekly finished on Monday morning
-~~~~
+        0 1 * * Mon /root/bin/rsnapshot-weekly.sh # run the weekly backups every Monday at 01:00
+        30 2 * * * /root/bin/rsnapshot-daily.sh # run the daily backups every day at 02:30, which *should* be after the weekly finished on Monday morning
 
 6.  Check, after the next scheduled runs, that everything appears to
     have run correctly. If you want, you can manually trigger the daily
