@@ -2,9 +2,10 @@ from fabric.api import *
 import fabric.contrib.project as project
 import os
 import re
+import sys
 import datetime
 
-from pelicanconf import ARTICLE_DIR, DEFAULT_CATEGORY, AUTHOR, OUTPUT_PATH
+from pelicanconf import ARTICLE_DIR, DEFAULT_CATEGORY, AUTHOR, OUTPUT_PATH, THEME, THEME_BRANCH
 
 # Local path configuration (can be absolute or relative to fabfile)
 env.deploy_path = 'output'
@@ -19,6 +20,16 @@ env.cloudfiles_username = 'my_rackspace_username'
 env.cloudfiles_api_key = 'my_rackspace_api_key'
 env.cloudfiles_container = 'my_cloudfiles_container'
 
+def prebuild():
+    """ tasks to run before any file generation - build, preview, publish, etc. """
+    # check for themes
+    if not os.path.exists(THEME):
+        print("ERROR: theme directory %s does not exist." % THEME)
+        sys.exit(1)
+    branch = local("cd %s && git rev-parse --abbrev-ref HEAD" % THEME, capture=True).strip()
+    if branch != THEME_BRANCH:
+        print("ERROR: %s is on wrong branch (%s not %s)" % (THEME, branch, THEME_BRANCH))
+        sys.exit(1)
 
 def clean():
     """ remove DEPLOY_PATH if it exists, then recreate """
@@ -28,6 +39,7 @@ def clean():
 
 def build():
     """ run pelican to build output """
+    prebuild()
     local('pelican -s pelicanconf.py')
 
 def rebuild():
@@ -37,6 +49,7 @@ def rebuild():
 
 def regenerate():
     """ pelican -r ; regenerate whenever a file changes """
+    prebuild()
     local('pelican -r -s pelicanconf.py')
 
 def serve():
@@ -50,6 +63,7 @@ def reserve():
 
 def preview():
     """ pelican with publishconf.py """
+    prebuild()
     local('pelican -s publishconf.py')
 
 def publish():
@@ -58,7 +72,7 @@ def publish():
     if not re.match(r'(y|Y|yes|Yes|YES)', resp):
         return False
     clean()
-    local('pelican -s publishconf.py')
+    preview()
     local("ghp-import %s" % OUTPUT_PATH)
     local("git push origin gh-pages")
 
@@ -164,9 +178,3 @@ def categories():
     """ show all current blog post categories """
     for c in _get_categories():
         print c
-
-def submodules():
-    """ update all git submodules """
-    print("Still needs to be implemented")
-    # GitPython 0.3.2 provides repo.git.version_info(), as we need 1.8.2+ to
-    # have submodules track branches - http://bec-systems.com/site/1020/git-submodules-can-now-track-branches
