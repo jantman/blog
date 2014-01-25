@@ -78,7 +78,9 @@ TAG_FEED_RSS = 'feeds/%s.rss.xml'
 #
 # Theme and Display Settings
 #
-THEME = 'themes/pelican-bootstrap3'
+THEME = '/home/jantman/GIT/pelican-themes/pelican-bootstrap3'
+BOOTSTRAP_THEME = 'flatly'
+THEME_BRANCH = 'jantman-bootstrap3'
 
 DISPLAY_CATEGORIES_ON_MENU = True
 
