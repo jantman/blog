@@ -212,6 +212,8 @@ def main():
             continue
         if (path_dict[p]['review'] is True or path_dict[p]['markup'] is True) and opts.revisit is False:
             continue
+        if path_dict[p]['review'] is False and path_dict[p]['markup'] is False and opts.revisit is True:
+            continue
         if path_dict[p]['review'] is True or path_dict[p]['markup'] is True:
             print("Reopening %s for review" % p)
             if path_dict[p]['note'] != "":
