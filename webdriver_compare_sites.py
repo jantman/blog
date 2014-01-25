@@ -64,7 +64,11 @@ def check_path(path, pdict, old, new, browser, windows):
     resp = "invalid"
     while resp not in ['s', 'r', 'o', 'm', '']:
         resp = raw_input("Page Decision: [s=skip, r=review, o=ok, m=markup fix, <Enter>=no change] ").strip()
-    if resp == 'r':
+    if resp == 'o':
+        pdict['note'] = ''
+        pdict['review'] = False
+        pdict['markup'] = False
+    elif resp == 'r':
         pdict['review'] = True
         note = raw_input("Notes: ").strip()
         if note != "":
