@@ -111,45 +111,51 @@
                 </div>
                 <p>At $<span class="caps">WORK</span> we lost a disk in the <span class="caps">RAID1</span> of one of our external nameservers,
 and it rekindled an occasional discussion of migration from <a><span class="caps">ISC</span>
-<span class="caps">BIND</span></a> to <a href="http://powerdns.com/content/products.html">PowerDNS</a>. PowerDNS has separate authoritative and
-recursive servers, and doesn&#8217;t seem to natively support views or
-split-horizon the way <span class="caps">BIND</span> does, but it has some really cool features
-including very mature database backends, load balancing, Lua scripting
-support to modify how recursive queries are answered, and geolocation or
-<span class="caps">IP</span>-range based query&nbsp;results.</p>
+<span class="caps">BIND</span></a> to <a href="http://powerdns.com/content/products.html">PowerDNS</a>.
+PowerDNS has separate authoritative and recursive servers, and doesn&#8217;t
+seem to natively support views or split-horizon the way <span class="caps">BIND</span> does, but
+it has some really cool features including very mature database
+backends, load balancing, Lua scripting support to modify how recursive
+queries are answered, and geolocation or <span class="caps">IP</span>-range based query&nbsp;results.</p>
 <p>While this project is still just casual research, I thought I&#8217;d share
 some of the useful links and information I&#8217;ve&nbsp;found:</p>
 <p>PowerDNS&nbsp;Front-ends:</p>
 <ul>
-<li><a href="http://www.nicmus.com/community.html">JPowerAdmin</a> - One of the two most popular, a GPLv3 Java (JBoss
-    <span class="caps">SEAM</span>) based web <span class="caps">UI</span> with a RESTful <span class="caps">API</span>, with support for &#8220;multiple&#8221;
-    database backends. Sponsored by Nicmus, Inc. <a href="http://www.nicmus.com/JPowerAdmin">Online demo</a>
+<li><a href="http://www.nicmus.com/community.html">JPowerAdmin</a> - One of the two
+    most popular, a GPLv3 Java (JBoss <span class="caps">SEAM</span>) based web <span class="caps">UI</span> with a RESTful
+    <span class="caps">API</span>, with support for &#8220;multiple&#8221; database backends. Sponsored by
+    Nicmus, Inc. <a href="http://www.nicmus.com/JPowerAdmin">Online demo</a>
     (demo:demo). Looks nice, simple <span class="caps">UI</span>, but no support for&nbsp;split-horizon.</li>
-<li><a href="https://www.poweradmin.org">PowerAdmin</a> - the other most popular, though it seems to be
-    undergoing a large overhaul at the moment. Has full support for most
-    of PowerDNS&#8217;s features, written in <span class="caps">PHP</span>, supports &#8220;large&#8221; databases,
-    fine-grained user permissions, <span class="caps">RFC</span> validation, zone templates.
-    <a href="http://demo.poweradmin.org/">Online demo</a> (demo:demo). I don&#8217;t really like that it manages
-    the SOAs as full text (without any templating, dropdowns or default
-    values), and that it doesn&#8217;t prepopulate default values for <span class="caps">TTL</span> in
-    the new record form, but it looks like a good starting place for
-    someone (like me) who&#8217;s handy with&nbsp;<span class="caps">PHP</span>.</li>
-<li><a href="http://code.google.com/p/pdns-gui/">pdns-gui - PowerDNS <span class="caps">GUI</span> - Google Project Hosting</a> - <span class="caps">PHP</span>/MySQL
-    <span class="caps">GUI</span>. <a href="http://www.powerdns-gui.org/">Online demo</a>. Handles templates nicely but won&#8217;t scale to
-    too many of them. Window-based <span class="caps">UI</span> is visually pleasing but will
-    probably be a problem for big&nbsp;zones.</li>
-<li>[powerdns-webinterface - PowerDNS Webinterface - Google Project
-    Hosting][] - A nice but relatively simplistic <span class="caps">UI</span> written in <span class="caps">PHP</span>. It
-    has some nice features like multi-user authentication (and logging,
-    though I haven&#8217;t looked into how detailed it is), automatic <span class="caps">SOA</span>
-    serial update, automatic <span class="caps">PTR</span> creation, etc. Unfortunately not geared
+<li><a href="https://www.poweradmin.org">PowerAdmin</a> - the other most popular,
+    though it seems to be undergoing a large overhaul at the moment. Has
+    full support for most of PowerDNS&#8217;s features, written in <span class="caps">PHP</span>,
+    supports &#8220;large&#8221; databases, fine-grained user permissions, <span class="caps">RFC</span>
+    validation, zone templates. <a href="http://demo.poweradmin.org/">Online
+    demo</a> (demo:demo). I don&#8217;t really like
+    that it manages the SOAs as full text (without any templating,
+    dropdowns or default values), and that it doesn&#8217;t prepopulate
+    default values for <span class="caps">TTL</span> in the new record form, but it looks like a
+    good starting place for someone (like me) who&#8217;s handy with&nbsp;<span class="caps">PHP</span>.</li>
+<li><a href="http://code.google.com/p/pdns-gui/">pdns-gui - PowerDNS <span class="caps">GUI</span> - Google Project
+    Hosting</a> - <span class="caps">PHP</span>/MySQL <span class="caps">GUI</span>.
+    <a href="http://www.powerdns-gui.org/">Online demo</a>. Handles templates
+    nicely but won&#8217;t scale to too many of them. Window-based <span class="caps">UI</span> is
+    visually pleasing but will probably be a problem for big&nbsp;zones.</li>
+<li><a href="http://code.google.com/p/powerdns-webinterface/">powerdns-webinterface - PowerDNS Webinterface - Google Project
+    Hosting</a> - A nice
+    but relatively simplistic <span class="caps">UI</span> written in <span class="caps">PHP</span>. It has some nice
+    features like multi-user authentication (and logging, though I
+    haven&#8217;t looked into how detailed it is), automatic <span class="caps">SOA</span> serial
+    update, automatic <span class="caps">PTR</span> creation, etc. Unfortunately not geared
     towards people with lots of domains and multiple records; it has
     only one template for new domains (and no way to update domains
     created from a template), no easy filtering, and still treats <span class="caps">SOA</span>
     like a single text&nbsp;record.</li>
-<li><a href="http://sourceforge.net/projects/zoneadmin/">ZoneAdmin | SourceForge.net</a> and <a>Project website</a> - Maybe
-    not the fastest tool to use in bulk, but a nice, relatively
-    intuitive and full-featured admin tool. <a href="http://open.megabit.net/demos/ZoneAdmin/">Online demo</a>&nbsp;(demo:demo).</li>
+<li><a href="http://sourceforge.net/projects/zoneadmin/">ZoneAdmin |
+    SourceForge.net</a> and
+    <a>Project website</a> - Maybe not the fastest tool to use in bulk,
+    but a nice, relatively intuitive and full-featured admin tool.
+    <a href="http://open.megabit.net/demos/ZoneAdmin/">Online demo</a>&nbsp;(demo:demo).</li>
 </ul>
 <p>Some links on PowerDNS&nbsp;split-horizon</p>
 <ul>
@@ -169,9 +175,8 @@ the real catch - all of our machines are in private <span class="caps">IP</span>
 firewall, so I need to be able to manage the internal and external
 records on one screen. While it&#8217;s not exactly scalable, and the code
 stagnated quite a bit once I got it to a point that was usable for me,
-this was the main goal of my <a href="http://multibindadmin.jasonantman.com/">MultiBIND Admin</a>&nbsp;project.</p>
-<p>[powerdns-webinterface - PowerDNS Webinterface - Google Project
-  Hosting]:&nbsp;http://code.google.com/p/powerdns-webinterface/</p>
+this was the main goal of my <a href="http://multibindadmin.jasonantman.com/">MultiBIND
+Admin</a>&nbsp;project.</p>
             </div>
             <!-- /.entry-content -->
         </article>
@@ -205,8 +210,8 @@ this was the main goal of my <a href="http://multibindadmin.jasonantman.com/">Mu
                             </a>
                         </li>
                         <li class="list-group-item tag-1">
-                            <a href="http://jantman.github.io/blog/tag/nagios.html">
-                                Nagios
+                            <a href="http://jantman.github.io/blog/tag/android.html">
+                                android
                             </a>
                         </li>
                         <li class="list-group-item tag-1">
@@ -215,8 +220,8 @@ this was the main goal of my <a href="http://multibindadmin.jasonantman.com/">Mu
                             </a>
                         </li>
                         <li class="list-group-item tag-1">
-                            <a href="http://jantman.github.io/blog/tag/android.html">
-                                android
+                            <a href="http://jantman.github.io/blog/tag/nagios.html">
+                                Nagios
                             </a>
                         </li>
                         <li class="list-group-item tag-1">
@@ -225,68 +230,8 @@ this was the main goal of my <a href="http://multibindadmin.jasonantman.com/">Mu
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/apache.html">
-                                apache
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/perl.html">
-                                perl
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/dns.html">
-                                dns
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/mediawiki.html">
-                                mediawiki
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/ems.html">
-                                EMS
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/rpm.html">
-                                rpm
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/monitoring.html">
-                                monitoring
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/puppet.html">
-                                puppet
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/droid.html">
-                                droid
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/blog.html">
-                                blog
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/sun.html">
-                                sun
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/mac.html">
-                                mac
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/security.html">
-                                security
+                            <a href="http://jantman.github.io/blog/tag/logging.html">
+                                logging
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
@@ -295,8 +240,38 @@ this was the main goal of my <a href="http://multibindadmin.jasonantman.com/">Mu
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/apache.html">
+                                apache
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
                             <a href="http://jantman.github.io/blog/tag/firefox.html">
                                 firefox
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/blog.html">
+                                blog
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/perl.html">
+                                perl
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/monitoring.html">
+                                monitoring
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/microsoft.html">
+                                microsoft
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/dns.html">
+                                dns
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
@@ -305,18 +280,48 @@ this was the main goal of my <a href="http://multibindadmin.jasonantman.com/">Mu
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/logging.html">
-                                logging
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
                             <a href="http://jantman.github.io/blog/tag/bind.html">
                                 bind
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/microsoft.html">
-                                microsoft
+                            <a href="http://jantman.github.io/blog/tag/sun.html">
+                                sun
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/mediawiki.html">
+                                mediawiki
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/rpm.html">
+                                rpm
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/droid.html">
+                                droid
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/puppet.html">
+                                puppet
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/ems.html">
+                                EMS
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/security.html">
+                                security
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/mac.html">
+                                mac
                             </a>
                         </li>
         </ul>

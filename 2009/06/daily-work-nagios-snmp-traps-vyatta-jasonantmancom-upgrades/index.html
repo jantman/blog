@@ -112,33 +112,39 @@
 </footer><!-- /.post-info -->                    </div>
                 </div>
                 <p>So it&#8217;s been a very busy day. I was up until 5 <span class="caps">AM</span> or so working on
-implementing <a href="http://reductivelabs.com/trac/puppet/">Puppet</a> at home. I&#8217;m building two new boxes - a storage
-(centralized home directory)/syslog (to MySQL) server and a second web
-server (possibly also to handle Nagios) - and I decided that they&#8217;ll be
-totally built by Puppet. The only thing I had to give up on was setting
-up the <span class="caps">NFS</span> share for my home directory on the new storage box and
-installing and testing <a href="http://www.rsyslog.com/">rsyslog</a> on&nbsp;it.</p>
+implementing <a href="http://reductivelabs.com/trac/puppet/">Puppet</a> at home.
+I&#8217;m building two new boxes - a storage (centralized home
+directory)/syslog (to MySQL) server and a second web server (possibly
+also to handle Nagios) - and I decided that they&#8217;ll be totally built by
+Puppet. The only thing I had to give up on was setting up the <span class="caps">NFS</span> share
+for my home directory on the new storage box and installing and testing
+<a href="http://www.rsyslog.com/">rsyslog</a> on&nbsp;it.</p>
 <p>This afternoon around 7, I started on my weekend projects for <a href="http://www.midlandparkambulance.com">the
-ambulance corps</a> - setting up <a href="http://www.nagios.org">Nagios</a> to receive <span class="caps">SNMP</span> traps from
-the <span class="caps">APC</span> <span class="caps">UPS</span> and moving over to the new <a href="http://www.vyatta.org">Vyatta</a>-based router (from
-<a href="http://m0n0.ch/wall/">m0n0wall</a>). I&#8217;d attempted the router before, but had to rollback -
-I&#8217;m using an old <a href="http://www.bluesocket.com/">BlueSocket</a> controller for hardware - it&#8217;s just a
-nice black 1U enclosure with a stock Intel motherboard, <span class="caps">20GB</span> <span class="caps">HDD</span>, <span class="caps">512MB</span>
-<span class="caps">RAM</span> and three 10/100 NICs. The first time, I was unable to get link on
-either of the two NICs I was using, so I decided to&nbsp;rollback.</p>
+ambulance corps</a> - setting up
+<a href="http://www.nagios.org">Nagios</a> to receive <span class="caps">SNMP</span> traps from the <span class="caps">APC</span> <span class="caps">UPS</span>
+and moving over to the new <a href="http://www.vyatta.org">Vyatta</a>-based router
+(from <a href="http://m0n0.ch/wall/">m0n0wall</a>). I&#8217;d attempted the router
+before, but had to rollback - I&#8217;m using an old
+<a href="http://www.bluesocket.com/">BlueSocket</a> controller for hardware - it&#8217;s
+just a nice black 1U enclosure with a stock Intel motherboard, <span class="caps">20GB</span> <span class="caps">HDD</span>,
+<span class="caps">512MB</span> <span class="caps">RAM</span> and three 10/100 NICs. The first time, I was unable to get
+link on either of the two NICs I was using, so I decided to&nbsp;rollback.</p>
 <p><strong>Nagios <span class="caps">SNMP</span>&nbsp;Traps</strong></p>
 <p>I found a good starting point for Nagios <span class="caps">SNMP</span> traps on the <a href="http://altinity.blogs.com/dotorg/2006/03/lessons_in_snmp.html">OpsView
-blog</a>. I setup `snmptrapd` on the Nagios server and hacked together
-a little Python script to just write all of the traps to a file. After
-some testing with `snmptrap` on my laptop, I did a test by pulling the
+blog</a>. I
+setup `snmptrapd` on the Nagios server and hacked together a little
+Python script to just write all of the traps to a file. After some
+testing with `snmptrap` on my laptop, I did a test by pulling the
 power plug of the <span class="caps">UPS</span>, waiting about 30 seconds, and then plugging it
-back in. Sure enough, the little old <a href="http://blog.jasonantman.com/2007/03/apc-ap9605-powernet-snmp-card/"><span class="caps">AP9605</span> PowerNet <span class="caps">SNMP</span> card</a>
+back in. Sure enough, the little old <a href="http://blog.jasonantman.com/2007/03/apc-ap9605-powernet-snmp-card/"><span class="caps">AP9605</span> PowerNet <span class="caps">SNMP</span>
+card</a>
 generated two <span class="caps">SNMP</span> traps - one for power loss and one for power regained
 - both of which showed up in the test&nbsp;file</p>
 <p>The next step will be deciding how to get the traps into Nagios -
 specifically whether I want to go with something heavy-weight, like
-<a href="http://snmptt.sourceforge.net/">SNMPtt</a> that can handle other devices, or whether I want to code a
-simple script myself just to deal with the <span class="caps">APC</span>&nbsp;cards.</p>
+<a href="http://snmptt.sourceforge.net/">SNMPtt</a> that can handle other devices,
+or whether I want to code a simple script myself just to deal with the
+<span class="caps">APC</span>&nbsp;cards.</p>
 <p><strong>Router</strong></p>
 <p>The main reason why I wanted to make the switch from m0n0 to Vyatta was
 to ease the setup and maintenance of an IPsec tunnel from the ambulance
@@ -180,11 +186,12 @@ brought down for the first time in about 3 years (aside from brief
 outages for hardware upgrades or array rebuilds). Assuming I got
 everything off of it, it will be relegated to the spares&nbsp;pile.</p>
 <p>I&#8217;m going to make a serious effort to post on a daily basis, if only for
-my own future reference. I should have the demo of <a href="http://rackman.jasonantman.com">RackMan</a> out soon,
-and I&#8217;m also about to start on integrating it with Nathan Hubbard&#8217;s
-<a href="http://www.machdb.org/">MachDB</a> as well as a <span class="caps">PHP</span> script I wrote to pull port names and MACs
-from Cisco switches and associate them with NICs in machines. Hopefully
-I&#8217;ll also have some interesting Puppet stuff out&nbsp;soon.</p>
+my own future reference. I should have the demo of
+<a href="http://rackman.jasonantman.com">RackMan</a> out soon, and I&#8217;m also about
+to start on integrating it with Nathan Hubbard&#8217;s
+<a href="http://www.machdb.org/">MachDB</a> as well as a <span class="caps">PHP</span> script I wrote to pull
+port names and MACs from Cisco switches and associate them with NICs in
+machines. Hopefully I&#8217;ll also have some interesting Puppet stuff out&nbsp;soon.</p>
             </div>
             <!-- /.entry-content -->
         </article>
@@ -218,8 +225,8 @@ I&#8217;ll also have some interesting Puppet stuff out&nbsp;soon.</p>
                             </a>
                         </li>
                         <li class="list-group-item tag-1">
-                            <a href="http://jantman.github.io/blog/tag/nagios.html">
-                                Nagios
+                            <a href="http://jantman.github.io/blog/tag/android.html">
+                                android
                             </a>
                         </li>
                         <li class="list-group-item tag-1">
@@ -228,8 +235,8 @@ I&#8217;ll also have some interesting Puppet stuff out&nbsp;soon.</p>
                             </a>
                         </li>
                         <li class="list-group-item tag-1">
-                            <a href="http://jantman.github.io/blog/tag/android.html">
-                                android
+                            <a href="http://jantman.github.io/blog/tag/nagios.html">
+                                Nagios
                             </a>
                         </li>
                         <li class="list-group-item tag-1">
@@ -238,68 +245,8 @@ I&#8217;ll also have some interesting Puppet stuff out&nbsp;soon.</p>
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/apache.html">
-                                apache
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/perl.html">
-                                perl
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/dns.html">
-                                dns
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/mediawiki.html">
-                                mediawiki
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/ems.html">
-                                EMS
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/rpm.html">
-                                rpm
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/monitoring.html">
-                                monitoring
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/puppet.html">
-                                puppet
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/droid.html">
-                                droid
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/blog.html">
-                                blog
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/sun.html">
-                                sun
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/mac.html">
-                                mac
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/security.html">
-                                security
+                            <a href="http://jantman.github.io/blog/tag/logging.html">
+                                logging
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
@@ -308,8 +255,38 @@ I&#8217;ll also have some interesting Puppet stuff out&nbsp;soon.</p>
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/apache.html">
+                                apache
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
                             <a href="http://jantman.github.io/blog/tag/firefox.html">
                                 firefox
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/blog.html">
+                                blog
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/perl.html">
+                                perl
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/monitoring.html">
+                                monitoring
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/microsoft.html">
+                                microsoft
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/dns.html">
+                                dns
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
@@ -318,18 +295,48 @@ I&#8217;ll also have some interesting Puppet stuff out&nbsp;soon.</p>
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/logging.html">
-                                logging
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
                             <a href="http://jantman.github.io/blog/tag/bind.html">
                                 bind
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/microsoft.html">
-                                microsoft
+                            <a href="http://jantman.github.io/blog/tag/sun.html">
+                                sun
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/mediawiki.html">
+                                mediawiki
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/rpm.html">
+                                rpm
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/droid.html">
+                                droid
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/puppet.html">
+                                puppet
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/ems.html">
+                                EMS
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/security.html">
+                                security
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/mac.html">
+                                mac
                             </a>
                         </li>
         </ul>

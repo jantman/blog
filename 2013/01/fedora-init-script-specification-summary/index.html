@@ -112,20 +112,26 @@
 </footer><!-- /.post-info -->                    </div>
                 </div>
                 <p>I&#8217;ve been deploying some new software lately (specifically
-<a href="https://github.com/marisaseal/selenesse">selenesse</a>, which combines <a href="http://seleniumhq.org/">Selenium</a> and <a href="http://fitnesse.org/">fitnesse</a>, <a href="http://en.wikipedia.org/wiki/Xvfb">xvfb</a>).
-None of these seem to come with init scripts to run as daemons, and the
-quality of the few Fedora/RedHat/CentOS init scripts I was able to find
-was quite poor. The Fedora project has a <a href="http://fedoraproject.org/wiki/Packaging:SysVInitScript">Specification for SysV-style
-Init Scripts in their Packaging wiki</a>, which specifies what a
-Fedora/RedHat/CentOS init script should look like, in excruciating
-detail. What follows is an overview of the more important points, which
-I&#8217;m using to develop or modify the scripts I&#8217;m currently working&nbsp;on.</p>
+<a href="https://github.com/marisaseal/selenesse">selenesse</a>, which combines
+<a href="http://seleniumhq.org/">Selenium</a> and <a href="http://fitnesse.org/">fitnesse</a>,
+<a href="http://en.wikipedia.org/wiki/Xvfb">xvfb</a>). None of these seem to come
+with init scripts to run as daemons, and the quality of the few
+Fedora/RedHat/CentOS init scripts I was able to find was quite poor. The
+Fedora project has a <a href="http://fedoraproject.org/wiki/Packaging:SysVInitScript">Specification for SysV-style Init Scripts in their
+Packaging wiki</a>,
+which specifies what a Fedora/RedHat/CentOS init script should look
+like, in excruciating detail. What follows is an overview of the more
+important points, which I&#8217;m using to develop or modify the scripts I&#8217;m
+currently working&nbsp;on.</p>
 <ul>
 <li>Scripts must be put in <code>/etc/rc.d/init.d</code>, not in the <code>/etc/init.d</code>
     symlink. They should have 0755&nbsp;permissions.</li>
-<li>Scripts must have a Fedora-style <a href="http://fedoraproject.org/wiki/Packaging:SysVInitScript#Chkconfig_Header">chkconfig header</a> (&#8220;chkconfig:&#8221;,
-    &#8220;description:&#8221; lines), and may have an <a href="http://fedoraproject.org/wiki/Packaging:SysVInitScript#LSB_Header"><span class="caps">LSB</span>-style header</a> (<span class="caps">BEGIN</span>
-    <span class="caps">INIT</span> <span class="caps">INFO</span>/<span class="caps">END</span> <span class="caps">INIT</span> <span class="caps">INFO</span>). See <a href="http://fedoraproject.org/wiki/Packaging:SysVInitScript#Initscript_template">Initscript template</a>.</li>
+<li>Scripts must have a Fedora-style <a href="http://fedoraproject.org/wiki/Packaging:SysVInitScript#Chkconfig_Header">chkconfig
+    header</a>
+    (&#8220;chkconfig:&#8221;, &#8220;description:&#8221; lines), and may have an <a href="http://fedoraproject.org/wiki/Packaging:SysVInitScript#LSB_Header"><span class="caps">LSB</span>-style
+    header</a>
+    (<span class="caps">BEGIN</span> <span class="caps">INIT</span> <span class="caps">INFO</span>/<span class="caps">END</span> <span class="caps">INIT</span> <span class="caps">INFO</span>). See <a href="http://fedoraproject.org/wiki/Packaging:SysVInitScript#Initscript_template">Initscript
+    template</a>.</li>
 <li>Scripts <strong>must</strong> make use of a lockfile in <code>/var/lock/subsys/</code>, and
     the name of the lockfile must be the same as the name of the init
     script. (There is a technical reason for this relating to how sysv
@@ -138,9 +144,9 @@ I&#8217;m using to develop or modify the scripts I&#8217;m currently working&nbs
     of <code>/</code>, as enforced by <code>service(8)</code>, or with a full environment if
     they are called directly by a&nbsp;user.</li>
 <li>
-<p><a href="http://fedoraproject.org/wiki/Packaging:SysVInitScript#Required_Actions">Required actions</a> - all of the following actions are required,
-    and have specific&nbsp;definitions:</p>
+<p><a href="http://fedoraproject.org/wiki/Packaging:SysVInitScript#Required_Actions">Required&nbsp;actions</a></p>
 <ul>
+<li>all of the following actions are required, and have specific&nbsp;definitions:</li>
 <li><strong>start</strong>: starts the&nbsp;service</li>
 <li><strong>stop</strong>: stops the&nbsp;service</li>
 <li><strong>restart</strong>: stop and restart the service if the service is
@@ -159,8 +165,10 @@ I&#8217;m using to develop or modify the scripts I&#8217;m currently working&nbs
 </ul>
 </li>
 <li>
-<p>There are specified exit codes for <a href="http://fedoraproject.org/wiki/Packaging:SysVInitScript#Exit_Codes_for_the_Status_Action">status actions</a> and
-    <a href="http://fedoraproject.org/wiki/Packaging:SysVInitScript#Exit_Codes_for_non-Status_Actions">non-status actions</a>.</p>
+<p>There are specified exit codes for <a href="http://fedoraproject.org/wiki/Packaging:SysVInitScript#Exit_Codes_for_the_Status_Action">status
+    actions</a>
+    and <a href="http://fedoraproject.org/wiki/Packaging:SysVInitScript#Exit_Codes_for_non-Status_Actions">non-status
+    actions</a>.</p>
 </li>
 <li>They must &#8220;behave sensibly&#8221;. I&#8217;ve found this to be one of the
     biggest problems with homegrown init scripts. If <code>servicename start</code>
@@ -218,8 +226,8 @@ biggest problems with most init scripts revolve around poor handling of
                             </a>
                         </li>
                         <li class="list-group-item tag-1">
-                            <a href="http://jantman.github.io/blog/tag/nagios.html">
-                                Nagios
+                            <a href="http://jantman.github.io/blog/tag/android.html">
+                                android
                             </a>
                         </li>
                         <li class="list-group-item tag-1">
@@ -228,8 +236,8 @@ biggest problems with most init scripts revolve around poor handling of
                             </a>
                         </li>
                         <li class="list-group-item tag-1">
-                            <a href="http://jantman.github.io/blog/tag/android.html">
-                                android
+                            <a href="http://jantman.github.io/blog/tag/nagios.html">
+                                Nagios
                             </a>
                         </li>
                         <li class="list-group-item tag-1">
@@ -238,68 +246,8 @@ biggest problems with most init scripts revolve around poor handling of
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/apache.html">
-                                apache
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/perl.html">
-                                perl
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/dns.html">
-                                dns
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/mediawiki.html">
-                                mediawiki
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/ems.html">
-                                EMS
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/rpm.html">
-                                rpm
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/monitoring.html">
-                                monitoring
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/puppet.html">
-                                puppet
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/droid.html">
-                                droid
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/blog.html">
-                                blog
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/sun.html">
-                                sun
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/mac.html">
-                                mac
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/security.html">
-                                security
+                            <a href="http://jantman.github.io/blog/tag/logging.html">
+                                logging
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
@@ -308,8 +256,38 @@ biggest problems with most init scripts revolve around poor handling of
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/apache.html">
+                                apache
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
                             <a href="http://jantman.github.io/blog/tag/firefox.html">
                                 firefox
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/blog.html">
+                                blog
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/perl.html">
+                                perl
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/monitoring.html">
+                                monitoring
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/microsoft.html">
+                                microsoft
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/dns.html">
+                                dns
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
@@ -318,18 +296,48 @@ biggest problems with most init scripts revolve around poor handling of
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/logging.html">
-                                logging
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
                             <a href="http://jantman.github.io/blog/tag/bind.html">
                                 bind
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/microsoft.html">
-                                microsoft
+                            <a href="http://jantman.github.io/blog/tag/sun.html">
+                                sun
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/mediawiki.html">
+                                mediawiki
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/rpm.html">
+                                rpm
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/droid.html">
+                                droid
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/puppet.html">
+                                puppet
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/ems.html">
+                                EMS
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/security.html">
+                                security
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/mac.html">
+                                mac
                             </a>
                         </li>
         </ul>

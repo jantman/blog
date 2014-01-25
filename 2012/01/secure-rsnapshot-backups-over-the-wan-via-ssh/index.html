@@ -116,18 +116,19 @@
 </footer><!-- /.post-info -->                    </div>
                 </div>
                 <p>Since I moved all of my <span class="caps">WAN</span>-facing stuff (mail, web, this blog, svn
-etc.) to a virtual server with <a href="http://www.linode.com">Linode</a>, and just have a desktop at
-home, it&#8217;s no longer practical to use <a href="http://www.bacula.org/">Bacula</a> for backups. Linode
-manages daily and weekly backups through their backup service, but
-they&#8217;ll only restore a full filesystem at a time. I wanted something
-that would keep daily and weekly incremental backups long enough that I
-could find a file changed (or accidentally deleted) a few days or weeks
-ago. Since I&#8217;d be backing up to my desktop at home (which is on a
-residential dynamic <span class="caps">IP</span> connection), the logical solution was something
-using <a href="http://rsync.samba.org/">rsync</a>. Even better than that is the <a href="http://rsnapshot.org/">rsnapshot</a> tool, which
-builds upon rsync and hard links to manage incremental backups with as
-little disk usage as possible (though I&#8217;d certainly recommend excluding
-log&nbsp;files).</p>
+etc.) to a virtual server with <a href="http://www.linode.com">Linode</a>, and just
+have a desktop at home, it&#8217;s no longer practical to use
+<a href="http://www.bacula.org/">Bacula</a> for backups. Linode manages daily and
+weekly backups through their backup service, but they&#8217;ll only restore a
+full filesystem at a time. I wanted something that would keep daily and
+weekly incremental backups long enough that I could find a file changed
+(or accidentally deleted) a few days or weeks ago. Since I&#8217;d be backing
+up to my desktop at home (which is on a residential dynamic <span class="caps">IP</span>
+connection), the logical solution was something using
+<a href="http://rsync.samba.org/">rsync</a>. Even better than that is the
+<a href="http://rsnapshot.org/">rsnapshot</a> tool, which builds upon rsync and
+hard links to manage incremental backups with as little disk usage as
+possible (though I&#8217;d certainly recommend excluding log&nbsp;files).</p>
 <p>I&#8217;m pretty strict about security. Since my home connection has a dynamic
 <span class="caps">IP</span>, things are a bit more complicated - I can&#8217;t push from the server, I
 can&#8217;t <span class="caps">ACL</span> or firewall the server to just my home <span class="caps">IP</span>, and an IPsec <span class="caps">VPN</span>
@@ -166,22 +167,25 @@ the local machine which triggers the backup and stores the data as the
 <li>Now comes the first fun part. Let&#8217;s assume that your pre- and
     post-backup scripts are <code>/root/bin/rsnapshot-pre.sh</code> and
     <code>/root/bin/rsnapshot-post.sh</code>, respectively. As root, grab a copy of
-    cmd-wrapper.c (from <a href="http://svn.jasonantman.com/misc-scripts/cmd-wrapper.c">subversion</a> or at the bottom of this post).
-    Modify for your use - the only thing likely to change is line 38,
-    which ensures it will only run for a member of <span class="caps">GID</span> 502. Change this
-    to rsyncuser&#8217;s <span class="caps">GID</span>. Compile the wrapper with
-    <code>gcc -o cmd-wrapper cmd-wrapper.c</code>. Copy it to rsyncuser&#8217;s home
-    directory (/home/rsyncuser), <code>chown root:rsyncuser</code> and
-    <code>chmod 4750</code>. Yes, this sets the <span class="caps">SUID</span> bit. The program will now be
-    owned by root, and runnable <em>as root</em> by rsyncuser (or, more
+    cmd-wrapper.c (from
+    <a href="http://svn.jasonantman.com/misc-scripts/cmd-wrapper.c">subversion</a>
+    or at the bottom of this post). Modify for your use - the only thing
+    likely to change is line 38, which ensures it will only run for a
+    member of <span class="caps">GID</span> 502. Change this to rsyncuser&#8217;s <span class="caps">GID</span>. Compile the
+    wrapper with <code>gcc -o cmd-wrapper cmd-wrapper.c</code>. Copy it to
+    rsyncuser&#8217;s home directory (/home/rsyncuser), <code>chown root:rsyncuser</code>
+    and <code>chmod 4750</code>. Yes, this sets the <span class="caps">SUID</span> bit. The program will now
+    be owned by root, and runnable <em>as root</em> by rsyncuser (or, more
     specifically, any member of the rsyncuser&nbsp;group).</li>
 <li>Open rsyncuser&#8217;s <code>.ssh/authorized_keys</code> file in a text editor. At
     the beginning of the &#8220;remoteHostname_remoteBackupUsername_cmd&#8221; key
     line, prepend <code>command="/home/rsyncuser/cmd-wrapper"</code>. This sets up
-    <span class="caps">SSH</span> forced command (there&#8217;s a good overview in [O&#8217;Reilly&#8217;s <span class="caps">SSH</span>: The
-    Definitive Guide][]) so that when this key is used to login, it will
-    directly execute <code>/home/rsyncuser/cmd-wrapper</code> and then exit,
-    without allowing access to anything&nbsp;else.</li>
+    <span class="caps">SSH</span> forced command (there&#8217;s a good overview in <a href="http://oreilly.com/catalog/sshtdg/chapter/ch08.html">O&#8217;Reilly&#8217;s <span class="caps">SSH</span>: The
+    Definitive
+    Guide</a>) so that
+    when this key is used to login, it will directly execute
+    <code>/home/rsyncuser/cmd-wrapper</code> and then exit, without allowing access
+    to anything&nbsp;else.</li>
 <li>Add rsyncuser to <code>AllowUsers</code> in <code>/etc/ssh/sshd_config</code> (you <em>do</em>
     limit user access via <span class="caps">SSH</span>, right?) and then reload&nbsp;sshd.</li>
 <li>Now, if you <span class="caps">SSH</span> to rsyncuser@remoteHost from the local host, using
@@ -196,8 +200,9 @@ the local machine which triggers the backup and stores the data as the
     work better with rsnapshot backups of multiple remote&nbsp;hosts.)</em></li>
 <li>Cat the &#8220;remoteHostname_remoteBackupUsername_rsync&#8221; public key
     into the backup user&#8217;s <code>~/.ssh/authorized_keys</code> file.</li>
-<li>As root, grab a copy of rsync-wrapper.c (from <a href="http://svn.jasonantman.com/misc-scripts/rsync-wrapper.c">subversion</a> or at
-    the bottom of this post). Modify for your use - the only thing
+<li>As root, grab a copy of rsync-wrapper.c (from
+    <a href="http://svn.jasonantman.com/misc-scripts/rsync-wrapper.c">subversion</a>
+    or at the bottom of this post). Modify for your use - the only thing
     likely to change is line 38, which ensures it will only run for a
     member of <span class="caps">GID</span> 502 (change this to rsyncuser&#8217;s <span class="caps">GID</span>), and perhaps the
     path of or arguments passed to rsync (the wrapper will call
@@ -335,13 +340,15 @@ remoteHostName, logging in as rsyncuser), and where to back up to
     messed up. If you have issues with rsync, aside from the usual
     troubleshooting, check that rsync-wrapper.c is calling rsync with
     the same arguments that rsnapshot is sending. It may be useful to
-    use my <a href="http://svn.jasonantman.com/misc-scripts/print-cmd.sh">print-cmd.sh</a> script in place of the &#8220;rsync-wrapper&#8221;
-    forced command. This script will simply log the command rsnapshot
-    calls via&nbsp;<span class="caps">SSH</span>.</li>
+    use my
+    <a href="http://svn.jasonantman.com/misc-scripts/print-cmd.sh">print-cmd.sh</a>
+    script in place of the &#8220;rsync-wrapper&#8221; forced command. This script
+    will simply log the command rsnapshot calls via&nbsp;<span class="caps">SSH</span>.</li>
 </ol>
 <p>Assuming all of this worked, you should now have a fairly secure
 <span class="caps">SSH</span>-based remotely-triggered backup system. In a follow-up post I
-provide my <a href="/2012/02/nagios-check-plugin-for-rsnapshot-backups/">Nagios Check Plugin for Rsnapshot Backups</a>.</p>
+provide my <a href="/2012/02/nagios-check-plugin-for-rsnapshot-backups/">Nagios Check Plugin for Rsnapshot
+Backups</a>.</p>
 <p>The referenced scripts, config files, etc. are&nbsp;below:</p>
 <p><code>cmd-wrapper.c</code>:</p>
 <div class="codehilite"><pre><span class="cp">#include </span>
@@ -554,8 +561,8 @@ provide my <a href="/2012/02/nagios-check-plugin-for-rsnapshot-backups/">Nagios 
                             </a>
                         </li>
                         <li class="list-group-item tag-1">
-                            <a href="http://jantman.github.io/blog/tag/nagios.html">
-                                Nagios
+                            <a href="http://jantman.github.io/blog/tag/android.html">
+                                android
                             </a>
                         </li>
                         <li class="list-group-item tag-1">
@@ -564,8 +571,8 @@ provide my <a href="/2012/02/nagios-check-plugin-for-rsnapshot-backups/">Nagios 
                             </a>
                         </li>
                         <li class="list-group-item tag-1">
-                            <a href="http://jantman.github.io/blog/tag/android.html">
-                                android
+                            <a href="http://jantman.github.io/blog/tag/nagios.html">
+                                Nagios
                             </a>
                         </li>
                         <li class="list-group-item tag-1">
@@ -574,68 +581,8 @@ provide my <a href="/2012/02/nagios-check-plugin-for-rsnapshot-backups/">Nagios 
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/apache.html">
-                                apache
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/perl.html">
-                                perl
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/dns.html">
-                                dns
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/mediawiki.html">
-                                mediawiki
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/ems.html">
-                                EMS
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/rpm.html">
-                                rpm
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/monitoring.html">
-                                monitoring
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/puppet.html">
-                                puppet
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/droid.html">
-                                droid
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/blog.html">
-                                blog
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/sun.html">
-                                sun
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/mac.html">
-                                mac
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/security.html">
-                                security
+                            <a href="http://jantman.github.io/blog/tag/logging.html">
+                                logging
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
@@ -644,8 +591,38 @@ provide my <a href="/2012/02/nagios-check-plugin-for-rsnapshot-backups/">Nagios 
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/apache.html">
+                                apache
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
                             <a href="http://jantman.github.io/blog/tag/firefox.html">
                                 firefox
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/blog.html">
+                                blog
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/perl.html">
+                                perl
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/monitoring.html">
+                                monitoring
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/microsoft.html">
+                                microsoft
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/dns.html">
+                                dns
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
@@ -654,18 +631,48 @@ provide my <a href="/2012/02/nagios-check-plugin-for-rsnapshot-backups/">Nagios 
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/logging.html">
-                                logging
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
                             <a href="http://jantman.github.io/blog/tag/bind.html">
                                 bind
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/microsoft.html">
-                                microsoft
+                            <a href="http://jantman.github.io/blog/tag/sun.html">
+                                sun
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/mediawiki.html">
+                                mediawiki
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/rpm.html">
+                                rpm
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/droid.html">
+                                droid
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/puppet.html">
+                                puppet
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/ems.html">
+                                EMS
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/security.html">
+                                security
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/mac.html">
+                                mac
                             </a>
                         </li>
         </ul>

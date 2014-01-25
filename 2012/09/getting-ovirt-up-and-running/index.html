@@ -119,27 +119,33 @@
                 </div>
                 <p>The bulk of this post was written way back in April 2012. If you&#8217;re just
 coming here, and looking to setup oVirt, you should probably <a href="#postscript">skip down
-to the postscript</a> for an update, and ignore most of the content here
-(as it&#8217;s applicable to an older oVirt&nbsp;version).</p>
-<p>I recently started setting up <a href="http://www.ovirt.org">oVirt</a>, the community version of Red
-Hat Enterprise Virtualization, at work for some testing (mainly a
-&#8220;sandbox&#8221; <span class="caps">VM</span> environment, and because <a href="http://theforeman.org/">Foreman</a> <a href="http://blog.theforeman.org/2012/03/vnc-support-built-in-foreman.html">supports</a> it). To
-start with, I had two nodes, each with two dual-core Xeon processors
-(<span class="caps">VT</span>-x capable) with <span class="caps">20GB</span> <span class="caps">RAM</span>, one with <span class="caps">600GB</span> internal storage and one
-with <span class="caps">140GB</span> internal. While oVirt&#8217;s documentation isn&#8217;t exactly
+to the postscript</a> for an update, and ignore most of the
+content here (as it&#8217;s applicable to an older oVirt&nbsp;version).</p>
+<p>I recently started setting up <a href="http://www.ovirt.org">oVirt</a>, the
+community version of Red Hat Enterprise Virtualization, at work for some
+testing (mainly a &#8220;sandbox&#8221; <span class="caps">VM</span> environment, and because
+<a href="http://theforeman.org/">Foreman</a>
+<a href="http://blog.theforeman.org/2012/03/vnc-support-built-in-foreman.html">supports</a>
+it). To start with, I had two nodes, each with two dual-core Xeon
+processors (<span class="caps">VT</span>-x capable) with <span class="caps">20GB</span> <span class="caps">RAM</span>, one with <span class="caps">600GB</span> internal storage
+and one with <span class="caps">140GB</span> internal. While oVirt&#8217;s documentation isn&#8217;t exactly
 wonderful, I found a blgo post by Jason Brooks, <a href="http://blog.jebpages.com/archives/how-to-get-up-and-running-with-ovirt/">How to Get Up and
-Running with oVirt</a>, which gives a great walkthrough of getting the
-oVirt Engine setup on a machine, and also setting up that same machine
-as a <span class="caps">VM</span> host. As oVirt is still fairly young, this is all done on
-Fedora. I performed my installation via Cobbler, though I&#8217;m afraid to
-admit it was an entirely manual, interactive&nbsp;install.</p>
+Running with
+oVirt</a>,
+which gives a great walkthrough of getting the oVirt Engine setup on a
+machine, and also setting up that same machine as a <span class="caps">VM</span> host. As oVirt is
+still fairly young, this is all done on Fedora. I performed my
+installation via Cobbler, though I&#8217;m afraid to admit it was an entirely
+manual, interactive&nbsp;install.</p>
 <p>I did run into a few bumps during Jason&#8217;s tutorial. In step 15, adding
 the data <span class="caps">NFS</span> export as a Storage Domain, I was unable to add the <span class="caps">NFS</span>
 export. I found the <a href="http://www.ovirt.org/wiki/Troubleshooting_NFS_Storage_Issues">Troubleshooting <span class="caps">NFS</span> Storage Issues page on the
-oVirt wiki</a>, ensured that SELinux was disabled and that the export had
-the correct permissions, confirmed that <code>/etc/nfsmount.conf</code> specified
-<code>Nfsvers=3</code>, rebooted, and then ran the <code>nfs-check.py</code> script. At this
-point, I was able to add the other storage domains in steps 15 and&nbsp;16.</p>
+oVirt
+wiki</a>,
+ensured that SELinux was disabled and that the export had the correct
+permissions, confirmed that <code>/etc/nfsmount.conf</code> specified <code>Nfsvers=3</code>,
+rebooted, and then ran the <code>nfs-check.py</code> script. At this point, I was
+able to add the other storage domains in steps 15 and&nbsp;16.</p>
 <p>My second issue was that even on Fedora 16, I simply can&#8217;t get the spice
 client (through the <code>spice-xpi</code> browser plugin) to work. As far as I can
 tell from the logs, it looks like <code>spicec</code> is being sent a value of
@@ -155,11 +161,11 @@ binary, which is in the &#8220;tigervnc&#8221; package on&nbsp;Fedora.</p>
 <p>To run <code>ovirt-shell</code> on your workstation (Fedora 16, of course&#8230;)
 you&#8217;ll need the ovirt-engine-cli and ovirt-engine-sdk packages. I
 manually downloaded them from
-<a href="http://www.ovirt.org/releases/nightly/fedora/16/">http://www.ovirt.org/releases/nightly/fedora/16/</a>, versions 2.1.3 and
-1.6.2, respecitively. The <span class="caps">SDK</span> and <span class="caps">CLI</span> are python based, so there are a
-few Python dependencies, all of which were automatically solved by yum.
-I know there are <span class="caps">SDK</span> and <span class="caps">CLI</span> packages out there for other distros, but
-haven&#8217;t tried them&nbsp;yet.</p>
+<a href="http://www.ovirt.org/releases/nightly/fedora/16/">http://www.ovirt.org/releases/nightly/fedora/16/</a>,
+versions 2.1.3 and 1.6.2, respecitively. The <span class="caps">SDK</span> and <span class="caps">CLI</span> are python
+based, so there are a few Python dependencies, all of which were
+automatically solved by yum. I know there are <span class="caps">SDK</span> and <span class="caps">CLI</span> packages out
+there for other distros, but haven&#8217;t tried them&nbsp;yet.</p>
 <p><strong>Installing Linux&nbsp;Guests</strong></p>
 <p>Installing a CentOS 6.2 x86_64 guest was relatively straightforward,
 and my usual kickstart infrastructure worked fine. The only catch was
@@ -171,29 +177,34 @@ hosts), or <code>vdx</code> by specifying&nbsp;&#8220;virtual=ovirt&#8221;.</p>
 <p>As installed, oVirt only has one user, &#8220;admin@internal&#8221;; it requires an
 external directory service for user authentication. Currently, it
 supports <span class="caps">IPA</span>, Red Hat&#8217;s Enterprise Identity Management tool (combines
-<span class="caps">RHEL</span>, oVirt Directory Server, Kerberos and <span class="caps">NTP</span>; perhaps <a href="http://freeipa.org">FreeIPA</a>
-would work as well?) and Microsoft Active Directory. As much as I&#8217;d like
-to give <span class="caps">IPA</span> or FreeIPA a try, my company already has an <span class="caps">AD</span>
-infrastructure, so I opted to go that route. Documentation is given in
-the <a href="http://www.ovirt.org/wiki/File:OVirt-3.0-Installation_Guide-en-US.pdf">oVirt 3.0 Installation Guide</a>, starting on page 96.
-Unfortunately, I was never about to get <span class="caps">AD</span> auth working correctly, so I
-just worked with the one admin&nbsp;user.</p>
+<span class="caps">RHEL</span>, oVirt Directory Server, Kerberos and <span class="caps">NTP</span>; perhaps
+<a href="http://freeipa.org">FreeIPA</a> would work as well?) and Microsoft Active
+Directory. As much as I&#8217;d like to give <span class="caps">IPA</span> or FreeIPA a try, my company
+already has an <span class="caps">AD</span> infrastructure, so I opted to go that route.
+Documentation is given in the <a href="http://www.ovirt.org/wiki/File:OVirt-3.0-Installation_Guide-en-US.pdf">oVirt 3.0 Installation
+Guide</a>,
+starting on page 96. Unfortunately, I was never about to get <span class="caps">AD</span> auth
+working correctly, so I just worked with the one admin&nbsp;user.</p>
 <p><strong>Adding a&nbsp;Node</strong></p>
 <p>The biggest issue I had was adding the second node to oVirt. I attempted
 to use the <span class="caps">DVD</span> Import feature of Cobbler on the <a href="http://www.ovirt.org/get-ovirt/">oVirt Node Image
-<span class="caps">ISO</span></a>, but that failed. I then found the image&#8217;s
-<code>LiveOS/livecd-iso-to-pxeboot</code> script and used that to make a kernerl
-and initrd, and kernel parameters, for Cobbler. <span class="caps">PXE</span> works&nbsp;fine.</p>
+<span class="caps">ISO</span></a>, but that failed. I then found the
+image&#8217;s <code>LiveOS/livecd-iso-to-pxeboot</code> script and used that to make a
+kernerl and initrd, and kernel parameters, for Cobbler. <span class="caps">PXE</span> works&nbsp;fine.</p>
 <p><a name="postscript"></a><strong>Postscript:</strong> I ended up blowing away my
 oVirt installation in favor of testing other things. At some point, the
 engine install got corrupted in a way that I just couldn&#8217;t fix; even
 though I spent all day one Saturday working on it, it took more time
 than I could allocate to a personal project. So this post is really
 semi-complete at best. However, there is some good news. Jason Brooks&#8217;
-original post, <a href="http://blog.jebpages.com/archives/how-to-get-up-and-running-with-ovirt/">How to Get Up and Running with oVirt</a>, was written for
-oVirt 3.0, as was this post. Since then, there has been a new release,
-<a href="http://wiki.ovirt.org/wiki/OVirt_3.1_release_notes">oVirt 3.1</a>, which apparently has a better <span class="caps">UI</span> and a better installer.
-Jason Brooks has a new post, <a href="http://blog.jebpages.com/archives/up-and-running-with-ovirt-3-1-edition/">Up and Running with oVirt, 3.1 Edition</a>,
+original post, <a href="http://blog.jebpages.com/archives/how-to-get-up-and-running-with-ovirt/">How to Get Up and Running with
+oVirt</a>,
+was written for oVirt 3.0, as was this post. Since then, there has been
+a new release, <a href="http://wiki.ovirt.org/wiki/OVirt_3.1_release_notes">oVirt
+3.1</a>, which
+apparently has a better <span class="caps">UI</span> and a better installer. Jason Brooks has a
+new post, <a href="http://blog.jebpages.com/archives/up-and-running-with-ovirt-3-1-edition/">Up and Running with oVirt, 3.1
+Edition</a>,
 which covers installation and configuration of both an all-in-one
 machine and a separate node. If you&#8217;re looking to try oVirt, I&#8217;d
 recommend you give that a shot. Unfortunately (and strangely, given that
@@ -232,8 +243,8 @@ still all based on&nbsp;Fedora.</p>
                             </a>
                         </li>
                         <li class="list-group-item tag-1">
-                            <a href="http://jantman.github.io/blog/tag/nagios.html">
-                                Nagios
+                            <a href="http://jantman.github.io/blog/tag/android.html">
+                                android
                             </a>
                         </li>
                         <li class="list-group-item tag-1">
@@ -242,8 +253,8 @@ still all based on&nbsp;Fedora.</p>
                             </a>
                         </li>
                         <li class="list-group-item tag-1">
-                            <a href="http://jantman.github.io/blog/tag/android.html">
-                                android
+                            <a href="http://jantman.github.io/blog/tag/nagios.html">
+                                Nagios
                             </a>
                         </li>
                         <li class="list-group-item tag-1">
@@ -252,68 +263,8 @@ still all based on&nbsp;Fedora.</p>
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/apache.html">
-                                apache
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/perl.html">
-                                perl
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/dns.html">
-                                dns
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/mediawiki.html">
-                                mediawiki
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/ems.html">
-                                EMS
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/rpm.html">
-                                rpm
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/monitoring.html">
-                                monitoring
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/puppet.html">
-                                puppet
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/droid.html">
-                                droid
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/blog.html">
-                                blog
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/sun.html">
-                                sun
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/mac.html">
-                                mac
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/security.html">
-                                security
+                            <a href="http://jantman.github.io/blog/tag/logging.html">
+                                logging
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
@@ -322,8 +273,38 @@ still all based on&nbsp;Fedora.</p>
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/apache.html">
+                                apache
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
                             <a href="http://jantman.github.io/blog/tag/firefox.html">
                                 firefox
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/blog.html">
+                                blog
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/perl.html">
+                                perl
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/monitoring.html">
+                                monitoring
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/microsoft.html">
+                                microsoft
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/dns.html">
+                                dns
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
@@ -332,18 +313,48 @@ still all based on&nbsp;Fedora.</p>
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/logging.html">
-                                logging
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
                             <a href="http://jantman.github.io/blog/tag/bind.html">
                                 bind
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/microsoft.html">
-                                microsoft
+                            <a href="http://jantman.github.io/blog/tag/sun.html">
+                                sun
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/mediawiki.html">
+                                mediawiki
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/rpm.html">
+                                rpm
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/droid.html">
+                                droid
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/puppet.html">
+                                puppet
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/ems.html">
+                                EMS
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/security.html">
+                                security
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/mac.html">
+                                mac
                             </a>
                         </li>
         </ul>

@@ -115,28 +115,34 @@
 	<a href="http://jantman.github.io/blog/tag/rvm.html">rvm</a>
 </footer><!-- /.post-info -->                    </div>
                 </div>
-                <p>I&#8217;ve been working on a personal project with <a href="http://logstash.net/">Logstash</a> lately, and it
-relies relatively heavily on <a href="https://github.com/jordansissel/grok">grok</a> filters for matching text and
-extracting matched parts. Today, I&#8217;ve been parsing syslog from
-<a href="http://puppetlabs.com/puppet/puppet-open-source/">Puppet</a> to extract various metrics and timings, which will then be
-passed on from Logstash to <a href="https://github.com/etsy/statsd">Etsy&#8217;s statsd</a> and then to <a href="http://graphite.wikidot.com/">graphite</a>
-for display. Unfortunately, a few of my patterns are showing the
-&#8220;_grokparsefailure&#8221; tag and I just can&#8217;t seem to find the&nbsp;problem.</p>
-<p>The logstash wiki provides a page on <a href="https://github.com/logstash/logstash/wiki/Testing-your-Grok-patterns-(--logstash-1.1.0-and-above-)">Testing your Grok patterns</a>, as
-does Sean Laurent on his blog: <a href="http://blog.bealetech.com/content/testing-logstash-grok-filters">Testing Logstash grok filters</a>.
+                <p>I&#8217;ve been working on a personal project with
+<a href="http://logstash.net/">Logstash</a> lately, and it relies relatively
+heavily on <a href="https://github.com/jordansissel/grok">grok</a> filters for
+matching text and extracting matched parts. Today, I&#8217;ve been parsing
+syslog from <a href="http://puppetlabs.com/puppet/puppet-open-source/">Puppet</a>
+to extract various metrics and timings, which will then be passed on
+from Logstash to <a href="https://github.com/etsy/statsd">Etsy&#8217;s statsd</a> and
+then to <a href="http://graphite.wikidot.com/">graphite</a> for display.
+Unfortunately, a few of my patterns are showing the &#8220;_grokparsefailure&#8221;
+tag and I just can&#8217;t seem to find the&nbsp;problem.</p>
+<p>The logstash wiki provides a page on <a href="https://github.com/logstash/logstash/wiki/Testing-your-Grok-patterns-(--logstash-1.1.0-and-above-)">Testing your Grok
+patterns</a>,
+as does Sean Laurent on his blog: <a href="http://blog.bealetech.com/content/testing-logstash-grok-filters">Testing Logstash grok
+filters</a>.
 Unfortunately, I work in a CentOS/<span class="caps">RHEL</span> shop, and we&#8217;re decidedly <em>not</em> a
 Ruby shop. Our Logstash install is using the monolithic/standalone Java
 <span class="caps">JAR</span>. We run Puppet, which is currently under ruby 1.8.7, and the
-<a href="http://rubygems.org/gems/jls-grok">jls-grok rubygem</a> requires ruby 1.9. There&#8217;s no way I&#8217;d feel safe
-installing 1.9 on any of our machines, as they all run (and require)
-Puppet. So, I found out about <a href="https://rvm.io/"><span class="caps">RVM</span></a>, the Ruby Version Manager, which
-allows you to run and switch between multiple ruby versions, and all of
-it is installed on a per-user basis. So, I created a new user on my
-Fedora 16 desktop called &#8220;rvmtest&#8221; and went about the process of setting
-up what&#8217;s needed to test grok patterns in the user&#8217;s local environment.
-I imagine this would work similarly under CentOS or <span class="caps">RHEL</span>, but the
-following is only tested on Fedora 16. If you have any issues, you
-should probably refer back to the <span class="caps">RVM</span>&nbsp;documentation.</p>
+<a href="http://rubygems.org/gems/jls-grok">jls-grok rubygem</a> requires ruby 1.9.
+There&#8217;s no way I&#8217;d feel safe installing 1.9 on any of our machines, as
+they all run (and require) Puppet. So, I found out about
+<a href="https://rvm.io/"><span class="caps">RVM</span></a>, the Ruby Version Manager, which allows you to
+run and switch between multiple ruby versions, and all of it is
+installed on a per-user basis. So, I created a new user on my Fedora 16
+desktop called &#8220;rvmtest&#8221; and went about the process of setting up what&#8217;s
+needed to test grok patterns in the user&#8217;s local environment. I imagine
+this would work similarly under CentOS or <span class="caps">RHEL</span>, but the following is
+only tested on Fedora 16. If you have any issues, you should probably
+refer back to the <span class="caps">RVM</span>&nbsp;documentation.</p>
 <ol>
 <li>Create the isolated user, just to be extra careful. Login as that&nbsp;user.</li>
 <li>As per <a href="https://rvm.io/rvm/install/">Installing <span class="caps">RVM</span></a>:
@@ -174,11 +180,13 @@ in tab-completion for the `rvm` command.
 patterns, I prefer something easier to move to production, more
 reliable, and more repeatable. The following quick little ruby script
 takes test to match against on <span class="caps">STDIN</span> (log files, messages, etc.) and
-prints the matches to <span class="caps">STDOUT</span>. The script is based on <a href="https://github.com/jordansissel/ruby-grok/blob/master/examples/test.rb">test.rb</a> from
-<a href="https://github.com/jordansissel/ruby-grok">jordansissel&#8217;s ruby-grok</a>. Note one important thing here, I couldn&#8217;t
-get the shebang (<code>#!</code>) to work with anything other than the explicit
-path to my <span class="caps">RVM</span> ruby install (<code>which ruby</code>) so you&#8217;ll need to manually
-update this&nbsp;yourself.</p>
+prints the matches to <span class="caps">STDOUT</span>. The script is based on
+<a href="https://github.com/jordansissel/ruby-grok/blob/master/examples/test.rb">test.rb</a>
+from <a href="https://github.com/jordansissel/ruby-grok">jordansissel&#8217;s
+ruby-grok</a>. Note one
+important thing here, I couldn&#8217;t get the shebang (<code>#!</code>) to work with
+anything other than the explicit path to my <span class="caps">RVM</span> ruby install
+(<code>which ruby</code>) so you&#8217;ll need to manually update this&nbsp;yourself.</p>
 <div class="codehilite"><pre><span class="c1">#!.rvm/rubies/ruby-1.9.2-320bin/ruby</span>
 
 <span class="nb">require</span> <span class="s1">&#39;rubygems&#39;</span>
@@ -280,8 +288,8 @@ MATCH:
                             </a>
                         </li>
                         <li class="list-group-item tag-1">
-                            <a href="http://jantman.github.io/blog/tag/nagios.html">
-                                Nagios
+                            <a href="http://jantman.github.io/blog/tag/android.html">
+                                android
                             </a>
                         </li>
                         <li class="list-group-item tag-1">
@@ -290,8 +298,8 @@ MATCH:
                             </a>
                         </li>
                         <li class="list-group-item tag-1">
-                            <a href="http://jantman.github.io/blog/tag/android.html">
-                                android
+                            <a href="http://jantman.github.io/blog/tag/nagios.html">
+                                Nagios
                             </a>
                         </li>
                         <li class="list-group-item tag-1">
@@ -300,68 +308,8 @@ MATCH:
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/apache.html">
-                                apache
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/perl.html">
-                                perl
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/dns.html">
-                                dns
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/mediawiki.html">
-                                mediawiki
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/ems.html">
-                                EMS
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/rpm.html">
-                                rpm
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/monitoring.html">
-                                monitoring
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/puppet.html">
-                                puppet
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/droid.html">
-                                droid
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/blog.html">
-                                blog
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/sun.html">
-                                sun
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/mac.html">
-                                mac
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/security.html">
-                                security
+                            <a href="http://jantman.github.io/blog/tag/logging.html">
+                                logging
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
@@ -370,8 +318,38 @@ MATCH:
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/apache.html">
+                                apache
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
                             <a href="http://jantman.github.io/blog/tag/firefox.html">
                                 firefox
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/blog.html">
+                                blog
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/perl.html">
+                                perl
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/monitoring.html">
+                                monitoring
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/microsoft.html">
+                                microsoft
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/dns.html">
+                                dns
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
@@ -380,18 +358,48 @@ MATCH:
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/logging.html">
-                                logging
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
                             <a href="http://jantman.github.io/blog/tag/bind.html">
                                 bind
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/microsoft.html">
-                                microsoft
+                            <a href="http://jantman.github.io/blog/tag/sun.html">
+                                sun
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/mediawiki.html">
+                                mediawiki
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/rpm.html">
+                                rpm
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/droid.html">
+                                droid
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/puppet.html">
+                                puppet
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/ems.html">
+                                EMS
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/security.html">
+                                security
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/mac.html">
+                                mac
                             </a>
                         </li>
         </ul>

@@ -115,24 +115,27 @@
 	<a href="http://jantman.github.io/blog/tag/viewvc.html">viewvc</a>
 </footer><!-- /.post-info -->                    </div>
                 </div>
-                <p>All of my public <a href="http://viewvc.jasonantman.com">subversion repositories</a> and <a href="http://cvs.jasonantman.com"><span class="caps">CVS</span> repositories</a>
-are available online through a great Python application called
-<a href="http://viewvc.org/">ViewVC</a>, which provides a web-based interface to <span class="caps">CVS</span> and <span class="caps">SVN</span>
-repositories, as well as history browsing, graphical diffs, etc. An
-amazingly large amount of the traffic to my web server is for the vhosts
-that serve this, so I decided that I should add some analytics to it.
-I&#8217;m in the process of trying out <a href="http://piwik.org">Piwik</a>, a full-featured,
-<span class="caps">GPL</span>-licensed, self-hosted alternative to <a href="http://www.google.com/analytics/">Google Analytics</a>. It gives
-lots of useful information like number of visits and unique visits per
-page, search engine keywords, referrers, average time on page, bounce
-rate (number of one-page visits),&nbsp;etc.</p>
-<p>I have ViewVC installed from the <a href="http://pkgs.repoforge.org/viewvc/">RPMforge packages</a>, so there&#8217;s one
-code base for both of my vhosts. This means that I can&#8217;t simply slap the
-tracking code at the bottom of the templates and call it a day. I opted
-to go for a nicer solution, and what follows is a patch (diff -u) to the
-current (1.1.13) version of ViewVC that adds a &#8220;piwik&#8221; section to
-viewvc.conf, and adds the piwik tracking code with the specified base
-<span class="caps">URL</span> and site <span class="caps">ID</span> into all ViewVC pages.&nbsp;Enjoy.</p>
+                <p>All of my public <a href="http://viewvc.jasonantman.com">subversion
+repositories</a> and <a href="http://cvs.jasonantman.com"><span class="caps">CVS</span>
+repositories</a> are available online through a
+great Python application called <a href="http://viewvc.org/">ViewVC</a>, which
+provides a web-based interface to <span class="caps">CVS</span> and <span class="caps">SVN</span> repositories, as well as
+history browsing, graphical diffs, etc. An amazingly large amount of the
+traffic to my web server is for the vhosts that serve this, so I decided
+that I should add some analytics to it. I&#8217;m in the process of trying out
+<a href="http://piwik.org">Piwik</a>, a full-featured, <span class="caps">GPL</span>-licensed, self-hosted
+alternative to <a href="http://www.google.com/analytics/">Google Analytics</a>. It
+gives lots of useful information like number of visits and unique visits
+per page, search engine keywords, referrers, average time on page,
+bounce rate (number of one-page visits),&nbsp;etc.</p>
+<p>I have ViewVC installed from the <a href="http://pkgs.repoforge.org/viewvc/">RPMforge
+packages</a>, so there&#8217;s one code base
+for both of my vhosts. This means that I can&#8217;t simply slap the tracking
+code at the bottom of the templates and call it a day. I opted to go for
+a nicer solution, and what follows is a patch (diff -u) to the current
+(1.1.13) version of ViewVC that adds a &#8220;piwik&#8221; section to viewvc.conf,
+and adds the piwik tracking code with the specified base <span class="caps">URL</span> and site <span class="caps">ID</span>
+into all ViewVC pages.&nbsp;Enjoy.</p>
 <div class="codehilite"><pre><span class="gh">diff -ru viewvc-<span class="caps">ORIG</span>/lib/config.py viewvc/lib/config.py</span>
 <span class="gd">--- viewvc-<span class="caps">ORIG</span>/lib/config.py   2012-01-25 08:31:52.000000000 -0500</span>
 <span class="gi">+++ viewvc/lib/config.py    2012-03-23 21:57:08.000000000 -0400</span>
@@ -258,8 +261,8 @@ Only in viewvc-<span class="caps">ORIG</span>/templates/include: header.ezt~
                             </a>
                         </li>
                         <li class="list-group-item tag-1">
-                            <a href="http://jantman.github.io/blog/tag/nagios.html">
-                                Nagios
+                            <a href="http://jantman.github.io/blog/tag/android.html">
+                                android
                             </a>
                         </li>
                         <li class="list-group-item tag-1">
@@ -268,8 +271,8 @@ Only in viewvc-<span class="caps">ORIG</span>/templates/include: header.ezt~
                             </a>
                         </li>
                         <li class="list-group-item tag-1">
-                            <a href="http://jantman.github.io/blog/tag/android.html">
-                                android
+                            <a href="http://jantman.github.io/blog/tag/nagios.html">
+                                Nagios
                             </a>
                         </li>
                         <li class="list-group-item tag-1">
@@ -278,68 +281,8 @@ Only in viewvc-<span class="caps">ORIG</span>/templates/include: header.ezt~
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/apache.html">
-                                apache
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/perl.html">
-                                perl
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/dns.html">
-                                dns
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/mediawiki.html">
-                                mediawiki
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/ems.html">
-                                EMS
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/rpm.html">
-                                rpm
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/monitoring.html">
-                                monitoring
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/puppet.html">
-                                puppet
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/droid.html">
-                                droid
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/blog.html">
-                                blog
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/sun.html">
-                                sun
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/mac.html">
-                                mac
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/security.html">
-                                security
+                            <a href="http://jantman.github.io/blog/tag/logging.html">
+                                logging
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
@@ -348,8 +291,38 @@ Only in viewvc-<span class="caps">ORIG</span>/templates/include: header.ezt~
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/apache.html">
+                                apache
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
                             <a href="http://jantman.github.io/blog/tag/firefox.html">
                                 firefox
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/blog.html">
+                                blog
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/perl.html">
+                                perl
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/monitoring.html">
+                                monitoring
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/microsoft.html">
+                                microsoft
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/dns.html">
+                                dns
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
@@ -358,18 +331,48 @@ Only in viewvc-<span class="caps">ORIG</span>/templates/include: header.ezt~
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/logging.html">
-                                logging
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
                             <a href="http://jantman.github.io/blog/tag/bind.html">
                                 bind
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/microsoft.html">
-                                microsoft
+                            <a href="http://jantman.github.io/blog/tag/sun.html">
+                                sun
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/mediawiki.html">
+                                mediawiki
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/rpm.html">
+                                rpm
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/droid.html">
+                                droid
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/puppet.html">
+                                puppet
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/ems.html">
+                                EMS
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/security.html">
+                                security
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/mac.html">
+                                mac
                             </a>
                         </li>
         </ul>

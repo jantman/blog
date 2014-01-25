@@ -111,18 +111,20 @@
 and partly configured, albeit without email alerts yet. I&#8217;ve found some
 serious features that I need missing, but I&#8217;m going to give it a full
 run before I move on to&nbsp;another.</p>
-<p>The full text, updated a few times a day, is available on <a href="http://www.jasonantman.com/wiki/index.php/Network_Monitoring_Comparison">my wiki</a>.
+<p>The full text, updated a few times a day, is available on <a href="http://www.jasonantman.com/wiki/index.php/Network_Monitoring_Comparison">my
+wiki</a>.
 Here&#8217;s a bit of an excerpt:<br />
 <a name="Part_I_-_Installation"></a>  </p>
-<h3 id="wzxhzdk3part-i-installationwzxhzdk4"><span class="mw-headline">Part I -&nbsp;Installation</span></h3>
+<h3 id="wzxhzdk2part-i-installationwzxhzdk3"><span class="mw-headline">Part I -&nbsp;Installation</span></h3>
 <ol>
 <li>setup Xen virtual machine running OpenSuSE 10.3 base packages. (3
     hours, some server problems, some Xen problems, and some time
     learning Xen administration from the&nbsp;<span class="caps">CLI</span>)</li>
 <li>Download <code>hyperic-hq-installer-3.2.0-607-x86-linux.tgz</code> from
-    <a href="http://www.hyperic.com/downloads/dl-hq-oss.html" title="http://www.hyperic.com/downloads/dl-hq-oss.html">Hyperic</a> and&nbsp;extract.</li>
+    <a href="http://www.hyperic.com/downloads/dl-hq-oss.html" title="http://www.hyperic.com/downloads/dl-hq-oss.html">Hyperic</a>
+    and&nbsp;extract.</li>
 <li>Browse to
-    <a href="">http://support.hyperic.com/confluence/display/<span class="caps">DOC</span>/Full+Installation+Guide</a></li>
+    <a href="http://support.hyperic.com/confluence/display/DOC/Full+Installation+Guide" title="http://support.hyperic.com/confluence/display/DOC/Full+Installation+Guide">http://support.hyperic.com/confluence/display/<span class="caps">DOC</span>/Full+Installation+Guide</a></li>
 <li>
 <p><code>cd</code> into <code>hyperic-hq-installer</code> and run <code>./setup.sh -full</code></p>
 <ol>
@@ -153,7 +155,7 @@ Here&#8217;s a bit of an excerpt:<br />
     this method, but I guess it works. Login and do&nbsp;it.</li>
 <li>How will it start the builtin database? As my user???? Yup.
     postgres is running as my user. Wonderful. Nothing in the
-    <a href="">install
+    <a href="http://support.hyperic.com/confluence/display/DOC/Full+Installation+Guide" title="http://support.hyperic.com/confluence/display/DOC/Full+Installation+Guide">install
     document</a>
     mentioned user creation. Was this just assumed? Because in the
     naive world I live in, most installer scripts (think Nagios)
@@ -165,11 +167,13 @@ Here&#8217;s a bit of an excerpt:<br />
 <p>Run <code>/home/hyperic/server-3.2.0/bin/hq-server.sh start</code>&#8230; as my
     user. <em>Note to self:</em> setup a user for Postgres and Hyperic. Believe
     it or not, but it booted - but followed with the message, &#8220;Login to
-    <span class="caps">HQ</span> at: <a href="http://127.0.0.1:7080/" title="http://127.0.0.1:7080/">http://127.0.0.1:7080/</a>&#8221;</p>
+    <span class="caps">HQ</span> at:
+    <a href="http://127.0.0.1:7080/" title="http://127.0.0.1:7080/">http://127.0.0.1:7080/</a>&#8221;</p>
 </li>
-<li>Browsed to <a href="http://devel-hyperic1:7080/" title="http://devel-hyperic1:7080">http://devel-hyperic1:7080</a> and was greeted by a
-    startup page, saying that the server was 18% finished booting. My, I
-    yearn for little C binaries and a <span class="caps">PHP</span>&nbsp;frontend.</li>
+<li>Browsed to
+    <a href="http://devel-hyperic1:7080/" title="http://devel-hyperic1:7080">http://devel-hyperic1:7080</a>
+    and was greeted by a startup page, saying that the server was 18%
+    finished booting. My, I yearn for little C binaries and a <span class="caps">PHP</span>&nbsp;frontend.</li>
 <li>Page turns blank and stops there. I refresh, and get a login page. I
     enter my username and password, and get a little message box where
     the &#8220;invalid password&#8221; box usually is - says &#8220;Server is still
@@ -202,27 +206,32 @@ Here&#8217;s a bit of an excerpt:<br />
     time to give Part I a rest. But&nbsp;first&#8230;</li>
 <li>Go to the &#8220;Platform&#8221; page for my one machine and&#8230; <span class="caps">YES</span>! Graphs are
     starting to&nbsp;appear!</li>
-<li>Following the suggestion <a href="http://support.hyperic.com/confluence/display/DOC/HQ+Quick+Start#HQQuickStart-enableTracking" title="http://support.hyperic.com/confluence/display/DOC/HQ+Quick+Start#HQQuickStart-enableTracking">here</a>, I enable log and config tracking
-    on the platform for <code>/var/log/warn</code> and <code>/etc/hosts</code>,&nbsp;respecitvely.</li>
+<li>Following the suggestion
+    <a href="http://support.hyperic.com/confluence/display/DOC/HQ+Quick+Start#HQQuickStart-enableTracking" title="http://support.hyperic.com/confluence/display/DOC/HQ+Quick+Start#HQQuickStart-enableTracking">here</a>,
+    I enable log and config tracking on the platform for <code>/var/log/warn</code>
+    and <code>/etc/hosts</code>,&nbsp;respecitvely.</li>
 <li>Before I call it a night (now 03:42), I stop back at the <a href="http://www.hyperic.com/downloads/dl-hq-oss.html" title="http://www.hyperic.com/downloads/dl-hq-oss.html">downloads
-    page</a> and grab the Linux x86 Agent for the dom0 machine,
-    hoping to get some physical information as well. While I&#8217;m at it, I
-    grab the Linux <span class="caps">AMD64</span> Agent to try on my laptop. I create &#8220;hyperic&#8221;
-    users on each system. On the base Xen server, I give it a shot and
-    get &#8220;Unable to register agent: Error communicating with agent:
-    Unauthorized&#8221;. Same thing on the&nbsp;laptop.</li>
-<li>Did a little reading <a href="http://support.hyperic.com/confluence/display/DOC/Installation+Non-Windows#InstallationNon-Windows-install" title="http://support.hyperic.com/confluence/display/DOC/Installation+Non-Windows#InstallationNon-Windows-install">here</a>. As to keeping all of the defaults,
-    it turns out that both clients had firewalls blocking <span class="caps">TCP</span> port 2144.
-    I opened it up on both, and also set the <span class="caps">IP</span> address (that the server
-    uses to contact the client) to the correct ones. Viola! Now I have 3
-    clients connected, and gatheirng data for the next \~16 hours until
-    I have time to check it out&nbsp;agian.</li>
+    page</a>
+    and grab the Linux x86 Agent for the dom0 machine, hoping to get
+    some physical information as well. While I&#8217;m at it, I grab the Linux
+    <span class="caps">AMD64</span> Agent to try on my laptop. I create &#8220;hyperic&#8221; users on each
+    system. On the base Xen server, I give it a shot and get &#8220;Unable to
+    register agent: Error communicating with agent: Unauthorized&#8221;. Same
+    thing on the&nbsp;laptop.</li>
+<li>Did a little reading
+    <a href="http://support.hyperic.com/confluence/display/DOC/Installation+Non-Windows#InstallationNon-Windows-install" title="http://support.hyperic.com/confluence/display/DOC/Installation+Non-Windows#InstallationNon-Windows-install">here</a>.
+    As to keeping all of the defaults, it turns out that both clients
+    had firewalls blocking <span class="caps">TCP</span> port 2144. I opened it up on both, and
+    also set the <span class="caps">IP</span> address (that the server uses to contact the client)
+    to the correct ones. Viola! Now I have 3 clients connected, and
+    gatheirng data for the next \~16 hours until I have time to check it
+    out&nbsp;agian.</li>
 </ol>
 <p>More to come in Part <span class="caps">II</span> tomorrow - actually doing something with
 Hyperic. For<br />
 now (04:08), time to&nbsp;sleep.</p>
 <p><a name="Part_II_-_Configuration"></a>  </p>
-<h3 id="wzxhzdk7part-ii-configurationwzxhzdk8"><span class="mw-headline">Part <span class="caps">II</span> -&nbsp;Configuration</span></h3>
+<h3 id="wzxhzdk6part-ii-configurationwzxhzdk7"><span class="mw-headline">Part <span class="caps">II</span> -&nbsp;Configuration</span></h3>
 <p>Unfortunately, I haven&#8217;t had much time to play with Hyperic in the two
 days<br />
 since installation. The most I&#8217;ve really done is setup Agents on my
@@ -252,7 +261,7 @@ see metrics - Availability, <span class="caps">IP</span> Forwards, <span class="
 Received per<br />
 Second. While it&#8217;s quite basic, that&#8217;s good for a starting point. While
 the<br />
-[<a href="">http://support.hyperic.com/confluence/display/<span class="caps">DOCSHQ30</span>/Network+Device+platform</a><br />
+[<a href="http://support.hyperic.com/confluence/display/DOCSHQ30/Network+Device+platform" title="http://support.hyperic.com/confluence/display/DOCSHQ30/Network+Device+platform">http://support.hyperic.com/confluence/display/<span class="caps">DOCSHQ30</span>/Network+Device+platform</a><br />
 Network Device Platform] documentation lists lots of metrics that can
 be<br />
 enabled, I&#8217;d also like telnet availability and - my big one since I use
@@ -326,14 +335,11 @@ metric, threshold, and time-based criteria, and a second for who to
 alert. This means that to add alerts for a machine, you need to view the
 platform page as well as the services and servers pages, and each metric&nbsp;therein.</p>
 <p>I&#8217;ll be posting some more in the days to come. From a <a href="http://forums.hyperic.com/jiveforums/thread.jspa?messageID=14561&amp;#14561">post at the
-Hyperic Forums</a>, I was able to find out that a Xen plugin is in the
-works, but for the Open Source version, the only way to trigger a script
-is to send an email and have it handled by a filter such as&nbsp;Procmail.</p>
-<div class="codehilite"><pre>http://support.hyperic.com/confluence/display/DOC/Full+Installation+Guide
-&quot;http://support.hyperic.com/confluence/display/DOC/Full+Installation+Guide&quot;
-http://support.hyperic.com/confluence/display/DOCSHQ30/Network+Device+platform
-&quot;http://support.hyperic.com/confluence/display/DOCSHQ30/Network+Device+platform&quot;
-</pre></div>
+Hyperic
+Forums</a>,
+I was able to find out that a Xen plugin is in the works, but for the
+Open Source version, the only way to trigger a script is to send an
+email and have it handled by a filter such as&nbsp;Procmail.</p>
             </div>
             <!-- /.entry-content -->
         </article>
@@ -367,8 +373,8 @@ http://support.hyperic.com/confluence/display/DOCSHQ30/Network+Device+platform
                             </a>
                         </li>
                         <li class="list-group-item tag-1">
-                            <a href="http://jantman.github.io/blog/tag/nagios.html">
-                                Nagios
+                            <a href="http://jantman.github.io/blog/tag/android.html">
+                                android
                             </a>
                         </li>
                         <li class="list-group-item tag-1">
@@ -377,8 +383,8 @@ http://support.hyperic.com/confluence/display/DOCSHQ30/Network+Device+platform
                             </a>
                         </li>
                         <li class="list-group-item tag-1">
-                            <a href="http://jantman.github.io/blog/tag/android.html">
-                                android
+                            <a href="http://jantman.github.io/blog/tag/nagios.html">
+                                Nagios
                             </a>
                         </li>
                         <li class="list-group-item tag-1">
@@ -387,68 +393,8 @@ http://support.hyperic.com/confluence/display/DOCSHQ30/Network+Device+platform
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/apache.html">
-                                apache
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/perl.html">
-                                perl
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/dns.html">
-                                dns
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/mediawiki.html">
-                                mediawiki
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/ems.html">
-                                EMS
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/rpm.html">
-                                rpm
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/monitoring.html">
-                                monitoring
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/puppet.html">
-                                puppet
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/droid.html">
-                                droid
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/blog.html">
-                                blog
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/sun.html">
-                                sun
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/mac.html">
-                                mac
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/security.html">
-                                security
+                            <a href="http://jantman.github.io/blog/tag/logging.html">
+                                logging
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
@@ -457,8 +403,38 @@ http://support.hyperic.com/confluence/display/DOCSHQ30/Network+Device+platform
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/apache.html">
+                                apache
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
                             <a href="http://jantman.github.io/blog/tag/firefox.html">
                                 firefox
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/blog.html">
+                                blog
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/perl.html">
+                                perl
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/monitoring.html">
+                                monitoring
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/microsoft.html">
+                                microsoft
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/dns.html">
+                                dns
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
@@ -467,18 +443,48 @@ http://support.hyperic.com/confluence/display/DOCSHQ30/Network+Device+platform
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/logging.html">
-                                logging
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
                             <a href="http://jantman.github.io/blog/tag/bind.html">
                                 bind
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/microsoft.html">
-                                microsoft
+                            <a href="http://jantman.github.io/blog/tag/sun.html">
+                                sun
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/mediawiki.html">
+                                mediawiki
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/rpm.html">
+                                rpm
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/droid.html">
+                                droid
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/puppet.html">
+                                puppet
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/ems.html">
+                                EMS
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/security.html">
+                                security
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/mac.html">
+                                mac
                             </a>
                         </li>
         </ul>

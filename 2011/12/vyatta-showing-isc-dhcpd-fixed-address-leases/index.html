@@ -107,18 +107,20 @@
 	<a href="http://jantman.github.io/blog/tag/vyatta.html">vyatta</a>
 </footer><!-- /.post-info -->                    </div>
                 </div>
-                <p><span class="caps">ISC</span> <a href="http://www.isc.org/software/dhcp">dhcpd</a> has the ability to always give a specific <span class="caps">MAC</span> address the
-same <span class="caps">IP</span> address &#8220;lease&#8221; using the fixed-address configuration option.
-This is configured in <a href="http://www.vyatta.org">Vyatta</a> using the <code>static-mapping</code>
-configuration statement. Unfortunately, since dhcpd doesn&#8217;t store
-fixed-address leases in the <code>dhcpd.leases</code> file, the Vyatta
-<code>show dhcp leases</code> command doesn&#8217;t show anything about them - which
-makes it difficult to debug anything dhcp-related if all of the hosts on
-your network are setup for fixed addresses. I found a mention of this on
-the <a href="http://www.vyatta.org/forum/viewtopic.php?p=121558">vyatta forum</a>, and also an <a href="https://bugzilla.vyatta.com/show_bug.cgi?id=1990">open bug (1990)</a> to fix it, but no
-proposed resolution. Since I came across this problem and happen to know
-a bit about <span class="caps">ISC</span> dhcpd, I developed both a workaround for users
-(including a perl script) and a possible solution for the Vyatta
+                <p><span class="caps">ISC</span> <a href="http://www.isc.org/software/dhcp">dhcpd</a> has the ability to always
+give a specific <span class="caps">MAC</span> address the same <span class="caps">IP</span> address &#8220;lease&#8221; using the
+fixed-address configuration option. This is configured in
+<a href="http://www.vyatta.org">Vyatta</a> using the <code>static-mapping</code> configuration
+statement. Unfortunately, since dhcpd doesn&#8217;t store fixed-address leases
+in the <code>dhcpd.leases</code> file, the Vyatta <code>show dhcp leases</code> command
+doesn&#8217;t show anything about them - which makes it difficult to debug
+anything dhcp-related if all of the hosts on your network are setup for
+fixed addresses. I found a mention of this on the <a href="http://www.vyatta.org/forum/viewtopic.php?p=121558">vyatta
+forum</a>, and also an
+<a href="https://bugzilla.vyatta.com/show_bug.cgi?id=1990">open bug (1990)</a> to
+fix it, but no proposed resolution. Since I came across this problem and
+happen to know a bit about <span class="caps">ISC</span> dhcpd, I developed both a workaround for
+users (including a perl script) and a possible solution for the Vyatta
 developers to&nbsp;implement.</p>
 <p><strong>Workaround for&nbsp;Users:</strong></p>
 <p>There&#8217;s no way to get dhcpd to store fixed-address hosts in the
@@ -126,10 +128,11 @@ dhcpd.leases file (though it&#8217;s been discussed on the dhcpd-users mailing
 list a few times). There is, however, a way to get dhcpd to log every
 time it sends an <span class="caps">ACK</span> to a client. The following Vyatta configuration
 commands will get dhcpd to log all transactions to syslog, will have
-<a href="http://rsyslog.com/">rsyslog</a> put that in <code>/var/log/user/dhcpd</code>. Since this log can fill
-up very quickly on a busy server, the latter two commands will tell
-<a href="https://fedorahosted.org/logrotate/">logrotate</a> to rotate the log file when it reaches 3000k in size, and
-keep 5 copies (feel free to adjust to your&nbsp;needs):</p>
+<a href="http://rsyslog.com/">rsyslog</a> put that in <code>/var/log/user/dhcpd</code>. Since
+this log can fill up very quickly on a busy server, the latter two
+commands will tell <a href="https://fedorahosted.org/logrotate/">logrotate</a> to
+rotate the log file when it reaches 3000k in size, and keep 5 copies
+(feel free to adjust to your&nbsp;needs):</p>
 <div class="codehilite"><pre>set service dhcp-server global-parameters &quot;log-facility local2;&quot;
 set system syslog file dhcpd facility local2 level debug
 set system syslog file dhcpd archive files 5
@@ -140,9 +143,10 @@ set system syslog file dhcpd archive size 3000
 <p>Once this is done, you can <code>tail -f /var/log/user/dhcpd</code> to watch <span class="caps">DHCP</span>
 discover/request/offer/ack in realtime, or grep through the log file for
 a specific <span class="caps">IP</span> or <span class="caps">MAC</span>. If you want an easier method, I&#8217;ve written a perl
-script (latest version will always live in <a href="http://svn.jasonantman.com/misc-scripts/show_dhcp_fixed_ACKs.pl">my subversion repo</a>) to
-grep through <code>/var/log/user/dhcpd</code> and show the most recent <span class="caps">DHCPACK</span> for
-each <span class="caps">IP</span> address, sorted by <span class="caps">IP</span>. Here&#8217;s the code of the simple script,
+script (latest version will always live in <a href="http://svn.jasonantman.com/misc-scripts/show_dhcp_fixed_ACKs.pl">my subversion
+repo</a>)
+to grep through <code>/var/log/user/dhcpd</code> and show the most recent <span class="caps">DHCPACK</span>
+for each <span class="caps">IP</span> address, sorted by <span class="caps">IP</span>. Here&#8217;s the code of the simple script,
 which is more than half comments. To use it, after performing the above
 steps, all you need to do is login to your Vyatta box,
 <code>wget http://svn.jasonantman.com/misc-scripts/show_dhcp_fixed_ACKs.pl</code>
@@ -217,15 +221,16 @@ and then <code>perl show_dhcp_fixed_ACKs.pl</code>.</p>
 
 
 <p><strong>A solution for&nbsp;Vyatta:</strong></p>
-<p>I suggested this to Vyatta in a reply to <a href="https://bugzilla.vyatta.com/show_bug.cgi?id=1990">bug 1990</a>.
-Since they already use <a href="http://rsyslog.com/">rsyslog</a> which has very powerful processing
-capabilities, it would be easy to have rsyslog parse the <span class="caps">DHCPACK</span>
-messages in real time and update some data store (flat files or a simple
-database) with the information. While how to store this would be up to
-the Vyatta guys, I have some rsyslog configuration to parse <span class="caps">DHCPACK</span>
-messages and update a MySQL database (with two tables; one for most
-recent <span class="caps">ACK</span> per <span class="caps">IP</span> address and one for most recent <span class="caps">ACK</span> per <span class="caps">MAC</span> address)
-that might be of some&nbsp;use:</p>
+<p>I suggested this to Vyatta in a reply to <a href="https://bugzilla.vyatta.com/show_bug.cgi?id=1990">bug
+1990</a>. Since they
+already use <a href="http://rsyslog.com/">rsyslog</a> which has very powerful
+processing capabilities, it would be easy to have rsyslog parse the
+<span class="caps">DHCPACK</span> messages in real time and update some data store (flat files or
+a simple database) with the information. While how to store this would
+be up to the Vyatta guys, I have some rsyslog configuration to parse
+<span class="caps">DHCPACK</span> messages and update a MySQL database (with two tables; one for
+most recent <span class="caps">ACK</span> per <span class="caps">IP</span> address and one for most recent <span class="caps">ACK</span> per <span class="caps">MAC</span>
+address) that might be of some&nbsp;use:</p>
 <div class="codehilite"><pre>$template DHCPACKonIP, &quot;INSERT INTO dhcplog_ip   
        SET   
        server_ip=inet_aton(&#39;%fromhost-ip%&#39;),   
@@ -336,8 +341,8 @@ then :ommysql:hostname,database,dbuser,dbpass;DHCPACKtoMAC
                             </a>
                         </li>
                         <li class="list-group-item tag-1">
-                            <a href="http://jantman.github.io/blog/tag/nagios.html">
-                                Nagios
+                            <a href="http://jantman.github.io/blog/tag/android.html">
+                                android
                             </a>
                         </li>
                         <li class="list-group-item tag-1">
@@ -346,8 +351,8 @@ then :ommysql:hostname,database,dbuser,dbpass;DHCPACKtoMAC
                             </a>
                         </li>
                         <li class="list-group-item tag-1">
-                            <a href="http://jantman.github.io/blog/tag/android.html">
-                                android
+                            <a href="http://jantman.github.io/blog/tag/nagios.html">
+                                Nagios
                             </a>
                         </li>
                         <li class="list-group-item tag-1">
@@ -356,68 +361,8 @@ then :ommysql:hostname,database,dbuser,dbpass;DHCPACKtoMAC
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/apache.html">
-                                apache
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/perl.html">
-                                perl
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/dns.html">
-                                dns
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/mediawiki.html">
-                                mediawiki
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/ems.html">
-                                EMS
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/rpm.html">
-                                rpm
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/monitoring.html">
-                                monitoring
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/puppet.html">
-                                puppet
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/droid.html">
-                                droid
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/blog.html">
-                                blog
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/sun.html">
-                                sun
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/mac.html">
-                                mac
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/security.html">
-                                security
+                            <a href="http://jantman.github.io/blog/tag/logging.html">
+                                logging
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
@@ -426,8 +371,38 @@ then :ommysql:hostname,database,dbuser,dbpass;DHCPACKtoMAC
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/apache.html">
+                                apache
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
                             <a href="http://jantman.github.io/blog/tag/firefox.html">
                                 firefox
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/blog.html">
+                                blog
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/perl.html">
+                                perl
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/monitoring.html">
+                                monitoring
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/microsoft.html">
+                                microsoft
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/dns.html">
+                                dns
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
@@ -436,18 +411,48 @@ then :ommysql:hostname,database,dbuser,dbpass;DHCPACKtoMAC
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/logging.html">
-                                logging
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
                             <a href="http://jantman.github.io/blog/tag/bind.html">
                                 bind
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/microsoft.html">
-                                microsoft
+                            <a href="http://jantman.github.io/blog/tag/sun.html">
+                                sun
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/mediawiki.html">
+                                mediawiki
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/rpm.html">
+                                rpm
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/droid.html">
+                                droid
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/puppet.html">
+                                puppet
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/ems.html">
+                                EMS
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/security.html">
+                                security
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/mac.html">
+                                mac
                             </a>
                         </li>
         </ul>

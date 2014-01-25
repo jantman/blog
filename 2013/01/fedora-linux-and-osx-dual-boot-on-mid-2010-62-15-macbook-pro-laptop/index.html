@@ -122,11 +122,15 @@
 </footer><!-- /.post-info -->                    </div>
                 </div>
                 <p>As part of the transition from a contractor to a full-time employee of
-<a href="http://www.cmgdigital.com">Cox Media Group Digital <span class="amp">&amp;</span> Strategy</a> (check out our <a href="https://github.com/cmgdigital">github</a>), I&#8217;ve
-been issued a <a href="http://support.apple.com/kb/SP582">Mid-2010 (6,2)</a> 15&#8221; <a href="http://en.wikipedia.org/wiki/Macbook_pro#Technical_specifications_2">MacBook Pro</a> laptop, to replace
-my current <a href="http://support.apple.com/kb/SP11">Early-2008 (3,1)</a> MacPro desktop. The desktop is currently
-running <a href="http://fedoraproject.org/">Fedora</a> 17, dual-boot with with Mac <span class="caps">OS</span> X (left in place for
-firmware updates and emergencies) using the <a href="http://www.rodsbooks.com/refind/index.html">rEFInd boot manager</a> to
+<a href="http://www.cmgdigital.com">Cox Media Group Digital <span class="amp">&amp;</span> Strategy</a> (check
+out our <a href="https://github.com/cmgdigital">github</a>), I&#8217;ve been issued a
+<a href="http://support.apple.com/kb/SP582">Mid-2010 (6,2)</a> 15&#8221; <a href="http://en.wikipedia.org/wiki/Macbook_pro#Technical_specifications_2">MacBook
+Pro</a>
+laptop, to replace my current <a href="http://support.apple.com/kb/SP11">Early-2008
+(3,1)</a> MacPro desktop. The desktop is
+currently running <a href="http://fedoraproject.org/">Fedora</a> 17, dual-boot with
+with Mac <span class="caps">OS</span> X (left in place for firmware updates and emergencies) using
+the <a href="http://www.rodsbooks.com/refind/index.html">rEFInd boot manager</a> to
 choose between the two OSes. It took me two days to get this working
 right on my desktop, but it had been my plan to duplicate this setup on
 my laptop. I found a lot of conflicting information online, but I
@@ -145,30 +149,35 @@ Fedora), and had some assumptions about the installation process based
 on earlier&nbsp;versions.</p>
 <p><strong>How to get it&nbsp;working:</strong></p>
 <p>Forget about rEFInd. This had been the original advice from <a href="http://mjg59.dreamwidth.org/">Matthew
-Garrett</a>, <a href="https://twitter.com/mjg59">@mjg59</a>, kernel coder, contributor to the Anaconda
-project, and all-around authority on booting Linux on <span class="caps">EFI</span>/<span class="caps">UEFI</span> hardware.
-My advice, and the method that worked for&nbsp;me:</p>
+Garrett</a>,
+<a href="https://twitter.com/mjg59">@mjg59</a>, kernel coder, contributor to the
+Anaconda project, and all-around authority on booting Linux on <span class="caps">EFI</span>/<span class="caps">UEFI</span>
+hardware. My advice, and the method that worked for&nbsp;me:</p>
 <ol>
 <li>Shrink your Mac partitions and leave as much free space as you want
     for Fedora. using the Disk Utility tool in <span class="caps">OS</span> X (I also created an
     <span class="caps">8GB</span> <span class="caps">VFAT</span> partition that both OSes can read/write&nbsp;to).</li>
-<li><a href="http://fedoraproject.org/en/get-fedora">Download Fedora 18</a> 64-bit <span class="caps">DVD</span> image, I chose the <span class="caps">KDE</span> version.
-    Verify the sha256 sum if you want (they don&#8217;t have a readily visible
-    link to the checksum file. Copy the download link, paste it into
-    your address bar and remove the filename. You should get a directory
-    index that includes a <code>-CHECKSUM</code> file.</li>
-<li>Per the Installation Guide&#8217;s <a href="http://docs.fedoraproject.org/en-US/Fedora/18/html/Installation_Guide/Making_USB_Media-UNIX_Linux.html">Making Fedora <span class="caps">USB</span> Media page</a>, use
-    <code>liveusb-creator</code> to setup the installation image on the <span class="caps">USB</span> flash
-    drive (I needed to start it with the <code>--reset-mbr</code> option). You can
-    also use other tools (dd if you&#8217;re not on a Fedora-based distro), or
-    a <span class="caps">DVD</span>, but this is the method I&nbsp;chose.</li>
-<li>Due to a <a href="https://fedorahosted.org/liveusb-creator/ticket/810">bug in liveusb-creator</a>, you may need to manually edit
-    <code>/EFI/boot/grub.cfg</code> on the created <span class="caps">USB</span> stick if grub gives you a
-    file not found error. If that happens, please see my bug report
-    above for the action to take (in short, you need to mount the <span class="caps">USB</span>
-    stick, <code>chmod u+w /EFI/boot/grub.cfg</code> then edit that file and
-    replace every occurrence of &#8220;isolinux&#8221; with &#8220;syslinux&#8221; and every
-    occurrence of &#8220;root=live:<span class="caps">LABEL</span>=Fedora-18-x86_64-Live-<span class="caps">KDE</span>.iso&#8221; with&nbsp;&#8220;root=live:<span class="caps">LABEL</span>=<span class="caps">LIVE</span>&#8221;).</li>
+<li><a href="http://fedoraproject.org/en/get-fedora">Download Fedora 18</a> 64-bit
+    <span class="caps">DVD</span> image, I chose the <span class="caps">KDE</span> version. Verify the sha256 sum if you
+    want (they don&#8217;t have a readily visible link to the checksum file.
+    Copy the download link, paste it into your address bar and remove
+    the filename. You should get a directory index that includes a
+    <code>-CHECKSUM</code> file.</li>
+<li>Per the Installation Guide&#8217;s <a href="http://docs.fedoraproject.org/en-US/Fedora/18/html/Installation_Guide/Making_USB_Media-UNIX_Linux.html">Making Fedora <span class="caps">USB</span> Media
+    page</a>,
+    use <code>liveusb-creator</code> to setup the installation image on the <span class="caps">USB</span>
+    flash drive (I needed to start it with the <code>--reset-mbr</code> option).
+    You can also use other tools (dd if you&#8217;re not on a Fedora-based
+    distro), or a <span class="caps">DVD</span>, but this is the method I&nbsp;chose.</li>
+<li>Due to a <a href="https://fedorahosted.org/liveusb-creator/ticket/810">bug in
+    liveusb-creator</a>,
+    you may need to manually edit <code>/EFI/boot/grub.cfg</code> on the created
+    <span class="caps">USB</span> stick if grub gives you a file not found error. If that happens,
+    please see my bug report above for the action to take (in short, you
+    need to mount the <span class="caps">USB</span> stick, <code>chmod u+w /EFI/boot/grub.cfg</code> then
+    edit that file and replace every occurrence of &#8220;isolinux&#8221; with
+    &#8220;syslinux&#8221; and every occurrence of
+    &#8220;root=live:<span class="caps">LABEL</span>=Fedora-18-x86_64-Live-<span class="caps">KDE</span>.iso&#8221; with&nbsp;&#8220;root=live:<span class="caps">LABEL</span>=<span class="caps">LIVE</span>&#8221;).</li>
 <li>Boot the <span class="caps">USB</span> drive (use the alt key when you turn on the laptop to
     select the <span class="caps">USB</span> drive) and just install Fedora normally, letting it
     do its thing. Select a boot disk and let it put <span class="caps">GRUB2</span> on the <span class="caps">EFI</span>&nbsp;partition.</li>
@@ -252,10 +261,12 @@ to quickly and accurately layout a more complex partitioning&nbsp;scheme.</p>
 <p>Below are some screenshots from the Fedora 17 and Fedora 18 Installation
 Guides, which contrast both the overview of all partitions and the
 individual partition&nbsp;settings:</p>
-<p>Fedora 18 Overview, from <a href="http://docs.fedoraproject.org/en-US/Fedora/18/html/Installation_Guide/s1-diskpartitioning-x86.html">9.13. Creating a Custom Partition Layout</a>:  </p>
+<p>Fedora 18 Overview, from <a href="http://docs.fedoraproject.org/en-US/Fedora/18/html/Installation_Guide/s1-diskpartitioning-x86.html">9.13. Creating a Custom Partition
+Layout</a>:  </p>
 <p><img alt="image" src="http://www.dedoimedo.com/images/computers_years/2013_1/fedora-18-installer-configure-partitions.jpg" />  </p>
 <p>Fedora 17 Overview, from <a href="http://docs.fedoraproject.org/en-US/Fedora/17/html/Installation_Guide/s1-diskpartitioning-x86.html">9.14. Creating a Custom Layout or Modifying
-the Default Layout</a>:  </p>
+the Default
+Layout</a>:  </p>
 <p><img alt="image" src="http://docs.fedoraproject.org/en-US/Fedora/17/html/Installation_Guide/images/diskpartitioning/ddmain.png" />  </p>
 <p>Fedora 18 Partition Creation/Editing, from <a href="http://docs.fedoraproject.org/en-US/Fedora/18/html/Installation_Guide/Create_LVM-x86.html">9.13.3. Create <span class="caps">LVM</span> Logical
 Volume</a>:  </p>
@@ -296,8 +307,8 @@ Partitions</a>:  </p>
                             </a>
                         </li>
                         <li class="list-group-item tag-1">
-                            <a href="http://jantman.github.io/blog/tag/nagios.html">
-                                Nagios
+                            <a href="http://jantman.github.io/blog/tag/android.html">
+                                android
                             </a>
                         </li>
                         <li class="list-group-item tag-1">
@@ -306,8 +317,8 @@ Partitions</a>:  </p>
                             </a>
                         </li>
                         <li class="list-group-item tag-1">
-                            <a href="http://jantman.github.io/blog/tag/android.html">
-                                android
+                            <a href="http://jantman.github.io/blog/tag/nagios.html">
+                                Nagios
                             </a>
                         </li>
                         <li class="list-group-item tag-1">
@@ -316,68 +327,8 @@ Partitions</a>:  </p>
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/apache.html">
-                                apache
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/perl.html">
-                                perl
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/dns.html">
-                                dns
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/mediawiki.html">
-                                mediawiki
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/ems.html">
-                                EMS
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/rpm.html">
-                                rpm
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/monitoring.html">
-                                monitoring
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/puppet.html">
-                                puppet
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/droid.html">
-                                droid
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/blog.html">
-                                blog
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/sun.html">
-                                sun
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/mac.html">
-                                mac
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/security.html">
-                                security
+                            <a href="http://jantman.github.io/blog/tag/logging.html">
+                                logging
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
@@ -386,8 +337,38 @@ Partitions</a>:  </p>
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/apache.html">
+                                apache
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
                             <a href="http://jantman.github.io/blog/tag/firefox.html">
                                 firefox
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/blog.html">
+                                blog
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/perl.html">
+                                perl
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/monitoring.html">
+                                monitoring
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/microsoft.html">
+                                microsoft
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/dns.html">
+                                dns
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
@@ -396,18 +377,48 @@ Partitions</a>:  </p>
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/logging.html">
-                                logging
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
                             <a href="http://jantman.github.io/blog/tag/bind.html">
                                 bind
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/microsoft.html">
-                                microsoft
+                            <a href="http://jantman.github.io/blog/tag/sun.html">
+                                sun
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/mediawiki.html">
+                                mediawiki
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/rpm.html">
+                                rpm
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/droid.html">
+                                droid
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/puppet.html">
+                                puppet
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/ems.html">
+                                EMS
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/security.html">
+                                security
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/mac.html">
+                                mac
                             </a>
                         </li>
         </ul>
