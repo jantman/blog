@@ -18,26 +18,23 @@ developed.
 tcpdump filter for CDP (I should have this memorized by now) from
 [SWeidner](http://sidewynder.blogspot.com/2005/07/tcpdump-filter-for-capturing-only.html):
 
-~~~~{.text}
+~~~~{.bash}
 tcpdump -nn -v -i eth0 -s 1500 -c 1 'ether[20:2] == 0x2000'
 ~~~~
 
-</p>
 Wireshark display filter for a specific DHCP client (by MAC):
 
 ~~~~{.text}
 bootp.hw.mac_addr == 00:11:22:33:44:55
 ~~~~
 
-</p>
 tcpdump filter to match DHCP packets including a specific Client MAC
 Address:
 
-~~~~{.text}
+~~~~{.bash}
 tcpdump -i br0 -vvv -s 1500 '((port 67 or port 68) and (udp[38:4] = 0x3e0ccf08))'
 ~~~~
 
-</p>
 tcpdump only allows matching on a maximum of 4 bytes (octets), not the 6
 bytes of a MAC address. So, in the above example, we match the last 4
 bytes (presumably the most unique) - our original MAC address was
@@ -58,15 +55,13 @@ This can also be modified as a Wireshark display filter:
 udp[38:4]==3e:0c:cf:08
 ~~~~
 
-</p>
 Using the same logic, a tcpdump filter to capture packets sent by the
 client (DISCOVER, REQUEST, INFORM):
 
-~~~~{.text}
+~~~~{.bash}
 tcpdump -i br0 -vvv -s 1500 '((port 67 or port 68) and (udp[8:1] = 0x1))'
 ~~~~
 
-</p>
 Finally, a tcpdump filter for DHCPDISCOVER packets (this makes the
 possibly flawed ass-umption that Option 53 will be the first option set:
 
@@ -80,7 +75,6 @@ and a wireshark display filter:
 udp[247:4]==63:35:01:01
 ~~~~
 
-</p>
 And the same thing for DHCPREQUEST packets:
 
 ~~~~{.text}
@@ -92,6 +86,3 @@ and a wireshark display filter:
 ~~~~{.text}
 udp[247:4]==63:35:01:03
 ~~~~
-
-</p>
-

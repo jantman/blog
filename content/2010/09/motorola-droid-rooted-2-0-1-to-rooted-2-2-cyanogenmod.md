@@ -123,7 +123,6 @@ found (if any) in no particular order...
 -   I had to change my voicemail number (Settings -\> Call Settings -\>
     Voicemail Settings) to automatically wait and enter my password.
 
-</ol>
 At the moment, this script is obviously setup to do one app at a time,
 hard-coded in the APP variable. It also assumes that the app data
 directory is stored at /sdcard/restore/$APP.

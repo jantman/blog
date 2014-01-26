@@ -18,9 +18,8 @@ the subnet, whether they're actually using DHCP or not. There's a quick
 way to do this with `nmap` using the options for ping scan (`-sP`) and
 always resolve DNS (`-R`):
 
-`nmap -sP -R 172.16.43.129-159`
-
-~~~~{.text}
+~~~~{.console}
+# nmap -sP -R 172.16.43.129-159
 Host ar01-hill-hill.example.com (172.16.43.129) appears to be up.
 MAC Address: 00:11:BC:7D:28:0A (Cisco Systems)
 Host ccf-hill019-1.example.com (172.16.43.130) appears to be up.

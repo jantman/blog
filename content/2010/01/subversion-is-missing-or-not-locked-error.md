@@ -40,6 +40,10 @@ heart. Be sure you don't screw anything up.
     `stats/.svn/entries` file, it should look like:
 
 ~~~~{.xml}
+<entry
+   name="generated"
+   kind="dir"
+   schedule="add"/>
 ~~~~
 
 3.  Make the entries file writable (`chmod u+w entries`)

@@ -33,7 +33,38 @@ repositories has the ipmitool required to get the relevant information.
 A call is pretty simple: `ipmitool -l open lan print 1` yields something
 like:  
 
-` Set in Progress         : Set Complete Auth Type Support       : NONE MD2 MD5 PASSWORD Auth Type Enable        : Callback : MD2 MD5 PASSWORD                         : User     : MD2 MD5 PASSWORD                         : Operator : MD2 MD5 PASSWORD                         : Admin    : MD2 MD5 PASSWORD                         : OEM      : IP Address Source       : DHCP Address IP Address              : 172.16.xxx.xxx Subnet Mask             : 255.255.255.224 MAC Address             : 00:14:4f:xx:xx:xx SNMP Community String   : xxxxxx IP Header               : TTL=0x00 Flags=0x00 Precedence=0x00 TOS=0x00 BMC ARP Control         : ARP Responses Disabled, Gratuitous ARP Disabled Gratituous ARP Intrvl   : 5.0 seconds Default Gateway IP      : 172.16.xx.xx Default Gateway MAC     : 00:00:00:00:00:00 Backup Gateway IP       : 0.0.0.0 Backup Gateway MAC      : 00:00:00:00:00:00 802.1q VLAN ID          : Disabled 802.1q VLAN Priority    : 0 RMCP+ Cipher Suites     : 2,3,0 Cipher Suite Priv Max   : XXXXXXXXXXXXXXX                         :     X=Cipher Suite Unused                         :     c=CALLBACK                         :     u=USER                         :     o=OPERATOR                         :     a=ADMIN                         :     O=OEM`  
+~~~~{.text}
+Set in Progress         : Set Complete
+Auth Type Support       : NONE MD2 MD5 PASSWORD
+Auth Type Enable        : Callback : MD2 MD5 PASSWORD
+                        : User     : MD2 MD5 PASSWORD
+                        : Operator : MD2 MD5 PASSWORD
+                        : Admin    : MD2 MD5 PASSWORD
+                        : OEM      :
+IP Address Source       : DHCP Address
+IP Address              : 172.16.xxx.xxx
+Subnet Mask             : 255.255.255.224
+MAC Address             : 00:14:4f:xx:xx:xx
+SNMP Community String   : xxxxxx
+IP Header               : TTL=0x00 Flags=0x00 Precedence=0x00 TOS=0x00
+BMC ARP Control         : ARP Responses Disabled, Gratuitous ARP Disabled
+Gratituous ARP Intrvl   : 5.0 seconds
+Default Gateway IP      : 172.16.xx.xx
+Default Gateway MAC     : 00:00:00:00:00:00
+Backup Gateway IP       : 0.0.0.0
+Backup Gateway MAC      : 00:00:00:00:00:00
+802.1q VLAN ID          : Disabled
+802.1q VLAN Priority    : 0
+RMCP+ Cipher Suites     : 2,3,0
+Cipher Suite Priv Max   : XXXXXXXXXXXXXXX
+                        :     X=Cipher Suite Unused
+                        :     c=CALLBACK
+                        :     u=USER
+                        :     o=OPERATOR
+                        :     a=ADMIN
+                        :     O=OEM
+~~~~
+
 Now it's just a matter of integrating this into ocsinventory-agent,
 having it run the command if present (and Sun hardware), and parsing the
 results. Once I have some actual code done, I'll pass it along.

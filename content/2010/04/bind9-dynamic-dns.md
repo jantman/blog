@@ -25,25 +25,24 @@ The whole process was relatively simple...
 3.  Make sure you have logging enabled for things of interest in your
     `logging` section of `named.conf`:
 
-~~~~{.text}
-category dnssec { syslog_info; };
-category update { syslog_info; };
-category security { syslog_info; };
-~~~~
+        :::text
+        category dnssec { syslog_info; };
+        category update { syslog_info; };
+        category security { syslog_info; };
 
 4.  Create a keys.conf file for your keys (you *do* split your configs
     out into usable chunks, right?):
 
-~~~~{.text}
-key foo.example.com. {
-    algorithm HMAC-MD5.SIG-ALG.REG.INT;
-    secret "this is your secret here (after Key: in the .private file)";
-};
-~~~~
+        :::text
+        key foo.example.com. {
+            algorithm HMAC-MD5.SIG-ALG.REG.INT;
+            secret "this is your secret here (after Key: in the .private file)";
+        };
 
-    <p>
-    and include it in `named.conf` like
-    `include "/etc/named.d/keys.conf";`
+    and include it in `named.conf` like:
+
+        :::text
+        include "/etc/named.d/keys.conf";
 
 5.  Set an
     [`update-policy`](http://www.zytrax.com/books/dns/ch7/xfer.html#update-policy)
@@ -51,14 +50,11 @@ key foo.example.com. {
     specific view (external), as that's the only place I would
     conceivably want updates right now.
 
-    </p>
-~~~~{.text}
-update-policy {
-    grant * self * A TXT;
-};
-~~~~
+        :::text
+        update-policy {
+            grant * self * A TXT;
+        };
 
-    <p>
     Assuming your TSIG keys are named for specific RRs, this will let
     any client (with a valid key setup on the server) update its own RR
     and nothing else.
@@ -71,27 +67,25 @@ update-policy {
     in `/etc/dhcp3/dhclient-exit-hooks.d` so it will run on DHCP
     updates.
 
-    </p>
-~~~~{.bash}
-#!/bin/bash
-IFACE="eth0"
-TTL=3600
-SERVER=ns1.example.com
-HOSTNAME=foo.example.com
-ZONE=example.com
-KEYFILE=/root/ddns-keys/Kfoo.example.com.+157+12345.private
+        :::bash
+        #!/bin/bash
+        IFACE="eth0"
+        TTL=3600
+        SERVER=ns1.example.com
+        HOSTNAME=foo.example.com
+        ZONE=example.com
+        KEYFILE=/root/ddns-keys/Kfoo.example.com.+157+12345.private
 
-new_ip_address=`ifconfig $IFACE | grep "inet addr:" | awk '{print $2}' | awk -F ":" '{print $2}'`
-new_ip_address=${new_ip_address/ /}
+        new_ip_address=`ifconfig $IFACE | grep "inet addr:" | awk '{print $2}' | awk -F ":" '{print $2}'`
+        new_ip_address=${new_ip_address/ /}
 
-nsupdate -v -k $KEYFILE << EOF
-server $SERVER
-zone $ZONE
-update delete $HOSTNAME A
-update add $HOSTNAME $TTL A $new_ip_address
-send
-EOF
-~~~~
+        nsupdate -v -k $KEYFILE << EOF
+        server $SERVER
+        zone $ZONE
+        update delete $HOSTNAME A
+        update add $HOSTNAME $TTL A $new_ip_address
+        send
+        EOF
 
 When I finally got things setup, my only problem was with permissions on
 the zone file directories, which was easily corrected.Once this was

@@ -19,7 +19,9 @@ process to a syslog server.
 
 The directive in the KS file is quite simple:
 
-    syslog=hostname
+~~~~{.text}
+syslog=hostname
+~~~~
 
 Hopefully this will be as much of a help to someone else who hasn't
 noticed it yet...

@@ -23,7 +23,7 @@ please give me a heads-up if you experience any problems.
 
 The numbers are rather impressive:
 
-<table>
+<table border="1">
 <tr>
 <td>
 </td>

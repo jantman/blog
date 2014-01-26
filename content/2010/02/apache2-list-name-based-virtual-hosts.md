@@ -12,7 +12,7 @@ they were parsed from the config files.
 
 The output on one of my servers looks something like:
 
-~~~~{.text}
+~~~~{.console}
 [root@web2 vhosts.d]# httpd -S
 VirtualHost configuration:
 wildcard NameVirtualHosts and _default_ servers:

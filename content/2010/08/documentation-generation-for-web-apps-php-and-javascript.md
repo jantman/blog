@@ -59,14 +59,16 @@ update the changelog if you modify it).
 
 My Makefile rule (which uses a temp directory to both keep the generated
 files separate from the source and keep the file paths as seen by phpdoc
-the same as the actual source):  
-` .PHONY: docs`
+the same as the actual source):
 
-docs:  
-mkdir -p temp/js  
-bin/js2phpdoc.php js/ temp/js/  
-cp -r inc temp/  
-cp \*.php temp/  
-phpdoc -c docs/default.ini  
-rm -Rf temp  
-</code>
+~~~~{.makefile}
+.PHONY: docs
+
+docs:
+        mkdir -p temp/js
+        bin/js2phpdoc.php js/ temp/js/
+        cp -r inc temp/
+        cp *.php temp/
+        phpdoc -c docs/default.ini
+        rm -Rf temp
+~~~~

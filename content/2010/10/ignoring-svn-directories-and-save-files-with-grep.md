@@ -33,12 +33,10 @@ acceptably imprecise for my purposes). To get rid of the tilde (save)
 files, all we need is `--exclude=\*~`. It's no problem to string them
 together as `grep --exclude=\*~ --exclude=\*.svn\* -rin "foo bar" *`.
 
-<p>
 To make this even easier, just add to your `.bashrc`:
 
 ~~~~{.bash}
 export GREP_OPTIONS="--exclude=\*~ --exclude=\*.svn\*"
 ~~~~
 
-</p>
 

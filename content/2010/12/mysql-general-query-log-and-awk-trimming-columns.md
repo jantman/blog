@@ -18,7 +18,10 @@ MySQLd has a [General Query
 Log](http://dev.mysql.com/doc/refman/5.1/en/query-log.html) that can be
 activated by addling a line like:  
   
-`log=/tmp/query.log`  
+~~~~{.text}
+log=/tmp/query.log`
+~~~~
+
 to `/etc/my.cnf` under the `[mysqld]` section. This will log \*all\*
 queries to the specified log file, even if they resulted in an error or
 did not manipulate data.
@@ -29,8 +32,10 @@ that each line appeared to begin with some whitespace, then a number
 ordering number), then the word "Query", then the query. The following
 awk expression prints everything from the third column on, dropping the
 first two columns (the number and "Query"):  
-  
-`awk '{ for (i=2; i<=NF; i++) printf "%s ", $i; printf "\n"; }'`  
+
+~~~~{.bash}
+awk '{ for (i=2; i<=NF; i++) printf "%s ", $i; printf "\n"; }'
+~~~~
   
 For easy analysis, the output of that can be piped into `sort` and then
 `uniq`.
