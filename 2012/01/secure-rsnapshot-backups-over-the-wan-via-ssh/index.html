@@ -17,7 +17,7 @@
             <meta property="og:description" content="Since I moved all of my WAN-facing stuff (mail, web, this blog, svn etc.) to a virtual server with Linode, and just have a desktop at home, it’s no longer practical to use Bacula for backups. Linode manages daily and weekly backups through their backup service, but they ..."/>
 
     <!-- Bootstrap -->
-        <link rel="stylesheet" href="http://jantman.github.io/blog/theme/css/bootstrap.min.css" type="text/css"/>
+        <link rel="stylesheet" href="http://jantman.github.io/blog/theme/css/bootstrap.flatly.min.css" type="text/css"/>
     <link href="http://jantman.github.io/blog/theme/css/font-awesome.min.css" rel="stylesheet">
     <link href="http://jantman.github.io/blog/theme/css/pygments.css" rel="stylesheet">
         <link href="http://jantman.github.io/blog/theme/css/typogrify.css" rel="stylesheet">
@@ -141,7 +141,7 @@ cover the things that won&#8217;t be found in most tutorials. Also, I&#8217;ll b
 referring to the remote machine to be backed up as the &#8220;remote host&#8221; and
 the local machine which triggers the backup and stores the data as the
 &#8220;local&nbsp;host&#8221;.</p>
-<p><strong>Local Host Setup - Part&nbsp;I</strong></p>
+<h2 id="local-host-setup-part-i">Local Host Setup - Part&nbsp;I</h2>
 <ol>
 <li>Choose and create a directory to store your backups in. I have a <span class="caps">1TB</span>
     external disk mounted at <code>/mnt/backup/</code>, so I chose
@@ -154,7 +154,7 @@ the local machine which triggers the backup and stores the data as the
     &#8220;remoteHostname_remoteBackupUsername_rsync&#8221;). Now, get (scp) the
     public key for each pair to the remote&nbsp;host.</li>
 </ol>
-<p><strong>Remote Host&nbsp;Setup</strong></p>
+<h2 id="remote-host-setup">Remote Host&nbsp;Setup</h2>
 <ol>
 <li>Ensure that rsync is installed on the&nbsp;host.</li>
 <li>Create a user to run the backups. I called this user &#8220;rsyncuser&#8221;.
@@ -216,50 +216,45 @@ the local machine which triggers the backup and stores the data as the
     will run rsync with the arguments specified in rsync-wrapper.c every
     time this key is used to&nbsp;login.</li>
 </ol>
-<p><strong>Local Host Setup - Part&nbsp;<span class="caps">II</span></strong></p>
+<h2 id="local-host-setup-part-ii">Local Host Setup - Part&nbsp;<span class="caps">II</span></h2>
 <p>I use totally separate configs for each host that I backup, to keep
 things clean and to let me enable, disable, or tweak one remote backup
 without affecting the&nbsp;others.</p>
 <ol>
 <li>
 <p>Create host-specific pre- and post-backup scripts. I put them in
-    <code>/etc/rsnapshot.d/</code>.   </p>
-<p><code>/etc/rsnapshot.d/pre-remoteHostName.sh</code>:</p>
-</p>
+    <code>/etc/rsnapshot.d/</code>.
+    <code>/etc/rsnapshot.d/pre-remoteHostName.sh</code>:</p>
+<div class="codehilite"><pre><span class="c">#!/bin/bash</span>
 
-</li>
-</ol>
-<div class="codehilite"><pre>#!/bin/bash
-
-# do anything else needed on the local system before a backup
+<span class="c"># do anything else needed on the local system before a backup</span>
 ssh -i /path/to/remoteHostname_remoteBackupUsername_cmd rsyncuser@remoteHost pre
 </pre></div>
 
 
-<div class="codehilite"><pre>`/etc/rsnapshot.d/post-remoteHostName.sh`:
-</pre></div>
+<p><code>/etc/rsnapshot.d/post-remoteHostName.sh</code>:</p>
+<div class="codehilite"><pre><span class="c">#!/bin/bash</span>
 
-
-<div class="codehilite"><pre>#!/bin/bash
-
-# do anything else needed on the local system after a backup
+<span class="c"># do anything else needed on the local system after a backup</span>
 ssh -i /path/to/remoteHostname_remoteBackupUsername_cmd rsyncuser@remoteHost post
 </pre></div>
 
 
-<ol>
-<li>Setup a set of rsync include and exclude files (see <code>man rsync(1)</code>,
+</li>
+<li>
+<p>Setup a set of rsync include and exclude files (see <code>man rsync(1)</code>,
     <code>--include-from=</code> and <code>--exclude-from=</code>). I put mine at
     <code>/etc/rsnapshot.d/rsync-include-remoteHostName.txt</code> and
     <code>/etc/rsnapshot.d/rsync-exclude-remoteHostName.txt</code>, respectively.
-    (Examples included at the bottom of this&nbsp;post).</li>
-<li>Configure rsnapshot. I use a separate config file for each remote
+    (Examples included at the bottom of this&nbsp;post).</p>
+</li>
+<li>
+<p>Configure rsnapshot. I use a separate config file for each remote
     host. Copy the default <code>/etc/rsnapshot.conf</code> to
     <code>/etc/rsnapshot-remoteHostName.conf</code>. The important items are
     <code>rsync_short_args</code>, <code>rsync_long_args</code>, <code>ssh_args</code>, <code>cmd_preexec</code>,
     <code>cmd_postexec</code> and <code>backup</code>. Here&#8217;s an example of my config file,
-    with comments and blank lines&nbsp;removed:</li>
-</ol>
+    with comments and blank lines&nbsp;removed:</p>
 <div class="codehilite"><pre>config_version  1.2
 snapshot_root   /mnt/backup/rsnapshot/
 cmd_cp          /bin/cp
@@ -288,52 +283,40 @@ backup  rsyncuser@remoteHostName:/      remoteHostName/
 </pre></div>
 
 
-<div class="codehilite"><pre>&lt;p&gt;
-The `backup` line is what tells rsync what to back up (`/` on
-remoteHostName, logging in as rsyncuser), and where to back up to
-(snapshot\_root/remoteHostName/).
-</pre></div>
-
-
-<ol>
+<p>The <code>backup</code> line is what tells rsync what to back up (<code>/</code> on
+remoteHostName, logging in as rsyncuser), and where to back up to&nbsp;(snapshot_root/remoteHostName/).</p>
+</li>
 <li>
 <p>Create two scripts that will actually trigger the backups, which
-    I&#8217;ll call <code>/root/bin/rsnapshot-daily.sh</code> and
-    <code>/root/bin/rsnapshot-weekly.sh</code>:  </p>
+    I&#8217;ll call <code>/root/bin/rsnapshot-daily.sh</code> and <code>/root/bin/rsnapshot-weekly.sh</code>:</p>
 <p><code>/root/bin/rsnapshot-daily.sh</code>:</p>
-</p>
-
-</li>
-</ol>
-<div class="codehilite"><pre>#!/bin/bash
+<div class="codehilite"><pre><span class="c">#!/bin/bash</span>
 
 /usr/bin/rsnapshot -c /etc/rsnapshot-remoteHostName.conf daily
-# add other hosts here; note, they&#39;ll run in series
+<span class="c"># add other hosts here; note, they&#39;ll run in series</span>
 </pre></div>
 
 
-<div class="codehilite"><pre>`/root/bin/rsnapshot-weekly.sh`:
-</pre></div>
-
-
-<div class="codehilite"><pre>#!/bin/bash
+<p><code>/root/bin/rsnapshot-weekly.sh</code>:</p>
+<div class="codehilite"><pre><span class="c">#!/bin/bash</span>
 
 /usr/bin/rsnapshot -c /etc/rsnapshot-remoteHostName.conf weekly
-# add other hosts here; note, they&#39;ll run in series
+<span class="c"># add other hosts here; note, they&#39;ll run in series</span>
 </pre></div>
 
 
-<ol>
-<li>Add two entries to root&#8217;s croontab to run the rsnapshot backups.
-    Adjust the following days and times to your&nbsp;liking:</li>
-</ol>
-<div class="codehilite"><pre>0 1 * * Mon /root/bin/rsnapshot-weekly.sh <span class="c"># run the weekly backups every Monday at 01:00</span>
-30 2 * * * /root/bin/rsnapshot-daily.sh <span class="c"># run the daily backups every day at 02:30, which *should* be after the weekly finished on Monday morning</span>
+</li>
+<li>
+<p>Add two entries to root&#8217;s croontab to run the rsnapshot backups.
+    Adjust the following days and times to your&nbsp;liking:</p>
+<div class="codehilite"><pre>0 1 * * Mon /root/bin/rsnapshot-weekly.sh # run the weekly backups every Monday at 01:00
+30 2 * * * /root/bin/rsnapshot-daily.sh # run the daily backups every day at 02:30, which *should* be after the weekly finished on Monday morning
 </pre></div>
 
 
-<ol>
-<li>Check, after the next scheduled runs, that everything appears to
+</li>
+<li>
+<p>Check, after the next scheduled runs, that everything appears to
     have run correctly. If you want, you can manually trigger the daily
     script and watch what happens. If you do this more than once, you
     should delete the directories it creates, or else rotation will be
@@ -343,7 +326,8 @@ remoteHostName, logging in as rsyncuser), and where to back up to
     use my
     <a href="http://svn.jasonantman.com/misc-scripts/print-cmd.sh">print-cmd.sh</a>
     script in place of the &#8220;rsync-wrapper&#8221; forced command. This script
-    will simply log the command rsnapshot calls via&nbsp;<span class="caps">SSH</span>.</li>
+    will simply log the command rsnapshot calls via&nbsp;<span class="caps">SSH</span>.</p>
+</li>
 </ol>
 <p>Assuming all of this worked, you should now have a fairly secure
 <span class="caps">SSH</span>-based remotely-triggered backup system. In a follow-up post I
@@ -506,19 +490,17 @@ Backups</a>.</p>
 
 
 <p><code>/etc/rsnapshot.d/rsync-include-remoteHostName.txt</code>:</p>
-<p>~~~~{.text&nbsp;only}</p>
-<h1 id="include">Include</h1>
-<ul>
-<li>/dev/console</li>
-<li>/dev/initctl</li>
-<li>/dev/null</li>
-<li>/dev/zero</li>
-<li>/usr/local/*</li>
-</ul>
-<div class="codehilite"><pre>`/etc/rsnapshot.d/rsync-exclude-remoteHostName.txt`:
+<div class="codehilite"><pre># Include
++ /dev/console
++ /dev/initctl
++ /dev/null
++ /dev/zero
++ /usr/local/*
+</pre></div>
 
-~~~~{.text only}
-# Exclude
+
+<p><code>/etc/rsnapshot.d/rsync-exclude-remoteHostName.txt</code>:</p>
+<div class="codehilite"><pre># Exclude
 - /cgroup/*
 - /dev/*
 - /lib/*
@@ -551,13 +533,18 @@ Backups</a>.</p>
 
                 <li class="list-group-item"><a href="http://jantman.github.io/blog/tags.html"><h4><i class="icon-tags icon-large"></i>Tags</h4></a></li>
                         <li class="list-group-item tag-1">
+                            <a href="http://jantman.github.io/blog/tag/google.html">
+                                google
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
                             <a href="http://jantman.github.io/blog/tag/linux.html">
                                 linux
                             </a>
                         </li>
                         <li class="list-group-item tag-1">
-                            <a href="http://jantman.github.io/blog/tag/php.html">
-                                PHP
+                            <a href="http://jantman.github.io/blog/tag/sysadmin.html">
+                                sysadmin
                             </a>
                         </li>
                         <li class="list-group-item tag-1">
@@ -566,53 +553,13 @@ Backups</a>.</p>
                             </a>
                         </li>
                         <li class="list-group-item tag-1">
-                            <a href="http://jantman.github.io/blog/tag/google.html">
-                                google
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-1">
                             <a href="http://jantman.github.io/blog/tag/nagios.html">
                                 Nagios
                             </a>
                         </li>
                         <li class="list-group-item tag-1">
-                            <a href="http://jantman.github.io/blog/tag/sysadmin.html">
-                                sysadmin
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/logging.html">
-                                logging
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/wordpress.html">
-                                wordpress
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/apache.html">
-                                apache
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/firefox.html">
-                                firefox
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/blog.html">
-                                blog
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/perl.html">
-                                perl
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/monitoring.html">
-                                monitoring
+                            <a href="http://jantman.github.io/blog/tag/php.html">
+                                PHP
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
@@ -621,8 +568,8 @@ Backups</a>.</p>
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/dns.html">
-                                dns
+                            <a href="http://jantman.github.io/blog/tag/monitoring.html">
+                                monitoring
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
@@ -631,23 +578,18 @@ Backups</a>.</p>
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/bind.html">
-                                bind
+                            <a href="http://jantman.github.io/blog/tag/blog.html">
+                                blog
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/sun.html">
-                                sun
+                            <a href="http://jantman.github.io/blog/tag/firefox.html">
+                                firefox
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/mediawiki.html">
-                                mediawiki
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/rpm.html">
-                                rpm
+                            <a href="http://jantman.github.io/blog/tag/apache.html">
+                                apache
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
@@ -656,8 +598,18 @@ Backups</a>.</p>
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/puppet.html">
-                                puppet
+                            <a href="http://jantman.github.io/blog/tag/bind.html">
+                                bind
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/mediawiki.html">
+                                mediawiki
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/logging.html">
+                                logging
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
@@ -666,13 +618,43 @@ Backups</a>.</p>
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/mac.html">
+                                mac
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/wordpress.html">
+                                wordpress
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/dns.html">
+                                dns
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/puppet.html">
+                                puppet
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
                             <a href="http://jantman.github.io/blog/tag/security.html">
                                 security
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/mac.html">
-                                mac
+                            <a href="http://jantman.github.io/blog/tag/rpm.html">
+                                rpm
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/perl.html">
+                                perl
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/sun.html">
+                                sun
                             </a>
                         </li>
         </ul>

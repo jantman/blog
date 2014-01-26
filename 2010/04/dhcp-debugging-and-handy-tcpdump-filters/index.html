@@ -17,7 +17,7 @@
             <meta property="og:description" content="Recently at $WORK we’ve been having some strange issues with a particular Xen VM not getting DHCP. Traditional (tail -f dhcpd.log) debugging hasn’t turned up much, other than the server is getting the DISCOVER but not sending out an OFFER. I’ve turned to packet captures to ..."/>
 
     <!-- Bootstrap -->
-        <link rel="stylesheet" href="http://jantman.github.io/blog/theme/css/bootstrap.min.css" type="text/css"/>
+        <link rel="stylesheet" href="http://jantman.github.io/blog/theme/css/bootstrap.flatly.min.css" type="text/css"/>
     <link href="http://jantman.github.io/blog/theme/css/font-awesome.min.css" rel="stylesheet">
     <link href="http://jantman.github.io/blog/theme/css/pygments.css" rel="stylesheet">
         <link href="http://jantman.github.io/blog/theme/css/typogrify.css" rel="stylesheet">
@@ -117,24 +117,21 @@ try and track down the problem. Of course, this is where
 share some of the filters that I&#8217;ve been using, and a few that I&nbsp;developed.</p>
 <p>tcpdump filter for <span class="caps">CDP</span> (I should have this memorized by now) from
 <a href="http://sidewynder.blogspot.com/2005/07/tcpdump-filter-for-capturing-only.html">SWeidner</a>:</p>
-<div class="codehilite"><pre>tcpdump -nn -v -i eth0 -s 1500 -c 1 &#39;ether[20:2] == 0x2000&#39;
+<div class="codehilite"><pre>tcpdump -nn -v -i eth0 -s 1500 -c 1 <span class="s1">&#39;ether[20:2] == 0x2000&#39;</span>
 </pre></div>
 
 
-<p></p>
-Wireshark display filter for a specific <span class="caps">DHCP</span> client (by&nbsp;<span class="caps">MAC</span>):</p>
+<p>Wireshark display filter for a specific <span class="caps">DHCP</span> client (by&nbsp;<span class="caps">MAC</span>):</p>
 <div class="codehilite"><pre>bootp.hw.mac_addr == 00:11:22:33:44:55
 </pre></div>
 
 
-<p></p>
-tcpdump filter to match <span class="caps">DHCP</span> packets including a specific Client <span class="caps">MAC</span>&nbsp;Address:</p>
-<div class="codehilite"><pre>tcpdump -i br0 -vvv -s 1500 &#39;((port 67 or port 68) and (udp[38:4] = 0x3e0ccf08))&#39;
+<p>tcpdump filter to match <span class="caps">DHCP</span> packets including a specific Client <span class="caps">MAC</span>&nbsp;Address:</p>
+<div class="codehilite"><pre>tcpdump -i br0 -vvv -s 1500 <span class="s1">&#39;((port 67 or port 68) and (udp[38:4] = 0x3e0ccf08))&#39;</span>
 </pre></div>
 
 
-<p></p>
-tcpdump only allows matching on a maximum of 4 bytes (octets), not the 6
+<p>tcpdump only allows matching on a maximum of 4 bytes (octets), not the 6
 bytes of a <span class="caps">MAC</span> address. So, in the above example, we match the last 4
 bytes (presumably the most unique) - our original <span class="caps">MAC</span> address was
 <code>00:16:3e:0c:cf:08</code>, so we match on <code>3e0ccf08</code>. The <code>udp[38:4]</code> matches
@@ -152,15 +149,13 @@ octet comparison) = 38 (our total&nbsp;offset).</p>
 </pre></div>
 
 
-<p></p>
-Using the same logic, a tcpdump filter to capture packets sent by the
+<p>Using the same logic, a tcpdump filter to capture packets sent by the
 client (<span class="caps">DISCOVER</span>, <span class="caps">REQUEST</span>,&nbsp;<span class="caps">INFORM</span>):</p>
-<div class="codehilite"><pre>tcpdump -i br0 -vvv -s 1500 &#39;((port 67 or port 68) and (udp[8:1] = 0x1))&#39;
+<div class="codehilite"><pre>tcpdump -i br0 -vvv -s 1500 <span class="s1">&#39;((port 67 or port 68) and (udp[8:1] = 0x1))&#39;</span>
 </pre></div>
 
 
-<p></p>
-Finally, a tcpdump filter for <span class="caps">DHCPDISCOVER</span> packets (this makes the
+<p>Finally, a tcpdump filter for <span class="caps">DHCPDISCOVER</span> packets (this makes the
 possibly flawed ass-umption that Option 53 will be the first option&nbsp;set:</p>
 <div class="codehilite"><pre>udp[247:4] = 0x63350101
 </pre></div>
@@ -171,8 +166,7 @@ possibly flawed ass-umption that Option 53 will be the first option&nbsp;set:</p
 </pre></div>
 
 
-<p></p>
-And the same thing for <span class="caps">DHCPREQUEST</span>&nbsp;packets:</p>
+<p>And the same thing for <span class="caps">DHCPREQUEST</span>&nbsp;packets:</p>
 <div class="codehilite"><pre>udp[247:4] = 0x63350103
 </pre></div>
 
@@ -180,9 +174,6 @@ And the same thing for <span class="caps">DHCPREQUEST</span>&nbsp;packets:</p>
 <p>and a wireshark display&nbsp;filter:</p>
 <div class="codehilite"><pre>udp[247:4]==63:35:01:03
 </pre></div>
-
-
-</p>
             </div>
             <!-- /.entry-content -->
         </article>
@@ -206,13 +197,18 @@ And the same thing for <span class="caps">DHCPREQUEST</span>&nbsp;packets:</p>
 
                 <li class="list-group-item"><a href="http://jantman.github.io/blog/tags.html"><h4><i class="icon-tags icon-large"></i>Tags</h4></a></li>
                         <li class="list-group-item tag-1">
+                            <a href="http://jantman.github.io/blog/tag/google.html">
+                                google
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
                             <a href="http://jantman.github.io/blog/tag/linux.html">
                                 linux
                             </a>
                         </li>
                         <li class="list-group-item tag-1">
-                            <a href="http://jantman.github.io/blog/tag/php.html">
-                                PHP
+                            <a href="http://jantman.github.io/blog/tag/sysadmin.html">
+                                sysadmin
                             </a>
                         </li>
                         <li class="list-group-item tag-1">
@@ -221,53 +217,13 @@ And the same thing for <span class="caps">DHCPREQUEST</span>&nbsp;packets:</p>
                             </a>
                         </li>
                         <li class="list-group-item tag-1">
-                            <a href="http://jantman.github.io/blog/tag/google.html">
-                                google
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-1">
                             <a href="http://jantman.github.io/blog/tag/nagios.html">
                                 Nagios
                             </a>
                         </li>
                         <li class="list-group-item tag-1">
-                            <a href="http://jantman.github.io/blog/tag/sysadmin.html">
-                                sysadmin
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/logging.html">
-                                logging
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/wordpress.html">
-                                wordpress
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/apache.html">
-                                apache
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/firefox.html">
-                                firefox
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/blog.html">
-                                blog
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/perl.html">
-                                perl
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/monitoring.html">
-                                monitoring
+                            <a href="http://jantman.github.io/blog/tag/php.html">
+                                PHP
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
@@ -276,8 +232,8 @@ And the same thing for <span class="caps">DHCPREQUEST</span>&nbsp;packets:</p>
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/dns.html">
-                                dns
+                            <a href="http://jantman.github.io/blog/tag/monitoring.html">
+                                monitoring
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
@@ -286,23 +242,18 @@ And the same thing for <span class="caps">DHCPREQUEST</span>&nbsp;packets:</p>
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/bind.html">
-                                bind
+                            <a href="http://jantman.github.io/blog/tag/blog.html">
+                                blog
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/sun.html">
-                                sun
+                            <a href="http://jantman.github.io/blog/tag/firefox.html">
+                                firefox
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/mediawiki.html">
-                                mediawiki
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/rpm.html">
-                                rpm
+                            <a href="http://jantman.github.io/blog/tag/apache.html">
+                                apache
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
@@ -311,8 +262,18 @@ And the same thing for <span class="caps">DHCPREQUEST</span>&nbsp;packets:</p>
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/puppet.html">
-                                puppet
+                            <a href="http://jantman.github.io/blog/tag/bind.html">
+                                bind
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/mediawiki.html">
+                                mediawiki
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/logging.html">
+                                logging
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
@@ -321,13 +282,43 @@ And the same thing for <span class="caps">DHCPREQUEST</span>&nbsp;packets:</p>
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/mac.html">
+                                mac
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/wordpress.html">
+                                wordpress
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/dns.html">
+                                dns
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/puppet.html">
+                                puppet
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
                             <a href="http://jantman.github.io/blog/tag/security.html">
                                 security
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/mac.html">
-                                mac
+                            <a href="http://jantman.github.io/blog/tag/rpm.html">
+                                rpm
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/perl.html">
+                                perl
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/sun.html">
+                                sun
                             </a>
                         </li>
         </ul>

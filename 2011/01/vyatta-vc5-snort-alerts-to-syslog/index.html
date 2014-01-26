@@ -17,7 +17,7 @@
             <meta property="og:description" content="I’m running a Vyatta vyatta router at home - in my opinion it’s pretty near “enterprise grade”, and I’m running the Community/Core (read: no-cost and almost all Free) on commodity hardware with great performance. Granted, I’m still on the older version (5 as opposed to the ..."/>
 
     <!-- Bootstrap -->
-        <link rel="stylesheet" href="http://jantman.github.io/blog/theme/css/bootstrap.min.css" type="text/css"/>
+        <link rel="stylesheet" href="http://jantman.github.io/blog/theme/css/bootstrap.flatly.min.css" type="text/css"/>
     <link href="http://jantman.github.io/blog/theme/css/font-awesome.min.css" rel="stylesheet">
     <link href="http://jantman.github.io/blog/theme/css/pygments.css" rel="stylesheet">
         <link href="http://jantman.github.io/blog/theme/css/typogrify.css" rel="stylesheet">
@@ -130,12 +130,28 @@ a more secure location. Through a bit of digging, I found the
 <code>/opt/vyatta/share/perl5/VyattaSnortConfig.pm</code> Perl module which
 generates the Snort config file from Vyatta&#8217;s <span class="caps">CLI</span> stuff. Looking through
 the Perl code, I found the definition of the snort.conf output&nbsp;statements:</p>
-<div class="codehilite"><pre><span class="k">my</span> <span class="nv">$output_def</span> <span class="o">=&lt;</span>
-<span class="n">I</span> <span class="n">simply</span> <span class="n">added</span> <span class="n">a</span> <span class="n">line</span> <span class="n">output</span> <span class="n">alert_syslog:</span> <span class="n">log_local3</span> <span class="n">log_notice</span> <span class="n">after</span> <span class="n">the</span> <span class="n">output</span> <span class="n">alert_unified</span> <span class="n">line</span><span class="o">.</span>
-
-<span class="k">my</span> <span class="nv">$output_def</span> <span class="o">=&lt;</span>
-<span class="n">I</span> <span class="k">then</span> <span class="n">went</span> <span class="n">into</span> <span class="n">Vyatta</span> <span class="n">configuration</span> <span class="ow">and</span> <span class="n">changed</span> <span class="n">a</span> <span class="n">rule</span> <span class="n">from</span> <span class="n">alert</span> <span class="n">to</span> <span class="n">pass</span><span class="p">,</span> <span class="n">committed</span><span class="p">,</span> <span class="n">changed</span> <span class="n">back</span><span class="p">,</span> <span class="n">committed</span><span class="p">,</span> <span class="ow">and</span> <span class="sr">/etc/s</span><span class="n">nort</span><span class="o">/</span><span class="n">snort</span><span class="o">.</span><span class="n">conf</span> <span class="n">now</span> <span class="n">had</span> <span class="k">my</span> <span class="n">syslog</span> <span class="n">lines</span><span class="o">.</span> <span class="n">I</span><span class="s">&#39;m now getting snort alerts to local3 in syslog, which is fed to my centralized log server. My next project is to find or write something which will parse these logs, generate a daily summary email, and maybe check them hourly and alert on any big changes. I also might just cron an emailing of the output from Vyatta&#39;</span><span class="n">s</span> <span class="n">show</span> <span class="n">ips</span> <span class="n">summary</span> <span class="n">command</span><span class="o">.</span> <span class="n">So</span> <span class="n">far</span> <span class="n">I</span> <span class="n">have</span> <span class="n">over</span> <span class="mi">11</span><span class="p">,</span><span class="mo">000</span> <span class="n">events</span> <span class="n">logged</span> <span class="n">in</span> <span class="n">about</span> <span class="mi">12</span> <span class="n">hours</span><span class="o">.</span>
+<div class="codehilite"><pre><span class="k">my</span> <span class="nv">$output_def</span> <span class="o">=</span><span class="s">&lt;&lt;<span class="caps">EOD</span>;</span>
+<span class="s">  output alert_unified: alert, limit $log_limit</span>
+<span class="s">  output log_null</span>
+<span class="s"><span class="caps">EOD</span></span>
 </pre></div>
+
+
+<p>I simply added a line <code>output alert_syslog: log_local3 log_notice</code> after the <code>output alert_unified</code> line.</p>
+<div class="codehilite"><pre><span class="k">my</span> <span class="nv">$output_def</span> <span class="o">=</span><span class="s">&lt;&lt;<span class="caps">EOD</span>;</span>
+<span class="s">  output alert_unified: alert, limit $log_limit</span>
+<span class="s">  output alert_syslog: log_local3 log_notice</span>
+<span class="s">  output log_null</span>
+<span class="s"><span class="caps">EOD</span></span>
+</pre></div>
+
+
+<p>I then went into Vyatta configuration and changed a rule from alert to pass, committed,
+changed back, committed, and <code>/etc/snort/snort.conf</code> now had my syslog lines. I&#8217;m now 
+getting snort alerts to local3 in syslog, which is fed to my centralized log server. My
+next project is to find or write something which will parse these logs, generate a daily
+summary email, and maybe check them hourly and alert on any big changes. I also might just
+cron an emailing of the output from Vyatta&#8217;s show ips summary command. So far I have over 11,000 events logged in about 12&nbsp;hours.</p>
             </div>
             <!-- /.entry-content -->
         </article>
@@ -159,13 +175,18 @@ the Perl code, I found the definition of the snort.conf output&nbsp;statements:<
 
                 <li class="list-group-item"><a href="http://jantman.github.io/blog/tags.html"><h4><i class="icon-tags icon-large"></i>Tags</h4></a></li>
                         <li class="list-group-item tag-1">
+                            <a href="http://jantman.github.io/blog/tag/google.html">
+                                google
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
                             <a href="http://jantman.github.io/blog/tag/linux.html">
                                 linux
                             </a>
                         </li>
                         <li class="list-group-item tag-1">
-                            <a href="http://jantman.github.io/blog/tag/php.html">
-                                PHP
+                            <a href="http://jantman.github.io/blog/tag/sysadmin.html">
+                                sysadmin
                             </a>
                         </li>
                         <li class="list-group-item tag-1">
@@ -174,53 +195,13 @@ the Perl code, I found the definition of the snort.conf output&nbsp;statements:<
                             </a>
                         </li>
                         <li class="list-group-item tag-1">
-                            <a href="http://jantman.github.io/blog/tag/google.html">
-                                google
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-1">
                             <a href="http://jantman.github.io/blog/tag/nagios.html">
                                 Nagios
                             </a>
                         </li>
                         <li class="list-group-item tag-1">
-                            <a href="http://jantman.github.io/blog/tag/sysadmin.html">
-                                sysadmin
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/logging.html">
-                                logging
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/wordpress.html">
-                                wordpress
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/apache.html">
-                                apache
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/firefox.html">
-                                firefox
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/blog.html">
-                                blog
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/perl.html">
-                                perl
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/monitoring.html">
-                                monitoring
+                            <a href="http://jantman.github.io/blog/tag/php.html">
+                                PHP
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
@@ -229,8 +210,8 @@ the Perl code, I found the definition of the snort.conf output&nbsp;statements:<
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/dns.html">
-                                dns
+                            <a href="http://jantman.github.io/blog/tag/monitoring.html">
+                                monitoring
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
@@ -239,23 +220,18 @@ the Perl code, I found the definition of the snort.conf output&nbsp;statements:<
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/bind.html">
-                                bind
+                            <a href="http://jantman.github.io/blog/tag/blog.html">
+                                blog
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/sun.html">
-                                sun
+                            <a href="http://jantman.github.io/blog/tag/firefox.html">
+                                firefox
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/mediawiki.html">
-                                mediawiki
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/rpm.html">
-                                rpm
+                            <a href="http://jantman.github.io/blog/tag/apache.html">
+                                apache
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
@@ -264,8 +240,18 @@ the Perl code, I found the definition of the snort.conf output&nbsp;statements:<
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/puppet.html">
-                                puppet
+                            <a href="http://jantman.github.io/blog/tag/bind.html">
+                                bind
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/mediawiki.html">
+                                mediawiki
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/logging.html">
+                                logging
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
@@ -274,13 +260,43 @@ the Perl code, I found the definition of the snort.conf output&nbsp;statements:<
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/mac.html">
+                                mac
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/wordpress.html">
+                                wordpress
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/dns.html">
+                                dns
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/puppet.html">
+                                puppet
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
                             <a href="http://jantman.github.io/blog/tag/security.html">
                                 security
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/mac.html">
-                                mac
+                            <a href="http://jantman.github.io/blog/tag/rpm.html">
+                                rpm
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/perl.html">
+                                perl
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/sun.html">
+                                sun
                             </a>
                         </li>
         </ul>

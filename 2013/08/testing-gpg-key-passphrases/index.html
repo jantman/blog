@@ -17,7 +17,7 @@
             <meta property="og:description" content="So hypothetically, you have a GPG public/private keypair (from a backup or old computer), but you don’t remember the passphrase. Here’s a relatively simple way to find it from a number of possible options. This requires that you have a computer secure enough to store the possible ..."/>
 
     <!-- Bootstrap -->
-        <link rel="stylesheet" href="http://jantman.github.io/blog/theme/css/bootstrap.min.css" type="text/css"/>
+        <link rel="stylesheet" href="http://jantman.github.io/blog/theme/css/bootstrap.flatly.min.css" type="text/css"/>
     <link href="http://jantman.github.io/blog/theme/css/font-awesome.min.css" rel="stylesheet">
     <link href="http://jantman.github.io/blog/theme/css/pygments.css" rel="stylesheet">
         <link href="http://jantman.github.io/blog/theme/css/typogrify.css" rel="stylesheet">
@@ -133,136 +133,132 @@ when you&#8217;re&nbsp;done.</p>
     you&#8217;ve verified the fingerprints against a
     <a href="http://pgp.mit.edu/">keyserver</a> that you know is authoritative for
     your keys,&nbsp;etc.).</li>
-<li>
-<p>First, we import the public and private keys to&nbsp;<span class="caps">GPG</span>:</p>
-<div class="codehilite"><pre>testuser:~$ cd .gnupg
-testuser:~/.gnupg$ gpg --import TestUser_public.key 
-gpg: keyring `/home/testuser/.gnupg/secring.gpg` created
-gpg: key 17AD8D3D: public key &quot;Test User (Test User) &quot; imported
-gpg: Total number processed: 1
-gpg:               imported: 1  (RSA: 1)
+<li>First, we import the public and private keys to&nbsp;<span class="caps">GPG</span>:</li>
+</ol>
+<div class="codehilite"><pre><span class="gp">testuser:~$</span> <span class="nb">cd</span> .gnupg
+<span class="gp">testuser:~/.gnupg$</span> gpg --import TestUser_public.key 
+<span class="go">gpg: keyring `/home/testuser/.gnupg/secring.gpg` created</span>
+<span class="go">gpg: key <span class="caps">17AD8D3D</span>: public key &quot;Test User (Test User) &quot; imported</span>
+<span class="go">gpg: Total number processed: 1</span>
+<span class="go">gpg:               imported: 1  (<span class="caps">RSA</span>: 1)</span>
 
-testuser:~/.gnupg$ gpg --allow-secret-key-import --import TestUser_secret.key 
-gpg: key 17AD8D3D: secret key imported
-gpg: key 17AD8D3D: &quot;Test User (Test User) &quot; not changed
-gpg: Total number processed: 1
-gpg:              unchanged: 1
-gpg:       secret keys read: 1
-gpg:   secret keys imported: 1
+<span class="gp">testuser:~/.gnupg$</span> gpg --allow-secret-key-import --import TestUser_secret.key 
+<span class="go">gpg: key <span class="caps">17AD8D3D</span>: secret key imported</span>
+<span class="go">gpg: key <span class="caps">17AD8D3D</span>: &quot;Test User (Test User) &quot; not changed</span>
+<span class="go">gpg: Total number processed: 1</span>
+<span class="go">gpg:              unchanged: 1</span>
+<span class="go">gpg:       secret keys read: 1</span>
+<span class="go">gpg:   secret keys imported: 1</span>
 </pre></div>
 
 
-</li>
-<li>
-<p>Check that the keys are&nbsp;there:</p>
-<div class="codehilite"><pre>testuser:~/.gnupg$ gpg --list-keys
-/home/testuser/.gnupg/pubring.gpg
---------------------------------
-pub   2048R/17AD8D3D 2013-08-24
-uid                  Test User (Test User) 
-sub   2048R/40D9F35E 2013-08-24
+<ol>
+<li>Check that the keys are&nbsp;there:</li>
+</ol>
+<div class="codehilite"><pre><span class="gp">testuser:~/.gnupg$</span> gpg --list-keys
+<span class="go">/home/testuser/.gnupg/pubring.gpg</span>
+<span class="go">--------------------------------</span>
+<span class="go">pub   2048R/<span class="caps">17AD8D3D</span> 2013-08-24</span>
+<span class="go">uid                  Test User (Test User) </span>
+<span class="go">sub   2048R/<span class="caps">40D9F35E</span> 2013-08-24</span>
 
-testuser:~/.gnupg$ gpg --list-secret-keys
-/home/testuser/.gnupg/secring.gpg
---------------------------------
-sec   2048R/17AD8D3D 2013-08-24
-uid                  Test User (Test User) 
-ssb   2048R/40D9F35E 2013-08-24
+<span class="gp">testuser:~/.gnupg$</span> gpg --list-secret-keys
+<span class="go">/home/testuser/.gnupg/secring.gpg</span>
+<span class="go">--------------------------------</span>
+<span class="go">sec   2048R/<span class="caps">17AD8D3D</span> 2013-08-24</span>
+<span class="go">uid                  Test User (Test User) </span>
+<span class="go">ssb   2048R/<span class="caps">40D9F35E</span> 2013-08-24</span>
 
-testuser:~/.gnupg$
+<span class="gp">testuser:~/.gnupg$</span> 
 </pre></div>
 
 
-</li>
-<li>
-<p>Note the fingerprint of the key which is, in this case, <code>17AD8D3D</code>.</p>
-</li>
+<ol>
+<li>Note the fingerprint of the key which is, in this case, <code>17AD8D3D</code>.</li>
 </ol>
 <p><strong>Testing&nbsp;Passphrases:</strong></p>
 <ol>
-<li>
-<p>Now that we have the keys imported, we&#8217;re ready to test some
+<li>Now that we have the keys imported, we&#8217;re ready to test some
     passphrases. Enter your passphrases, one per line, in a text file.
     We&#8217;re assuming that we&#8217;re working on a totally secured host
     (ideally, a <span class="caps">VM</span> running on a standalone, non-networked machine) that
     will be destroyed when we&#8217;re done. For added security, I&#8217;d put this
     file on a ramdisk. In this example, the actual passphrase for the
-    key is &#8220;test&#8221;. Here&#8217;s our text&nbsp;file:</p>
-<div class="codehilite"><pre>testuser:~/.gnupg$ cat /tmp/passphrases 
-bad
-notgood
-notright
-test
+    key is &#8220;test&#8221;. Here&#8217;s our text&nbsp;file:</li>
+</ol>
+<div class="codehilite"><pre><span class="gp">testuser:~/.gnupg$</span> cat /tmp/passphrases 
+<span class="go">bad</span>
+<span class="go">notgood</span>
+<span class="go">notright</span>
+<span class="go">test</span>
 </pre></div>
 
 
-</li>
-<li>
-<p>Next, create a test data file to try to&nbsp;sign/encrypt:</p>
-<div class="codehilite"><pre>testuser:~/.gnupg$ echo &quot;test input&quot; &gt; /tmp/test.in
+<ol>
+<li>Next, create a test data file to try to&nbsp;sign/encrypt:</li>
+</ol>
+<div class="codehilite"><pre><span class="gp">testuser:~/.gnupg$</span> <span class="nb">echo</span> <span class="s2">&quot;test input&quot;</span> &gt; /tmp/test.in
 </pre></div>
 
 
-</li>
-<li>
-<p>Now we run the actual test (see below for more&nbsp;information&#8230;</p>
-<div class="codehilite"><pre>testuser:~/.gnupg$ for p in `cat /tmp/passphrases`; do echo &quot;$p&quot; | gpg -q --sign --local-user 17AD8D3D --passphrase-fd 0 --output /dev/null --yes /tmp/test.in &amp;&amp; (echo &quot;CORRECT passphrase: $p&quot; &amp;&amp; break); done
-Reading passphrase from file descriptor 0
+<ol>
+<li>Now we run the actual test (see below for more&nbsp;information&#8230;)</li>
+</ol>
+<div class="codehilite"><pre><span class="gp">testuser:~/.gnupg$</span> <span class="k">for </span>p in <span class="sb">`</span>cat /tmp/passphrases<span class="sb">`</span>; <span class="k">do </span><span class="nb">echo</span> <span class="s2">&quot;$p&quot;</span> | gpg -q --sign --local-user <span class="caps">17AD8D3D</span> --passphrase-fd 0 --output /dev/null --yes /tmp/test.in <span class="o">&amp;&amp;</span> <span class="o">(</span><span class="nb">echo</span> <span class="s2">&quot;<span class="caps">CORRECT</span> passphrase: $p&quot;</span> <span class="o">&amp;&amp;</span> <span class="nb">break</span><span class="o">)</span>; <span class="k">done</span>
+<span class="go">Reading passphrase from file descriptor 0    </span>
 
-You need a passphrase to unlock the secret key for
-user: &quot;Test User (Test User) &quot;
-2048-bit RSA key, ID 17AD8D3D, created 2013-08-24
+<span class="go">You need a passphrase to unlock the secret key for</span>
+<span class="go">user: &quot;Test User (Test User) &quot;</span>
+<span class="go">2048-bit <span class="caps">RSA</span> key, <span class="caps">ID</span> <span class="caps">17AD8D3D</span>, created 2013-08-24</span>
 
-gpg: skipped &quot;17AD8D3D&quot;: bad passphrase
-gpg: signing failed: bad passphrase
-Reading passphrase from file descriptor 0
+<span class="go">gpg: skipped &quot;<span class="caps">17AD8D3D</span>&quot;: bad passphrase</span>
+<span class="go">gpg: signing failed: bad passphrase</span>
+<span class="go">Reading passphrase from file descriptor 0    </span>
 
-You need a passphrase to unlock the secret key for
-user: &quot;Test User (Test User) &quot;
-2048-bit RSA key, ID 17AD8D3D, created 2013-08-24
+<span class="go">You need a passphrase to unlock the secret key for</span>
+<span class="go">user: &quot;Test User (Test User) &quot;</span>
+<span class="go">2048-bit <span class="caps">RSA</span> key, <span class="caps">ID</span> <span class="caps">17AD8D3D</span>, created 2013-08-24</span>
 
-gpg: skipped &quot;17AD8D3D&quot;: bad passphrase
-gpg: signing failed: bad passphrase
-Reading passphrase from file descriptor 0
+<span class="go">gpg: skipped &quot;<span class="caps">17AD8D3D</span>&quot;: bad passphrase</span>
+<span class="go">gpg: signing failed: bad passphrase</span>
+<span class="go">Reading passphrase from file descriptor 0    </span>
 
-You need a passphrase to unlock the secret key for
-user: &quot;Test User (Test User) &quot;
-2048-bit RSA key, ID 17AD8D3D, created 2013-08-24
+<span class="go">You need a passphrase to unlock the secret key for</span>
+<span class="go">user: &quot;Test User (Test User) &quot;</span>
+<span class="go">2048-bit <span class="caps">RSA</span> key, <span class="caps">ID</span> <span class="caps">17AD8D3D</span>, created 2013-08-24</span>
 
-gpg: skipped &quot;17AD8D3D&quot;: bad passphrase
-gpg: signing failed: bad passphrase
-Reading passphrase from file descriptor 0
+<span class="go">gpg: skipped &quot;<span class="caps">17AD8D3D</span>&quot;: bad passphrase</span>
+<span class="go">gpg: signing failed: bad passphrase</span>
+<span class="go">Reading passphrase from file descriptor 0    </span>
 
-You need a passphrase to unlock the secret key for
-user: &quot;Test User (Test User) &quot;
-2048-bit RSA key, ID 17AD8D3D, created 2013-08-24
+<span class="go">You need a passphrase to unlock the secret key for</span>
+<span class="go">user: &quot;Test User (Test User) &quot;</span>
+<span class="go">2048-bit <span class="caps">RSA</span> key, <span class="caps">ID</span> <span class="caps">17AD8D3D</span>, created 2013-08-24</span>
 
-CORRECT passphrase: test
-testuser:~/.gnupg$
+<span class="go"><span class="caps">CORRECT</span> passphrase: test</span>
+<span class="gp">testuser:~/.gnupg$</span> 
 </pre></div>
 
 
-</li>
-<li>
-<p>And there we have it, the working passphrase. I&#8217;m sure there&#8217;s a
+<ol>
+<li>And there we have it, the working passphrase. I&#8217;m sure there&#8217;s a
     more efficient way to do this, and probably a more secure way, but
     I&#8217;m not trying to brute-force someone&#8217;s <span class="caps">GPG</span> key, I&#8217;m trying to
     remember which one of my (many, many) passwords I used for a <span class="caps">GPG</span> key
-    that I generated a decade&nbsp;ago.</p>
-</li>
+    that I generated a decade&nbsp;ago.</li>
 </ol>
 <p>The actual command that we ran, rewritten with some linebreaks for
 legibility,&nbsp;is:</p>
-<div class="codehilite"><pre>for p in `cat /tmp/passphrases`
-do
-    echo &quot;$p&quot; | gpg -q --sign --local-user 17AD8D3D --passphrase-fd 0 --output /dev/null --yes /tmp/test.in &amp;&amp; (echo &quot;CORRECT passphrase: $p&quot; &amp;&amp; break)
-done
+<div class="codehilite"><pre><span class="k">for </span>p in <span class="sb">`</span>cat /tmp/passphrases<span class="sb">`</span>
+<span class="k">do</span>
+<span class="k">    </span><span class="nb">echo</span> <span class="s2">&quot;$p&quot;</span> | gpg -q --sign --local-user <span class="caps">17AD8D3D</span> --passphrase-fd 0 --output /dev/null --yes /tmp/test.in <span class="o">&amp;&amp;</span> <span class="o">(</span><span class="nb">echo</span> <span class="s2">&quot;<span class="caps">CORRECT</span> passphrase: $p&quot;</span> <span class="o">&amp;&amp;</span> <span class="nb">break</span><span class="o">)</span>
+<span class="k">done</span>
 </pre></div>
 
 
 <p>This loops over each line in the passphrases file (each passphrase that
 we want to try), and for each one, echoes the password and pipes it to
-<span class="caps">STDIN</span> of `gpg`, which tries to sign /tmp/test.in (sending the output
+<span class="caps">STDIN</span> of <code>gpg</code>, which tries to sign /tmp/test.in (sending the output
 to /dev/null) using the key with <span class="caps">ID</span> <code>17AD8D3D</code> (from #5 in the
 Preparation steps above) and a password provided on <span class="caps">STDIN</span>. If the <span class="caps">GPG</span>
 command succeeds, we echo the passphrase and stop looping through the
@@ -293,13 +289,18 @@ for unethical&nbsp;purposes.</p>
 
                 <li class="list-group-item"><a href="http://jantman.github.io/blog/tags.html"><h4><i class="icon-tags icon-large"></i>Tags</h4></a></li>
                         <li class="list-group-item tag-1">
+                            <a href="http://jantman.github.io/blog/tag/google.html">
+                                google
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
                             <a href="http://jantman.github.io/blog/tag/linux.html">
                                 linux
                             </a>
                         </li>
                         <li class="list-group-item tag-1">
-                            <a href="http://jantman.github.io/blog/tag/php.html">
-                                PHP
+                            <a href="http://jantman.github.io/blog/tag/sysadmin.html">
+                                sysadmin
                             </a>
                         </li>
                         <li class="list-group-item tag-1">
@@ -308,53 +309,13 @@ for unethical&nbsp;purposes.</p>
                             </a>
                         </li>
                         <li class="list-group-item tag-1">
-                            <a href="http://jantman.github.io/blog/tag/google.html">
-                                google
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-1">
                             <a href="http://jantman.github.io/blog/tag/nagios.html">
                                 Nagios
                             </a>
                         </li>
                         <li class="list-group-item tag-1">
-                            <a href="http://jantman.github.io/blog/tag/sysadmin.html">
-                                sysadmin
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/logging.html">
-                                logging
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/wordpress.html">
-                                wordpress
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/apache.html">
-                                apache
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/firefox.html">
-                                firefox
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/blog.html">
-                                blog
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/perl.html">
-                                perl
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/monitoring.html">
-                                monitoring
+                            <a href="http://jantman.github.io/blog/tag/php.html">
+                                PHP
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
@@ -363,8 +324,8 @@ for unethical&nbsp;purposes.</p>
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/dns.html">
-                                dns
+                            <a href="http://jantman.github.io/blog/tag/monitoring.html">
+                                monitoring
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
@@ -373,23 +334,18 @@ for unethical&nbsp;purposes.</p>
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/bind.html">
-                                bind
+                            <a href="http://jantman.github.io/blog/tag/blog.html">
+                                blog
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/sun.html">
-                                sun
+                            <a href="http://jantman.github.io/blog/tag/firefox.html">
+                                firefox
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/mediawiki.html">
-                                mediawiki
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/rpm.html">
-                                rpm
+                            <a href="http://jantman.github.io/blog/tag/apache.html">
+                                apache
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
@@ -398,8 +354,18 @@ for unethical&nbsp;purposes.</p>
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/puppet.html">
-                                puppet
+                            <a href="http://jantman.github.io/blog/tag/bind.html">
+                                bind
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/mediawiki.html">
+                                mediawiki
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/logging.html">
+                                logging
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
@@ -408,13 +374,43 @@ for unethical&nbsp;purposes.</p>
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/mac.html">
+                                mac
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/wordpress.html">
+                                wordpress
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/dns.html">
+                                dns
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/puppet.html">
+                                puppet
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
                             <a href="http://jantman.github.io/blog/tag/security.html">
                                 security
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/mac.html">
-                                mac
+                            <a href="http://jantman.github.io/blog/tag/rpm.html">
+                                rpm
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/perl.html">
+                                perl
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/sun.html">
+                                sun
                             </a>
                         </li>
         </ul>

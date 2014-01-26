@@ -17,7 +17,7 @@
             <meta property="og:description" content="At a remote location, I have a number of machines to monitor but only one IP (dynamic on a residential connection). Most of my remote monitoring with Nagios uses check_by_ssh. Previously, I’d used one host for Nagios to SSH to, and then chained together another check_by_ssh to reach the ..."/>
 
     <!-- Bootstrap -->
-        <link rel="stylesheet" href="http://jantman.github.io/blog/theme/css/bootstrap.min.css" type="text/css"/>
+        <link rel="stylesheet" href="http://jantman.github.io/blog/theme/css/bootstrap.flatly.min.css" type="text/css"/>
     <link href="http://jantman.github.io/blog/theme/css/font-awesome.min.css" rel="stylesheet">
     <link href="http://jantman.github.io/blog/theme/css/pygments.css" rel="stylesheet">
         <link href="http://jantman.github.io/blog/theme/css/typogrify.css" rel="stylesheet">
@@ -117,38 +117,38 @@ externally on different&nbsp;ports.</p>
 host key verification will fail, as the <span class="caps">SSH</span> client only looks at the
 address that it&#8217;s connecting to, not the port number. Normally, this is
 bypassed by using a <code>.ssh/config</code> file&nbsp;like:</p>
-<p>~~~~{.text only}
-Host foo1
+<div class="codehilite"><pre>Host foo1
         Hostname foo.example.com
         HostKeyAlias foo1
         CheckHostIP no
         Port 22
-        User&nbsp;nagios</p>
-<p>Host foo2
+        User nagios
+
+Host foo2
         Hostname foo.example.com
         HostKeyAlias foo2
         CheckHostIP no
         Port 222
-        User&nbsp;nagios</p>
-<p>Host foo3
+        User nagios
+
+Host foo3
         Hostname foo.example.com
         HostKeyAlias foo3
         CheckHostIP no
         Port 10022
-        User&nbsp;nagios</p>
-<div class="codehilite"><pre>And then you SSH using the &quot;Host&quot; named in the config file, not the
-actual hostname.
-
-Unfortunately, the only way to get check\_by\_ssh to do this was a bit
-messy, and required defining a bunch of extra macros for each host:
-
-~~~~{.text only}
-/check_by_ssh -o Hostname=foo.example.com -o HostKeyAlias=foo1 -o CheckHostIP=no -o Port=222 -o User=nagios -H foo.example.com -C uptime
+        User nagios
 </pre></div>
 
 
-<p></p>
-So, I made a quick little patch for check_by_ssh.c (patched against
+<p>And then you <span class="caps">SSH</span> using the &#8220;Host&#8221; named in the config file, not the
+actual&nbsp;hostname.</p>
+<p>Unfortunately, the only way to get check_by_ssh to do this was a bit
+messy, and required defining a bunch of extra macros for each&nbsp;host:</p>
+<div class="codehilite"><pre>./check_by_ssh -o Hostname=foo.example.com -o HostKeyAlias=foo1 -o CheckHostIP=no -o Port=222 -o User=nagios -H foo.example.com -C uptime
+</pre></div>
+
+
+<p>So, I made a quick little patch for check_by_ssh.c (patched against
 the released nagios-plugins-1.4.14)&nbsp;:</p>
 <div class="codehilite"><pre><span class="gd">--- check_by_ssh.c      2009-10-22 14:32:26.000000000 -0400</span>
 <span class="gi">+++ check_by_ssh_ORIG.c 2009-10-22 14:12:15.000000000 -0400</span>
@@ -211,8 +211,10 @@ it will still give an exit code of 3). I had to do this because
 check_by_ssh was checking for a valid hostname itself, though <span class="caps">SSH</span>
 needs to be passed the &#8220;Host&#8221; alias as defined in the config&nbsp;file.</p>
 <p>With the patch, we now have something nice and clean&nbsp;like:</p>
-<p>~~~~{.text only}
-./check_by_ssh -H foo1 -F /home/nagios/.ssh/config -l nagios -i /home/nagios/.ssh/id_dsa -C uptime&nbsp;~~~~</p>
+<div class="codehilite"><pre>./check_by_ssh -H foo1 -F /home/nagios/.ssh/config -l nagios -i /home/nagios/.ssh/id_dsa -C uptime
+</pre></div>
+
+
 <p>Which only adds the &#8220;-F&#8221; flag to what I was already using, and is safe
 to use for all&nbsp;hosts.</p>
 <p>When I get a chance, I&#8217;ll figure out a way to gracefully deal with the
@@ -243,13 +245,18 @@ add another option so that you have to specify both the actual hostname
 
                 <li class="list-group-item"><a href="http://jantman.github.io/blog/tags.html"><h4><i class="icon-tags icon-large"></i>Tags</h4></a></li>
                         <li class="list-group-item tag-1">
+                            <a href="http://jantman.github.io/blog/tag/google.html">
+                                google
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
                             <a href="http://jantman.github.io/blog/tag/linux.html">
                                 linux
                             </a>
                         </li>
                         <li class="list-group-item tag-1">
-                            <a href="http://jantman.github.io/blog/tag/php.html">
-                                PHP
+                            <a href="http://jantman.github.io/blog/tag/sysadmin.html">
+                                sysadmin
                             </a>
                         </li>
                         <li class="list-group-item tag-1">
@@ -258,53 +265,13 @@ add another option so that you have to specify both the actual hostname
                             </a>
                         </li>
                         <li class="list-group-item tag-1">
-                            <a href="http://jantman.github.io/blog/tag/google.html">
-                                google
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-1">
                             <a href="http://jantman.github.io/blog/tag/nagios.html">
                                 Nagios
                             </a>
                         </li>
                         <li class="list-group-item tag-1">
-                            <a href="http://jantman.github.io/blog/tag/sysadmin.html">
-                                sysadmin
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/logging.html">
-                                logging
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/wordpress.html">
-                                wordpress
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/apache.html">
-                                apache
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/firefox.html">
-                                firefox
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/blog.html">
-                                blog
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/perl.html">
-                                perl
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/monitoring.html">
-                                monitoring
+                            <a href="http://jantman.github.io/blog/tag/php.html">
+                                PHP
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
@@ -313,8 +280,8 @@ add another option so that you have to specify both the actual hostname
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/dns.html">
-                                dns
+                            <a href="http://jantman.github.io/blog/tag/monitoring.html">
+                                monitoring
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
@@ -323,23 +290,18 @@ add another option so that you have to specify both the actual hostname
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/bind.html">
-                                bind
+                            <a href="http://jantman.github.io/blog/tag/blog.html">
+                                blog
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/sun.html">
-                                sun
+                            <a href="http://jantman.github.io/blog/tag/firefox.html">
+                                firefox
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/mediawiki.html">
-                                mediawiki
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/rpm.html">
-                                rpm
+                            <a href="http://jantman.github.io/blog/tag/apache.html">
+                                apache
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
@@ -348,8 +310,18 @@ add another option so that you have to specify both the actual hostname
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/puppet.html">
-                                puppet
+                            <a href="http://jantman.github.io/blog/tag/bind.html">
+                                bind
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/mediawiki.html">
+                                mediawiki
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/logging.html">
+                                logging
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
@@ -358,13 +330,43 @@ add another option so that you have to specify both the actual hostname
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/mac.html">
+                                mac
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/wordpress.html">
+                                wordpress
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/dns.html">
+                                dns
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/puppet.html">
+                                puppet
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
                             <a href="http://jantman.github.io/blog/tag/security.html">
                                 security
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/mac.html">
-                                mac
+                            <a href="http://jantman.github.io/blog/tag/rpm.html">
+                                rpm
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/perl.html">
+                                perl
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/sun.html">
+                                sun
                             </a>
                         </li>
         </ul>

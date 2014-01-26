@@ -17,7 +17,7 @@
             <meta property="og:description" content="There’s a known issue with the SSH implementation in the iLO firmware for HP Proliant servers (specifically G2 and G3) and OpenSSH 5.1p1. There was a thread on the OpenSSH developers list that referenced this problem and suggested a solution, but it doesn’t seem to be a ..."/>
 
     <!-- Bootstrap -->
-        <link rel="stylesheet" href="http://jantman.github.io/blog/theme/css/bootstrap.min.css" type="text/css"/>
+        <link rel="stylesheet" href="http://jantman.github.io/blog/theme/css/bootstrap.flatly.min.css" type="text/css"/>
     <link href="http://jantman.github.io/blog/theme/css/font-awesome.min.css" rel="stylesheet">
     <link href="http://jantman.github.io/blog/theme/css/pygments.css" rel="stylesheet">
         <link href="http://jantman.github.io/blog/theme/css/typogrify.css" rel="stylesheet">
@@ -121,35 +121,32 @@ solution, but it doesn&#8217;t seem to be a sure&nbsp;fix.</p>
 <span class="caps">DL380G3</span> running iLO 1.92 2008.04.24 and system firmware P29 2004.09.15.
 The only way that I can reliably get into the iLO is by SSHing from a
 box with an older version of <span class="caps">SSH</span>, such as&nbsp;4.2p1.</p>
-<p>
-Most of the things that I could find online referenced unsetting the
-<span class="caps">LANG</span> environment variable:
-
-wzxhzdk:0
-
-
-and then SSHing with agent forwarding disabled:
-
-
-wzxhzdk:1
-
-
-Unfortunately this combination doesn&#8217;t seem to do it for me.
-
-I happened to stumble by [this
-post](http://www.mail-archive.com/debian-ssh@lists.debian.org/msg00904.html)
+<p>Most of the things that I could find online referenced unsetting the
+<span class="caps">LANG</span> environment variable (<code>unset LANG</code>) and then SSHing with agent forwarding disabled (<code>ssh -a hostname-ilo</code>).</p>
+<p>Unfortunately this combination doesn&#8217;t seem to do it for&nbsp;me.</p>
+<p>I happened to stumble by <a href="http://www.mail-archive.com/debian-ssh@lists.debian.org/msg00904.html">this
+post</a>
 to the debian-ssh mailing list, which suggested that shortening the new
-OpenSSH version string fixed the problem.
-
-I was able to confirm that the version string is, in fact, the sole
+OpenSSH version string fixed the&nbsp;problem.</p>
+<p>I was able to confirm that the version string is, in fact, the sole
 problem. I downloaded the source of OpenSSH 5.2p1 and, with the
 following small patch to version.h, managed to get <span class="caps">SSH</span> working to the
-iLO perfectly:&nbsp;wzxhzdk:2
+iLO&nbsp;perfectly:</p>
+<div class="codehilite"><pre><span class="gd">--- openssh-patched/version.h   2009-06-12 00:35:48.000000000 -0400</span>
+<span class="gi">+++ openssh-5.2p1/version.h     2009-02-22 19:09:26.000000000 -0500</span>
+<span class="gu">@@ -1,6 +1,6 @@</span>
+ /* $OpenBSD: version.h,v 1.55 2009/02/23 00:06:15 djm Exp $ */
+
+<span class="gd">-#define SSH_VERSION    &quot;OpenSSH&quot;</span>
+<span class="gi">+#define SSH_VERSION    &quot;OpenSSH_5.2&quot;</span>
+
+<span class="gd">-#define SSH_PORTABLE   &quot;&quot;</span>
+<span class="gi">+#define SSH_PORTABLE   &quot;p1&quot;</span>
+ #define SSH_RELEASE    SSH_VERSION SSH_PORTABLE
+</pre></div>
 
 
-</p>
-
-<p>I patched version.h, ran `./configure`, `make`, and then copied the
+<p>I patched version.h, ran <code>./configure</code>, <code>make</code>, and then copied the
 compiled ssh binary to /usr/bin/ilossh, so that my original ssh binary
 would be intact, and the ilossh binary would be left alone by <span class="caps">RPM</span>&nbsp;upgrades.</p>
             </div>
@@ -175,13 +172,18 @@ would be intact, and the ilossh binary would be left alone by <span class="caps"
 
                 <li class="list-group-item"><a href="http://jantman.github.io/blog/tags.html"><h4><i class="icon-tags icon-large"></i>Tags</h4></a></li>
                         <li class="list-group-item tag-1">
+                            <a href="http://jantman.github.io/blog/tag/google.html">
+                                google
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
                             <a href="http://jantman.github.io/blog/tag/linux.html">
                                 linux
                             </a>
                         </li>
                         <li class="list-group-item tag-1">
-                            <a href="http://jantman.github.io/blog/tag/php.html">
-                                PHP
+                            <a href="http://jantman.github.io/blog/tag/sysadmin.html">
+                                sysadmin
                             </a>
                         </li>
                         <li class="list-group-item tag-1">
@@ -190,53 +192,13 @@ would be intact, and the ilossh binary would be left alone by <span class="caps"
                             </a>
                         </li>
                         <li class="list-group-item tag-1">
-                            <a href="http://jantman.github.io/blog/tag/google.html">
-                                google
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-1">
                             <a href="http://jantman.github.io/blog/tag/nagios.html">
                                 Nagios
                             </a>
                         </li>
                         <li class="list-group-item tag-1">
-                            <a href="http://jantman.github.io/blog/tag/sysadmin.html">
-                                sysadmin
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/logging.html">
-                                logging
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/wordpress.html">
-                                wordpress
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/apache.html">
-                                apache
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/firefox.html">
-                                firefox
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/blog.html">
-                                blog
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/perl.html">
-                                perl
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/monitoring.html">
-                                monitoring
+                            <a href="http://jantman.github.io/blog/tag/php.html">
+                                PHP
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
@@ -245,8 +207,8 @@ would be intact, and the ilossh binary would be left alone by <span class="caps"
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/dns.html">
-                                dns
+                            <a href="http://jantman.github.io/blog/tag/monitoring.html">
+                                monitoring
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
@@ -255,23 +217,18 @@ would be intact, and the ilossh binary would be left alone by <span class="caps"
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/bind.html">
-                                bind
+                            <a href="http://jantman.github.io/blog/tag/blog.html">
+                                blog
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/sun.html">
-                                sun
+                            <a href="http://jantman.github.io/blog/tag/firefox.html">
+                                firefox
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/mediawiki.html">
-                                mediawiki
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/rpm.html">
-                                rpm
+                            <a href="http://jantman.github.io/blog/tag/apache.html">
+                                apache
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
@@ -280,8 +237,18 @@ would be intact, and the ilossh binary would be left alone by <span class="caps"
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/puppet.html">
-                                puppet
+                            <a href="http://jantman.github.io/blog/tag/bind.html">
+                                bind
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/mediawiki.html">
+                                mediawiki
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/logging.html">
+                                logging
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
@@ -290,13 +257,43 @@ would be intact, and the ilossh binary would be left alone by <span class="caps"
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/mac.html">
+                                mac
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/wordpress.html">
+                                wordpress
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/dns.html">
+                                dns
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/puppet.html">
+                                puppet
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
                             <a href="http://jantman.github.io/blog/tag/security.html">
                                 security
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/mac.html">
-                                mac
+                            <a href="http://jantman.github.io/blog/tag/rpm.html">
+                                rpm
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/perl.html">
+                                perl
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/sun.html">
+                                sun
                             </a>
                         </li>
         </ul>

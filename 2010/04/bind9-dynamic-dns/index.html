@@ -17,7 +17,7 @@
             <meta property="og:description" content="I needed a better solution for Dynamic DNS than dyndns.org for something, so I set about setting up DDNS through my BIND9 servers. I found a number of very helpful blog posts, including nsupdate: Painless Dynamic DNS, Painless DDNS part 2: the server, Secure dynamic DNS howto and A ..."/>
 
     <!-- Bootstrap -->
-        <link rel="stylesheet" href="http://jantman.github.io/blog/theme/css/bootstrap.min.css" type="text/css"/>
+        <link rel="stylesheet" href="http://jantman.github.io/blog/theme/css/bootstrap.flatly.min.css" type="text/css"/>
     <link href="http://jantman.github.io/blog/theme/css/font-awesome.min.css" rel="stylesheet">
     <link href="http://jantman.github.io/blog/theme/css/pygments.css" rel="stylesheet">
         <link href="http://jantman.github.io/blog/theme/css/typogrify.css" rel="stylesheet">
@@ -125,19 +125,19 @@ very&nbsp;helpful.</p>
 <ol>
 <li>Add an <span class="caps">RR</span> for the host I want, in the appropriate&nbsp;zone.</li>
 <li>Generate <span class="caps">TSIG</span> keys, distribute them to the&nbsp;client.</li>
-<li>Make sure you have logging enabled for things of interest in your
-    <code>logging</code> section of <code>named.conf</code>:</li>
-</ol>
+<li>
+<p>Make sure you have logging enabled for things of interest in your
+    <code>logging</code> section of <code>named.conf</code>:</p>
 <div class="codehilite"><pre>category dnssec { syslog_info; };
 category update { syslog_info; };
 category security { syslog_info; };
 </pre></div>
 
 
-<ol>
-<li>Create a keys.conf file for your keys (you <em>do</em> split your configs
-    out into usable chunks,&nbsp;right?):</li>
-</ol>
+</li>
+<li>
+<p>Create a keys.conf file for your keys (you <em>do</em> split your configs
+    out into usable chunks,&nbsp;right?):</p>
 <div class="codehilite"><pre>key foo.example.com. {
     algorithm HMAC-MD5.SIG-ALG.REG.INT;
     secret &quot;this is your secret here (after Key: in the .private file)&quot;;
@@ -145,37 +145,28 @@ category security { syslog_info; };
 </pre></div>
 
 
-<div class="codehilite"><pre>&lt;p&gt;
-and include it in `named.conf` like
-`include &quot;/etc/named.d/keys.conf&quot;;`
+<p>and include it in <code>named.conf</code> like:</p>
+<div class="codehilite"><pre>include &quot;/etc/named.d/keys.conf&quot;;
 </pre></div>
 
 
-<ol>
+</li>
 <li>
 <p>Set an
     <a href="http://www.zytrax.com/books/dns/ch7/xfer.html#update-policy"><code>update-policy</code></a>
     statement in <code>named.conf</code>. I just added mine to a specific zone in a
     specific view (external), as that&#8217;s the only place I would
     conceivably want updates right&nbsp;now.</p>
-</p>
-
-</li>
-</ol>
 <div class="codehilite"><pre>update-policy {
     grant * self * A TXT;
 };
 </pre></div>
 
 
-<div class="codehilite"><pre>&lt;p&gt;
-Assuming your TSIG keys are named for specific RRs, this will let
-any client (with a valid key setup on the server) update its own RR
-and nothing else.
-</pre></div>
-
-
-<ol>
+<p>Assuming your <span class="caps">TSIG</span> keys are named for specific RRs, this will let
+any client (with a valid key setup on the server) update its own <span class="caps">RR</span>
+and nothing&nbsp;else.</p>
+</li>
 <li>
 <p>Finally, I created a script for ddns updates on the client. Since I
     want to be able to fire off this script manually or via cron (if I
@@ -183,10 +174,6 @@ and nothing else.
     MultiBINDadmin), I bypassed the usual dhclient stuff and manually
     grab the current <span class="caps">IP</span> from the interface of interest. I symlinked this
     in <code>/etc/dhcp3/dhclient-exit-hooks.d</code> so it will run on <span class="caps">DHCP</span>&nbsp;updates.</p>
-</p>
-
-</li>
-</ol>
 <div class="codehilite"><pre><span class="c">#!/bin/bash</span>
 <span class="nv"><span class="caps">IFACE</span></span><span class="o">=</span><span class="s2">&quot;eth0&quot;</span>
 <span class="nv"><span class="caps">TTL</span></span><span class="o">=</span>3600
@@ -208,6 +195,8 @@ nsupdate -v -k <span class="nv">$<span class="caps">KEYFILE</span></span> <span 
 </pre></div>
 
 
+</li>
+</ol>
 <p>When I finally got things setup, my only problem was with permissions on
 the zone file directories, which was easily corrected.Once this was
 straightened out, my <code>nsupdate</code> script ran flawlessly, and the update
@@ -270,13 +259,18 @@ interrogate <span class="caps">BIND</span> about RRs for the external zone from 
 
                 <li class="list-group-item"><a href="http://jantman.github.io/blog/tags.html"><h4><i class="icon-tags icon-large"></i>Tags</h4></a></li>
                         <li class="list-group-item tag-1">
+                            <a href="http://jantman.github.io/blog/tag/google.html">
+                                google
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
                             <a href="http://jantman.github.io/blog/tag/linux.html">
                                 linux
                             </a>
                         </li>
                         <li class="list-group-item tag-1">
-                            <a href="http://jantman.github.io/blog/tag/php.html">
-                                PHP
+                            <a href="http://jantman.github.io/blog/tag/sysadmin.html">
+                                sysadmin
                             </a>
                         </li>
                         <li class="list-group-item tag-1">
@@ -285,53 +279,13 @@ interrogate <span class="caps">BIND</span> about RRs for the external zone from 
                             </a>
                         </li>
                         <li class="list-group-item tag-1">
-                            <a href="http://jantman.github.io/blog/tag/google.html">
-                                google
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-1">
                             <a href="http://jantman.github.io/blog/tag/nagios.html">
                                 Nagios
                             </a>
                         </li>
                         <li class="list-group-item tag-1">
-                            <a href="http://jantman.github.io/blog/tag/sysadmin.html">
-                                sysadmin
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/logging.html">
-                                logging
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/wordpress.html">
-                                wordpress
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/apache.html">
-                                apache
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/firefox.html">
-                                firefox
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/blog.html">
-                                blog
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/perl.html">
-                                perl
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/monitoring.html">
-                                monitoring
+                            <a href="http://jantman.github.io/blog/tag/php.html">
+                                PHP
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
@@ -340,8 +294,8 @@ interrogate <span class="caps">BIND</span> about RRs for the external zone from 
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/dns.html">
-                                dns
+                            <a href="http://jantman.github.io/blog/tag/monitoring.html">
+                                monitoring
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
@@ -350,23 +304,18 @@ interrogate <span class="caps">BIND</span> about RRs for the external zone from 
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/bind.html">
-                                bind
+                            <a href="http://jantman.github.io/blog/tag/blog.html">
+                                blog
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/sun.html">
-                                sun
+                            <a href="http://jantman.github.io/blog/tag/firefox.html">
+                                firefox
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/mediawiki.html">
-                                mediawiki
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/rpm.html">
-                                rpm
+                            <a href="http://jantman.github.io/blog/tag/apache.html">
+                                apache
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
@@ -375,8 +324,18 @@ interrogate <span class="caps">BIND</span> about RRs for the external zone from 
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/puppet.html">
-                                puppet
+                            <a href="http://jantman.github.io/blog/tag/bind.html">
+                                bind
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/mediawiki.html">
+                                mediawiki
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/logging.html">
+                                logging
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
@@ -385,13 +344,43 @@ interrogate <span class="caps">BIND</span> about RRs for the external zone from 
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/mac.html">
+                                mac
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/wordpress.html">
+                                wordpress
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/dns.html">
+                                dns
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/puppet.html">
+                                puppet
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
                             <a href="http://jantman.github.io/blog/tag/security.html">
                                 security
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/mac.html">
-                                mac
+                            <a href="http://jantman.github.io/blog/tag/rpm.html">
+                                rpm
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/perl.html">
+                                perl
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/sun.html">
+                                sun
                             </a>
                         </li>
         </ul>

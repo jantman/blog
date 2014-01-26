@@ -17,7 +17,7 @@
             <meta property="og:description" content="Lately I’ve been contributing to some open source projects hosted on github. I’m pretty new to git, and the process is a bit confusing for beginners. So, here’s a sample workflow, based on the The Foreman‘s foreman github repository. Note that I’m developing against the ..."/>
 
     <!-- Bootstrap -->
-        <link rel="stylesheet" href="http://jantman.github.io/blog/theme/css/bootstrap.min.css" type="text/css"/>
+        <link rel="stylesheet" href="http://jantman.github.io/blog/theme/css/bootstrap.flatly.min.css" type="text/css"/>
     <link href="http://jantman.github.io/blog/theme/css/font-awesome.min.css" rel="stylesheet">
     <link href="http://jantman.github.io/blog/theme/css/pygments.css" rel="stylesheet">
         <link href="http://jantman.github.io/blog/theme/css/typogrify.css" rel="stylesheet">
@@ -127,179 +127,166 @@ time to <em>really</em> learn git, and I also can&#8217;t find a simple enough
 tutorial that covers all&nbsp;this&#8230;</p>
 <ol>
 <li>Fork the original repository through the GitHub&nbsp;interface.</li>
-<li>On your machine, clone your&nbsp;fork:</li>
-</ol>
-<div class="codehilite"><pre>git clone git@github.com:username/reponame.git <span class="o">&amp;&amp;</span> <span class="nb">cd </span>reponame
+<li>
+<p>On your machine, clone your&nbsp;fork:</p>
+<div class="codehilite"><pre>git clone git@github.com:username/reponame.git &amp;&amp; cd reponame
 </pre></div>
 
 
-<ol>
-<li>Make sure you&#8217;ve&nbsp;setup</li>
-</ol>
-<div class="codehilite"><pre>git config --global branch.autosetupmerge <span class="nb">true</span>
+</li>
+<li>
+<p>Make sure you&#8217;ve&nbsp;setup</p>
+<div class="codehilite"><pre>git config --global branch.autosetupmerge true
 </pre></div>
 
 
-<ol>
-<li>Add your upstream&nbsp;repo:</li>
-</ol>
+</li>
+<li>
+<p>Add your upstream&nbsp;repo:</p>
 <div class="codehilite"><pre>git remote add upstream git://github.com/upstream_user/upstream_repo.git
 </pre></div>
 
 
-<ol>
-<li>Fetch it and initialize any&nbsp;submodules:</li>
-</ol>
-<div class="codehilite"><pre>git fetch upstream <span class="o">&amp;&amp;</span> git submodule update --init
+</li>
+<li>
+<p>Fetch it and initialize any&nbsp;submodules:</p>
+<div class="codehilite"><pre>git fetch upstream &amp;&amp; git submodule update --init
 </pre></div>
 
 
-<ol>
-<li>Check the current branch (<code>git branch</code>, let&#8217;s assume it&#8217;s called
-    &#8220;develop&#8221;) and rebase to its&nbsp;upstream:</li>
-</ol>
+</li>
+<li>
+<p>Check the current branch (<code>git branch</code>, let&#8217;s assume it&#8217;s called
+    &#8220;develop&#8221;) and rebase to its&nbsp;upstream:</p>
 <div class="codehilite"><pre>git rebase upstream/develop develop
 </pre></div>
 
 
-<ol>
-<li>Create my &#8220;jantman&#8221; branch, which will be the upstream &#8220;develop&#8221;,
-    plus my finished work merged into&nbsp;it:</li>
-</ol>
+</li>
+<li>
+<p>Create my &#8220;jantman&#8221; branch, which will be the upstream &#8220;develop&#8221;,
+    plus my finished work merged into&nbsp;it:</p>
 <div class="codehilite"><pre>git checkout -b jantman origin/develop
 </pre></div>
 
 
-<ol>
-<li>Create a topic branch to do some&nbsp;work:</li>
-</ol>
+</li>
+<li>
+<p>Create a topic branch to do some&nbsp;work:</p>
 <div class="codehilite"><pre>git checkout -b NewBranchName jantman
 </pre></div>
 
 
-<ol>
-<li>Periodically, push the topic branch to&nbsp;github:</li>
-</ol>
+</li>
+<li>
+<p>Periodically, push the topic branch to&nbsp;github:</p>
 <div class="codehilite"><pre>git push origin NewBranchName
 </pre></div>
 
 
-<ol>
-<li>If you commit to this branch from another computer (or someone else
-    commits to it), periodically update your local tracking&nbsp;branch:</li>
-</ol>
+</li>
+<li>
+<p>If you commit to this branch from another computer (or someone else
+    commits to it), periodically update your local tracking&nbsp;branch:</p>
 <div class="codehilite"><pre>git pull origin NewBranchName
 </pre></div>
 
 
-<ol>
-<li>Periodically, you want to pull in the upstream changes:<ol>
-<li>switch to the develop&nbsp;branch:</li>
-</ol>
 </li>
-</ol>
+<li>
+<p>Periodically, you want to pull in the upstream&nbsp;changes:</p>
+<ol>
+<li>
+<p>switch to the develop&nbsp;branch:</p>
 <div class="codehilite"><pre>git checkout develop
 </pre></div>
 
 
-<div class="codehilite"><pre>2.  grab the latest version of the upstream git repo:
-</pre></div>
-
-
+</li>
+<li>
+<p>grab the latest version of the upstream git&nbsp;repo:</p>
 <div class="codehilite"><pre>git fetch upstream
 </pre></div>
 
 
-<div class="codehilite"><pre>3.  rebase develop to mirror the upstream develop branch:
-</pre></div>
-
-
+</li>
+<li>
+<p>rebase develop to mirror the upstream develop&nbsp;branch:</p>
 <div class="codehilite"><pre>git rebase upstream/develop develop
 </pre></div>
 
 
-<div class="codehilite"><pre>4.  switch to our personal branch:
-</pre></div>
-
-
+</li>
+<li>
+<p>switch to our personal&nbsp;branch:</p>
 <div class="codehilite"><pre>git checkout jantman
 </pre></div>
 
 
-<div class="codehilite"><pre>5.  rebase our personal branch onto develop (pull all the new
-    commits from develop into our personal branch):
-</pre></div>
-
-
+</li>
+<li>
+<p>rebase our personal branch onto develop (pull all the new
+    commits from develop into our personal&nbsp;branch):</p>
 <div class="codehilite"><pre>git rebase develop jantman
 </pre></div>
 
 
-<div class="codehilite"><pre>6.  If we want those new upstream changes to continue down to our
-    topic branches:
-</pre></div>
-
-
+</li>
+<li>
+<p>If we want those new upstream changes to continue down to our
+    topic&nbsp;branches:</p>
 <div class="codehilite"><pre>git rebase develop topicBranchName
 </pre></div>
 
 
-<ol>
-<li>When we&#8217;re done with a topic branch, we want to merge it into our
-    &#8220;personal&#8221;&nbsp;branch:</li>
+</li>
 </ol>
-<div class="codehilite"><pre>git checkout jantman; git merge --squash node-table-facts
+</li>
+<li>
+<p>When we&#8217;re done with a topic branch, we want to merge it into our
+    &#8220;personal&#8221;&nbsp;branch:</p>
+<div class="codehilite"><pre>    git checkout jantman; git merge --squash node-table-facts
 </pre></div>
 
 
-<div class="codehilite"><pre>&lt;p&gt;
-and then commit:
+<p>and then&nbsp;commit:</p>
+<div class="codehilite"><pre>    git commit
 </pre></div>
 
 
-<div class="codehilite"><pre>git commit
-</pre></div>
-
-
-<div class="codehilite"><pre>&lt;p&gt;
-The `--squash` will squash all the history of that branch down to
+<p>The <code>--squash</code> will squash all the history of that branch down to
 one commit. This is generally easier for integration into upstream,
 and assuming the topic branch was created for a single feature or
-bug, should be logical.
-</pre></div>
-
-
-<ol>
-<li>If we&#8217;re sure we don&#8217;t need it anymore, delete the topic branch from
-    our local&nbsp;machine:</li>
-</ol>
+bug, should be&nbsp;logical.</p>
+</li>
+<li>
+<p>If we&#8217;re sure we don&#8217;t need it anymore, delete the topic branch from
+    our local&nbsp;machine:</p>
 <div class="codehilite"><pre>git branch -d topicBranchName
 </pre></div>
 
 
-<div class="codehilite"><pre>&lt;p&gt;
-and from github:
-</pre></div>
-
-
+<p>and from&nbsp;github:</p>
 <div class="codehilite"><pre>git push origin --delete topicBranchName
 </pre></div>
 
 
-<ol>
-<li>Finally, make sure we push our &#8220;personal&#8221; branch back to&nbsp;origin:</li>
-</ol>
+</li>
+<li>
+<p>Finally, make sure we push our &#8220;personal&#8221; branch back to&nbsp;origin:</p>
 <div class="codehilite"><pre>git push origin jantman
 </pre></div>
 
 
-<ol>
-<li>Assuming all went well, you&#8217;ll see the new commit on github, and
-    have a nice pull request&nbsp;button.</li>
+</li>
+<li>
+<p>Assuming all went well, you&#8217;ll see the new commit on github, and
+    have a nice pull request&nbsp;button.</p>
+</li>
 </ol>
 <p>References:</p>
 <ol>
-<li><a href="http://www.doctrine-project.org/contribute.html">Contribute —&nbsp;Doctrine-Project</a></li>
+<li><a href="http://www.doctrine-project.org/contribute.html">Contribute -&nbsp;Doctrine-Project</a></li>
 <li><a href="http://qsapp.com/wiki/Github">Github - Quicksilver&nbsp;Wiki</a></li>
 <li><a href="https://github.com/carmaa/inception/wiki/Contributor-Workflow-with-Github">Contributor Workflow with Github · carmaa/inception&nbsp;Wiki</a></li>
 <li><a href="http://help.github.com/fork-a-repo/">Help.GitHub - Fork A&nbsp;Repo</a></li>
@@ -327,13 +314,18 @@ and from github:
 
                 <li class="list-group-item"><a href="http://jantman.github.io/blog/tags.html"><h4><i class="icon-tags icon-large"></i>Tags</h4></a></li>
                         <li class="list-group-item tag-1">
+                            <a href="http://jantman.github.io/blog/tag/google.html">
+                                google
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
                             <a href="http://jantman.github.io/blog/tag/linux.html">
                                 linux
                             </a>
                         </li>
                         <li class="list-group-item tag-1">
-                            <a href="http://jantman.github.io/blog/tag/php.html">
-                                PHP
+                            <a href="http://jantman.github.io/blog/tag/sysadmin.html">
+                                sysadmin
                             </a>
                         </li>
                         <li class="list-group-item tag-1">
@@ -342,53 +334,13 @@ and from github:
                             </a>
                         </li>
                         <li class="list-group-item tag-1">
-                            <a href="http://jantman.github.io/blog/tag/google.html">
-                                google
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-1">
                             <a href="http://jantman.github.io/blog/tag/nagios.html">
                                 Nagios
                             </a>
                         </li>
                         <li class="list-group-item tag-1">
-                            <a href="http://jantman.github.io/blog/tag/sysadmin.html">
-                                sysadmin
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/logging.html">
-                                logging
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/wordpress.html">
-                                wordpress
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/apache.html">
-                                apache
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/firefox.html">
-                                firefox
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/blog.html">
-                                blog
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/perl.html">
-                                perl
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/monitoring.html">
-                                monitoring
+                            <a href="http://jantman.github.io/blog/tag/php.html">
+                                PHP
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
@@ -397,8 +349,8 @@ and from github:
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/dns.html">
-                                dns
+                            <a href="http://jantman.github.io/blog/tag/monitoring.html">
+                                monitoring
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
@@ -407,23 +359,18 @@ and from github:
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/bind.html">
-                                bind
+                            <a href="http://jantman.github.io/blog/tag/blog.html">
+                                blog
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/sun.html">
-                                sun
+                            <a href="http://jantman.github.io/blog/tag/firefox.html">
+                                firefox
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/mediawiki.html">
-                                mediawiki
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/rpm.html">
-                                rpm
+                            <a href="http://jantman.github.io/blog/tag/apache.html">
+                                apache
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
@@ -432,8 +379,18 @@ and from github:
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/puppet.html">
-                                puppet
+                            <a href="http://jantman.github.io/blog/tag/bind.html">
+                                bind
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/mediawiki.html">
+                                mediawiki
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/logging.html">
+                                logging
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
@@ -442,13 +399,43 @@ and from github:
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/mac.html">
+                                mac
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/wordpress.html">
+                                wordpress
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/dns.html">
+                                dns
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/puppet.html">
+                                puppet
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
                             <a href="http://jantman.github.io/blog/tag/security.html">
                                 security
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/mac.html">
-                                mac
+                            <a href="http://jantman.github.io/blog/tag/rpm.html">
+                                rpm
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/perl.html">
+                                perl
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/sun.html">
+                                sun
                             </a>
                         </li>
         </ul>

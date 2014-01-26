@@ -17,7 +17,7 @@
             <meta property="og:description" content="At work, I have a pretty beefy workstation (a Dell OptiPlex 990 with a 3.4GHz Intel Core i7-2600 and 8GB RAM running Fedora 16) that I usually run a few VMs on as my test/development environment. I usually reboot my machine every other week or so, and start ..."/>
 
     <!-- Bootstrap -->
-        <link rel="stylesheet" href="http://jantman.github.io/blog/theme/css/bootstrap.min.css" type="text/css"/>
+        <link rel="stylesheet" href="http://jantman.github.io/blog/theme/css/bootstrap.flatly.min.css" type="text/css"/>
     <link href="http://jantman.github.io/blog/theme/css/font-awesome.min.css" rel="stylesheet">
     <link href="http://jantman.github.io/blog/theme/css/pygments.css" rel="stylesheet">
         <link href="http://jantman.github.io/blog/theme/css/typogrify.css" rel="stylesheet">
@@ -126,47 +126,57 @@ manual</a>, but here&#8217;s a
 step-by-step&nbsp;method.</p>
 <ol>
 <li>
-First, download the Oracle (non-free) Oracle VirtualBox <span class="caps">VM</span> Extension
-Pack tarball from the [VirtualBox Downloads
-Page](https://www.virtualbox.org/wiki/Downloads), which provides <span class="caps">VRDP</span>
+<p>First, download the Oracle (non-free) Oracle VirtualBox <span class="caps">VM</span> Extension
+Pack tarball from the <a href="https://www.virtualbox.org/wiki/Downloads">VirtualBox Downloads
+Page</a>, which provides <span class="caps">VRDP</span>
 support (as well as support for the virtual <span class="caps">USB</span> 2.0 device, Intel <span class="caps">PXE</span>
 Boot <span class="caps">ROM</span> support for the E1000 <span class="caps">NIC</span> driver, and experimental Linux host
-<span class="caps">PCI</span> passthrough suport). Then install it using:&nbsp;wzxhzdk:0
+<span class="caps">PCI</span> passthrough suport). Then install it&nbsp;using:</p>
+<div class="codehilite"><pre>sudo VBoxManage extpack install Oracle_VM_VirtualBox_Extension_Pack-4.1.8-75467.vbox-extpack
+</pre></div>
 
 
 </li>
 <li>
-Assuming you have an existing <span class="caps">VM</span> (you can list them using
-`VBoxManage list vms`), enable <span class="caps">VRDP</span> support on it:&nbsp;wzxhzdk:1
+<p>Assuming you have an existing <span class="caps">VM</span> (you can list them using <code>VBoxManage list vms</code>), enable <span class="caps">VRDP</span> support on&nbsp;it:</p>
+<div class="codehilite"><pre>VBoxManage modifyvm &quot;VM name&quot; --vrde on
+</pre></div>
 
 
 </li>
 <li>
-I like to assign specific ports to <span class="caps">VRDP</span> on each <span class="caps">VM</span> so I can &#8220;bookmark&#8221;
-them in my [<span class="caps">KRDC</span>](http://kde.org/applications/internet/krdc/) client by
+<p>I like to assign specific ports to <span class="caps">VRDP</span> on each <span class="caps">VM</span> so I can &#8220;bookmark&#8221;
+them in my <a href="http://kde.org/applications/internet/krdc/"><span class="caps">KRDC</span></a> client by
 <span class="caps">VM</span> name. I generally start with 10011, as the 10011-10049 range is both
-unassigned and doesn&#8217;t appear in my `/etc/services`:&nbsp;wzxhzdk:2
+unassigned and doesn&#8217;t appear in my <code>/etc/services</code>:</p>
+<div class="codehilite"><pre>VBoxManage modifyvm &quot;VM name&quot; --vrdeport 10011
+</pre></div>
 
 
 </li>
 <li>
-Start the <span class="caps">VM</span>, using VBoxHeadless (shows more debugging/errors, but also
+<p>Start the <span class="caps">VM</span>, using VBoxHeadless (shows more debugging/errors, but also
 stays in the foreground, so you&#8217;ll want to use
-[screen](http://www.gnu.org/software/screen/) or something like it):
-
-
-wzxhzdk:3
-
-
-If all went well, it should show some output including a confirmation
-that the <span class="caps">VRDE</span> server is running on the correct port:&nbsp;wzxhzdk:4
+<a href="http://www.gnu.org/software/screen/">screen</a> or something like&nbsp;it):</p>
+<div class="codehilite"><pre>VBoxHeadless --startvm &quot;VM name&quot;
+</pre></div>
 
 
 </li>
-</ul>
-That&#8217;s it. Assuming you&#8217;re using something like
-[screen](http://www.gnu.org/software/screen/), you can start a whole
-bunch of new VMs, and still keep the VBoxHeadless output in case of an&nbsp;error.
+</ol>
+<p>If all went well, it should show some output including a confirmation
+that the <span class="caps">VRDE</span> server is running on the correct&nbsp;port:</p>
+<div class="codehilite"><pre>Oracle VM VirtualBox Headless Interface 4.1.8_OSE
+(C) 2008-2012 Oracle Corporation
+All rights reserved.
+
+VRDE server is listening on port 3389.
+</pre></div>
+
+
+<p>That&#8217;s it. Assuming you&#8217;re using something like
+<a href="http://www.gnu.org/software/screen/">screen</a>, you can start a whole
+bunch of new VMs, and still keep the VBoxHeadless output in case of an&nbsp;error.</p>
             </div>
             <!-- /.entry-content -->
         </article>
@@ -190,13 +200,18 @@ bunch of new VMs, and still keep the VBoxHeadless output in case of an&nbsp;erro
 
                 <li class="list-group-item"><a href="http://jantman.github.io/blog/tags.html"><h4><i class="icon-tags icon-large"></i>Tags</h4></a></li>
                         <li class="list-group-item tag-1">
+                            <a href="http://jantman.github.io/blog/tag/google.html">
+                                google
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
                             <a href="http://jantman.github.io/blog/tag/linux.html">
                                 linux
                             </a>
                         </li>
                         <li class="list-group-item tag-1">
-                            <a href="http://jantman.github.io/blog/tag/php.html">
-                                PHP
+                            <a href="http://jantman.github.io/blog/tag/sysadmin.html">
+                                sysadmin
                             </a>
                         </li>
                         <li class="list-group-item tag-1">
@@ -205,53 +220,13 @@ bunch of new VMs, and still keep the VBoxHeadless output in case of an&nbsp;erro
                             </a>
                         </li>
                         <li class="list-group-item tag-1">
-                            <a href="http://jantman.github.io/blog/tag/google.html">
-                                google
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-1">
                             <a href="http://jantman.github.io/blog/tag/nagios.html">
                                 Nagios
                             </a>
                         </li>
                         <li class="list-group-item tag-1">
-                            <a href="http://jantman.github.io/blog/tag/sysadmin.html">
-                                sysadmin
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/logging.html">
-                                logging
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/wordpress.html">
-                                wordpress
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/apache.html">
-                                apache
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/firefox.html">
-                                firefox
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/blog.html">
-                                blog
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/perl.html">
-                                perl
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/monitoring.html">
-                                monitoring
+                            <a href="http://jantman.github.io/blog/tag/php.html">
+                                PHP
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
@@ -260,8 +235,8 @@ bunch of new VMs, and still keep the VBoxHeadless output in case of an&nbsp;erro
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/dns.html">
-                                dns
+                            <a href="http://jantman.github.io/blog/tag/monitoring.html">
+                                monitoring
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
@@ -270,23 +245,18 @@ bunch of new VMs, and still keep the VBoxHeadless output in case of an&nbsp;erro
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/bind.html">
-                                bind
+                            <a href="http://jantman.github.io/blog/tag/blog.html">
+                                blog
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/sun.html">
-                                sun
+                            <a href="http://jantman.github.io/blog/tag/firefox.html">
+                                firefox
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/mediawiki.html">
-                                mediawiki
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/rpm.html">
-                                rpm
+                            <a href="http://jantman.github.io/blog/tag/apache.html">
+                                apache
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
@@ -295,8 +265,18 @@ bunch of new VMs, and still keep the VBoxHeadless output in case of an&nbsp;erro
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/puppet.html">
-                                puppet
+                            <a href="http://jantman.github.io/blog/tag/bind.html">
+                                bind
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/mediawiki.html">
+                                mediawiki
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/logging.html">
+                                logging
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
@@ -305,13 +285,43 @@ bunch of new VMs, and still keep the VBoxHeadless output in case of an&nbsp;erro
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/mac.html">
+                                mac
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/wordpress.html">
+                                wordpress
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/dns.html">
+                                dns
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/puppet.html">
+                                puppet
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
                             <a href="http://jantman.github.io/blog/tag/security.html">
                                 security
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/mac.html">
-                                mac
+                            <a href="http://jantman.github.io/blog/tag/rpm.html">
+                                rpm
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/perl.html">
+                                perl
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/sun.html">
+                                sun
                             </a>
                         </li>
         </ul>

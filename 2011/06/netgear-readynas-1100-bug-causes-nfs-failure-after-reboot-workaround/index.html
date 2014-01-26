@@ -17,7 +17,7 @@
             <meta property="og:description" content="At work, we have a Netgear ReadyNAS 1100. It’s a 4TB NAS appliance, a cute little 1U half-depth Linux box with 4 SATA disks, a RAID controller, and some firmware to do a whole bunch of fancy stuff (mainly geared towards consumers and very small shops - all configuration is ..."/>
 
     <!-- Bootstrap -->
-        <link rel="stylesheet" href="http://jantman.github.io/blog/theme/css/bootstrap.min.css" type="text/css"/>
+        <link rel="stylesheet" href="http://jantman.github.io/blog/theme/css/bootstrap.flatly.min.css" type="text/css"/>
     <link href="http://jantman.github.io/blog/theme/css/font-awesome.min.css" rel="stylesheet">
     <link href="http://jantman.github.io/blog/theme/css/pygments.css" rel="stylesheet">
         <link href="http://jantman.github.io/blog/theme/css/typogrify.css" rel="stylesheet">
@@ -130,43 +130,43 @@ in the web <span class="caps">UI</span>, and also told it to `fsck` the volumes,
 been done in quite some time. Unfortunately, when the unit came back up,
 even after I could log into the web <span class="caps">UI</span>, I couldn&#8217;t mount the <span class="caps">NFS</span> shares
 on my backup server. I kept getting messages&nbsp;like:</p>
-<div class="codehilite"><pre><span class="o">[</span>root@backup-server ~<span class="o">]</span><span class="c"># mount -a</span>
-mount: mount to <span class="caps">NFS</span> server <span class="s1">&#39;css-readynas&#39;</span> failed: <span class="caps">RPC</span> Error: Program not registered.
+<div class="codehilite"><pre><span class="go">[root@backup-server ~]# mount -a</span>
+<span class="go">mount: mount to <span class="caps">NFS</span> server &#39;css-readynas&#39; failed: <span class="caps">RPC</span> Error: Program not registered.</span>
 </pre></div>
 
 
 <p>so my next step was to check <span class="caps">RPC</span> status of the readynas, from the
 client. That was also a bit of a&nbsp;surprise:</p>
-<div class="codehilite"><pre><span class="o">[</span>root@backup-server ~<span class="o">]</span><span class="c"># rpcinfo -p css-readynas                        </span>
-   program vers proto   port                                              
-    100000    2   tcp    111  portmapper                                  
-    100000    2   udp    111  portmapper                                  
-    100011    1   udp    620  rquotad                                     
-    100011    2   udp    620  rquotad                                     
-    100011    1   tcp    623  rquotad                                     
-    100011    2   tcp    623  rquotad                                     
-    100024    1   udp  32765  status                                      
-    100024    1   tcp  32765  status                                      
-    100005    1   udp   2051  mountd                                      
-    100005    1   tcp   3006  mountd                                      
-    100005    2   udp   2051  mountd                                      
-    100005    2   tcp   3006  mountd                                      
-    100005    3   udp   2051  mountd                                      
-    100005    3   tcp   3006  mountd 
+<div class="codehilite"><pre><span class="go">[root@backup-server ~]# rpcinfo -p css-readynas                        </span>
+<span class="go">   program vers proto   port                                              </span>
+<span class="go">    100000    2   tcp    111  portmapper                                  </span>
+<span class="go">    100000    2   udp    111  portmapper                                  </span>
+<span class="go">    100011    1   udp    620  rquotad                                     </span>
+<span class="go">    100011    2   udp    620  rquotad                                     </span>
+<span class="go">    100011    1   tcp    623  rquotad                                     </span>
+<span class="go">    100011    2   tcp    623  rquotad                                     </span>
+<span class="go">    100024    1   udp  32765  status                                      </span>
+<span class="go">    100024    1   tcp  32765  status                                      </span>
+<span class="go">    100005    1   udp   2051  mountd                                      </span>
+<span class="go">    100005    1   tcp   3006  mountd                                      </span>
+<span class="go">    100005    2   udp   2051  mountd                                      </span>
+<span class="go">    100005    2   tcp   3006  mountd                                      </span>
+<span class="go">    100005    3   udp   2051  mountd                                      </span>
+<span class="go">    100005    3   tcp   3006  mountd </span>
 </pre></div>
 
 
 <p>Somewhere in that list is supposed to be nfsd, listening on port 2049.
 Next, I did an nmap (port scan) of the&nbsp;readynas:</p>
-<div class="codehilite"><pre><span class="o">[</span>root@backup-server ~<span class="o">]</span><span class="c"># nmap -sU -p2047-2050 css-readynas             </span>
+<div class="codehilite"><pre><span class="go">[root@backup-server ~]# nmap -sU -p2047-2050 css-readynas             </span>
 
-Starting Nmap 4.11 <span class="o">(</span> http://www.insecure.org/nmap/ <span class="o">)</span> at 2011-06-23 15:21 <span class="caps">EDT</span>
-Interesting ports on css-readynas.rutgers.edu <span class="o">(</span>172.16.25.108<span class="o">)</span>:              
-<span class="caps">PORT</span>     <span class="caps">STATE</span>         <span class="caps">SERVICE</span>                                              
-2047/udp closed        dls                                                  
-2048/udp closed        dls-monitor                                          
-2049/udp open|filtered nfs                                                  
-2050/udp closed        unknown  
+<span class="go">Starting Nmap 4.11 ( http://www.insecure.org/nmap/ ) at 2011-06-23 15:21 <span class="caps">EDT</span></span>
+<span class="go">Interesting ports on css-readynas.rutgers.edu (172.16.25.108):              </span>
+<span class="go"><span class="caps">PORT</span>     <span class="caps">STATE</span>         <span class="caps">SERVICE</span>                                              </span>
+<span class="go">2047/udp closed        dls                                                  </span>
+<span class="go">2048/udp closed        dls-monitor                                          </span>
+<span class="go">2049/udp open|filtered nfs                                                  </span>
+<span class="go">2050/udp closed        unknown  </span>
 </pre></div>
 
 
@@ -188,76 +188,126 @@ central syslog server and, sure enough, found an identical message that
 something had already bound to <span class="caps">UDP</span> port 2049 when <span class="caps">NFS</span> was starting. I
 tried confirming that upnpd was disabled and rebooting, but that didn&#8217;t
 help. Grepping my logs for &#8220;nfs&#8221;&nbsp;returned:</p>
-<div class="codehilite"><pre>daemon.log:Jun 23 12:43:43 css-readynas nfsd<span class="o">[</span>2331<span class="o">]</span>: nfssvc: Address already in use
-daemon.log:Jun 23 15:26:33 css-readynas nfsd<span class="o">[</span>2724<span class="o">]</span>: nfssvc: Address already in use
-kern.log:Jun 23 11:35:29 css-readynas kernel: Installing knfsd <span class="o">(</span>copyright <span class="o">(</span>C<span class="o">)</span> 1996 okir@monad.swb.de<span class="o">)</span>.
-kern.log:Jun 23 12:43:43 css-readynas kernel: <span class="caps">NFSD</span>: Using /var/lib/nfs/v4recovery as the NFSv4 state recovery directory
-kern.log:Jun 23 12:43:43 css-readynas kernel: <span class="caps">NFSD</span>: starting 90-second grace period
-kern.log:Jun 23 14:56:20 css-readynas kernel: Installing knfsd <span class="o">(</span>copyright <span class="o">(</span>C<span class="o">)</span> 1996 okir@monad.swb.de<span class="o">)</span>.
-kern.log:Jun 23 15:12:41 css-readynas kernel: <span class="caps">NFSD</span>: starting 90-second grace period
-kern.log:Jun 23 15:26:33 css-readynas kernel: <span class="caps">NFSD</span>: Using /var/lib/nfs/v4recovery as the NFSv4 state recovery directory
-kern.log:Jun 23 15:26:33 css-readynas kernel: <span class="caps">NFSD</span>: starting 90-second grace period
+<div class="codehilite"><pre>daemon.log:Jun 23 12:43:43 css-readynas nfsd[2331]: nfssvc: Address already in use
+daemon.log:Jun 23 15:26:33 css-readynas nfsd[2724]: nfssvc: Address already in use
+kern.log:Jun 23 11:35:29 css-readynas kernel: Installing knfsd (copyright (C) 1996 okir@monad.swb.de).
+kern.log:Jun 23 12:43:43 css-readynas kernel: NFSD: Using /var/lib/nfs/v4recovery as the NFSv4 state recovery directory
+kern.log:Jun 23 12:43:43 css-readynas kernel: NFSD: starting 90-second grace period
+kern.log:Jun 23 14:56:20 css-readynas kernel: Installing knfsd (copyright (C) 1996 okir@monad.swb.de).
+kern.log:Jun 23 15:12:41 css-readynas kernel: NFSD: starting 90-second grace period
+kern.log:Jun 23 15:26:33 css-readynas kernel: NFSD: Using /var/lib/nfs/v4recovery as the NFSv4 state recovery directory
+kern.log:Jun 23 15:26:33 css-readynas kernel: NFSD: starting 90-second grace period
 </pre></div>
 
 
-<p></p>
-My next step was a few more reboots, with no change. I then upgraded the
+<p>My next step was a few more reboots, with no change. I then upgraded the
 RAIDiator firmware to the latest, 4.1.7. Still no luck. I installed the
 <a href="http://www.readynas.com/?p=4203">Enable root <span class="caps">SSH</span></a> addon, and that&#8217;s
 when things became very&nbsp;clear:</p>
-<div class="codehilite"><pre>css-readynas:/var/log# netstat -unlp
-Active Internet connections <span class="o">(</span>only servers<span class="o">)</span>
-Proto Recv-Q Send-Q Local Address           Foreign Address         State       <span class="caps">PID</span>/Program name   
-udp        0      0 0.0.0.0:2049            0.0.0.0:*                           794/snmpd           
-udp        0      0 0.0.0.0:514             0.0.0.0:*                           673/syslogd         
-udp        0      0 172.16.25.108:137       0.0.0.0:*                           1672/nmbd           
-udp        0      0 0.0.0.0:137             0.0.0.0:*                           1672/nmbd           
-udp        0      0 172.16.25.108:138       0.0.0.0:*                           1672/nmbd           
-udp        0      0 0.0.0.0:138             0.0.0.0:*                           1672/nmbd           
-udp        0      0 0.0.0.0:161             0.0.0.0:*                           794/snmpd           
-udp        0      0 0.0.0.0:162             0.0.0.0:*                           802/snmptrapd       
-udp        0      0 0.0.0.0:2086            0.0.0.0:*                           1565/rpc.mountd     
-udp        0      0 127.0.0.1:22081         0.0.0.0:*                           1599/raidard        
-udp        0      0 172.16.25.108:22081     0.0.0.0:*                           1599/raidard        
-udp        0      0 0.0.0.0:22081           0.0.0.0:*                           1599/raidard        
-udp        0      0 0.0.0.0:988             0.0.0.0:*                           819/rpc.rquotad     
-udp        0      0 0.0.0.0:5353            0.0.0.0:*                           729/avahi-daemon: r 
-udp        0      0 0.0.0.0:111             0.0.0.0:*                           666/portmap         
-udp        0      0 0.0.0.0:881             0.0.0.0:*                           1553/rpc.statd      
-udp        0      0 0.0.0.0:32765           0.0.0.0:*                           1553/rpc.statd     
+<div class="codehilite"><pre><span class="gp">css-readynas:/var/log#</span> netstat -unlp
+<span class="go">Active Internet connections (only servers)</span>
+<span class="go">Proto Recv-Q Send-Q Local Address           Foreign Address         State       <span class="caps">PID</span>/Program name   </span>
+<span class="go">udp        0      0 0.0.0.0:2049            0.0.0.0:*                           794/snmpd           </span>
+<span class="go">udp        0      0 0.0.0.0:514             0.0.0.0:*                           673/syslogd         </span>
+<span class="go">udp        0      0 172.16.25.108:137       0.0.0.0:*                           1672/nmbd           </span>
+<span class="go">udp        0      0 0.0.0.0:137             0.0.0.0:*                           1672/nmbd           </span>
+<span class="go">udp        0      0 172.16.25.108:138       0.0.0.0:*                           1672/nmbd           </span>
+<span class="go">udp        0      0 0.0.0.0:138             0.0.0.0:*                           1672/nmbd           </span>
+<span class="go">udp        0      0 0.0.0.0:161             0.0.0.0:*                           794/snmpd           </span>
+<span class="go">udp        0      0 0.0.0.0:162             0.0.0.0:*                           802/snmptrapd       </span>
+<span class="go">udp        0      0 0.0.0.0:2086            0.0.0.0:*                           1565/rpc.mountd     </span>
+<span class="go">udp        0      0 127.0.0.1:22081         0.0.0.0:*                           1599/raidard        </span>
+<span class="go">udp        0      0 172.16.25.108:22081     0.0.0.0:*                           1599/raidard        </span>
+<span class="go">udp        0      0 0.0.0.0:22081           0.0.0.0:*                           1599/raidard        </span>
+<span class="go">udp        0      0 0.0.0.0:988             0.0.0.0:*                           819/rpc.rquotad     </span>
+<span class="go">udp        0      0 0.0.0.0:5353            0.0.0.0:*                           729/avahi-daemon: r </span>
+<span class="go">udp        0      0 0.0.0.0:111             0.0.0.0:*                           666/portmap         </span>
+<span class="go">udp        0      0 0.0.0.0:881             0.0.0.0:*                           1553/rpc.statd      </span>
+<span class="go">udp        0      0 0.0.0.0:32765           0.0.0.0:*                           1553/rpc.statd     </span>
 </pre></div>
 
 
-<p></p>
-For some <strong><em>very</em></strong> strange reason, snmpd had bound to port 2049 (the
+<p>For some <strong><em>very</em></strong> strange reason, snmpd had bound to port 2049 (the
 nfs port) instead of 161. That left no port for nfs to bind&nbsp;to.</p>
 <p><strong>Solution:</strong></p>
-<p>
+<div class="codehilite"><pre><span class="gp">css-readynas:/var/log#</span> /etc/init.d/snmpd stop                                                       
+<span class="go">Stopping network management services: snmpd snmptrapd readynas-agent.                               </span>
+<span class="gp">css-readynas:/var/log#</span> /etc/init.d/nfs-kernel-server start
+<span class="go">Exporting directories for <span class="caps">NFS</span> kernel daemon...done.</span>
+<span class="go">Starting <span class="caps">NFS</span> kernel daemon:mount: nfsd already mounted or /proc/fs/nfsd/ busy</span>
+<span class="go">mount: according to mtab, nfsd is mounted on /proc/fs/nfsd</span>
+<span class="go"> statd nfsd mountd.</span>
+<span class="gp">css-readynas:/var/log#</span> /etc/init.d/snmpd start
+<span class="go">Starting network management services: snmpd snmptrapd readynas-agent.</span>
+</pre></div>
 
-wzxhzdk:5
 
-
-Stop snmpd, restart nfs-kernel-server so that it grabs port 2049 like it
+<p>Stop snmpd, restart nfs-kernel-server so that it grabs port 2049 like it
 should, and then start snmpd back up. If all went well, nfsd should now
 be listening on <span class="caps">UDP</span> 2049, and snmpd should be listening on <span class="caps">UDP</span> 161 like
-it should. To confirm:
+it should. To&nbsp;confirm:</p>
+<div class="codehilite"><pre><span class="gp">css-readynas:/var/log#</span> netstat -unlp
+<span class="go">Active Internet connections (only servers)</span>
+<span class="go">Proto Recv-Q Send-Q Local Address           Foreign Address         State       <span class="caps">PID</span>/Program name</span>
+<span class="go">udp        0      0 0.0.0.0:2049            0.0.0.0:*                           -</span>
+<span class="go">udp        0      0 0.0.0.0:514             0.0.0.0:*                           673/syslogd</span>
+<span class="go">udp        0      0 172.16.25.108:137       0.0.0.0:*                           1672/nmbd</span>
+<span class="go">udp        0      0 0.0.0.0:137             0.0.0.0:*                           1672/nmbd</span>
+<span class="go">udp        0      0 172.16.25.108:138       0.0.0.0:*                           1672/nmbd</span>
+<span class="go">udp        0      0 0.0.0.0:138             0.0.0.0:*                           1672/nmbd</span>
+<span class="go">udp        0      0 0.0.0.0:161             0.0.0.0:*                           26161/snmpd</span>
+<span class="go">udp        0      0 0.0.0.0:162             0.0.0.0:*                           26163/snmptrapd</span>
+<span class="go">udp        0      0 0.0.0.0:2086            0.0.0.0:*                           1565/rpc.mountd</span>
+<span class="go">udp        0      0 127.0.0.1:22081         0.0.0.0:*                           1599/raidard</span>
+<span class="go">udp        0      0 172.16.25.108:22081     0.0.0.0:*                           1599/raidard</span>
+<span class="go">udp        0      0 0.0.0.0:22081           0.0.0.0:*                           1599/raidard</span>
+<span class="go">udp        0      0 0.0.0.0:988             0.0.0.0:*                           819/rpc.rquotad</span>
+<span class="go">udp        0      0 0.0.0.0:5353            0.0.0.0:*                           729/avahi-daemon: r</span>
+<span class="go">udp        0      0 0.0.0.0:2158            0.0.0.0:*                           -</span>
+<span class="go">udp        0      0 0.0.0.0:111             0.0.0.0:*                           666/portmap</span>
+<span class="go">udp        0      0 0.0.0.0:2160            0.0.0.0:*                           26161/snmpd</span>
+<span class="go">udp        0      0 0.0.0.0:881             0.0.0.0:*                           1553/rpc.statd</span>
+<span class="go">udp        0      0 0.0.0.0:32765           0.0.0.0:*                           1553/rpc.statd</span>
+</pre></div>
 
 
-wzxhzdk:6
+<p>All is well. Now to confirm this from the client&nbsp;machine:</p>
+<div class="codehilite"><pre><span class="go">[root@backup-server ~]# rpcinfo -p css-readynas</span>
+<span class="go">   program vers proto   port</span>
+<span class="go">    100000    2   tcp    111  portmapper</span>
+<span class="go">    100000    2   udp    111  portmapper</span>
+<span class="go">    100011    1   udp    988  rquotad</span>
+<span class="go">    100011    2   udp    988  rquotad</span>
+<span class="go">    100011    1   tcp    991  rquotad</span>
+<span class="go">    100011    2   tcp    991  rquotad</span>
+<span class="go">    100024    1   udp  32765  status</span>
+<span class="go">    100024    1   tcp  32765  status</span>
+<span class="go">    100005    1   udp   2086  mountd</span>
+<span class="go">    100005    1   tcp   3131  mountd</span>
+<span class="go">    100005    2   udp   2086  mountd</span>
+<span class="go">    100005    2   tcp   3131  mountd</span>
+<span class="go">    100005    3   udp   2086  mountd</span>
+<span class="go">    100005    3   tcp   3131  mountd</span>
+<span class="go">    100003    2   udp   2049  nfs</span>
+<span class="go">    100003    3   udp   2049  nfs</span>
+<span class="go">    100003    4   udp   2049  nfs</span>
+<span class="go">    100003    2   tcp   2049  nfs</span>
+<span class="go">    100003    3   tcp   2049  nfs</span>
+<span class="go">    100003    4   tcp   2049  nfs</span>
+<span class="go">    100021    1   udp   2158  nlockmgr</span>
+<span class="go">    100021    3   udp   2158  nlockmgr</span>
+<span class="go">    100021    4   udp   2158  nlockmgr</span>
+<span class="go">    100021    1   tcp   4189  nlockmgr</span>
+<span class="go">    100021    3   tcp   4189  nlockmgr</span>
+<span class="go">    100021    4   tcp   4189  nlockmgr</span>
+</pre></div>
 
 
-All is well. Now to confirm this from the client machine:
-
-
-wzxhzdk:7
-
-
-Ok, <span class="caps">NFS</span> is now there. It all looks good, and re-running `mount -a` on
-the client successfully mounts the <span class="caps">NFS</span> share.
-
-We&#8217;ll see what happens next time I have to reboot the ReadyNAS. In the
+<p>Ok, <span class="caps">NFS</span> is now there. It all looks good, and re-running <code>mount -a</code> on
+the client successfully mounts the <span class="caps">NFS</span>&nbsp;share.</p>
+<p>We&#8217;ll see what happens next time I have to reboot the ReadyNAS. In the
 mean time, I&#8217;m going to try to bring this to the attention of Netgear
-support and hope they do something about&nbsp;it.
+support and hope they do something about&nbsp;it.</p>
             </div>
             <!-- /.entry-content -->
         </article>
@@ -281,13 +331,18 @@ support and hope they do something about&nbsp;it.
 
                 <li class="list-group-item"><a href="http://jantman.github.io/blog/tags.html"><h4><i class="icon-tags icon-large"></i>Tags</h4></a></li>
                         <li class="list-group-item tag-1">
+                            <a href="http://jantman.github.io/blog/tag/google.html">
+                                google
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
                             <a href="http://jantman.github.io/blog/tag/linux.html">
                                 linux
                             </a>
                         </li>
                         <li class="list-group-item tag-1">
-                            <a href="http://jantman.github.io/blog/tag/php.html">
-                                PHP
+                            <a href="http://jantman.github.io/blog/tag/sysadmin.html">
+                                sysadmin
                             </a>
                         </li>
                         <li class="list-group-item tag-1">
@@ -296,53 +351,13 @@ support and hope they do something about&nbsp;it.
                             </a>
                         </li>
                         <li class="list-group-item tag-1">
-                            <a href="http://jantman.github.io/blog/tag/google.html">
-                                google
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-1">
                             <a href="http://jantman.github.io/blog/tag/nagios.html">
                                 Nagios
                             </a>
                         </li>
                         <li class="list-group-item tag-1">
-                            <a href="http://jantman.github.io/blog/tag/sysadmin.html">
-                                sysadmin
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/logging.html">
-                                logging
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/wordpress.html">
-                                wordpress
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/apache.html">
-                                apache
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/firefox.html">
-                                firefox
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/blog.html">
-                                blog
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/perl.html">
-                                perl
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/monitoring.html">
-                                monitoring
+                            <a href="http://jantman.github.io/blog/tag/php.html">
+                                PHP
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
@@ -351,8 +366,8 @@ support and hope they do something about&nbsp;it.
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/dns.html">
-                                dns
+                            <a href="http://jantman.github.io/blog/tag/monitoring.html">
+                                monitoring
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
@@ -361,23 +376,18 @@ support and hope they do something about&nbsp;it.
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/bind.html">
-                                bind
+                            <a href="http://jantman.github.io/blog/tag/blog.html">
+                                blog
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/sun.html">
-                                sun
+                            <a href="http://jantman.github.io/blog/tag/firefox.html">
+                                firefox
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/mediawiki.html">
-                                mediawiki
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/rpm.html">
-                                rpm
+                            <a href="http://jantman.github.io/blog/tag/apache.html">
+                                apache
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
@@ -386,8 +396,18 @@ support and hope they do something about&nbsp;it.
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/puppet.html">
-                                puppet
+                            <a href="http://jantman.github.io/blog/tag/bind.html">
+                                bind
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/mediawiki.html">
+                                mediawiki
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/logging.html">
+                                logging
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
@@ -396,13 +416,43 @@ support and hope they do something about&nbsp;it.
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/mac.html">
+                                mac
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/wordpress.html">
+                                wordpress
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/dns.html">
+                                dns
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/puppet.html">
+                                puppet
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
                             <a href="http://jantman.github.io/blog/tag/security.html">
                                 security
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/mac.html">
-                                mac
+                            <a href="http://jantman.github.io/blog/tag/rpm.html">
+                                rpm
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/perl.html">
+                                perl
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/sun.html">
+                                sun
                             </a>
                         </li>
         </ul>

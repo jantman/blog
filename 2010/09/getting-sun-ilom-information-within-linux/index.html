@@ -17,7 +17,7 @@
             <meta property="og:description" content="At work, I’m starting to implement OCS Inventory NG on our Linux boxes to keep track of hardware. Part of the plan is also that we have a MediaWiki installation for internal documentation, and articles for every host (named as the hostname). I’m going to pull data from ..."/>
 
     <!-- Bootstrap -->
-        <link rel="stylesheet" href="http://jantman.github.io/blog/theme/css/bootstrap.min.css" type="text/css"/>
+        <link rel="stylesheet" href="http://jantman.github.io/blog/theme/css/bootstrap.flatly.min.css" type="text/css"/>
     <link href="http://jantman.github.io/blog/theme/css/font-awesome.min.css" rel="stylesheet">
     <link href="http://jantman.github.io/blog/theme/css/pygments.css" rel="stylesheet">
         <link href="http://jantman.github.io/blog/theme/css/typogrify.css" rel="stylesheet">
@@ -138,8 +138,39 @@ now, but I&#8217;ll probably be adding support for it&nbsp;soon).</p>
 interface, and the standard OpenIPMI-tools package in CentOS
 repositories has the ipmitool required to get the relevant information.
 A call is pretty simple: <code>ipmitool -l open lan print 1</code> yields something&nbsp;like:  </p>
-<p><code>Set in Progress         : Set Complete Auth Type Support       : NONE MD2 MD5 PASSWORD Auth Type Enable        : Callback : MD2 MD5 PASSWORD                         : User     : MD2 MD5 PASSWORD                         : Operator : MD2 MD5 PASSWORD                         : Admin    : MD2 MD5 PASSWORD                         : OEM      : IP Address Source       : DHCP Address IP Address              : 172.16.xxx.xxx Subnet Mask             : 255.255.255.224 MAC Address             : 00:14:4f:xx:xx:xx SNMP Community String   : xxxxxx IP Header               : TTL=0x00 Flags=0x00 Precedence=0x00 TOS=0x00 BMC ARP Control         : ARP Responses Disabled, Gratuitous ARP Disabled Gratituous ARP Intrvl   : 5.0 seconds Default Gateway IP      : 172.16.xx.xx Default Gateway MAC     : 00:00:00:00:00:00 Backup Gateway IP       : 0.0.0.0 Backup Gateway MAC      : 00:00:00:00:00:00 802.1q VLAN ID          : Disabled 802.1q VLAN Priority    : 0 RMCP+ Cipher Suites     : 2,3,0 Cipher Suite Priv Max   : XXXXXXXXXXXXXXX                         :     X=Cipher Suite Unused                         :     c=CALLBACK                         :     u=USER                         :     o=OPERATOR                         :     a=ADMIN                         :     O=OEM</code><br />
-Now it&#8217;s just a matter of integrating this into ocsinventory-agent,
+<div class="codehilite"><pre>Set in Progress         : Set Complete
+Auth Type Support       : NONE MD2 MD5 PASSWORD
+Auth Type Enable        : Callback : MD2 MD5 PASSWORD
+                        : User     : MD2 MD5 PASSWORD
+                        : Operator : MD2 MD5 PASSWORD
+                        : Admin    : MD2 MD5 PASSWORD
+                        : OEM      :
+IP Address Source       : DHCP Address
+IP Address              : 172.16.xxx.xxx
+Subnet Mask             : 255.255.255.224
+MAC Address             : 00:14:4f:xx:xx:xx
+SNMP Community String   : xxxxxx
+IP Header               : TTL=0x00 Flags=0x00 Precedence=0x00 TOS=0x00
+BMC ARP Control         : ARP Responses Disabled, Gratuitous ARP Disabled
+Gratituous ARP Intrvl   : 5.0 seconds
+Default Gateway IP      : 172.16.xx.xx
+Default Gateway MAC     : 00:00:00:00:00:00
+Backup Gateway IP       : 0.0.0.0
+Backup Gateway MAC      : 00:00:00:00:00:00
+802.1q VLAN ID          : Disabled
+802.1q VLAN Priority    : 0
+RMCP+ Cipher Suites     : 2,3,0
+Cipher Suite Priv Max   : XXXXXXXXXXXXXXX
+                        :     X=Cipher Suite Unused
+                        :     c=CALLBACK
+                        :     u=USER
+                        :     o=OPERATOR
+                        :     a=ADMIN
+                        :     O=OEM
+</pre></div>
+
+
+<p>Now it&#8217;s just a matter of integrating this into ocsinventory-agent,
 having it run the command if present (and Sun hardware), and parsing the
 results. Once I have some actual code done, I&#8217;ll pass it&nbsp;along.</p>
 <p>Many thanks to <code>pseud0</code> on the Sun forums for answering my
@@ -168,13 +199,18 @@ about&nbsp;this.</p>
 
                 <li class="list-group-item"><a href="http://jantman.github.io/blog/tags.html"><h4><i class="icon-tags icon-large"></i>Tags</h4></a></li>
                         <li class="list-group-item tag-1">
+                            <a href="http://jantman.github.io/blog/tag/google.html">
+                                google
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
                             <a href="http://jantman.github.io/blog/tag/linux.html">
                                 linux
                             </a>
                         </li>
                         <li class="list-group-item tag-1">
-                            <a href="http://jantman.github.io/blog/tag/php.html">
-                                PHP
+                            <a href="http://jantman.github.io/blog/tag/sysadmin.html">
+                                sysadmin
                             </a>
                         </li>
                         <li class="list-group-item tag-1">
@@ -183,53 +219,13 @@ about&nbsp;this.</p>
                             </a>
                         </li>
                         <li class="list-group-item tag-1">
-                            <a href="http://jantman.github.io/blog/tag/google.html">
-                                google
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-1">
                             <a href="http://jantman.github.io/blog/tag/nagios.html">
                                 Nagios
                             </a>
                         </li>
                         <li class="list-group-item tag-1">
-                            <a href="http://jantman.github.io/blog/tag/sysadmin.html">
-                                sysadmin
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/logging.html">
-                                logging
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/wordpress.html">
-                                wordpress
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/apache.html">
-                                apache
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/firefox.html">
-                                firefox
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/blog.html">
-                                blog
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/perl.html">
-                                perl
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/monitoring.html">
-                                monitoring
+                            <a href="http://jantman.github.io/blog/tag/php.html">
+                                PHP
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
@@ -238,8 +234,8 @@ about&nbsp;this.</p>
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/dns.html">
-                                dns
+                            <a href="http://jantman.github.io/blog/tag/monitoring.html">
+                                monitoring
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
@@ -248,23 +244,18 @@ about&nbsp;this.</p>
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/bind.html">
-                                bind
+                            <a href="http://jantman.github.io/blog/tag/blog.html">
+                                blog
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/sun.html">
-                                sun
+                            <a href="http://jantman.github.io/blog/tag/firefox.html">
+                                firefox
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/mediawiki.html">
-                                mediawiki
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/rpm.html">
-                                rpm
+                            <a href="http://jantman.github.io/blog/tag/apache.html">
+                                apache
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
@@ -273,8 +264,18 @@ about&nbsp;this.</p>
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/puppet.html">
-                                puppet
+                            <a href="http://jantman.github.io/blog/tag/bind.html">
+                                bind
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/mediawiki.html">
+                                mediawiki
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/logging.html">
+                                logging
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
@@ -283,13 +284,43 @@ about&nbsp;this.</p>
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/mac.html">
+                                mac
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/wordpress.html">
+                                wordpress
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/dns.html">
+                                dns
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/puppet.html">
+                                puppet
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
                             <a href="http://jantman.github.io/blog/tag/security.html">
                                 security
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/mac.html">
-                                mac
+                            <a href="http://jantman.github.io/blog/tag/rpm.html">
+                                rpm
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/perl.html">
+                                perl
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/sun.html">
+                                sun
                             </a>
                         </li>
         </ul>

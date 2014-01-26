@@ -17,7 +17,7 @@
             <meta property="og:description" content="I spend a fair amount of my time debugging network and service problems on a few racks of Linux servers. Of course, they’re located in a data center (yes, just downstairs, but still not quite as comfortable as my office), and they’re all command-line only - no sense in ..."/>
 
     <!-- Bootstrap -->
-        <link rel="stylesheet" href="http://jantman.github.io/blog/theme/css/bootstrap.min.css" type="text/css"/>
+        <link rel="stylesheet" href="http://jantman.github.io/blog/theme/css/bootstrap.flatly.min.css" type="text/css"/>
     <link href="http://jantman.github.io/blog/theme/css/font-awesome.min.css" rel="stylesheet">
     <link href="http://jantman.github.io/blog/theme/css/pygments.css" rel="stylesheet">
         <link href="http://jantman.github.io/blog/theme/css/typogrify.css" rel="stylesheet">
@@ -140,59 +140,55 @@ comments for people working on Red Hat/CentOS and&nbsp;OpenSuSE.</p>
 </ol>
 <p><strong>Procedure:</strong></p>
 <ol>
-<li>On the destination system, if you haven&#8217;t already done&nbsp;so,</li>
-</ol>
+<li>
+<p>On the destination system, if you haven&#8217;t already done&nbsp;so,</p>
 <div class="codehilite"><pre>mkfifo /tmp/packet_capture
 </pre></div>
 
 
-<div class="codehilite"><pre>&lt;p&gt;
-This creates a [named pipe](http://en.wikipedia.org/wiki/Named_pipe)
+<p>This creates a <a href="http://en.wikipedia.org/wiki/Named_pipe">named pipe</a>
 where the source packet data (via ssh) will be written and Wireshark
 will read it from. You can use any name or location you want, but
-`/tmp/packet_capture` is pretty logical.
-</pre></div>
-
-
-<ol>
-<li>On your destination system, open up Wireshark (we do this now, since
+<code>/tmp/packet_capture</code> is pretty&nbsp;logical.</p>
+</li>
+<li>
+<p>On your destination system, open up Wireshark (we do this now, since
     on many systems it required the root password to start). In the
     &#8220;Capture&#8221; menu, select &#8220;Options&#8221;. In the &#8220;Interface&#8221; box, type in
     the path to the <span class="caps">FIFO</span> you created (<code>/tmp/packet_capture</code>). You should
     press the Start button before running the next command - I recommend
     typing the command in a terminal window, pressing start, then
-    hitting enter in the terminal to run the&nbsp;command.</li>
-<li>On the destination system,&nbsp;run</li>
-</ol>
+    hitting enter in the terminal to run the&nbsp;command.</p>
+</li>
+<li>
+<p>On the destination system,&nbsp;run</p>
 <div class="codehilite"><pre>ssh user@source-hostname <span class="s2">&quot;sudo /usr/sbin/tcpdump -s 0 -U -n -w - -i eth0 not port 22&quot;</span> &gt; /tmp/packet_capture
 </pre></div>
 
 
-<div class="codehilite"><pre>&lt;p&gt;
-This will SSH to the source system (`source-hostname`, either by
-hostname or IP) as the specified user (`user`) and execute
-`sudo /usr/sbin/tcpdump`. Omit the &quot;sudo&quot; if you don&#39;t need it,
-though if you do, you&#39;ll need passwordless access. Options passed to
-tcpdump are: &quot;-s 0&quot; snarf entire packets, no length limit; &quot;-U&quot;
+<p>This will <span class="caps">SSH</span> to the source system (<code>source-hostname</code>, either by
+hostname or <span class="caps">IP</span>) as the specified user (<code>user</code>) and execute
+<code>sudo /usr/sbin/tcpdump</code>. Omit the &#8220;sudo&#8221; if you don&#8217;t need it,
+though if you do, you&#8217;ll need passwordless access. Options passed to
+tcpdump are: &#8220;-s 0&#8221; snarf entire packets, no length limit; &#8220;-U&#8221;
 packet-buffered output - write each complete packet to output once
-it&#39;s captured, rather than waiting for a buffer to fill up; &quot;-n&quot;
-don&#39;t convert addresses to hostnames; &quot;-w -&quot; write raw packets to
-STDOUT (which will be passed through the SSH tunnel and become
-STDOUT of the &quot;ssh&quot; command on the destination machine); &quot;-i eth0&quot;
-capture on interface eth0; &quot;not port 22&quot; a tcpdump filter expression
-to prevent capturing our own SSH packets (more on this below). The
-final &quot;\&gt; /tmp/packet\_capture&quot; redirects the STDOUT of the ssh
+it&#8217;s captured, rather than waiting for a buffer to fill up; &#8220;-n&#8221;
+don&#8217;t convert addresses to hostnames; &#8220;-w -&#8221; write raw packets to
+<span class="caps">STDOUT</span> (which will be passed through the <span class="caps">SSH</span> tunnel and become
+<span class="caps">STDOUT</span> of the &#8220;ssh&#8221; command on the destination machine); &#8220;-i eth0&#8221;
+capture on interface eth0; &#8220;not port 22&#8221; a tcpdump filter expression
+to prevent capturing our own <span class="caps">SSH</span> packets (more on this below). The
+final &#8220;> /tmp/packet_capture&#8221; redirects the <span class="caps">STDOUT</span> of the ssh
 program (the raw packets from tcpdump on the source machine) to the
-`/tmp/packet_capture` FIFO.
-</pre></div>
-
-
-<ol>
-<li>When you&#8217;re ready to stop the capture, just Ctrl+C the <span class="caps">SSH</span> command
+<code>/tmp/packet_capture</code> <span class="caps">FIFO</span>.</p>
+</li>
+<li>
+<p>When you&#8217;re ready to stop the capture, just Ctrl+C the <span class="caps">SSH</span> command
     in the terminal window. Wireshark will automatically stop capturing,
     and you can save the capture file or play around with it. To capture
     again, you&#8217;ll need to restart the capture in Wireshark and then run
-    the ssh command&nbsp;again.</li>
+    the ssh command&nbsp;again.</p>
+</li>
 </ol>
 <p><strong>A note on network usage and tcpdump&nbsp;filters</strong></p>
 <p>This is a relatively bandwidth intensive procedure. If you use the &#8220;not
@@ -230,13 +226,18 @@ the&nbsp;tunnel.</p>
 
                 <li class="list-group-item"><a href="http://jantman.github.io/blog/tags.html"><h4><i class="icon-tags icon-large"></i>Tags</h4></a></li>
                         <li class="list-group-item tag-1">
+                            <a href="http://jantman.github.io/blog/tag/google.html">
+                                google
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
                             <a href="http://jantman.github.io/blog/tag/linux.html">
                                 linux
                             </a>
                         </li>
                         <li class="list-group-item tag-1">
-                            <a href="http://jantman.github.io/blog/tag/php.html">
-                                PHP
+                            <a href="http://jantman.github.io/blog/tag/sysadmin.html">
+                                sysadmin
                             </a>
                         </li>
                         <li class="list-group-item tag-1">
@@ -245,53 +246,13 @@ the&nbsp;tunnel.</p>
                             </a>
                         </li>
                         <li class="list-group-item tag-1">
-                            <a href="http://jantman.github.io/blog/tag/google.html">
-                                google
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-1">
                             <a href="http://jantman.github.io/blog/tag/nagios.html">
                                 Nagios
                             </a>
                         </li>
                         <li class="list-group-item tag-1">
-                            <a href="http://jantman.github.io/blog/tag/sysadmin.html">
-                                sysadmin
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/logging.html">
-                                logging
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/wordpress.html">
-                                wordpress
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/apache.html">
-                                apache
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/firefox.html">
-                                firefox
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/blog.html">
-                                blog
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/perl.html">
-                                perl
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/monitoring.html">
-                                monitoring
+                            <a href="http://jantman.github.io/blog/tag/php.html">
+                                PHP
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
@@ -300,8 +261,8 @@ the&nbsp;tunnel.</p>
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/dns.html">
-                                dns
+                            <a href="http://jantman.github.io/blog/tag/monitoring.html">
+                                monitoring
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
@@ -310,23 +271,18 @@ the&nbsp;tunnel.</p>
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/bind.html">
-                                bind
+                            <a href="http://jantman.github.io/blog/tag/blog.html">
+                                blog
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/sun.html">
-                                sun
+                            <a href="http://jantman.github.io/blog/tag/firefox.html">
+                                firefox
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/mediawiki.html">
-                                mediawiki
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/rpm.html">
-                                rpm
+                            <a href="http://jantman.github.io/blog/tag/apache.html">
+                                apache
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
@@ -335,8 +291,18 @@ the&nbsp;tunnel.</p>
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/puppet.html">
-                                puppet
+                            <a href="http://jantman.github.io/blog/tag/bind.html">
+                                bind
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/mediawiki.html">
+                                mediawiki
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/logging.html">
+                                logging
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
@@ -345,13 +311,43 @@ the&nbsp;tunnel.</p>
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/mac.html">
+                                mac
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/wordpress.html">
+                                wordpress
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/dns.html">
+                                dns
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/puppet.html">
+                                puppet
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
                             <a href="http://jantman.github.io/blog/tag/security.html">
                                 security
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/mac.html">
-                                mac
+                            <a href="http://jantman.github.io/blog/tag/rpm.html">
+                                rpm
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/perl.html">
+                                perl
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/sun.html">
+                                sun
                             </a>
                         </li>
         </ul>

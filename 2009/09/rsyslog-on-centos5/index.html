@@ -17,7 +17,7 @@
             <meta property="og:description" content="Update July 2011 - We’ve been using rsyslog for our centralized syslog infrastructure at work (site being redesigned at the moment) for about a year now. As a result, our colleagues at Rutgers University Open System Solutions have been nice enough to include rsyslog in their koji build system. Updated ..."/>
 
     <!-- Bootstrap -->
-        <link rel="stylesheet" href="http://jantman.github.io/blog/theme/css/bootstrap.min.css" type="text/css"/>
+        <link rel="stylesheet" href="http://jantman.github.io/blog/theme/css/bootstrap.flatly.min.css" type="text/css"/>
     <link href="http://jantman.github.io/blog/theme/css/font-awesome.min.css" rel="stylesheet">
     <link href="http://jantman.github.io/blog/theme/css/pygments.css" rel="stylesheet">
         <link href="http://jantman.github.io/blog/theme/css/typogrify.css" rel="stylesheet">
@@ -146,42 +146,32 @@ set about building it from source. It was a *very* difficult build on
 my machine (CentOS 5.3, 2.6.18-128.el5 #1 <span class="caps">SMP</span> i686). Unfortunately, I
 don&#8217;t have an <span class="caps">RPM</span> build environment setup, but here&#8217;s how I accomplished&nbsp;it:</p>
 <ol>
-<li>I f not already done, <span style="font-family: courier new;">yum
-    install&nbsp;rpmforge-release</span></li>
-<li><span style="font-family: courier new;">yum install gnutls-devel
-    gnutls libatomic_ops-devel gcc43&nbsp;java-1.6.0-openjdk-devel</span></li>
+<li>If not already done, <code>yum install rpmforge-release</code></li>
+<li><code>yum install gnutls-devel gnutls libatomic\_ops-devel gcc43 java-1.6.0-openjdk-devel</code></li>
 <li>Download
     <a href="http://rsyslog.com/Downloads-index-req-viewdownload-cid-1-orderby-dateD.phtml">rsyslog-4.5.2</a>
-    (currently Beta). Extract, cd into the&nbsp;directory.</li>
+    (currently Beta). Extract, <code>cd</code> into the&nbsp;directory.</li>
 <li>To test the performance difference from MySQL,
-    <span style="font-family: courier new;">yum install php-pgsql
-    postgresql postgresql-devel postgresql-libs&nbsp;postgresql-server</span></li>
-<li>Edit the &#8220;configure&#8221; script, add
-    <span style="font-family: courier new;">-DHAVE_ATOMIC_BUILTINS</span>
-    to the <span style="font-family: courier new;"><span class="caps">DEFS</span></span> line
-    (28936 in this&nbsp;version).</li>
-<li><span style="font-family: courier new;">export&nbsp;<span class="caps">CC</span>=/usr/bin/gcc43</span></li>
-<li><span style="font-family: courier new;">export&nbsp;<span class="caps">CCDEPMODE</span>=&#8221;depmode=gcc4&#8221;</span></li>
-<li><span style="font-family: courier new;">export <span class="caps">CFLAGS</span>=&#8221;-O3&nbsp;-march=i686&#8221;</span></li>
-<li><span style="font-family: courier new;">./configure &#8212;enable-mysql
-    &#8212;enable-omtemplate &#8212;enable-gnutls&nbsp;&#8212;enable-pgsql</span></li>
-<li><span style="font-family: courier new;">make &amp;&amp; make&nbsp;install</span></li>
+    <code>yum install php-pgsql postgresql postgresql-devel postgresql-libs postgresql-server</code></li>
+<li>Edit the <code>configure</code> script, add <code>-DHAVE\_ATOMIC\_BUILTINS</code>
+    to the <code>DEFS</code> line (28936 in this&nbsp;version).</li>
+<li><code>export CC=/usr/bin/gcc43</code></li>
+<li><code>export CCDEPMODE="depmode=gcc4"</code></li>
+<li><code>export CFLAGS="-O3 -march=i686"</code></li>
+<li><code>./configure --enable-mysql --enable-omtemplate --enable-gnutls --enable-pgsql</code></li>
+<li><code>make &amp;&amp; make install</code></li>
 </ol>
-<p>For my system, I used the
-<span style="font-family: courier new;">/etc/sysconfig/rsyslog</span>
-and <span style="font-family: courier new;">/etc/init.d/rsyslog</span>
+<p>For my system, I used the <code>/etc/sysconfig/rsyslog</code> and <code>/etc/init.d/rsyslog</code>
 from the 2.x rsyslog RPMs, with some modifications as&nbsp;follows:</p>
-<p><span style="font-family: courier new;">/etc/sysconfig/rsyslog</span>
-<em>(comments have been removed to save space)</em>:</p>
-<div class="codehilite"><pre><span class="c"># -c4   version 4 compatibility mode</span>
-<span class="c"># -x     disable <span class="caps">DNS</span> for remote messages (don&#39;t want it to hang if <span class="caps">DNS</span> is down</span>
-<span class="c"># -4     IPv4 only</span>
-<span class="nv">SYSLOGD_OPTIONS</span><span class="o">=</span><span class="s2">&quot;-c4 -x -4&quot;</span>
+<p><code>/etc/sysconfig/rsyslog</code> <em>(comments have been removed to save space)</em>:</p>
+<div class="codehilite"><pre># -c4   version 4 compatibility mode
+# -x     disable DNS for remote messages (don&#39;t want it to hang if DNS is down
+# -4     IPv4 only
+SYSLOGD_OPTIONS=&quot;-c4 -x -4&quot;
 </pre></div>
 
 
-<p><span style="font-family: courier new;">/etc/init.d/rsyslog</span>
-<em>(comments have been removed to save space)</em>:</p>
+<p><code>/etc/init.d/rsyslog</code> <em>(comments have been removed to save space)</em>:</p>
 <div class="codehilite"><pre><span class="c">#!/bin/bash</span>
 <span class="c">#</span>
 <span class="c"># rsyslog        Starts rsyslogd.</span>
@@ -297,61 +287,73 @@ restart<span class="o">()</span> <span class="o">{</span>
 
 
 <p><strong>My rsyslog.conf file</strong>:</p>
-<p>~~~~{.text&nbsp;only}</p>
-<h1 id="uncomment-next-line-for-debugging-use-graphvis-to-see-the-graph">uncomment next line for debugging, use graphvis to see the&nbsp;graph</h1>
-<h1 id="generateconfiggraph-rootrsyslog-graphdot">$GenerateConfigGraph&nbsp;/root/rsyslog-graph.dot</h1>
-<p>$ModLoad imklog
+<div class="codehilite"><pre># uncomment next line for debugging, use graphvis to see the graph
+#$GenerateConfigGraph /root/rsyslog-graph.dot
+$ModLoad imklog
 $ModLoad imtcp
 $ModLoad imudp
-$ModLoad&nbsp;imuxsock</p>
-<h1 id="template">template</h1>
-<p>$template&nbsp;RemoteHost,&#8221;/var/log/<span class="caps">HOSTS</span>/%<span class="caps">HOSTNAME</span>%/%$<span class="caps">YEAR</span>%/%$<span class="caps">MONTH</span>%/%$<span class="caps">DAY</span>%/%syslogfacility-text%.log&#8221;</p>
-<h1 id="used-for-cisco-vanilla-syslog-when-we-cant-parse-host-name">used for Cisco, vanilla syslog when we can&#8217;t parse host&nbsp;name</h1>
-<p>$template&nbsp;RemoteFromHost,&#8221;/var/log/<span class="caps">HOSTS</span>/%<span class="caps">FROMHOST</span>%/%$<span class="caps">YEAR</span>%/%$<span class="caps">MONTH</span>%/%$<span class="caps">DAY</span>%/%syslogfacility-text%.log&#8221;</p>
-<h1 id="note-we-cant-bind-udp-to-a-ruleset-so-it-enters-the-local-ruleset"><span class="caps">NOTE</span> - we can&#8217;t bind <span class="caps">UDP</span> to a ruleset, so it enters the local&nbsp;RuleSet</h1>
-<h1 id="and-has-to-be-dealt-with-here">and has to be dealt with&nbsp;here</h1>
-<p>$RuleSet&nbsp;local</p>
-<h1 id="for-cisco-vyatta-doesnt-send-hostname-need-to-use-ip-manually">for cisco, vyatta - doesn&#8217;t send hostname, need to use <span class="caps">IP</span>&nbsp;manually</h1>
-<p>:fromhost, isequal, &#8220;192.168.0.99&#8221; ?RemoteFromHost
-:fromhost, isequal, &#8220;192.168.0.99&#8221; ~
-:fromhost, isequal, &#8220;192.168.0.103&#8221; ?RemoteFromHost
-:fromhost, isequal, &#8220;192.168.0.103&#8221; ~
-:fromhost, isequal, &#8220;192.168.0.97&#8221; ?RemoteFromHost
-:fromhost, isequal, &#8220;192.168.0.97&#8221; ~
-:fromhost, isequal, &#8220;192.168.0.111&#8221; ?RemoteFromHost
-:fromhost, isequal, &#8220;192.168.0.111&#8221;&nbsp;~</p>
-<h1 id="anything-from-a-remote-host-gets-logged-as-such">anything from a remote host gets logged as&nbsp;such</h1>
-<p>:source, isequal, &#8220;&#8221; ?RemoteHost
-:source, isequal, &#8220;&#8221;&nbsp;~</p>
-<h1></h1>
-<h1 id="local-logging"><span class="caps">LOCAL</span>&nbsp;<span class="caps">LOGGING</span></h1>
-<h1></h1>
-<p>kern.<em>                                                 /var/log/messages
-</em>.info;mail.none;authpriv.none;cron.none                /var/log/messages
-authpriv.<em>                                              /var/log/secure
-mail.</em>                                                  -/var/log/maillog
-cron.<em>                                                  /var/log/cron
-</em>.emerg                                                 <em>
+$ModLoad imuxsock
+
+# template
+$template RemoteHost,&quot;/var/log/HOSTS/%HOSTNAME%/%$YEAR%/%$MONTH%/%$DAY%/%syslogfacility-text%.log&quot;
+# used for Cisco, vanilla syslog when we can&#39;t parse host name
+$template RemoteFromHost,&quot;/var/log/HOSTS/%FROMHOST%/%$YEAR%/%$MONTH%/%$DAY%/%syslogfacility-text%.log&quot;
+
+# NOTE - we can&#39;t bind UDP to a ruleset, so it enters the local RuleSet
+#   and has to be dealt with here
+
+$RuleSet local
+
+# for cisco, vyatta - doesn&#39;t send hostname, need to use IP manually
+:fromhost, isequal, &quot;192.168.0.99&quot; ?RemoteFromHost
+:fromhost, isequal, &quot;192.168.0.99&quot; ~
+:fromhost, isequal, &quot;192.168.0.103&quot; ?RemoteFromHost
+:fromhost, isequal, &quot;192.168.0.103&quot; ~
+:fromhost, isequal, &quot;192.168.0.97&quot; ?RemoteFromHost
+:fromhost, isequal, &quot;192.168.0.97&quot; ~
+:fromhost, isequal, &quot;192.168.0.111&quot; ?RemoteFromHost
+:fromhost, isequal, &quot;192.168.0.111&quot; ~
+# anything from a remote host gets logged as such
+:source, isequal, &quot;&quot; ?RemoteHost
+:source, isequal, &quot;&quot; ~
+
+#
+# LOCAL LOGGING
+#
+
+kern.*                                                 /var/log/messages
+*.info;mail.none;authpriv.none;cron.none                /var/log/messages
+authpriv.*                                              /var/log/secure
+mail.*                                                  -/var/log/maillog
+cron.*                                                  /var/log/cron
+*.emerg                                                 *
 uucp,news.crit                                          /var/log/spooler
-local7.</em>&nbsp;/var/log/boot.log</p>
-<h1 id="use-the-local-ruleset-as-default">use the local RuleSet as&nbsp;default</h1>
-<p>$DefaultRuleset&nbsp;local</p>
-<h1></h1>
-<h1 id="begin-centralized-logging-stuff-added-2009-09-16-by-jantman"><span class="caps">BEGIN</span> centralized logging stuff added 2009-09-16 by&nbsp;jantman</h1>
-<h1></h1>
-<h1 id="define-ruleset-for-remote-logging">define ruleset for remote&nbsp;logging</h1>
-<p>$RuleSet&nbsp;remote</p>
-<p><em>.</em>&nbsp;?RemoteHost</p>
-<h1 id="bind-ruleset-to-tcp-listener">bind ruleset to tcp&nbsp;listener</h1>
-<p>$InputTCPServerBindRuleset&nbsp;remote</p>
-<h1 id="and-activate-it">and activate&nbsp;it:</h1>
-<p>$InputTCPServerRun&nbsp;5000</p>
-<p>$UDPServerRun 514
-$UDPServerRun&nbsp;5000</p>
-<h1></h1>
-<h1 id="end-remote-logging"><span class="caps">END</span> remote&nbsp;logging</h1>
-<h1></h1>
-<p>~~~~</p>
+local7.*                                                /var/log/boot.log
+
+# use the local RuleSet as default
+$DefaultRuleset local
+
+#
+# BEGIN centralized logging stuff added 2009-09-16 by jantman
+#
+
+# define ruleset for remote logging
+$RuleSet remote
+
+*.* ?RemoteHost
+
+# bind ruleset to tcp listener
+$InputTCPServerBindRuleset remote
+# and activate it:
+$InputTCPServerRun 5000
+
+$UDPServerRun 514
+$UDPServerRun 5000
+
+#
+# END remote logging
+#
+</pre></div>
             </div>
             <!-- /.entry-content -->
         </article>
@@ -375,13 +377,18 @@ $UDPServerRun&nbsp;5000</p>
 
                 <li class="list-group-item"><a href="http://jantman.github.io/blog/tags.html"><h4><i class="icon-tags icon-large"></i>Tags</h4></a></li>
                         <li class="list-group-item tag-1">
+                            <a href="http://jantman.github.io/blog/tag/google.html">
+                                google
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
                             <a href="http://jantman.github.io/blog/tag/linux.html">
                                 linux
                             </a>
                         </li>
                         <li class="list-group-item tag-1">
-                            <a href="http://jantman.github.io/blog/tag/php.html">
-                                PHP
+                            <a href="http://jantman.github.io/blog/tag/sysadmin.html">
+                                sysadmin
                             </a>
                         </li>
                         <li class="list-group-item tag-1">
@@ -390,53 +397,13 @@ $UDPServerRun&nbsp;5000</p>
                             </a>
                         </li>
                         <li class="list-group-item tag-1">
-                            <a href="http://jantman.github.io/blog/tag/google.html">
-                                google
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-1">
                             <a href="http://jantman.github.io/blog/tag/nagios.html">
                                 Nagios
                             </a>
                         </li>
                         <li class="list-group-item tag-1">
-                            <a href="http://jantman.github.io/blog/tag/sysadmin.html">
-                                sysadmin
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/logging.html">
-                                logging
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/wordpress.html">
-                                wordpress
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/apache.html">
-                                apache
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/firefox.html">
-                                firefox
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/blog.html">
-                                blog
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/perl.html">
-                                perl
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/monitoring.html">
-                                monitoring
+                            <a href="http://jantman.github.io/blog/tag/php.html">
+                                PHP
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
@@ -445,8 +412,8 @@ $UDPServerRun&nbsp;5000</p>
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/dns.html">
-                                dns
+                            <a href="http://jantman.github.io/blog/tag/monitoring.html">
+                                monitoring
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
@@ -455,23 +422,18 @@ $UDPServerRun&nbsp;5000</p>
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/bind.html">
-                                bind
+                            <a href="http://jantman.github.io/blog/tag/blog.html">
+                                blog
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/sun.html">
-                                sun
+                            <a href="http://jantman.github.io/blog/tag/firefox.html">
+                                firefox
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/mediawiki.html">
-                                mediawiki
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/rpm.html">
-                                rpm
+                            <a href="http://jantman.github.io/blog/tag/apache.html">
+                                apache
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
@@ -480,8 +442,18 @@ $UDPServerRun&nbsp;5000</p>
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/puppet.html">
-                                puppet
+                            <a href="http://jantman.github.io/blog/tag/bind.html">
+                                bind
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/mediawiki.html">
+                                mediawiki
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/logging.html">
+                                logging
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
@@ -490,13 +462,43 @@ $UDPServerRun&nbsp;5000</p>
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/mac.html">
+                                mac
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/wordpress.html">
+                                wordpress
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/dns.html">
+                                dns
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/puppet.html">
+                                puppet
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
                             <a href="http://jantman.github.io/blog/tag/security.html">
                                 security
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/mac.html">
-                                mac
+                            <a href="http://jantman.github.io/blog/tag/rpm.html">
+                                rpm
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/perl.html">
+                                perl
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/sun.html">
+                                sun
                             </a>
                         </li>
         </ul>

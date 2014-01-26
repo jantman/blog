@@ -17,7 +17,7 @@
             <meta property="og:description" content="I’ve been working on a personal project with Logstash lately, and it relies relatively heavily on grok filters for matching text and extracting matched parts. Today, I’ve been parsing syslog from Puppet to extract various metrics and timings, which will then be passed on from Logstash to Etsy ..."/>
 
     <!-- Bootstrap -->
-        <link rel="stylesheet" href="http://jantman.github.io/blog/theme/css/bootstrap.min.css" type="text/css"/>
+        <link rel="stylesheet" href="http://jantman.github.io/blog/theme/css/bootstrap.flatly.min.css" type="text/css"/>
     <link href="http://jantman.github.io/blog/theme/css/font-awesome.min.css" rel="stylesheet">
     <link href="http://jantman.github.io/blog/theme/css/pygments.css" rel="stylesheet">
         <link href="http://jantman.github.io/blog/theme/css/typogrify.css" rel="stylesheet">
@@ -145,23 +145,26 @@ only tested on Fedora 16. If you have any issues, you should probably
 refer back to the <span class="caps">RVM</span>&nbsp;documentation.</p>
 <ol>
 <li>Create the isolated user, just to be extra careful. Login as that&nbsp;user.</li>
-<li>As per <a href="https://rvm.io/rvm/install/">Installing <span class="caps">RVM</span></a>:
-    <code>curl https://raw.github.com/wayneeseguin/rvm/master/binscripts/rvm-installer | bash -s stable</code></li>
-<li>edit your <code>~/.bashrc</code> and&nbsp;add:</li>
-</ol>
+<li>
+<p>As per <a href="https://rvm.io/rvm/install/">Installing <span class="caps">RVM</span></a>:</p>
+<div class="codehilite"><pre>curl https://raw.github.com/wayneeseguin/rvm/master/binscripts/rvm-installer | bash -s stable
+</pre></div>
+
+
+</li>
+<li>
+<p>edit your <code>~/.bashrc</code> and&nbsp;add:</p>
 <div class="codehilite"><pre><span class="o">[[</span> -s <span class="s2">&quot;$<span class="caps">HOME</span>/.rvm/scripts/rvm&quot;</span> <span class="o">]]</span> <span class="o">&amp;&amp;</span> . <span class="s2">&quot;$<span class="caps">HOME</span>/.rvm/scripts/rvm&quot;</span>
 <span class="o">[[</span> -r <span class="nv">$rvm_path</span>/scripts/completion <span class="o">]]</span> <span class="o">&amp;&amp;</span> . <span class="nv">$rvm_path</span>/scripts/completion
 </pre></div>
 
 
-<div class="codehilite"><pre>&lt;p&gt;
-The first line sets up RVM for your sessions, and the second sources
-in tab-completion for the `rvm` command.
-</pre></div>
-
-
-<ol>
-<li><code>source .bashrc</code></li>
+<p>The first line sets up <span class="caps">RVM</span> for your sessions, and the second sources
+in tab-completion for the <code>rvm</code> command.</p>
+</li>
+<li>
+<p><code>source .bashrc</code></p>
+</li>
 <li>If you&#8217;re interested, you can see a list of all known rubies with:
     <code>rvm list known</code></li>
 <li>Install Ruby (<span class="caps">MRI</span>) 1.9.2: <code>rvm install 1.9.2</code></li>
@@ -215,10 +218,10 @@ anything other than the explicit path to my <span class="caps">RVM</span> ruby i
 
 <p>Here&#8217;s an example using a pattern to capture information from custom
 syslog messages triggered by updating puppet configs. Here&#8217;s some sample&nbsp;messages:</p>
-<div class="codehilite"><pre>[rvmtest@jantmanwork ~]$ cat puppet.log
-Updated 2 files in puppet svn (environment prod) to revision 754
-Updated 3 files in puppet svn (environment prod) to revision 756
-Updated 1 files in puppet svn (environment prod) to revision 757
+<div class="codehilite"><pre><span class="go">[rvmtest@jantmanwork ~]$ cat puppet.log</span>
+<span class="go">Updated 2 files in puppet svn (environment prod) to revision 754</span>
+<span class="go">Updated 3 files in puppet svn (environment prod) to revision 756</span>
+<span class="go">Updated 1 files in puppet svn (environment prod) to revision 757</span>
 </pre></div>
 
 
@@ -228,29 +231,29 @@ Updated 1 files in puppet svn (environment prod) to revision 757
 
 
 <p>And the output of the&nbsp;script:</p>
-<div class="codehilite"><pre>[rvmtest@jantmanwork ~]$ cat puppet.log | ./puppet-update-test.rb 
-PATTERN: Updated%{SPACE}%{NUMBER:puppet_svn_num_files}%{SPACE}files%{SPACE}in%{SPACE}puppet%{SPACE}svn%{SPACE}\(environment%{SPACE}%{WORD:puppet_svn_env}\)%{SPACE}to%{SPACE}revision%{SPACE}%{NUMBER:puppet_svn_revision}
-IN: Updated 2 files in puppet svn (environment prod) to revision 754
-MATCH:
-{&quot;SPACE&quot;=&gt;[&quot; &quot;, &quot; &quot;, &quot; &quot;, &quot; &quot;, &quot; &quot;, &quot; &quot;, &quot; &quot;, &quot; &quot;, &quot; &quot;, &quot; &quot;],
- &quot;NUMBER:puppet_svn_num_files&quot;=&gt;[&quot;2&quot;],
- &quot;BASE10NUM&quot;=&gt;[&quot;2&quot;, &quot;754&quot;],
- &quot;WORD:puppet_svn_env&quot;=&gt;[&quot;prod&quot;],
- &quot;NUMBER:puppet_svn_revision&quot;=&gt;[&quot;754&quot;]}
-IN: Updated 3 files in puppet svn (environment prod) to revision 756
-MATCH:
-{&quot;SPACE&quot;=&gt;[&quot; &quot;, &quot; &quot;, &quot; &quot;, &quot; &quot;, &quot; &quot;, &quot; &quot;, &quot; &quot;, &quot; &quot;, &quot; &quot;, &quot; &quot;],
- &quot;NUMBER:puppet_svn_num_files&quot;=&gt;[&quot;3&quot;],
- &quot;BASE10NUM&quot;=&gt;[&quot;3&quot;, &quot;756&quot;],
- &quot;WORD:puppet_svn_env&quot;=&gt;[&quot;prod&quot;],
- &quot;NUMBER:puppet_svn_revision&quot;=&gt;[&quot;756&quot;]}
-IN: Updated 1 files in puppet svn (environment prod) to revision 757
-MATCH:
-{&quot;SPACE&quot;=&gt;[&quot; &quot;, &quot; &quot;, &quot; &quot;, &quot; &quot;, &quot; &quot;, &quot; &quot;, &quot; &quot;, &quot; &quot;, &quot; &quot;, &quot; &quot;],
- &quot;NUMBER:puppet_svn_num_files&quot;=&gt;[&quot;1&quot;],
- &quot;BASE10NUM&quot;=&gt;[&quot;1&quot;, &quot;757&quot;],
- &quot;WORD:puppet_svn_env&quot;=&gt;[&quot;prod&quot;],
- &quot;NUMBER:puppet_svn_revision&quot;=&gt;[&quot;757&quot;]}
+<div class="codehilite"><pre><span class="go">[rvmtest@jantmanwork ~]$ cat puppet.log | ./puppet-update-test.rb </span>
+<span class="go"><span class="caps">PATTERN</span>: Updated%{<span class="caps">SPACE</span>}%{<span class="caps">NUMBER</span>:puppet_svn_num_files}%{<span class="caps">SPACE</span>}files%{<span class="caps">SPACE</span>}in%{<span class="caps">SPACE</span>}puppet%{<span class="caps">SPACE</span>}svn%{<span class="caps">SPACE</span>}\(environment%{<span class="caps">SPACE</span>}%{<span class="caps">WORD</span>:puppet_svn_env}\)%{<span class="caps">SPACE</span>}to%{<span class="caps">SPACE</span>}revision%{<span class="caps">SPACE</span>}%{<span class="caps">NUMBER</span>:puppet_svn_revision}</span>
+<span class="go"><span class="caps">IN</span>: Updated 2 files in puppet svn (environment prod) to revision 754</span>
+<span class="go"><span class="caps">MATCH</span>:</span>
+<span class="go">{&quot;<span class="caps">SPACE</span>&quot;=&gt;[&quot; &quot;, &quot; &quot;, &quot; &quot;, &quot; &quot;, &quot; &quot;, &quot; &quot;, &quot; &quot;, &quot; &quot;, &quot; &quot;, &quot; &quot;],</span>
+<span class="go"> &quot;<span class="caps">NUMBER</span>:puppet_svn_num_files&quot;=&gt;[&quot;2&quot;],</span>
+<span class="go"> &quot;<span class="caps">BASE10NUM</span>&quot;=&gt;[&quot;2&quot;, &quot;754&quot;],</span>
+<span class="go"> &quot;<span class="caps">WORD</span>:puppet_svn_env&quot;=&gt;[&quot;prod&quot;],</span>
+<span class="go"> &quot;<span class="caps">NUMBER</span>:puppet_svn_revision&quot;=&gt;[&quot;754&quot;]}</span>
+<span class="go"><span class="caps">IN</span>: Updated 3 files in puppet svn (environment prod) to revision 756</span>
+<span class="go"><span class="caps">MATCH</span>:</span>
+<span class="go">{&quot;<span class="caps">SPACE</span>&quot;=&gt;[&quot; &quot;, &quot; &quot;, &quot; &quot;, &quot; &quot;, &quot; &quot;, &quot; &quot;, &quot; &quot;, &quot; &quot;, &quot; &quot;, &quot; &quot;],</span>
+<span class="go"> &quot;<span class="caps">NUMBER</span>:puppet_svn_num_files&quot;=&gt;[&quot;3&quot;],</span>
+<span class="go"> &quot;<span class="caps">BASE10NUM</span>&quot;=&gt;[&quot;3&quot;, &quot;756&quot;],</span>
+<span class="go"> &quot;<span class="caps">WORD</span>:puppet_svn_env&quot;=&gt;[&quot;prod&quot;],</span>
+<span class="go"> &quot;<span class="caps">NUMBER</span>:puppet_svn_revision&quot;=&gt;[&quot;756&quot;]}</span>
+<span class="go"><span class="caps">IN</span>: Updated 1 files in puppet svn (environment prod) to revision 757</span>
+<span class="go"><span class="caps">MATCH</span>:</span>
+<span class="go">{&quot;<span class="caps">SPACE</span>&quot;=&gt;[&quot; &quot;, &quot; &quot;, &quot; &quot;, &quot; &quot;, &quot; &quot;, &quot; &quot;, &quot; &quot;, &quot; &quot;, &quot; &quot;, &quot; &quot;],</span>
+<span class="go"> &quot;<span class="caps">NUMBER</span>:puppet_svn_num_files&quot;=&gt;[&quot;1&quot;],</span>
+<span class="go"> &quot;<span class="caps">BASE10NUM</span>&quot;=&gt;[&quot;1&quot;, &quot;757&quot;],</span>
+<span class="go"> &quot;<span class="caps">WORD</span>:puppet_svn_env&quot;=&gt;[&quot;prod&quot;],</span>
+<span class="go"> &quot;<span class="caps">NUMBER</span>:puppet_svn_revision&quot;=&gt;[&quot;757&quot;]}</span>
 </pre></div>
 
 
@@ -278,13 +281,18 @@ MATCH:
 
                 <li class="list-group-item"><a href="http://jantman.github.io/blog/tags.html"><h4><i class="icon-tags icon-large"></i>Tags</h4></a></li>
                         <li class="list-group-item tag-1">
+                            <a href="http://jantman.github.io/blog/tag/google.html">
+                                google
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
                             <a href="http://jantman.github.io/blog/tag/linux.html">
                                 linux
                             </a>
                         </li>
                         <li class="list-group-item tag-1">
-                            <a href="http://jantman.github.io/blog/tag/php.html">
-                                PHP
+                            <a href="http://jantman.github.io/blog/tag/sysadmin.html">
+                                sysadmin
                             </a>
                         </li>
                         <li class="list-group-item tag-1">
@@ -293,53 +301,13 @@ MATCH:
                             </a>
                         </li>
                         <li class="list-group-item tag-1">
-                            <a href="http://jantman.github.io/blog/tag/google.html">
-                                google
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-1">
                             <a href="http://jantman.github.io/blog/tag/nagios.html">
                                 Nagios
                             </a>
                         </li>
                         <li class="list-group-item tag-1">
-                            <a href="http://jantman.github.io/blog/tag/sysadmin.html">
-                                sysadmin
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/logging.html">
-                                logging
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/wordpress.html">
-                                wordpress
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/apache.html">
-                                apache
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/firefox.html">
-                                firefox
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/blog.html">
-                                blog
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/perl.html">
-                                perl
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/monitoring.html">
-                                monitoring
+                            <a href="http://jantman.github.io/blog/tag/php.html">
+                                PHP
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
@@ -348,8 +316,8 @@ MATCH:
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/dns.html">
-                                dns
+                            <a href="http://jantman.github.io/blog/tag/monitoring.html">
+                                monitoring
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
@@ -358,23 +326,18 @@ MATCH:
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/bind.html">
-                                bind
+                            <a href="http://jantman.github.io/blog/tag/blog.html">
+                                blog
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/sun.html">
-                                sun
+                            <a href="http://jantman.github.io/blog/tag/firefox.html">
+                                firefox
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/mediawiki.html">
-                                mediawiki
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/rpm.html">
-                                rpm
+                            <a href="http://jantman.github.io/blog/tag/apache.html">
+                                apache
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
@@ -383,8 +346,18 @@ MATCH:
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/puppet.html">
-                                puppet
+                            <a href="http://jantman.github.io/blog/tag/bind.html">
+                                bind
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/mediawiki.html">
+                                mediawiki
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/logging.html">
+                                logging
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
@@ -393,13 +366,43 @@ MATCH:
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/mac.html">
+                                mac
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/wordpress.html">
+                                wordpress
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/dns.html">
+                                dns
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/puppet.html">
+                                puppet
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
                             <a href="http://jantman.github.io/blog/tag/security.html">
                                 security
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/mac.html">
-                                mac
+                            <a href="http://jantman.github.io/blog/tag/rpm.html">
+                                rpm
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/perl.html">
+                                perl
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/sun.html">
+                                sun
                             </a>
                         </li>
         </ul>

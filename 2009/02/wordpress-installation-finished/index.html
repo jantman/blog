@@ -17,7 +17,7 @@
             <meta property="og:description" content="Found this from a month and a half ago, waiting as a draft: So, I mostly finished the WordPress installation. I got everything for WordPress up and running, tested my Blogger URL redirection script and then switched over my subdomain redirection. The blogger redirection takes two parts, but is in ..."/>
 
     <!-- Bootstrap -->
-        <link rel="stylesheet" href="http://jantman.github.io/blog/theme/css/bootstrap.min.css" type="text/css"/>
+        <link rel="stylesheet" href="http://jantman.github.io/blog/theme/css/bootstrap.flatly.min.css" type="text/css"/>
     <link href="http://jantman.github.io/blog/theme/css/font-awesome.min.css" rel="stylesheet">
     <link href="http://jantman.github.io/blog/theme/css/pygments.css" rel="stylesheet">
         <link href="http://jantman.github.io/blog/theme/css/typogrify.css" rel="stylesheet">
@@ -117,11 +117,13 @@ then switched over my subdomain&nbsp;redirection.</p>
 First, I went into the directory where the Blogger content had lived -
 <code>/srv/www/htdocs/blog</code> and moved everything in there into another
 directory, out of the way. I then created a .htaccess in the directory&nbsp;like:</p>
-<div class="codehilite"><pre><span class="nb">RewriteEngine</span> <span class="k">On</span>
+<div class="codehilite"><pre><span class="nt">&lt;IfModule</span> <span class="s">mod_rewrite.c</span><span class="nt">&gt;</span>
+<span class="nb">RewriteEngine</span> <span class="k">On</span>
 <span class="nb">RewriteBase</span> <span class="sx">/blog/</span>
 <span class="nb">RewriteCond</span> %{REQUEST_FILENAME} !-f
 <span class="nb">RewriteCond</span> %{REQUEST_FILENAME} !-d
 <span class="nb">RewriteRule</span> .* index.php [L]
+<span class="nt">&lt;/IfModule&gt;</span>
 </pre></div>
 
 
@@ -140,7 +142,100 @@ table with a <code>meta_key</code> of &#8220;blogger_permalink&#8221;. I just lo
 Blogger permalink matching the title from the Blogger <span class="caps">URL</span>, found the
 corresponding post <span class="caps">ID</span> and redirected to the proper new <span class="caps">WP</span>&nbsp;<span class="caps">URL</span>.</p>
 <p>The code for index.php, for me, looks something&nbsp;like:</p>
-<div class="codehilite"><pre>
+<div class="codehilite"><pre><span class="cp">&lt;?php</span>
+<span class="c1">// redirect old Blogger URLs in /blog to new WordPress in /wp</span>
+<span class="nv">$request</span> <span class="o">=</span> <span class="nb">mysql_real_escape_string</span><span class="p">(</span><span class="nb">str_replace</span><span class="p">(</span><span class="s2">&quot;/blog&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="nv">$_SERVER</span><span class="p">[</span><span class="s1">&#39;REQUEST_URI&#39;</span><span class="p">]));</span>
+
+<span class="c1">// handle constant stuff like feeds and top-level pages</span>
+<span class="c1">// <span class="caps">TODO</span></span>
+<span class="k">if</span><span class="p">(</span><span class="nb">strpos</span><span class="p">(</span><span class="nv">$request</span><span class="p">,</span> <span class="s2">&quot;_archive.html&quot;</span><span class="p">))</span>
+<span class="p">{</span>
+    <span class="c1">// redirect to an archive</span>
+    <span class="nv">$request</span> <span class="o">=</span> <span class="nx">substr</span><span class="p">(</span><span class="nv">$request</span><span class="p">,</span> <span class="nb">strpos</span><span class="p">(</span><span class="nv">$request</span><span class="p">,</span> <span class="s2">&quot;/&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span><span class="p">);</span>
+    <span class="nv">$ary</span> <span class="o">=</span> <span class="nb">explode</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">,</span> <span class="nv">$request</span><span class="p">);</span>
+    <span class="nv">$redirect_to</span> <span class="o">=</span> <span class="s2">&quot;http://blog.jasonantman.com/&quot;</span><span class="o">.</span><span class="nv">$ary</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="s2">&quot;/&quot;</span><span class="o">.</span><span class="nv">$ary</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="s2">&quot;/&quot;</span><span class="p">;</span>
+    <span class="nx">header</span><span class="p">(</span><span class="s2">&quot;Location: &quot;</span><span class="o">.</span><span class="nv">$redirect_to</span><span class="p">);</span>
+    <span class="k">die</span><span class="p">();</span>
+<span class="p">}</span>
+<span class="k">elseif</span><span class="p">(</span><span class="nb">strpos</span><span class="p">(</span><span class="nv">$request</span><span class="p">,</span> <span class="s2">&quot;labels/&quot;</span><span class="p">))</span>
+<span class="p">{</span>
+    <span class="c1">// redirect to a tag page</span>
+    <span class="nv">$redirect_to</span> <span class="o">=</span> <span class="nx">substr</span><span class="p">(</span><span class="nv">$request</span><span class="p">,</span> <span class="nb">strpos</span><span class="p">(</span><span class="nv">$request</span><span class="p">,</span> <span class="s2">&quot;labels/&quot;</span><span class="p">)</span><span class="o">+</span><span class="mi">7</span><span class="p">);</span>
+    <span class="nv">$redirect_to</span> <span class="o">=</span> <span class="nb">str_replace</span><span class="p">(</span><span class="s2">&quot;.html&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="nv">$redirect_to</span><span class="p">);</span>
+    <span class="nv">$redirect_to</span> <span class="o">=</span> <span class="nb">urldecode</span><span class="p">(</span><span class="nv">$redirect_to</span><span class="p">);</span>
+    <span class="nv">$redirect_to</span> <span class="o">=</span> <span class="nb">str_replace</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">,</span> <span class="s2">&quot;-&quot;</span><span class="p">,</span> <span class="nv">$redirect_to</span><span class="p">);</span>
+    <span class="nv">$redirect_to</span> <span class="o">=</span> <span class="s2">&quot;http://blog.jasonantman.com/tags/&quot;</span><span class="o">.</span><span class="nx">strtolower</span><span class="p">(</span><span class="nv">$redirect_to</span><span class="p">)</span><span class="o">.</span><span class="s2">&quot;/&quot;</span><span class="p">;</span>
+    <span class="nx">header</span><span class="p">(</span><span class="s2">&quot;Location: &quot;</span><span class="o">.</span><span class="nv">$redirect_to</span><span class="p">);</span>
+    <span class="k">die</span><span class="p">();</span>
+<span class="p">}</span>
+<span class="k">elseif</span><span class="p">(</span><span class="nb">strpos</span><span class="p">(</span><span class="nv">$request</span><span class="p">,</span> <span class="s2">&quot;/blogger.html&quot;</span><span class="p">))</span>
+<span class="p">{</span>
+    <span class="c1">// redirect to main blog</span>
+    <span class="nx">header</span><span class="p">(</span><span class="s2">&quot;Location: http://blog.jasonantman.com/&quot;</span><span class="p">);</span>
+    <span class="k">die</span><span class="p">();</span>
+<span class="p">}</span>
+<span class="k">elseif</span><span class="p">(</span><span class="nb">strpos</span><span class="p">(</span><span class="nv">$request</span><span class="p">,</span> <span class="s2">&quot;/atom.xml&quot;</span><span class="p">))</span>
+<span class="p">{</span>
+    <span class="c1">// redirect to new feed</span>
+    <span class="nx">header</span><span class="p">(</span><span class="s2">&quot;Location: http://blog.jasonantman.com/feed/&quot;</span><span class="p">);</span>
+    <span class="k">die</span><span class="p">();</span>
+<span class="p">}</span>
+
+<span class="c1">// handle the posts, months, tags, etc.</span>
+<span class="nv">$fail</span> <span class="o">=</span> <span class="k">false</span><span class="p">;</span>
+<span class="nv">$redirect_to</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">;</span>
+<span class="nv">$conn</span> <span class="o">=</span> <span class="nb">mysql_connect</span><span class="p">()</span>   <span class="k">or</span> <span class="k">die</span><span class="p">(</span><span class="s2">&quot;Error. MySQL connection failed at mysql_connect&quot;</span><span class="p">);</span>
+<span class="k">if</span><span class="p">(</span><span class="o">!</span> <span class="nv">$conn</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="nb">error_log</span><span class="p">(</span><span class="s2">&quot;<span class="caps">SCRIPT</span> &quot;</span><span class="o">.</span><span class="nv">$_SERVER</span><span class="p">[</span><span class="s1">&#39;PHP_SELF&#39;</span><span class="p">]</span><span class="o">.</span><span class="s2">&quot;: &quot;</span><span class="o">.</span><span class="s2">&quot;Unable to connect to MySQL.&quot;</span><span class="p">);</span>
+    <span class="nv">$fail</span> <span class="o">=</span> <span class="k">true</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="nv">$select</span> <span class="o">=</span> <span class="nb">mysql_select_db</span><span class="p">(</span><span class="s1">&#39;wordpress&#39;</span><span class="p">);</span>
+<span class="k">if</span><span class="p">(</span><span class="o">!</span> <span class="nv">$select</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="nb">error_log</span><span class="p">(</span><span class="s2">&quot;<span class="caps">SCRIPT</span> &quot;</span><span class="o">.</span><span class="nv">$_SERVER</span><span class="p">[</span><span class="s1">&#39;PHP_SELF&#39;</span><span class="p">]</span><span class="o">.</span><span class="s2">&quot;: &quot;</span><span class="o">.</span><span class="s2">&quot;Unable to select <span class="caps">DB</span> wordpress.&quot;</span><span class="p">);</span>
+    <span class="nv">$fail</span> <span class="o">=</span> <span class="k">true</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="nv">$query</span> <span class="o">=</span> <span class="s2">&quot;<span class="caps">SELECT</span> m.meta_key,m.meta_value,p.post_name,p.post_date <span class="caps">FROM</span> wp_postmeta <span class="caps">AS</span> m <span class="caps">LEFT</span> <span class="caps">JOIN</span> wp_posts <span class="caps">AS</span> p <span class="caps">ON</span> m.post_id=p.<span class="caps">ID</span> <span class="caps">WHERE</span> m.meta_key=&#39;blogger_permalink&#39; <span class="caps">AND</span> m.meta_value=&#39;&quot;</span><span class="o">.</span><span class="nv">$request</span><span class="o">.</span><span class="s2">&quot;&#39;;&quot;</span><span class="p">;</span>
+<span class="nv">$result</span> <span class="o">=</span> <span class="nb">mysql_query</span><span class="p">(</span><span class="nv">$query</span><span class="p">);</span>
+<span class="k">if</span><span class="p">(</span><span class="o">!</span> <span class="nv">$result</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="nb">error_log</span><span class="p">(</span><span class="s2">&quot;<span class="caps">SCRIPT</span> &quot;</span><span class="o">.</span><span class="nv">$_SERVER</span><span class="p">[</span><span class="s1">&#39;PHP_SELF&#39;</span><span class="p">]</span><span class="o">.</span><span class="s2">&quot;: &quot;</span><span class="o">.</span><span class="s2">&quot;Error in query: &quot;</span><span class="o">.</span><span class="nv">$query</span><span class="o">.</span><span class="s2">&quot; <span class="caps">ERROR</span>: &quot;</span><span class="o">.</span><span class="nb">mysql_error</span><span class="p">());</span>
+    <span class="nv">$fail</span> <span class="o">=</span> <span class="k">true</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="k">if</span><span class="p">(</span><span class="nb">mysql_num_rows</span><span class="p">(</span><span class="nv">$result</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="c1">// couldn&#39;t find an appropriate page</span>
+    <span class="c1">// <span class="caps">TODO</span>: find a better way... for now just redirect to the month page</span>
+    <span class="nv">$ary</span> <span class="o">=</span> <span class="nb">explode</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">,</span> <span class="nv">$request</span><span class="p">);</span>
+    <span class="k">if</span><span class="p">(</span><span class="nb">count</span><span class="p">(</span><span class="nv">$ary</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">3</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$redirect_to</span> <span class="o">=</span> <span class="s2">&quot;http://blog.jasonantman.com/&quot;</span><span class="o">.</span><span class="nv">$ary</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="s2">&quot;/&quot;</span><span class="o">.</span><span class="nv">$ary</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="s2">&quot;/&quot;</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="k">else</span>
+    <span class="p">{</span>
+        <span class="nv">$redirect_to</span> <span class="o">=</span> <span class="s2">&quot;http://blog.jasonantman.com/&quot;</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+<span class="k">else</span>
+<span class="p">{</span>
+    <span class="nv">$row</span> <span class="o">=</span> <span class="nb">mysql_fetch_assoc</span><span class="p">(</span><span class="nv">$result</span><span class="p">);</span>
+    <span class="nv">$redirect_to</span> <span class="o">=</span> <span class="s2">&quot;http://blog.jasonantman.com/&quot;</span><span class="o">.</span><span class="nb">date</span><span class="p">(</span><span class="s2">&quot;Y&quot;</span><span class="p">,</span> <span class="nb">strtotime</span><span class="p">(</span><span class="nv">$row</span><span class="p">[</span><span class="s1">&#39;post_date&#39;</span><span class="p">]))</span><span class="o">.</span><span class="s2">&quot;/&quot;</span><span class="o">.</span><span class="nb">date</span><span class="p">(</span><span class="s2">&quot;m&quot;</span><span class="p">,</span> <span class="nb">strtotime</span><span class="p">(</span><span class="nv">$row</span><span class="p">[</span><span class="s1">&#39;post_date&#39;</span><span class="p">]))</span><span class="o">.</span><span class="s2">&quot;/&quot;</span><span class="o">.</span><span class="nv">$row</span><span class="p">[</span><span class="s1">&#39;post_name&#39;</span><span class="p">];</span>
+<span class="p">}</span>
+
+<span class="k">if</span><span class="p">(</span><span class="nv">$fail</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="c1">// redirect to main page with 302</span>
+    <span class="nx">Header</span><span class="p">(</span> <span class="s2">&quot;Location: http://blog.jasonantman.com/&quot;</span> <span class="p">);</span> <span class="c1">// implicit 302</span>
+<span class="p">}</span>
+<span class="k">else</span>
+<span class="p">{</span>
+    <span class="c1">// redirect to the post or month</span>
+    <span class="nx">Header</span><span class="p">(</span> <span class="s2">&quot;<span class="caps">HTTP</span>/1.1 301 Moved Permanently&quot;</span> <span class="p">);</span>
+    <span class="nx">Header</span><span class="p">(</span> <span class="s2">&quot;Location: &quot;</span><span class="o">.</span><span class="nv">$redirect_to</span> <span class="p">);</span>
+<span class="p">}</span>
+
+<span class="cp">?&gt;</span><span class="x"></span>
 </pre></div>
 
 
@@ -188,13 +283,18 @@ redirection to the new subdomain.&nbsp;Eek.</p>
 
                 <li class="list-group-item"><a href="http://jantman.github.io/blog/tags.html"><h4><i class="icon-tags icon-large"></i>Tags</h4></a></li>
                         <li class="list-group-item tag-1">
+                            <a href="http://jantman.github.io/blog/tag/google.html">
+                                google
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
                             <a href="http://jantman.github.io/blog/tag/linux.html">
                                 linux
                             </a>
                         </li>
                         <li class="list-group-item tag-1">
-                            <a href="http://jantman.github.io/blog/tag/php.html">
-                                PHP
+                            <a href="http://jantman.github.io/blog/tag/sysadmin.html">
+                                sysadmin
                             </a>
                         </li>
                         <li class="list-group-item tag-1">
@@ -203,53 +303,13 @@ redirection to the new subdomain.&nbsp;Eek.</p>
                             </a>
                         </li>
                         <li class="list-group-item tag-1">
-                            <a href="http://jantman.github.io/blog/tag/google.html">
-                                google
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-1">
                             <a href="http://jantman.github.io/blog/tag/nagios.html">
                                 Nagios
                             </a>
                         </li>
                         <li class="list-group-item tag-1">
-                            <a href="http://jantman.github.io/blog/tag/sysadmin.html">
-                                sysadmin
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/logging.html">
-                                logging
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/wordpress.html">
-                                wordpress
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/apache.html">
-                                apache
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/firefox.html">
-                                firefox
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/blog.html">
-                                blog
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/perl.html">
-                                perl
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/monitoring.html">
-                                monitoring
+                            <a href="http://jantman.github.io/blog/tag/php.html">
+                                PHP
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
@@ -258,8 +318,8 @@ redirection to the new subdomain.&nbsp;Eek.</p>
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/dns.html">
-                                dns
+                            <a href="http://jantman.github.io/blog/tag/monitoring.html">
+                                monitoring
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
@@ -268,23 +328,18 @@ redirection to the new subdomain.&nbsp;Eek.</p>
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/bind.html">
-                                bind
+                            <a href="http://jantman.github.io/blog/tag/blog.html">
+                                blog
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/sun.html">
-                                sun
+                            <a href="http://jantman.github.io/blog/tag/firefox.html">
+                                firefox
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/mediawiki.html">
-                                mediawiki
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/rpm.html">
-                                rpm
+                            <a href="http://jantman.github.io/blog/tag/apache.html">
+                                apache
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
@@ -293,8 +348,18 @@ redirection to the new subdomain.&nbsp;Eek.</p>
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/puppet.html">
-                                puppet
+                            <a href="http://jantman.github.io/blog/tag/bind.html">
+                                bind
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/mediawiki.html">
+                                mediawiki
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/logging.html">
+                                logging
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
@@ -303,13 +368,43 @@ redirection to the new subdomain.&nbsp;Eek.</p>
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/mac.html">
+                                mac
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/wordpress.html">
+                                wordpress
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/dns.html">
+                                dns
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/puppet.html">
+                                puppet
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
                             <a href="http://jantman.github.io/blog/tag/security.html">
                                 security
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/mac.html">
-                                mac
+                            <a href="http://jantman.github.io/blog/tag/rpm.html">
+                                rpm
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/perl.html">
+                                perl
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/sun.html">
+                                sun
                             </a>
                         </li>
         </ul>

@@ -14,10 +14,10 @@
             <meta property="og:type" content="article"/>
             <meta property="og:title" content="Apache catchall vhost"/>
             <meta property="og:url" content="http://jantman.github.io/blog/2010/04/apache-catchall-vhost/"/>
-            <meta property="og:description" content="‘; echo ’ The page you are looking for is best found at: ‘; echo ’ ‘.$newURL.’ ‘; echo ’ You will be automatically redirected after 5 seconds. If this does not happen, click the link above. ‘; echo ’ ‘; } This script takes two distinct actions: If the requested URL is / or /index.php, it transparently redirects to ..."/>
+            <meta property="og:description" content="As mentioned in one of my recent posts, I occasionally have to setup catchall pages in Apache. The general idea is usually that I either want a vhost that serves one page for any conceivable request, or that I moved something and want to alert the visitor, but provide a ..."/>
 
     <!-- Bootstrap -->
-        <link rel="stylesheet" href="http://jantman.github.io/blog/theme/css/bootstrap.min.css" type="text/css"/>
+        <link rel="stylesheet" href="http://jantman.github.io/blog/theme/css/bootstrap.flatly.min.css" type="text/css"/>
     <link href="http://jantman.github.io/blog/theme/css/font-awesome.min.css" rel="stylesheet">
     <link href="http://jantman.github.io/blog/theme/css/pygments.css" rel="stylesheet">
         <link href="http://jantman.github.io/blog/theme/css/typogrify.css" rel="stylesheet">
@@ -109,23 +109,46 @@
 	<a href="http://jantman.github.io/blog/tag/web.html">web</a>
 </footer><!-- /.post-info -->                    </div>
                 </div>
-                <p><span class="quo">&#8216;</span>; echo&nbsp;&#8217;</p>
-<p>The page you are looking for is best found&nbsp;at:</p>
-<p><span class="quo">&#8216;</span>; echo&nbsp;&#8217;</p>
-<p><strong><a href="" title=".$newURL."><span class="quo">&#8216;</span>.$newURL.&#8217;</a></strong></p>
-<p><span class="quo">&#8216;</span>; echo&nbsp;&#8217;</p>
-<p>You will be automatically redirected after 5 seconds. If this does not
-happen, click the link&nbsp;above.</p>
-<p><span class="quo">&#8216;</span>; echo&nbsp;&#8217;</p>
-<p><span class="quo">&#8216;</span>;&nbsp;}</p>
-<p></pre>
-This script takes two distinct&nbsp;actions:</p>
-<ul>
-<li>If the requested <span class="caps">URL</span> is <code>/</code> or <code>/index.php</code>, it transparently
-    redirects to a different <span class="caps">URL</span> (and&nbsp;port).</li>
-<li>Otherwise, it displays a &#8220;page moved to&#8221; message and uses a
-    Meta-Refresh to redirect after 5&nbsp;seconds.</li>
-</ul>
+                <p>As mentioned in <a href="/2010/04/bind9-dynamic-dns/">one of my recent posts</a>, I occasionally
+have to setup catchall pages in Apache. The general idea is usually that I either want
+a vhost that serves one page for any conceivable request, or that I moved something and
+want to alert the visitor, but provide a formula-based link to the new content. Assuming
+you have <code>mod_rewrite</code>, this is relatively&nbsp;simple.</p>
+<p>In your vhost configuration (or .htaccess), you just need two&nbsp;lines:</p>
+<div class="codehilite"><pre><span class="nb">RewriteEngine</span> <span class="k">on</span>
+<span class="nb">RewriteCond</span> %{REQUEST_URI} !/index\.php$1
+<span class="nb">RewriteRule</span> ^(.*)$ <span class="sx">/index.php</span>$1 [L]
+</pre></div>
+
+
+<p>This will redirect every request for the vhost to <code>/index.php</code>. Within
+your <span class="caps">PHP</span> script, you can access the actual request <span class="caps">URI</span> through <code>$_SERVER["REQUEST_URI"]</code>.
+The script that I&#8217;m currently using for an internal page&nbsp;is:</p>
+<div class="codehilite"><pre><span class="x">$newServer = &quot;http://foo.example.com:12345&quot;;</span>
+
+<span class="x">if($_SERVER[&quot;REQUEST_URI&quot;] == &quot;/&quot; || $_SERVER[&quot;REQUEST_URI&quot;] == &quot;/index.php&quot;)</span>
+<span class="x">  {</span>
+<span class="x">    header(&quot;Location: &quot;.$newServer);</span>
+<span class="x">  }</span>
+<span class="x">else</span>
+<span class="x">  {</span>
+<span class="x">    $newURL = $newServer.$_SERVER[&quot;REQUEST_URI&quot;];</span>
+<span class="x">    echo &#39;&lt;html&gt;&lt;head&gt;&lt;title&gt;Page Moved&lt;/title&gt;&#39;;</span>
+<span class="x">    echo &#39;&lt;<span class="caps">META</span> <span class="caps">HTTP</span>-<span class="caps">EQUIV</span>=&quot;refresh&quot; <span class="caps">CONTENT</span>=&quot;5;<span class="caps">URL</span>=&#39;.$newURL.&#39;&quot;&gt;&#39;;</span>
+<span class="x">    echo &#39;&lt;/head&gt;&lt;body&gt;&#39;;</span>
+<span class="x">    echo &#39;&lt;p&gt;The page you are looking for is best found at:&lt;/p&gt;&#39;;</span>
+<span class="x">    echo &#39;&lt;p&gt;&lt;strong&gt;&lt;a href=&quot;&#39;.$newURL.&#39;&quot;&gt;&#39;.$newURL.&#39;&lt;/a&gt;&lt;/strong&gt;&lt;/p&gt;&#39;;</span>
+<span class="x">    echo &#39;&lt;p&gt;You will be automatically redirected after 5 seconds. If this does not happen, click the link above.&lt;/p&gt;&#39;;</span>
+<span class="x">    echo &#39;&lt;/body&gt;&lt;/html&gt;&#39;;</span>
+<span class="x">  }</span>
+</pre></div>
+
+
+<p>This script takes two distinct&nbsp;actions:</p>
+<ol>
+<li>If the requested path is <code>/</code> or <code>/index.php</code>, it transparently redirects to a different <span class="caps">URL</span> (and&nbsp;port).</li>
+<li>Otherwise, it displays a &#8220;page moved to&#8221; message and uses a Meta-Refresh to redirect after 5&nbsp;seconds.</li>
+</ol>
             </div>
             <!-- /.entry-content -->
         </article>
@@ -149,13 +172,18 @@ This script takes two distinct&nbsp;actions:</p>
 
                 <li class="list-group-item"><a href="http://jantman.github.io/blog/tags.html"><h4><i class="icon-tags icon-large"></i>Tags</h4></a></li>
                         <li class="list-group-item tag-1">
+                            <a href="http://jantman.github.io/blog/tag/google.html">
+                                google
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
                             <a href="http://jantman.github.io/blog/tag/linux.html">
                                 linux
                             </a>
                         </li>
                         <li class="list-group-item tag-1">
-                            <a href="http://jantman.github.io/blog/tag/php.html">
-                                PHP
+                            <a href="http://jantman.github.io/blog/tag/sysadmin.html">
+                                sysadmin
                             </a>
                         </li>
                         <li class="list-group-item tag-1">
@@ -164,53 +192,13 @@ This script takes two distinct&nbsp;actions:</p>
                             </a>
                         </li>
                         <li class="list-group-item tag-1">
-                            <a href="http://jantman.github.io/blog/tag/google.html">
-                                google
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-1">
                             <a href="http://jantman.github.io/blog/tag/nagios.html">
                                 Nagios
                             </a>
                         </li>
                         <li class="list-group-item tag-1">
-                            <a href="http://jantman.github.io/blog/tag/sysadmin.html">
-                                sysadmin
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/logging.html">
-                                logging
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/wordpress.html">
-                                wordpress
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/apache.html">
-                                apache
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/firefox.html">
-                                firefox
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/blog.html">
-                                blog
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/perl.html">
-                                perl
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/monitoring.html">
-                                monitoring
+                            <a href="http://jantman.github.io/blog/tag/php.html">
+                                PHP
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
@@ -219,8 +207,8 @@ This script takes two distinct&nbsp;actions:</p>
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/dns.html">
-                                dns
+                            <a href="http://jantman.github.io/blog/tag/monitoring.html">
+                                monitoring
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
@@ -229,23 +217,18 @@ This script takes two distinct&nbsp;actions:</p>
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/bind.html">
-                                bind
+                            <a href="http://jantman.github.io/blog/tag/blog.html">
+                                blog
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/sun.html">
-                                sun
+                            <a href="http://jantman.github.io/blog/tag/firefox.html">
+                                firefox
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/mediawiki.html">
-                                mediawiki
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/rpm.html">
-                                rpm
+                            <a href="http://jantman.github.io/blog/tag/apache.html">
+                                apache
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
@@ -254,8 +237,18 @@ This script takes two distinct&nbsp;actions:</p>
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/puppet.html">
-                                puppet
+                            <a href="http://jantman.github.io/blog/tag/bind.html">
+                                bind
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/mediawiki.html">
+                                mediawiki
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/logging.html">
+                                logging
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
@@ -264,13 +257,43 @@ This script takes two distinct&nbsp;actions:</p>
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/mac.html">
+                                mac
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/wordpress.html">
+                                wordpress
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/dns.html">
+                                dns
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/puppet.html">
+                                puppet
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
                             <a href="http://jantman.github.io/blog/tag/security.html">
                                 security
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/mac.html">
-                                mac
+                            <a href="http://jantman.github.io/blog/tag/rpm.html">
+                                rpm
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/perl.html">
+                                perl
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/sun.html">
+                                sun
                             </a>
                         </li>
         </ul>

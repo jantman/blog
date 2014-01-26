@@ -17,7 +17,7 @@
             <meta property="og:description" content="Using GraphViz to describe configurations is relatively popular in the software and systems architecture world; the simple text-based format makes it quiet simple, and the directed graph (dot file) is a simple method to store a graph of information flow or component relationships. Puppet includes builtin support for generating dot ..."/>
 
     <!-- Bootstrap -->
-        <link rel="stylesheet" href="http://jantman.github.io/blog/theme/css/bootstrap.min.css" type="text/css"/>
+        <link rel="stylesheet" href="http://jantman.github.io/blog/theme/css/bootstrap.flatly.min.css" type="text/css"/>
     <link href="http://jantman.github.io/blog/theme/css/font-awesome.min.css" rel="stylesheet">
     <link href="http://jantman.github.io/blog/theme/css/pygments.css" rel="stylesheet">
         <link href="http://jantman.github.io/blog/theme/css/typogrify.css" rel="stylesheet">
@@ -127,8 +127,11 @@ Puppet&#8217;s own
 only mentions using the <code>dot</code> command to generate a <span class="caps">PNG</span> graphical
 representation of the the graph. When debugging a recent problem with
 puppet, I ended up with a message&nbsp;like:  </p>
-<p><code>Could not apply complete catalog: Found dependency cycles in the following relationships: Service[puppet] =&gt; File[/var/lib/puppet/yaml/foreman], File[/var/lib/puppet/yaml] =&gt; File[/var/lib/puppet/yaml/foreman], Service[puppet] =&gt; File[/etc/puppet/node.rb], File[fileserver.conf] =&gt; Service[apache], File[namespaceauth.conf] =&gt; Service[apache], File[puppet.conf] =&gt; Service[apache], File[puppet.conf] =&gt; Service[puppet], Service[puppet] =&gt; File[foreman-report.rb], File[/var/lib/puppet/yaml/foreman] =&gt; Package[puppet-server], Service[foreman-proxy] =&gt; Package[puppet-server], File[foreman-proxy-settings.yml] =&gt; Package[puppet-server], Package[foreman-proxy] =&gt; Package[puppet-server], User[foreman-proxy] =&gt; Package[puppet-server], File[/var/lib/puppet/yaml] =&gt; Package[puppet-server], File[foreman-report.rb] =&gt; Package[puppet-server], File[/etc/puppet/node.rb] =&gt; Package[puppet-server], File[/var/lib/puppet/yaml/foreman] =&gt; Exec[create_puppetmaster_certs], Service[foreman-proxy] =&gt; Exec[create_puppetmaster_certs], File[foreman-proxy-settings.yml] =&gt; Exec[create_puppetmaster_certs], Package[foreman-proxy] =&gt; Exec[create_puppetmaster_certs], User[foreman-proxy] =&gt; Exec[create_puppetmaster_certs], File[/var/lib/puppet/yaml] =&gt; Exec[create_puppetmaster_certs], File[foreman-report.rb] =&gt; Exec[create_puppetmaster_certs], File[/etc/puppet/node.rb] =&gt; Exec[create_puppetmaster_certs], File[/var/lib/puppet/yaml/foreman] =&gt; File[/etc/puppet/environments], Service[foreman-proxy] =&gt; File[/etc/puppet/environments], File[foreman-proxy-settings.yml] =&gt; File[/etc/puppet/environments], Package[foreman-proxy] =&gt; File[/etc/puppet/environments], User[foreman-proxy] =&gt; File[/etc/puppet/environments], File[/var/lib/puppet/yaml] =&gt; File[/etc/puppet/environments], File[foreman-report.rb] =&gt; File[/etc/puppet/environments], File[/etc/puppet/node.rb] =&gt; File[/etc/puppet/environments], File[foreman-proxy-settings.yml] =&gt; Service[foreman-proxy], Package[foreman-proxy] =&gt; Service[foreman-proxy], Service[puppet]</code><br />
-Not exactly easy to follow, or to pull much meaning out of, even if I
+<div class="codehilite"><pre>Could not apply complete catalog: Found dependency cycles in the following relationships: Service[puppet] =&gt; File[/var/lib/puppet/yaml/foreman], File[/var/lib/puppet/yaml] =&gt; File[/var/lib/puppet/yaml/foreman], Service[puppet] =&gt; File[/etc/puppet/node.rb], File[fileserver.conf] =&gt; Service[apache], File[namespaceauth.conf] =&gt; Service[apache], File[puppet.conf] =&gt; Service[apache], File[puppet.conf] =&gt; Service[puppet], Service[puppet] =&gt; File[foreman-report.rb], File[/var/lib/puppet/yaml/foreman] =&gt; Package[puppet-server], Service[foreman-proxy] =&gt; Package[puppet-server], File[foreman-proxy-settings.yml] =&gt; Package[puppet-server], Package[foreman-proxy] =&gt; Package[puppet-server], User[foreman-proxy] =&gt; Package[puppet-server], File[/var/lib/puppet/yaml] =&gt; Package[puppet-server], File[foreman-report.rb] =&gt; Package[puppet-server], File[/etc/puppet/node.rb] =&gt; Package[puppet-server], File[/var/lib/puppet/yaml/foreman] =&gt; Exec[create_puppetmaster_certs], Service[foreman-proxy] =&gt; Exec[create_puppetmaster_certs], File[foreman-proxy-settings.yml] =&gt; Exec[create_puppetmaster_certs], Package[foreman-proxy] =&gt; Exec[create_puppetmaster_certs], User[foreman-proxy] =&gt; Exec[create_puppetmaster_certs], File[/var/lib/puppet/yaml] =&gt; Exec[create_puppetmaster_certs], File[foreman-report.rb] =&gt; Exec[create_puppetmaster_certs], File[/etc/puppet/node.rb] =&gt; Exec[create_puppetmaster_certs], File[/var/lib/puppet/yaml/foreman] =&gt; File[/etc/puppet/environments], Service[foreman-proxy] =&gt; File[/etc/puppet/environments], File[foreman-proxy-settings.yml] =&gt; File[/etc/puppet/environments], Package[foreman-proxy] =&gt; File[/etc/puppet/environments], User[foreman-proxy] =&gt; File[/etc/puppet/environments], File[/var/lib/puppet/yaml] =&gt; File[/etc/puppet/environments], File[foreman-report.rb] =&gt; File[/etc/puppet/environments], File[/etc/puppet/node.rb] =&gt; File[/etc/puppet/environments], File[foreman-proxy-settings.yml] =&gt; Service[foreman-proxy], Package[foreman-proxy] =&gt; Service[foreman-proxy], Service[puppet]
+</pre></div>
+
+
+<p>Not exactly easy to follow, or to pull much meaning out of, even if I
 did some slight reformatting by putting in some newlines. I then
 generated the png as described in the Puppet FAQs, but even scrolling
 back and forth on this for 20 minutes didn&#8217;t help: <em>(note: link is to
@@ -289,13 +292,18 @@ CentOS at least). For Puppet purposes, I&#8217;d recommend running this on
 
                 <li class="list-group-item"><a href="http://jantman.github.io/blog/tags.html"><h4><i class="icon-tags icon-large"></i>Tags</h4></a></li>
                         <li class="list-group-item tag-1">
+                            <a href="http://jantman.github.io/blog/tag/google.html">
+                                google
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
                             <a href="http://jantman.github.io/blog/tag/linux.html">
                                 linux
                             </a>
                         </li>
                         <li class="list-group-item tag-1">
-                            <a href="http://jantman.github.io/blog/tag/php.html">
-                                PHP
+                            <a href="http://jantman.github.io/blog/tag/sysadmin.html">
+                                sysadmin
                             </a>
                         </li>
                         <li class="list-group-item tag-1">
@@ -304,53 +312,13 @@ CentOS at least). For Puppet purposes, I&#8217;d recommend running this on
                             </a>
                         </li>
                         <li class="list-group-item tag-1">
-                            <a href="http://jantman.github.io/blog/tag/google.html">
-                                google
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-1">
                             <a href="http://jantman.github.io/blog/tag/nagios.html">
                                 Nagios
                             </a>
                         </li>
                         <li class="list-group-item tag-1">
-                            <a href="http://jantman.github.io/blog/tag/sysadmin.html">
-                                sysadmin
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/logging.html">
-                                logging
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/wordpress.html">
-                                wordpress
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/apache.html">
-                                apache
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/firefox.html">
-                                firefox
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/blog.html">
-                                blog
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/perl.html">
-                                perl
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/monitoring.html">
-                                monitoring
+                            <a href="http://jantman.github.io/blog/tag/php.html">
+                                PHP
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
@@ -359,8 +327,8 @@ CentOS at least). For Puppet purposes, I&#8217;d recommend running this on
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/dns.html">
-                                dns
+                            <a href="http://jantman.github.io/blog/tag/monitoring.html">
+                                monitoring
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
@@ -369,23 +337,18 @@ CentOS at least). For Puppet purposes, I&#8217;d recommend running this on
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/bind.html">
-                                bind
+                            <a href="http://jantman.github.io/blog/tag/blog.html">
+                                blog
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/sun.html">
-                                sun
+                            <a href="http://jantman.github.io/blog/tag/firefox.html">
+                                firefox
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/mediawiki.html">
-                                mediawiki
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/rpm.html">
-                                rpm
+                            <a href="http://jantman.github.io/blog/tag/apache.html">
+                                apache
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
@@ -394,8 +357,18 @@ CentOS at least). For Puppet purposes, I&#8217;d recommend running this on
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/puppet.html">
-                                puppet
+                            <a href="http://jantman.github.io/blog/tag/bind.html">
+                                bind
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/mediawiki.html">
+                                mediawiki
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/logging.html">
+                                logging
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
@@ -404,13 +377,43 @@ CentOS at least). For Puppet purposes, I&#8217;d recommend running this on
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/mac.html">
+                                mac
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/wordpress.html">
+                                wordpress
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/dns.html">
+                                dns
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/puppet.html">
+                                puppet
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
                             <a href="http://jantman.github.io/blog/tag/security.html">
                                 security
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/mac.html">
-                                mac
+                            <a href="http://jantman.github.io/blog/tag/rpm.html">
+                                rpm
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/perl.html">
+                                perl
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/sun.html">
+                                sun
                             </a>
                         </li>
         </ul>

@@ -14,10 +14,10 @@
             <meta property="og:type" content="article"/>
             <meta property="og:title" content="Puppet problems with hostname in autosign.conf - Invalid pattern"/>
             <meta property="og:url" content="http://jantman.github.io/blog/2009/10/puppet-problems-with-hostname-in-autosignconf-invalid-pattern/"/>
-            <meta property="og:description" content="In playing with Puppet (0.24.8 on clients and server) today (well, building a new host) I came by a strange error when I ran puppet on the client: ~~~~{.text only} err: Could not request certificate: Certificate retrieval failed: Invalid pattern css-storemanager The thing that was so strange is ..."/>
+            <meta property="og:description" content="In playing with Puppet (0.24.8 on clients and server) today (well, building a new host) I came by a strange error when I ran puppet on the client: err: Could not request certificate: Certificate retrieval failed: Invalid pattern css-storemanager The thing that was so strange is that “css-storemanager ..."/>
 
     <!-- Bootstrap -->
-        <link rel="stylesheet" href="http://jantman.github.io/blog/theme/css/bootstrap.min.css" type="text/css"/>
+        <link rel="stylesheet" href="http://jantman.github.io/blog/theme/css/bootstrap.flatly.min.css" type="text/css"/>
     <link href="http://jantman.github.io/blog/theme/css/font-awesome.min.css" rel="stylesheet">
     <link href="http://jantman.github.io/blog/theme/css/pygments.css" rel="stylesheet">
         <link href="http://jantman.github.io/blog/theme/css/typogrify.css" rel="stylesheet">
@@ -109,18 +109,17 @@
                 </div>
                 <p>In playing with Puppet (0.24.8 on clients and server) today (well,
 building a new host) I came by a strange error when I ran puppet on the&nbsp;client:</p>
-<p>~~~~{.text only}
-err: Could not request certificate: Certificate retrieval failed: Invalid pattern&nbsp;css-storemanager</p>
-<div class="codehilite"><pre>The thing that was so strange is that &quot;css-storemanager&quot; is the name of
+<div class="codehilite"><pre>err: Could not request certificate: Certificate retrieval failed: Invalid pattern css-storemanager
+</pre></div>
+
+
+<p>The thing that was so strange is that &#8220;css-storemanager&#8221; is the name of
 a host at my site, controlled by Puppet, but it has nothing to do with
-the host I was building. They&#39;re different boxes, on different subnets,
-in different rooms. One is a SunFire and the other is an HP desktop.
-
-Google turned up nothing. Running puppetmasterd with `--debug --trace`
-yielded:
-
-~~~~{.text only}
-info: Listening on port 8140
+the host I was building. They&#8217;re different boxes, on different subnets,
+in different rooms. One is a SunFire and the other is an <span class="caps">HP</span>&nbsp;desktop.</p>
+<p>Google turned up nothing. Running puppetmasterd with <code>--debug --trace</code>
+yielded:</p>
+<div class="codehilite"><pre>info: Listening on port 8140
 notice: Starting Puppet server version 0.24.8
 notice: Allowing unauthenticated client ccf-hill019-12.example.edu(172.x.x.x) access to puppetca.getcert
 /usr/lib/ruby/site_ruby/1.8/puppet/network/authstore.rb:289:in `parse&#39;
@@ -173,73 +172,71 @@ err: Invalid pattern css-storemanager
 <p>After a bit of investigation into that trace, I found the following code
 in <code>/usr/lib/ruby/site_ruby/1.8/puppet/network/authstore.rb</code> starting on
 line&nbsp;242:</p>
-<p>~~~~ {lang=&#8221;ruby&#8221; line=&#8221;242&#8221;}
-            # Parse our input pattern and figure out what kind of allowal
-            # statement it is.  The output of this is used for later matching.
-            def parse(value)
-                case value
-                when /^(\d+.){1,3}*$/: # an ip address with a &#8216;*&#8217; at the end
-                    @name = :ip
-                    match = $1
-                    match.sub!(&#8220;.&#8221;, &#8221;)
-                    ary =&nbsp;value.split(&#8220;.&#8221;)</p>
-<div class="codehilite"><pre>                mask = case ary.index(match)
-                when 0: 8
-                when 1: 16
-                when 2: 24
-                else
-                    raise AuthStoreError, &quot;Invalid IP pattern %s&quot; % value
-                end
+<div class="codehilite"><pre>            <span class="c1"># Parse our input pattern and figure out what kind of allowal</span>
+            <span class="c1"># statement it is.  The output of this is used for later matching.</span>
+            <span class="k">def</span> <span class="nf">parse</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+                <span class="k">case</span> <span class="n">value</span>
+                <span class="k">when</span> <span class="sr">/^(\d+\.){1,3}\*$/</span><span class="p">:</span> <span class="c1"># an ip address with a &#39;*&#39; at the end</span>
+                    <span class="vi">@name</span> <span class="o">=</span> <span class="ss">:ip</span>
+                    <span class="n">match</span> <span class="o">=</span> <span class="vg">$1</span>
+                    <span class="n">match</span><span class="o">.</span><span class="n">sub!</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+                    <span class="n">ary</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)</span>
 
-                @length = mask
+                    <span class="n">mask</span> <span class="o">=</span> <span class="k">case</span> <span class="n">ary</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">match</span><span class="p">)</span>
+                    <span class="k">when</span> <span class="mi">0</span><span class="p">:</span> <span class="mi">8</span>
+                    <span class="k">when</span> <span class="mi">1</span><span class="p">:</span> <span class="mi">16</span>
+                    <span class="k">when</span> <span class="mi">2</span><span class="p">:</span> <span class="mi">24</span>
+                    <span class="k">else</span>
+                        <span class="k">raise</span> <span class="no">AuthStoreError</span><span class="p">,</span> <span class="s2">&quot;Invalid <span class="caps">IP</span> pattern %s&quot;</span> <span class="o">%</span> <span class="n">value</span>
+                    <span class="k">end</span>
 
-                ary.pop
-                while ary.length &lt; 4
-                    ary.push(&quot;0&quot;)
-                end
+                    <span class="vi">@length</span> <span class="o">=</span> <span class="n">mask</span>
 
-                begin
-                    @pattern = IPAddr.new(ary.join(&quot;.&quot;) + &quot;/&quot; + mask.to_s)
-                rescue ArgumentError =&gt; detail
-                    raise AuthStoreError, &quot;Invalid IP address pattern %s&quot; % value
-                end
-            when /^([a-zA-Z][-\w]*\.)+[-\w]+$/: # a full hostname
-                @name = :domain
-                @pattern = munge_name(value)
-            when /^\*(\.([a-zA-Z][-\w]*)){1,}$/: # *.domain.com
-                @name = :domain
-                @pattern = munge_name(value)
-                @pattern.pop # take off the &#39;*&#39;
-                @length = @pattern.length
-            else
-                # Else, use the IPAddr class to determine if we&#39;ve got a
-                # valid IP address.
-                if value =~ /\/(\d+)$/
-                    @length = Integer($1)
-                end
-                begin
-                    @pattern = IPAddr.new(value)
-                rescue ArgumentError =&gt; detail
-                    raise AuthStoreError, &quot;Invalid pattern %s&quot; % value
-                end
-                @name = :ip
-            end
+                    <span class="n">ary</span><span class="o">.</span><span class="n">pop</span>
+                    <span class="k">while</span> <span class="n">ary</span><span class="o">.</span><span class="n">length</span> <span class="o">&lt;</span> <span class="mi">4</span>
+                        <span class="n">ary</span><span class="o">.</span><span class="n">push</span><span class="p">(</span><span class="s2">&quot;0&quot;</span><span class="p">)</span>
+                    <span class="k">end</span>
+
+                    <span class="k">begin</span>
+                        <span class="vi">@pattern</span> <span class="o">=</span> <span class="no">IPAddr</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">ary</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;/&quot;</span> <span class="o">+</span> <span class="n">mask</span><span class="o">.</span><span class="n">to_s</span><span class="p">)</span>
+                    <span class="k">rescue</span> <span class="no">ArgumentError</span> <span class="o">=&gt;</span> <span class="n">detail</span>
+                        <span class="k">raise</span> <span class="no">AuthStoreError</span><span class="p">,</span> <span class="s2">&quot;Invalid <span class="caps">IP</span> address pattern %s&quot;</span> <span class="o">%</span> <span class="n">value</span>
+                    <span class="k">end</span>
+                <span class="k">when</span> <span class="sr">/^([a-zA-Z][-\w]*\.)+[-\w]+$/</span><span class="p">:</span> <span class="c1"># a full hostname</span>
+                    <span class="vi">@name</span> <span class="o">=</span> <span class="ss">:domain</span>
+                    <span class="vi">@pattern</span> <span class="o">=</span> <span class="n">munge_name</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+                <span class="k">when</span> <span class="sr">/^\*(\.([a-zA-Z][-\w]*)){1,}$/</span><span class="p">:</span> <span class="c1"># *.domain.com</span>
+                    <span class="vi">@name</span> <span class="o">=</span> <span class="ss">:domain</span>
+                    <span class="vi">@pattern</span> <span class="o">=</span> <span class="n">munge_name</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+                    <span class="vi">@pattern</span><span class="o">.</span><span class="n">pop</span> <span class="c1"># take off the &#39;*&#39;</span>
+                    <span class="vi">@length</span> <span class="o">=</span> <span class="vi">@pattern</span><span class="o">.</span><span class="n">length</span>
+                <span class="k">else</span>
+                    <span class="c1"># Else, use the IPAddr class to determine if we&#39;ve got a</span>
+                    <span class="c1"># valid <span class="caps">IP</span> address.</span>
+                    <span class="k">if</span> <span class="n">value</span> <span class="o">=~</span> <span class="sr">/\/(\d+)$/</span>
+                        <span class="vi">@length</span> <span class="o">=</span> <span class="nb">Integer</span><span class="p">(</span><span class="vg">$1</span><span class="p">)</span>
+                    <span class="k">end</span>
+                    <span class="k">begin</span>
+                        <span class="vi">@pattern</span> <span class="o">=</span> <span class="no">IPAddr</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+                    <span class="k">rescue</span> <span class="no">ArgumentError</span> <span class="o">=&gt;</span> <span class="n">detail</span>
+                        <span class="k">raise</span> <span class="no">AuthStoreError</span><span class="p">,</span> <span class="s2">&quot;Invalid pattern %s&quot;</span> <span class="o">%</span> <span class="n">value</span>
+                    <span class="k">end</span>
+                    <span class="vi">@name</span> <span class="o">=</span> <span class="ss">:ip</span>
+                <span class="k">end</span>
 </pre></div>
 
 
-<div class="codehilite"><pre>Following the trace back, I took a look at
-`/usr/lib/ruby/site_ruby/1.8/puppet/network/handler/ca.rb` starting at
-line 50:
-
-~~~~ {lang=&quot;ruby&quot; line=&quot;50&quot;}
-            auth = Puppet::Network::AuthStore.new
-            File.open(autosign) { |f|
-                f.each { |line|
-                    next if line =~ /^\s*#/
-                    next if line =~ /^\s*$/
-                    auth.allow(line.chomp)
-                }
-            }
+<p>Following the trace back, I took a look at
+<code>/usr/lib/ruby/site_ruby/1.8/puppet/network/handler/ca.rb</code> starting at
+line&nbsp;50:</p>
+<div class="codehilite"><pre>            <span class="n">auth</span> <span class="o">=</span> <span class="ss">Puppet</span><span class="p">:</span><span class="ss">:Network</span><span class="o">::</span><span class="no">AuthStore</span><span class="o">.</span><span class="n">new</span>
+            <span class="no">File</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">autosign</span><span class="p">)</span> <span class="p">{</span> <span class="o">|</span><span class="n">f</span><span class="o">|</span>
+                <span class="n">f</span><span class="o">.</span><span class="n">each</span> <span class="p">{</span> <span class="o">|</span><span class="n">line</span><span class="o">|</span>
+                    <span class="k">next</span> <span class="k">if</span> <span class="n">line</span> <span class="o">=~</span> <span class="sr">/^\s*#/</span>
+                    <span class="k">next</span> <span class="k">if</span> <span class="n">line</span> <span class="o">=~</span> <span class="sr">/^\s*$/</span>
+                    <span class="n">auth</span><span class="o">.</span><span class="n">allow</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">chomp</span><span class="p">)</span>
+                <span class="p">}</span>
+            <span class="p">}</span>
 </pre></div>
 
 
@@ -279,13 +276,18 @@ this until you try and build a new&nbsp;box.</p>
 
                 <li class="list-group-item"><a href="http://jantman.github.io/blog/tags.html"><h4><i class="icon-tags icon-large"></i>Tags</h4></a></li>
                         <li class="list-group-item tag-1">
+                            <a href="http://jantman.github.io/blog/tag/google.html">
+                                google
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-1">
                             <a href="http://jantman.github.io/blog/tag/linux.html">
                                 linux
                             </a>
                         </li>
                         <li class="list-group-item tag-1">
-                            <a href="http://jantman.github.io/blog/tag/php.html">
-                                PHP
+                            <a href="http://jantman.github.io/blog/tag/sysadmin.html">
+                                sysadmin
                             </a>
                         </li>
                         <li class="list-group-item tag-1">
@@ -294,53 +296,13 @@ this until you try and build a new&nbsp;box.</p>
                             </a>
                         </li>
                         <li class="list-group-item tag-1">
-                            <a href="http://jantman.github.io/blog/tag/google.html">
-                                google
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-1">
                             <a href="http://jantman.github.io/blog/tag/nagios.html">
                                 Nagios
                             </a>
                         </li>
                         <li class="list-group-item tag-1">
-                            <a href="http://jantman.github.io/blog/tag/sysadmin.html">
-                                sysadmin
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/logging.html">
-                                logging
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/wordpress.html">
-                                wordpress
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/apache.html">
-                                apache
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/firefox.html">
-                                firefox
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/blog.html">
-                                blog
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/perl.html">
-                                perl
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/monitoring.html">
-                                monitoring
+                            <a href="http://jantman.github.io/blog/tag/php.html">
+                                PHP
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
@@ -349,8 +311,8 @@ this until you try and build a new&nbsp;box.</p>
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/dns.html">
-                                dns
+                            <a href="http://jantman.github.io/blog/tag/monitoring.html">
+                                monitoring
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
@@ -359,23 +321,18 @@ this until you try and build a new&nbsp;box.</p>
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/bind.html">
-                                bind
+                            <a href="http://jantman.github.io/blog/tag/blog.html">
+                                blog
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/sun.html">
-                                sun
+                            <a href="http://jantman.github.io/blog/tag/firefox.html">
+                                firefox
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/mediawiki.html">
-                                mediawiki
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/rpm.html">
-                                rpm
+                            <a href="http://jantman.github.io/blog/tag/apache.html">
+                                apache
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
@@ -384,8 +341,18 @@ this until you try and build a new&nbsp;box.</p>
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/puppet.html">
-                                puppet
+                            <a href="http://jantman.github.io/blog/tag/bind.html">
+                                bind
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/mediawiki.html">
+                                mediawiki
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/logging.html">
+                                logging
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
@@ -394,13 +361,43 @@ this until you try and build a new&nbsp;box.</p>
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/mac.html">
+                                mac
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/wordpress.html">
+                                wordpress
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/dns.html">
+                                dns
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/puppet.html">
+                                puppet
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
                             <a href="http://jantman.github.io/blog/tag/security.html">
                                 security
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
-                            <a href="http://jantman.github.io/blog/tag/mac.html">
-                                mac
+                            <a href="http://jantman.github.io/blog/tag/rpm.html">
+                                rpm
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/perl.html">
+                                perl
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
+                            <a href="http://jantman.github.io/blog/tag/sun.html">
+                                sun
                             </a>
                         </li>
         </ul>
