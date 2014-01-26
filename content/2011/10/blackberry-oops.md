@@ -92,6 +92,7 @@ So what are my (admittedly poorly-informed) thoughts on this?
     that can fail without anyone blinking. Scaling out might not fix
     every problem, but having half the world on a single core switch
     with N+1 redundancy probably isn't smart either.
+
 2.  Disasters need to be planned for. Every possible contingency needs
     to be planned for. Plans need to be tested, regularly. If your giant
     core switch goes down and the failover doesn't "function as
@@ -104,6 +105,7 @@ So what are my (admittedly poorly-informed) thoughts on this?
     test/validation methodologies and procedures. For a company with 70
     million users, having a piece of infrastructure this critical fail,
     and the failover 'not work as tested' is a very serious issue.
+
 3.  Damage control is important. As I said, I can only imagine that the
     severe service degradation outside of EMEA was due to rerouting data
     from EMEA to the remaining functional data center(s). Such a

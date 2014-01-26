@@ -29,7 +29,7 @@ with `svn-commit.tmp` as an argument, the bash script will do what it
 needs to (commit message preloading) with svn-commit.tmp and *then* call
 your editor to finish the message.
 
-/usr/local/bin/svnPreCommitClientHook.sh:
+`/usr/local/bin/svnPreCommitClientHook.sh`:
 
 ~~~~{.bash}
 #!/bin/bash

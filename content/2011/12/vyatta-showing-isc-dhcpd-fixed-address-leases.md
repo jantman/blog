@@ -34,10 +34,12 @@ commands will tell [logrotate](https://fedorahosted.org/logrotate/) to
 rotate the log file when it reaches 3000k in size, and keep 5 copies
 (feel free to adjust to your needs):
 
-    set service dhcp-server global-parameters "log-facility local2;"
-    set system syslog file dhcpd facility local2 level debug
-    set system syslog file dhcpd archive files 5
-    set system syslog file dhcpd archive size 3000
+~~~~{.console}
+# set service dhcp-server global-parameters "log-facility local2;"
+# set system syslog file dhcpd facility local2 level debug
+# set system syslog file dhcpd archive files 5
+# set system syslog file dhcpd archive size 3000
+~~~~
 
 Once this is done, you can `tail -f /var/log/user/dhcpd` to watch DHCP
 discover/request/offer/ack in realtime, or grep through the log file for

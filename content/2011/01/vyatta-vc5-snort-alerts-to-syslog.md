@@ -30,9 +30,25 @@ the Perl code, I found the definition of the snort.conf output
 statements:
 
 ~~~~{.perl}
-my $output_def =<
-I simply added a line output alert_syslog: log_local3 log_notice after the output alert_unified line.
-
-my $output_def =<
-I then went into Vyatta configuration and changed a rule from alert to pass, committed, changed back, committed, and /etc/snort/snort.conf now had my syslog lines. I'm now getting snort alerts to local3 in syslog, which is fed to my centralized log server. My next project is to find or write something which will parse these logs, generate a daily summary email, and maybe check them hourly and alert on any big changes. I also might just cron an emailing of the output from Vyatta's show ips summary command. So far I have over 11,000 events logged in about 12 hours.
+my $output_def =<<EOD;
+  output alert_unified: alert, limit $log_limit
+  output log_null
+EOD
 ~~~~
+
+I simply added a line `output alert_syslog: log_local3 log_notice` after the `output alert_unified` line.
+
+~~~~{.perl}
+my $output_def =<<EOD;
+  output alert_unified: alert, limit $log_limit
+  output alert_syslog: log_local3 log_notice
+  output log_null
+EOD
+~~~~
+
+I then went into Vyatta configuration and changed a rule from alert to pass, committed,
+changed back, committed, and `/etc/snort/snort.conf` now had my syslog lines. I'm now 
+getting snort alerts to local3 in syslog, which is fed to my centralized log server. My
+next project is to find or write something which will parse these logs, generate a daily
+summary email, and maybe check them hourly and alert on any big changes. I also might just
+cron an emailing of the output from Vyatta's show ips summary command. So far I have over 11,000 events logged in about 12 hours.

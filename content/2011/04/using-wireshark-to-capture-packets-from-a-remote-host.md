@@ -35,11 +35,9 @@ comments for people working on Red Hat/CentOS and OpenSuSE.
 
 1.  On the destination system, if you haven't already done so,
 
-~~~~{.bash}
-mkfifo /tmp/packet_capture
-~~~~
+        :::bash
+        mkfifo /tmp/packet_capture
 
-    <p>
     This creates a [named pipe](http://en.wikipedia.org/wiki/Named_pipe)
     where the source packet data (via ssh) will be written and Wireshark
     will read it from. You can use any name or location you want, but
@@ -52,13 +50,12 @@ mkfifo /tmp/packet_capture
     press the Start button before running the next command - I recommend
     typing the command in a terminal window, pressing start, then
     hitting enter in the terminal to run the command.
+
 3.  On the destination system, run
 
-~~~~{.bash}
-ssh user@source-hostname "sudo /usr/sbin/tcpdump -s 0 -U -n -w - -i eth0 not port 22" > /tmp/packet_capture
-~~~~
+        :::bash
+        ssh user@source-hostname "sudo /usr/sbin/tcpdump -s 0 -U -n -w - -i eth0 not port 22" > /tmp/packet_capture
 
-    <p>
     This will SSH to the source system (`source-hostname`, either by
     hostname or IP) as the specified user (`user`) and execute
     `sudo /usr/sbin/tcpdump`. Omit the "sudo" if you don't need it,

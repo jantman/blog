@@ -35,7 +35,6 @@ It's composed of four files:
     - Readme file including some warnings on the lack of error checking
     in the functions.
 
-</p>
 Hopefully this will be of some use to someone. I should probably mention
 two important things here. First, the AP only accepts up to 32 MAC
 addresses, so if you feed the `makeNewConfigFile()` function an array

@@ -15,7 +15,7 @@ be using more than 1% of memory. It took me a minute or two to open my
 eyes and see past the panic of memory usage, and finally look at the
 complete output from `free(1)`:
 
-~~~~{.bash}
+~~~~{.text}
              total       used       free     shared    buffers     cached
 Mem:       8171508    8032632     138876          0     162084    7253716
 -/+ buffers/cache:     616832    7554676

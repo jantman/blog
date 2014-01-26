@@ -22,7 +22,7 @@ been done in quite some time. Unfortunately, when the unit came back up,
 even after I could log into the web UI, I couldn't mount the NFS shares
 on my backup server. I kept getting messages like:
 
-~~~~{.bash}
+~~~~{.console}
 [root@backup-server ~]# mount -a
 mount: mount to NFS server 'css-readynas' failed: RPC Error: Program not registered.
 ~~~~
@@ -30,7 +30,7 @@ mount: mount to NFS server 'css-readynas' failed: RPC Error: Program not registe
 so my next step was to check RPC status of the readynas, from the
 client. That was also a bit of a surprise:
 
-~~~~{.bash}
+~~~~{.console}
 [root@backup-server ~]# rpcinfo -p css-readynas                        
    program vers proto   port                                              
     100000    2   tcp    111  portmapper                                  
@@ -52,7 +52,7 @@ client. That was also a bit of a surprise:
 Somewhere in that list is supposed to be nfsd, listening on port 2049.
 Next, I did an nmap (port scan) of the readynas:
 
-~~~~{.bash}
+~~~~{.console}
 [root@backup-server ~]# nmap -sU -p2047-2050 css-readynas             
 
 Starting Nmap 4.11 ( http://www.insecure.org/nmap/ ) at 2011-06-23 15:21 EDT
@@ -84,7 +84,7 @@ something had already bound to UDP port 2049 when NFS was starting. I
 tried confirming that upnpd was disabled and rebooting, but that didn't
 help. Grepping my logs for "nfs" returned:
 
-~~~~{.bash}
+~~~~{.text}
 daemon.log:Jun 23 12:43:43 css-readynas nfsd[2331]: nfssvc: Address already in use
 daemon.log:Jun 23 15:26:33 css-readynas nfsd[2724]: nfssvc: Address already in use
 kern.log:Jun 23 11:35:29 css-readynas kernel: Installing knfsd (copyright (C) 1996 okir@monad.swb.de).
@@ -96,13 +96,12 @@ kern.log:Jun 23 15:26:33 css-readynas kernel: NFSD: Using /var/lib/nfs/v4recover
 kern.log:Jun 23 15:26:33 css-readynas kernel: NFSD: starting 90-second grace period
 ~~~~
 
-</p>
 My next step was a few more reboots, with no change. I then upgraded the
 RAIDiator firmware to the latest, 4.1.7. Still no luck. I installed the
 [Enable root SSH](http://www.readynas.com/?p=4203) addon, and that's
 when things became very clear:
 
-~~~~{.bash}
+~~~~{.console}
 css-readynas:/var/log# netstat -unlp
 Active Internet connections (only servers)
 Proto Recv-Q Send-Q Local Address           Foreign Address         State       PID/Program name   
@@ -125,15 +124,12 @@ udp        0      0 0.0.0.0:881             0.0.0.0:*                           
 udp        0      0 0.0.0.0:32765           0.0.0.0:*                           1553/rpc.statd     
 ~~~~
 
-</p>
 For some ***very*** strange reason, snmpd had bound to port 2049 (the
 nfs port) instead of 161. That left no port for nfs to bind to.
 
 **Solution:**
 
-<p>
-~~~~{.bash}
- 
+~~~~{.console}
 css-readynas:/var/log# /etc/init.d/snmpd stop                                                       
 Stopping network management services: snmpd snmptrapd readynas-agent.                               
 css-readynas:/var/log# /etc/init.d/nfs-kernel-server start
@@ -150,7 +146,7 @@ should, and then start snmpd back up. If all went well, nfsd should now
 be listening on UDP 2049, and snmpd should be listening on UDP 161 like
 it should. To confirm:
 
-~~~~{.bash}
+~~~~{.console}
 css-readynas:/var/log# netstat -unlp
 Active Internet connections (only servers)
 Proto Recv-Q Send-Q Local Address           Foreign Address         State       PID/Program name
@@ -177,7 +173,7 @@ udp        0      0 0.0.0.0:32765           0.0.0.0:*                           
 
 All is well. Now to confirm this from the client machine:
 
-~~~~{.bash}
+~~~~{.console}
 [root@backup-server ~]# rpcinfo -p css-readynas
    program vers proto   port
     100000    2   tcp    111  portmapper
