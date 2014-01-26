@@ -32,6 +32,9 @@ def loadPages(browser, windows, one, two):
     """
     load pages, one in each window
     """
+    if one is None:
+        browser.get(two)
+        return True
     browser.switch_to_window(windows[1])
     browser.get(two)
     browser.switch_to_window(windows[0])
@@ -51,13 +54,16 @@ def _status_string(pdict):
         s = s + ", note: " + pdict['note']
     return s
 
-def check_path(path, pdict, old, new, browser, windows):
+def check_path(path, pdict, old, new, browser, windows, newonly=False):
     """
     Interactively check a path
     """
     pdict['seen'] = True
     print("Previous Status: %s" % _status_string(pdict))
-    one = old + path
+    if newonly:
+        one = None
+    else:
+        one = old + path
     two = new + path
     loadPages(browser, windows, one, two)
     # prompt for status
@@ -175,6 +181,9 @@ def parse_opts(argv):
     parser.add_option('--revisit', dest='revisit', action='store_true', default=False,
                       help='revisit previously reviewed pages')
 
+    parser.add_option('--new-only', dest='newonly', action='store_true', default=False,
+                      help='show only new site, dont compare')
+
     options, args = parser.parse_args(argv)
 
     if not options.old or not options.new:
@@ -220,10 +229,11 @@ def main():
     # setup the WebDriver stuff
     browser = webdriver.Firefox() # Get local session of firefox
 
-    # open another window, which requires a loaded document/page
-    browser.get("http://www.google.com")
-    temp = browser.find_element_by_tag_name('body')
-    temp.send_keys(Keys.CONTROL, 'n')
+    if not opts.newonly:
+        # open another window, which requires a loaded document/page
+        browser.get("http://www.google.com")
+        temp = browser.find_element_by_tag_name('body')
+        temp.send_keys(Keys.CONTROL, 'n')
     windows = browser.window_handles
 
     for p in path_dict:
@@ -238,7 +248,7 @@ def main():
             if path_dict[p]['note'] != "":
                 print("\tPrevious Note: %s" % path_dict[p]['note'])
         print("Checking: %s" % p)
-        path_dict[p] = check_path(p, path_dict[p], opts.old, opts.new, browser, windows)
+        path_dict[p] = check_path(p, path_dict[p], opts.old, opts.new, browser, windows, newonly=opts.newonly)
         # write the JSON out and flush
         with open(opts.savefile, "w") as fh:
             fh.write(anyjson.serialize(path_dict))
