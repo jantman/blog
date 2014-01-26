@@ -38,8 +38,6 @@ The chief requirements:
 -   Support for future barcoding of components and physically-performed
     inventory.
 
-</p>
-
 Some of the data that I'd like collected:
 
 -   Data on a machine stored by chassis vendor name and serial

@@ -8,7 +8,7 @@ Slug: mac-to-ttf-font-conversion
 I know i haven't posted in a while.
 
 I'm working on a friend's web site, and needed a specific font for the
-title graphic. I couldn't find it \*anywhere\* as a free TTF download
+title graphic. I couldn't find it *anywhere* as a free TTF download
 for my Linux machine. However, after asking a friend who's a Mac user, I
 got a .dfont file as an email attachment.
 

@@ -48,7 +48,7 @@ quick project. This is even worse during the school year when I'm living
 in my apartment an hour away, taking classes full time, and still
 working 25 hours a week.
 
-<span style="font-style: italic;">The Solution</span>: At the end of my
+**The Solution**: At the end of my
 eight-hour install, everything was programmed and setup, but the logs
 were still bothering me. Then I hit on an idea. Remembering how archaic
 the real-world interfacing of these things seemed to me (how can you use

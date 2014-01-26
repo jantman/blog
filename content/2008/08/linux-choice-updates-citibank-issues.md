@@ -14,9 +14,6 @@ not, certainly CitiBank never contacted me back), citicards.com now
 works with Firefox on Linux. I have no idea if it was a change made by
 Citi, or a change with Firefox or Flash Player.
 
-* * * * *
-
-</p>
 I know this blog has been less-than-active lately. Life has been pretty
 busy, between a massive network upgrade at the [ambulance
 corps](http://www.midlandparkambulance.com) that I volunteer with, the

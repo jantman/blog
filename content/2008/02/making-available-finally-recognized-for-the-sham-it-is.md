@@ -8,7 +8,6 @@ Slug: making-available-finally-recognized-for-the-sham-it-is
 From A [Groklaw article
 today](http://www.groklaw.net/article.php?story=20080226005921833):
 
-<p>
 In *Atlantic v. Brennan*, the courts have finally recognized RIAA's
 "making available" argument for the sham it is. Groklaw has a link to
 the full ruling, which includes:  
@@ -23,9 +22,8 @@ the full ruling, which includes:
 > (collecting cases); *Perfect 10, Inc. v. Amazon.com, Inc*., 508 F.3d
 > 1146, 1162 (9th Cir. 2007) (affirming the district court's finding
 > "that distribution requires an 'actual dissemination' of a copy").
-> </p>
 
-*<span style="font-style: italic;"></span>*Also, finally, the judge
+Also, finally, the judge
 rejected the claims as being speculative, as they all rested on the
 "upon information and belief" statements.
 

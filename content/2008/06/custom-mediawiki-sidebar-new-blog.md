@@ -27,10 +27,25 @@ of the `foreach ($this->data['sidebar'] as $bar => $cont)` loop. This
 threw the button in a box directly above the search box, and below all
 of my sidebar links.
 
-<p>
 The code looked something like:
 
-          <?php } ?>      <!-- firefox link added to MonoBook.php by jantman 2008-06-18 -->      <div class='portlet' id='p-logos'>          <h5>Cool Stuff</h5>          <div class='pBody'>              <ul>                  <li><a href="http://www.spreadfirefox.com/node&id=238326&t=305" target="_blank"><img border="0" alt="Firefox 3" title="Firefox 3" src="http://sfx-images.mozilla.org/affiliates/Buttons/firefox3/110x32_best-yet.png"/></a></li>              </ul>           </div>      </div>      <!-- end firefox link -->      <div id="p-search" class="portlet">
+~~~~{.html}
+<?php } ?>
+<!-- firefox link added to MonoBook.php by jantman 2008-06-18 -->
+<div class='portlet' id='p-logos'>
+<h5>Cool Stuff</h5>
+<div class='pBody'>
+<ul>
+<li><a href="http://www.spreadfirefox.com/node&id=238326&t=305" target="_blank">
+<img border="0" alt="Firefox 3" title="Firefox 3" src="http://sfx-images.mozilla.org/affiliates/Buttons/firefox3/110x32_best-yet.png"/>
+</a>
+</li>
+</ul>
+</div>
+</div>
+<!-- end firefox link -->
+<div id="p-search" class="portlet">
+~~~~
 
 In other news, I'm taking a Data Driven Websites class this summer
 (PHP/MySQL, but for some reason they switched to a Windows server...

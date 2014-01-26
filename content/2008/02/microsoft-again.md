@@ -25,7 +25,6 @@ Microsoft actively tries to turn the software industry into a facist
 dictatorship, where you do it Microsoft's way, or you're taken out back
 and shot (ok, bought up and then shut down).
 
-<p>
 Anyway, from the blog of Zeheda Bhorat, Open Source Programs Manager at
 Google,  
 
@@ -34,16 +33,15 @@ Google,
 > </p>
 
 How can it be that the ISO - the International
-<span style="font-style: italic;"></span>Organization for
-<span style="font-style: italic;">Standardization</span> - would
-actually consider a <span style="font-style: italic;">second</span>,
+Organization for *Standardization* - would
+actually consider a *second*,
 competing standard for document formats. And one that's [as flawed as
 OOXML](http://www.noooxml.org/argu-brief)? These guys are the ISO. They
 practically run the world, at least technically. Why don't they have the
 balls to look Microsoft in the eye and say, "Hey, moron. We already
-<span style="font-style: italic;">have</span> a document format
+**have** a document format
 standard. It's called ISO 26300. If you want to have anything to do with
-the ISO, which sets <span style="font-style: italic;">standards</span>,
+the ISO, which sets *standards*,
 you can take your 6,000 page specification, put it through a crosscut
 paper-burning radiation-producing shredder, pay the $320 for a copy of
 ISO26300, and implement it!"

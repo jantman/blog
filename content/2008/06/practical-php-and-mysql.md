@@ -38,7 +38,7 @@ only being used to host 8 sample projects, so a lot could be left out).
 
 Anyway, it appears that LAMPP is running in a chroot'ed environment. The
 actual sample code is rooted at `/opt/lampp/htdocs/sites`. It seems that
-***all*** of the PHP files are also owned by root and chmod'ed 777! And
+*all* of the PHP files are also owned by root and chmod'ed 777! And
 the top-level `index.php` file makes use of absolute links, so obviously
 he never thought that someone may want to copy the sample code and use
 it on a *real* box.

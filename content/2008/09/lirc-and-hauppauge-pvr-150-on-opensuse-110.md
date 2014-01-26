@@ -21,7 +21,6 @@ some changes that are specific to getting it to compile on OpenSuSE 11.
     it loaded).
 2.  In your kernel source directory, run
     `make oldconfig && make prepare.`
-    <p>
 3.  In your kernel source directory, run `make prepare scripts` which,
     among other things, compiles the required `genksyms` scurript.
 4.  I was getting a compile error like "WARNING: Symbol version dump

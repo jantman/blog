@@ -5,7 +5,6 @@ Category: Miscellaneous
 Tags: driving, gigabit, switch
 Slug: switch-shopping-the-law-of-gross-tonnage
 
-<p>
 Well, I'm shopping for a new switch. But first, a small aside:  
 
 > I drive a [Ford
@@ -24,7 +23,6 @@ Well, I'm shopping for a new switch. But first, a small aside:
 > won't even mention the people who cut off or tailgate dump trucks and
 > semi's.
 >
-> </p>
 > I've spent a bit of time on the water throughout my life. Piloting a
 > boat isn't especially difficult, but there are a few things you learn
 > about navigation. One of them is affectionately known as [The Law of

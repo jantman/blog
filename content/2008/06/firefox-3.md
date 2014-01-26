@@ -13,12 +13,12 @@ better page load time. I'm not sure how I feel about the UI changes, but
 those can be dealt with...
 
 For everyone who downloaded Firefox 3 today - good job! Over
-<span style="font-weight: bold;">8 Million</span> downloads in 24 hours,
+**8 Million** downloads in 24 hours,
 and inching up to 580 Million total downloads of Firefox!!!
 
 Want to hear a figure even more amazing, from Mozilla's [Blog of
 Metrics](http://blog.mozilla.com/metrics/)? It's only been
-<span style="font-weight: bold;">a little over twenty four hours since
-the launch</span>, and "According the [live
+*a little over twenty four hours since
+the launch*, and "According the [live
 tracking](http://marketshare.hitslink.com/report.aspx?qprid=31) from Net
 Applications, Fx3 has been hovering around 4% worldwide market share."

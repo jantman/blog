@@ -34,7 +34,7 @@ to the Cablevision/Optimum Triple Play - iO digital TV, cable, and
 voice. Given that jasonantman.com - and all of my other machines - live
 on shelves in her basement, this will have quite an impact on me. And a
 good one! Optimum offers Business-grade service at 30 Mbps down/5 Mbps
-up <span style="font-weight: bold;">with 5 static IPs</span> at a rate
+up **with 5 static IPs** at a rate
 that I can afford. So, there may be an end to DynDNS, and my sites might
 finally live on port 80, like they should! On the down side, this would
 mean (for digital TV) a major coax rewiring of mom's house - and RG-6/UQ

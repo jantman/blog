@@ -54,14 +54,14 @@ for classes at [SCILS](http://www.scils.rutgers.edu/) is a Windows lab.
 
 This isn't just a problem because of moral reasons, but more because of
 practical ones - I know Linux. I like it.
-<span style="font-weight: bold;">I'm used to Linux.</span> I do tens of
+*I'm used to Linux.* I do tens of
 hours of development and admin work every week (maybe hundreds if I'm
 being bad, or in a prolific period), and I'm most productive in the
 environment I'm used to. I remember when I took my Java classes, trying
 to explain to the TA's that I wasn't cheating, but I had to bring a
 CD-ROM to the on-computer programming exam -
-<span style="font-style: italic;">"there's no way you can make me
-program without my .emacs!"</span>
+**"there's no way you can make me
+program without my .emacs!"**
 
 I've considered that I could just bring my eeePC to class and do
 everything on that over wireless. I guess that could work for most of
@@ -116,6 +116,6 @@ On a side note, a few links for the day:
 art](http://royal.pingdom.com/?p=240).  
 [Designing PDF forms with
 Scribus](http://wiki.scribus.net/index.php/Your_first_PDF_form_with_Scribus).  
-A wonderful Craigslist ad: [<span style="font-size:100%;">Help me keep
+A wonderful Craigslist ad: [Help me keep
 the shell people
-alive.</span>](http://www.craigslist.org/about/best/nyc/485967082.html)
+alive.](http://www.craigslist.org/about/best/nyc/485967082.html)

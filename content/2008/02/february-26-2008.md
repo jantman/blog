@@ -25,8 +25,8 @@ tuner/video out boxes just providing A/V I/O. Unfortunately, the two
 boxes with tuners are both high-spec'ed P4's, and I'm not sure what I
 can come up with in terms of a server for the backend.
 
-Now, <span style="font-weight: bold;">the question for anyone who may be
-reading</span> - I'd like to setup a good amount (1-2TB) of storage for
+Now, *the question for anyone who may be
+reading* - I'd like to setup a good amount (1-2TB) of storage for
 this. My roommate wants a RAID configuration, but I don't see the need
 for videos - if I lose my TV recordings, I set MythTV to record it again
 the next time it's on. Anyway, I have an 8-bay external SCAI enclosure
@@ -52,7 +52,6 @@ addition to the Intel Pro/1000 XT and Asante GigaNIC that I already
 have. The problem here is finding a good GigE switch - I'd really like
 something with Telnet, SNMP, VLANs, the works.
 
-<p>
 In other news, I highly recommend reading the [Groklaw story on
 Microsoft's latest pledge for
 interoperability](http://www.groklaw.net/article.php?story=20080221184924826).
@@ -64,13 +63,11 @@ statement:
 > implemented by the rest of the industry. Unless and until that
 > behaviour stops, today's words mean nothing.
 >
-> </p>
 > More fundamentally, today's announcement is still all about the rest
 > of the world interoperating with Microsoft on Microsoft's own terms,
 > not the other way around.
 
-<p>
-There's even links to \*ten\* previous Microsoft statements promising
+There's even links to *ten* previous Microsoft statements promising
 interoperability.  
 
 > The thing is, this is a promise to interoperate with old-fashioned
@@ -79,7 +76,6 @@ interoperability.
 > competition.
 > </p>
 
-<p>
 From Michael Cunningham, VP and General Counsel of Red Hat:  
 
 > Eight years ago the U.S. regulatory authorities, and four years ago

@@ -7,7 +7,7 @@ Slug: update-2
 
 I've been incredibly busy lately. But I have 2 quick updates-
 
-\1) tuxOstat, my thermostat project, isn't totally finished, but is up
+1) tuxOstat, my thermostat project, isn't totally finished, but is up
 and running. There's still some work to do, but the code is largely
 complete, and in [CVS](http://cvs.jasonantman.com/tuxostat). There's
 also a [web interface](http://701rh.dyndns.org:10080/) with temperature

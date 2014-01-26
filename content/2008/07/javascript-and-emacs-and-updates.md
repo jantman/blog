@@ -26,8 +26,6 @@ corps](http://www.midlandparkambulance.com).
     small demo version, but would like it to be fully modular, and
     eventually form a codebase for [OpenEPCR](http://www.openepcr.org).
 
-</p>
-
 Anyway, I've been doing a lot of work for my Building Data-Driven
 Websites class (well, alternate assignments, but still a lot of work).
 The latest project was an Ajax/DHTML calendar (view-only

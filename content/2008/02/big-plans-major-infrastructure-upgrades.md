@@ -131,7 +131,6 @@ which is currently running in a Xen VM as the *only* load on a beautiful
         failover from home to the apartment, just for the downtime, if I
         mirrored the home server to a box at the apartment.
 
-    <p>
     While I don't want to give up my email on my Treo, it is tempting
     that Verizon FiOS is now listing [a business-class FiOS connection
     at 3Mbps down/768Kbps

@@ -71,8 +71,6 @@ It's not an easy project. So far, the major challenges seem to be:
 There will be more to come in the future. For now, take a look at [the
 TuxTruck github](https://github.com/jantman/tuxtruck).
 
-* * * * *
-
 **Update Saturday, March 2, 2013** - I'm in the process of migrating my
 legacy CVS and Subversion repositories to
 [github.com](http://github.com/jantman/). The forgotten SVN repository
@@ -80,9 +78,7 @@ for TuxTruck has been migrated there, and the CVS repository will soon
 be moved there as well. Tuxtruck.org has been permanently taken offline
 and redirected to the GitHub repository.
 
-* * * * *
-
-<span style="font-weight: bold;">Mediawiki Logging</span> - I recently
+**Mediawiki Logging** - I recently
 had a situation where I had to confirm how much work someone had done on
 a MediaWiki-based project. The Recent Changes page only goes back 30
 days, and walking through the History of each page is a pain. After

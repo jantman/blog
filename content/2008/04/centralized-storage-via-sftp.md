@@ -39,7 +39,14 @@ filesystem as:
 
 `sshfs hostname:/path/to/mount /path/to/local/mountpoint`
 
-Once that worked pefectly, I added the following to my .bash\_profile:
+Once that worked pefectly, I added the following to my `.bash_profile`:
 
-`# this handles SSHFS mount of the central-home dirif [ -a /path/to/local/mountpoint ]; then  echo "HOSTNAME home is mounted at /path/to/local/mountpoint"else  echo "Mounting HOSTNAME home at /path/to/local/mountpoint..."hostname:/path/to/mount /path/to/local/mountpoint`  
-`fi`
+~~~~{.bash}
+# this handles SSHFS mount of the central-home dir
+if [ -a /path/to/local/mountpoint ]; then
+    echo "HOSTNAME home is mounted at /path/to/local/mountpoint"
+else
+    echo "Mounting HOSTNAME home at /path/to/local/mountpoint..."
+    hostname:/path/to/mount /path/to/local/mountpoint`  
+fi
+~~~~

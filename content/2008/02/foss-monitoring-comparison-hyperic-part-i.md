@@ -13,9 +13,8 @@ run before I move on to another.
 The full text, updated a few times a day, is available on [my
 wiki](http://www.jasonantman.com/wiki/index.php/Network_Monitoring_Comparison).
 Here's a bit of an excerpt:  
-<a name="Part_I_-_Installation"></a>  
 
-### <span class="mw-headline">Part I - Installation</span>
+### Part I - Installation
 
 1.  setup Xen virtual machine running OpenSuSE 10.3 base packages. (3
     hours, some server problems, some Xen problems, and some time
@@ -129,9 +128,7 @@ More to come in Part II tomorrow - actually doing something with
 Hyperic. For  
 now (04:08), time to sleep.
 
-<a name="Part_II_-_Configuration"></a>  
-
-### <span class="mw-headline">Part II - Configuration</span>
+### Part II - Configuration
 
 Unfortunately, I haven't had much time to play with Hyperic in the two
 days  

@@ -8,7 +8,7 @@ The other big news in tech today - as posted on
 [slashdot](http://yro.slashdot.org/article.pl?sid=08/01/26/0341210&from=rss),
 the author of the pchdtvr/atscap package previously on SourceForge has
 [announced his attempt to
-<span style="font-weight: bold;">retroactively</span> remove his package
+*retroactively* remove his package
 from GPL
 coverage](http://sourceforge.net/developer/diary.php?diary_id=26407&diary_user=147583).
 His post states, in part,
@@ -34,11 +34,10 @@ His post states, in part,
 > best interest to remove any and all of my code from your  
 > project(s).
 
-<p>
 So not only is this guy trying to retroactively unassign rights that he
 has previously irrecovably assigned, but he's
-<span style="font-weight: bold;">asking developers to pull his code from
-their codebase</span>???? I mean, that's not just an inconvenience. Does
+**asking developers to pull his code from
+their codebase**???? I mean, that's not just an inconvenience. Does
 he comprehend what he's asking? To pull a few excerpts from
 [GPLv2](http://www.gnu.org/licenses/old-licenses/gpl-2.0.html):  
 
@@ -54,7 +53,6 @@ he comprehend what he's asking? To pull a few excerpts from
 > original licensor to copy, distribute or modify the Program subject to
 > these terms and conditions. You may not impose any further
 > restrictions on the recipients' exercise of the rights granted herein.
-> </p>
 
 Apparently this is being [discussed at length over at
 GrokLaw,](http://www.groklaw.net/article.php?story=2006062204552163)

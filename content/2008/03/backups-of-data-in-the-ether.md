@@ -36,10 +36,11 @@ Google Calendar Backup:
 Wonderfully simple. Go into Settings, copy the URLs to the private
 calendar links (I used iCal format), and wget them.
 
-<p>
 del.icio.us backup:
 
-    curl --user usernam:pass -o myDelicious.xml -O 'https://api.del.icio.us/v1/posts/all'
+~~~~{.bash}
+curl --user usernam:pass -o myDelicious.xml -O 'https://api.del.icio.us/v1/posts/all'
+~~~~
 
 Google Reader Backup:  
 Still in the works - Perl problems on my backup machine.
