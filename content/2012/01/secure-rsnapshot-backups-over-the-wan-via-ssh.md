@@ -116,18 +116,18 @@ things clean and to let me enable, disable, or tweak one remote backup
 without affecting the others.
 
 1. Create host-specific pre- and post-backup scripts. I put them in
-   `/etc/rsnapshot.d/`.   
-      
-   `/etc/rsnapshot.d/pre-remoteHostName.sh`:
+    `/etc/rsnapshot.d/`.
+    `/etc/rsnapshot.d/pre-remoteHostName.sh`:
 
         :::bash
         #!/bin/bash
-
+        
         # do anything else needed on the local system before a backup
         ssh -i /path/to/remoteHostname_remoteBackupUsername_cmd rsyncuser@remoteHost pre
 
     `/etc/rsnapshot.d/post-remoteHostName.sh`:
 
+        :::bash
         #!/bin/bash
 
         # do anything else needed on the local system after a backup
@@ -176,10 +176,11 @@ without affecting the others.
     (snapshot\_root/remoteHostName/).
 
 4.  Create two scripts that will actually trigger the backups, which
-    I'll call `/root/bin/rsnapshot-daily.sh` and `/root/bin/rsnapshot-weekly.sh`:  
-      
+    I'll call `/root/bin/rsnapshot-daily.sh` and `/root/bin/rsnapshot-weekly.sh`:
+
     `/root/bin/rsnapshot-daily.sh`:
 
+        :::bash
         #!/bin/bash
 
         /usr/bin/rsnapshot -c /etc/rsnapshot-remoteHostName.conf daily
@@ -187,6 +188,7 @@ without affecting the others.
 
     `/root/bin/rsnapshot-weekly.sh`:
 
+        :::bash
         #!/bin/bash
 
         /usr/bin/rsnapshot -c /etc/rsnapshot-remoteHostName.conf weekly
@@ -195,6 +197,7 @@ without affecting the others.
 5.  Add two entries to root's croontab to run the rsnapshot backups.
     Adjust the following days and times to your liking:
 
+        :::text
         0 1 * * Mon /root/bin/rsnapshot-weekly.sh # run the weekly backups every Monday at 01:00
         30 2 * * * /root/bin/rsnapshot-daily.sh # run the daily backups every day at 02:30, which *should* be after the weekly finished on Monday morning
 
@@ -376,7 +379,7 @@ int main(int argc, char **argv)
 
 `/etc/rsnapshot.d/rsync-include-remoteHostName.txt`:
 
-~~~~{.text only}
+~~~~{.text}
 # Include
 + /dev/console
 + /dev/initctl
@@ -387,7 +390,7 @@ int main(int argc, char **argv)
 
 `/etc/rsnapshot.d/rsync-exclude-remoteHostName.txt`:
 
-~~~~{.text only}
+~~~~{.text}
 # Exclude
 - /cgroup/*
 - /dev/*
