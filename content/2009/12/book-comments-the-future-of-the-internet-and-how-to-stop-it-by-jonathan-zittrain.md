@@ -114,15 +114,15 @@ I do in terms of configuration and, IMHO, should be OS/distro defaults
     and also prevents a user from becoming lazy and operating as root on
     a regular basis.
 -   Pick a good, strong root password. Write it down on a post-it note
-    and keep it somewhere near the computer. *(Yes, I know what you're
+    and keep it somewhere near the computer. (Yes, I know what you're
     thinking. But if it's a home computer, anyone already in the house
     either is trusted, or will own the computer one way or another. I'd
     rather have everyone in the house have access to the box, than a
     password that a remote attacker can easily brute force.)*
 -   Disable caching of sudo passwords in the desktop manager, if it
-    already isn't done. This is a \*very\* bad idea, IMHO, and
+    already isn't done. This is a *very* bad idea, IMHO, and
     effectively defeats privilege separation. If someone needs to use
-    sudo \*that\* often, they're either a knowledgeable user, or they're
+    sudo *that* often, they're either a knowledgeable user, or they're
     doing something wrong.
 -   Set the package manager to use the strictest key verification
     settings.
@@ -201,7 +201,7 @@ that distros (especially desktop-oriented distros) should have an option
 to easily install packages for just the current user, and possibly do
 this by default.
 
-\* I can't find the link right now, but I did find an interesting
+I can't find the link right now, but I did find an interesting
 article on Microsoft's old anti-Linux campaign ("get the facts"). One of
 the things mentioned was that when Microsoft compared "vulnerability
 counts", they were actually comparing: 1) entire Linux distros vs just
@@ -212,7 +212,6 @@ Given Microsoft's habit of not fixing vulnerabilities - especially in
 "unsupported" products - it's no wonder how they got the numbers to look
 so good.
 
-</p>
 So, here's a thought. People are used to paying for an OS and for
 software. Start a Linux vendor that sells a desktop, newbie-oriented
 Linux distro. Charge a per-user flat rate for the distro and a bunch of
@@ -227,7 +226,7 @@ their actions will be logged and won't get full support. Then figure out
 a way for support to write a shell script that's sent to the user to
 perform administrative actions, which will all be listed in relatively
 simple terms for the user to examine and approve. Finally, have a
-\*giant\* package repo, all of which is free or comes with paid support.
+*giant* package repo, all of which is free or comes with paid support.
 Any F/OSS packages that aren't already in the repo can be requested by a
 customer, and for a flat fee for the first requesting customer (say,
 $10) will be examined, approved, packaged, and added to the repo.

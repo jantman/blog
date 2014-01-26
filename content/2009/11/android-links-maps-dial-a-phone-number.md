@@ -16,7 +16,7 @@ One](http://maps.google.com/maps?daddr=42+Pierce+Ave,+Midland+Park,+NJ+07432).
 The links are actually pretty simple:
 
 ~~~~{.html}
-Get Directions
+<a href="http://maps.google.com/maps?daddr=42+Pierce+Ave%2C+Midland+Park%2C+NJ+07432">Get Directions</a>
 ~~~~
 
 It just uses a regular Google Maps URL, with the destination address
@@ -33,7 +33,7 @@ browser uses the Phone app to handle the "tel" scheme, as defined by
 link like:
 
 ~~~~{.html}
-201-555-5555
+<a href="tel:2015555555">201-555-5555</a>
 ~~~~
 
 on Android will bring up the Phone app and pre-enter the digits for

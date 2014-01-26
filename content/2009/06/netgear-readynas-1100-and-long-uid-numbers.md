@@ -60,7 +60,7 @@ the \>2\^16 UID correctly, and NFS.*
 2.  Frontview "System" -\> "Config Backup", "Backup" tab, select only
     "Users and Groups".
 3.  Download config files and unzip.
-4.  Open etc/passwd from the config archive in a text editor, change the
+4.  Open `/etc/passwd` from the config archive in a text editor, change the
     automatically assigned UID (1002) to the desired UID (101739).
 5.  Re-zip the directory tree and re-upload to ReadyNAS.
 6.  Enjoy.

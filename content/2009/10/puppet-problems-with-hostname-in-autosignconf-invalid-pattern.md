@@ -9,7 +9,7 @@ In playing with Puppet (0.24.8 on clients and server) today (well,
 building a new host) I came by a strange error when I ran puppet on the
 client:
 
-~~~~{.text only}
+~~~~{.text}
 err: Could not request certificate: Certificate retrieval failed: Invalid pattern css-storemanager
 ~~~~
 
@@ -21,7 +21,7 @@ in different rooms. One is a SunFire and the other is an HP desktop.
 Google turned up nothing. Running puppetmasterd with `--debug --trace`
 yielded:
 
-~~~~{.text only}
+~~~~{.text}
 info: Listening on port 8140
 notice: Starting Puppet server version 0.24.8
 notice: Allowing unauthenticated client ccf-hill019-12.example.edu(172.x.x.x) access to puppetca.getcert
@@ -75,7 +75,7 @@ After a bit of investigation into that trace, I found the following code
 in `/usr/lib/ruby/site_ruby/1.8/puppet/network/authstore.rb` starting on
 line 242:
 
-~~~~ {lang="ruby" line="242"}
+~~~~{.ruby}
             # Parse our input pattern and figure out what kind of allowal
             # statement it is.  The output of this is used for later matching.
             def parse(value)
@@ -133,7 +133,7 @@ Following the trace back, I took a look at
 `/usr/lib/ruby/site_ruby/1.8/puppet/network/handler/ca.rb` starting at
 line 50:
 
-~~~~ {lang="ruby" line="50"}
+~~~~{.ruby}
             auth = Puppet::Network::AuthStore.new
             File.open(autosign) { |f|
                 f.each { |line|

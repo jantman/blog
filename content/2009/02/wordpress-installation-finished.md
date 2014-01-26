@@ -18,12 +18,13 @@ directory, out of the way. I then created a .htaccess in the directory
 like:
 
 ~~~~{.apacheconf}
-
+<IfModule mod_rewrite.c>
 RewriteEngine On
 RewriteBase /blog/
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteRule .* index.php [L]
+</IfModule>
 ~~~~
 
 All this does is used mod\_rewrite to serve blog/index.php up for every
@@ -45,6 +46,100 @@ corresponding post ID and redirected to the proper new WP URL.
 The code for index.php, for me, looks something like:
 
 ~~~~{.php}
+<?php
+// redirect old Blogger URLs in /blog to new WordPress in /wp
+$request = mysql_real_escape_string(str_replace("/blog", "", $_SERVER['REQUEST_URI']));
+
+// handle constant stuff like feeds and top-level pages
+// TODO
+if(strpos($request, "_archive.html"))
+{
+    // redirect to an archive
+    $request = substr($request, strpos($request, "/", 1)+1);
+    $ary = explode("_", $request);
+    $redirect_to = "http://blog.jasonantman.com/".$ary[0]."/".$ary[1]."/";
+    header("Location: ".$redirect_to);
+    die();
+}
+elseif(strpos($request, "labels/"))
+{
+    // redirect to a tag page
+    $redirect_to = substr($request, strpos($request, "labels/")+7);
+    $redirect_to = str_replace(".html", "", $redirect_to);
+    $redirect_to = urldecode($redirect_to);
+    $redirect_to = str_replace(" ", "-", $redirect_to);
+    $redirect_to = "http://blog.jasonantman.com/tags/".strtolower($redirect_to)."/";
+    header("Location: ".$redirect_to);
+    die();
+}
+elseif(strpos($request, "/blogger.html"))
+{
+    // redirect to main blog
+    header("Location: http://blog.jasonantman.com/");
+    die();
+}
+elseif(strpos($request, "/atom.xml"))
+{
+    // redirect to new feed
+    header("Location: http://blog.jasonantman.com/feed/");
+    die();
+}
+
+// handle the posts, months, tags, etc.
+$fail = false;
+$redirect_to = "";
+$conn = mysql_connect()   or die("Error. MySQL connection failed at mysql_connect");
+if(! $conn)
+{
+    error_log("SCRIPT ".$_SERVER['PHP_SELF'].": "."Unable to connect to MySQL.");
+    $fail = true;
+}
+$select = mysql_select_db('wordpress');
+if(! $select)
+{
+    error_log("SCRIPT ".$_SERVER['PHP_SELF'].": "."Unable to select DB wordpress.");
+    $fail = true;
+}
+$query = "SELECT m.meta_key,m.meta_value,p.post_name,p.post_date FROM wp_postmeta AS m LEFT JOIN wp_posts AS p ON m.post_id=p.ID WHERE m.meta_key='blogger_permalink' AND m.meta_value='".$request."';";
+$result = mysql_query($query);
+if(! $result)
+{
+    error_log("SCRIPT ".$_SERVER['PHP_SELF'].": "."Error in query: ".$query." ERROR: ".mysql_error());
+    $fail = true;
+}
+if(mysql_num_rows($result) < 1)
+{
+    // couldn't find an appropriate page
+    // TODO: find a better way... for now just redirect to the month page
+    $ary = explode("/", $request);
+    if(count($ary) > 3)
+    {
+        $redirect_to = "http://blog.jasonantman.com/".$ary[1]."/".$ary[2]."/";
+    }
+    else
+    {
+        $redirect_to = "http://blog.jasonantman.com/";
+    }
+}
+else
+{
+    $row = mysql_fetch_assoc($result);
+    $redirect_to = "http://blog.jasonantman.com/".date("Y", strtotime($row['post_date']))."/".date("m", strtotime($row['post_date']))."/".$row['post_name'];
+}
+
+if($fail)
+{
+    // redirect to main page with 302
+    Header( "Location: http://blog.jasonantman.com/" ); // implicit 302
+}
+else
+{
+    // redirect to the post or month
+    Header( "HTTP/1.1 301 Moved Permanently" );
+    Header( "Location: ".$redirect_to );
+}
+
+?>
 ~~~~
 
 </p>

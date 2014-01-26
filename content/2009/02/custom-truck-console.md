@@ -38,8 +38,7 @@ requirements that I came up with included:
 -   Radio and switch box should be mounted using the [Jotto
     Desk](http://www.jottodesk.com/) faceplates that I had from the CVPI
     console.
--   <span style="font-style: italic;">The real clincher that prevented
-    me from using a stock console:</span> Have a large storage
+-   *The real clincher that prevented me from using a stock console:* Have a large storage
     compartment comparable to the factory console.
 -   Provide a set of rear cupholders.
 

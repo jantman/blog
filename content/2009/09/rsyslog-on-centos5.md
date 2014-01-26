@@ -47,47 +47,34 @@ my machine (CentOS 5.3, 2.6.18-128.el5 \#1 SMP i686). Unfortunately, I
 don't have an RPM build environment setup, but here's how I accomplished
 it:
 
-1.  I f not already done, <span style="font-family: courier new;">yum
-    install rpmforge-release</span>
-2.  <span style="font-family: courier new;">yum install gnutls-devel
-    gnutls libatomic\_ops-devel gcc43 java-1.6.0-openjdk-devel</span>
+1.  If not already done, `yum install rpmforge-release`
+2.  `yum install gnutls-devel gnutls libatomic\_ops-devel gcc43 java-1.6.0-openjdk-devel`
 3.  Download
     [rsyslog-4.5.2](http://rsyslog.com/Downloads-index-req-viewdownload-cid-1-orderby-dateD.phtml)
-    (currently Beta). Extract, cd into the directory.
+    (currently Beta). Extract, `cd` into the directory.
 4.  To test the performance difference from MySQL,
-    <span style="font-family: courier new;">yum install php-pgsql
-    postgresql postgresql-devel postgresql-libs postgresql-server</span>
-5.  Edit the "configure" script, add
-    <span style="font-family: courier new;">-DHAVE\_ATOMIC\_BUILTINS</span>
-    to the <span style="font-family: courier new;">DEFS</span> line
-    (28936 in this version).
-6.  <span style="font-family: courier new;">export
-    CC=/usr/bin/gcc43</span>
-7.  <span style="font-family: courier new;">export
-    CCDEPMODE="depmode=gcc4"</span>
-8.  <span style="font-family: courier new;">export CFLAGS="-O3
-    -march=i686"</span>
-9.  <span style="font-family: courier new;">./configure --enable-mysql
-    --enable-omtemplate --enable-gnutls --enable-pgsql</span>
-10. <span style="font-family: courier new;">make && make install</span>
+    `yum install php-pgsql postgresql postgresql-devel postgresql-libs postgresql-server`
+5.  Edit the `configure` script, add `-DHAVE\_ATOMIC\_BUILTINS`
+    to the `DEFS` line (28936 in this version).
+6.  `export CC=/usr/bin/gcc43`
+7.  `export CCDEPMODE="depmode=gcc4"`
+8.  `export CFLAGS="-O3 -march=i686"`
+9.  `./configure --enable-mysql --enable-omtemplate --enable-gnutls --enable-pgsql`
+10. `make && make install`
 
-For my system, I used the
-<span style="font-family: courier new;">/etc/sysconfig/rsyslog</span>
-and <span style="font-family: courier new;">/etc/init.d/rsyslog</span>
+For my system, I used the `/etc/sysconfig/rsyslog` and `/etc/init.d/rsyslog`
 from the 2.x rsyslog RPMs, with some modifications as follows:
 
-<span style="font-family: courier new;">/etc/sysconfig/rsyslog</span>
-*(comments have been removed to save space)*:
+`/etc/sysconfig/rsyslog` *(comments have been removed to save space)*:
 
-~~~~{.bash}
+~~~~{.text}
 # -c4   version 4 compatibility mode
 # -x     disable DNS for remote messages (don't want it to hang if DNS is down
 # -4     IPv4 only
 SYSLOGD_OPTIONS="-c4 -x -4"
 ~~~~
 
-<span style="font-family: courier new;">/etc/init.d/rsyslog</span>
-*(comments have been removed to save space)*:
+`/etc/init.d/rsyslog` *(comments have been removed to save space)*:
 
 ~~~~{.bash}
 #!/bin/bash
@@ -205,7 +192,7 @@ exit $?
 
 **My rsyslog.conf file**:
 
-~~~~{.text only}
+~~~~{.text}
 # uncomment next line for debugging, use graphvis to see the graph
 #$GenerateConfigGraph /root/rsyslog-graph.dot
 $ModLoad imklog

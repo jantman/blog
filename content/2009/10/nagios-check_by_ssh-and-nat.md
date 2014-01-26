@@ -19,7 +19,7 @@ host key verification will fail, as the SSH client only looks at the
 address that it's connecting to, not the port number. Normally, this is
 bypassed by using a `.ssh/config` file like:
 
-~~~~{.text only}
+~~~~{.text}
 Host foo1
         Hostname foo.example.com
         HostKeyAlias foo1
@@ -48,11 +48,10 @@ actual hostname.
 Unfortunately, the only way to get check\_by\_ssh to do this was a bit
 messy, and required defining a bunch of extra macros for each host:
 
-~~~~{.text only}
-/check_by_ssh -o Hostname=foo.example.com -o HostKeyAlias=foo1 -o CheckHostIP=no -o Port=222 -o User=nagios -H foo.example.com -C uptime
+~~~~{.text}
+./check_by_ssh -o Hostname=foo.example.com -o HostKeyAlias=foo1 -o CheckHostIP=no -o Port=222 -o User=nagios -H foo.example.com -C uptime
 ~~~~
 
-</p>
 So, I made a quick little patch for check\_by\_ssh.c (patched against
 the released nagios-plugins-1.4.14) :
 
@@ -119,7 +118,7 @@ needs to be passed the "Host" alias as defined in the config file.
 
 With the patch, we now have something nice and clean like:
 
-~~~~{.text only}
+~~~~{.text}
 ./check_by_ssh -H foo1 -F /home/nagios/.ssh/config -l nagios -i /home/nagios/.ssh/id_dsa -C uptime
 ~~~~
 

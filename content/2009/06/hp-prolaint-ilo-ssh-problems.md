@@ -19,19 +19,8 @@ DL380G3 running iLO 1.92 2008.04.24 and system firmware P29 2004.09.15.
 The only way that I can reliably get into the iLO is by SSHing from a
 box with an older version of SSH, such as 4.2p1.
 
-<p>
 Most of the things that I could find online referenced unsetting the
-LANG environment variable:
-
-~~~~{.bash}
-unset LANG
-~~~~
-
-and then SSHing with agent forwarding disabled:
-
-~~~~{.bash}
-ssh -a hostname-ilo
-~~~~
+LANG environment variable (`unset LANG`) and then SSHing with agent forwarding disabled (`ssh -a hostname-ilo`).
 
 Unfortunately this combination doesn't seem to do it for me.
 
@@ -59,8 +48,7 @@ iLO perfectly:
  #define SSH_RELEASE    SSH_VERSION SSH_PORTABLE
 ~~~~
 
-</p>
-I patched version.h, ran \`./configure\`, \`make\`, and then copied the
+I patched version.h, ran `./configure`, `make`, and then copied the
 compiled ssh binary to /usr/bin/ilossh, so that my original ssh binary
 would be intact, and the ilossh binary would be left alone by RPM
 upgrades.

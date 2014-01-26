@@ -31,7 +31,7 @@ that I am, I decied, "hey, it's my personal site, it's low traffic, and
 I want it up before I go to sleep. I'll roll over DNS *before* I bring
 everything up."
 
-That was a <strong>*very bad idea</strong>*. Vyatta isn't nearly as
+That was a **very bad idea**. Vyatta isn't nearly as
 simple as it seems - especially for someone who isn't really a network
 (or at least router/firewall) guy. When they say Enterprise, they mean
 robust. They also mean that week-long bootcamps aren't for naught. It

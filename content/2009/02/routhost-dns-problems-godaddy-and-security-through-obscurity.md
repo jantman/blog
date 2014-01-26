@@ -23,7 +23,7 @@ emails to support and management - 2 hours ago - are unanswered.
 Once the problem started, I knew the yearly contract with ROUThost was a
 bad idea - even at $35/year USD. So, given the great experience I've had
 with them as registrar for my myriad domains, I took a look at
-[](http://www.godaddy.com) \>GoDaddy's site</a>. They offer shared
+[GoDaddy's Site](http://www.godaddy.com). They offer shared
 hosting at around $4/month (for shared on a Linux box) and are currently
 offering some deals, so I figured it would be a good idea. I know and
 trust GoDaddy's support, and have had an account with them for *quite

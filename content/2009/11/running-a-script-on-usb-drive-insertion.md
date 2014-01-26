@@ -16,11 +16,9 @@ Here's how to use udev to do it:
 
 1.  Create `/etc/udev/rules.d/99-usbhook.rules`:
 
-~~~~{.text}
-ACTION=="add",KERNEL=="sd*", SUBSYSTEMS=="usb", ATTRS{product}=="Mass Storage", RUN+="/root/bin/usbhook %k"
-~~~~
+        :::text
+        ACTION=="add",KERNEL=="sd*", SUBSYSTEMS=="usb", ATTRS{product}=="Mass Storage", RUN+="/root/bin/usbhook %k"
 
-    <p>
     This will run "/root/bin/usbook", passing it the device name as an
     argument, every time a USB Mass Storage device is plugged in.
 
