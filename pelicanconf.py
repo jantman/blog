@@ -104,7 +104,7 @@ TAG_CLOUD_MAX_ITEMS = 20
 LINKS =  (('Homepage', 'http://www.jasonantman.com'),
           ('Resume', 'http://resume.jasonantman.com'),)
 
-SOCIAL = (('@j_antman', 'http://twitter.com/j_antman'),)
+#SOCIAL = (('@j_antman', 'http://twitter.com/j_antman'),)
 
 #GITHUB_URL = 'https://github.com/jantman' # doesnt work in bootstrap3
 GITHUB_USER = 'jantman'
@@ -113,6 +113,7 @@ GITHUB_SKIP_FORK = False
 GITHUB_SHOW_USER_LINK = True
 
 TWITTER_USERNAME = 'j_antman'
+TWITTER_WIDGET_ID = '429640274453594113'
 
 #ADDTHIS_PROFILE = ''
 
