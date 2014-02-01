@@ -83,6 +83,10 @@ BOOTSTRAP_THEME = 'flatly'
 THEME_BRANCH = 'jantman-bootstrap3'
 
 DISPLAY_CATEGORIES_ON_MENU = True
+DISPLAY_CATEGORIES_ON_SIDEBAR = False
+
+DISPLAY_RECENT_POSTS_ON_SIDEBAR = True
+RECENT_POST_COUNT = 5
 
 # disable tags, since it's a list not a "cloud"
 DISPLAY_TAGS_ON_SIDEBAR = True
@@ -97,15 +101,16 @@ TAG_CLOUD_MAX_ITEMS = 20
 # Links, Social, etc.
 #
 
-LINKS =  (('Pelican', 'http://getpelican.com/'),
-          ('Python.org', 'http://python.org/'),
-          ('Jinja2', 'http://jinja.pocoo.org/'),
-          ('You can modify those links in your config file', '#'),)
+LINKS =  (('Homepage', 'http://www.jasonantman.com'),
+          ('Resume', 'http://resume.jasonantman.com'),)
 
-SOCIAL = (('You can add links in your config file', '#'),
-          ('Another social link', '#'),)
+SOCIAL = (('@j_antman', 'http://twitter.com/j_antman'),)
 
-GITHUB_URL = 'https://github.com/jantman'
+#GITHUB_URL = 'https://github.com/jantman' # doesnt work in bootstrap3
+GITHUB_USER = 'jantman'
+GITHUB_REPO_COUNT = 5
+GITHUB_SKIP_FORK = False
+GITHUB_SHOW_USER_LINK = True
 
 TWITTER_USERNAME = 'j_antman'
 
