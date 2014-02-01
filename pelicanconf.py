@@ -7,7 +7,7 @@ from __future__ import unicode_literals
 #
 AUTHOR = u'Jason Antman'
 SITENAME = u"Jason Antman's Blog"
-SITESUBTITLE = u"Subtitle here"
+#SITESUBTITLE = u"Subtitle here"
 #DISQUS_SITENAME = None
 #GOOGLE_ANALYTICS = 'UA-XXXX-YYYY'
 SITEURL = '' # TODO
@@ -113,6 +113,8 @@ GITHUB_SKIP_FORK = False
 GITHUB_SHOW_USER_LINK = True
 
 TWITTER_USERNAME = 'j_antman'
+
+#ADDTHIS_PROFILE = ''
 
 #
 # Plugins
