@@ -7,7 +7,7 @@ Slug: possible-downtime-this-weekend
 
 Tropical Storm [Hanna](http://www.nhc.noaa.gov/#HANNA) is expected to
 reach the New Jersey area on Saturday, September 6, 2008. The latest
-predictions as of 20:00 September 4^th^ call for winds from 30-60 MPH
+predictions as of 20:00 September 4<sup>th</sup> call for winds from 30-60 MPH
 and rainfall possibly in excess of 5 inches, at a rate of 1-1.5 inches
 per hour (as per the [Bergen County Office of Emergency
 Management](http://www.bcoem.org/)).

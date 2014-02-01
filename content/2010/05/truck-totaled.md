@@ -14,7 +14,7 @@ explaining a bit about what happened to my
 [truck](/2009/02/truck-wiring-and-lighting-part-i/), which I'd put so
 much [work](/2009/02/custom-truck-console/) into.
 
-Two weeks ago - 08:43 on Saturday, May 1^st^, 2010 - I was involved in a
+Two weeks ago - 08:43 on Saturday, May 1<sup>st</sup>, 2010 - I was involved in a
 "bit" of an accident with my truck while driving down to my dad's place
 in Hunterdon county. I was [on 208
 Northbound](http://maps.google.com/maps?q=41.017828,-74.217229&num=1&t=h&sll=41.018107,-74.218228&sspn=0.007026,0.016512&ie=UTF8&ll=41.017834,-74.217217&spn=0.007026,0.016512&z=17)

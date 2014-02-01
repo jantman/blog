@@ -11,12 +11,12 @@ very interesting [post on the Windows Azure
 blog](http://blogs.msdn.com/b/windowsazure/archive/2012/03/09/summary-of-windows-azure-service-disruption-on-feb-29th-2012.aspx)
 the other day. It's a very detailed postmortem of the major outage of
 the Windows Azure cloud service which occurred from 4:00 PM PST on
-February 28^th^ through 2:15 AM on March 1^st^. Before I get into any of
+February 28<sup>th</sup> through 2:15 AM on March 1<sup>st</sup>. Before I get into any of
 the details, I should say that it really is a nice, well-done post. And
 the fact that they're willing to do such a detailed, public postmortem -
 and admit the failures that they did - is a step in the right direction
 for Microsoft (a company that I don't particularly care for, to put it
-lightly.
+lightly).
 
 I'm going to glance over the majority of the post, though I highly
 recommend that anyone interested in running web-scale services,

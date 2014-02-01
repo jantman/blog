@@ -14,7 +14,7 @@ attempt at running the Solaris operating system on a laptop, and it took
 quite an effort to get my favorite mainstream Linux distro installed on
 the eeePC, though I've been running that on laptops for 6+ years.
 
-This Sunday, March 30^th^, the [Rutgers University Student Linux Users'
+This Sunday, March 30<sup>th</sup>, the [Rutgers University Student Linux Users'
 Group](http://ruslug.rutgers.edu/w/) (RUSLUG) will be hosting our annual
 Installfest in the [EIT Lab](http://ruslug.rutgers.edu/w/EitDirections)
 from 10 AM until 6 PM. While the event is generally marketed towards
@@ -28,7 +28,7 @@ information and pointers on NetBeans and Solaris, as well as
 installation assistance (and maybe some prizes) for anyone looking to
 give OpenSolaris a whirl on their system.
 
-Following up the Installfest, on Tuesday, April 1^st^ at 9 PM (also in
+Following up the Installfest, on Tuesday, April 1<sup>st</sup> at 9 PM (also in
 the EIT lab) will be the RUSLUG Newbie Night. It's generally a
 fun-filled evening with [Ubuntu](http://www.ubuntu.com/) LiveCDs and a
 general Q&A session about Linux. Generally this includes one-on-one

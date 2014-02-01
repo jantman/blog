@@ -7,7 +7,7 @@ Slug: android-2-0-1-update
 
 So, I updated my Droid to Android 2.0.1 today. I'll be honest that it
 didn't work the way I'd hoped. When I woke up this morning (December
-10^th^ 2009) I had an alert dialog on screen telling me that an update
+10<sup>th</sup> 2009) I had an alert dialog on screen telling me that an update
 was ready. It gave me three options: "Install Now", "Install Later" and
 "More Info". The More Info screen didn't show me anything useful. Well,
 I clicked the "Later" option, figuring that when I got home tonight I'd

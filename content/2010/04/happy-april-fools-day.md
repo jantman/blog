@@ -4,7 +4,7 @@ Author: admin
 Category: Miscellaneous
 Slug: happy-april-fools-day
 
-It's April 1^st^, also known as April Fool's Day. While I,
+It's April 1<sup>st</sup>, also known as April Fool's Day. While I,
 unfortunately, haven't planned any pranks or jokes myself this year (I
 guess I've just been too busy), I always try to find as many of
 [Google](http://www.google.com)'s jokes as possible. Despite being a

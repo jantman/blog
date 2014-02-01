@@ -5,7 +5,7 @@ Category: Tech HowTos
 Tags: android, droid, tether, wifi
 Slug: wifi-tether-for-droid
 
-My Motorola Droid (purchased on [November 10^th^,
+My Motorola Droid (purchased on [November 10<sup>th</sup>,
 2009](/2009/11/droid/), 4 days after the release) is still running
 Android 2.0.1. I guess this is somewhat out of laziness - I love the
 Incredible and its new (and more refined) Android version and UI, but my
@@ -19,7 +19,7 @@ survey or a real installation, and the signal level in my room is
 useless (despite a pretty low noise floor). So after a little googling,
 I managed to find the [Barnacle Wifi
 Tether](http://szym.net/projects/barnacle/) ([Market
-link](market://search?q=pname:net.szym.barnacle) app. Sure enough, it
+link](market://search?q=pname:net.szym.barnacle)) app. Sure enough, it
 allows any Droid users with a rooted phone to setup an ad-hoc wireless
 network for tethering without a custom kernel. In fact, I'm writing this
 right now on my MacBook Pro tethered to my phone over WiFi. I'm seeing

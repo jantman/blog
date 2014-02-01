@@ -38,7 +38,7 @@ It's composed of four files:
 Hopefully this will be of some use to someone. I should probably mention
 two important things here. First, the AP only accepts up to 32 MAC
 addresses, so if you feed the `makeNewConfigFile()` function an array
-with more than 32, it will just stop at the 32^nd^. Also, be aware, this
+with more than 32, it will just stop at the 32<sup>nd</sup>. Also, be aware, this
 SCPs a config file to the AP, runs `cfgmtd` and the reboots the AP. If
 you send it a bad config file, who knows what will happen. If you allow
 your users to add MAC addresses, your APs will reboot every time someone
