@@ -84,8 +84,11 @@ THEME_BRANCH = 'jantman-bootstrap3'
 
 DISPLAY_CATEGORIES_ON_MENU = True
 
-TAG_CLOUD_STEPS = 5
-TAG_CLOUD_MAX_ITEMS = 25
+# disable tags, since it's a list not a "cloud"
+DISPLAY_TAGS_ON_SIDEBAR = True
+TAG_CLOUD_STEPS = 4
+TAG_CLOUD_MAX_ITEMS = 20
+#MENUITEMS = [('Tags', '/tags.html')]
 
 #MENUITEMS = None
 # list of tuples (Title, URL) to displat at beginning of main menu
