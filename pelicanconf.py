@@ -106,7 +106,8 @@ LINKS =  (('Homepage', 'http://www.jasonantman.com'),
 
 #SOCIAL = (('@j_antman', 'http://twitter.com/j_antman'),)
 
-#GITHUB_URL = 'https://github.com/jantman' # doesnt work in bootstrap3
+GITHUB_URL = 'https://github.com/jantman/blog'
+SHOW_GITHUB_RIBBON = True
 GITHUB_USER = 'jantman'
 GITHUB_REPO_COUNT = 5
 GITHUB_SKIP_FORK = False
