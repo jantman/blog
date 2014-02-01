@@ -121,6 +121,20 @@ TWITTER_WIDGET_ID = '429640274453594113'
 #
 # Plugins
 #
-PLUGINS = []
+PLUGINS = ['pelican.plugins.sitemap',]
 PLUGIN_PATH = '/home/jantman/GIT/pelican-plugins'
 PLUGIN_BRANCH = 'jantman'
+
+SITEMAP = {
+    'format': 'xml',
+    'priorities': {
+        'articles': 0.5,
+        'indexes': 0.5,
+        'pages': 0.1
+    },
+    'changefreqs': {
+        'articles': 'monthly',
+        'indexes': 'daily',
+        'pages': 'monthly'
+    }
+}
