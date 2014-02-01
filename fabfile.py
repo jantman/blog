@@ -5,7 +5,7 @@ import re
 import sys
 import datetime
 
-from pelicanconf import ARTICLE_DIR, DEFAULT_CATEGORY, AUTHOR, OUTPUT_PATH, THEME, THEME_BRANCH
+from pelicanconf import ARTICLE_DIR, DEFAULT_CATEGORY, AUTHOR, OUTPUT_PATH, THEME, THEME_BRANCH, PLUGIN_PATH, PLUGIN_BRANCH
 
 # Local path configuration (can be absolute or relative to fabfile)
 env.deploy_path = 'output'
@@ -29,6 +29,14 @@ def prebuild():
     branch = local("cd %s && git rev-parse --abbrev-ref HEAD" % THEME, capture=True).strip()
     if branch != THEME_BRANCH:
         print("ERROR: %s is on wrong branch (%s not %s)" % (THEME, branch, THEME_BRANCH))
+        sys.exit(1)
+    # check for plugins
+    if not os.path.exists(os.path.join(PLUGIN_PATH, 'LICENSE')):
+        print("ERROR: plugin directory %s does not exist." % PLUGIN_PATH)
+        sys.exit(1)
+    branch = local("cd %s && git rev-parse --abbrev-ref HEAD" % PLUGIN_PATH, capture=True).strip()
+    if branch != PLUGIN_BRANCH:
+        print("ERROR: %s is on wrong branch (%s not %s)" % (PLUGIN_PATH, branch, PLUGIN_BRANCH))
         sys.exit(1)
 
 def clean():

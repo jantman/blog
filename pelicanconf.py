@@ -122,4 +122,5 @@ TWITTER_WIDGET_ID = '429640274453594113'
 # Plugins
 #
 PLUGINS = []
-# TODO - https://github.com/getpelican/pelican-plugins
+PLUGIN_PATH = '/home/jantman/GIT/pelican-plugins'
+PLUGIN_BRANCH = 'jantman'
