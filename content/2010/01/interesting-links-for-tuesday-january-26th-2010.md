@@ -4,7 +4,7 @@ Author: admin
 Category: Miscellaneous
 Slug: interesting-links-for-tuesday-january-26th-2010
 
-**Interesting Links for Tuesday, January 26<sup>th<sup> 2010**
+**Interesting Links for Tuesday, January 26<sup>th</sup> 2010**
 
 -   [Jan. 25, 1979: Robot Kills
     Human](http://www.wired.com/thisdayintech/2010/01/0125robot-kills-worker/)
