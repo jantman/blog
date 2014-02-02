@@ -13,19 +13,16 @@ commits" medal...
 
 [Custom Tombstone Maker](http://www.tombstonebuilder.com/index.php)
 
-![Image of tombstone, with 'Your Text Goes Here' carved into
-it](/GFX/my_tombstone.jpg)
+![Image of tombstone, with 'Your Text Goes Here' carved into it](/GFX/my_tombstone.jpg)
 
-<a href="http://www.customroadsign.com/">CustomRoadSign.com
+[CustomRoadSign.com](http://www.customroadsign.com/)
 
-![Highway sign with 'Your Text Goes Here' written on
-it](/GFX/menusign.jpg)
+![Highway sign with 'Your Text Goes Here' written on it](/GFX/menusign.jpg)
 
-<a href="http://www.custommotelsign.com/">CustomMotelSign.com
+[CustomMotelSign.com](http://www.custommotelsign.com/)
 
-![Motel-style sign with 'Your Text Goes Here' written on
-it](/GFX/motelsign.jpg)
+![Motel-style sign with 'Your Text Goes Here' written on it](/GFX/motelsign.jpg)
 
-<a href="http://www.getamedal.com/">GetAMedal.com
+[GetAMedal.com](http://www.getamedal.com/)
 
 ![Gold medal with 'Your Text Goes Here' written on it](/GFX/medal.jpg)
