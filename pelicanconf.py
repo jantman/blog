@@ -88,6 +88,8 @@ DISPLAY_CATEGORIES_ON_SIDEBAR = False
 DISPLAY_RECENT_POSTS_ON_SIDEBAR = True
 RECENT_POST_COUNT = 5
 
+USE_OPEN_GRAPH = False # this adds non-standard tags; thats bad
+
 # disable tags, since it's a list not a "cloud"
 DISPLAY_TAGS_ON_SIDEBAR = True
 TAG_CLOUD_STEPS = 4
@@ -121,9 +123,11 @@ TWITTER_WIDGET_ID = '429640274453594113'
 #
 # Plugins
 #
-PLUGINS = ['pelican.plugins.sitemap',]
+PLUGINS = ['sitemap', ]
 PLUGIN_PATH = '/home/jantman/GIT/pelican-plugins'
 PLUGIN_BRANCH = 'jantman'
+#W3C_SLEEP = 0
+W3C_VALIDATOR_URL = 'http://localhost/w3c-validator/check'
 
 SITEMAP = {
     'format': 'xml',
