@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+>
+<head>
+    <title>Buildout and Scaling of Graphite Clusters</title>
+    <!-- Using the latest rendering mode for IE -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Open Graph tags -->
+    <!-- Bootstrap -->
+        <link rel="stylesheet" href="http://jantman.github.io/blog/theme/css/bootstrap.flatly.min.css" type="text/css"/>
+    <link href="http://jantman.github.io/blog/theme/css/font-awesome.min.css" rel="stylesheet">
+    <link href="http://jantman.github.io/blog/theme/css/pygments.css" rel="stylesheet">
+        <link href="http://jantman.github.io/blog/theme/css/typogrify.css" rel="stylesheet">
+    <link rel="stylesheet" href="http://jantman.github.io/blog/theme/css/style.css" type="text/css"/>
+    <!-- JavaScript plugins (requires jQuery) -->
+    <script src="http://code.jquery.com/jquery.js"></script>
+
+    <link rel="stylesheet" href="http://jantman.github.io/blog/theme/css/forkongithub.min.css" type="text/css" />
+
+
+</head>
+<body>
+<span id="forkongithub"><a href="https://github.com/jantman/blog">Fork me on GitHub</a></span><nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="http://jantman.github.io/blog" class="navbar-brand">Jason Antman's Blog</a>
+        </div>
+        <div class="collapse navbar-collapse navbar-ex1-collapse">
+            <ul class="nav navbar-nav">
+                         <li><a href="http://jantman.github.io/blog/pages/about.html">
+                             About
+                          </a></li>
+                        <li >
+                            <a href="http://jantman.github.io/blog/category/ideas-and-rants.html">Ideas and rants</a>
+                        </li>
+                        <li >
+                            <a href="http://jantman.github.io/blog/category/miscellaneous.html">Miscellaneous</a>
+                        </li>
+                        <li >
+                            <a href="http://jantman.github.io/blog/category/monitoring.html">Monitoring</a>
+                        </li>
+                        <li >
+                            <a href="http://jantman.github.io/blog/category/projects.html">Projects</a>
+                        </li>
+                        <li >
+                            <a href="http://jantman.github.io/blog/category/puppet.html">Puppet</a>
+                        </li>
+                        <li >
+                            <a href="http://jantman.github.io/blog/category/sysadmin.html">Sysadmin</a>
+                        </li>
+                        <li >
+                            <a href="http://jantman.github.io/blog/category/tech-howtos.html">Tech howtos</a>
+                        </li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="http://jantman.github.io/blog/archives.html"><i class="icon-th-list"></i>Archives</a></li>
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+</nav>
+<!-- /.navbar -->
+<div class="container">
+    <div class="row">
+        <div class="col-lg-9">
+    <section id="content">
+        <article>
+            <header class="page-header">
+                <h1>
+                    <a href="http://jantman.github.io/blog/2013/09/buildout-and-scaling-of-graphite-clusters/"
+                       rel="bookmark"
+                       title="Permalink to Buildout and Scaling of Graphite Clusters">
+                        Buildout and Scaling of Graphite&nbsp;Clusters
+                    </a>
+                </h1>
+<a href="http://twitter.com/share" class="twitter-share-button" data-count="horizontal" data-via="j_antman">Tweet</a><script type="text/javascript" src="http://platform.twitter.com/widgets.js"></script>
+            </header>
+            <div class="entry-content">
+                <div class="panel">
+                    <div class="panel-body">
+<footer class="post-info">
+    <span class="label label-default">Date</span>
+    <span class="published">
+        <i class="icon-calendar"></i>Thu 05 September 2013
+    </span>
+
+
+
+</footer><!-- /.post-info -->                    </div>
+                </div>
+                <p>Blog posts -<br />
+1. Building a graphite cluster and migrating data from standalone<br />
+2. Monitoring graphite/stasd and their internal metrics<br />
+3. patch to add matrics - lost data, latency, metrics received by path
+X deep<br />
+4. statsd blacklist patch<br />
+graphite aggregation methods<br />
+cluster rebalancing,&nbsp;megacarbon</p>
+<p>Graphite and Statsd - Performance and&nbsp;Monitoring</p>
+<p>I&#8217;ve been planning a series of blog posts on
+<a href="http://graphite.readthedocs.org/en/latest/">Graphite</a> and <a href="https://github.com/etsy/statsd">Etsy&#8217;s
+statsd</a> for a while now, as I&#8217;ve spent
+the past week at work transforming our previous single <span class="caps">VM</span> running
+graphite into a 3-node bare-metal cluster (albeit on very old,
+repurposed hardware). A few days ago, just as I was polishing up our
+internal documentation that would form the core of those blog posts, a
+production deploy introduced a new metric being pushed to statsd from
+inside an object in our <span class="caps">CMS</span>. That metric happened to include a
+relatively unique <span class="caps">URL</span> component. This is the graph of our master
+carbon-relay&#8217;s metricsReceived from the time of the deploy, until I took
+some decisive&nbsp;action:</p>
+<p><a href="/GFX/metricsReceived_large.png"><img alt="graph of metricsReceived, linear increase from 100,000 to over
+750,000 in 3.5
+hours" src="/GFX/metricsReceived.png" /></a></p>
+<p>While this obviously wasn&#8217;t good, it did teach me quite a bit about
+Graphite, how it scales and handles load, what our capacity is and what
+to watch for early warning of problems. Since most of this post is about
+graphite, I&#8217;ll take a minute to mention statsd, which we push most of
+our metrics through. It performed amazingly well. I supposed it&#8217;s just
+because graphite is disk-bound, but even when we hit 750k
+metrics/minute, statsd still showed virtually no resource usage on its
+host (a <span class="caps">VM</span>), and certainly no signs for concern. My only complaints with
+statsd are that I would absolutely love a way to blacklist certain
+runaway metric strings (with wildcards or a regex) at runtime (I opened
+<a href="https://github.com/etsy/statsd/issues/293">issue 293</a> about this), and
+that by default statsd continues sending 0 value for metrics to its
+backends even if no value was received for the metric, which gave me a
+brief moment of confusion when I finally stopped the flow of abusive
+metrics but saw no real change in the data going to&nbsp;graphite.</p>
+<p>First, the machines we&#8217;re using for Graphite are <span class="caps">IO</span>-bound, and we know
+it. The three cluster nodes are Dell PowerEdge 1950s with two spinning
+disks each (single Xeon 5150 with 2 cores at 2.6GHz, <span class="caps">4MB</span> L2 cache; 4x 4G
+<span class="caps">DDR2</span>-667 memory; <span class="caps">PERC</span> 6/i <span class="caps">RAID</span> controller with dual <span class="caps">68GB</span> 15k/3Gbps <span class="caps">SAS</span>
+Seagate <span class="caps">ST373454SS</span> disks in <span class="caps">RAID</span>-1, disk cache disabled, write back, no
+read ahead). It&#8217;s inefficient, but it&#8217;s all we can allocate to graphite
+at the moment, and it&#8217;s a lot better than the one <span class="caps">VM</span> it was on a week
+ago. All that said, I was quite impressed with how graphite performed
+under extraordinary load - made much worse because most of these metrics
+were unique, so the number of new whisper files created was quite high.
+The core of what I learned (both during the issues, and from the folks
+on <a href="irc://irc.freenode.net/#graphite">#graphite on Freenode</a>) is that
+if we want to scale to 2+ million metrics every 10 seconds, we need a
+good <span class="caps">RAID</span> setup with SSDs, and a fair amount of <span class="caps">RAM</span>. But despite all
+three nodes in our cluster being <span class="caps">IO</span>-bound (effectively maxed on <span class="caps">IO</span>) and
+maxed out on memory, graphite never died, and I wasn&#8217;t able to find any
+obvious loss of large amounts of data. Things just got <span class="caps">REALLY</span>&nbsp;slow.</p>
+<p>Before I go into the internals of graphite and what I learned, let&#8217;s
+look a bit at some graphs of the graphite processes and hosts, and what
+they show (click the images for larger versions). Keep in mind that in
+most of these graphs, they&#8217;re including three physical hosts, each with
+one carbon-relay and two carbon-caches, plus a master carbon-relay on
+one of the&nbsp;hosts.</p>
+<p><a href="creates_vs_io_read_await_large.png">&lt; img src=&#8221;/<span class="caps">GFX</span>/creates_vs_io_read_await.png&#8221; width=&#8221;800&#8221;
+height=&#8221;480&#8221; alt=&#8221;graph of iostat read_await vs carbon-cache creates.
+When creates reach approx. 500/minute across the cluster, await begins
+to show spikes.&#8221; /></a></p>
+<p><a href="creates_vs_io_read_ms_large.png">&lt; img src=&#8221;/<span class="caps">GFX</span>/creates_vs_io_read_ms.png&#8221; width=&#8221;800&#8221; height=&#8221;480&#8221;
+alt=&#8221;graph of iostat milliseconds reading vs carbon-cache creates. When
+creates reach approx. 1000/minute, read time increases from near-zero to
+over 50% of clock time.&#8221; /></a></p>
+<p><a href="metricsReceived_vs_carbon-cache_memUsage_large.png">&lt; img src=&#8221;/<span class="caps">GFX</span>/metricsReceived_vs_carbon-cache_memUsage.png&#8221;
+width=&#8221;800&#8221; height=&#8221;480&#8221; alt=&#8221;graph of carbon-relay metrics received vs
+carbon-cache memory usage. Memory usage climbs unevenly but in a
+generally similar fashion to metrics received, but does not decrease.
+The second spike in metrics received simply increases memory use.&#8221;
+/></a></p>
+<p><a href="metricsReceived_vs_carbon-relay-master_memUsage_large.png">&lt; img src=&#8221;/<span class="caps">GFX</span>/metricsReceived_vs_carbon-relay-master_memUsage.png&#8221;
+width=&#8221;800&#8221; height=&#8221;480&#8221; alt=&#8221;graph of carbon-relay metrics received vs
+carbon-relay master memory usage. This graph is a signigicant departure
+from the other, close-to-linear relationships. Master carbon-relay
+memory usage stays largely steady from 95k metrics/minute to
+approximately 300k metrics/minute, then almost doubles within one sample
+period (from approx. 16 <span class="caps">MB</span> to approx. 28 <span class="caps">MB</span>) and maintains that level to
+the peak of 750k metrics/minute.&#8221;
+/></a></p>
+<p><a href="metrics_recvd_vs_flush_time_large.png">&lt; img src=&#8221;/<span class="caps">GFX</span>/metrics_recvd_vs_flush_time.png&#8221; width=&#8221;800&#8221;
+height=&#8221;480&#8221; alt=&#8221;graph of carbon-relay metrics received vs statsd time
+flushing graphite stats. the best-fit line of the two graphs would
+almost match.&#8221; /></a></p>
+<p><a href="metrics_recvd_vs_iops_large.png">&lt; img src=&#8221;/<span class="caps">GFX</span>/metrics_recvd_vs_iops.png&#8221; width=&#8221;800&#8221; height=&#8221;480&#8221;
+alt=&#8221;graph of carbon-relay metrics received vs <span class="caps">IOPS</span>. It&#8217;s clear that we
+were near our <span class="caps">IOPS</span> ceiling prior to this event when handling about 300k
+metrics per minute, and at 75k metrics per minute we&#8217;re using about half
+of our available <span class="caps">IO</span>.&#8221; /></a></p>
+<p><a href="metrics_recvd_vs_iostat_queue_length_large.png">&lt; img src=&#8221;/<span class="caps">GFX</span>/metrics_recvd_vs_iostat_queue_length.png&#8221;
+width=&#8221;800&#8221; height=&#8221;480&#8221; alt=&#8221;graph of carbon-relay metrics received vs
+<span class="caps">IO</span> queue length. Shows that we were already at maximum disk queue at
+300k metrics/minute before the event, but after limiting metrics down to
+75k per minute <span class="caps">IO</span> queues dropped to about 25% of capacity.&#8221;
+/></a></p>
+<p><a href="metrics_recvd_vs_iostat_wps_large.png">&lt; img src=&#8221;/<span class="caps">GFX</span>/metrics_recvd_vs_iostat_wps.png&#8221; width=&#8221;800&#8221;
+height=&#8221;480&#8221; alt=&#8221;graph of carbon-relay metrics received vs <span class="caps">IO</span> writes
+per second. Writes per second increase roughly linearly with
+metricsReceived from 95k metrics/minute to about 175k metrics/minute,
+and then level off when <span class="caps">IO</span> is saturated.&#8221;
+/></a></p>
+<p><a href="metrics_recvd_vs_iostat_write_bytes_large.png">&lt; img src=&#8221;/<span class="caps">GFX</span>/metrics_recvd_vs_iostat_write_bytes.png&#8221;
+width=&#8221;800&#8221; height=&#8221;480&#8221; alt=&#8221;graph of carbon-relay metrics received vs
+<span class="caps">IO</span> bytes written. This is an even better indication than the previous
+graph that writes to disk continue acceptably up to about 175k
+metrics/minute and then level off, indicating <span class="caps">IO</span> saturation and metric
+create queueing in carbon-cache.&#8221;
+/></a></p>
+<p><a href="metrics_vs_relay-master_cpuUsage_large.png">&lt; img src=&#8221;/<span class="caps">GFX</span>/metrics_vs_relay-master_cpuUsage.png&#8221; width=&#8221;800&#8221;
+height=&#8221;480&#8221; alt=&#8221;graph of carbon-relay master metrics received vs
+carbon-relay master <span class="caps">CPU</span> usage. Through the entire event up to 750k
+metrics/minute, master carbon-relay <span class="caps">CPU</span> usage stayed almost perfectly in
+step with the number of metrics. Aside from some spikes and dips, the
+<span class="caps">CPU</span> usage line almost perfectly mirrors the slope of the metrics
+received line.&#8221; /></a></p>
+<ul>
+<li>what the various internal stats&nbsp;mean  </li>
+<li>how to interpret&nbsp;them  </li>
+<li>what to&nbsp;graph  </li>
+<li>early indicators of&nbsp;problems  </li>
+<li>creates - this is the number of <span class="caps">NEW</span> whisper files written to disk. If
+this goes up (it has a max per interval), you&#8217;re getting a bunch of
+never-before-seen metrics. In my environment, there&#8217;s a pretty clear
+line of how many creates per minute are normal, and how many are a new
+metric that ops should have been aware of (and, if it wasn&#8217;t planned
+for, will be a&nbsp;problem).  </li>
+<li>metricsReceived - especially take a look at the second derivative, or
+acceleration. Large changes here in either direction are probably&nbsp;<span class="caps">BAD</span>.  </li>
+<li>io service time - once this starts rising substantially, carbon
+queues will begin&nbsp;filling  </li>
+<li>carbon.agents memUsage - large jumps in memory usage for carbon-cache
+indicates an increase in incoming metrics, or that <span class="caps">IO</span> has slowed&nbsp;down.  </li>
+<li>late indicators of&nbsp;problems  </li>
+<li>missing data points in carbon.* internal&nbsp;metrics  </li>
+<li>carbon.agents avgUpdateTime - this is the time taken to write metrics
+to disk. If it jumps above a reasonable baseline, your <span class="caps">IO</span> is fully&nbsp;saturated.  </li>
+<li>statsd graphiteStats.flush_time - if statsd starts experiencing
+higher latency flushing metrics to graphite, so will everything else.
+When this starts happening, overall latency of the end-to-end system is&nbsp;increasing.  </li>
+<li>io queue length - there&#8217;s a maximum for this. When you hit the
+ceiling, the system&#8217;s latency will shoot&nbsp;up.  </li>
+<li>carbon.agents cache.size - this is a pretty poor indicator, and is
+really more of a &#8220;kiss your ass goodbye&#8221; alarm. If the size of the cache
+gets larger than metricsReceived, you&#8217;ve got a backlog growing faster
+than <span class="caps">IO</span> can handle, and need to fix the problem&nbsp;immediately</li>
+</ul>
+            </div>
+            <!-- /.entry-content -->
+        </article>
+    </section>
+
+        </div>
+        <div class="col-lg-3 well well-sm" id="sidebar">
+
+<aside>
+    <section>
+        <ul class="list-group list-group-flush">
+
+                <li class="list-group-item"><h4><i class="icon-home icon-large"></i>Recent Posts</h4></li>
+                        <li class="list-group-item">
+                            <a href="http://jantman.github.io/blog/2014/01/planning-migration-from-wordpress-to-static-site/">
+                                Planning Migration from WordPress to Static&nbsp;Site
+                            </a>
+                        </li>
+                        <li class="list-group-item">
+                            <a href="http://jantman.github.io/blog/2013/08/testing-gpg-key-passphrases/">
+                                Testing <span class="caps">GPG</span> Key&nbsp;Passphrases
+                            </a>
+                        </li>
+                        <li class="list-group-item">
+                            <a href="http://jantman.github.io/blog/2013/06/quick-tip-timestamping-bash-history/">
+                                Quick Tip: Timestamping bash&nbsp;history
+                            </a>
+                        </li>
+                        <li class="list-group-item">
+                            <a href="http://jantman.github.io/blog/2013/06/python-script-to-check-a-list-of-urls-for-return-code-and-final-return-code-if-redirected/">
+                                Python script to check a list of URLs for return code, and final return code if&nbsp;redirected
+                            </a>
+                        </li>
+                        <li class="list-group-item">
+                            <a href="http://jantman.github.io/blog/2013/06/modern-0-10-x-nodejs-rpms-on-centosrehl-5-and-6/">
+                                Modern (0.10.x+) NodeJS RPMs on CentOS/<span class="caps">REHL</span> 5 and&nbsp;6
+                            </a>
+                        </li>
+
+
+                <li class="list-group-item"><a href="http://jantman.github.io/blog/tags.html"><h4><i class="icon-tags icon-large"></i>Tags</h4></a></li>
+                <li class="list-group-item">
+                        <span class="tag-0">
+                            <a href="http://jantman.github.io/blog/tag/linux.html">
+                                linux
+                            </a>
+                        </span>
+                        <span class="tag-1">
+                            <a href="http://jantman.github.io/blog/tag/google.html">
+                                google
+                            </a>
+                        </span>
+                        <span class="tag-1">
+                            <a href="http://jantman.github.io/blog/tag/sun.html">
+                                sun
+                            </a>
+                        </span>
+                        <span class="tag-1">
+                            <a href="http://jantman.github.io/blog/tag/monitoring.html">
+                                monitoring
+                            </a>
+                        </span>
+                        <span class="tag-1">
+                            <a href="http://jantman.github.io/blog/tag/php.html">
+                                PHP
+                            </a>
+                        </span>
+                        <span class="tag-1">
+                            <a href="http://jantman.github.io/blog/tag/android.html">
+                                android
+                            </a>
+                        </span>
+                        <span class="tag-1">
+                            <a href="http://jantman.github.io/blog/tag/microsoft.html">
+                                microsoft
+                            </a>
+                        </span>
+                        <span class="tag-1">
+                            <a href="http://jantman.github.io/blog/tag/puppet.html">
+                                puppet
+                            </a>
+                        </span>
+                        <span class="tag-1">
+                            <a href="http://jantman.github.io/blog/tag/wordpress.html">
+                                wordpress
+                            </a>
+                        </span>
+                        <span class="tag-1">
+                            <a href="http://jantman.github.io/blog/tag/sysadmin.html">
+                                sysadmin
+                            </a>
+                        </span>
+                        <span class="tag-1">
+                            <a href="http://jantman.github.io/blog/tag/nagios.html">
+                                Nagios
+                            </a>
+                        </span>
+                        <span class="tag-2">
+                            <a href="http://jantman.github.io/blog/tag/logging.html">
+                                logging
+                            </a>
+                        </span>
+                        <span class="tag-2">
+                            <a href="http://jantman.github.io/blog/tag/mediawiki.html">
+                                mediawiki
+                            </a>
+                        </span>
+                        <span class="tag-2">
+                            <a href="http://jantman.github.io/blog/tag/firefox.html">
+                                firefox
+                            </a>
+                        </span>
+                        <span class="tag-2">
+                            <a href="http://jantman.github.io/blog/tag/dns.html">
+                                dns
+                            </a>
+                        </span>
+                        <span class="tag-2">
+                            <a href="http://jantman.github.io/blog/tag/syslog.html">
+                                syslog
+                            </a>
+                        </span>
+                        <span class="tag-2">
+                            <a href="http://jantman.github.io/blog/tag/security.html">
+                                security
+                            </a>
+                        </span>
+                        <span class="tag-2">
+                            <a href="http://jantman.github.io/blog/tag/rpm.html">
+                                rpm
+                            </a>
+                        </span>
+                        <span class="tag-2">
+                            <a href="http://jantman.github.io/blog/tag/apache.html">
+                                apache
+                            </a>
+                        </span>
+                        <span class="tag-2">
+                            <a href="http://jantman.github.io/blog/tag/droid.html">
+                                droid
+                            </a>
+                        </span>
+                </li>
+        </ul>
+    </section>
+    <section>
+    <ul class="list-group list-group-flush">
+    <li class="list-group-item" style="padding: 10px 15px 0px 15px;"><h4><i class="icon-twitter
+    icon-large"></i>Twitter <a href="https://twitter.com/j_antman"
+    class="twitter-follow-button" data-show-count="false"
+    data-dnt="true">Follow @j_antman</a></h4>
+<script>!function(d,s,id){var
+  js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document,
+  'script', 'twitter-wjs');</script></li>
+    </ul>
+    <a class="twitter-timeline" data-dnt="true"
+    href="https://twitter.com/j_antman"
+    data-chrome="transparent noheader" data-widget-id="429640274453594113">Tweets by @j_antman</a>
+    <script>!function(d,s,id){var
+    js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+"://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+    </section>
+    <section>
+    <ul class="list-group list-group-flush">
+    <li class="list-group-item"><h4><i class="icon-github icon-large"></i>GitHub Repos</h4></li>
+    <li class="list-group-item">
+        <div id="gh_repos">
+            <p class="list-group-item">Status updating...</p>
+        </div>
+            <a href="https://github.com/jantman">@jantman</a> on GitHub
+        <script type="text/javascript">
+            $(document).ready(function () {
+                if (!window.jXHR) {
+                    var jxhr = document.createElement('script');
+                    jxhr.type = 'text/javascript';
+                    jxhr.src = 'http://jantman.github.io/blog/theme/js/jXHR.js';
+                    var s = document.getElementsByTagName('script')[0];
+                    s.parentNode.insertBefore(jxhr, s);
+                }
+
+                github.showRepos({
+                    user: 'jantman',
+                    count: 5,
+                    skip_forks: false,
+                    target: '#gh_repos'
+                });
+            });
+        </script>
+        <script src="http://jantman.github.io/blog/theme/js/github.js" type="text/javascript"></script>
+    </li>
+    </ul>
+    </section>
+</aside>        </div>
+    </div>
+</div>
+<footer>
+    <div class="container">
+        <hr>
+        <p class="pull-right"><i class="icon-arrow-up"></i> <a href="#">Back to top</a></p>
+
+
+        <p>&copy; 2014 Jason Antman &middot; Powered by <a href="https://github.com/DandyDev/pelican-bootstrap3" target="_blank">pelican-bootstrap3</a>,
+            <a href="http://docs.getpelican.com/" target="_blank">Pelican</a>,
+            <a href="http://getbootstrap.com" target="_blank">Bootstrap</a></p>
+    </div>
+</footer>
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="http://jantman.github.io/blog/theme/js/bootstrap.min.js"></script>
+
+<!-- Enable responsive features in IE8 with Respond.js (https://github.com/scottjehl/Respond) -->
+<script src="http://jantman.github.io/blog/theme/js/respond.min.js"></script>
+
+
+</body>
+</html>

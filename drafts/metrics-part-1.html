@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+>
+<head>
+    <title>Metrics Part 1</title>
+    <!-- Using the latest rendering mode for IE -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Open Graph tags -->
+    <!-- Bootstrap -->
+        <link rel="stylesheet" href="http://jantman.github.io/blog/theme/css/bootstrap.flatly.min.css" type="text/css"/>
+    <link href="http://jantman.github.io/blog/theme/css/font-awesome.min.css" rel="stylesheet">
+    <link href="http://jantman.github.io/blog/theme/css/pygments.css" rel="stylesheet">
+        <link href="http://jantman.github.io/blog/theme/css/typogrify.css" rel="stylesheet">
+    <link rel="stylesheet" href="http://jantman.github.io/blog/theme/css/style.css" type="text/css"/>
+    <!-- JavaScript plugins (requires jQuery) -->
+    <script src="http://code.jquery.com/jquery.js"></script>
+
+    <link rel="stylesheet" href="http://jantman.github.io/blog/theme/css/forkongithub.min.css" type="text/css" />
+
+
+</head>
+<body>
+<span id="forkongithub"><a href="https://github.com/jantman/blog">Fork me on GitHub</a></span><nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="http://jantman.github.io/blog" class="navbar-brand">Jason Antman's Blog</a>
+        </div>
+        <div class="collapse navbar-collapse navbar-ex1-collapse">
+            <ul class="nav navbar-nav">
+                         <li><a href="http://jantman.github.io/blog/pages/about.html">
+                             About
+                          </a></li>
+                        <li >
+                            <a href="http://jantman.github.io/blog/category/ideas-and-rants.html">Ideas and rants</a>
+                        </li>
+                        <li >
+                            <a href="http://jantman.github.io/blog/category/miscellaneous.html">Miscellaneous</a>
+                        </li>
+                        <li >
+                            <a href="http://jantman.github.io/blog/category/monitoring.html">Monitoring</a>
+                        </li>
+                        <li >
+                            <a href="http://jantman.github.io/blog/category/projects.html">Projects</a>
+                        </li>
+                        <li >
+                            <a href="http://jantman.github.io/blog/category/puppet.html">Puppet</a>
+                        </li>
+                        <li class="active">
+                            <a href="http://jantman.github.io/blog/category/sysadmin.html">Sysadmin</a>
+                        </li>
+                        <li >
+                            <a href="http://jantman.github.io/blog/category/tech-howtos.html">Tech howtos</a>
+                        </li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="http://jantman.github.io/blog/archives.html"><i class="icon-th-list"></i>Archives</a></li>
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+</nav>
+<!-- /.navbar -->
+<div class="container">
+    <div class="row">
+        <div class="col-lg-9">
+    <section id="content">
+        <article>
+            <header class="page-header">
+                <h1>
+                    <a href="http://jantman.github.io/blog/2013/03/metrics-part-1/"
+                       rel="bookmark"
+                       title="Permalink to Metrics Part 1">
+                        Metrics Part&nbsp;1
+                    </a>
+                </h1>
+<a href="http://twitter.com/share" class="twitter-share-button" data-count="horizontal" data-via="j_antman">Tweet</a><script type="text/javascript" src="http://platform.twitter.com/widgets.js"></script>
+            </header>
+            <div class="entry-content">
+                <div class="panel">
+                    <div class="panel-body">
+<footer class="post-info">
+    <span class="label label-default">Date</span>
+    <span class="published">
+        <i class="icon-calendar"></i>Wed 06 March 2013
+    </span>
+
+
+
+<span class="label label-default">Tags</span>
+	<a href="http://jantman.github.io/blog/tag/diamond.html">diamond</a>
+        /
+	<a href="http://jantman.github.io/blog/tag/graphing.html">graphing</a>
+        /
+	<a href="http://jantman.github.io/blog/tag/graphite.html">graphite</a>
+        /
+	<a href="http://jantman.github.io/blog/tag/metrics.html">metrics</a>
+        /
+	<a href="http://jantman.github.io/blog/tag/monitoring.html">monitoring</a>
+        /
+	<a href="http://jantman.github.io/blog/tag/munin.html">munin</a>
+        /
+	<a href="http://jantman.github.io/blog/tag/statsd.html">statsd</a>
+</footer><!-- /.post-info -->                    </div>
+                </div>
+                <p>At work we&#8217;re currently in between metric collection and display
+(graphing) tools. We&#8217;ve got <a href="http://munin-monitoring.org/">munin</a> on its
+way out (but still largely responsible for collection via munin-node)
+and <a href="http://graphite.wikidot.com/">graphite</a>/carbon/whisper on its way
+in for storage and display/graphing. But we&#8217;ve yet to fill the void for
+data collection. We have a few ideas for specific areas (as we&#8217;re a
+python shop, we seem to have decided on
+<a href="https://github.com/BrightcoveOS/Diamond">Diamond</a> as the munin-node
+replacement, and we&#8217;re pretty sold on
+<a href="https://github.com/etsy/statsd/">statsd</a> to push to Graphite), but
+there are still a number of slots that need to be filled. And as such,
+we&#8217;re starting to amass a bunch of shell and Python scripts pushing data
+to Graphite every minute (or 30 seconds), just so we can get something
+better than&nbsp;Munin.</p>
+<p>So, I thought I&#8217;d take a few minutes to outline some of my thoughts on
+the topic. I&#8217;ve <a href="/2012/09/project-storing-and-analyzing-apache-httpd-logs-from-many-hosts/">written about similar topics
+before</a>,
+and even if you&#8217;re one of the people who doesn&#8217;t really buy into the
+whole <a href="https://github.com/monitoringsucks/blog-posts">monitoring sucks</a>
+camp, there are
+<a href="http://lusislog.blogspot.com/2011/07/monitoring-sucks-watch-your-language.html">a</a>
+<a href="http://lusislog.blogspot.com/2011/06/why-monitoring-sucks.html">lot of</a>
+<a href="http://obfuscurity.com/2011/07/Monitoring-Sucks-Do-Something-About-It">really</a>
+<a href="http://jedi.be/blog/2012/01/03/monitoring-wonderland-metrics-api-gateways/">good</a>
+<a href="http://www.devco.net/archives/2011/03/19/thinking_about_monitoring_frameworks.php">posts</a>
+about monitoring and metric collection out there. And I&#8217;m sure there are
+a few that suggest a specific solution, but this is obviously something
+we have to explore on our own - and working for a mostly Python shop
+adds an incentive to not just use the newest, coolest thing written in
+Ruby or&nbsp;Node.</p>
+<h2 id="what-i-already-know">What I Already&nbsp;Know</h2>
+<p>I know we&#8217;re using <a href="http://graphite.wikidot.com/">Graphite</a> (and
+carbon-cache) for storing and displaying data. We like it, we&#8217;re already
+using it, it&#8217;s written in our strongest language, and it&#8217;s cool. We
+might investigate alternate web front-ends (the current one, admittedly,
+could use more than a little work). We&#8217;re also going to be using
+<a href="https://github.com/BrightcoveOS/Diamond">Brightcove&#8217;s Diamond</a> as a
+collector, likely to replace munin-node; however, it&#8217;s not known how
+many of our metrics will actually pass through Diamond, and what other
+collector(s) we may or may not&nbsp;have.</p>
+<h2 id="identifying-the-problem-with-collection">Identifying the Problem with&nbsp;Collection</h2>
+<p>We know that we want metrics and event data from, in the simplest terms,
+as many places as possible. Disk is cheap and it&#8217;s better to have unused
+historical data than have no data on a metric when you need it.<br />
+3 sources of metrics:<br />
+- code that&#8217;s ours and can send metrics natively<br />
+- code that&#8217;s not ours, but can either be modified to send metrics
+natively, or will return metrics via a programmatic interface (command
+line, <span class="caps">JSON</span>, <span class="caps">XML</span>, etc.) that can be easily grabbed and shipped elsewhere<br />
+- stuff other than the above, that requires parsing of log files,
+screen-scraping <span class="caps">HTML</span> or similar &#8220;ugly&#8221; ways of extracting&nbsp;metrics</p>
+            </div>
+            <!-- /.entry-content -->
+        </article>
+    </section>
+
+        </div>
+        <div class="col-lg-3 well well-sm" id="sidebar">
+
+<aside>
+    <section>
+        <ul class="list-group list-group-flush">
+
+                <li class="list-group-item"><h4><i class="icon-home icon-large"></i>Recent Posts</h4></li>
+                        <li class="list-group-item">
+                            <a href="http://jantman.github.io/blog/2014/01/planning-migration-from-wordpress-to-static-site/">
+                                Planning Migration from WordPress to Static&nbsp;Site
+                            </a>
+                        </li>
+                        <li class="list-group-item">
+                            <a href="http://jantman.github.io/blog/2013/08/testing-gpg-key-passphrases/">
+                                Testing <span class="caps">GPG</span> Key&nbsp;Passphrases
+                            </a>
+                        </li>
+                        <li class="list-group-item">
+                            <a href="http://jantman.github.io/blog/2013/06/quick-tip-timestamping-bash-history/">
+                                Quick Tip: Timestamping bash&nbsp;history
+                            </a>
+                        </li>
+                        <li class="list-group-item">
+                            <a href="http://jantman.github.io/blog/2013/06/python-script-to-check-a-list-of-urls-for-return-code-and-final-return-code-if-redirected/">
+                                Python script to check a list of URLs for return code, and final return code if&nbsp;redirected
+                            </a>
+                        </li>
+                        <li class="list-group-item">
+                            <a href="http://jantman.github.io/blog/2013/06/modern-0-10-x-nodejs-rpms-on-centosrehl-5-and-6/">
+                                Modern (0.10.x+) NodeJS RPMs on CentOS/<span class="caps">REHL</span> 5 and&nbsp;6
+                            </a>
+                        </li>
+
+
+                <li class="list-group-item"><a href="http://jantman.github.io/blog/tags.html"><h4><i class="icon-tags icon-large"></i>Tags</h4></a></li>
+                <li class="list-group-item">
+                        <span class="tag-0">
+                            <a href="http://jantman.github.io/blog/tag/linux.html">
+                                linux
+                            </a>
+                        </span>
+                        <span class="tag-1">
+                            <a href="http://jantman.github.io/blog/tag/google.html">
+                                google
+                            </a>
+                        </span>
+                        <span class="tag-1">
+                            <a href="http://jantman.github.io/blog/tag/sun.html">
+                                sun
+                            </a>
+                        </span>
+                        <span class="tag-1">
+                            <a href="http://jantman.github.io/blog/tag/monitoring.html">
+                                monitoring
+                            </a>
+                        </span>
+                        <span class="tag-1">
+                            <a href="http://jantman.github.io/blog/tag/php.html">
+                                PHP
+                            </a>
+                        </span>
+                        <span class="tag-1">
+                            <a href="http://jantman.github.io/blog/tag/android.html">
+                                android
+                            </a>
+                        </span>
+                        <span class="tag-1">
+                            <a href="http://jantman.github.io/blog/tag/microsoft.html">
+                                microsoft
+                            </a>
+                        </span>
+                        <span class="tag-1">
+                            <a href="http://jantman.github.io/blog/tag/puppet.html">
+                                puppet
+                            </a>
+                        </span>
+                        <span class="tag-1">
+                            <a href="http://jantman.github.io/blog/tag/wordpress.html">
+                                wordpress
+                            </a>
+                        </span>
+                        <span class="tag-1">
+                            <a href="http://jantman.github.io/blog/tag/sysadmin.html">
+                                sysadmin
+                            </a>
+                        </span>
+                        <span class="tag-1">
+                            <a href="http://jantman.github.io/blog/tag/nagios.html">
+                                Nagios
+                            </a>
+                        </span>
+                        <span class="tag-2">
+                            <a href="http://jantman.github.io/blog/tag/logging.html">
+                                logging
+                            </a>
+                        </span>
+                        <span class="tag-2">
+                            <a href="http://jantman.github.io/blog/tag/mediawiki.html">
+                                mediawiki
+                            </a>
+                        </span>
+                        <span class="tag-2">
+                            <a href="http://jantman.github.io/blog/tag/firefox.html">
+                                firefox
+                            </a>
+                        </span>
+                        <span class="tag-2">
+                            <a href="http://jantman.github.io/blog/tag/dns.html">
+                                dns
+                            </a>
+                        </span>
+                        <span class="tag-2">
+                            <a href="http://jantman.github.io/blog/tag/syslog.html">
+                                syslog
+                            </a>
+                        </span>
+                        <span class="tag-2">
+                            <a href="http://jantman.github.io/blog/tag/security.html">
+                                security
+                            </a>
+                        </span>
+                        <span class="tag-2">
+                            <a href="http://jantman.github.io/blog/tag/rpm.html">
+                                rpm
+                            </a>
+                        </span>
+                        <span class="tag-2">
+                            <a href="http://jantman.github.io/blog/tag/apache.html">
+                                apache
+                            </a>
+                        </span>
+                        <span class="tag-2">
+                            <a href="http://jantman.github.io/blog/tag/droid.html">
+                                droid
+                            </a>
+                        </span>
+                </li>
+        </ul>
+    </section>
+    <section>
+    <ul class="list-group list-group-flush">
+    <li class="list-group-item" style="padding: 10px 15px 0px 15px;"><h4><i class="icon-twitter
+    icon-large"></i>Twitter <a href="https://twitter.com/j_antman"
+    class="twitter-follow-button" data-show-count="false"
+    data-dnt="true">Follow @j_antman</a></h4>
+<script>!function(d,s,id){var
+  js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document,
+  'script', 'twitter-wjs');</script></li>
+    </ul>
+    <a class="twitter-timeline" data-dnt="true"
+    href="https://twitter.com/j_antman"
+    data-chrome="transparent noheader" data-widget-id="429640274453594113">Tweets by @j_antman</a>
+    <script>!function(d,s,id){var
+    js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+"://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+    </section>
+    <section>
+    <ul class="list-group list-group-flush">
+    <li class="list-group-item"><h4><i class="icon-github icon-large"></i>GitHub Repos</h4></li>
+    <li class="list-group-item">
+        <div id="gh_repos">
+            <p class="list-group-item">Status updating...</p>
+        </div>
+            <a href="https://github.com/jantman">@jantman</a> on GitHub
+        <script type="text/javascript">
+            $(document).ready(function () {
+                if (!window.jXHR) {
+                    var jxhr = document.createElement('script');
+                    jxhr.type = 'text/javascript';
+                    jxhr.src = 'http://jantman.github.io/blog/theme/js/jXHR.js';
+                    var s = document.getElementsByTagName('script')[0];
+                    s.parentNode.insertBefore(jxhr, s);
+                }
+
+                github.showRepos({
+                    user: 'jantman',
+                    count: 5,
+                    skip_forks: false,
+                    target: '#gh_repos'
+                });
+            });
+        </script>
+        <script src="http://jantman.github.io/blog/theme/js/github.js" type="text/javascript"></script>
+    </li>
+    </ul>
+    </section>
+</aside>        </div>
+    </div>
+</div>
+<footer>
+    <div class="container">
+        <hr>
+        <p class="pull-right"><i class="icon-arrow-up"></i> <a href="#">Back to top</a></p>
+
+
+        <p>&copy; 2014 Jason Antman &middot; Powered by <a href="https://github.com/DandyDev/pelican-bootstrap3" target="_blank">pelican-bootstrap3</a>,
+            <a href="http://docs.getpelican.com/" target="_blank">Pelican</a>,
+            <a href="http://getbootstrap.com" target="_blank">Bootstrap</a></p>
+    </div>
+</footer>
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="http://jantman.github.io/blog/theme/js/bootstrap.min.js"></script>
+
+<!-- Enable responsive features in IE8 with Respond.js (https://github.com/scottjehl/Respond) -->
+<script src="http://jantman.github.io/blog/theme/js/respond.min.js"></script>
+
+
+</body>
+</html>
