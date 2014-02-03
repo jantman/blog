@@ -10,11 +10,11 @@ Slug: interesting-links-for-tuesday-january-26th-2010
     Human](http://www.wired.com/thisdayintech/2010/01/0125robot-kills-worker/)
 -   [Lawyers Challenge $54,000 P2P Fine As
     Unconstitutional](http://www.wired.com/threatlevel/2010/01/lawyers-challenge-filesharing-verdict/)
--   [Verizon Terminating Copyright Infringers’ Internet
+-   [Verizon Terminating Copyright Infringers' Internet
     Access](http://www.wired.com/threatlevel/2010/01/verizon-terminating-internet-accessinternet-access/)
 -   [Linux performance: is Linux becoming just too slow and
     bloated?](http://www.freesoftwaremagazine.com/columns/linux_performance_linux_slow_bloated)
--   [Mr. Edison’s Kindle: Fifteen amazing gadget ideas that were way,
+-   [Mr. Edison's Kindle: Fifteen amazing gadget ideas that were way,
     way ahead of their
     time](http://technologizer.com/2010/01/24/edisons-kindle/) *(though,
     I must say, the author of this blog is really looking at things from

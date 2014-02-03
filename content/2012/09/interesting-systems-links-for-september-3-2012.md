@@ -8,7 +8,7 @@ Slug: interesting-systems-links-for-september-3-2012
 Here is a small selection of sysadmin links that I recently found, and
 wanted to share:
 
--   [Blameless PostMortems and a Just Culture « Code as
+-   [Blameless PostMortems and a Just Culture - Code as
     Craft](http://codeascraft.etsy.com/2012/05/22/blameless-postmortems/)
     - some really good ideas about a culture that recognizes and seeks
     to remedy human errors, rather than punishing and generating fear.
