@@ -10,11 +10,20 @@ import sys
 sys.path.append(os.curdir)
 from pelicanconf import *
 
-SITEURL = 'http://jantman.github.io/blog'
+SITEURL = 'http://newblog.jasonantman.com'
 RELATIVE_URLS = False
 
-#FEED_ALL_ATOM = 'feeds/all.atom.xml'
-#CATEGORY_FEED_ATOM = 'feeds/%s.atom.xml'
+# TODO - update feedburner? see http://docs.getpelican.com/en/3.3.0/settings.html#feedburner
+FEED_DOMAIN = SITEURL
+FEED_ATOM = 'feeds/feed.atom.xml'
+FEED_RSS = None 'feeds/feed.rss.xml'
+FEED_ALL_ATOM = 'feeds/all.atom.xml'
+FEED_ALL_RSS = 'feeds/all.rss.xml'
+CATEGORY_FEED_ATOM = 'feeds/categories/%s.atom.xml'
+CATEGORY_FEED_RSS = 'feeds/categories/%s.rss.xml'
+TAG_FEED_ATOM = 'feeds/tags/%s.atom.xml'
+TAG_FEED_RSS = 'feeds/tags/%s.rss.xml'
+FEED_MAX_ITEMS = 500
 
 DELETE_OUTPUT_DIRECTORY = True
 

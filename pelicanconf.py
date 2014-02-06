@@ -37,7 +37,19 @@ PAGE_DIR = 'pages'
 PAGE_EXCLUDES = []
 ARTICLE_DIR = 'content'
 ARTICLE_EXCLUDES = ['pages',]
-STATIC_PATHS = ['images', 'GFX', 'favicon.ico', 'CNAME', 'robots.txt']
+
+STATIC_PATHS = [
+    'CNAME',
+    'GFX',
+    'static/favicon.ico',
+    'static/robots.txt',
+    'static/googleea75ea27535d4ffe.html',
+]
+EXTRA_PATH_METADATA = {
+    'static/favicon.ico': {'path': 'favicon.ico'},
+    'static/robots.txt': {'path': 'robots.txt'},
+    'static/googleea75ea27535d4ffe.html': {'path': 'googleea75ea27535d4ffe.html'},
+}
 
 # URL settings
 ARTICLE_URL = '{date:%Y}/{date:%m}/{slug}/'
