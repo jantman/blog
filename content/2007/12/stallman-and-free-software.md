@@ -32,8 +32,8 @@ granted to a user of software. However, what of the responsibilities of
 the developers? Compromise is part of life. Very few of us have the
 privilege of being able to live an idealistic life free of compromise.
 So, in my opinion, one of the most important aspect of free software is
-the <span style="font-weight: bold;">right of users to be exposed to
-Free software</span>. This entails not only producing truly (purely)
+the **right of users to be exposed to
+Free software**. This entails not only producing truly (purely)
 Free software, but also the responsibility of us, the developers,
 administrators, consultants, and manufacturers, to raise the world's
 awareness of Free software. Most importantly, this must be done with the

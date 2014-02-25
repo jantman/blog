@@ -37,7 +37,7 @@ WAVs for alarm tones, and add a GPIO "snooze" and "off" button.
 The serial console allows setting a daily alarm or two, as well as
 selecting one of the default tones.
 
-<span style="font-weight: bold;">The Geekier Part:</span>  
+**The Geekier Part:**
 The alarm clock is controlled by a script called by a Cron job. Now, we
 add the miniserv web server and a PHP admin gateway. Login via a
 password (user-selectable) and we can upload new audio files for alarms,
@@ -45,7 +45,7 @@ as well as adding alarms via the web as cron jobs - now I can program in
 my class schedule, and automatically have an alarm at the right time
 each day of the week!
 
-<span style="font-weight: bold;">The Geekiest Part:</span>  
+**The Geekiest Part:**
 Remember the matrix display and that additional really bright LED? We
 setup simple communication between machines via SNMP or a script on the
 clock (called with an Expect script on a remote machine) and we can

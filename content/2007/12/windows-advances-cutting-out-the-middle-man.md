@@ -29,7 +29,7 @@ proprietary world will start to understand that just because you can
 give a copy of BusyBox to your friends doesn't mean they can disregard
 the license.
 
-<span style="font-weight: bold;">Windows Advances?</span>  
+**Windows Advances?**
 I came by [this blog
 post](http://blogs.ittoolbox.com/linux/locutus/archives/if-the-gui-is-so-good-then-why-is-microsoft-dropping-it-20951?e=unrec#commentsForm)
 discussing the fact that, apparently, Windows 2008 is going to be able
@@ -37,25 +37,24 @@ to be installed in a CLI-only (yes, that's right, no GUI) mode.
 
 I'm not going to preach about Microsoft turning unix-y. Rather, I think
 it just reiterates something that I've said time and time
-again:<span style="font-style: italic;"> I'm setting up a DNS server.
+again:*I'm setting up a DNS server.
 It's going to be administered in a web GUI or by scripts. Why should I
 tie up RAM and processor cycles to display a GUI that, if the system
-works right, will never be looked at?
+works right, will never be looked at?*
 
-<span style="font-style: italic;"></span></span>Rather than seeing this
+Rather than seeing this
 as some victory for Linux, Unix, etc., I take it a bit more
-realistically (though still, perhaps, over-optimistically):  
+realistically (though still, perhaps, over-optimistically):
 Maybe Microsoft is finally realizing that their one-size-fits-all
 mentality doesn't work. That people want options. And, even more
 mysteriously, that not everyone wants to have to buy the newest hardware
 just to run an OS.
 
-<span style="font-weight: bold;">Cutting out the Middle Man:</span>  
+**Cutting out the Middle Man:**
 I found and [article at
 internetnews.com](http://www.internetnews.com/stats/article.php/3655796)
 entitled
-"<span style="font-family:Verdana, Arial, Helvetica, sans-serif;font-size:-1;"><span>The
-Young, Smart And Loaded Watch Online TV</span> ". Many parts of it
+"The Young, Smart And Loaded Watch Online TV". Many parts of it
 saddened me - like the thought of allowing providers to push
 advertisement through my computer, or tracking my viewing habits in
 great detail.
@@ -96,5 +95,4 @@ Firstly, it's useless if you can't record it and watch it later, or
 transfer it to another computer. But more importantly, the odds of such
 a company embracing a standardized technology (like just streaming
 everything over the web and depending on SSL and HTTP-based
-authentication) that will run on my Linux boxen is pretty slim.  
-</span><span style="font-style: italic;"></span>
+authentication) that will run on my Linux boxen is pretty slim.

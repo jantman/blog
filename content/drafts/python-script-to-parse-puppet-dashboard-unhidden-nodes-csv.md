@@ -15,5 +15,3 @@ optionally only the ones with a latest report before a given time. The
 latest version of the script lives at:
 [https://github.com/jantman/misc-scripts/blob/master/find\_outdated\_puppets.py](https://github.com/jantman/misc-scripts/blob/master/find_outdated_puppets.py)
 
-~~~~ {lang="python"}
-~~~~

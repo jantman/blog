@@ -22,6 +22,5 @@ github repository:
     Netbackup](http://www.symantec.com/netbackup). Useful for making
     generation of include/exclude files conditional on having NetBackup
     installed.
-    </p>
 
 Hopefully some of these will be of use to someone else as well.

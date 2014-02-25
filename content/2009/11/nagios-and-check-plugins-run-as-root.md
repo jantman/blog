@@ -21,8 +21,8 @@ file push). Here's how to do it:
     path to your script.
 4.  **Be sure** your script is owned by root, and is chmod **at most**
     755.
-5.  Compile setuid-prog.c:  
-    `gcc -o {check_script_name}-wrapper setuid-prog.c`{lang="bash"}
+5.  Compile setuid-prog.c:
+    `gcc -o {check_script_name}-wrapper setuid-prog.c`
 6.  Put the resulting binary in your plugin directory.
 7.  Assuming your checks run as user nagios and group nagios, chown the
     binary to root:nagios and chmod 4755.

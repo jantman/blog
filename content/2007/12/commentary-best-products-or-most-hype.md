@@ -39,22 +39,18 @@ arguably Microsoft's biggest flop (other than Windows ME), which appears
 on the list - though they do mention, "While many users hate it, there's
 little question that the operating system is selling extremely well.".
 They mention that Microsoft said, in October, that it
-<span style="font-weight: bold;">had shipped 88 million copies of
-Vista</span>. While I don't totally doubt that figure, it doesn't take
+**had shipped 88 million copies of Vista**. While I don't totally doubt that figure, it doesn't take
 into account the users who bought a Dell with Vista and then dumped it
 for Ubuntu. Or even the (I imagine rather large) number of users, like
 many of my friends, who bought that new computer with Vista and
 immediately loaded their old XP Pro disk.
 
-So, after all of that nitpicking, what do I think is missing?  
-1) The desktop processor revolution, with 64-bit systems becoming quite
-common.  
-2) The Intel and AMD dual- and quad-core CPUs being put in consumer
-machines.  
-3) Intel VT hardware virtualization technology.  
-4) OLPC  
-5) The Asus eeePC (well, this is still to be determined)  
-6) Motorola cellphones moving to Linux (as well as other companies)  
-7) The portion of the 700-MHz spectrum set for auction by the FCC.
-(well, not a consumer product, but it could revolutionize mobile
-communications if it falls into the right hands).
+So, after all of that nitpicking, what do I think is missing?
+
+1. The desktop processor revolution, with 64-bit systems becoming quite common.
+2. The Intel and AMD dual- and quad-core CPUs being put in consumer machines.
+3. Intel VT hardware virtualization technology.
+4. OLPC
+5. The Asus eeePC (well, this is still to be determined)
+6. Motorola cellphones moving to Linux (as well as other companies)
+7. The portion of the 700-MHz spectrum set for auction by the FCC. (well, not a consumer product, but it could revolutionize mobile communications if it falls into the right hands).

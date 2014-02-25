@@ -142,7 +142,6 @@ else
 ?>
 ~~~~
 
-</p>
 So, it now looks like I'm pretty much done with setup, and even get to
 keep my links. The one interesting problem that will crop up is due to
 the fact that, at the moment, I'm hosting off of a dynamically IPed

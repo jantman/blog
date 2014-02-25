@@ -19,7 +19,8 @@ post - though I don't have anything to support that). Obviously, to do
 this, it would be easiest to handle the blog with software on my server,
 probably something slightly custom.
 
-<span style="font-weight: bold;">Facebook Beacon</span>  
+## Facebook Beacon
+
 In an update on Facebook Beacon, I came by
 [this](http://yro.slashdot.org/article.pl?sid=07/12/14/1620258&from=rss)
 post on Slashdot, referencing a [ComputerWorld
@@ -29,7 +30,8 @@ appears to violate the Video Privacy Protection Act of 1988, which
 prevents video rental agencies from disclosing the rental history of
 their customers without a written release. Interesting stuff.
 
-<span style="font-weight: bold;">Linux in the Real World</span>  
+## Linux in the Real World
+
 Being an avid Linux user, and a fan of both the functionality (from the
 point of view of a user as well as a programmer) and religion of F/OSS,
 I always like to hear stories of Linux (and other F/OSS) usage in the
@@ -52,4 +54,4 @@ article from the New York Times, talking about how the New York Stock
 Exchange is "investing heavily" in Linux on commodity x86 hardware,
 replacing Unix mainframes, nonetheless. And what hardware are they
 using? My beloved HP
-Proliants.<span style="display: block;" id="formatbar_Buttons"><span class="down" style="display: block;" id="formatbar_CreateLink" title="Link" onmouseover="ButtonHoverOn(this);" onmouseout="ButtonHoverOff(this);" onmouseup onmousedown="CheckFormatting(event);FormatbarButton('richeditorframe', this, 8);ButtonMouseDown(this);"></span></span>
+Proliants.

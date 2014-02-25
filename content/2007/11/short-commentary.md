@@ -36,8 +36,7 @@ I was speaking with a supervisor at the Rutgers University student
 computer labs the other day, and was pretty astonished to realize that
 [OpenOffice](http://www.openoffice.org/) isn't loaded on the lab
 computers. Why? Because 99% of their "patrons" wouldn't know what it is,
-and can't handle choices. <span style="font-weight: bold;">Can't handle
-choices</span>. Or, at least, don't want them. It's attitudes like this
+and can't handle choices. **Can't handle choices**. Or, at least, don't want them. It's attitudes like this
 that lead to a world where you have ONE cable company, ONE phone
 company, ONE high-bandwidth ISP, and can only use ONE cellular
 provider's equipment on a network. I wonder how those same "patrons"

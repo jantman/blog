@@ -10,6 +10,6 @@ lately, and have been doing some testing against its HTTP-based API,
 which returns results in JSON. If you're looking to pretty-print a JSON
 response for easier viewing, here's a nice way to do it at the command
 line using Python and
-[json.tool](http://docs.python.org/library/json.html):  
+[json.tool](http://docs.python.org/library/json.html):
 
-` curl http://username:pass@hostname:55672/api/overview | python -m json.tool`{lang="bash"}
+` curl http://username:pass@hostname:55672/api/overview | python -m json.tool`

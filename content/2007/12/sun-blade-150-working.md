@@ -10,9 +10,9 @@ I finally got one of my two surplus (and fully locked down in NVRAM) Sun
 Blade 150 workstations up and running. I encountered a few problems
 along the way, but managed to solve them - more or less.
 
-<span style="font-weight: bold;">Problem 1 - NVRAM password set,
-impossible to install an OS.</span>  
-I did a \*lot\* of googling, and asking for advice. Eventually, I came
+## Problem 1 - NVRAM password set, impossible to install an OS.
+
+I did a *lot* of googling, and asking for advice. Eventually, I came
 by a forum post expressing success with a procedure of pulling out and
 then re-inserting the NVRAM \*while\* the system is powered on. This
 left my system un-bootable. I pulled the chip again, and found two pins
@@ -26,7 +26,8 @@ prompt. I then popped in the Solaris 10 install CD, issued the
 boot menu, and told it to boot from CDROM ("boot cdrom"). Installation
 then started.
 
-<span style="font-weight: bold;">Problem 2 - Invalid NVRAM</span>  
+## Problem 2 - Invalid NVRAM
+
 After the above procedure, when booting, I got a message following the
 Sun banner stating that there was a problem with the IDprom checksum.
 When the install CD booted, I also got messages stating "Invalid format
@@ -68,8 +69,8 @@ Sun Developer Forum post, and
 [this](http://forum.java.sun.com/thread.jspa?threadID=5093819&messageID=9329080)
 post on password recovery.
 
-<span style="font-weight: bold;">Problem 3 - MAC / Ethernet address is
-00:00:00:00:00:00</span>  
+## Problem 3 - MAC / Ethernet address is 00:00:00:00:00:00
+
 When booting Solaris, I found that I couldn't get DHCP. When I finally
 got the OS running and logged in as root, I realized something
 interesting - I couldn't access or ping anything past the one switch I
@@ -87,8 +88,8 @@ post that I found suggested adding the previous ifconfig command to the
 top of /etc/rc.c/init.d/network, which I've done and will see how it
 works at the next boot.
 
-<span style="font-weight: bold;">Problem 4 - Can't login to SMC (Solaris
-Management Console)</span>  
+## Problem 4 - Can't login to SMC (Solaris Management Console)
+
 My next task after getting the system up and running, and getting
 networking working, as to give myself a user account. I was logged in
 using the Java Desktop System, so I opened a terminal and ran "smc &".

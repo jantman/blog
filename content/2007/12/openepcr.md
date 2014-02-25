@@ -81,8 +81,9 @@ either the technical or EMS standpoint - please check out the [project
 homepage](http://www.openepcr.org) or drop me an
 [E-Mail](mailto:jason@jasonantman.com).
 
-Excerpted from the homepage is a bit of information on my goals:  
-<span style="font-weight: bold;">Project Mission:</span>  
+Excerpted from the homepage is a bit of information on my goals:
+
+**Project Mission:**
 OpenEPCR aims to provide the Emergency Medical Services sector with a
 Free (as in Freedom, a.k.a. Open-Source) Electronic Patient Care Report
 (EPCR) software solution. Licensed under the [GNU
@@ -96,9 +97,9 @@ third party. The software will attempt to do all of this while paying
 heed to applicable standards on privacy and security, as well as being
 fully platform-independent.
 
-<span style="font-weight: bold;">Project Goals:</span>
+**Project Goals:**
 
-1.  Provide \*all\* code licensed under the GNU GPL, and make code as
+1.  Provide *all* code licensed under the GNU GPL, and make code as
     easy as possible to modify and extend.
 2.  Be fully platform-independent and database-independent, running in a
     platform-independent language.

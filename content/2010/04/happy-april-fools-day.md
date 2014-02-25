@@ -14,7 +14,7 @@ level.
 
 Here's what I found this year (updated as I find them):
 
-1.  ![topeka](/GFX/topeka-hp.gif)  
+1.  ![topeka](/GFX/topeka-hp.gif)
    Google name change to Topeka - [blog
     post](http://googleblog.blogspot.com/2010/04/different-kind-of-company-name.html),
     [CNN
@@ -26,7 +26,7 @@ Here's what I found this year (updated as I find them):
 
 On a side note, I'm quite sad that the Store Anything [beta test
 form](https://spreadsheets.google.com/viewform?hl=en&formkey=dEx3d1BSR1Ntb0hvdEpJNkJvaUI2Z2c6MQ)
-([local copy](/GFX/viewform.html)doesn't work. When they asked what
+([local copy](/GFX/viewform.html))doesn't work. When they asked what
 object I wanted to store, I checked "other" for "exotic matter", and
 entered the following description of why I should be allowed to test the
 service:

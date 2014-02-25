@@ -52,8 +52,8 @@ So, I have a few big projects planned for the upcoming down time:
     sitemaps (big issue when you have static content, MediaWiki, and
     source code) and submitting my CVS repo to Google Code Search.
 
-Also, A few <span style="font-weight: bold;">Links</span> for your
-enjoyment:  
+Also, A few **Links** for your
+enjoyment:
 A [New York Times
 blog](http://pogue.blogs.nytimes.com/2007/12/20/the-generational-divide-in-copyright-morality/)
 by David Pogue talking about "intellectual property", "copyright

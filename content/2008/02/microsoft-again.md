@@ -9,9 +9,8 @@ Here's [another Groklaw article on recent Microsoft
 tribulations](http://www.groklaw.net/article.php?story=20080227031234460).
 This really is starting to get disgusting. It's not that I hate
 Microsoft, I don't. What I hate is their attitude, and their business
-practices. Everyone else - I mean
-<span style="font-style: italic;">everyone</span> - makes software that
-interoperates with other vendors. Microsoft, even after a \*billion\*
+practices. Everyone else - I mean *everyone* - makes software that
+interoperates with other vendors. Microsoft, even after a *billion*
 dollar fine, won't. Everyone else uses open, industry-accepted
 standards. Microsoft doesn't. Many other vendors open up their code.
 Microsoft tried to make some vague gesture to, but makes it incompatible
@@ -26,11 +25,10 @@ dictatorship, where you do it Microsoft's way, or you're taken out back
 and shot (ok, bought up and then shut down).
 
 Anyway, from the blog of Zeheda Bhorat, Open Source Programs Manager at
-Google,  
+Google,
 
 > Google believes OOXML would be an insufficient and unnecessary
 > standard, designed purely around the needs of Microsoft Office.
-> </p>
 
 How can it be that the ISO - the International
 Organization for *Standardization* - would

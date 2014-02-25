@@ -17,7 +17,7 @@ corporations. Corporations with more money than brains, hopes, or balls.
 The 700MHz spectrum will become another copy of what American has now -
 a resource (frequencies) that are "owned by the people", yet controlled
 by major corporations, and horribly biased
-<span style="font-style: italic;">against</span> the interests of the
+*against* the interests of the
 consumer.
 
 Well, OOXML is now a standard. Is it any less flawed? No. Is it any
@@ -31,7 +31,7 @@ I'm still a bit worried about the issues that will crop up with OOXML -
 not to mention the fact that it's a standard squarely aimed at
 eliminating choice (we all know Microsoft will push hard for
 organizations not to use ODF) and preventing competition in a sector
-already overwhelmingly dominated by \*one\* product.
+already overwhelmingly dominated by *one* product.
 
 In short, what happened in the past few weeks? A confirmation that the
 governments and organizations of the world care little about the

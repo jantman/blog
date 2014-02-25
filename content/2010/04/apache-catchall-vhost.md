@@ -19,7 +19,7 @@ RewriteCond %{REQUEST_URI} !/index\.php$1
 RewriteRule ^(.*)$ /index.php$1 [L]
 ~~~~
 
-This will redirect every request for the vhost to <code>/index.php</code>. Within
+This will redirect every request for the vhost to `/index.php`. Within
 your PHP script, you can access the actual request URI through `$_SERVER["REQUEST_URI"]`.
 The script that I'm currently using for an internal page is:
 

@@ -32,7 +32,7 @@ use in high-bandwidth applications on multi-core systems.
 [An ITnews article on why Open Source needs better
 PR](http://www.itnews.com.au/Feature/4203,linux-we-have-a-pr-problem.aspx).
 
-What? Microsoft sued <span style="font-style: italic;">again</span>?
+What? Microsoft sued *again*?
 [Ars Technica ran an article on the Vista Capable
 fiasco](http://arstechnica.com/news.ars/post/20080211-vista-capable-scheme-was-panned-at-microsoft.html),
 with some comments from MS insiders. How is it that such a big company,

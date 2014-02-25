@@ -24,7 +24,7 @@ without my consent. I kept hitting "Later" because that was the only way
 to get the popup to go away. Apparently. after X times of hitting Later
 (and each time your only real options are Later or Now) it will download
 the update by itself. Once the update is downloaded, I'm assuming that
-it \*may\* just automatically install on the next reboot. That would be
+it *may* just automatically install on the next reboot. That would be
 a bitch thing to do.
 
 Anyway, the "More Info" screen, which provides (as far as I can tell)

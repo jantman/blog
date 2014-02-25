@@ -10,14 +10,14 @@ today](http://www.groklaw.net/article.php?story=20080226005921833):
 
 In *Atlantic v. Brennan*, the courts have finally recognized RIAA's
 "making available" argument for the sham it is. Groklaw has a link to
-the full ruling, which includes:  
+the full ruling, which includes:
 
 > At least one aspect of Plaintiffs' distribution claim is problematic,
 > however, namely the allegation of infringement based on "mak[ing] the
 > Copyrighted Recordings available for distribution to others."... This
 > amounts to a valid ground on which to mount a defense, for
-> "<span style="color:red;">without actual distribution of copies . . .
-> there is no violation [of] the distribution right</span>." 4 William
+> "without actual distribution of copies . . .
+> there is no violation [of] the distribution right." 4 William
 > F. Patry, *Patry on Copyright* § 13:9 (2007); *see also id.* n.10
 > (collecting cases); *Perfect 10, Inc. v. Amazon.com, Inc*., 508 F.3d
 > 1146, 1162 (9th Cir. 2007) (affirming the district court's finding

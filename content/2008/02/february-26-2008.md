@@ -56,7 +56,7 @@ In other news, I highly recommend reading the [Groklaw story on
 Microsoft's latest pledge for
 interoperability](http://www.groklaw.net/article.php?story=20080221184924826).
 I especially liked the one quote from the [ECIS](http://www.ecis.eu/)
-statement:  
+statement:
 
 > For years now, Microsoft has either failed to implement or has
 > actively corrupted a range of truly open standards adopted and
@@ -68,15 +68,14 @@ statement:
 > not the other way around.
 
 There's even links to *ten* previous Microsoft statements promising
-interoperability.  
+interoperability.
 
 > The thing is, this is a promise to interoperate with old-fashioned
 > competitors. It doesn't enable interoperability with the GPL, which is
 > not compatible with patent licenses, and that is Microsoft's true
 > competition.
-> </p>
 
-From Michael Cunningham, VP and General Counsel of Red Hat:  
+From Michael Cunningham, VP and General Counsel of Red Hat:
 
 > Eight years ago the U.S. regulatory authorities, and four years ago
 > the European regulators made clear to Microsoft that its refusal to

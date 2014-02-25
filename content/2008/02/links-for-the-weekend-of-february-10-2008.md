@@ -39,7 +39,7 @@ few days:
     filtering clause intact. Fine. Whatever. A gross invasion of
     privacy, and of college students' rights, but that's nothing new.
     However, if I'm sitting in my office at Rutgers and have a
-    <span style="font-style: italic;">single hiccup</span> downloading
+    *single hiccup* downloading
     the OpenSuSE Beta 1 via BitTorrent on April 17th, mark my words, my
     congressmen (and Rutgers administrators) will learn my phone number
     by heart.

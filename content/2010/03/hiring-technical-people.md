@@ -6,8 +6,7 @@ Tags: hiring, hr, jobs
 Slug: hiring-technical-people
 
 After seeing a link to it on the [SAGE](http://www.sage.org) mailing
-list, I happened to read Mark Dennehy'sblog post on [  
-Tips for hiring new
+list, I happened to read Mark Dennehy'sblog post on [Tips for hiring new
 engineers](http://www.stochasticgeometry.ie/2008/04/25/tips-for-hiring-new-engineers/).
 I felt the need to make a few comments on some of his findings. Perhaps
 someone in HR, or a recruiter, will actually read this and learn a thing
@@ -71,7 +70,6 @@ the criteria I use:
 -   The skills/requirements section has far too disparate of a list -
     something that only an engineer, administrator, programmer, and
     hardware designer could master.
-    </p>
 
 **Follow-up:**
 

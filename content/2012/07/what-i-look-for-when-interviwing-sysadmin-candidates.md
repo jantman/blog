@@ -11,13 +11,13 @@ asking whether people (hiring managers) think it's appropriate to put
 "side projects" (running your own web and mail servers, freelance web
 work, etc.) on your resume. Since I've been interviewing candidates for
 a few SysAdmin positions lately, I thought I'd take the time to write
-down a few of my ideas on this. Two disclaimers first, though. 1) I tend
+down a few of my ideas on this. Two disclaimers first, though. (1) I tend
 to be pretty geeky, progressive, and very open source/DevOps focused at
 heart. Not everyone I work with will agree with what I say here. As a
 candidate, remember that you'll probably interview with all types, and
 what I say here won't be the best advice with Enterprise types. I'm very
 open source centric, and have always held SA jobs where the majority of
-the software I run is open source and not vendor supported. 2) If you
+the software I run is open source and not vendor supported. (2) If you
 happen to actually interview with me, don't make the mistake of reading
 this and tailoring your resume/responses to fit if that's not accurate.
 I'm not a manager, I'm a line SA.
@@ -83,6 +83,5 @@ I'm not a manager, I'm a line SA.
     applications for them, and designed the infrastructure to run them
     24x7x365. Small shop? Sure. But I learned a LOT, especially about
     how to make things resilient enough that I didn't get paged often.
-    </p>
 
 I'm sure I'll update this over time as I distill more of my ideas.
