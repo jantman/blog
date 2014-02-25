@@ -34,7 +34,7 @@ Python script to just write all of the traps to a file. After some
 testing with \`snmptrap\` on my laptop, I did a test by pulling the
 power plug of the UPS, waiting about 30 seconds, and then plugging it
 back in. Sure enough, the little old [AP9605 PowerNet SNMP
-card](http://blog.jasonantman.com/2007/03/apc-ap9605-powernet-snmp-card/)
+card](/2007/03/apc-ap9605-powernet-snmp-card/)
 generated two SNMP traps - one for power loss and one for power regained
 - both of which showed up in the test file
 

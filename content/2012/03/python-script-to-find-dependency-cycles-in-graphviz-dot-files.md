@@ -89,10 +89,8 @@ from. I sincerely hope that this script will save someone else at least
 as much time as it took me to write (I know it will for me...).
 
 You can always obtain the latest version of this script from
-[dot\_find\_cycles.py
-(SVN)](http://svn.jasonantman.com/misc-scripts/dot_find_cycles.py), or
-by checking out my [misc-scripts SVN
-repository](http://svn.jasonantman.com/misc-scripts/). It's free for use
+[my github repository](https://github.com/jantman/misc-scripts/blob/master/dot_find_cycles.py)
+It's free for use
 and distribution, provided that you leave my copyright/attribution and
 source URL notice intact, update the changelog, and send any
 features/fixes back to me. The script is written in Python, and depends

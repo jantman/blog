@@ -6,7 +6,7 @@ Tags: console, emergency, emergency vehicle, EMS, lighting, truck
 Slug: truck-wiring-and-lighting-part-i
 
 As mentioned in my [Custom Truck
-Console](http://blog.jasonantman.com/2009/02/custom-truck-console/)
+Console](/2009/02/custom-truck-console/)
 post, since my truck was stolen and now recovered (with all of the
 emergency equipment stripped out - weird) I've got to start from
 scratch. Since I finished the console, I've started work on redoing the
@@ -41,34 +41,27 @@ far is:
 -   2x B/B Whelen LIN4's on [10-75
     Lighting](http://www.1075lighting.com) front license plate bracket.
 
-The console with equipment mounted in it:  
-  
+The console with equipment mounted in it:
 
-![console](http://www.jasonantman.com/GFX/TruckConsole/DSC_0057_small.JPG)
+![console](/GFX/TruckConsole/DSC_0057_small.JPG)
 
-Dual Avenger (B/B) on headliner bracket above rearview mirror - it
-*just* fits:  
+Dual Avenger (B/B) on headliner bracket above rearview mirror - it *just* fits:
   
-![dual avenger on headliner
-bracket](http://www.jasonantman.com/GFX/TruckConsole/DSC_0065_small.JPG)
+![dual avenger on headliner bracket](/GFX/TruckConsole/DSC_0065_small.JPG)
 
-Avenger from the outside:  
+Avenger from the outside:
   
-![avenger from the
-outside](http://www.jasonantman.com/GFX/TruckConsole/DSC_0073_small.JPG)  
+![avenger from the outside](/GFX/TruckConsole/DSC_0073_small.JPG)
   
-![avenger from the outside,
-lit](http://www.jasonantman.com/GFX/TruckConsole/DSC_0075_small.JPG)
+![avenger from the outside, lit](/GFX/TruckConsole/DSC_0075_small.JPG)
 
-10-75 Intersection Bracket behind front license plate. B/B LIN4's:  
+10-75 Intersection Bracket behind front license plate. B/B LIN4's:
   
-![10-75 intersection
-bracket](http://www.jasonantman.com/GFX/TruckConsole/DSC_0066_small.JPG)
+![10-75 intersection bracket](/GFX/TruckConsole/DSC_0066_small.JPG)
 
-SirenNet 100W speakers behind front bumper:  
+SirenNet 100W speakers behind front bumper:
   
-![speakers in front
-bumper](http://www.jasonantman.com/GFX/TruckConsole/DSC_0068_small.JPG)
+![speakers in front bumper](/GFX/TruckConsole/DSC_0068_small.JPG)
 
 **Coming next:**
 

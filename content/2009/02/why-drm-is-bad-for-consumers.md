@@ -21,8 +21,7 @@ would that do me?
 
 So, today Ruckus just shows this:  
   
-![Ruckus shutdown
-graphic](http://www.jasonantman.com/GFX/ruckus_final.jpg)
+![Ruckus shutdown graphic](/GFX/ruckus_final.jpg)
 
 I'll admit it, I'm not the least bit sad to see it go. And not just
 because it was Windows-only at a time when Linux is gaining in

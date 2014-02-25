@@ -12,38 +12,36 @@ almost as absolutely wonderful as the Vyatta platform.
 
 Some of my personal favorites:
 
-GFX/vyatta/clothesline\_large.jpg
+![](GFX/vyatta/clothesline_large.jpg)
 
-GFX/vyatta/crisco\_allwet\_large.jpg
+![](GFX/vyatta/crisco_allwet_large.jpg)
 
-GFX/vyatta/d\_g.gif
+![](GFX/vyatta/d_g.gif)
 
-GFX/vyatta/imgs
+![](GFX/vyatta/IQ_test_large.jpg)
 
-GFX/vyatta/IQ\_test\_large.jpg
+![](GFX/vyatta/ITflasher1_large.jpg)
 
-GFX/vyatta/ITflasher1\_large.jpg
+![](GFX/vyatta/rk_goodold_large.jpg)
 
-GFX/vyatta/rk\_goodold\_large.jpg
+![](GFX/vyatta/rk_outdated_large.jpg)
 
-GFX/vyatta/rk\_outdated\_large.jpg
+![](GFX/vyatta/rk_vader_large.jpg)
 
-GFX/vyatta/rk\_vader\_large.jpg
+![](GFX/vyatta/vyatta_customization_large.jpg)
 
-GFX/vyatta/vyatta\_customization\_large.jpg
+![](GFX/vyatta/vyatta_fortune_large.jpg)
 
-GFX/vyatta/vyatta\_fortune\_large.jpg
+![](GFX/vyatta/vyatta_pillage_large.jpg)
 
-GFX/vyatta/vyatta\_pillage\_large.jpg
+![](GFX/vyatta/vyatta_porsche_large.jpg)
 
-GFX/vyatta/vyatta\_porsche\_large.jpg
+![](GFX/vyatta/vyatta_sheep_large.jpg)
 
-GFX/vyatta/vyatta\_sheep\_large.jpg
+![](GFX/vyatta/vyatta_spiral_large.jpg)
 
-GFX/vyatta/vyatta\_spiral\_large.jpg
+![](GFX/vyatta/vyatta_timeschange_large.jpg)
 
-GFX/vyatta/vyatta\_timeschange\_large.jpg
+![](GFX/vyatta/vyatta_trs80_large.jpg)
 
-GFX/vyatta/vyatta\_trs80\_large.jpg
-
-GFX/vyatta/vyatta\_wiener\_large.jpg
+![](GFX/vyatta/vyatta_wiener_large.jpg)

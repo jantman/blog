@@ -24,9 +24,12 @@ This script (a standalone PHP script) uses
 to load the wordpress environment, and then finds the oldest post with a
 given status ("pending" in my case) and attempts to publish it. It only
 does this if there has not been another post published in the last 24
-hours. The following script can be found in subversion at
-[http://svn.jasonantman.com/misc-scripts/wordpress\_daily\_post.php](http://svn.jasonantman.com/misc-scripts/wordpress_daily_post.php):
+hours. The following script can be found in Git at
+[https://github.com/jantman/misc-scripts/blob/master/wordpress_daily_post.php](https://github.com/jantman/misc-scripts/blob/master/wordpress_daily_post.php)
 
+<!---
+sourceinclude
+--->
 ~~~~{.php}
 #!/usr/bin/php
 <?php

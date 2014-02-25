@@ -28,10 +28,7 @@ corps](http://www.midlandparkambulance.com).
 
 Anyway, I've been doing a lot of work for my Building Data-Driven
 Websites class (well, alternate assignments, but still a lot of work).
-The latest project was an Ajax/DHTML calendar (view-only
-[here](http://www.jasonantman.com/rutgerswork/BDDW/calendar/), and in
-[CVS](http://cvs.jasonantman.com/rutgerswork/BDDW/calendar/), of
-course). Needless to say, this involved a lot of JavaScript work. To
+The latest project was an Ajax/DHTML calendar. Needless to say, this involved a lot of JavaScript work. To
 make it worse, I used a fair amount of sample code to get an idea of how
 to do things, and way too many of the snippets out there on the 'net are
 in formats that are quite unfriendly for pasting into an Emacs console

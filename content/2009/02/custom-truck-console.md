@@ -53,14 +53,13 @@ relatively good form and transferred it to ½" cabinet-grade luan
 plywood. It was a bit difficult with only a jigsaw, but worked out
 relatively well. While I can't seem to find any pictures of the foam
 core, here are some of the wood form being assembled and the test fit in
-the truck:  
+the truck:
   
-![first assembly and test of
-console](http://www.jasonantman.com/GFX/TruckConsole/console2-small.jpg)  
-![first assembly and test of
-console](http://www.jasonantman.com/GFX/TruckConsole/console1-small.jpg)  
-![first assembly and test of
-console](http://www.jasonantman.com/GFX/TruckConsole/console3-small.jpg)  
+![first assembly and test of console](/GFX/TruckConsole/console2-small.jpg)
+
+![first assembly and test of console](/GFX/TruckConsole/console1-small.jpg)
+
+![first assembly and test of console](/GFX/TruckConsole/console3-small.jpg)
   
 I'd originally been a bit worried about the structural integrity, but I
 found that by clamping the corners, pre-drilling and securing them with
@@ -112,28 +111,28 @@ faceplates are just held in with screws into the vertical wood strips
 placed on the sides of the opening.
 
 Top view of the console, mounted in place, with the unfinished storage
-box.  
-![top view of
-console](http://www.jasonantman.com/GFX/TruckConsole/DSC_0040_small.jpg)
+box.
 
-Equipment mounting area:  
-![console equipment mounting
-area](http://www.jasonantman.com/GFX/TruckConsole/DSC_0041_small.jpg)
+![top view of console](/GFX/TruckConsole/DSC_0040_small.jpg)
 
-View from the driver's seat:  
-![view from drivers
-seat](http://www.jasonantman.com/GFX/TruckConsole/DSC_0042_small.jpg)
+Equipment mounting area:
 
-Factory cupholders extended with just enough clearance to work:  
-![factory cupholders open,
-barely](http://www.jasonantman.com/GFX/TruckConsole/DSC_0045_small.jpg)
+![console equipment mounting area](/GFX/TruckConsole/DSC_0041_small.jpg)
+
+View from the driver's seat:
+
+![view from drivers seat](/GFX/TruckConsole/DSC_0042_small.jpg)
+
+Factory cupholders extended with just enough clearance to work:
+
+![factory cupholders open, barely](/GFX/TruckConsole/DSC_0045_small.jpg)
 
 Staples around the edges, intended to be covered with molding. They're
 really not that visible unless you make a point of looking at them
 (given their placement). Red handle is a 100A cutoff for the main
-battery lead, with a removable handle.  
-![staples around edges and battery cutoff
-switch](http://www.jasonantman.com/GFX/TruckConsole/DSC_0046_small.jpg)
+battery lead, with a removable handle.
+
+![staples around edges and battery cutoff switch](/GFX/TruckConsole/DSC_0046_small.jpg)
 
 **The weekend after console fabrication, I started wiring. Here's the
 relevant parts involving the console.**
@@ -142,19 +141,19 @@ Semi-finished console with equipment mounted. Front-to back,
 [RAM](http://www.ram-mount.com/) magnet mount for GPS, Radio Shack
 [Pro-433](http://wiki.radioreference.com/index.php/Pro-433), Galls
 [SE082](http://www.galls.com/style.html?assort=general_catalog&style=SE082),
-nifty Jotto storage tray.  
+nifty Jotto storage tray.
   
 ![equipment in mounted
-position](http://www.jasonantman.com/GFX/TruckConsole/DSC_0059_small.JPG)
+position](/GFX/TruckConsole/DSC_0059_small.JPG)
 
-Wire routing in loom from the console to under the dash  
+Wire routing in loom from the console to under the dash
 ![main wiring
-runs](http://www.jasonantman.com/GFX/TruckConsole/DSC_0063_small.JPG)
+runs](/GFX/TruckConsole/DSC_0063_small.JPG)
 
 Rear of console - Jotto cupholder and charger for [Streamlight Stinger
-75014](http://www.streamlight.com/product/product.aspx?pid=7)  
+75014](http://www.streamlight.com/product/product.aspx?pid=7)
 ![rear of
-console](http://www.jasonantman.com/GFX/TruckConsole/DSC_0064_small.JPG)
+console](/GFX/TruckConsole/DSC_0064_small.JPG)
 
 Still to be done:
 

@@ -25,7 +25,7 @@ so I may have to redo it.
 Here's a screenshot:
 
 [![Dashboard screenshot after
-patch](http://blog.jasonantman.com/GFX/dashboard_after_patch_sm.png)](http://blog.jasonantman.com/GFX/dashboard_after_patch.png)
+patch](/GFX/dashboard_after_patch_sm.png)](/GFX/dashboard_after_patch.png)
 
 And here's that the configuration section added to settings.yml looks
 like:

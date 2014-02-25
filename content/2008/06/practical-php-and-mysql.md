@@ -12,7 +12,7 @@ need the credits, and Bill Crosbie is just the type of rare teacher that
 can keep even me awake and interested. Our book is [Practical PHP and
 MySQL: Building Eight Dynamic Web
 Applications](http://www.informit.com/store/product.aspx?isbn=0132239973)
-([Amazon](http://www.amazon.com/Practical-PHP-MySQL-Building-Applications/dp/0132239973)
+([Amazon](http://www.amazon.com/Practical-PHP-MySQL-Building-Applications/dp/0132239973))
 by [Jono Bacon](http://www.jonobacon.org/). Now, I know it's not a
 *real* book like, say, [ESA3 by
 Frisch](http://oreilly.com/catalog/9780596003432/), which has a healthy
@@ -47,8 +47,3 @@ I just can't imagine someone who's a beginner with Linux, let alone a
 Windows person, trying to get this source code onto a machine where they
 can actually play with it. And... to make the situation worse... the
 LiveCD has vi and vim, but no Emacs!!!! Eeeek!!
-
-For anyone who needs it, I have the archive available [on my
-site](http://rutgerswork.jasonantman.com/BDDW/PracticalPHPandMySQL.tar.gz).
-For non-\*nix people, you'll need [Gzip](http://www.gzip.org/) or an
-equivalent program to extract it.

@@ -43,8 +43,8 @@ well-aware* of the issue, and stated that Citi would not fix it. At this
 point, I stated that I thought I would cancel my card, and she told me
 to have a nice day and hung up.
 
-I decided to go to [step 2 of the Generic Problem Solving
-Method](http://www.jasonantman.com/wiki/index.php/Generic_Problem_Solving_Method),
+I decided to go to step 2 of the Generic Problem Solving
+Method,
 and found [hundreds of references to a problem with CitiCards.com on
 Linux](http://www.google.com/search?hl=en&q=citicards.com+linux&btnG=Google+Search).
 I read through a lot of conspiracy theory, but decided to test one of

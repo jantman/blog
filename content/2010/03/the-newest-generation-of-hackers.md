@@ -10,7 +10,7 @@ The title of this post includes the word "hacker". If you think that has
 anything to do with illegal acts or unethical behavior, you've fallen
 victim to what happens when the mainstream media latches on to a term
 they don't understand. The
-[definition](http://www.jasonantman.com/jargon/entry.php?id=hacker) of
+[definition](http://www.catb.org/jargon/html/H/hacker.html) of
 this word is far from negative. Within the geek community, the title
 "hacker" is the utmost compliment - something like Grand Master in the
 martial arts, or perhaps whatever title is given to an eminent artist.

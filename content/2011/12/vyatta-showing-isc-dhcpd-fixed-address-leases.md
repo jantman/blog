@@ -44,13 +44,13 @@ rotate the log file when it reaches 3000k in size, and keep 5 copies
 Once this is done, you can `tail -f /var/log/user/dhcpd` to watch DHCP
 discover/request/offer/ack in realtime, or grep through the log file for
 a specific IP or MAC. If you want an easier method, I've written a perl
-script (latest version will always live in [my subversion
-repo](http://svn.jasonantman.com/misc-scripts/show_dhcp_fixed_ACKs.pl))
+script (latest version will always live in [my GitHub misc-scripts
+repo](https://github.com/jantman/misc-scripts/blob/master/show_dhcp_fixed_ACKs.pl))
 to grep through `/var/log/user/dhcpd` and show the most recent DHCPACK
 for each IP address, sorted by IP. Here's the code of the simple script,
 which is more than half comments. To use it, after performing the above
 steps, all you need to do is login to your Vyatta box,
-`wget http://svn.jasonantman.com/misc-scripts/show_dhcp_fixed_ACKs.pl`
+`wget https://raw.github.com/jantman/misc-scripts/master/show_dhcp_fixed_ACKs.pl`
 and then `perl show_dhcp_fixed_ACKs.pl`.
 
 ~~~~{.perl}

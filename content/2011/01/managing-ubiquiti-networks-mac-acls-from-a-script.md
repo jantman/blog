@@ -18,20 +18,20 @@ from the AP and SSHing in to run commands, and will need passwordless
 public key auth to the AP.
 
 The code itself is in subversion at
-[http://svn.jasonantman.com/misc-scripts/ubiquiti-mac-acl/](http://svn.jasonantman.com/misc-scripts/ubiquiti-mac-acl/).
+[https://github.com/jantman/misc-scripts/tree/master/ubiquiti-mac-acl](https://github.com/jantman/misc-scripts/tree/master/ubiquiti-mac-acl).
 It's composed of four files:
 
--   [updateAPconfigs.php.inc](http://svn.jasonantman.com/misc-scripts/ubiquiti-mac-acl/updateAPconfigs.php.inc)
+-   [updateAPconfigs.php.inc](https://github.com/jantman/misc-scripts/blob/master/ubiquiti-mac-acl/updateAPconfigs.php.inc)
     - the main PHP file with three functions for working with the APs
--   [wirelessTools.php](http://svn.jasonantman.com/misc-scripts/ubiquiti-mac-acl/wirelessTools.php)
+-   [wirelessTools.php](https://github.com/jantman/misc-scripts/blob/master/ubiquiti-mac-acl/wirelessTools.php)
     - My PHP page for users to add MACs. It's pretty rough and is mostly
     based on handling our LDAP authentication/group framework, but it
     gives a fair example of how I store MACs in a MySQL table and then
     rebuild a given AP config file with the current list of MACs. I
     doubt it will be useful to anyone else as more than an example.
--   [wireless.sql](http://svn.jasonantman.com/misc-scripts/ubiquiti-mac-acl/wireless.sql)
+-   [wireless.sql](https://github.com/jantman/misc-scripts/blob/master/ubiquiti-mac-acl/wireless.sql)
     - The schema for the SQL database I use to store MACs.
--   [README.txt](http://svn.jasonantman.com/misc-scripts/ubiquiti-mac-acl/README.txt)
+-   [README.txt](https://github.com/jantman/misc-scripts/blob/master/ubiquiti-mac-acl/README.txt)
     - Readme file including some warnings on the lack of error checking
     in the functions.
 

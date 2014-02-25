@@ -5,6 +5,9 @@ Category: Tech HowTos
 Tags: analytics, piwik, python, subversion, svn, tracking, viewvc
 Slug: adding-piwik-web-analytics-integration-to-viewvc
 
+__Update February 2014:__ Give up the analytics, and just host your code
+on [GitHub](https://github.com).
+
 All of my public [subversion
 repositories](http://viewvc.jasonantman.com) and [CVS
 repositories](http://cvs.jasonantman.com) are available online through a

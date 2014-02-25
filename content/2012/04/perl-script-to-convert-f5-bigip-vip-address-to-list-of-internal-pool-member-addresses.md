@@ -30,5 +30,4 @@ Members of Pool 'pool_name':
 ~~~~
 
 The code can be found at
-[http://svn.jasonantman.com/misc-scripts/VipToInternalHosts.pl](http://svn.jasonantman.com/misc-scripts/VipToInternalHosts.pl)
-via either HTTP or SVN. I hope it's of use to someone else as well.
+[https://github.com/jantman/misc-scripts/blob/master/VipToInternalHosts.pl](https://github.com/jantman/misc-scripts/blob/master/VipToInternalHosts.pl). I hope it's of use to someone else as well.

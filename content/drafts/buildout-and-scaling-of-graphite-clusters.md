@@ -74,73 +74,62 @@ most of these graphs, they're including three physical hosts, each with
 one carbon-relay and two carbon-caches, plus a master carbon-relay on
 one of the hosts.
 
-[< img src="/GFX/creates\_vs\_io\_read\_await.png" width="800"
-height="480" alt="graph of iostat read\_await vs carbon-cache creates.
+[![graph of iostat read_await vs carbon-cache creates.
 When creates reach approx. 500/minute across the cluster, await begins
-to show spikes." /\>](creates_vs_io_read_await_large.png)
+to show spikes](/GFX/creates_vs_io_read_await.png)](/GFX/creates_vs_io_read_await_large.png)
 
-[< img src="/GFX/creates\_vs\_io\_read\_ms.png" width="800" height="480"
-alt="graph of iostat milliseconds reading vs carbon-cache creates. When
+[![graph of iostat milliseconds reading vs carbon-cache creates. When
 creates reach approx. 1000/minute, read time increases from near-zero to
-over 50% of clock time." /\>](creates_vs_io_read_ms_large.png)
+over 50% of clock time](/GFX/creates_vs_io_read_ms.png)](/GFX/creates_vs_io_read_ms_large.png)
 
-[< img src="/GFX/metricsReceived\_vs\_carbon-cache\_memUsage.png"
-width="800" height="480" alt="graph of carbon-relay metrics received vs
+[![graph of carbon-relay metrics received vs
 carbon-cache memory usage. Memory usage climbs unevenly but in a
 generally similar fashion to metrics received, but does not decrease.
-The second spike in metrics received simply increases memory use."
-/\>](metricsReceived_vs_carbon-cache_memUsage_large.png)
+The second spike in metrics received simply increases memory use.](/GFX/metricsReceived_vs_carbon-cache_memUsage.png)](/GFX/metricsReceived_vs_carbon-cache_memUsage_large.png)
 
-[< img src="/GFX/metricsReceived\_vs\_carbon-relay-master\_memUsage.png"
-width="800" height="480" alt="graph of carbon-relay metrics received vs
+[![graph of carbon-relay metrics received vs
 carbon-relay master memory usage. This graph is a signigicant departure
 from the other, close-to-linear relationships. Master carbon-relay
 memory usage stays largely steady from 95k metrics/minute to
 approximately 300k metrics/minute, then almost doubles within one sample
 period (from approx. 16 MB to approx. 28 MB) and maintains that level to
-the peak of 750k metrics/minute."
-/\>](metricsReceived_vs_carbon-relay-master_memUsage_large.png)
+the peak of 750k metrics/minute.](/GFX/metricsReceived_vs_carbon-relay-master_memUsage.png)
+](metricsReceived_vs_carbon-relay-master_memUsage_large.png)
 
-[< img src="/GFX/metrics\_recvd\_vs\_flush\_time.png" width="800"
-height="480" alt="graph of carbon-relay metrics received vs statsd time
+[![graph of carbon-relay metrics received vs statsd time
 flushing graphite stats. the best-fit line of the two graphs would
-almost match." /\>](metrics_recvd_vs_flush_time_large.png)
+almost match](/GFX/metrics_recvd_vs_flush_time.png)](/GFX/metrics_recvd_vs_flush_time_large.png)
 
-[< img src="/GFX/metrics\_recvd\_vs\_iops.png" width="800" height="480"
-alt="graph of carbon-relay metrics received vs IOPS. It's clear that we
+[![graph of carbon-relay metrics received vs IOPS. It's clear that we
 were near our IOPS ceiling prior to this event when handling about 300k
 metrics per minute, and at 75k metrics per minute we're using about half
-of our available IO." /\>](metrics_recvd_vs_iops_large.png)
+of our available IO](/GFX/metrics_recvd_vs_iops.png)](/GFX/metrics_recvd_vs_iops_large.png)
 
-[< img src="/GFX/metrics\_recvd\_vs\_iostat\_queue\_length.png"
-width="800" height="480" alt="graph of carbon-relay metrics received vs
+[![graph of carbon-relay metrics received vs
 IO queue length. Shows that we were already at maximum disk queue at
 300k metrics/minute before the event, but after limiting metrics down to
-75k per minute IO queues dropped to about 25% of capacity."
-/\>](metrics_recvd_vs_iostat_queue_length_large.png)
+75k per minute IO queues dropped to about 25% of capacity.](/GFX/metrics_recvd_vs_iostat_queue_length.png)
+](metrics_recvd_vs_iostat_queue_length_large.png)
 
-[< img src="/GFX/metrics\_recvd\_vs\_iostat\_wps.png" width="800"
-height="480" alt="graph of carbon-relay metrics received vs IO writes
+[![graph of carbon-relay metrics received vs IO writes
 per second. Writes per second increase roughly linearly with
 metricsReceived from 95k metrics/minute to about 175k metrics/minute,
-and then level off when IO is saturated."
-/\>](metrics_recvd_vs_iostat_wps_large.png)
+and then level off when IO is saturated.](/GFX/metrics_recvd_vs_iostat_wps.png)
+](metrics_recvd_vs_iostat_wps_large.png)
 
-[< img src="/GFX/metrics\_recvd\_vs\_iostat\_write\_bytes.png"
-width="800" height="480" alt="graph of carbon-relay metrics received vs
+[![graph of carbon-relay metrics received vs
 IO bytes written. This is an even better indication than the previous
 graph that writes to disk continue acceptably up to about 175k
 metrics/minute and then level off, indicating IO saturation and metric
-create queueing in carbon-cache."
-/\>](metrics_recvd_vs_iostat_write_bytes_large.png)
+create queueing in carbon-cache.](/GFX/metrics_recvd_vs_iostat_write_bytes.png)
+](metrics_recvd_vs_iostat_write_bytes_large.png)
 
-[< img src="/GFX/metrics\_vs\_relay-master\_cpuUsage.png" width="800"
-height="480" alt="graph of carbon-relay master metrics received vs
+[![graph of carbon-relay master metrics received vs
 carbon-relay master CPU usage. Through the entire event up to 750k
 metrics/minute, master carbon-relay CPU usage stayed almost perfectly in
 step with the number of metrics. Aside from some spikes and dips, the
 CPU usage line almost perfectly mirrors the slope of the metrics
-received line." /\>](metrics_vs_relay-master_cpuUsage_large.png)
+received line.](/GFX/metrics_vs_relay-master_cpuUsage.png)](/GFX/metrics_vs_relay-master_cpuUsage_large.png)
 
 - what the various internal stats mean  
 - how to interpret them  

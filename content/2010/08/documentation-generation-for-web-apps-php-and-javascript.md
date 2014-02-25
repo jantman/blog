@@ -52,7 +52,7 @@ files. I also added explicit package names (like "-PHP" and "-JS") to
 keep things separated a little.
 
 The script can be found at:
-[http://svn.jasonantman.com/misc-scripts/js2phpdoc.php](http://svn.jasonantman.com/misc-scripts/js2phpdoc.php).
+[https://github.com/jantman/misc-scripts/blob/master/js2phpdoc.php](https://github.com/jantman/misc-scripts/blob/master/js2phpdoc.php).
 It's (obviously) free for any use, provided that you follow the license
 terms (leave copyrights intact, send modifications back to me, and
 update the changelog if you modify it).

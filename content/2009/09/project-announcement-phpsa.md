@@ -45,7 +45,7 @@ pre-existing tools:
 -   [RackMan](http://rackman.jasonantman.com/), my tool for mapping
     devices' physical locations in racks (and tacking patching).
 -   My simple config tool for
-    [Puppet](http://reductivelabs.com/products/puppet/).
+    [Puppet](http://www.puppetlabs.com).
 -   [Nagios](http://nagios.org/).
 -   [Cacti](http://www.cacti.net/).
 -   Nathan Hubbard's [MachDB](http://www.machdb.org/).

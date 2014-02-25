@@ -30,7 +30,8 @@ I also managed to find a Perl one-liner from Tyler Krpata, Manger of
 Security Engineering at Constant Contact, [in a post on his
 blog](http://www.tylerkrpata.com/2009/06/decode-f5-bigip-cookie-in-one-line-of.html).
 I built on that work to develop the following perl script, which can
-both encode and decode BigIP cookie IP/port values.
+both encode and decode BigIP cookie IP/port values. The latest version lives
+on my [GitHub misc-scripts repository](https://github.com/jantman/misc-scripts/blob/master/bigipcookie.pl).
 
 ~~~~{.perl}
 #!/usr/bin/perl

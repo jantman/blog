@@ -61,7 +61,7 @@ the local machine which triggers the backup and stores the data as the
     post-backup scripts are `/root/bin/rsnapshot-pre.sh` and
     `/root/bin/rsnapshot-post.sh`, respectively. As root, grab a copy of
     cmd-wrapper.c (from
-    [subversion](http://svn.jasonantman.com/misc-scripts/cmd-wrapper.c)
+    [GitHub](https://github.com/jantman/misc-scripts/blob/master/cmd-wrapper.c)
     or at the bottom of this post). Modify for your use - the only thing
     likely to change is line 38, which ensures it will only run for a
     member of GID 502. Change this to rsyncuser's GID. Compile the
@@ -94,7 +94,7 @@ the local machine which triggers the backup and stores the data as the
 10. Cat the "remoteHostname\_remoteBackupUsername\_rsync" public key
     into the backup user's `~/.ssh/authorized_keys` file.
 11. As root, grab a copy of rsync-wrapper.c (from
-    [subversion](http://svn.jasonantman.com/misc-scripts/rsync-wrapper.c)
+    [GitHub](https://github.com/jantman/misc-scripts/blob/master/rsync-wrapper.c)
     or at the bottom of this post). Modify for your use - the only thing
     likely to change is line 38, which ensures it will only run for a
     member of GID 502 (change this to rsyncuser's GID), and perhaps the
@@ -209,7 +209,7 @@ without affecting the others.
     troubleshooting, check that rsync-wrapper.c is calling rsync with
     the same arguments that rsnapshot is sending. It may be useful to
     use my
-    [print-cmd.sh](http://svn.jasonantman.com/misc-scripts/print-cmd.sh)
+    [print-cmd.sh](https://github.com/jantman/misc-scripts/blob/master/print-cmd.sh)
     script in place of the "rsync-wrapper" forced command. This script
     will simply log the command rsnapshot calls via SSH.
 

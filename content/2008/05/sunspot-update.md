@@ -31,9 +31,3 @@ it worked.
 13. Go back to NetBeans (exit SPOTManager) and open the
     TelemetryDemo-onSpot.
 14. Now it WORKS!
-
-Also, I tried my hand at a first demo - horribly simple, it just reads
-light, temperature, and accelerometer data from a USB-connected SPOT.
-The code is in my [CVS
-repository](http://cvs.jasonantman.com/SunSPOTs/AllSensorsOnSpot/), as a
-netbeans project (NB 6.1).

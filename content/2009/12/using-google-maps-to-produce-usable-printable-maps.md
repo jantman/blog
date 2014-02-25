@@ -41,8 +41,8 @@ PHP and Monte Ohrt's
 [GoogleMapAPI](http://www.phpinsider.com/php/code/GoogleMapAPI/) PHP
 wrapper class. It was simple enough to setup a big (3300x5100px) map,
 zoom out in Firefox, and start adding some stuff. My examples and
-development pages, if you want to take a peek at the code, are
-[here](http://www.jasonantman.com/indexed/googleMaps/).
+development pages, if you want to take a peek at the code, are available
+in [googleMaps.tar.gz](/GFX/googleMaps.tar.gz).
 
 The first step was to draw a polygon for the outline of the town. I
 found some very detailed information on how to get zip code boundary
