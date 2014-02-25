@@ -8,13 +8,11 @@ Slug: vyatta-initial-impressions
 I'm part-way through the major overhaul of my home network (hosting this
 blog and everything else jasonantman.com) that I've been planning for
 quite some time. The current hardware is... uh... currently... described
-on my
-[Hardware](http://www.jasonantman.com/wiki/index.php/Jasonantman.com_Hardware)
+on my Hardware
 page, but I soon plan on ditching the wiki and moving to a CMS for my
 entire site.
 
-Anyway, so far I've decommissioned my aged [HP ProCurve 2424M
-switch](http://www.jasonantman.com/wiki/index.php/HP_ProCurve_2424M_Switch)
+Anyway, so far I've decommissioned my aged HP ProCurve 2424M switch
 and replaced it with used but less-aged Cisco 2948G from [Horizon
 Datacom](http://horizondatacom.com/) (purchased on Ebay). Quite an
 upgrade. In order to handle network backups a little better, I'm also

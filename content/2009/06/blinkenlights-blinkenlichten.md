@@ -17,15 +17,15 @@ Tripp Lite UPS, and I have a few other issues to sort out, but here's a
 photo that I took this weekend after the upgrades (yes, it's a bit
 blurry - that happens handheld at 1/10 sec).
 
-![blinkenlights](http://www.jasonantman.com/indexed/photos/dsc_0231_cropped_sm.jpg)
+![blinkenlights](/GFX/Das_Blinkenlights.gif)
 
-> ACHTUNG! ALLES LOOKENSPEEPERS!  
+> ACHTUNG! ALLES LOOKENSPEEPERS!
 >  Alles touristen und non-technischen looken peepers! Das
-> computermachine ist nicht fuer gefingerpoken und mittengrabben.  
+> computermachine ist nicht fuer gefingerpoken und mittengrabben.
 >  Ist easy schnappen der springenwerk, blowenfusen und poppencorken mit
 > spitzensparken. Ist nicht fuer gewerken bei das dumpkopfen. Das
 > rubbernecken sichtseeren keepen das cotten-pickenen hans in das
 > pockets muss; relaxen und watchen das blinkenlichten.
 
 (For those of you who aren't familiar with it,
-[blinkenlights](http://www.jasonantman.com/jargon/entry.php?id=blinkenlights)).
+[blinkenlights](http://www.catb.org/jargon/html/B/blinkenlights.html)).

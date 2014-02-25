@@ -72,11 +72,3 @@ officers to check who's come, and who tried to get in but couldn't.
 I've never written a daemon before, so I still have a bit more research
 to do - mainly in terms of error handling and how to keep it constantly
 running. However, I have a first version working.
-
-In the next few days I'll start posting better code for ieilogd. I have
-[some in CVS now](http://cvs.jasonantman.com/cvs/ieilogd/), but it's
-kludgey (well, it was written through
-[PuTTY](http://www.chiark.greenend.org.uk/~sgtatham/putty/download.html)
-on a Windows laptop in a utility closet at 3 AM). It also has quite a
-bit of user-handling code that's specific to the roster format of my
-package [PHP EMS Tools](http://www.php-ems-tools.com).

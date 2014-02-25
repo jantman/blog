@@ -12,7 +12,7 @@ In the mean time...
 
 So it's been two weeks since classes started again, and that means two
 weeks using my now-beloved eeePC 4G Surf (details in a [previous
-post](http://www.jasonantman.com/blog/2008/01/eeepc-solaris-other-updates.html)).
+post](/2008/01/eeepc-solaris-other-updates.html)).
 Granted, I have my "desktop replacement" laptop ([a Linux Certified
 LC2464](http://www.linuxcertified.com/linux-laptop-lc2464.html)) to use
 at my desk at home or at my apartment - though the "desktop replacement"

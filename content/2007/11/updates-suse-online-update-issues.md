@@ -77,7 +77,7 @@ at the apartment to its' matching counterpart in my basement at home.
 Well, things are still being added to the rack, but it's coming along
 very nicely.
 
-![image](http://www.jasonantman.com/GFX/rack1sm.jpg)
+![image](/GFX/rack1sm.jpg)
 
 **The Rack** - (clockwise from top left) some ballast in the bottom (an
 ancient Proliant 6000 with 12 or so SCSI disks and 3 power supplies, 3x

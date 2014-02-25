@@ -6,7 +6,7 @@ Tags: configuration, dream network, ideal network, management
 Slug: my-dream-network
 
 On the same thread as the [last
-post](http://blog.jasonantman.com/2009/02/community-datacenter/), some
+post](/2009/02/community-datacenter/), some
 thoughts on my ideal network, or the hosts on that network:
 
 -   One "gold master" installation/kickstart file of a single chosen
@@ -17,7 +17,7 @@ thoughts on my ideal network, or the hosts on that network:
     fashion, and from a local repository.
 -   Software updates are automated (either through a configuration
     management tool or something like the behemoth I talked about
-    [here](http://blog.jasonantman.com/2008/10/my-biggest-problem-with-linux/)
+    [here](/2008/10/my-biggest-problem-with-linux/))
     and pulled from a local repository (perhaps one which mirrors the
     mainline repos, but only downloads a package the first time it's
     requested?).

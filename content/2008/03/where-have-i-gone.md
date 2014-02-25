@@ -42,5 +42,4 @@ version numbers and which Palm devices are listed.
 And, from Rutgers Telecommunications, this is what RUwireless looked
 like over spring break, and the Monday that everyone came back:
 
-![Rutgers daily traffic graph of sr02-hill012-svcs\_vlan1000 on
-2008-03-25](http://www.jasonantman.com/GFX/blog/sr02-hill012-svcs_vlan1000-daily-2008-03-25-scaled.png)
+![Rutgers daily traffic graph of sr02-hill012-svcs\_vlan1000 on 2008-03-25](/GFX/blog/sr02-hill012-svcs_vlan1000-daily-2008-03-25-scaled.png)

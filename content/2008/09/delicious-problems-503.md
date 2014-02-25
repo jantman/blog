@@ -5,7 +5,7 @@ Category: Miscellaneous
 Tags: bookmarks, del.icio.us
 Slug: delicious-problems-503
 
-![Delicious.com 503](http://www.jasonantman.com/GFX/delicious.png)
+![Delicious.com 503](/GFX/delicious.png)
 
 I don't know if I'm the only one experiencing this, but this is the
 third time in two days that I've gotten a 503 when trying to view my

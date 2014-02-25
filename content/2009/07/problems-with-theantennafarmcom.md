@@ -6,7 +6,7 @@ Tags: antennafarm, communications, EMS, radio
 Slug: problems-with-theantennafarmcom
 
 When I did the [communications upgrades to my
-truck](http://blog.jasonantman.com/2009/07/update-on-my-f-250-icom-mobile-antennas-strobes/),
+truck](/2009/07/update-on-my-f-250-icom-mobile-antennas-strobes/),
 I was originally going to order the antennas and mounts from
 [Tessco](http://www.tessco.com/), but I found that [The Antenna
 Farm](http://www.theantennafarm.com) in Montana had the best price on

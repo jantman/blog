@@ -8,7 +8,7 @@ Slug: making-maps-from-gis-data-with-inkscape
 **NOTE-** I more or less dropped this project, in favor of a more
 precise approach, as outlined in [Using Google Maps to produce usable,
 printable
-maps](http://blog.jasonantman.com/2009/12/using-google-maps-to-produce-usable-printable-maps/).
+maps](/2009/12/using-google-maps-to-produce-usable-printable-maps/).
 This is being left just to give other people ideas.
 
 **Background**

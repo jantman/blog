@@ -19,6 +19,6 @@ of them, and presents a nice table showing the result for each host/port
 for each scan file.
 
 The current version of the script can be found at
-[http://svn.jasonantman.com/misc-scripts/nmap-xml-to-table.php](http://svn.jasonantman.com/misc-scripts/nmap-xml-to-table.php),
+[https://github.com/jantman/misc-scripts/blob/master/nmap-xml-to-table.php](https://github.com/jantman/misc-scripts/blob/master/nmap-xml-to-table.php),
 and simply called as `./nmap-xml-to-table.php file1.xml file2.xml [...]`
 and outputs HTML to stdout.

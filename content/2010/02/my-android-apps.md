@@ -12,7 +12,7 @@ The past 48 hours has been very eventful in my Android world. Thanks to
 the instructions on [rootyourdroid.info](http://rootyourdroid.info)
 (hey, it's an expensive phone and locked hardware - I'm not fooling
 around the way I would with something [more
-common](http://blog.jasonantman.com/2009/11/root-on-a-cyclades-acs-console-server/)),
+common](/2009/11/root-on-a-cyclades-acs-console-server/)),
 I rooted my droid and did a few minor hacks. Though, I must say, it
 pains me to see all of the post-rooting instructions based on access via
 adb, instead of using a terminal emulator on the phone. Also, last

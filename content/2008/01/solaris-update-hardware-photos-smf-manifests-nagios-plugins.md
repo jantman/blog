@@ -56,10 +56,10 @@ basement. Nothing wonderful, but it gets the job done. I'll admit that I
 could have done a better job stitching the photos together, but the
 space is so tight that I can't get a wide shot of the whole rack.
 
-The rack, in all its glory:  
-[![image](http://www.jasonantman.com/wiki/images/0/0a/Tall1_sm.jpg)](http://www.jasonantman.com/wiki/images/c/c3/Tall1.jpg)
+The rack, in all its glory:
+[![image](/GFX/Tall1_sm.jpg)](/GFX/Tall1.jpg)
 
-A closer view of (most of) the hardware:  
-[![image](http://www.jasonantman.com/wiki/images/5/57/Tall3_sm.jpg)](http://www.jasonantman.com/wiki/images/7/77/Tall3.jpg)
+A closer view of (most of) the hardware:
+[![image](/GFX/Tall3_sm.jpg)](/GFX/Tall3.jpg)
 
 Happy New Year!

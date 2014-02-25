@@ -20,7 +20,7 @@ with the unit). NetGear tech support ("ProSupport Labs") was quite good
 once I got past the first level or two, and Mark H. who helped me with
 most of my issues was one of the best tech support people I've ever
 spoken to. In fact, he probably ties with [Paulo from
-HP](http://blog.jasonantman.com/2007/03/managing-g1-proliant-servers-with-modern-linux/)
+HP](/2007/03/managing-g1-proliant-servers-with-modern-linux/)
 for the best tech support person I've ever dealt with.
 
 Anyway, the only issue with the NetGear installation that we weren't

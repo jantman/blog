@@ -54,7 +54,7 @@ changes that I could find.
 At the VZW droid support site, I found a [link to a
 PDF](http://learning.verizonwireless.com/learning/Droid_Motorola_Software_Update.pdf)
 of "Why to Update" ([local
-copy](http://blog.jasonantman.com/GFX/Droid_Motorola_Software_Update.pdf)).
+copy](/GFX/Droid_Motorola_Software_Update.pdf)).
 This sheet lists the enhancements made by the update
 ("AP:ESD56/BP:C\_01.3E.01P", build ESD56) as:
 

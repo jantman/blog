@@ -91,9 +91,4 @@ gotten around to setting up [Zenoss](http://www.zenoss.com/) yet, I did
 a quick (well, 4 hours later I'm done configuring it)
 [Cacti](http://www.cacti.net/)installation on my web server (I should
 already have it running on the monitoring box, but who knows what that
-will look like when I get home). I also dropped a [Cacti host template
-in
-CVS](http://cvs.jasonantman.com/cvs/misc-scripts/cacti_host_template_apc_powernet_ap9605.xml?view=log)
-for the [AP9605 PowerNet SNMP
-card](http://www.jasonantman.com/blog/2007/03/apc-ap9605-powernet-snmp-card.html)
-in my UPSs.
+will look like when I get home).

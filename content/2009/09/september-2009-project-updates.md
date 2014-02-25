@@ -30,8 +30,7 @@ projects:
     [MachDB](http://www.machdb.org/).
 
 I've also done quite a bit of customization of the current version of
-Nathan Hubbard's [MachDB](http://www.machdb.org/). My local version is
-in [subversion](http://svn.jasonantman.com/machdb/). It adds detailed
+Nathan Hubbard's [MachDB](http://www.machdb.org/). It adds detailed
 network interface information, information on expansion slots, and some
 extra details for the system and storage. I plan on developing a patch
 and contacting Nathan once I get a chance. It also includes a Python

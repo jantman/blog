@@ -33,7 +33,7 @@ The HTML will include `ol`s for each window listing the tabs, links to
 the current content (sessionstore.js also holds history for each tab,
 but I don't need this), and it shows which tab is currently selected.
 
-You can grab the script from subversion at:
-[http://svn.jasonantman.com/misc-scripts/dumpFirefoxSession.php](http://svn.jasonantman.com/misc-scripts/dumpFirefoxSession.php).
+You can grab the script from github at:
+[https://github.com/jantman/misc-scripts/blob/master/nmap-xml-to-table.php](https://github.com/jantman/misc-scripts/blob/master/nmap-xml-to-table.php).
 The current version is 3. You'll need PHP (probably 5) with JSON
 support.

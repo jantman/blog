@@ -23,7 +23,7 @@ wiki pays off. And hopefully some people are getting help.
 
 On another note, later this week I'm going to setup two virtual machines
 on my spare PowerEdge 650 to test some [network monitoring
-systems](http://www.jasonantman.com/blog/2008/01/network-monitoring.html)
+systems](/2008/01/network-monitoring.html)
 - specifically, [Hyperic
 HQ](http://www.hyperic.com/products/hq_oss.html),
 [OpenNMS](http://www.opennms.org/), and [Groundwork Open

@@ -67,15 +67,14 @@ changes.
 And the rest falls somewhere in the middle. One option, if budget is an
 issue, is to move an older machine down to the apartment to use as a
 print server for [print
-accounting](http://www.jasonantman.com/blog/2007/11/print-accounting.html),
+accounting](/2007/11/print-accounting.html),
 which is currently running in a Xen VM as the *only* load on a beautiful
 1U Dell PowerEdge 650 (Pentium-4 2.4GHz, 762MB RAM, 2x 36GB SCSI disks,
 3com 10/100 NIC and Intel Pro Dual-Gigabit NIC).  
 
 ## Other acquisitions on the list:
 
-1.  New switch to replace the aged [BayStack 450-24T
-    switch](http://www.jasonantman.com/wiki/index.php/BayStack_450-24T)
+1.  New switch to replace the aged BayStack 450-24T
     that *everything* is running on now. I'm looking for something good,
     managed, with Telnet (or SSH) and SNMP for monitoring, as well as
     the easy ability to do a span port. The important thing is that I
@@ -101,7 +100,7 @@ which is currently running in a Xen VM as the *only* load on a beautiful
     easy way of distributing files or running commands on multiple
     systems without manually scp/ssh'ing to all of them
 2.  I'm going to start testing some other [Network
-    Monitoring](http://www.jasonantman.com/blog/2008/01/network-monitoring.html)
+    Monitoring](/2008/01/network-monitoring.html)
     packages at the apartment. Since I'm going to have some scheduled
     downtime for all of this (especially with a router/firewall
     replacement), I might as well plan a move to a new monitoring

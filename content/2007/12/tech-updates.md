@@ -25,7 +25,7 @@ projects.
     looked into the technicalities of
     Procmail/Postfix/SpamAssassin/some-IMAP-server on Solaris.
 -   [Print
-    Accounting](http://www.jasonantman.com/blog/2007/11/print-accounting.html)
+    Accounting](/2007/11/print-accounting.html)
     is finished, though the GUI isn't completely done. I'll have it in
     CVS sometime this week.
 
@@ -68,7 +68,7 @@ That file would then be encrypted using GNUpg and strong encryption.
 Another possibility is separate files per "class" of password, such as
 one for root accounts, one for user accounts, one for web sites, etc.
 with different encryption strength for each class (speed may be an issue
-for en/decrypting large files on small devices like phones.
+for en/decrypting large files on small devices like phones).
 
 In terms of the program, ideally I'd have a graphical client for my
 phone (Treo or Blackberry) probably written in Java, a graphical client
