@@ -1,0 +1,792 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Jason Antman's Blog</title><link>http://newblog.jasonantman.com/</link><description></description><atom:link href="http://newblog.jasonantman.com/feeds/tags/microsoft.rss.xml" rel="self"></atom:link><lastBuildDate>Tue, 24 Apr 2012 21:18:00 -0400</lastBuildDate><item><title>SysAdmin Links of The Day</title><link>http://newblog.jasonantman.com/2012/04/sysadmin-links-of-the-day/</link><description>&lt;p&gt;A few links that I&amp;#8217;ve had in my &amp;#8220;mention in a blog post&amp;#8221; category for a&amp;nbsp;while:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href="http://blogs.msdn.com/b/windowsazure/archive/2012/03/09/summary-of-windows-azure-service-disruption-on-feb-29th-2012.aspx"&gt;Summary of Windows Azure Service Disruption on Feb 29th, 2012 -
+    Windows Azure - Site Home - &lt;span class="caps"&gt;MSDN&lt;/span&gt;
+    Blogs&lt;/a&gt;&lt;ul&gt;
+&lt;li&gt;a &lt;em&gt;very&lt;/em&gt; detailed and interesting post on what caused the Windows
+Azure cloud outage on February 29th, 2012. &lt;span class="caps"&gt;IMHO&lt;/span&gt; many of these
+failures were predictable, and the bulk of the outage was caused by
+a combination of inputs not being checked for validity in code, or
+the invalid case not being handled&amp;nbsp;properly.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;a href="http://highscalability.com/blog/2012/3/12/google-taming-the-long-latency-tail-when-more-machines-equal.html"&gt;High Scalability - High Scalability - Google: Taming the Long
+    Latency Tail - When More Machines Equals Worse&amp;nbsp;Results&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href="http://everythingsysadmin.com/2012/03/fear-of-rebooting.html"&gt;Everything Sysadmin: Fear of&amp;nbsp;Rebooting&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href="http://everythingsysadmin.com/2012/03/using-statements-of-undeniable.html"&gt;Everything Sysadmin: Using statements of &amp;#8220;Undeniable&amp;nbsp;Value&amp;#8221;&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Tue, 24 Apr 2012 21:18:00 -0400</pubDate><guid>tag:newblog.jasonantman.com,2012-04-24:2012/04/sysadmin-links-of-the-day/</guid><category>azure</category><category>failure</category><category>microsoft</category><category>sysadmin</category></item><item><title>Leap Year Windows Azure Cloud Outage</title><link>http://newblog.jasonantman.com/2012/03/leap-year-windows-azure-cloud-outage/</link><description>&lt;p&gt;I haven&amp;#8217;t talked about Microsoft in quite a while (mainly because I
+don&amp;#8217;t follow mainstream tech news as much anymore), but I happened by a
+very interesting &lt;a href="http://blogs.msdn.com/b/windowsazure/archive/2012/03/09/summary-of-windows-azure-service-disruption-on-feb-29th-2012.aspx"&gt;post on the Windows Azure
+blog&lt;/a&gt;
+the other day. It&amp;#8217;s a very detailed postmortem of the major outage of
+the Windows Azure cloud service which occurred from 4:00 &lt;span class="caps"&gt;PM&lt;/span&gt; &lt;span class="caps"&gt;PST&lt;/span&gt; on
+February 28&lt;sup&gt;th&lt;/sup&gt; through 2:15 &lt;span class="caps"&gt;AM&lt;/span&gt; on March 1&lt;sup&gt;st&lt;/sup&gt;. Before I get into any of
+the details, I should say that it really is a nice, well-done post. And
+the fact that they&amp;#8217;re willing to do such a detailed, public postmortem -
+and admit the failures that they did - is a step in the right direction
+for Microsoft (a company that I don&amp;#8217;t particularly care for, to put it&amp;nbsp;lightly).&lt;/p&gt;
+&lt;p&gt;I&amp;#8217;m going to glance over the majority of the post, though I highly
+recommend that anyone interested in running web-scale services,
+specifically highly available ones, read it. The general overview
+(really just the points that are germane to my discussion) is as
+follows: An agent running inside the guest &lt;span class="caps"&gt;VM&lt;/span&gt; instances (i.e. domU)
+communicates with a counterpart on the host &lt;span class="caps"&gt;OS&lt;/span&gt; (i.e. dom0) over an
+encrypted channel, authenticated by certificate. The certs are generated
+and passed from the guest to the host when the guest instance is first
+initialized, which means when an app is first deployed, scaled out, &lt;span class="caps"&gt;OS&lt;/span&gt;
+updated, or when an app is reinitialized on a new host. This cert was
+generated for a 1-year validity period, by adding 1 to the integer year
+- hence, the generation process failed on February 29th of a leap year,
+as the cert end date wasn&amp;#8217;t valid. When the cert generation failed, the
+guest agent essentially stopped cold. The host agent waited for a 25
+minute timeout, then re-initialized the guest and started over. After
+three of these failures, the host assumes there&amp;#8217;s a hardware error
+(since the guest would have reported a more specific error otherwise),
+declares itself in an error state, and tries to move its current
+workload over to another host. Which re-initializes the guests on that
+host, thereby causing a chain-reaction of failures in this case. Skip
+forward the 2-1/2 hours it took them to identify the problem, and
+further 2-1/2 hours to get a fix ready. They fast-tracked their fix to 7
+clusters that had already been in the process of a software update, but
+ended up with those clusters in an inconsistent state with
+incompatibilities between the guest and host networking subsystems,
+bringing down previously-unaffected instances on these&amp;nbsp;clusters.&lt;/p&gt;
+&lt;p&gt;This whole scenario offers a few important points on both the
+development and operations&amp;nbsp;sides:&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Inputs need error checking, and errors need to be raised.&lt;/strong&gt; So the
+first problem here was the failed cert generation. I&amp;#8217;ll leave alone the
+fact that, in my opinion, doing math on a the integer year of a date is
+a high school or college programming mistake, and never should have been
+made by someone doing platform coding for a major company (believe it or
+not, 25% of years are leap years &amp;lt;/sarcasm&gt;). If whatever code was
+generating the cert was smart enough to check the cert end date validity
+and error out, that error should have been pushed up the stack to
+somewhere where it could be handled - or, at least, sent to a central
+log server that does error&amp;nbsp;trending.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Secure communications when provisioning need an insecure error path.&lt;/strong&gt;
+This is somewhat connected to the previous point. If the normal process
+of creating a new instance and communicating errors up the stack relies
+on certs and authentication or encryption, there should be some method
+of communicating errors with &lt;em&gt;that&lt;/em&gt; process either up the stack, or to a
+separate event correlation/trending system. Errors with a
+certificate-based system are not unusual, and even something as simple
+as a vastly incorrect time set on the guests could have caused this same
+problem. In environments where management/control communication between
+levels of a system are encrypted or authenticated, there should be some
+way for lower levels of the system to deliver a meaningful error message
+&amp;#8220;somewhere&amp;#8221;. Even if this is just a syslog server or web service that
+listens for errors and can escalate a warning when the numbers spike,
+it&amp;#8217;s a useful alarm and debugging&amp;nbsp;tool.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Autonomous systems shouldn&amp;#8217;t lightly assume hardware failures.&lt;/strong&gt; It&amp;#8217;s
+arrogance for a host system to assume that just because it can&amp;#8217;t
+instantiate new guests, a hardware failure exists. This entire incident
+is a perfect example that, at least if hardware error indicators are
+properly monitored, it&amp;#8217;s more likely for a software problem to be
+falsely identified as a hardware problem than the other way around. All
+of my points are somewhat related, but I can think of many more reasons
+why a new guest can&amp;#8217;t be instantiated that are software-related rather
+than&amp;nbsp;hardware-related.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Autonomous control mechanisms need historical trending, and need to
+call for help if this looks wrong.&lt;/strong&gt; These host systems tried to
+instantiate new guests three times, waiting 25 minutes in between, and
+then declared themselves bad and tried to migrate guests to other hosts.
+From what I understand, Microsoft got it right in having a &amp;#8220;kill switch&amp;#8221;
+that prevented further migration of guests. What they didn&amp;#8217;t have right
+was reporting of autonomous actions (guest migration) to a central
+location that performs trending. The 25 minute timeout with three
+attempts is a great safety feature, but if the status of guest creation
+actions was reported to a central server, it would have been much more
+quickly apparent that 100% of guest creations in the past, say, 10
+minutes, had failed - across all clusters. I know plenty of shops that
+do little, if any, real-time analysis and historical comparisons of
+their log data. But when systems are designed to perform self-healing
+and autonomous actions, it&amp;#8217;s imperative that these actions are tracked
+in near-real-time, compared to historical averages, and that deviation
+from a baseline is identified and escalated to&amp;nbsp;humans.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Release procedures are more, not less, important when the sky is
+falling.&lt;/strong&gt; The extended downtime of the last seven clusters was because
+of an improperly &lt;span class="caps"&gt;QA&lt;/span&gt;&amp;#8217;ed update that was pushed out bypassing the normal
+release and testing procedures. As a matter of fact, it was so poorly
+&lt;span class="caps"&gt;QA&lt;/span&gt;&amp;#8217;ed that the update totally broke networking for the guest VMs, and
+was still pushed out. I&amp;#8217;m sure this was more of a management/executive
+decision than one made by the actual engineers, but organizations (even
+management) need to understand that when the sky is falling, services
+are down, and everybody is stressed, it&amp;#8217;s &lt;em&gt;more&lt;/em&gt; likely for mistakes and
+oversights to happen, and this is when a proper, well-documented &lt;span class="caps"&gt;QA&lt;/span&gt; and
+release procedure (including phased rollout) is &lt;em&gt;most&lt;/em&gt; important.
+Failure to follow these procedures results in exactly what happened in
+this case - making an already bad problem much&amp;nbsp;worse.&lt;/p&gt;
+&lt;p&gt;Even &lt;em&gt;I&lt;/em&gt; can&amp;#8217;t blame Microsoft specifically for all this (though the
+whole thing would have been avoided if they just represented timestamps
+as integers like the rest of us&amp;#8230;), but it is a good opportunity for us
+all to learn from a major incident at a &amp;#8220;pretty well known&amp;#8221;&amp;nbsp;company.&lt;/p&gt;
+&lt;p&gt;release procedures are most important when things are already going&amp;nbsp;wrong&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Tue, 20 Mar 2012 18:12:00 -0400</pubDate><guid>tag:newblog.jasonantman.com,2012-03-20:2012/03/leap-year-windows-azure-cloud-outage/</guid><category>azure</category><category>microsoft</category><category>outage</category><category>release</category><category>testing</category><category>windows</category></item><item><title>Slashdot - A Public Funded “Microsoft Shop?”</title><link>http://newblog.jasonantman.com/2010/03/slashdot-a-public-funded-microsoft-shop/</link><description>&lt;p&gt;I just came by an interesting post on Slashdot, &lt;a href="http://science.slashdot.org/story/10/03/04/1416226/A-Public-Funded-Microsoft-Shop"&gt;A Public Funded
+&amp;#8220;Microsoft
+Shop?&amp;#8221;&lt;/a&gt;.
+The author works at a publicly-funded hospital and comments that he
+received an email from management&amp;nbsp;stating:&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;Information Services is strategically a Microsoft shop and when
+talking to staff / customers we are to support this strategy. I no
+longer want to see comments promoting other Operating&amp;nbsp;Systems.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;Initially, my anti-Microsoft buzzer went off. But the post also stated
+that they were ordered to remove Firefox from any computers not
+specifically authorized by management. As usual, the Slashdot
+conversation degenerated into a proprietary vs open&amp;nbsp;debate.&lt;/p&gt;
+&lt;p&gt;As I have to comment on the Microsoft issue, I have two remarks. First,
+software (an &lt;span class="caps"&gt;OS&lt;/span&gt;, a browser, a text editor, whatever) is a tool. A tool
+should be chosen base on whether it&amp;#8217;s the right one for the job, not
+just because of who makes it. I&amp;#8217;d like to see a major construction
+company state decree that they&amp;#8217;ll only buy Stanley and DeWalt tools.
+What will their answer be when the plumbers realize that neither of
+those companies make a simple pipe wrench? &amp;#8220;Use a hammer&amp;#8221;? Secondly, as
+is evidenced by history, popularity is a relatively poor indicator of
+quality, and always ephemeral. Wigs were popular for wealthy men. The
+telegraph was popular, and many thought the telephone would never catch
+on. The &lt;a href="http://en.wikipedia.org/wiki/Fluoroscope"&gt;fluoroscope&lt;/a&gt; was
+popular for shoe fitting. Racism was popular. Smoking was popular. &lt;span class="caps"&gt;BASIC&lt;/span&gt;
+was the greatest programming language ever. Decisions based solely on
+popularity are rarely good in the long&amp;nbsp;term.&lt;/p&gt;
+&lt;p&gt;But, alas, enough of the Microsoft-bashing. What struck me more was the
+prohibition against Firefox, and what it means for technically-apt
+employees. Times are changing, and many of the people now entering the
+workforce are well-versed with technology. The days when employers could
+expect to give their new hires initial computer training are long gone.
+And, while many may not see it, the days when every new employee could
+be expected to know only a common &amp;#8220;popular&amp;#8221; system (Windows, &lt;span class="caps"&gt;MS&lt;/span&gt; Office,
+&lt;span class="caps"&gt;MSIE&lt;/span&gt;) are gone, too. Many people who work at universities, such as
+myself, are seeing browser stats that report less than 40% Windows, with
+an explosion of Mac-based users and (perhaps thanks to Android,
+Netbooks, and Ubuntu) a strong growth in the Linux user&amp;nbsp;base.&lt;/p&gt;
+&lt;p&gt;The Rutgers University student computing labs have both &lt;span class="caps"&gt;IE&lt;/span&gt; and Firefox
+installed on the Windows machines (and we also have a *very* large
+number of Mac or dual-boot Windows/Mac clients) and a walk through a
+busy lab will reveal a strong majority of users on Firefox. Many
+cash-strapped students, even the ones I knew a few years ago, were using
+OpenOffice rather than pay for &lt;span class="caps"&gt;MS&lt;/span&gt;&amp;nbsp;Office.&lt;/p&gt;
+&lt;p&gt;A similar trend can be seen in the new hires and young professionals who
+simply won&amp;#8217;t settle for a corporate cell phone - Windows Mobile, iPhone
+or Android, they already have a phone and &lt;span class="caps"&gt;OS&lt;/span&gt; that they like, and
+consider a part of their&amp;nbsp;lives.&lt;/p&gt;
+&lt;p&gt;There&amp;#8217;s a very simple point here - for an increasing number of people,
+especially those now entering the workforce, technology is an
+inextricable part of their lives. It&amp;#8217;s part of their sense of self, of
+expression, of free choice. Telling many people what browser they can
+and can&amp;#8217;t use is like telling a new hire a decade or two ago how their
+handwriting had to look or what size note pad they could use. Asking
+many of my (even non-techie) friends to switch cell phone &lt;span class="caps"&gt;OS&lt;/span&gt; would be
+like telling them what color clothes or tie they have to wear to work.
+Telling the average 20-year-old that they can&amp;#8217;t use instant messenger or
+facebook at work is like telling the average 40-year-old they can&amp;#8217;t
+receive a phone call from their spouse or child. Most especially, with
+the pervasiveness of Internet access, connected devices and choice in
+browsers and other software, these choices are being seen as a part of
+life, a part of&amp;nbsp;technology.&lt;/p&gt;
+&lt;p&gt;Lastly, and perhaps most importantly to many businesses, the role of &lt;span class="caps"&gt;IT&lt;/span&gt;
+as seen by the end-user is changing, and the role of technology in
+productivity is changing. For many young college-educated workers, &lt;span class="caps"&gt;IT&lt;/span&gt; is
+more of a procurement avenue than a support system. Many would happily
+install the software application of their choice (whether it is Firefox,
+OpenOffice, or something else) on their own, without the worry of a
+formal help desk. There&amp;#8217;s also the issue of productivity -
+technologically proficient new hires are already used to a software
+environment. They&amp;#8217;ve been able to choose their own applications, &lt;span class="caps"&gt;OS&lt;/span&gt;,
+browser, etc. Forcing them to switch - especially if they have been
+using an application for years and still do at home - will only result
+in lower productivity and some amount of frustration. I know that I, for
+one, have almost laughed when people advertising for Linux admin jobs
+said I&amp;#8217;d be using the same Windows desktop environment as all of the&amp;nbsp;users.&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Thu, 04 Mar 2010 21:27:00 -0500</pubDate><guid>tag:newblog.jasonantman.com,2010-03-04:2010/03/slashdot-a-public-funded-microsoft-shop/</guid><category>microsoft</category></item><item><title>Microsoft submits driver code for Linux kernel</title><link>http://newblog.jasonantman.com/2009/07/microsoft-submits-driver-code-for-linux-kernel/</link><description>&lt;p&gt;I read a very interesting &lt;a href="http://www.linux-mag.com/cache/7439/1.html"&gt;article on
+Linux-Mag.com&lt;/a&gt; today. The
+gist of it is that Microsoft (as happily announced in a &lt;a href="http://www.microsoft.com/presspass/features/2009/Jul09/07-20LinuxQA.mspx"&gt;press
+release&lt;/a&gt;)
+has submitted 20,000 lines of code for inclusion into the kernel.
+Specifically, the code is comprised of a number of drivers that will
+enable Linux to run better under Microsoft&amp;nbsp;Hyper-V.&lt;/p&gt;
+&lt;p&gt;Yes, that&amp;#8217;s right, Microsoft released code under GPLv2 and is asking for
+it to be put in Linux. They released it under the license that they call
+&amp;#8220;cancer&amp;#8221;. And the entire purpose is, essentially, saying &amp;#8220;we want your
+project to run well as a guest under our&amp;nbsp;hypervisor.&lt;/p&gt;
+&lt;p&gt;The Linux Mag article did touch on some recent news, such as Microsoft&amp;#8217;s
+&lt;a href="http://www.linux-mag.com/id/7325"&gt;lawsuit against TomTom&lt;/a&gt; (&lt;a href="http://arstechnica.com/microsoft/news/2009/03/microsoft-and-tomtom-settle-patent-dispute.ars"&gt;settled in
+late
+March&lt;/a&gt;)
+claiming that the Linux kernel infringes their &lt;span class="caps"&gt;VFAT&lt;/span&gt; patents and the 2004
+&lt;a href="http://ec.europa.eu/comm/competition/antitrust/cases/decisions/37792/en.pdf"&gt;&lt;span class="caps"&gt;EU&lt;/span&gt; antitrust case
+(&lt;span class="caps"&gt;PDF&lt;/span&gt;)&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;A number of things are immediately apparent to&amp;nbsp;me:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;The only reason for this is so Linux will virtualize well under&amp;nbsp;Windows/Hyper-V.&lt;/li&gt;
+&lt;li&gt;Microsoft doesn&amp;#8217;t seem to be making any similar effort to allow
+    Windows to virtualize well under Xen (and it seems to me that many
+    more people would want Windows on a reliable Linux host than the
+    other way&amp;nbsp;around).&lt;/li&gt;
+&lt;li&gt;Microsoft reached a settlement with TomTom, but never did anything
+    to indemnify the Linux community at&amp;nbsp;large.&lt;/li&gt;
+&lt;li&gt;This is &lt;strong&gt;not&lt;/strong&gt; a Microsoft endorsement (or even recognition) of the&amp;nbsp;&lt;span class="caps"&gt;GPL&lt;/span&gt;.&lt;/li&gt;
+&lt;li&gt;Microsoft &lt;a href="http://www.linux-watch.com/news/NS6670466370.html"&gt;made
+    threats&lt;/a&gt; about
+    Linux violating &amp;#8220;over 228&amp;#8221; of its patents in&amp;nbsp;2007.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;There&amp;#8217;s a
+&lt;a href="http://www.kroah.com/log/linux/microsoft-linux-hyper-v-drivers.html"&gt;post&lt;/a&gt;
+on &lt;a href="http://www.kroah.com/log/"&gt;Greg Kroah-Hartman&amp;#8217;s blog&lt;/a&gt; (he&amp;#8217;s the
+kernel maintainer who will - or will not - eventually be in charge of
+the inclusion of the code). It should be noted that &lt;strong&gt;this all started&lt;/strong&gt;
+due to a guy who I really admire, &lt;a href="http://linux-network-plumber.blogspot.com/"&gt;Stephen
+Hemminger&lt;/a&gt;, the principal
+engineer at Vyatta (whose router product I absolutely love, and their
+mock advertisements are just as wonderful). Steve has a &lt;a href="http://linux-network-plumber.blogspot.com/2009/07/congratulations-microsoft.html"&gt;post on his
+blog&lt;/a&gt;
+giving the&amp;nbsp;background.&lt;/p&gt;
+&lt;p&gt;So what do &lt;em&gt;I&lt;/em&gt; think should be done? Include the code. But first&amp;#8230; (I
+know Microsoft doing all of this at once would be a dream, but maybe one
+or two of them would be&amp;nbsp;nice)&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;If they haven&amp;#8217;t already done so, Microsoft should publicly recognize
+    the &lt;span class="caps"&gt;GPL&lt;/span&gt; and all of its terms as being a legally binding&amp;nbsp;license.&lt;/li&gt;
+&lt;li&gt;Prior to having any Microsoft code included in the Linux kernel,
+    Microsoft publicly states that the Linux kernel, as of the time they
+    submitted their code, does not infringe on any Microsoft
+    intellectual&amp;nbsp;property.&lt;/li&gt;
+&lt;li&gt;It would be nice of Microsoft would agree to some level of
+    cooperation with the Linux&amp;nbsp;community.&lt;/li&gt;
+&lt;li&gt;Microsoft pledges to allow, support, and actively develop for
+    Windows as a guest under Xen and&amp;nbsp;&lt;span class="caps"&gt;KVM&lt;/span&gt;.&lt;/li&gt;
+&lt;/ol&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Thu, 23 Jul 2009 09:32:00 -0400</pubDate><guid>tag:newblog.jasonantman.com,2009-07-23:2009/07/microsoft-submits-driver-code-for-linux-kernel/</guid><category>gpl</category><category>kernel</category><category>linux</category><category>microsoft</category></item><item><title>My Take on the MS TomTom Suit</title><link>http://newblog.jasonantman.com/2009/03/my-take-on-the-ms-tomtom-suit/</link><description>&lt;p&gt;To keep it short, I&amp;#8217;m sure anyone who winds up here has already heard
+about the recent Microsoft lawsuit against TomTom, alleging patent
+infringement. Coverage has been extensive, including
+&lt;a href="http://www.groklaw.net/article.php?story=20090226070041454"&gt;GrokLaw&lt;/a&gt;
+and &lt;a href="http://www.linux-mag.com/id/7258"&gt;Linux Magazine&lt;/a&gt;. While the
+mentioned patents include car navigation technology (at least the names
+of the patents seem amazingly vague) and &lt;span class="caps"&gt;FAT&lt;/span&gt; . Most of the news stories
+I&amp;#8217;ve read say that it&amp;#8217;s &amp;#8220;good for Linux&amp;#8221; and will never see the inside
+of a&amp;nbsp;courtroom.&lt;/p&gt;
+&lt;p&gt;Maybe I&amp;#8217;m just a pessimist, but I see the idea behind this as much worse
+than &amp;#8220;good for Linux&amp;#8221;. &lt;span class="caps"&gt;MS&lt;/span&gt; chose one company to sue. TomTom just happens
+to be not only a household name, but also posted a $1.2 Billion loss
+last year. It seems to me this is more of a &lt;span class="caps"&gt;FUD&lt;/span&gt; campaign than anything
+else&amp;#8230; the best case for Microsoft is that they could strangle TomTom
+in a legal battle, perhaps force them to go under, and then ensure a
+media spin along the lines of &amp;#8220;Know that company that made the &lt;span class="caps"&gt;GPS&lt;/span&gt; in
+every car? They used Linux in it, they got sued by Microsoft, and
+they&amp;#8217;re no&amp;nbsp;more.&amp;#8221;&lt;/p&gt;
+&lt;p&gt;While I haven&amp;#8217;t always been a fan of TomTom - and am still bothered by
+the fact that my (stolen, no longer in my possession) TomTom One ran
+Linux but wouldn&amp;#8217;t give me a console or even let me see the filesystem -
+I&amp;#8217;ll be watching this closely, and hoping that the powers that be will
+not let the angry dinosaur crush a company over a series of patents that
+are either horribly obvious (anyone other than Garmin having a claim to
+any &lt;span class="caps"&gt;GPS&lt;/span&gt;-related idea is beyond me) or just horrible&amp;nbsp;(&lt;span class="caps"&gt;FAT&lt;/span&gt;?!?!?!).&lt;/p&gt;
+&lt;p&gt;On a final note - isn&amp;#8217;t it about time that the &lt;span class="caps"&gt;US&lt;/span&gt; finally dealt with
+this damn software patent thing? Not only does it horribly stifle
+innovation (not good to do in a bad economy), and I have a hard time
+grasping the claim that Microsoft&amp;#8217;s developers are so all-powerful that
+they&amp;#8217;re the only people that thought of technology X, but it&amp;#8217;s about
+time that the &lt;span class="caps"&gt;US&lt;/span&gt; government got the balls to look Microsoft in the eyes
+and say, &amp;#8220;you&amp;#8217;re not the only game in town anymore. Get used to&amp;nbsp;it.&amp;#8221;&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Thu, 05 Mar 2009 10:05:00 -0500</pubDate><guid>tag:newblog.jasonantman.com,2009-03-05:2009/03/my-take-on-the-ms-tomtom-suit/</guid><category>lawsuit</category><category>microsoft</category><category>patents</category><category>tomtom</category></item><item><title>Internet Security, Microsoft Lies</title><link>http://newblog.jasonantman.com/2008/09/internet-security-microsoft-lies/</link><description>&lt;p&gt;&lt;strong&gt;Internet&amp;nbsp;Security&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;So, this semester I&amp;#8217;m taking a class on Internet Security. Our textbook
+is &lt;a href="http://search.barnesandnoble.com/booksearch/isbninquiry.asp?ean=1423901304"&gt;Management of Internet Security, 2nd
+Edition&lt;/a&gt;
+by Michael E. Whitman and Herbert J. Mattord. It seems pretty basic, and
+very much focused on the management side of things (as opposed to
+technical). The table of contents is as&amp;nbsp;follows:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Introduction to the Management of Information&amp;nbsp;Security&lt;/li&gt;
+&lt;li&gt;Planning for&amp;nbsp;Security&lt;/li&gt;
+&lt;li&gt;Planning for&amp;nbsp;Contingencies&lt;/li&gt;
+&lt;li&gt;Information Security&amp;nbsp;Policy&lt;/li&gt;
+&lt;li&gt;Developing the Security&amp;nbsp;Program&lt;/li&gt;
+&lt;li&gt;Security Management Models and&amp;nbsp;Practices&lt;/li&gt;
+&lt;li&gt;Risk Management: Identifying and Assessing&amp;nbsp;Risk&lt;/li&gt;
+&lt;li&gt;Risk Management: Assessing and Controlling&amp;nbsp;Risk&lt;/li&gt;
+&lt;li&gt;Protection&amp;nbsp;Mechanisms&lt;/li&gt;
+&lt;li&gt;Personnel and&amp;nbsp;Security&lt;/li&gt;
+&lt;li&gt;Law and&amp;nbsp;Ethics&lt;/li&gt;
+&lt;li&gt;Information Security Project&amp;nbsp;Management&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Now, given that it&amp;#8217;s really a &amp;#8220;management&amp;#8221; book, I can&amp;#8217;t say I&amp;#8217;m
+surprised that it reads like an essay that was graded on a scale of
+buzzwords-per-sentence. However, it seems to be missing the one chapter
+that&amp;#8217;s the most important - actually, the only chapter that would be in
+the book if I wrote it - &amp;#8220;How to get management to allocate the money
+you need for proper security.&amp;#8221; In fact, skimming over the book, I found
+a lot of content on general management planning, job descriptions,
+sample policies, and a lot of other pie-in-the-sky stuff, but not one
+concrete section dedicated to the most difficult part of security -
+getting the &amp;#8220;resources&amp;#8221; to do it&amp;nbsp;right!&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Microsoft&amp;nbsp;Lies&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;Why we would spend time analyzing corporate mission statements in an
+Internet Security class, I have no idea. That seems, to me, too much
+like what we covered in &amp;#8220;Management of Technological Organizations.&amp;#8221;
+But, we do, and one of the examples used is &lt;a href="http://www.microsoft.com/About/default.mspx"&gt;Microsoft&amp;#8217;s Mission and
+Values statement&lt;/a&gt;. Perhaps,
+being the F/&lt;span class="caps"&gt;OSS&lt;/span&gt; advocate that I am, my reading of it was a bit cynical.
+Let&amp;#8217;s take a look at&amp;nbsp;it.&lt;/p&gt;
+&lt;p&gt;&lt;span class="dquo"&gt;&amp;#8220;&lt;/span&gt;At Microsoft, our mission and values are to help people and business
+throughout the world realize their full potential.&amp;#8221; Well, we&amp;#8217;re off to a
+good start. Aside from the fact that they want you to realize that
+potential using &lt;strong&gt;only their software&lt;/strong&gt;, and use their power and money
+to actively monopolize (or attempt to) most industries that they enter,
+this seems pretty&amp;nbsp;run-of-the-mill.&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;Corporate Citizenship:&lt;/em&gt;&amp;#8220;Every successful corporation has &lt;em&gt;a
+responsibility to use its resources and influence to make a positive
+impact on the world and its people&lt;/em&gt;. Microsoft’s Global Citizenship
+Initiative is focused on mobilizing our resources across the company and
+around the world, to create opportunities in the communities where we do
+business, and to &lt;em&gt;fulfill our commitment to serving the public good
+through innovative technologies and partnerships&lt;/em&gt;.&amp;#8221; Well. Now we&amp;#8217;re
+getting somewhere. Apparently &amp;#8220;a positive impact on the world and its
+people&amp;#8221; is defined as trying to monopolize every sector that Microsoft
+touches, whether attempting to crush and then buy-out the competition,
+or through flat-out
+&lt;a href="http://en.wikipedia.org/wiki/Fear,_uncertainty_and_doubt"&gt;&lt;span class="caps"&gt;FUD&lt;/span&gt;&lt;/a&gt; and
+billion-dollar marketing campaigns. Hmm&amp;#8230; innovative partnerships&amp;#8230; as
+in&amp;nbsp;Novell?&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;Legal and Corporate Affairs:&lt;/em&gt;&amp;#8220;Microsoft’s Legal and Corporate Affairs
+Group works on the cutting edge of business and regulatory issues around
+the world.&amp;#8221; Well, I can&amp;#8217;t argue with that, they sure are on the cutting
+edge. What started with Bill Gates mailing out whiny letters about
+pirated Altair &lt;span class="caps"&gt;BASIC&lt;/span&gt; has now turned into a global juggernaut, capable of
+forcing the creation of &lt;span class="caps"&gt;ISO&lt;/span&gt; standards at their whim, and successfully
+quashing any dissent about obviously flawed and under-reviewed
+&amp;#8220;standards&amp;#8221; (which, in fact, simply describe current software, rather
+than setting any real&amp;nbsp;standard).&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;Values:&lt;/em&gt;As a company, and as individuals, we value &lt;strong&gt;integrity&lt;/strong&gt;,
+&lt;strong&gt;honesty&lt;/strong&gt;, &lt;strong&gt;openness&lt;/strong&gt;, personal excellence, &lt;strong&gt;constructive
+self-criticism&lt;/strong&gt;, &lt;strong&gt;continual self-improvement&lt;/strong&gt;, and &lt;strong&gt;mutual
+respect&lt;/strong&gt;. We are committed to our customers and partners and have a
+passion for technology. We take on big challenges, and pride ourselves
+on seeing them through. &lt;strong&gt;We hold ourselves accountable to our
+customers&lt;/strong&gt;, shareholders, partners, and employees by honoring our
+commitments, providing results, and &lt;strong&gt;striving for the highest
+quality&lt;/strong&gt;.&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;integrity&lt;/strong&gt; - i.e. not creating a draft &lt;span class="caps"&gt;ISO&lt;/span&gt; standard and then
+    &lt;a href="http://www.networkworld.com/news/2007/083007-microsoft-employee-offered-incentives-for.html"&gt;offering monetary incentives for
+    acceptance&lt;/a&gt;.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;honesty&lt;/strong&gt; - when it works. Intentionally making Vista-Capable
+    labeling so ambiguous that it even &lt;a href="http://www.nytimes.com/2008/03/09/business/09digi.html?_r=1&amp;amp;oref=slogin"&gt;confuses Microsoft
+    executives&lt;/a&gt;?&amp;nbsp;Fine.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;openness&lt;/strong&gt; um&amp;#8230; did they seriously say that? Openness like&amp;#8230;
+    protocol interoperability? Standards that can be implemented without
+    patent violations? An &amp;#8220;Open Specification Promise&amp;#8221; that doesn&amp;#8217;t come
+    with a &lt;a href="http://www.microsoft.com/interop/osp/default.mspx"&gt;three page
+    &lt;span class="caps"&gt;FAQ&lt;/span&gt;&lt;/a&gt;? Nope. Not&amp;nbsp;Microsoft.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;constructive self-criticism&lt;/strong&gt; - Ok, I&amp;#8217;ll give them this one. They
+    do, rarely, criticize themselves. Though &amp;#8220;constructive&amp;#8221; usually
+    means making comments about the poor design of a previous product,
+    and suggesting that everyone upgrade to the new&amp;nbsp;version.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;continual self-improvement&lt;/strong&gt; - I&amp;#8217;ll give them this one too. In
+    fact, they&amp;#8217;re so crazy about it that they&amp;#8217;ve been improving the same
+    codebase for&amp;nbsp;decades!&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;mutual respect&lt;/strong&gt; - See&amp;nbsp;above.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;We hold ourselves accountable to our customers&lt;/strong&gt; - Ok. They &lt;em&gt;are&lt;/em&gt;
+    offering to allow users to &lt;a href="http://download.microsoft.com/download/5/f/4/5f4c83d3-833e-4f11-8cbd-699b0c164182/royaltyoemreferencesheet.pdf"&gt;downgrade from Vista to
+    &lt;span class="caps"&gt;XP&lt;/span&gt;&lt;/a&gt;.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;striving for the highest quality&lt;/strong&gt; - I don&amp;#8217;t think so. They&amp;#8217;re
+    striving for products that have the highest &lt;em&gt;market share&lt;/em&gt;. As long
+    as the quality is acceptable to the majority of users, and the
+    products do what the majority of users need, that&amp;#8217;s fine. But
+    wait&amp;#8230; apparently they even missed &lt;em&gt;that&lt;/em&gt; goal with&amp;nbsp;Vista.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;This is just the opinion of one person. My motivations may be diverse,
+and surely there&amp;#8217;s a bit of zealotry in there. After all, if Ford told
+me I couldn&amp;#8217;t put fog lights on my car myself, I had to bring it to the
+dealer and pay $400, I&amp;#8217;d stop buying their cars - and make sure everyone
+else knew what they did. But there&amp;#8217;s also my ever-present desire to make
+sure people know both sides of the story, and all the facts. The
+mainstream media (specifically dumbed-down television) rarely reports on
+the less cheerful side of Microsoft, like the &lt;span class="caps"&gt;ISO&lt;/span&gt; &amp;#8220;standard&amp;#8221;
+&lt;a href="http://www.networkworld.com/news/2007/083007-microsoft-employee-offered-incentives-for.html"&gt;scandal&lt;/a&gt;,
+or the &lt;a href="http://www.nytimes.com/2008/03/09/business/09digi.html?_r=1&amp;amp;oref=slogin"&gt;Vista
+letters&lt;/a&gt;,
+or the
+&lt;a href="http://yro.slashdot.org/article.pl?sid=08/04/22/2032232&amp;amp;from=rss"&gt;Vista-Capable&lt;/a&gt;
+fiasco. And I find this to be horribly disturbing. Many people don&amp;#8217;t
+realize that there &lt;em&gt;are&lt;/em&gt; alternatives to Microsoft products, even ones
+that are provided by such big names as &lt;a href="http://www.sun.com"&gt;Sun
+Microsystems&lt;/a&gt; and &lt;a href="http://www.ibm.com"&gt;&lt;span class="caps"&gt;IBM&lt;/span&gt;&lt;/a&gt;. But,
+most striking, is Microsoft&amp;#8217;s overwhelming monopoly. Windows&amp;#8217; market
+share is currently
+&lt;a href="http://marketshare.hitslink.com/report.aspx?qprid=8"&gt;90.66%&lt;/a&gt; or higher.
+I ask you, what other industries which affect not only consumers, but
+nearly every aspect of our daily lives (as computing does) would be
+allowed to have such a monopoly? It has happened in many other American
+industries - oil, steel, the railroads, telephone service. Where is the
+government&amp;nbsp;now?&lt;/p&gt;
+&lt;p&gt;What happened to the America that made massive monopolies illegal? Have
+we forgotten a supremely part of our history that began in 1980 with the
+Sherman Act? Or even the recent events with Bell? In order to truly
+stimulate competition in the software industry, and provide for not only
+choice but the improved quality, reliability, and security that comes
+with true software competition, something needs to be done. For
+starters, how about breaking Microsoft into separate entities - browser,
+Office, &lt;span class="caps"&gt;OS&lt;/span&gt;, server, etc. And - the important part - preventing any
+package sales, discounts, or bundling between the separate types of
+software (and separate&amp;nbsp;companies).&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Tue, 16 Sep 2008 23:24:00 -0400</pubDate><guid>tag:newblog.jasonantman.com,2008-09-16:2008/09/internet-security-microsoft-lies/</guid><category>microsoft</category><category>rutgers</category><category>school</category><category>security</category></item><item><title>Microsoft and Novell Deliver Joint Virtualization Solution - or do they?</title><link>http://newblog.jasonantman.com/2008/09/microsoft-and-novell-deliver-joint-virtualization-solution-or-do-they/</link><description>&lt;p&gt;From PRNewsWire: &lt;a href="http://www.prnewswire.com/cgi-bin/stories.pl?ACCT=104&amp;amp;STORY=/www/story/09-11-2008/0004883058&amp;amp;EDATE="&gt;Microsoft and Novell Deliver Joint Virtualization
+Solution Through
+Partners&lt;/a&gt;.
+The headline of the press release: &amp;#8220;Supported by Dell and other channel
+partners, solution includes &lt;span class="caps"&gt;SUSE&lt;/span&gt; Linux Enterprise Server running as
+optimized guest on Windows Server 2008&amp;nbsp;Hyper-V.&amp;#8221;&lt;/p&gt;
+&lt;p&gt;Now, maybe I&amp;#8217;m not up on the news regarding my favorite distribution,
+but it seems to me that a deal allowing SuSE to be virtualized as a
+&lt;strong&gt;guest&lt;/strong&gt; under Windows is not only &amp;#8220;joint&amp;#8221;, but plain moronic. Despite
+the marketing efforts of Microsoft, Unix-based systems (including Linux)
+have always had the upper hand in availability, reliability, and&amp;nbsp;performance.&lt;/p&gt;
+&lt;p&gt;I must say, from what I&amp;#8217;ve heard, Windows Server is getting *much*
+better in these areas - and I&amp;#8217;ve even heard that the latest version
+includes an option to install without a graphical environment, and even
+includes a command-line that&amp;#8217;s useful. It&amp;#8217;s about&amp;nbsp;time.&lt;/p&gt;
+&lt;p&gt;However, it seems to me, that any virtualization deal between Microsoft
+and a Linux distributor can provide only one logical solution: Windows
+Server virtualized as a guest in a high-availability Linux host. More
+importantly, without the insane per-processor licensing - a per-&lt;span class="caps"&gt;VM&lt;/span&gt;
+instance license that&amp;#8217;s hardware-agnostic and allows VMs to be migrated
+across hardware as the admin sees&amp;nbsp;fit.&lt;/p&gt;
+&lt;p&gt;Oh, and one more insight. If Microsoft wants to be a serious player in
+the virtualization arena, here&amp;#8217;s a few &amp;#8220;simple&amp;#8221;&amp;nbsp;steps:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Get Windows Server to work correctly under Xen, VirtualBox, etc.
+    Certify it. Provide the correct guest &lt;span class="caps"&gt;OS&lt;/span&gt; tool&amp;nbsp;packages&lt;/li&gt;
+&lt;li&gt;Provide simple management of Windows in a virtualized environment -
+    minimally, a standard &lt;span class="caps"&gt;SSH&lt;/span&gt; server that&amp;#8217;s compatible with OpenSSH, a
+    &lt;span class="caps"&gt;GUI&lt;/span&gt;-less environment, and a serial&amp;nbsp;console.&lt;/li&gt;
+&lt;li&gt;Get rid of per-processor licenses. Provide a basic license that
+    allows for, say, 10 VMs to be running at once, and allows as many
+    installs as needed - the only licensing is based on the amount of
+    VMs actually running. i.e., if you have 10 VMs and one gets
+    corrupted, you can bring that one down and online a back-up image,
+    without violating the&amp;nbsp;license.&lt;/li&gt;
+&lt;li&gt;Make licensing processor-agnostic. Want to migrate a Xen &lt;span class="caps"&gt;VM&lt;/span&gt; (Windows
+    guest) from a dual-core Pentium to an 8-core Xeon, or even a 16
+    processor &lt;span class="caps"&gt;SPARC&lt;/span&gt;? Sure, no&amp;nbsp;problem.&lt;/li&gt;
+&lt;/ol&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Thu, 11 Sep 2008 11:40:00 -0400</pubDate><guid>tag:newblog.jasonantman.com,2008-09-11:2008/09/microsoft-and-novell-deliver-joint-virtualization-solution-or-do-they/</guid><category>microsoft</category><category>novell</category><category>suse</category><category>virtualization</category></item><item><title>Where are we going and what’s with the handbasket?</title><link>http://newblog.jasonantman.com/2008/04/where-are-we-going-and-whats-with-the-handbasket/</link><description>&lt;p&gt;Well, that&amp;#8217;s it. Not only did Verizon and &lt;span class="caps"&gt;AT&lt;/span&gt;&amp;amp;T come out on top in the
+&lt;a href="http://www.engadget.com/2008/03/20/fcc-releases-700mhz-auction-details-verizon-atandt-big-winners/"&gt;700MHz spectrum
+auction&lt;/a&gt;
+- promising an end to hopes of Google&amp;#8217;s utopian ideals of a truly open
+network - but I just heard that &amp;#8220;Office Open &lt;span class="caps"&gt;XML&lt;/span&gt;&amp;#8221; &lt;a href="http://www.iso.org/iso/pressrelease.htm?refid=Ref1123"&gt;was approved as an
+&lt;span class="caps"&gt;ISO&lt;/span&gt; standard&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;I don&amp;#8217;t think it even merits comment on my part. The world is run by
+corporations. Corporations with more money than brains, hopes, or balls.
+The 700MHz spectrum will become another copy of what American has now -
+a resource (frequencies) that are &amp;#8220;owned by the people&amp;#8221;, yet controlled
+by major corporations, and horribly biased
+&lt;em&gt;against&lt;/em&gt; the interests of the&amp;nbsp;consumer.&lt;/p&gt;
+&lt;p&gt;Well, &lt;span class="caps"&gt;OOXML&lt;/span&gt; is now a standard. Is it any less flawed? No. Is it any
+safer for me to implement? No. Does it even contain enough information
+for me to implement? No. But it&amp;#8217;s a specification, and it&amp;#8217;s here. While
+Jason Matusow may have stated that &amp;#8220;&lt;a href="http://blogs.msdn.com/jasonmatusow/archive/2008/02/26/open-xml-brm-day-2-thoughts.aspx"&gt;the patents related to the
+technology are not a barrier to use - for anyone, in any country, for
+all
+time&lt;/a&gt;&amp;#8220;,
+I&amp;#8217;m still a bit worried about the issues that will crop up with &lt;span class="caps"&gt;OOXML&lt;/span&gt; -
+not to mention the fact that it&amp;#8217;s a standard squarely aimed at
+eliminating choice (we all know Microsoft will push hard for
+organizations not to use &lt;span class="caps"&gt;ODF&lt;/span&gt;) and preventing competition in a sector
+already overwhelmingly dominated by &lt;em&gt;one&lt;/em&gt;&amp;nbsp;product.&lt;/p&gt;
+&lt;p&gt;In short, what happened in the past few weeks? A confirmation that the
+governments and organizations of the world care little about the
+individual, and fear change. They&amp;#8217;re owned by big business, and the
+700MHz spectrum will end up being, at best, a marginal improvement over
+the current restrictive cellular system. And big business doesn&amp;#8217;t even
+have the balls to fight for itself. Or, even worse, doesn&amp;#8217;t worry about
+vendor lock-in or proprietary software because, as long as they keep
+bending over backwards to follow Microsoft&amp;#8217;s every whim, Microsoft will
+always be there to help&amp;nbsp;them.&lt;/p&gt;
+&lt;p&gt;I&amp;#8217;m surprised that even multinational corporations, who have a data
+center filled with redundant systems, and fiber running in every
+direction in case this or that &lt;span class="caps"&gt;CO&lt;/span&gt; goes up in flames, doesn&amp;#8217;t consider
+closed standards, proprietary (possibly patent-encumbered) software, or
+closed-source software to be as obvious a single point of failure as a
+critical service running on a single desktop computer. Sure, your vendor
+might tell you their software will achieve five-nines. But if they
+discontinue support, or have a few bad quarters, and they won&amp;#8217;t fix it
+for you, what&amp;nbsp;then?&lt;/p&gt;
+&lt;p&gt;I&amp;#8217;m just thankful that there are &lt;a href="http://blogs.sun.com/jonathan/"&gt;some
+people&lt;/a&gt;, few and far between, that don&amp;#8217;t
+fall into the&amp;nbsp;trap.&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Wed, 02 Apr 2008 12:13:00 -0400</pubDate><guid>tag:newblog.jasonantman.com,2008-04-02:2008/04/where-are-we-going-and-whats-with-the-handbasket/</guid><category>700mhz</category><category>microsoft</category><category>ooxml</category><category>spectrum</category></item><item><title>Microsoft $1.35B poorer</title><link>http://newblog.jasonantman.com/2008/02/microsoft-135b-poorer/</link><description>&lt;p&gt;Yeah, I almost forgot to link right to the&lt;a href="http://www.reuters.com/article/mergersNews/idUSBRU00634320080227"&gt;article from Reuters about
+the &lt;span class="caps"&gt;EU&lt;/span&gt; fining
+Microsoft&lt;/a&gt;
+$1.35 &lt;span class="caps"&gt;BILLION&lt;/span&gt; &lt;span class="caps"&gt;USD&lt;/span&gt; (899 million&amp;nbsp;euros).&lt;/p&gt;
+&lt;p&gt;Microsoft&amp;#8217;s monopolistic business practices are costing it billions of&amp;nbsp;dollars.&lt;/p&gt;
+&lt;p&gt;&lt;span class="caps"&gt;IDEA&lt;/span&gt;:&lt;br /&gt;
+Actually be open. Open up all of your protocols, specifications, APIs.
+Even start opening up some of your source code, under GPLv3, and
+assigning patents to the &lt;a href="http://www.patent-commons.org/"&gt;Patent
+Common&lt;/a&gt;&lt;a href="http://www.patent-commons.org/"&gt;s&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;Believe it or not, your sales will go up. Maybe then Bill can donate the
+next $1B in fines to some starving kids who need&amp;nbsp;laptops.&lt;/p&gt;
+&lt;p&gt;Seriously though, if I could get Windows Server under GPLv3, and do
+whatever I want - fork it, whatever, I might buy a copy. I&amp;#8217;m sure a lot
+of people would if they realized that they could change it, wouldn&amp;#8217;t get
+locked in,&amp;nbsp;etc.&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Wed, 27 Feb 2008 14:42:00 -0500</pubDate><guid>tag:newblog.jasonantman.com,2008-02-27:2008/02/microsoft-135b-poorer/</guid><category>microsoft</category><category>patents</category></item><item><title>Microsoft… again</title><link>http://newblog.jasonantman.com/2008/02/microsoft-again/</link><description>&lt;p&gt;Here&amp;#8217;s &lt;a href="http://www.groklaw.net/article.php?story=20080227031234460"&gt;another Groklaw article on recent Microsoft
+tribulations&lt;/a&gt;.
+This really is starting to get disgusting. It&amp;#8217;s not that I hate
+Microsoft, I don&amp;#8217;t. What I hate is their attitude, and their business
+practices. Everyone else - I mean &lt;em&gt;everyone&lt;/em&gt; - makes software that
+interoperates with other vendors. Microsoft, even after a &lt;em&gt;billion&lt;/em&gt;
+dollar fine, won&amp;#8217;t. Everyone else uses open, industry-accepted
+standards. Microsoft doesn&amp;#8217;t. Many other vendors open up their code.
+Microsoft tried to make some vague gesture to, but makes it incompatible
+with &lt;span class="caps"&gt;GPL&lt;/span&gt;&amp;#8217;d code (okay, okay, I know about &lt;span class="caps"&gt;ZFS&lt;/span&gt;&amp;#8230;) and says developers
+can only use it in non-commercial projects. So they open a few things up
+to hobbyists, and want a pat on the back. It boils down to how they
+treat customers and developers. Not very well. I don&amp;#8217;t like that. I&amp;#8217;m
+not going to start on the technical aspects of Windows, though it seems
+to be getting better, a baby step at a time. But the bottom line is that
+Microsoft actively tries to turn the software industry into a facist
+dictatorship, where you do it Microsoft&amp;#8217;s way, or you&amp;#8217;re taken out back
+and shot (ok, bought up and then shut&amp;nbsp;down).&lt;/p&gt;
+&lt;p&gt;Anyway, from the blog of Zeheda Bhorat, Open Source Programs Manager at&amp;nbsp;Google,&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;Google believes &lt;span class="caps"&gt;OOXML&lt;/span&gt; would be an insufficient and unnecessary
+standard, designed purely around the needs of Microsoft&amp;nbsp;Office.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;How can it be that the &lt;span class="caps"&gt;ISO&lt;/span&gt; - the International
+Organization for &lt;em&gt;Standardization&lt;/em&gt; - would
+actually consider a &lt;em&gt;second&lt;/em&gt;,
+competing standard for document formats. And one that&amp;#8217;s &lt;a href="http://www.noooxml.org/argu-brief"&gt;as flawed as
+&lt;span class="caps"&gt;OOXML&lt;/span&gt;&lt;/a&gt;? These guys are the &lt;span class="caps"&gt;ISO&lt;/span&gt;. They
+practically run the world, at least technically. Why don&amp;#8217;t they have the
+balls to look Microsoft in the eye and say, &amp;#8220;Hey, moron. We already
+&lt;strong&gt;have&lt;/strong&gt; a document format
+standard. It&amp;#8217;s called &lt;span class="caps"&gt;ISO&lt;/span&gt; 26300. If you want to have anything to do with
+the &lt;span class="caps"&gt;ISO&lt;/span&gt;, which sets &lt;em&gt;standards&lt;/em&gt;,
+you can take your 6,000 page specification, put it through a crosscut
+paper-burning radiation-producing shredder, pay the $320 for a copy of
+&lt;span class="caps"&gt;ISO26300&lt;/span&gt;, and implement&amp;nbsp;it!&amp;#8221;&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Wed, 27 Feb 2008 14:05:00 -0500</pubDate><guid>tag:newblog.jasonantman.com,2008-02-27:2008/02/microsoft-again/</guid><category>iso</category><category>microsoft</category><category>ooxml</category></item><item><title>February 26, 2008</title><link>http://newblog.jasonantman.com/2008/02/february-26-2008/</link><description>&lt;p&gt;Well, while I haven&amp;#8217;t made much progress on anything interesting -
+mainly my &lt;span class="caps"&gt;NMS&lt;/span&gt; comparison or any of my other projects - due to my busy
+schedule, I did get an hour or two to clean up my network at the
+apartment, swapping out my 24-port Linksys switch in my room for the
+5-port Netgear previously used for printing. I threw all of the printers
+and the print server on their own &lt;span class="caps"&gt;VLAN&lt;/span&gt; on the main 3com&amp;nbsp;switch.&lt;/p&gt;
+&lt;p&gt;I&amp;#8217;ve also started thinking more about &lt;a href="http://www.mythtv.org/"&gt;MythTV&lt;/a&gt; -
+I use it for &lt;span class="caps"&gt;TV&lt;/span&gt; in my room (feeding a grossly insufficient 21&amp;#8221; &lt;span class="caps"&gt;CRT&lt;/span&gt;
+monitor), and my roommate has a Dell &lt;span class="caps"&gt;GX270&lt;/span&gt; by the big &lt;span class="caps"&gt;TV&lt;/span&gt; in the living
+room, though it was running Freevo (and now has a dead tuner and no &lt;span class="caps"&gt;RAM&lt;/span&gt;,
+or something like that). So, I decided that I might do things right -
+drop a 5- or 8-port GigE switch in the apartment, put GigE NICs in the
+two boxes with tuners (putting MythTV on the &lt;span class="caps"&gt;GX270&lt;/span&gt; also), and setting up
+a centralized system. The problem is that the ideal solution would be a
+single dedicated back-end system for storage and control, with the two
+tuner/video out boxes just providing A/V I/O. Unfortunately, the two
+boxes with tuners are both high-spec&amp;#8217;ed P4&amp;#8217;s, and I&amp;#8217;m not sure what I
+can come up with in terms of a server for the&amp;nbsp;backend.&lt;/p&gt;
+&lt;p&gt;Now, &lt;em&gt;the question for anyone who may be
+reading&lt;/em&gt; - I&amp;#8217;d like to setup a good amount (1-&lt;span class="caps"&gt;2TB&lt;/span&gt;) of storage for
+this. My roommate wants a &lt;span class="caps"&gt;RAID&lt;/span&gt; configuration, but I don&amp;#8217;t see the need
+for videos - if I lose my &lt;span class="caps"&gt;TV&lt;/span&gt; recordings, I set MythTV to record it again
+the next time it&amp;#8217;s on. Anyway, I have an 8-bay external &lt;span class="caps"&gt;SCAI&lt;/span&gt; enclosure
+and cards in all of the servers, but &lt;span class="caps"&gt;SCSI&lt;/span&gt; disks are expensive. I was
+thinking of going to &lt;span class="caps"&gt;SATA&lt;/span&gt; 3.0. Most likely, I&amp;#8217;d get some sort of 4-8
+disk enclosure, start with 1-3 disks in the 400-&lt;span class="caps"&gt;750GB&lt;/span&gt;&amp;nbsp;range.&lt;/p&gt;
+&lt;p&gt;So, the question - what type of system specs would be needed to stream
+audio and video, uncompressed, perhaps even &lt;span class="caps"&gt;HDTV&lt;/span&gt; (we have the &lt;span class="caps"&gt;TV&lt;/span&gt; and
+cable box, would just need an &lt;span class="caps"&gt;HD&lt;/span&gt; tuner) to remote storage over the
+network? I was thinking of doing either a Linux master MythTV backend
+with eSATA cards, or letting each &lt;span class="caps"&gt;TV&lt;/span&gt; computer be its&amp;#8217; own backend, and
+then doing Solaris/&lt;span class="caps"&gt;ZFS&lt;/span&gt; with iSCSI or ATAoE. Any suggestions? I&amp;#8217;m pretty
+much thinking of using a PowerEdge 2550 for&amp;nbsp;this.&lt;/p&gt;
+&lt;p&gt;Anyway, I&amp;#8217;m also filling up my backup disks at home, and don&amp;#8217;t want to
+shorten my expiration cycle. My nightly backup runs put quite a strain
+on my main Fast Ethernet &lt;span class="caps"&gt;LAN&lt;/span&gt;, so I&amp;#8217;ve been planning for a while on
+moving to GigE. My thought at home is to setup a second, separate GigE
+switch/lan, with GigE NICs in all of the servers. Not exactly cheap, but
+I can pickup a Linux-/Solaris-compatible Negear &lt;span class="caps"&gt;GA311&lt;/span&gt; for around $40, in
+addition to the Intel Pro/1000 &lt;span class="caps"&gt;XT&lt;/span&gt; and Asante GigaNIC that I already
+have. The problem here is finding a good GigE switch - I&amp;#8217;d really like
+something with Telnet, &lt;span class="caps"&gt;SNMP&lt;/span&gt;, VLANs, the&amp;nbsp;works.&lt;/p&gt;
+&lt;p&gt;In other news, I highly recommend reading the &lt;a href="http://www.groklaw.net/article.php?story=20080221184924826"&gt;Groklaw story on
+Microsoft&amp;#8217;s latest pledge for
+interoperability&lt;/a&gt;.
+I especially liked the one quote from the &lt;a href="http://www.ecis.eu/"&gt;&lt;span class="caps"&gt;ECIS&lt;/span&gt;&lt;/a&gt;&amp;nbsp;statement:&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;For years now, Microsoft has either failed to implement or has
+actively corrupted a range of truly open standards adopted and
+implemented by the rest of the industry. Unless and until that
+behaviour stops, today&amp;#8217;s words mean&amp;nbsp;nothing.&lt;/p&gt;
+&lt;p&gt;More fundamentally, today&amp;#8217;s announcement is still all about the rest
+of the world interoperating with Microsoft on Microsoft&amp;#8217;s own terms,
+not the other way&amp;nbsp;around.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;There&amp;#8217;s even links to &lt;em&gt;ten&lt;/em&gt; previous Microsoft statements promising&amp;nbsp;interoperability.&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;The thing is, this is a promise to interoperate with old-fashioned
+competitors. It doesn&amp;#8217;t enable interoperability with the &lt;span class="caps"&gt;GPL&lt;/span&gt;, which is
+not compatible with patent licenses, and that is Microsoft&amp;#8217;s true&amp;nbsp;competition.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;From Michael Cunningham, &lt;span class="caps"&gt;VP&lt;/span&gt; and General Counsel of Red&amp;nbsp;Hat:&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;Eight years ago the &lt;span class="caps"&gt;U.S.&lt;/span&gt; regulatory authorities, and four years ago
+the European regulators made clear to Microsoft that its refusal to
+disclose interface information for its monopoly software products
+violates the law. So, it is hardly surprising to see even Microsoft
+state today that “interoperability across systems is an important
+requirement” and announce a “change in [its] approach to
+interoperability.” Of course, we’ve heard similar announcements
+before, almost always strategically timed for other effect. Red Hat
+regards this most recent announcement with a healthy dose of
+skepticism. Three commitments by Microsoft would show that it really
+means what it is announcing&amp;nbsp;today:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Commit to open standards: Rather than pushing forward its
+    proprietary, Windows-based formats for document processing, &lt;span class="caps"&gt;OOXML&lt;/span&gt;,
+    Microsoft should embrace the existing &lt;span class="caps"&gt;ISO&lt;/span&gt;-approved, cross-platform
+    industry standard for document processing, Open Document Format
+    (&lt;span class="caps"&gt;ODF&lt;/span&gt;) at the International Standards Organization’s meeting next
+    week in Geneva. Microsoft, please demonstrate implementation of an
+    existing international open standard now rather than make press
+    announcements about intentions of future standards&amp;nbsp;support.&lt;/li&gt;
+&lt;li&gt;Commit to interoperability with open source: Instead of offering a
+    patent license for its protocol information on the basis of
+    licensing arrangements it knows are incompatible with the &lt;span class="caps"&gt;GPL&lt;/span&gt; –
+    the world’s most widely used open source software license –
+    Microsoft should extend its Open Specification Promise to all of
+    the interoperability information that it is announcing today will
+    be made available. The Open Specification Promise already covers
+    many Microsoft products that do not have monopoly market
+    positions. If Microsoft were truly committed to fostering openness
+    and preventing customer lock-in, it would extend this promise to
+    the protocol and interface information it intends to disclose
+    today. There is no explanation for refusing to extend the Open
+    Specification Promise to “high-volume” products, other than a
+    continued intention on Microsoft’s part to lock customers into its
+    monopoly products, and lock out competitors through patent&amp;nbsp;threats.&lt;/li&gt;
+&lt;li&gt;Commit to competition on a level playing field: Microsoft’s
+    announcement today appears carefully crafted to foreclose
+    competition from the open source community. How else can you
+    explain a “promise not to sue open source developers” as long as
+    they develop and distribute only*/ “non-commercial”
+    implementations of interoperable products? This is simply
+    disingenuous. The only hope for reintroducing competition to the
+    monopoly markets Microsoft now controls – Windows, Office, etc. –
+    is through commercial distributions of competitive open source
+    software&amp;nbsp;products.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;Amen!!!&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Tue, 26 Feb 2008 11:32:00 -0500</pubDate><guid>tag:newblog.jasonantman.com,2008-02-26:2008/02/february-26-2008/</guid><category>GigE</category><category>microsoft</category><category>mythtv</category><category>sata</category><category>storage</category></item><item><title>Links for 2008-02-23</title><link>http://newblog.jasonantman.com/2008/02/links-for-2008-02-23/</link><description>&lt;p&gt;Some links for&amp;nbsp;today:&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://arstechnica.com/news.ars/post/20080221-microsoft-launches-new-open-standards-interoperability-push.html"&gt;Microsoft&amp;#8217;s new promised on interoperability, open standards.
+etc.&lt;/a&gt;
+- somewhat ironic given the Office Open &lt;span class="caps"&gt;XML&lt;/span&gt; debacle on &amp;#8220;standards&amp;#8221;. &lt;a href="http://arstechnica.com/journals/linux.ars/2008/02/21/red-hat-not-impressed-with-microsofts-interoperability-plans"&gt;And
+Red Hat&amp;#8217;s worries about
+it&lt;/a&gt;.
+(Ars&amp;nbsp;Technica)&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://www.groklaw.net/article.php?story=20080221184924826"&gt;Groklaw&amp;#8217;s lengthy analysis of the
+promises&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://blogs.zdnet.com/threatchaos/"&gt;Pakistan removed from the Internet, causes global YouTube
+outage&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://www.guardian.co.uk/theguardian/2008/feb/23/internet.usa"&gt;A Guardian article on the WikiLeaks
+debacle&lt;/a&gt;
+- perhaps the biggest affront to the First Amendment this&amp;nbsp;year.&lt;/p&gt;
+&lt;p&gt;An&lt;a href="http://www.informationweek.com/story/showArticle.jhtml?articleID=206800800&amp;amp;cid=RSSfeed_IWK_All"&gt;InformationWeek article about some guys from BlackHat &lt;span class="caps"&gt;D.C.&lt;/span&gt; who said
+that they will be able to crack &lt;span class="caps"&gt;GSM&lt;/span&gt; encryption in under 30 minutes with
+$1,000 of technology or 30 seconds with
+$100,000&lt;/a&gt;
+(FPGAs - Maybe a cluster of&amp;nbsp;&lt;span class="caps"&gt;PS3&lt;/span&gt;&amp;#8217;s?)&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://citp.princeton.edu/memory/"&gt;A Princeton Unviersity blog about cold boots possibly able to crack the
+Windows BitLocker system&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://blog.mozilla.com/blog/2008/02/21/500-million-firefox-downloads-complete-500-million-grains-in-progress/"&gt;Yay! Firefox has hit its&amp;#8217; 500 Millionth
+download!!!&lt;/a&gt;
+And there was much&amp;nbsp;rejoicing&amp;#8230;&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://arstechnica.com/news.ars/post/20080219-opera-browser-market-isnt-functioning-thanks-to-microsoft.html"&gt;An ArsTechnica article on Internet Explorer, what should be done to fix
+it, and how there can still be a non-standards-compliant
+browser&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://jeremy.linuxquestions.org/"&gt;Jeremy&amp;#8217;s Blog&lt;/a&gt; - the mind behind
+&lt;a href="http://www.linuxquestions.org/"&gt;LinuxQuestions.org&lt;/a&gt; - &lt;a href="http://jeremy.linuxquestions.org/2008/02/21/2007-linuxquestionsorg-members-choice-award-winners/"&gt;provides a recap
+of the 2007 &lt;span class="caps"&gt;LQ&lt;/span&gt; Members&amp;#8217; Choice
+awards&lt;/a&gt;.
+Some interesting winners were VirtualBox for virtualization package,
+Debain for server distro, Knoppix for Live Distro, Eclipse for &lt;span class="caps"&gt;IDE&lt;/span&gt;/Web
+Development Environment, Python for language of the year, and - much to
+my chagrin - vi/vim for&amp;nbsp;editor.&lt;/p&gt;
+&lt;p&gt;A &lt;a href="http://www.linuxjournal.com/content/whats-next-open-source-and-public-media"&gt;LinuxJournal article on What&amp;#8217;s Next for Open Source and Public
+Meida&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://www.linuxinsider.com/rsstory/61803.html"&gt;LinuxInsider - &lt;span class="caps"&gt;EU&lt;/span&gt; taking Microsoft&amp;#8217;s promises with a grain of
+salt&lt;/a&gt;, noting that &lt;span class="caps"&gt;MS&lt;/span&gt;
+has made &amp;#8220;at least four similar statements&amp;#8221; in the&amp;nbsp;past.&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://utcc.utoronto.ca/~cks/space/blog/"&gt;Chris Siebenmann&lt;/a&gt; - &lt;a href="http://utcc.utoronto.ca/~cks/space/blog/tech/SharingRisk"&gt;Where
+the risk is with virtualization (and
+iSCSI)&lt;/a&gt; and
+&lt;a href="http://utcc.utoronto.ca/~cks/space/blog/sysadmin/WirelessMachineRoom"&gt;Wireless, machine rooms, and the Asus
+eeePC&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://www.ibm.com/developerworks/library/x-ooxmlstandard.html?ca=dgr-lnxw06OOXMLBigDeal&amp;amp;S_TACT=105AGX59&amp;amp;S_CMP=GR"&gt;&lt;span class="caps"&gt;IBM&lt;/span&gt; DeveloperWorks - &lt;span class="caps"&gt;OOXML&lt;/span&gt;: What&amp;#8217;s the big
+deal?&lt;/a&gt;
+- outlining the technical objections to &lt;span class="caps"&gt;OOXML&lt;/span&gt; as a standard. Linked from
+a &lt;a href="http://rootprompt.org/article.php3?article=11548"&gt;rootprompt.org&lt;/a&gt;
+article mentioning that &amp;#8220;&lt;span class="caps"&gt;OOXML&lt;/span&gt; is essentially a complete replication of
+every chunk of data that a Microsoft Office application might possibly
+save in a&amp;nbsp;file&amp;#8221;.&lt;/p&gt;
+&lt;p&gt;Slashdot &lt;span class="caps"&gt;YRO&lt;/span&gt; - &lt;a href="http://yro.slashdot.org/article.pl?sid=08/02/25/0159250&amp;amp;from=rss"&gt;a guy who got hist stock photos stolen, entered into a
+long legal battle, and
+won&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;Microsoft&amp;#8217;s &lt;a href="http://seattlepi.nwsource.com/business/352442_vista23.html"&gt;Windows Vista Capable lawsuit granted class-action
+status&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;A &lt;a href="http://www.washingtonpost.com/wp-dyn/content/article/2008/02/23/AR2008022300693.html"&gt;Washington Post article on Hans Reiser&amp;#8217;s Geek Defense
+strategy&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;A &lt;a href="http://apple.slashdot.org/article.pl?sid=08/02/23/1915254&amp;amp;from=rss"&gt;Slashdot post linking to news that Apple sent a cease-and-decist
+order to the Hymn
+Project&lt;/a&gt;,
+which produces software to remove &lt;span class="caps"&gt;DRM&lt;/span&gt; from iTunes songs. Apple had their
+&lt;span class="caps"&gt;ISP&lt;/span&gt; remove all download links. (I guess the only solution is for us all
+to buy bandwidth right from a&amp;nbsp;&lt;span class="caps"&gt;NSP&lt;/span&gt;&amp;#8230;)&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://news.yahoo.com/s/ap/20080222/ap_on_hi_te/yahoo_shareholder_lawsuit"&gt;Yahoo&amp;#8217;s shareholders are suing it for not gobbling up the Microsoft
+deal&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://arstechnica.com/news.ars/post/20080220-disgruntled-customer-sues-comcast-over-p2p-throttling.html"&gt;Comcast getting sued &lt;span class="caps"&gt;AGAIN&lt;/span&gt; for &lt;span class="caps"&gt;P2P&lt;/span&gt;
+filtering&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://blog.wired.com/music/2008/02/riaa-training-v.html"&gt;A leaked &lt;span class="caps"&gt;RIAA&lt;/span&gt; training video for
+prosecutors&lt;/a&gt;,
+going so far as to say that &lt;span class="caps"&gt;IP&lt;/span&gt; piracy can lead to arrests for drugs,
+weapons, or terrorism. It also includes instructions on how to get a
+&lt;span class="caps"&gt;RIAA&lt;/span&gt; investigator certified as a court&amp;nbsp;expert.&lt;/p&gt;
+&lt;p&gt;A &lt;a href="http://www.nytimes.com/2008/02/21/fashion/21webgirls.html?_r=2&amp;amp;oref=slogin&amp;amp;oref=slogin"&gt;New York Times article on - gasp - women using the
+Internet&lt;/a&gt;.
+Linked from &lt;a href="http://yesthattom.livejournal.com"&gt;Tom Limoncelli&amp;#8217;s blog&lt;/a&gt;.&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Mon, 25 Feb 2008 11:20:00 -0500</pubDate><guid>tag:newblog.jasonantman.com,2008-02-25:2008/02/links-for-2008-02-23/</guid><category>apple</category><category>bitlocker</category><category>cellphone</category><category>EU</category><category>firefox</category><category>gsm</category><category>microsoft</category><category>ooxml</category><category>pakistan</category><category>riaa</category><category>virtualization</category><category>wikileaks</category><category>windows</category><category>youtube</category></item><item><title>Links for the weekend of February 10, 2008</title><link>http://newblog.jasonantman.com/2008/02/links-for-the-weekend-of-february-10-2008/</link><description>&lt;p&gt;Well, I don&amp;#8217;t have much time for a real post. I&amp;#8217;m quite busy with school
+work and prepping for an &lt;a href="http://www.opensolaris.org"&gt;OpenSolaris&lt;/a&gt; demo
+at &lt;a href="http://ruslug.rutgers.edu"&gt;&lt;span class="caps"&gt;RUSLUG&lt;/span&gt;&lt;/a&gt; on this Tuesday. Also, I&amp;#8217;ve
+pretty much finished my initial evaluation of &lt;a href="http://www.hyperic.com"&gt;Hyperic
+&lt;span class="caps"&gt;HQ&lt;/span&gt;&lt;/a&gt; and, after reviewing the features of most of
+the options, I&amp;#8217;m looking at &lt;a href="http://www.zenoss.com"&gt;Zenoss Core&lt;/a&gt; for the
+next&amp;nbsp;round.&lt;/p&gt;
+&lt;p&gt;So, instead of anything interesting, a few news stories from the past
+few&amp;nbsp;days:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;Slashdot - an interesting &lt;a href="http://yro.slashdot.org/article.pl?sid=08/02/10/1251233&amp;amp;from=rss"&gt;article on search and seizure of
+    electronic devices at&amp;nbsp;airports&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;From
+    &lt;a href="http://asuseeehacks.blogspot.com/2008/02/security-alert-asus-eee-pc-vulnerable.html"&gt;asuseeehacks.blogspot.com&lt;/a&gt;,
+    also &lt;a href="http://seclists.org/bugtraq/2008/Feb/0086.html"&gt;bugtraq&lt;/a&gt; - the
+    Asus eeePC apparently has a root-level vulnerability in its&amp;#8217;
+    out-of-the-box Xandros distro, involving Samba. For people like me
+    who put a much better &lt;span class="caps"&gt;OS&lt;/span&gt; on it, it&amp;#8217;s not a big&amp;nbsp;problem.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;a href="http://www.informationweek.com/news/showArticle.jhtml?articleID=206106956"&gt;InformationWeek is
+    reporting&lt;/a&gt;
+    that the &lt;span class="caps"&gt;EU&lt;/span&gt; is investigating Microsoft - again. This time, for
+    violating antitrust laws during its&amp;#8217; push for &lt;span class="caps"&gt;MSOOXML&lt;/span&gt;. There&amp;#8217;s also
+    &lt;a href="http://www.groklaw.net/article.php?story=20080208151410252"&gt;a small page at GrokLaw dedicated to this newest
+    development&lt;/a&gt;.&lt;/li&gt;
+&lt;li&gt;&lt;a href="http://arstechnica.com/news.ars/post/20080207-controversial-college-funding-bill-passedp2p-proviso-intact.html"&gt;According to Ars
+    Technica&lt;/a&gt;,
+    the congressional bill on college funding that would require schools
+    to filter out &lt;span class="caps"&gt;P2P&lt;/span&gt; traffic has &lt;span class="caps"&gt;PASSED&lt;/span&gt; in the House, with the
+    filtering clause intact. Fine. Whatever. A gross invasion of
+    privacy, and of college students&amp;#8217; rights, but that&amp;#8217;s nothing new.
+    However, if I&amp;#8217;m sitting in my office at Rutgers and have a
+    &lt;em&gt;single hiccup&lt;/em&gt; downloading
+    the OpenSuSE Beta 1 via BitTorrent on April 17th, mark my words, my
+    congressmen (and Rutgers administrators) will learn my phone number
+    by&amp;nbsp;heart.&lt;/li&gt;
+&lt;li&gt;&lt;a href="http://recordingindustryvspeople.blogspot.com/2008/02/judge-grants-eff-motion-for-leave-to.html"&gt;Some progress in Arista v. Does
+    1-21&lt;/a&gt;,
+    the &lt;span class="caps"&gt;RIAA&lt;/span&gt;&amp;#8217;s attack on Boston University students. But, unfortunately,
+    the end of the McCarthy-esque tactics doesn&amp;#8217;t seem to be near yet
+    and, even worse for me, neither does the likelihood that the
+    recording industry will wake up and see what the market&amp;#8217;s asking
+    for, and give me downloadable &lt;span class="caps"&gt;DRM&lt;/span&gt;-free music and&amp;nbsp;movies.&lt;/li&gt;
+&lt;/ul&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Sun, 10 Feb 2008 23:07:00 -0500</pubDate><guid>tag:newblog.jasonantman.com,2008-02-10:2008/02/links-for-the-weekend-of-february-10-2008/</guid><category>antitrust</category><category>microsoft</category><category>msooxml</category><category>opensolaris</category><category>p2p</category><category>privacy</category><category>riaa</category><category>rights</category><category>ruslug</category></item></channel></rss>

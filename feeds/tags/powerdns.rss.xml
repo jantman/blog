@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Jason Antman's Blog</title><link>http://newblog.jasonantman.com/</link><description></description><atom:link href="http://newblog.jasonantman.com/feeds/tags/powerdns.rss.xml" rel="self"></atom:link><lastBuildDate>Wed, 05 Sep 2012 05:00:00 -0400</lastBuildDate><item><title>Some PowerDNS Links and Interesting Features</title><link>http://newblog.jasonantman.com/2012/09/some-powerdns-links-and-interesting-features/</link><description>&lt;p&gt;At $&lt;span class="caps"&gt;WORK&lt;/span&gt; we lost a disk in the &lt;span class="caps"&gt;RAID1&lt;/span&gt; of one of our external nameservers,
+and it rekindled an occasional discussion of migration from &lt;a&gt;&lt;span class="caps"&gt;ISC&lt;/span&gt;
+&lt;span class="caps"&gt;BIND&lt;/span&gt;&lt;/a&gt; to &lt;a href="http://powerdns.com/content/products.html"&gt;PowerDNS&lt;/a&gt;.
+PowerDNS has separate authoritative and recursive servers, and doesn&amp;#8217;t
+seem to natively support views or split-horizon the way &lt;span class="caps"&gt;BIND&lt;/span&gt; does, but
+it has some really cool features including very mature database
+backends, load balancing, Lua scripting support to modify how recursive
+queries are answered, and geolocation or &lt;span class="caps"&gt;IP&lt;/span&gt;-range based query&amp;nbsp;results.&lt;/p&gt;
+&lt;p&gt;While this project is still just casual research, I thought I&amp;#8217;d share
+some of the useful links and information I&amp;#8217;ve&amp;nbsp;found:&lt;/p&gt;
+&lt;p&gt;PowerDNS&amp;nbsp;Front-ends:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href="http://www.nicmus.com/community.html"&gt;JPowerAdmin&lt;/a&gt; - One of the two
+    most popular, a GPLv3 Java (JBoss &lt;span class="caps"&gt;SEAM&lt;/span&gt;) based web &lt;span class="caps"&gt;UI&lt;/span&gt; with a RESTful
+    &lt;span class="caps"&gt;API&lt;/span&gt;, with support for &amp;#8220;multiple&amp;#8221; database backends. Sponsored by
+    Nicmus, Inc. &lt;a href="http://www.nicmus.com/JPowerAdmin"&gt;Online demo&lt;/a&gt;
+    (demo:demo). Looks nice, simple &lt;span class="caps"&gt;UI&lt;/span&gt;, but no support for&amp;nbsp;split-horizon.&lt;/li&gt;
+&lt;li&gt;&lt;a href="https://www.poweradmin.org"&gt;PowerAdmin&lt;/a&gt; - the other most popular,
+    though it seems to be undergoing a large overhaul at the moment. Has
+    full support for most of PowerDNS&amp;#8217;s features, written in &lt;span class="caps"&gt;PHP&lt;/span&gt;,
+    supports &amp;#8220;large&amp;#8221; databases, fine-grained user permissions, &lt;span class="caps"&gt;RFC&lt;/span&gt;
+    validation, zone templates. &lt;a href="http://demo.poweradmin.org/"&gt;Online
+    demo&lt;/a&gt; (demo:demo). I don&amp;#8217;t really like
+    that it manages the SOAs as full text (without any templating,
+    dropdowns or default values), and that it doesn&amp;#8217;t prepopulate
+    default values for &lt;span class="caps"&gt;TTL&lt;/span&gt; in the new record form, but it looks like a
+    good starting place for someone (like me) who&amp;#8217;s handy with&amp;nbsp;&lt;span class="caps"&gt;PHP&lt;/span&gt;.&lt;/li&gt;
+&lt;li&gt;&lt;a href="http://code.google.com/p/pdns-gui/"&gt;pdns-gui - PowerDNS &lt;span class="caps"&gt;GUI&lt;/span&gt; - Google Project
+    Hosting&lt;/a&gt; - &lt;span class="caps"&gt;PHP&lt;/span&gt;/MySQL &lt;span class="caps"&gt;GUI&lt;/span&gt;.
+    &lt;a href="http://www.powerdns-gui.org/"&gt;Online demo&lt;/a&gt;. Handles templates
+    nicely but won&amp;#8217;t scale to too many of them. Window-based &lt;span class="caps"&gt;UI&lt;/span&gt; is
+    visually pleasing but will probably be a problem for big&amp;nbsp;zones.&lt;/li&gt;
+&lt;li&gt;&lt;a href="http://code.google.com/p/powerdns-webinterface/"&gt;powerdns-webinterface - PowerDNS Webinterface - Google Project
+    Hosting&lt;/a&gt; - A nice
+    but relatively simplistic &lt;span class="caps"&gt;UI&lt;/span&gt; written in &lt;span class="caps"&gt;PHP&lt;/span&gt;. It has some nice
+    features like multi-user authentication (and logging, though I
+    haven&amp;#8217;t looked into how detailed it is), automatic &lt;span class="caps"&gt;SOA&lt;/span&gt; serial
+    update, automatic &lt;span class="caps"&gt;PTR&lt;/span&gt; creation, etc. Unfortunately not geared
+    towards people with lots of domains and multiple records; it has
+    only one template for new domains (and no way to update domains
+    created from a template), no easy filtering, and still treats &lt;span class="caps"&gt;SOA&lt;/span&gt;
+    like a single text&amp;nbsp;record.&lt;/li&gt;
+&lt;li&gt;&lt;a href="http://sourceforge.net/projects/zoneadmin/"&gt;ZoneAdmin |
+    SourceForge.net&lt;/a&gt; and
+    &lt;a&gt;Project website&lt;/a&gt; - Maybe not the fastest tool to use in bulk,
+    but a nice, relatively intuitive and full-featured admin tool.
+    &lt;a href="http://open.megabit.net/demos/ZoneAdmin/"&gt;Online demo&lt;/a&gt;&amp;nbsp;(demo:demo).&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Some links on PowerDNS&amp;nbsp;split-horizon&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href="http://old.nabble.com/Split-Horizon-Scripts-td32843045.html"&gt;Old Nabble - PowerDNS - Split Horizon&amp;nbsp;Scripts&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;It looks to me that split-horizon is going to be the hardest part for
+us, at least to also have a web &lt;span class="caps"&gt;UI&lt;/span&gt; to manage it. It looks like with
+PowerDNS, the most common way to run split horizon &lt;span class="caps"&gt;DNS&lt;/span&gt; (views) is to run
+two separate sets of servers or instances, either on different boxes or
+multi-homed; one for internal and one for external. While that sounds
+like quite a bit of overhead beyond what &lt;span class="caps"&gt;BIND&lt;/span&gt; does, the real problem is
+finding a web &lt;span class="caps"&gt;UI&lt;/span&gt; that supports it; I don&amp;#8217;t care if it&amp;#8217;s in two separate
+databases, but what I want is a logical (web &lt;span class="caps"&gt;UI&lt;/span&gt;) view that has zones
+made up of resource names (i.e. the leftmost column in a zone file) with
+one or two RRs (type, ttl, priority, value) - one for each view. That&amp;#8217;s
+the real catch - all of our machines are in private &lt;span class="caps"&gt;IP&lt;/span&gt; space behind a
+firewall, so I need to be able to manage the internal and external
+records on one screen. While it&amp;#8217;s not exactly scalable, and the code
+stagnated quite a bit once I got it to a point that was usable for me,
+this was the main goal of my &lt;a href="http://multibindadmin.jasonantman.com/"&gt;MultiBIND
+Admin&lt;/a&gt;&amp;nbsp;project.&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Wed, 05 Sep 2012 05:00:00 -0400</pubDate><guid>tag:newblog.jasonantman.com,2012-09-05:2012/09/some-powerdns-links-and-interesting-features/</guid><category>bind</category><category>dns</category><category>multibindadmin</category><category>powerdns</category></item></channel></rss>

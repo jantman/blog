@@ -1,0 +1,262 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Jason Antman's Blog</title><link href="http://newblog.jasonantman.com/" rel="alternate"></link><link href="http://newblog.jasonantman.com/feeds/tags/dhcpd.atom.xml" rel="self"></link><id>http://newblog.jasonantman.com/</id><updated>2011-12-24T14:42:00-05:00</updated><entry><title>Vyatta - Showing ISC dhcpd fixed-address leases</title><link href="http://newblog.jasonantman.com/2011/12/vyatta-showing-isc-dhcpd-fixed-address-leases/" rel="alternate"></link><updated>2011-12-24T14:42:00-05:00</updated><author><name>admin</name></author><id>tag:newblog.jasonantman.com,2011-12-24:2011/12/vyatta-showing-isc-dhcpd-fixed-address-leases/</id><summary type="html">&lt;p&gt;&lt;span class="caps"&gt;ISC&lt;/span&gt; &lt;a href="http://www.isc.org/software/dhcp"&gt;dhcpd&lt;/a&gt; has the ability to always
+give a specific &lt;span class="caps"&gt;MAC&lt;/span&gt; address the same &lt;span class="caps"&gt;IP&lt;/span&gt; address &amp;#8220;lease&amp;#8221; using the
+fixed-address configuration option. This is configured in
+&lt;a href="http://www.vyatta.org"&gt;Vyatta&lt;/a&gt; using the &lt;code&gt;static-mapping&lt;/code&gt; configuration
+statement. Unfortunately, since dhcpd doesn&amp;#8217;t store fixed-address leases
+in the &lt;code&gt;dhcpd.leases&lt;/code&gt; file, the Vyatta &lt;code&gt;show dhcp leases&lt;/code&gt; command
+doesn&amp;#8217;t show anything about them - which makes it difficult to debug
+anything dhcp-related if all of the hosts on your network are setup for
+fixed addresses. I found a mention of this on the &lt;a href="http://www.vyatta.org/forum/viewtopic.php?p=121558"&gt;vyatta
+forum&lt;/a&gt;, and also an
+&lt;a href="https://bugzilla.vyatta.com/show_bug.cgi?id=1990"&gt;open bug (1990)&lt;/a&gt; to
+fix it, but no proposed resolution. Since I came across this problem and
+happen to know a bit about &lt;span class="caps"&gt;ISC&lt;/span&gt; dhcpd, I developed both a workaround for
+users (including a perl script) and a possible solution for the Vyatta
+developers to&amp;nbsp;implement.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Workaround for&amp;nbsp;Users:&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;There&amp;#8217;s no way to get dhcpd to store fixed-address hosts in the
+dhcpd.leases file (though it&amp;#8217;s been discussed on the dhcpd-users mailing
+list a few times). There is, however, a way to get dhcpd to log every
+time it sends an &lt;span class="caps"&gt;ACK&lt;/span&gt; to a client. The following Vyatta configuration
+commands will get dhcpd to log all transactions to syslog, will have
+&lt;a href="http://rsyslog.com/"&gt;rsyslog&lt;/a&gt; put that in &lt;code&gt;/var/log/user/dhcpd&lt;/code&gt;. Since
+this log can fill up very quickly on a busy server, the latter two
+commands will tell &lt;a href="https://fedorahosted.org/logrotate/"&gt;logrotate&lt;/a&gt; to
+rotate the log file when it reaches 3000k in size, and keep 5 copies
+(feel free to adjust to your&amp;nbsp;needs):&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="gp"&gt;#&lt;/span&gt; &lt;span class="nb"&gt;set &lt;/span&gt;service dhcp-server global-parameters &lt;span class="s2"&gt;&amp;quot;log-facility local2;&amp;quot;&lt;/span&gt;
+&lt;span class="gp"&gt;#&lt;/span&gt; &lt;span class="nb"&gt;set &lt;/span&gt;system syslog file dhcpd facility local2 level debug
+&lt;span class="gp"&gt;#&lt;/span&gt; &lt;span class="nb"&gt;set &lt;/span&gt;system syslog file dhcpd archive files 5
+&lt;span class="gp"&gt;#&lt;/span&gt; &lt;span class="nb"&gt;set &lt;/span&gt;system syslog file dhcpd archive size 3000
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Once this is done, you can &lt;code&gt;tail -f /var/log/user/dhcpd&lt;/code&gt; to watch &lt;span class="caps"&gt;DHCP&lt;/span&gt;
+discover/request/offer/ack in realtime, or grep through the log file for
+a specific &lt;span class="caps"&gt;IP&lt;/span&gt; or &lt;span class="caps"&gt;MAC&lt;/span&gt;. If you want an easier method, I&amp;#8217;ve written a perl
+script (latest version will always live in &lt;a href="https://github.com/jantman/misc-scripts/blob/master/show_dhcp_fixed_ACKs.pl"&gt;my GitHub misc-scripts
+repo&lt;/a&gt;)
+to grep through &lt;code&gt;/var/log/user/dhcpd&lt;/code&gt; and show the most recent &lt;span class="caps"&gt;DHCPACK&lt;/span&gt;
+for each &lt;span class="caps"&gt;IP&lt;/span&gt; address, sorted by &lt;span class="caps"&gt;IP&lt;/span&gt;. Here&amp;#8217;s the code of the simple script,
+which is more than half comments. To use it, after performing the above
+steps, all you need to do is login to your Vyatta box,
+&lt;code&gt;wget https://raw.github.com/jantman/misc-scripts/master/show_dhcp_fixed_ACKs.pl&lt;/code&gt;
+and then &lt;code&gt;perl show_dhcp_fixed_ACKs.pl&lt;/code&gt;.&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="c1"&gt;#!/usr/bin/perl&lt;/span&gt;
+
+&lt;span class="c1"&gt;#&lt;/span&gt;
+&lt;span class="c1"&gt;# show_dhcp_fixed_ACKs.pl - script to show the most recent &lt;span class="caps"&gt;DHCP&lt;/span&gt; ACKs per &lt;span class="caps"&gt;IP&lt;/span&gt; address for &lt;span class="caps"&gt;ISC&lt;/span&gt; DHCPd,&lt;/span&gt;
+&lt;span class="c1"&gt;#   from a log file. Originally written for Vyatta routers that just show the dynamic leases.&lt;/span&gt;
+&lt;span class="c1"&gt;#&lt;/span&gt;
+&lt;span class="c1"&gt;# To use this, you need to have dhcpd logging to syslog, and your syslog server putting the log file at&lt;/span&gt;
+&lt;span class="c1"&gt;# /var/log/user/dhcpd (or a file path specified by the $logfile variable below.&lt;/span&gt;
+&lt;span class="c1"&gt;#&lt;/span&gt;
+&lt;span class="c1"&gt;# To accomplish this on Vyatta 6.3, run:&lt;/span&gt;
+&lt;span class="c1"&gt;# set service dhcp-server global-parameters &amp;quot;log-facility local2;&amp;quot;&lt;/span&gt;
+&lt;span class="c1"&gt;# set system syslog file dhcpd facility local2 level debug&lt;/span&gt;
+&lt;span class="c1"&gt;# set system syslog file dhcpd archive files 5&lt;/span&gt;
+&lt;span class="c1"&gt;# set system syslog file dhcpd archive size 3000&lt;/span&gt;
+&lt;span class="c1"&gt;# commit&lt;/span&gt;
+&lt;span class="c1"&gt;#&lt;/span&gt;
+&lt;span class="c1"&gt;# Copyright 2011 Jason Antman  All Rights Reserved.&lt;/span&gt;
+&lt;span class="c1"&gt;# This script is free for use by anyone anywhere, provided that you comply with the following terms:&lt;/span&gt;
+&lt;span class="c1"&gt;# 1) Keep this notice and copyright statement intact.&lt;/span&gt;
+&lt;span class="c1"&gt;# 2) Send any substantial changes, improvements or bog fixes back to me at the above address.&lt;/span&gt;
+&lt;span class="c1"&gt;# 3) If you include this in a product or redistribute it, you notify me, and include my name in the credits or changelog.&lt;/span&gt;
+&lt;span class="c1"&gt;#&lt;/span&gt;
+&lt;span class="c1"&gt;# The following &lt;span class="caps"&gt;URL&lt;/span&gt; always points to the newest version of this script. If you obtained it from another source, you should&lt;/span&gt;
+&lt;span class="c1"&gt;# check here:&lt;/span&gt;
+&lt;span class="c1"&gt;# $HeadURL$&lt;/span&gt;
+&lt;span class="c1"&gt;# $LastChangedRevision$&lt;/span&gt;
+&lt;span class="c1"&gt;#&lt;/span&gt;
+&lt;span class="c1"&gt;# &lt;span class="caps"&gt;CHANGELOG&lt;/span&gt;:&lt;/span&gt;
+&lt;span class="c1"&gt;# 2011-12-24 jason@jasonantman.com:&lt;/span&gt;
+&lt;span class="c1"&gt;#    initial version of script&lt;/span&gt;
+&lt;span class="c1"&gt;#&lt;/span&gt;
+&lt;span class="c1"&gt;#&lt;/span&gt;
+
+&lt;span class="k"&gt;use&lt;/span&gt; &lt;span class="n"&gt;strict&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="k"&gt;use&lt;/span&gt; &lt;span class="n"&gt;warnings&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+
+&lt;span class="k"&gt;my&lt;/span&gt; &lt;span class="nv"&gt;$logfile&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;/var/log/user/dhcpd&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+
+&lt;span class="k"&gt;my&lt;/span&gt; &lt;span class="nv"&gt;%data&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;();&lt;/span&gt;
+
+&lt;span class="nb"&gt;open&lt;/span&gt; &lt;span class="n"&gt;&lt;span class="caps"&gt;DF&lt;/span&gt;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nv"&gt;$logfile&lt;/span&gt; &lt;span class="ow"&gt;or&lt;/span&gt; &lt;span class="nb"&gt;die&lt;/span&gt; &lt;span class="vg"&gt;$!&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="k"&gt;while&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt; &lt;span class="k"&gt;my&lt;/span&gt; &lt;span class="nv"&gt;$line&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt;  &lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt; &lt;span class="nv"&gt;$line&lt;/span&gt; &lt;span class="o"&gt;!~&lt;/span&gt; &lt;span class="sr"&gt;m/dhcpd: &lt;span class="caps"&gt;DHCPACK&lt;/span&gt;/&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt; &lt;span class="k"&gt;next&lt;/span&gt;&lt;span class="p"&gt;;}&lt;/span&gt;
+    &lt;span class="nv"&gt;$line&lt;/span&gt; &lt;span class="o"&gt;=~&lt;/span&gt; &lt;span class="sr"&gt;m/([A-Za-z]+ [0-9]+ [0-9]{1,2}:[0-9]{2}:[0-9]{2}) [^\/x]+ dhcpd: &lt;span class="caps"&gt;DHCPACK&lt;/span&gt; on (\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}) to ((?:[0-9a-f]{2}[:-]){5}[0-9a-f]{2}) via (.+)/&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+    &lt;span class="c1"&gt;#print &amp;quot;$1==$2==$3==$4==\n&amp;quot; ;&lt;/span&gt;
+    &lt;span class="nv"&gt;$data&lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;$2&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;mac&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;$3&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+    &lt;span class="nv"&gt;$data&lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;$2&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;date&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;$1&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+    &lt;span class="nv"&gt;$data&lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;$2&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;if&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;$4&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+    &lt;span class="nv"&gt;$data&lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;$2&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;ip&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;$2&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;    
+&lt;span class="p"&gt;}&lt;/span&gt;
+
+&lt;span class="nb"&gt;printf&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;%-18s %-20s %-18s %-10s\n&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;&lt;span class="caps"&gt;IP&lt;/span&gt; Address&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;Hardware Address&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;Date&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;Interface&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;span class="nb"&gt;printf&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;%-18s %-20s %-18s %-10s\n&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;----------&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;----------------&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;----&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;---------&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+
+&lt;span class="c1"&gt;# begin sort by &lt;span class="caps"&gt;IP&lt;/span&gt; address&lt;/span&gt;
+&lt;span class="k"&gt;my&lt;/span&gt; &lt;span class="nv"&gt;@keys&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt;
+  &lt;span class="nb"&gt;map&lt;/span&gt;  &lt;span class="nb"&gt;substr&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;$_&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mi"&gt;4&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;=&amp;gt;&lt;/span&gt;
+  &lt;span class="nb"&gt;sort&lt;/span&gt;
+  &lt;span class="nb"&gt;map&lt;/span&gt;  &lt;span class="nb"&gt;pack&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;C4&amp;#39;&lt;/span&gt; &lt;span class="o"&gt;=&amp;gt;&lt;/span&gt;
+    &lt;span class="sr"&gt;/(\d+)\.(\d+)\.(\d+)\.(\d+)/&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+    &lt;span class="o"&gt;.&lt;/span&gt; &lt;span class="nv"&gt;$_&lt;/span&gt; &lt;span class="o"&gt;=&amp;gt;&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;keys&lt;/span&gt; &lt;span class="nv"&gt;%data&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;span class="c1"&gt;# end sort by &lt;span class="caps"&gt;IP&lt;/span&gt; address&lt;/span&gt;
+
+&lt;span class="k"&gt;foreach&lt;/span&gt; &lt;span class="k"&gt;my&lt;/span&gt; &lt;span class="nv"&gt;$key&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;@keys&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="nb"&gt;printf&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;%-18s %-20s %-18s %-10s\n&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nv"&gt;$data&lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="nv"&gt;$key&lt;/span&gt;&lt;span class="p"&gt;}{&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;ip&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;},&lt;/span&gt; &lt;span class="nv"&gt;$data&lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="nv"&gt;$key&lt;/span&gt;&lt;span class="p"&gt;}{&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;mac&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;},&lt;/span&gt; &lt;span class="nv"&gt;$data&lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="nv"&gt;$key&lt;/span&gt;&lt;span class="p"&gt;}{&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;date&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;},&lt;/span&gt; &lt;span class="nv"&gt;$data&lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="nv"&gt;$key&lt;/span&gt;&lt;span class="p"&gt;}{&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;if&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;});&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;&lt;strong&gt;A solution for&amp;nbsp;Vyatta:&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;I suggested this to Vyatta in a reply to &lt;a href="https://bugzilla.vyatta.com/show_bug.cgi?id=1990"&gt;bug
+1990&lt;/a&gt;. Since they
+already use &lt;a href="http://rsyslog.com/"&gt;rsyslog&lt;/a&gt; which has very powerful
+processing capabilities, it would be easy to have rsyslog parse the
+&lt;span class="caps"&gt;DHCPACK&lt;/span&gt; messages in real time and update some data store (flat files or
+a simple database) with the information. While how to store this would
+be up to the Vyatta guys, I have some rsyslog configuration to parse
+&lt;span class="caps"&gt;DHCPACK&lt;/span&gt; messages and update a MySQL database (with two tables; one for
+most recent &lt;span class="caps"&gt;ACK&lt;/span&gt; per &lt;span class="caps"&gt;IP&lt;/span&gt; address and one for most recent &lt;span class="caps"&gt;ACK&lt;/span&gt; per &lt;span class="caps"&gt;MAC&lt;/span&gt;
+address) that might be of some&amp;nbsp;use:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;$template DHCPACKonIP, &amp;quot;INSERT INTO dhcplog_ip   
+       SET   
+       server_ip=inet_aton(&amp;#39;%fromhost-ip%&amp;#39;),   
+       msg_type=&amp;#39;DHCPACK&amp;#39;,   
+       date=&amp;#39;%timereported:::date-mysql%&amp;#39;,   
+       mac_addr=&amp;#39;%msg:R,ERE,2,BLANK:DHCPACK on ([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}) to (([0-9a-f]{2}:){5}[0-9a-f]{2})( \(([^)]+)\))? via (([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3})|eth0)--end%&amp;#39;,   
+       client_ip=inet_aton(&amp;#39;%msg:R,ERE,1,BLANK:DHCPACK on ([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}) to (([0-9a-f]{2}:){5}[0-9a-f]{2})( \(([^)]+)\))? via (([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3})|eth0)--end%&amp;#39;),   
+       gateway=&amp;#39;%msg:R,ERE,6,BLANK:DHCPACK on ([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}) to (([0-9a-f]{2}:){5}[0-9a-f]{2})( \(([^)]+)\))? via (([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3})|eth0)--end%&amp;#39;,   
+       fullmsg=&amp;#39;%msg%&amp;#39;   
+       ON DUPLICATE KEY UPDATE   
+       server_ip=inet_aton(&amp;#39;%fromhost-ip%&amp;#39;),   
+       date=&amp;#39;%timereported:::date-mysql%&amp;#39;,   
+       mac_addr=&amp;#39;%msg:R,ERE,2,BLANK:DHCPACK on ([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}) to (([0-9a-f]{2}:){5}[0-9a-f]{2})( \(([^)]+)\))? via (([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3})|eth0)--end%&amp;#39;,   
+       gateway=&amp;#39;%msg:R,ERE,6,BLANK:DHCPACK on ([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}) to (([0-9a-f]{2}:){5}[0-9a-f]{2})( \(([^)]+)\))? via (([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3})|eth0)--end%&amp;#39;,   
+       fullmsg=&amp;#39;%msg%&amp;#39;  
+&amp;quot;,SQL
+
+$template DHCPACKonMAC, &amp;quot;INSERT INTO dhcplog_mac   
+       SET   
+       server_ip=inet_aton(&amp;#39;%fromhost-ip%&amp;#39;),   
+       msg_type=&amp;#39;DHCPACK&amp;#39;,   
+       date=&amp;#39;%timereported:::date-mysql%&amp;#39;,   
+       mac_addr=&amp;#39;%msg:R,ERE,2,BLANK:DHCPACK on ([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}) to (([0-9a-f]{2}:){5}[0-9a-f]{2})( \(([^)]+)\))? via (([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3})|eth0)--end%&amp;#39;,   
+       client_ip=inet_aton(&amp;#39;%msg:R,ERE,1,BLANK:DHCPACK on ([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}) to (([0-9a-f]{2}:){5}[0-9a-f]{2})( \(([^)]+)\))? via (([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3})|eth0)--end%&amp;#39;),   
+       gateway=&amp;#39;%msg:R,ERE,6,BLANK:DHCPACK on ([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}) to (([0-9a-f]{2}:){5}[0-9a-f]{2})( \(([^)]+)\))? via (([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3})|eth0)--end%&amp;#39;,   
+       fullmsg=&amp;#39;%msg%&amp;#39;   
+       ON DUPLICATE KEY UPDATE   
+       server_ip=inet_aton(&amp;#39;%fromhost-ip%&amp;#39;),   
+       date=&amp;#39;%timereported:::date-mysql%&amp;#39;,   
+       client_ip=inet_aton(&amp;#39;%msg:R,ERE,1,BLANK:DHCPACK on ([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}) to (([0-9a-f]{2}:){5}[0-9a-f]{2})( \(([^)]+)\))? via (([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3})|eth0)--end%&amp;#39;),   
+       gateway=&amp;#39;%msg:R,ERE,6,BLANK:DHCPACK on ([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}) to (([0-9a-f]{2}:){5}[0-9a-f]{2})( \(([^)]+)\))? via (([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3})|eth0)--end%&amp;#39;,   
+       fullmsg=&amp;#39;%msg%&amp;#39;  
+&amp;quot;,SQL
+
+$template DHCPACKtoIP, &amp;quot;INSERT INTO dhcplog_ip   
+       SET   
+       server_ip=inet_aton(&amp;#39;%fromhost-ip%&amp;#39;),   
+       msg_type=&amp;#39;DHCPACK&amp;#39;,   
+       date=&amp;#39;%timereported:::date-mysql%&amp;#39;,   
+       mac_addr=&amp;#39;%msg:R,ERE,2,BLANK:DHCPACK to ([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}) \((([0-9a-f]{2}:){5}[0-9a-f]{2})\) via (([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3})|eth0)--end%&amp;#39;,   
+       client_ip=inet_aton(&amp;#39;%msg:R,ERE,1,BLANK:DHCPACK to ([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}) \((([0-9a-f]{2}:){5}[0-9a-f]{2})\) via (([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3})|eth0)--end%&amp;#39;),   
+       gateway=&amp;#39;%msg:R,ERE,4,BLANK:DHCPACK to ([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}) \((([0-9a-f]{2}:){5}[0-9a-f]{2})\) via (([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3})|eth0)--end%&amp;#39;,   
+       fullmsg=&amp;#39;%msg%&amp;#39;   
+       ON DUPLICATE KEY UPDATE   
+       server_ip=inet_aton(&amp;#39;%fromhost-ip%&amp;#39;),   
+       date=&amp;#39;%timereported:::date-mysql%&amp;#39;,   
+       mac_addr=&amp;#39;%msg:R,ERE,2,BLANK:DHCPACK to ([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}) \((([0-9a-f]{2}:){5}[0-9a-f]{2})\) via (([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3})|eth0)--end%&amp;#39;,   
+       gateway=&amp;#39;%msg:R,ERE,4,BLANK:DHCPACK to ([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}) \((([0-9a-f]{2}:){5}[0-9a-f]{2})\) via (([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3})|eth0)--end%&amp;#39;,   
+       fullmsg=&amp;#39;%msg%&amp;#39;  
+&amp;quot;,SQL
+
+$template DHCPACKtoMAC, &amp;quot;INSERT INTO dhcplog_mac   
+       SET   
+       server_ip=inet_aton(&amp;#39;%fromhost-ip%&amp;#39;),   
+       msg_type=&amp;#39;DHCPACK&amp;#39;,   
+       date=&amp;#39;%timereported:::date-mysql%&amp;#39;,   
+       mac_addr=&amp;#39;%msg:R,ERE,2,BLANK:DHCPACK to ([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}) \((([0-9a-f]{2}:){5}[0-9a-f]{2})\) via (([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3})|eth0)--end%&amp;#39;,   
+       client_ip=inet_aton(&amp;#39;%msg:R,ERE,1,BLANK:DHCPACK to ([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}) \((([0-9a-f]{2}:){5}[0-9a-f]{2})\) via (([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3})|eth0)--end%&amp;#39;),   
+       gateway=&amp;#39;%msg:R,ERE,4,BLANK:DHCPACK to ([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}) \((([0-9a-f]{2}:){5}[0-9a-f]{2})\) via (([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3})|eth0)--end%&amp;#39;,   
+       fullmsg=&amp;#39;%msg%&amp;#39;   
+       ON DUPLICATE KEY UPDATE   
+       server_ip=inet_aton(&amp;#39;%fromhost-ip%&amp;#39;),   
+       date=&amp;#39;%timereported:::date-mysql%&amp;#39;,   
+       client_ip=inet_aton(&amp;#39;%msg:R,ERE,1,BLANK:DHCPACK to ([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}) \((([0-9a-f]{2}:){5}[0-9a-f]{2})\) via (([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3})|eth0)--end%&amp;#39;),   
+       gateway=&amp;#39;%msg:R,ERE,4,BLANK:DHCPACK to ([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}) \((([0-9a-f]{2}:){5}[0-9a-f]{2})\) via (([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3})|eth0)--end%&amp;#39;,   
+       fullmsg=&amp;#39;%msg%&amp;#39;  
+&amp;quot;,SQL
+
+:msg, startswith, &amp;quot; DHCPACK on&amp;quot; :ommysql:hostname,database,dbuser,dbpass;DHCPACKonIP
+&lt;span class="amp"&gt;&amp;amp;&lt;/span&gt; :ommysql:hostname,database,dbuser,dbpass;DHCPACKonMAC
+&lt;span class="amp"&gt;&amp;amp;&lt;/span&gt; ~ ### &lt;span class="caps"&gt;DISCARD&lt;/span&gt;
+
+if $msg startswith &amp;#39; &lt;span class="caps"&gt;DHCPACK&lt;/span&gt; to&amp;#39; and ( not ( $msg contains &amp;#39;no client hardware address&amp;#39; ) )   
+then :ommysql:hostname,database,dbuser,dbpass;DHCPACKtoMAC
+&lt;span class="amp"&gt;&amp;amp;&lt;/span&gt; :ommysql:hostname,database,dbuser,dbpass;DHCPACKtoIP
+&lt;span class="amp"&gt;&amp;amp;&lt;/span&gt; ~ ### &lt;span class="caps"&gt;DISCARD&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;</summary><category term="dhcpd"></category><category term="rsyslog"></category><category term="vyatta"></category></entry><entry><title>Xen/Etherboot and DHCP Problems</title><link href="http://newblog.jasonantman.com/2010/04/xenetherboot-and-dhcp-problems/" rel="alternate"></link><updated>2010-04-20T10:46:00-04:00</updated><author><name>admin</name></author><id>tag:newblog.jasonantman.com,2010-04-20:2010/04/xenetherboot-and-dhcp-problems/</id><summary type="html">&lt;p&gt;Well, I&amp;#8217;ve spend the better part of the last week or so debugging a
+problem with out new Xen VMs (on one host) not getting &lt;span class="caps"&gt;DHCP&lt;/span&gt; leases.
+Since our &lt;span class="caps"&gt;DHCP&lt;/span&gt; servers (&lt;span class="caps"&gt;ISC&lt;/span&gt; DHCPd 3.0.6) are using Brian Masney&amp;#8217;s &lt;a href="http://personal.cfw.com/~masneyb/"&gt;&lt;span class="caps"&gt;LDAP&lt;/span&gt;
+patch&lt;/a&gt; (which has recently been
+included in &lt;a href="http://www.isc.org/files/release-notes/42b2_0.html"&gt;mainline
+DHCPd&lt;/a&gt;), I assumed
+that this might be the source of some of the&amp;nbsp;problems.&lt;/p&gt;
+&lt;p&gt;The Xen client booting process uses &lt;a href="http://etherboot.org/"&gt;Etherboot&lt;/a&gt;
+(specifically 5.4.2 on my machines) to get &lt;span class="caps"&gt;DHCP&lt;/span&gt; and &lt;span class="caps"&gt;PXE&lt;/span&gt; for the client.
+The Etherboot &lt;span class="caps"&gt;ROM&lt;/span&gt; is generated online with
+&lt;a href="http://rom-o-matic.net/"&gt;&lt;span class="caps"&gt;ROM&lt;/span&gt;-o-Matic&lt;/a&gt; (by the Xen devs) and is then
+packaged into &lt;code&gt;hvmloader&lt;/code&gt; (though I would not find this out until much
+later in my investigation, given the piss-poor documentation about it).
+So, aside from pulling the &lt;span class="caps"&gt;SRPM&lt;/span&gt; for Xen and looking around, I decided I
+couldn&amp;#8217;t really debug much on the client end (I wasn&amp;#8217;t getting any
+&lt;span class="caps"&gt;BIOS&lt;/span&gt;-like messages from Xen, so the client end seemed to be pretty much
+a black&amp;nbsp;box).&lt;/p&gt;
+&lt;p&gt;After a week of re-examining our &lt;span class="caps"&gt;DHCP&lt;/span&gt; servers, moving the client between
+pieces of hardware and different networks, tracing out the &lt;span class="caps"&gt;DHCP&lt;/span&gt; logs,
+and debugging everything in-between, I finally resorted to doing packet
+captures and analyzing them. Last Thursday (my last work day of the
+week), I popped my laptop on the same network, set it up in &lt;span class="caps"&gt;DHCP&lt;/span&gt;, and
+did some captures of the laptop (which worked correctly) and the problem&amp;nbsp;&lt;span class="caps"&gt;VM&lt;/span&gt;.&lt;/p&gt;
+&lt;p&gt;Sometime around 10:00 &lt;span class="caps"&gt;PM&lt;/span&gt;, long after I&amp;#8217;d gotten home, I had opened
+captures of both the good and bad hosts in separate
+&lt;a href="http://www.wireshark.org/"&gt;Wireshark&lt;/a&gt; windows, and was going through
+them line-by-line. I&amp;#8217;d also written a nifty little &lt;a href="/GFX/dhcptest.pl"&gt;Perl
+script&lt;/a&gt; (my weakest language) using
+&lt;a href="http://search.cpan.org/~fvandun/Net-DHCP-0.11/lib/Net/DHCP/Packet.pm"&gt;Net::&lt;span class="caps"&gt;DHCP&lt;/span&gt;::Packet&lt;/a&gt;
+to craft packets identical to the ones from the working and &lt;span class="caps"&gt;FUBAR&lt;/span&gt; hosts,
+and inject them into the network. The only thing I could find different
+was the value of the &amp;#8220;secs&amp;#8221; field of the &lt;span class="caps"&gt;DHCPDISCOVER&lt;/span&gt; packets (octets 9
+and 10), which are supposed to contain the number of seconds that have
+passed since the host started booting (&lt;a href="http://www.faqs.org/rfcs/rfc1541.html"&gt;&lt;span class="caps"&gt;RFC&lt;/span&gt;
+1541&lt;/a&gt;). My laptop (the working
+host) started getting replies from the server at 21 seconds. I took my
+Perl packet-injecting script, and started adjusting the &amp;#8220;secs&amp;#8221; values of
+both the working and bad packets. Sure enough, with identical packets
+from each host, the values converged. Anything with &amp;#8220;secs&amp;#8221; below 2 got
+no response from the &lt;span class="caps"&gt;DHCP&lt;/span&gt; server, anything with 2 or greater got a
+correct&amp;nbsp;lease.&lt;/p&gt;
+&lt;p&gt;Then it hit me. When we used to have a primary/secondary &lt;span class="caps"&gt;DHCP&lt;/span&gt; server
+setup (with manual failover), we&amp;#8217;d configured the secondary server with
+&lt;code&gt;min-secs: 2&lt;/code&gt;, instructing it to not give out any leases to clients with
+a &amp;#8220;secs&amp;#8221; value of under 2, to prevent the secondary server from
+answering if, for some reason, the primary was still online.&amp;nbsp;Bingo.&lt;/p&gt;
+&lt;p&gt;At this point, I&amp;#8217;m waiting to have a meeting of the binds before I add a
+network-level override of &amp;#8220;min-secs: 0&amp;#8221; for the networks in question.
+But I&amp;#8217;m relatively confident that everything will go smoothly from there&amp;nbsp;on.&lt;/p&gt;
+&lt;p&gt;This experience highlighted that one small &amp;#8220;bug&amp;#8221; can confuse 3 people
+for the better part of a&amp;nbsp;week:&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://etherboot.org/"&gt;Etherboot&lt;/a&gt; (at least 5.4.2) doesn&amp;#8217;t increment
+the &amp;#8220;secs&amp;#8221; field in its &lt;span class="caps"&gt;DISCOVER&lt;/span&gt; packets as &lt;span class="caps"&gt;RFC&lt;/span&gt; 1541 suggests. Therefore
+anyone with &amp;#8220;min-secs&amp;#8221; in their dhcpd configuration won&amp;#8217;t ever give out
+a&amp;nbsp;lease.&lt;/p&gt;
+&lt;p&gt;In hindsight, it really was a brain-dead moment. There was a little note
+in the dhcpd logs that I, and the others, totally overlooked:
+&amp;#8220;&lt;span class="caps"&gt;DHCPDISCOVER&lt;/span&gt; (&amp;#8230;) 0 secs &amp;lt; 2&amp;#8221;. I guess I should have turned my brain
+on and realized that those few characters were probably important, and
+there for a reason, no matter how unassuming (and un-error-like) they
+may&amp;nbsp;be&amp;#8230;&lt;/p&gt;</summary><category term="dhcp"></category><category term="dhcpd"></category><category term="etherboot"></category><category term="ldap"></category><category term="pxe"></category><category term="xen"></category></entry></feed>

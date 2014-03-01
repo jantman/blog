@@ -1,0 +1,348 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Jason Antman's Blog</title><link>http://newblog.jasonantman.com/</link><description></description><atom:link href="http://newblog.jasonantman.com/feeds/tags/emergency.rss.xml" rel="self"></atom:link><lastBuildDate>Tue, 01 Dec 2009 14:11:00 -0500</lastBuildDate><item><title>Using Google Maps to produce usable, printable maps</title><link>http://newblog.jasonantman.com/2009/12/using-google-maps-to-produce-usable-printable-maps/</link><description>&lt;p&gt;This is a follow-up to my &lt;a href="/2009/11/making-maps-from-gis-data-with-inkscape/"&gt;Making maps from &lt;span class="caps"&gt;GIS&lt;/span&gt; data with
+Inkscape&lt;/a&gt; post. After
+playing around with Inkscape for quite a while, and coming up with the
+dismal results seen in that post, I decided there has to be an easier
+way. A little Googling turned up &lt;a href="http://www.wipeout44.com/video/misc/google_maps_large.asp"&gt;this video
+tutorial&lt;/a&gt; on
+how to print large scale maps from Google Maps. It turns out that the
+Google Maps &lt;span class="caps"&gt;API&lt;/span&gt; will honor almost any pixel resolution that it&amp;#8217;s passed.
+The &lt;a href="https://addons.mozilla.org/en-US/firefox/addon/1146"&gt;Screengrab&lt;/a&gt;
+add-on for Firefox has the wonderful capability of being able to capture
+a screengrab of page content, at actual resolution, regardless of screen
+resolution. So load up a 5000x5000 pixel Google Map, use the Screengrab
+addon, and end up with a full 5000x5000 pixel image&amp;nbsp;file.&lt;/p&gt;
+&lt;p&gt;After testing this a bit, I decided to go the Google Maps route. This
+also has a lot of other added bonuses - I can store my overlay data in
+simple &lt;span class="caps"&gt;XML&lt;/span&gt; files, add and remove layers on-the-fly, and also make it
+available online (and, theoretically, to any Google Maps-equipped device
+used by responders). This even opens up the possibility of using paper
+maps as a last resort, and providing the Fire Department with live
+hydrant maps on &lt;span class="caps"&gt;GPS&lt;/span&gt;-enabled handheld devices and&amp;nbsp;phones.&lt;/p&gt;
+&lt;p&gt;The quirks, however, may need some serious photoshopping (err, rather,
+&lt;a href="http://www.gimp.org/"&gt;gimp&lt;/a&gt;ing) to&amp;nbsp;fix:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;With all of the background color, how will this look when&amp;nbsp;printed?&lt;/li&gt;
+&lt;li&gt;How do I make the town borders easily defined? It would be a &lt;em&gt;lot&lt;/em&gt;
+    of raster editing to remove the background color of areas outside of&amp;nbsp;town.&lt;/li&gt;
+&lt;li&gt;How do I overlay a grid for a street name&amp;nbsp;index?&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;The first step was to setup a large Google Map to develop with. I used
+&lt;span class="caps"&gt;PHP&lt;/span&gt; and Monte Ohrt&amp;#8217;s
+&lt;a href="http://www.phpinsider.com/php/code/GoogleMapAPI/"&gt;GoogleMapAPI&lt;/a&gt; &lt;span class="caps"&gt;PHP&lt;/span&gt;
+wrapper class. It was simple enough to setup a big (3300x5100px) map,
+zoom out in Firefox, and start adding some stuff. My examples and
+development pages, if you want to take a peek at the code, are available
+in &lt;a href="/GFX/googleMaps.tar.gz"&gt;googleMaps.tar.gz&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;The first step was to draw a polygon for the outline of the town. I
+found some very detailed information on how to get zip code boundary
+lines on Matt Cutts&amp;#8217;
+&lt;a href="http://www.mattcutts.com/blog/fun-with-zip-codes/"&gt;blog&lt;/a&gt;. Apparently,
+he&amp;#8217;s a Google software engineer, heading up their webspam team. I
+grabbed the files from the Census, as described, and came up with the
+boundary for my zip code looking&amp;nbsp;like:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;        60      -0.741427638843858E+02       0.409963180802469E+02
+      -0.741375870000000E+02       0.410075970000000E+02
+      -0.741308870000000E+02       0.410061970000000E+02
+      -0.741308870000000E+02       0.410061970000000E+02
+      -0.741307260000000E+02       0.410032600000000E+02
+      -0.741326870000000E+02       0.409955970000000E+02
+      -0.741278870000000E+02       0.409943970000000E+02
+      -0.741280870000000E+02       0.409938970000000E+02
+      -0.741327870000000E+02       0.409853970000000E+02
+      -0.741352870000000E+02       0.409830970000000E+02
+      -0.741369600000000E+02       0.409818620000000E+02
+      -0.741410520000000E+02       0.409821940000000E+02
+      -0.741412870000000E+02       0.409826970000000E+02
+      -0.741412870000000E+02       0.409826970000000E+02
+      -0.741417870000000E+02       0.409847970000000E+02
+      -0.741427870000000E+02       0.409863970000000E+02
+      -0.741482870000000E+02       0.409868970000000E+02
+      -0.741536880000000E+02       0.409899970000000E+02
+      -0.741510880000000E+02       0.409929970000000E+02
+      -0.741531880000000E+02       0.409965970000000E+02
+      -0.741571880000000E+02       0.409988970000000E+02
+      -0.741557880000000E+02       0.410013970000000E+02
+      -0.741461870000000E+02       0.410018970000000E+02
+      -0.741400870000000E+02       0.410065970000000E+02
+      -0.741375870000000E+02       0.410075970000000E+02
+END
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;As per Matt&amp;#8217;s instructions, I stripped off the first and last lines,
+converted everything to normal decimal notation, and built it into a &lt;span class="caps"&gt;PHP&lt;/span&gt;&amp;nbsp;array:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="x"&gt;$MP_boundary = array();&lt;/span&gt;
+&lt;span class="x"&gt;$MP_boundary[] = array(-74.137587, 41.007597);&lt;/span&gt;
+&lt;span class="x"&gt;$MP_boundary[] = array(-74.130887, 41.006197);&lt;/span&gt;
+&lt;span class="x"&gt;$MP_boundary[] = array(-74.130887, 41.006197);&lt;/span&gt;
+&lt;span class="x"&gt;$MP_boundary[] = array(-74.130726, 41.003260);&lt;/span&gt;
+&lt;span class="x"&gt;$MP_boundary[] = array(-74.132687, 40.995597);&lt;/span&gt;
+&lt;span class="x"&gt;$MP_boundary[] = array(-74.127887, 40.994397);&lt;/span&gt;
+&lt;span class="x"&gt;$MP_boundary[] = array(-74.128087, 40.993897);&lt;/span&gt;
+&lt;span class="x"&gt;$MP_boundary[] = array(-74.132787, 40.985397);&lt;/span&gt;
+&lt;span class="x"&gt;$MP_boundary[] = array(-74.135287, 40.983097);&lt;/span&gt;
+&lt;span class="x"&gt;$MP_boundary[] = array(-74.136960, 40.981862);&lt;/span&gt;
+&lt;span class="x"&gt;$MP_boundary[] = array(-74.141052, 40.982194);&lt;/span&gt;
+&lt;span class="x"&gt;$MP_boundary[] = array(-74.141287, 40.982697);&lt;/span&gt;
+&lt;span class="x"&gt;$MP_boundary[] = array(-74.141287, 40.982697);&lt;/span&gt;
+&lt;span class="x"&gt;$MP_boundary[] = array(-74.141787, 40.984797);&lt;/span&gt;
+&lt;span class="x"&gt;$MP_boundary[] = array(-74.142787, 40.986397);&lt;/span&gt;
+&lt;span class="x"&gt;$MP_boundary[] = array(-74.148287, 40.986897);&lt;/span&gt;
+&lt;span class="x"&gt;$MP_boundary[] = array(-74.153688, 40.989997);&lt;/span&gt;
+&lt;span class="x"&gt;$MP_boundary[] = array(-74.151088, 40.992997);&lt;/span&gt;
+&lt;span class="x"&gt;$MP_boundary[] = array(-74.153188, 40.996597);&lt;/span&gt;
+&lt;span class="x"&gt;$MP_boundary[] = array(-74.157188, 40.998897);&lt;/span&gt;
+&lt;span class="x"&gt;$MP_boundary[] = array(-74.155788, 41.001397);&lt;/span&gt;
+&lt;span class="x"&gt;$MP_boundary[] = array(-74.146187, 41.001897);&lt;/span&gt;
+&lt;span class="x"&gt;$MP_boundary[] = array(-74.140087, 41.006597);&lt;/span&gt;
+&lt;span class="x"&gt;$MP_boundary[] = array(-74.137587, 41.007597);&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Though this data doesn&amp;#8217;t seem exactly 100% accurate (at least by my
+knowledge of the town, and every map I can find) it&amp;#8217;s quite close and a
+very good&amp;nbsp;start.&lt;/p&gt;
+&lt;p&gt;I&amp;#8217;ll update later this week when I have some more&amp;nbsp;done&amp;#8230;&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Tue, 01 Dec 2009 14:11:00 -0500</pubDate><guid>tag:newblog.jasonantman.com,2009-12-01:2009/12/using-google-maps-to-produce-usable-printable-maps/</guid><category>catrography</category><category>emergency</category><category>EMS</category><category>google</category><category>maps</category><category>PHP</category></item><item><title>Update on my F-250 - Icom mobile, antennas, strobes</title><link>http://newblog.jasonantman.com/2009/07/update-on-my-f-250-icom-mobile-antennas-strobes/</link><description>&lt;p&gt;I&amp;#8217;ve done a bit of work on my truck since my last update, and also have
+some new photos. The work done&amp;nbsp;includes:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Added 4 strobes head to rear of truck, with strobe box in &lt;span class="caps"&gt;NEMA&lt;/span&gt;
+    enclosure in&amp;nbsp;bed.&lt;/li&gt;
+&lt;li&gt;Icom F5061 (&lt;span class="caps"&gt;VHF&lt;/span&gt; 50W) mobile radio in&amp;nbsp;console&lt;/li&gt;
+&lt;li&gt;Three antenna mounts and antennae on roof - WiFi antenna, &lt;span class="caps"&gt;VHF&lt;/span&gt; mobile
+    antenna and wideband scanner antenna. The installation and wiring
+    was done by &lt;a href="http://kensautoelectric.com/"&gt;Ken&amp;#8217;s Auto Electric&lt;/a&gt; of
+    Midland Park, &lt;span class="caps"&gt;NJ&lt;/span&gt; (Ken is a great guy, and prices very&amp;nbsp;reasonably).&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;&lt;em&gt;Click photos for larger&amp;nbsp;version.&lt;/em&gt;&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href="/GFX/truck2009-07-03/P1010180.JPG"&gt;&lt;img alt="Looking good after a wash and detail..." src="/GFX/truck2009-07-03/P1010180_small.JPG" /&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;Looking good after a wash and&amp;nbsp;detail&amp;#8230;&lt;/p&gt;
+&lt;p&gt;&lt;a href="/GFX/truck2009-07-03/P1010185.JPG"&gt;&lt;img alt="Another photo after the wash (before antenna installation)" src="/GFX/truck2009-07-03/P1010185_small.JPG" /&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;Another photo after the wash (before antenna&amp;nbsp;installation)&lt;/p&gt;
+&lt;p&gt;&lt;a href="/GFX/truck2009-07-03/P1010160.JPG"&gt;&lt;img alt="Front lighting job finished." src="/GFX/truck2009-07-03/P1010160_small.JPG" /&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;Front lighting job&amp;nbsp;finished.&lt;/p&gt;
+&lt;p&gt;&lt;a href="/GFX/truck2009-07-03/P1010159.JPG"&gt;&lt;img alt="Direct frontal view (before antennae)" src="/GFX/truck2009-07-03/P1010159_small.JPG" /&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;Direct frontal view (before antennae). The Dual Avenger is barely
+visible behind the Super Duty graphic at the top of the windshield, but
+shows through very clearly when&amp;nbsp;lit.&lt;/p&gt;
+&lt;p&gt;&lt;a href="/GFX/truck2009-07-03/P1010156.JPG"&gt;&lt;img alt="Running board mounted LIN4's." src="/GFX/truck2009-07-03/P1010156_small.JPG" /&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;Running board mounted&amp;nbsp;&lt;span class="caps"&gt;LIN4&lt;/span&gt;&amp;#8217;s.&lt;/p&gt;
+&lt;p&gt;&lt;a href="/GFX/truck2009-07-03/P1010154.JPG"&gt;&lt;img alt="Rear license plate mounted LIN3s and rear strobes." src="/GFX/truck2009-07-03/P1010154_small.JPG" /&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;Rear license plate mounted LIN3s and rear&amp;nbsp;strobes.&lt;/p&gt;
+&lt;p&gt;&lt;a href="/GFX/truck2009-07-03/P1010148.JPG"&gt;&lt;img alt="Closeup of rear LIN3s on license plate bracket." src="/GFX/truck2009-07-03/P1010148_small.JPG" /&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;Closeup of rear LIN3s on license plate&amp;nbsp;bracket.&lt;/p&gt;
+&lt;p&gt;&lt;a href="/GFX/truck2009-07-03/P1010165.JPG"&gt;&lt;img alt="Icom F5061 mounted in center console, wired to center antenna." src="/GFX/truck2009-07-03/P1010165_small.JPG" /&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;Icom F5061 mounted in center console, wired to center&amp;nbsp;antenna.&lt;/p&gt;
+&lt;p&gt;&lt;a href="/GFX/truck2009-07-03/P1010151.JPG"&gt;/&lt;span class="caps"&gt;GFX&lt;/span&gt;/truck2009-07-03/P1010151_small.&lt;span class="caps"&gt;JPG&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Video&lt;/strong&gt; of rear lights (LIN3s and strobes) during the day. Quicktime
+&lt;span class="caps"&gt;MOV&lt;/span&gt;, 20 seconds, 26 &lt;span class="caps"&gt;MB&lt;/span&gt;. &lt;a href="/GFX/truck2009-07-03/P1010151.MOV"&gt;download/view&amp;nbsp;video&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href="/GFX/truck2009-07-03/P1010186.JPG"&gt;/&lt;span class="caps"&gt;GFX&lt;/span&gt;/truck2009-07-03/P1010186_small.&lt;span class="caps"&gt;JPG&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Video&lt;/strong&gt; of truck lit at night, shot from all sides. 24 seconds,
+Quicktime &lt;span class="caps"&gt;MOV&lt;/span&gt;, 29 Mb. &lt;a href="/GFX/truck2009-07-03/P1010186.MOV"&gt;download/view video&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;&lt;a href="/GFX/truckPhotos2009-07-07/DSC_0180.JPG"&gt;/&lt;span class="caps"&gt;GFX&lt;/span&gt;/truckPhotos2009-07-07/DSC_0180_small.&lt;span class="caps"&gt;JPG&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href="/GFX/truckPhotos2009-07-07/DSC_0182.JPG"&gt;/&lt;span class="caps"&gt;GFX&lt;/span&gt;/truckPhotos2009-07-07/DSC_0182_small.&lt;span class="caps"&gt;JPG&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href="/GFX/truckPhotos2009-07-07/DSC_0183.JPG"&gt;/&lt;span class="caps"&gt;GFX&lt;/span&gt;/truckPhotos2009-07-07/DSC_0183_small.&lt;span class="caps"&gt;JPG&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;Antenna installation by &lt;a href="http://kensautoelectric.com/"&gt;Ken&amp;#8217;s Auto
+Electric&lt;/a&gt;. Front to&amp;nbsp;rear:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;a href="http://www.l-com.com/item.aspx?id=22288"&gt;L-Com &lt;span class="caps"&gt;HG2405U&lt;/span&gt;-&lt;span class="caps"&gt;NMO&lt;/span&gt;&lt;/a&gt; 2.4GHz
+    5dBi WiFi antenna for future&amp;nbsp;laptop.&lt;/li&gt;
+&lt;li&gt;&lt;a href="http://www.theantennafarm.com/catalog/index.php?main_page=product_info&amp;amp;products_id=721"&gt;Antenex
+    &lt;span class="caps"&gt;QW152B&lt;/span&gt;&lt;/a&gt;
+    152-162MHz 1/4 wave unity gain &lt;span class="caps"&gt;VHF&lt;/span&gt; antenna hooked up to Icom&amp;nbsp;mobile.&lt;/li&gt;
+&lt;li&gt;&lt;a href="http://www.theantennafarm.com/catalog/index.php?main_page=product_info&amp;amp;products_id=1048"&gt;Antenex
+    &lt;span class="caps"&gt;ABSCANC&lt;/span&gt;&lt;/a&gt;
+    150/450/800 MHz scanner&amp;nbsp;antenna.&lt;/li&gt;
+&lt;/ol&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Tue, 14 Jul 2009 00:15:00 -0400</pubDate><guid>tag:newblog.jasonantman.com,2009-07-14:2009/07/update-on-my-f-250-icom-mobile-antennas-strobes/</guid><category>antennafarm</category><category>antennas</category><category>emergency</category><category>EMS</category><category>f250</category><category>icom</category><category>lights</category><category>radio</category><category>truck</category></item><item><title>Truck Wiring and Lighting - Part I</title><link>http://newblog.jasonantman.com/2009/02/truck-wiring-and-lighting-part-i/</link><description>&lt;p&gt;As mentioned in my &lt;a href="/2009/02/custom-truck-console/"&gt;Custom Truck
+Console&lt;/a&gt;
+post, since my truck was stolen and now recovered (with all of the
+emergency equipment stripped out - weird) I&amp;#8217;ve got to start from
+scratch. Since I finished the console, I&amp;#8217;ve started work on redoing the
+lighting. The first grueling step was to check continuity of the
+existing wiring (what was left of it), strip out everything that didn&amp;#8217;t
+work, and rehab what did. Then I did a few pulls, mainly a giant pull
+from the console to under the hood of six 16-ga wires and three 12-ga,
+along with a massive run of 6-ga welding cable direct from the battery
+(with a circuit breaker) to the&amp;nbsp;console.&lt;/p&gt;
+&lt;p&gt;There&amp;#8217;s a thread covering this install over at
+&lt;a href="http://www.elightbars.org/bb/post59822.html"&gt;elightbars.org&lt;/a&gt; as well as
+a thread on the &lt;a href="http://www.elightbars.org/bb/post24858.html"&gt;previous (original)
+installation&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;This is part 1 of (hopefully only) 2. The list of what&amp;#8217;s installed so
+far&amp;nbsp;is:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Custom&amp;nbsp;console.&lt;/li&gt;
+&lt;li&gt;&lt;a href="http://www.galls.com/style.html?assort=general_catalog&amp;amp;style=SE082"&gt;Galls
+    &lt;span class="caps"&gt;SE082&lt;/span&gt;&lt;/a&gt;
+    switch box - 3-position slider, 5 on/off rocker switches and one
+    on-off-(on) rocker&amp;nbsp;switch.&lt;/li&gt;
+&lt;li&gt;Radio Shack
+    &lt;a href="http://wiki.radioreference.com/index.php/Pro-433"&gt;Pro-433&lt;/a&gt; scanner,
+    hopefully to be replaced by a &lt;a href="http://www.icomamerica.com/en/products/landmobile/mobiles/f5061_series/default.aspx"&gt;Icom
+    F5061&lt;/a&gt;.&lt;/li&gt;
+&lt;li&gt;B/B Whelen Dual Avenger above rearview&amp;nbsp;mirror.&lt;/li&gt;
+&lt;li&gt;Unitrol 80K air horn (siren wires not&amp;nbsp;connected)&lt;/li&gt;
+&lt;li&gt;2x &lt;a href="http://www.sirennet.com/sn1c.html"&gt;Sirennet 100W speakers&lt;/a&gt;
+    mounted in front&amp;nbsp;bumper.&lt;/li&gt;
+&lt;li&gt;2x B/B Whelen &lt;span class="caps"&gt;LIN4&lt;/span&gt;&amp;#8217;s on &lt;a href="http://www.1075lighting.com"&gt;10-75
+    Lighting&lt;/a&gt; front license plate&amp;nbsp;bracket.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;The console with equipment mounted in&amp;nbsp;it:&lt;/p&gt;
+&lt;p&gt;&lt;img alt="console" src="/GFX/TruckConsole/DSC_0057_small.JPG" /&gt;&lt;/p&gt;
+&lt;p&gt;Dual Avenger (B/B) on headliner bracket above rearview mirror - it &lt;em&gt;just&lt;/em&gt;&amp;nbsp;fits:&lt;/p&gt;
+&lt;p&gt;&lt;img alt="dual avenger on headliner bracket" src="/GFX/TruckConsole/DSC_0065_small.JPG" /&gt;&lt;/p&gt;
+&lt;p&gt;Avenger from the&amp;nbsp;outside:&lt;/p&gt;
+&lt;p&gt;&lt;img alt="avenger from the outside" src="/GFX/TruckConsole/DSC_0073_small.JPG" /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img alt="avenger from the outside, lit" src="/GFX/TruckConsole/DSC_0075_small.JPG" /&gt;&lt;/p&gt;
+&lt;p&gt;10-75 Intersection Bracket behind front license plate. B/B&amp;nbsp;&lt;span class="caps"&gt;LIN4&lt;/span&gt;&amp;#8217;s:&lt;/p&gt;
+&lt;p&gt;&lt;img alt="10-75 intersection bracket" src="/GFX/TruckConsole/DSC_0066_small.JPG" /&gt;&lt;/p&gt;
+&lt;p&gt;SirenNet 100W speakers behind front&amp;nbsp;bumper:&lt;/p&gt;
+&lt;p&gt;&lt;img alt="speakers in front bumper" src="/GFX/TruckConsole/DSC_0068_small.JPG" /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Coming&amp;nbsp;next:&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;4x (!!!) blue Whelen 500 Linear Super &lt;span class="caps"&gt;LED&lt;/span&gt;&amp;#8217;s in front grill, mounted
+    with chrome&amp;nbsp;flanges.&lt;/li&gt;
+&lt;li&gt;B/B &lt;span class="caps"&gt;LIN4&lt;/span&gt;&amp;#8217;s on front running board&amp;nbsp;mounts.&lt;/li&gt;
+&lt;li&gt;Blue &lt;span class="caps"&gt;LIN3&lt;/span&gt;&amp;#8217;s on rear license plate&amp;nbsp;bracket.&lt;/li&gt;
+&lt;li&gt;Some sort of lights in the rear window - if I can afford it,
+    blue/amber Whelen 400 Linear&amp;#8217;s (6-over-6) independently&amp;nbsp;switched.&lt;/li&gt;
+&lt;li&gt;Icom F5061 &lt;span class="caps"&gt;VHF&lt;/span&gt;&amp;nbsp;mobile.&lt;/li&gt;
+&lt;li&gt;&lt;span class="caps"&gt;VHF&lt;/span&gt; antenna, either roof mount or mounted in a &lt;a href="http://www.geotool.com/antmount.htm"&gt;stake
+    pocket&lt;/a&gt;.&lt;/li&gt;
+&lt;/ul&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Tue, 03 Feb 2009 12:20:00 -0500</pubDate><guid>tag:newblog.jasonantman.com,2009-02-03:2009/02/truck-wiring-and-lighting-part-i/</guid><category>console</category><category>emergency</category><category>emergency vehicle</category><category>EMS</category><category>lighting</category><category>truck</category></item><item><title>Custom truck console</title><link>http://newblog.jasonantman.com/2009/02/custom-truck-console/</link><description>&lt;p&gt;I&amp;#8217;ll keep this post relatively to the point (the original full story is
+on &lt;a href="http://www.elightbars.org"&gt;eLightbars.org&lt;/a&gt;
+&lt;a href="http://www.elightbars.org/bb//topic401009.html"&gt;here&lt;/a&gt; and
+&lt;a href="http://www.elightbars.org/bb/post59822.html"&gt;here&lt;/a&gt;). My 2006 Ford F-250
+&lt;span class="caps"&gt;CC&lt;/span&gt; &lt;span class="caps"&gt;XLT&lt;/span&gt; was stolen in September, 2008. It was recovered about a month
+later, after Geico said they&amp;#8217;d pay out, and after I&amp;#8217;d bought another
+vehicle. Anyway, it came back from the body shop about 2 months later,
+and it was time to begin customizing it again. The main parts of the
+project were wiring and installation and building a custom&amp;nbsp;console&amp;#8230;&lt;/p&gt;
+&lt;p&gt;My main inspiration was some of the custom consoles done by places like
+&lt;a href="http://www.odysseyauto.com/"&gt;Odyssey&lt;/a&gt;, though I wanted something
+carpeted (hopefully a close match to the factory interior). The main
+idea I was working off of was this one from&amp;nbsp;Odyssey:  &lt;/p&gt;
+&lt;p&gt;&lt;img alt="Odyssey Excursion
+console" src="http://www.odysseyauto.com/cabinets/Images/cabpics/excurcon-lg.jpg" /&gt;&lt;/p&gt;
+&lt;p&gt;The general idea was to have a replacement for the factory console which
+would allow mounting of a radio, emergency lighting controls, and a few
+other things while not sacrificing storage space. The specific
+requirements that I came up with&amp;nbsp;included:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Mount over the transmission hump more or less where the factory
+    console is, forward to the&amp;nbsp;dash.&lt;/li&gt;
+&lt;li&gt;Allow access to the pull-out cupholders in the dash and not impede
+    access to any&amp;nbsp;controls.&lt;/li&gt;
+&lt;li&gt;Fasten to the floor using only the four factory console&amp;nbsp;bolts.&lt;/li&gt;
+&lt;li&gt;Allow mounting of at least one radio, one switch box, &lt;span class="caps"&gt;GPS&lt;/span&gt; and&amp;nbsp;scanner.&lt;/li&gt;
+&lt;li&gt;Radio and switch box should be mounted using the &lt;a href="http://www.jottodesk.com/"&gt;Jotto
+    Desk&lt;/a&gt; faceplates that I had from the &lt;span class="caps"&gt;CVPI&lt;/span&gt;&amp;nbsp;console.&lt;/li&gt;
+&lt;li&gt;&lt;em&gt;The real clincher that prevented me from using a stock console:&lt;/em&gt; Have a large storage
+    compartment comparable to the factory&amp;nbsp;console.&lt;/li&gt;
+&lt;li&gt;Provide a set of rear&amp;nbsp;cupholders.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;I spent some time over the course of three days or so measuring the
+console area of the truck and drawing out my initial plan in &lt;span class="caps"&gt;CAD&lt;/span&gt;
+(specifically the demo version of &lt;a href="http://www.qcad.org/qcad.html"&gt;&lt;span class="caps"&gt;QCAD&lt;/span&gt;&lt;/a&gt;
+for Linux - regrettably not Free software). Once I had the plans drawn
+up and was satisfied that the angles and measurements were within
+acceptable tolerance, I made a full-scale prototype out of foam core
+board. With a little shaving of the corners, I managed to get a
+relatively good form and transferred it to ½&amp;#8221; cabinet-grade luan
+plywood. It was a bit difficult with only a jigsaw, but worked out
+relatively well. While I can&amp;#8217;t seem to find any pictures of the foam
+core, here are some of the wood form being assembled and the test fit in
+the&amp;nbsp;truck:&lt;/p&gt;
+&lt;p&gt;&lt;img alt="first assembly and test of console" src="/GFX/TruckConsole/console2-small.jpg" /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img alt="first assembly and test of console" src="/GFX/TruckConsole/console1-small.jpg" /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img alt="first assembly and test of console" src="/GFX/TruckConsole/console3-small.jpg" /&gt;&lt;/p&gt;
+&lt;p&gt;I&amp;#8217;d originally been a bit worried about the structural integrity, but I
+found that by clamping the corners, pre-drilling and securing them with
+aggressive wood screws at approximately 1 screw per 1.5 inches along the
+joints, the plywood held together&amp;nbsp;fine.&lt;/p&gt;
+&lt;p&gt;After testing the fit and checking that the four factory bolt holes
+lined up correctly (which they did, and also held the console quite
+securely), I pulled it back out and started the process of carpeting it.
+I bought 2 yards (76 x 72 inch) of color #8078 &amp;#8220;Dark Grey/Quartz&amp;#8221; plush
+cut pile automotive carpet from
+&lt;a href="http://www.stockinteriors.com/"&gt;StockInteriors.com&lt;/a&gt;, for about $80 with
+shipping. It turns out that the color isn&amp;#8217;t an exact match to the
+factory carpet (I got 6 sample squares from them and this was the
+closest color) but it&amp;#8217;s a good medium between the carpet and&amp;nbsp;upholstery.&lt;/p&gt;
+&lt;p&gt;Planning for how to cover this wooden behemoth with carpet took quite a
+few hours, and short of making it into a week-long job of sewing, I
+decided to wrap the sides and back with one piece, folded over on the
+bottom and top edges of the storage box, then use separate pieces for
+the top of the console and the front (which would be adjacent to the
+dash and mostly hidden from view). I started off with a plan to use &lt;a href="http://solutions.3m.com/wps/portal/3M/en_US/3M-Super-77/Super77/SprayAdhesive/"&gt;3M
+Super
+90&lt;/a&gt;
+spray adhesive, on the advice of an &lt;a href="http://www.elightbars.org"&gt;&lt;span class="caps"&gt;ELB&lt;/span&gt;&lt;/a&gt;
+member. Unfortunately, I could only find &lt;a href="http://solutions.3m.com/wps/portal/3M/en_US/3M-Super-77/Super77/SprayAdhesive/"&gt;Super
+77&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;Prior to carpeting, I had to get the equipment mounting openings down to
+about 8.5&amp;#8221; for the 8.75&amp;#8221; Jotto faceplates. I cut some excess luan
+plywood down into 2&amp;#8221; wide strips and then cut them to length for the
+openings, sandwiching about three together with &lt;a href="http://www.liquidnails.com/products/product.jsp?productId=42"&gt;Liquid
+Nails&lt;/a&gt; and
+then mounted them vertically on the sides of the&amp;nbsp;console.&lt;/p&gt;
+&lt;p&gt;Carpeting the console at 2 &lt;span class="caps"&gt;AM&lt;/span&gt; probably wasn&amp;#8217;t the best idea. I looked at
+how the cut edges of the carpet would meet and the corners, and decided
+I&amp;#8217;d need some sort of edge molding to make it look good - preferably
+black powder coated aluminum, somewhere around ½&amp;#8221; legs. As such, I
+decided to forgo most of the glue and stapled the carpet at the edges,
+planning to cover it with molding. Ok, I lose a few points for that one.
+The last thing to go on was the carpet on the front and top, which I
+glued with Super 77 and also stapled on the front (where it can&amp;#8217;t be
+seen). I cut X-shapes in the mounting areas and folded the carpet down,
+stapling it to the inside of the console, and cut a slit in the front
+for wiring. The glue didn&amp;#8217;t seem to hold on the narrow parts of the
+top/mounting area, but once faceplates were screwed in it was fine. The
+faceplates are just held in with screws into the vertical wood strips
+placed on the sides of the&amp;nbsp;opening.&lt;/p&gt;
+&lt;p&gt;Top view of the console, mounted in place, with the unfinished storage&amp;nbsp;box.&lt;/p&gt;
+&lt;p&gt;&lt;img alt="top view of console" src="/GFX/TruckConsole/DSC_0040_small.jpg" /&gt;&lt;/p&gt;
+&lt;p&gt;Equipment mounting&amp;nbsp;area:&lt;/p&gt;
+&lt;p&gt;&lt;img alt="console equipment mounting area" src="/GFX/TruckConsole/DSC_0041_small.jpg" /&gt;&lt;/p&gt;
+&lt;p&gt;View from the driver&amp;#8217;s&amp;nbsp;seat:&lt;/p&gt;
+&lt;p&gt;&lt;img alt="view from drivers seat" src="/GFX/TruckConsole/DSC_0042_small.jpg" /&gt;&lt;/p&gt;
+&lt;p&gt;Factory cupholders extended with just enough clearance to&amp;nbsp;work:&lt;/p&gt;
+&lt;p&gt;&lt;img alt="factory cupholders open, barely" src="/GFX/TruckConsole/DSC_0045_small.jpg" /&gt;&lt;/p&gt;
+&lt;p&gt;Staples around the edges, intended to be covered with molding. They&amp;#8217;re
+really not that visible unless you make a point of looking at them
+(given their placement). Red handle is a 100A cutoff for the main
+battery lead, with a removable&amp;nbsp;handle.&lt;/p&gt;
+&lt;p&gt;&lt;img alt="staples around edges and battery cutoff switch" src="/GFX/TruckConsole/DSC_0046_small.jpg" /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;The weekend after console fabrication, I started wiring. Here&amp;#8217;s the
+relevant parts involving the&amp;nbsp;console.&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;Semi-finished console with equipment mounted. Front-to back,
+&lt;a href="http://www.ram-mount.com/"&gt;&lt;span class="caps"&gt;RAM&lt;/span&gt;&lt;/a&gt; magnet mount for &lt;span class="caps"&gt;GPS&lt;/span&gt;, Radio Shack
+&lt;a href="http://wiki.radioreference.com/index.php/Pro-433"&gt;Pro-433&lt;/a&gt;, Galls
+&lt;a href="http://www.galls.com/style.html?assort=general_catalog&amp;amp;style=SE082"&gt;&lt;span class="caps"&gt;SE082&lt;/span&gt;&lt;/a&gt;,
+nifty Jotto storage&amp;nbsp;tray.&lt;/p&gt;
+&lt;p&gt;&lt;img alt="equipment in mounted
+position" src="/GFX/TruckConsole/DSC_0059_small.JPG" /&gt;&lt;/p&gt;
+&lt;p&gt;Wire routing in loom from the console to under the dash
+&lt;img alt="main wiring
+runs" src="/GFX/TruckConsole/DSC_0063_small.JPG" /&gt;&lt;/p&gt;
+&lt;p&gt;Rear of console - Jotto cupholder and charger for &lt;a href="http://www.streamlight.com/product/product.aspx?pid=7"&gt;Streamlight Stinger
+75014&lt;/a&gt;
+&lt;img alt="rear of
+console" src="/GFX/TruckConsole/DSC_0064_small.JPG" /&gt;&lt;/p&gt;
+&lt;p&gt;Still to be&amp;nbsp;done:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Most of the wiring and&amp;nbsp;installation.&lt;/li&gt;
+&lt;li&gt;Lining the storage box with something, probably toolbox drawer&amp;nbsp;liner.&lt;/li&gt;
+&lt;li&gt;Making a cover/lid for the storage&amp;nbsp;box.&lt;/li&gt;
+&lt;/ul&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Tue, 03 Feb 2009 10:35:00 -0500</pubDate><guid>tag:newblog.jasonantman.com,2009-02-03:2009/02/custom-truck-console/</guid><category>console</category><category>emergency</category><category>emergency vehicle</category><category>EMS</category><category>lighting</category><category>truck</category></item><item><title>Possible Downtime this weekend</title><link>http://newblog.jasonantman.com/2008/09/possible-downtime-this-weekend/</link><description>&lt;p&gt;Tropical Storm &lt;a href="http://www.nhc.noaa.gov/#HANNA"&gt;Hanna&lt;/a&gt; is expected to
+reach the New Jersey area on Saturday, September 6, 2008. The latest
+predictions as of 20:00 September 4&lt;sup&gt;th&lt;/sup&gt; call for winds from 30-60 &lt;span class="caps"&gt;MPH&lt;/span&gt;
+and rainfall possibly in excess of 5 inches, at a rate of 1-1.5 inches
+per hour (as per the &lt;a href="http://www.bcoem.org/"&gt;Bergen County Office of Emergency
+Management&lt;/a&gt;).&lt;/p&gt;
+&lt;p&gt;In light of this, please be advised that
+&lt;a href="http://www.jasonantman.com"&gt;JasonAntman.com&lt;/a&gt; may experience some
+unscheduled downtime - mainly due to the fact that my internet
+connection (Verizon FiOS fiber, right now) is run with suspended
+pole-to-pole cables. If this does happen (and power is still available)
+I&amp;#8217;ll make an effort to use the downtime as best as&amp;nbsp;possible.&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Thu, 04 Sep 2008 23:03:00 -0400</pubDate><guid>tag:newblog.jasonantman.com,2008-09-04:2008/09/possible-downtime-this-weekend/</guid><category>downtime</category><category>emergency</category><category>hanna</category></item></channel></rss>

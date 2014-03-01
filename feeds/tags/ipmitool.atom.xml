@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Jason Antman's Blog</title><link href="http://newblog.jasonantman.com/" rel="alternate"></link><link href="http://newblog.jasonantman.com/feeds/tags/ipmitool.atom.xml" rel="self"></link><id>http://newblog.jasonantman.com/</id><updated>2010-09-16T10:28:00-04:00</updated><entry><title>Getting Sun iLOM information within Linux</title><link href="http://newblog.jasonantman.com/2010/09/getting-sun-ilom-information-within-linux/" rel="alternate"></link><updated>2010-09-16T10:28:00-04:00</updated><author><name>admin</name></author><id>tag:newblog.jasonantman.com,2010-09-16:2010/09/getting-sun-ilom-information-within-linux/</id><summary type="html">&lt;p&gt;At work, I&amp;#8217;m starting to implement &lt;a href="http://www.ocsinventory-ng.org/"&gt;&lt;span class="caps"&gt;OCS&lt;/span&gt; Inventory
+&lt;span class="caps"&gt;NG&lt;/span&gt;&lt;/a&gt; on our Linux boxes to keep track of
+hardware. Part of the plan is also that we have a
+&lt;a href="http://www.mediawiki.org"&gt;MediaWiki&lt;/a&gt; installation for internal
+documentation, and articles for every host (named as the hostname). I&amp;#8217;m
+going to pull data from &lt;span class="caps"&gt;OCS&lt;/span&gt; into the articles based on hostname (via a
+&lt;span class="caps"&gt;PHP&lt;/span&gt; include) so the documentation will automatically include up-to-date
+information on&amp;nbsp;hardware.&lt;/p&gt;
+&lt;p&gt;Since we&amp;#8217;re moving to MySQL-backed &lt;span class="caps"&gt;DHCP&lt;/span&gt;, I decided that it would also be
+nice to include &lt;span class="caps"&gt;DHCP&lt;/span&gt; information and links to our web tool to edit the
+host (like setting &lt;span class="caps"&gt;PXE&lt;/span&gt; boot information). This is pretty easy for the
+ethX interfaces, as &lt;span class="caps"&gt;OCS&lt;/span&gt; collects &lt;span class="caps"&gt;MAC&lt;/span&gt; addresses and I can search our &lt;span class="caps"&gt;DHCP&lt;/span&gt;
+database for them. However, it isn&amp;#8217;t as simple for the iLOM interface,
+which (obviously) &lt;span class="caps"&gt;OCS&lt;/span&gt; knows nothing about - though it&amp;#8217;s arguably one of
+the most-forgotten things on our&amp;nbsp;machines.&lt;/p&gt;
+&lt;p&gt;I know that &lt;span class="caps"&gt;HP&lt;/span&gt; Proliant servers have the nice little &lt;span class="caps"&gt;HP&lt;/span&gt; &lt;span class="caps"&gt;PSP&lt;/span&gt; (Proliant
+Support Pack) that includes tools such as &lt;code&gt;hpasmcli&lt;/code&gt;, but Sun doesn&amp;#8217;t
+have anything like that. (We just have one &lt;span class="caps"&gt;HP&lt;/span&gt; box in production right
+now, but I&amp;#8217;ll probably be adding support for it&amp;nbsp;soon).&lt;/p&gt;
+&lt;p&gt;Enter &lt;a href="http://openipmi.sourceforge.net/"&gt;OpenIPMI&lt;/a&gt;. The iLOM has an &lt;span class="caps"&gt;IPMI&lt;/span&gt;
+interface, and the standard OpenIPMI-tools package in CentOS
+repositories has the ipmitool required to get the relevant information.
+A call is pretty simple: &lt;code&gt;ipmitool -l open lan print 1&lt;/code&gt; yields something&amp;nbsp;like:  &lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;Set in Progress         : Set Complete
+Auth Type Support       : NONE MD2 MD5 PASSWORD
+Auth Type Enable        : Callback : MD2 MD5 PASSWORD
+                        : User     : MD2 MD5 PASSWORD
+                        : Operator : MD2 MD5 PASSWORD
+                        : Admin    : MD2 MD5 PASSWORD
+                        : OEM      :
+IP Address Source       : DHCP Address
+IP Address              : 172.16.xxx.xxx
+Subnet Mask             : 255.255.255.224
+MAC Address             : 00:14:4f:xx:xx:xx
+SNMP Community String   : xxxxxx
+IP Header               : TTL=0x00 Flags=0x00 Precedence=0x00 TOS=0x00
+BMC ARP Control         : ARP Responses Disabled, Gratuitous ARP Disabled
+Gratituous ARP Intrvl   : 5.0 seconds
+Default Gateway IP      : 172.16.xx.xx
+Default Gateway MAC     : 00:00:00:00:00:00
+Backup Gateway IP       : 0.0.0.0
+Backup Gateway MAC      : 00:00:00:00:00:00
+802.1q VLAN ID          : Disabled
+802.1q VLAN Priority    : 0
+RMCP+ Cipher Suites     : 2,3,0
+Cipher Suite Priv Max   : XXXXXXXXXXXXXXX
+                        :     X=Cipher Suite Unused
+                        :     c=CALLBACK
+                        :     u=USER
+                        :     o=OPERATOR
+                        :     a=ADMIN
+                        :     O=OEM
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Now it&amp;#8217;s just a matter of integrating this into ocsinventory-agent,
+having it run the command if present (and Sun hardware), and parsing the
+results. Once I have some actual code done, I&amp;#8217;ll pass it&amp;nbsp;along.&lt;/p&gt;
+&lt;p&gt;Many thanks to &lt;code&gt;pseud0&lt;/code&gt; on the Sun forums for answering my
+&lt;a href="http://forums.sun.com/thread.jspa?messageID=11049794#11049794"&gt;question&lt;/a&gt;
+about&amp;nbsp;this.&lt;/p&gt;</summary><category term="inventory"></category><category term="ipmi"></category><category term="ipmitool"></category><category term="ocs-inventory"></category><category term="sun"></category><category term="sunfire"></category><category term="sysadmin"></category></entry></feed>

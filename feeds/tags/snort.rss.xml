@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Jason Antman's Blog</title><link>http://newblog.jasonantman.com/</link><description></description><atom:link href="http://newblog.jasonantman.com/feeds/tags/snort.rss.xml" rel="self"></atom:link><lastBuildDate>Sun, 30 Jan 2011 19:54:00 -0500</lastBuildDate><item><title>Vyatta VC5 - Snort alerts to syslog</title><link>http://newblog.jasonantman.com/2011/01/vyatta-vc5-snort-alerts-to-syslog/</link><description>&lt;p&gt;I&amp;#8217;m running a &lt;a href="http://www.vyatta.org"&gt;Vyatta&lt;/a&gt; vyatta router at home - in
+my opinion it&amp;#8217;s pretty near &amp;#8220;enterprise grade&amp;#8221;, and I&amp;#8217;m running the
+Community/Core (read: no-cost and almost all Free) on commodity hardware
+with great performance. Granted, I&amp;#8217;m still on the older version (5 as
+opposed to the current 6) since an upgrade will require total downtime
+and a spare set of &lt;span class="caps"&gt;SCSI&lt;/span&gt; disks for the machine it&amp;#8217;s on, but it still
+works quite well. Today I decided to enable the
+&lt;a href="http://www.snort.org"&gt;Snort&lt;/a&gt; &lt;span class="caps"&gt;IDS&lt;/span&gt; on the box. It actually worked quite
+well (albeit stuck at older rules until I upgrade to Vyatta &lt;span class="caps"&gt;VC6&lt;/span&gt;) and
+didn&amp;#8217;t put much more load on the box. For the time being I decided to
+just have it alert on problems and not drop anything, as I&amp;#8217;m getting
+pretty high false positives and the older Vyatta version doesn&amp;#8217;t seem to
+have a way to disregard&amp;nbsp;rules.&lt;/p&gt;
+&lt;p&gt;My biggest complaint was that Vyatta didn&amp;#8217;t see fit to allow alerts by
+syslog. I&amp;#8217;m not a big fan of keeping information like &lt;span class="caps"&gt;IDS&lt;/span&gt; logs stuck on
+the router - I don&amp;#8217;t like logging in to it any more than I have to, it
+doesn&amp;#8217;t have much storage, and I&amp;#8217;d also like to keep stuff like this in
+a more secure location. Through a bit of digging, I found the
+&lt;code&gt;/opt/vyatta/share/perl5/VyattaSnortConfig.pm&lt;/code&gt; Perl module which
+generates the Snort config file from Vyatta&amp;#8217;s &lt;span class="caps"&gt;CLI&lt;/span&gt; stuff. Looking through
+the Perl code, I found the definition of the snort.conf output&amp;nbsp;statements:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="k"&gt;my&lt;/span&gt; &lt;span class="nv"&gt;$output_def&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s"&gt;&amp;lt;&amp;lt;&lt;span class="caps"&gt;EOD&lt;/span&gt;;&lt;/span&gt;
+&lt;span class="s"&gt;  output alert_unified: alert, limit $log_limit&lt;/span&gt;
+&lt;span class="s"&gt;  output log_null&lt;/span&gt;
+&lt;span class="s"&gt;&lt;span class="caps"&gt;EOD&lt;/span&gt;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;I simply added a line &lt;code&gt;output alert_syslog: log_local3 log_notice&lt;/code&gt; after the &lt;code&gt;output alert_unified&lt;/code&gt; line.&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="k"&gt;my&lt;/span&gt; &lt;span class="nv"&gt;$output_def&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s"&gt;&amp;lt;&amp;lt;&lt;span class="caps"&gt;EOD&lt;/span&gt;;&lt;/span&gt;
+&lt;span class="s"&gt;  output alert_unified: alert, limit $log_limit&lt;/span&gt;
+&lt;span class="s"&gt;  output alert_syslog: log_local3 log_notice&lt;/span&gt;
+&lt;span class="s"&gt;  output log_null&lt;/span&gt;
+&lt;span class="s"&gt;&lt;span class="caps"&gt;EOD&lt;/span&gt;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;I then went into Vyatta configuration and changed a rule from alert to pass, committed,
+changed back, committed, and &lt;code&gt;/etc/snort/snort.conf&lt;/code&gt; now had my syslog lines. I&amp;#8217;m now 
+getting snort alerts to local3 in syslog, which is fed to my centralized log server. My
+next project is to find or write something which will parse these logs, generate a daily
+summary email, and maybe check them hourly and alert on any big changes. I also might just
+cron an emailing of the output from Vyatta&amp;#8217;s show ips summary command. So far I have over 11,000 events logged in about 12&amp;nbsp;hours.&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Sun, 30 Jan 2011 19:54:00 -0500</pubDate><guid>tag:newblog.jasonantman.com,2011-01-30:2011/01/vyatta-vc5-snort-alerts-to-syslog/</guid><category>security</category><category>snort</category><category>syslog</category><category>vyatta</category></item></channel></rss>

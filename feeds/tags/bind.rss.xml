@@ -1,0 +1,333 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Jason Antman's Blog</title><link>http://newblog.jasonantman.com/</link><description></description><atom:link href="http://newblog.jasonantman.com/feeds/tags/bind.rss.xml" rel="self"></atom:link><lastBuildDate>Wed, 05 Sep 2012 05:00:00 -0400</lastBuildDate><item><title>Some PowerDNS Links and Interesting Features</title><link>http://newblog.jasonantman.com/2012/09/some-powerdns-links-and-interesting-features/</link><description>&lt;p&gt;At $&lt;span class="caps"&gt;WORK&lt;/span&gt; we lost a disk in the &lt;span class="caps"&gt;RAID1&lt;/span&gt; of one of our external nameservers,
+and it rekindled an occasional discussion of migration from &lt;a&gt;&lt;span class="caps"&gt;ISC&lt;/span&gt;
+&lt;span class="caps"&gt;BIND&lt;/span&gt;&lt;/a&gt; to &lt;a href="http://powerdns.com/content/products.html"&gt;PowerDNS&lt;/a&gt;.
+PowerDNS has separate authoritative and recursive servers, and doesn&amp;#8217;t
+seem to natively support views or split-horizon the way &lt;span class="caps"&gt;BIND&lt;/span&gt; does, but
+it has some really cool features including very mature database
+backends, load balancing, Lua scripting support to modify how recursive
+queries are answered, and geolocation or &lt;span class="caps"&gt;IP&lt;/span&gt;-range based query&amp;nbsp;results.&lt;/p&gt;
+&lt;p&gt;While this project is still just casual research, I thought I&amp;#8217;d share
+some of the useful links and information I&amp;#8217;ve&amp;nbsp;found:&lt;/p&gt;
+&lt;p&gt;PowerDNS&amp;nbsp;Front-ends:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href="http://www.nicmus.com/community.html"&gt;JPowerAdmin&lt;/a&gt; - One of the two
+    most popular, a GPLv3 Java (JBoss &lt;span class="caps"&gt;SEAM&lt;/span&gt;) based web &lt;span class="caps"&gt;UI&lt;/span&gt; with a RESTful
+    &lt;span class="caps"&gt;API&lt;/span&gt;, with support for &amp;#8220;multiple&amp;#8221; database backends. Sponsored by
+    Nicmus, Inc. &lt;a href="http://www.nicmus.com/JPowerAdmin"&gt;Online demo&lt;/a&gt;
+    (demo:demo). Looks nice, simple &lt;span class="caps"&gt;UI&lt;/span&gt;, but no support for&amp;nbsp;split-horizon.&lt;/li&gt;
+&lt;li&gt;&lt;a href="https://www.poweradmin.org"&gt;PowerAdmin&lt;/a&gt; - the other most popular,
+    though it seems to be undergoing a large overhaul at the moment. Has
+    full support for most of PowerDNS&amp;#8217;s features, written in &lt;span class="caps"&gt;PHP&lt;/span&gt;,
+    supports &amp;#8220;large&amp;#8221; databases, fine-grained user permissions, &lt;span class="caps"&gt;RFC&lt;/span&gt;
+    validation, zone templates. &lt;a href="http://demo.poweradmin.org/"&gt;Online
+    demo&lt;/a&gt; (demo:demo). I don&amp;#8217;t really like
+    that it manages the SOAs as full text (without any templating,
+    dropdowns or default values), and that it doesn&amp;#8217;t prepopulate
+    default values for &lt;span class="caps"&gt;TTL&lt;/span&gt; in the new record form, but it looks like a
+    good starting place for someone (like me) who&amp;#8217;s handy with&amp;nbsp;&lt;span class="caps"&gt;PHP&lt;/span&gt;.&lt;/li&gt;
+&lt;li&gt;&lt;a href="http://code.google.com/p/pdns-gui/"&gt;pdns-gui - PowerDNS &lt;span class="caps"&gt;GUI&lt;/span&gt; - Google Project
+    Hosting&lt;/a&gt; - &lt;span class="caps"&gt;PHP&lt;/span&gt;/MySQL &lt;span class="caps"&gt;GUI&lt;/span&gt;.
+    &lt;a href="http://www.powerdns-gui.org/"&gt;Online demo&lt;/a&gt;. Handles templates
+    nicely but won&amp;#8217;t scale to too many of them. Window-based &lt;span class="caps"&gt;UI&lt;/span&gt; is
+    visually pleasing but will probably be a problem for big&amp;nbsp;zones.&lt;/li&gt;
+&lt;li&gt;&lt;a href="http://code.google.com/p/powerdns-webinterface/"&gt;powerdns-webinterface - PowerDNS Webinterface - Google Project
+    Hosting&lt;/a&gt; - A nice
+    but relatively simplistic &lt;span class="caps"&gt;UI&lt;/span&gt; written in &lt;span class="caps"&gt;PHP&lt;/span&gt;. It has some nice
+    features like multi-user authentication (and logging, though I
+    haven&amp;#8217;t looked into how detailed it is), automatic &lt;span class="caps"&gt;SOA&lt;/span&gt; serial
+    update, automatic &lt;span class="caps"&gt;PTR&lt;/span&gt; creation, etc. Unfortunately not geared
+    towards people with lots of domains and multiple records; it has
+    only one template for new domains (and no way to update domains
+    created from a template), no easy filtering, and still treats &lt;span class="caps"&gt;SOA&lt;/span&gt;
+    like a single text&amp;nbsp;record.&lt;/li&gt;
+&lt;li&gt;&lt;a href="http://sourceforge.net/projects/zoneadmin/"&gt;ZoneAdmin |
+    SourceForge.net&lt;/a&gt; and
+    &lt;a&gt;Project website&lt;/a&gt; - Maybe not the fastest tool to use in bulk,
+    but a nice, relatively intuitive and full-featured admin tool.
+    &lt;a href="http://open.megabit.net/demos/ZoneAdmin/"&gt;Online demo&lt;/a&gt;&amp;nbsp;(demo:demo).&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Some links on PowerDNS&amp;nbsp;split-horizon&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href="http://old.nabble.com/Split-Horizon-Scripts-td32843045.html"&gt;Old Nabble - PowerDNS - Split Horizon&amp;nbsp;Scripts&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;It looks to me that split-horizon is going to be the hardest part for
+us, at least to also have a web &lt;span class="caps"&gt;UI&lt;/span&gt; to manage it. It looks like with
+PowerDNS, the most common way to run split horizon &lt;span class="caps"&gt;DNS&lt;/span&gt; (views) is to run
+two separate sets of servers or instances, either on different boxes or
+multi-homed; one for internal and one for external. While that sounds
+like quite a bit of overhead beyond what &lt;span class="caps"&gt;BIND&lt;/span&gt; does, the real problem is
+finding a web &lt;span class="caps"&gt;UI&lt;/span&gt; that supports it; I don&amp;#8217;t care if it&amp;#8217;s in two separate
+databases, but what I want is a logical (web &lt;span class="caps"&gt;UI&lt;/span&gt;) view that has zones
+made up of resource names (i.e. the leftmost column in a zone file) with
+one or two RRs (type, ttl, priority, value) - one for each view. That&amp;#8217;s
+the real catch - all of our machines are in private &lt;span class="caps"&gt;IP&lt;/span&gt; space behind a
+firewall, so I need to be able to manage the internal and external
+records on one screen. While it&amp;#8217;s not exactly scalable, and the code
+stagnated quite a bit once I got it to a point that was usable for me,
+this was the main goal of my &lt;a href="http://multibindadmin.jasonantman.com/"&gt;MultiBIND
+Admin&lt;/a&gt;&amp;nbsp;project.&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Wed, 05 Sep 2012 05:00:00 -0400</pubDate><guid>tag:newblog.jasonantman.com,2012-09-05:2012/09/some-powerdns-links-and-interesting-features/</guid><category>bind</category><category>dns</category><category>multibindadmin</category><category>powerdns</category></item><item><title>Setting emacs zone-mode based on path</title><link>http://newblog.jasonantman.com/2012/08/setting-emacs-zone-mode-based-on-path/</link><description>&lt;p&gt;At work, we do a fair amount of &lt;span class="caps"&gt;DNS&lt;/span&gt; updates. Our zone files are stored
+in subversion, and are named according to the domain (with no .zone
+extension). It&amp;#8217;s a real pain when updating a few (or a few dozen) zones
+in Emacs, since I have to remember to &amp;#8220;M-x zone-mode&amp;#8221; so the serial gets
+automatically updated. Here&amp;#8217;s a lisp snippet to put in your &lt;code&gt;.emacs&lt;/code&gt;
+file that will set zone-mode for all files in any path matching the
+regex &lt;code&gt;svn/named/zones-internal&lt;/code&gt;. I deliberately made it a relative path
+(or, really, any path containing that) so it would work for all of my
+team&amp;#8217;s workstations, no matter where we have the svn repo checked&amp;nbsp;out:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;add-to-list&lt;/span&gt; &lt;span class="ss"&gt;&amp;#39;auto-mode-alist&lt;/span&gt; &lt;span class="o"&gt;&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;svn/named/zones-internal/&amp;quot;&lt;/span&gt; &lt;span class="o"&gt;.&lt;/span&gt; &lt;span class="nv"&gt;zone-mode&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Many thanks to &lt;code&gt;taylanub&lt;/code&gt; on #emacs on irc.freenode.net for helping
+with&amp;nbsp;this.&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Wed, 15 Aug 2012 08:00:00 -0400</pubDate><guid>tag:newblog.jasonantman.com,2012-08-15:2012/08/setting-emacs-zone-mode-based-on-path/</guid><category>bind</category><category>emacs</category><category>lisp</category><category>named</category><category>zone-mode</category></item><item><title>BIND9 Dynamic DNS</title><link>http://newblog.jasonantman.com/2010/04/bind9-dynamic-dns/</link><description>&lt;p&gt;I needed a better solution for Dynamic &lt;span class="caps"&gt;DNS&lt;/span&gt; than
+&lt;a href="http://www.dyndns.org"&gt;dyndns.org&lt;/a&gt; for something, so I set about
+setting up &lt;span class="caps"&gt;DDNS&lt;/span&gt; through my &lt;span class="caps"&gt;BIND9&lt;/span&gt; servers. I found a number of very
+helpful blog posts, including &lt;a href="http://linux.yyz.us/nsupdate/"&gt;nsupdate: Painless Dynamic
+&lt;span class="caps"&gt;DNS&lt;/span&gt;&lt;/a&gt;, &lt;a href="http://linux.yyz.us/dns/ddns-server.html"&gt;Painless &lt;span class="caps"&gt;DDNS&lt;/span&gt; part 2: the
+server&lt;/a&gt;, &lt;a href="http://ops.ietf.org/dns/dynupd/secure-ddns-howto.html"&gt;Secure dynamic &lt;span class="caps"&gt;DNS&lt;/span&gt;
+howto&lt;/a&gt; and &lt;a href="http://www.oceanwave.com/technical-resources/unix-admin/nsupdate.html"&gt;A
+&lt;span class="caps"&gt;DDNS&lt;/span&gt; Server Using &lt;span class="caps"&gt;BIND&lt;/span&gt; and
+Nsupdate&lt;/a&gt;.
+Of course, the &lt;a href="http://www.zytrax.com/books/dns/ch7/statements.html"&gt;&lt;span class="caps"&gt;BIND&lt;/span&gt; configuration statement
+reference&lt;/a&gt; was also
+very&amp;nbsp;helpful.&lt;/p&gt;
+&lt;p&gt;The whole process was relatively&amp;nbsp;simple&amp;#8230;&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Add an &lt;span class="caps"&gt;RR&lt;/span&gt; for the host I want, in the appropriate&amp;nbsp;zone.&lt;/li&gt;
+&lt;li&gt;Generate &lt;span class="caps"&gt;TSIG&lt;/span&gt; keys, distribute them to the&amp;nbsp;client.&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Make sure you have logging enabled for things of interest in your
+    &lt;code&gt;logging&lt;/code&gt; section of &lt;code&gt;named.conf&lt;/code&gt;:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;category dnssec { syslog_info; };
+category update { syslog_info; };
+category security { syslog_info; };
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Create a keys.conf file for your keys (you &lt;em&gt;do&lt;/em&gt; split your configs
+    out into usable chunks,&amp;nbsp;right?):&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;key foo.example.com. {
+    algorithm HMAC-MD5.SIG-ALG.REG.INT;
+    secret &amp;quot;this is your secret here (after Key: in the .private file)&amp;quot;;
+};
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;and include it in &lt;code&gt;named.conf&lt;/code&gt; like:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;include &amp;quot;/etc/named.d/keys.conf&amp;quot;;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Set an
+    &lt;a href="http://www.zytrax.com/books/dns/ch7/xfer.html#update-policy"&gt;&lt;code&gt;update-policy&lt;/code&gt;&lt;/a&gt;
+    statement in &lt;code&gt;named.conf&lt;/code&gt;. I just added mine to a specific zone in a
+    specific view (external), as that&amp;#8217;s the only place I would
+    conceivably want updates right&amp;nbsp;now.&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;update-policy {
+    grant * self * A TXT;
+};
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Assuming your &lt;span class="caps"&gt;TSIG&lt;/span&gt; keys are named for specific RRs, this will let
+any client (with a valid key setup on the server) update its own &lt;span class="caps"&gt;RR&lt;/span&gt;
+and nothing&amp;nbsp;else.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Finally, I created a script for ddns updates on the client. Since I
+    want to be able to fire off this script manually or via cron (if I
+    have to reload &lt;span class="caps"&gt;BIND&lt;/span&gt;, and until I make the needed changes to
+    MultiBINDadmin), I bypassed the usual dhclient stuff and manually
+    grab the current &lt;span class="caps"&gt;IP&lt;/span&gt; from the interface of interest. I symlinked this
+    in &lt;code&gt;/etc/dhcp3/dhclient-exit-hooks.d&lt;/code&gt; so it will run on &lt;span class="caps"&gt;DHCP&lt;/span&gt;&amp;nbsp;updates.&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="c"&gt;#!/bin/bash&lt;/span&gt;
+&lt;span class="nv"&gt;&lt;span class="caps"&gt;IFACE&lt;/span&gt;&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;eth0&amp;quot;&lt;/span&gt;
+&lt;span class="nv"&gt;&lt;span class="caps"&gt;TTL&lt;/span&gt;&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;3600
+&lt;span class="nv"&gt;&lt;span class="caps"&gt;SERVER&lt;/span&gt;&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;ns1.example.com
+&lt;span class="nv"&gt;&lt;span class="caps"&gt;HOSTNAME&lt;/span&gt;&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;foo.example.com
+&lt;span class="nv"&gt;&lt;span class="caps"&gt;ZONE&lt;/span&gt;&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;example.com
+&lt;span class="nv"&gt;&lt;span class="caps"&gt;KEYFILE&lt;/span&gt;&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;/root/ddns-keys/Kfoo.example.com.+157+12345.private
+
+&lt;span class="nv"&gt;new_ip_address&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="sb"&gt;`&lt;/span&gt;ifconfig &lt;span class="nv"&gt;$&lt;span class="caps"&gt;IFACE&lt;/span&gt;&lt;/span&gt; | grep &lt;span class="s2"&gt;&amp;quot;inet addr:&amp;quot;&lt;/span&gt; | awk &lt;span class="s1"&gt;&amp;#39;{print $2}&amp;#39;&lt;/span&gt; | awk -F &lt;span class="s2"&gt;&amp;quot;:&amp;quot;&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;{print $2}&amp;#39;&lt;/span&gt;&lt;span class="sb"&gt;`&lt;/span&gt;
+&lt;span class="nv"&gt;new_ip_address&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="k"&gt;${&lt;/span&gt;&lt;span class="nv"&gt;new_ip_address&lt;/span&gt;&lt;span class="p"&gt;/ /&lt;/span&gt;&lt;span class="k"&gt;}&lt;/span&gt;
+
+nsupdate -v -k &lt;span class="nv"&gt;$&lt;span class="caps"&gt;KEYFILE&lt;/span&gt;&lt;/span&gt; &lt;span class="s"&gt;&amp;lt;&amp;lt; &lt;span class="caps"&gt;EOF&lt;/span&gt;&lt;/span&gt;
+&lt;span class="s"&gt;server $&lt;span class="caps"&gt;SERVER&lt;/span&gt;&lt;/span&gt;
+&lt;span class="s"&gt;zone $&lt;span class="caps"&gt;ZONE&lt;/span&gt;&lt;/span&gt;
+&lt;span class="s"&gt;update delete $&lt;span class="caps"&gt;HOSTNAME&lt;/span&gt; A&lt;/span&gt;
+&lt;span class="s"&gt;update add $&lt;span class="caps"&gt;HOSTNAME&lt;/span&gt; $&lt;span class="caps"&gt;TTL&lt;/span&gt; A $new_ip_address&lt;/span&gt;
+&lt;span class="s"&gt;send&lt;/span&gt;
+&lt;span class="s"&gt;&lt;span class="caps"&gt;EOF&lt;/span&gt;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;When I finally got things setup, my only problem was with permissions on
+the zone file directories, which was easily corrected.Once this was
+straightened out, my &lt;code&gt;nsupdate&lt;/code&gt; script ran flawlessly, and the update
+was instantly (thanks to using &amp;#8220;notify&amp;#8221;) propagated out to the slave&amp;nbsp;server.&lt;/p&gt;
+&lt;p&gt;The only problem that I now have is one of my own creation - I use a
+small &lt;span class="caps"&gt;PHP&lt;/span&gt; application that I wrote
+(&lt;a href="http://multibindadmin.jasonantman.com/"&gt;MultiBINDadmin&lt;/a&gt;) to manage
+&lt;span class="caps"&gt;DNS&lt;/span&gt;. It&amp;#8217;s incredibly easy, as it keeps track of internal and external
+IPs, and everything else, for my zones, and triggers a pull on the
+master &lt;span class="caps"&gt;BIND&lt;/span&gt; server via the web interface. The only problem I now have is
+that this messes with &lt;span class="caps"&gt;DDNS&lt;/span&gt; updates. First, if I make changes in the web
+interface and there&amp;#8217;s already been a &lt;span class="caps"&gt;DDNS&lt;/span&gt; update that day, the zone
+serial generated by MultiBINDadmin will match the automatically
+incremented serial generated by the &lt;span class="caps"&gt;BIND&lt;/span&gt; server. Second, and more
+troubling, when the &lt;span class="caps"&gt;BIND&lt;/span&gt; server reloads, it loses the dynamic update. So
+when I push changes to a zone from the web interface, my dynamic updates
+go&amp;nbsp;away.&lt;/p&gt;
+&lt;p&gt;For the short-term, I&amp;#8217;m just going to check the zone serial before I
+make any updates and, if need be, manually increment it in the web tool.
+As to losing the dynamic updates, I&amp;#8217;m just going to have cron on the
+client fire the &lt;code&gt;nsupdate&lt;/code&gt; script every 30 minutes. I also did a little
+kludge, setup a vhost on one of my web servers to answer for the dynamic
+host (as a catch-all page), and set the &lt;span class="caps"&gt;IP&lt;/span&gt; of my web server as the
+hard-coded &lt;span class="caps"&gt;RR&lt;/span&gt; address in the zone file. If someone tries to use the new
+(&lt;span class="caps"&gt;DDNS&lt;/span&gt; through my &lt;span class="caps"&gt;BIND&lt;/span&gt; server) address for &lt;span class="caps"&gt;HTTP&lt;/span&gt; and for some reason the
+current dynamic address disappeared (&lt;span class="caps"&gt;BIND&lt;/span&gt; reloaded), they&amp;#8217;ll get a
+little page with a message and the old dyndns.org-based&amp;nbsp;&lt;span class="caps"&gt;URL&lt;/span&gt;.&lt;/p&gt;
+&lt;p&gt;When I get around to it (or when this becomes a problem), I&amp;#8217;ll make two
+changes to&amp;nbsp;MultiBINDadmin:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Before it pushes an update, check the current serial for the zone
+    (ok, this may be a bit interesting, as the internal and external
+    zones could have different serials) and increment from&amp;nbsp;that.&lt;/li&gt;
+&lt;li&gt;Have a &amp;#8220;&lt;span class="caps"&gt;DDNS&lt;/span&gt;&amp;#8221; flag in the database and &lt;span class="caps"&gt;GUI&lt;/span&gt; for RRs. For all flagged
+    RRs, try to get the (unfortunately external) current address and
+    update the record in the &lt;span class="caps"&gt;DB&lt;/span&gt; before the&amp;nbsp;push.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;The real question here, which I haven&amp;#8217;t looked into yet, is how I can
+interrogate &lt;span class="caps"&gt;BIND&lt;/span&gt; about RRs for the external zone from an internal&amp;nbsp;host.&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Wed, 07 Apr 2010 09:04:00 -0400</pubDate><guid>tag:newblog.jasonantman.com,2010-04-07:2010/04/bind9-dynamic-dns/</guid><category>bind</category><category>ddns</category><category>dhcp</category><category>multibindadmin</category></item><item><title>Project Announcement - PHPsa</title><link>http://newblog.jasonantman.com/2009/09/project-announcement-phpsa/</link><description>&lt;p&gt;So, here&amp;#8217;s the &amp;#8220;official&amp;#8221; scoop on the new project that I&amp;#8217;m
+planning/starting to work on. I&amp;#8217;m calling it PHPsa for now, and it&amp;#8217;s
+going to (hopefully) be an integrated dashboard/portal for SysAdmins.
+While there are a number of tools that fit into this general category
+(perhaps with &lt;a href="http://www.alienvault.com/home.php?section=News"&gt;&lt;span class="caps"&gt;OSSIM&lt;/span&gt;&lt;/a&gt;
+being the closest, though it&amp;#8217;s security-minded), I feel that there&amp;#8217;s a
+real gap in terms of tool integration. My daily workflow, which includes
+multiple trips to and correlation among Nagios, Cacti, &lt;span class="caps"&gt;DNS&lt;/span&gt;, &lt;span class="caps"&gt;DHCP&lt;/span&gt;,
+Puppet, logs, and other tools really leaves something to be desired. So,
+I&amp;#8217;m setting out to create a modular SysAdmin dashboard that unifies many
+of the common SysAdmin-related tools into a modular&amp;nbsp;dashboard.&lt;/p&gt;
+&lt;p&gt;The first overall design goals that I&amp;#8217;ve set&amp;nbsp;are:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;A modular, plugin-based architecture that allows admins to select
+    which features/tools they want, and allows easy development of new&amp;nbsp;modules.&lt;/li&gt;
+&lt;li&gt;Design with legacy tools in mind - easy ways to tie in to tools that
+    weren&amp;#8217;t written with PHPsa in mind, both in terms of linking to
+    information and gathering/unifying&amp;nbsp;information.&lt;/li&gt;
+&lt;li&gt;&lt;span class="caps"&gt;RBAC&lt;/span&gt;, including per-module rules and the possibility for a limited
+    read-only view (client/user&amp;nbsp;mode).&lt;/li&gt;
+&lt;li&gt;Use of data sources, specifically web-based/&lt;span class="caps"&gt;REST&lt;/span&gt; APIs where
+    available, and databases otherwise, from existing tools with as
+    little modification as&amp;nbsp;possible.&lt;/li&gt;
+&lt;li&gt;Support for database abstraction, though I&amp;#8217;ll be using&amp;nbsp;MySQL.&lt;/li&gt;
+&lt;li&gt;Eventually, implement &lt;span class="caps"&gt;RSS&lt;/span&gt; feeds of pertinent&amp;nbsp;information.&lt;/li&gt;
+&lt;li&gt;Balance Ajax/&lt;span class="caps"&gt;DHTML&lt;/span&gt; with the desire for important things to have
+    canonical, static, bookmark-able&amp;nbsp;URLs.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;So, here are some of the things that I&amp;#8217;m planning on integrating, with
+obvious bias towards getting my own projects done before I integrate
+pre-existing&amp;nbsp;tools:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href="http://multibindadmin.jasonantman.com"&gt;MultiBindAdmin&lt;/a&gt;, my &lt;span class="caps"&gt;DNS&lt;/span&gt; and
+    &lt;span class="caps"&gt;DHCP&lt;/span&gt; administration tool (specifically geared towards split-view &lt;span class="caps"&gt;DNS&lt;/span&gt;
+    with the inside view behind&amp;nbsp;&lt;span class="caps"&gt;NAT&lt;/span&gt;).&lt;/li&gt;
+&lt;li&gt;&lt;a href="http://rackman.jasonantman.com/"&gt;RackMan&lt;/a&gt;, my tool for mapping
+    devices&amp;#8217; physical locations in racks (and tacking&amp;nbsp;patching).&lt;/li&gt;
+&lt;li&gt;My simple config tool for
+    &lt;a href="http://www.puppetlabs.com"&gt;Puppet&lt;/a&gt;.&lt;/li&gt;
+&lt;li&gt;&lt;a href="http://nagios.org/"&gt;Nagios&lt;/a&gt;.&lt;/li&gt;
+&lt;li&gt;&lt;a href="http://www.cacti.net/"&gt;Cacti&lt;/a&gt;.&lt;/li&gt;
+&lt;li&gt;Nathan Hubbard&amp;#8217;s &lt;a href="http://www.machdb.org/"&gt;MachDB&lt;/a&gt;.&lt;/li&gt;
+&lt;li&gt;&lt;a href="http://www.bacula.org/en/"&gt;Bacula&lt;/a&gt; (monitoring/status&amp;nbsp;only).&lt;/li&gt;
+&lt;li&gt;Syslog via &lt;a href="http://www.rsyslog.com/"&gt;rsyslog&lt;/a&gt; (or any other
+    syslog-to-&lt;span class="caps"&gt;SQL&lt;/span&gt;&amp;nbsp;solution).&lt;/li&gt;
+&lt;li&gt;Possibly a front-end to &lt;a href="http://www.google.com/analytics/"&gt;Google
+    Analytics&lt;/a&gt;.&lt;/li&gt;
+&lt;li&gt;Some of my custom scripts for graphing SpamAssassin, &lt;span class="caps"&gt;DNS&lt;/span&gt; queries,&amp;nbsp;etc.&lt;/li&gt;
+&lt;li&gt;Some sort of Apache log analysis, like
+    &lt;a href="http://www.mrunix.net/webalizer/"&gt;Webalizer&lt;/a&gt;.&lt;/li&gt;
+&lt;li&gt;Mail log analysis, possibly
+    &lt;a href="http://awstats.sourceforge.net/"&gt;AWstats&lt;/a&gt;.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;So, the first big issues that I&amp;#8217;m going to&amp;nbsp;tackle:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;General layout. Specifically, how to handle a more-or-less
+    consistent layout while integrating tools that weren&amp;#8217;t designed for
+    PHPsa. I&amp;#8217;ll probably end up using iFrames (or even a frameset) for
+    tools that don&amp;#8217;t integrate&amp;nbsp;well.&lt;/li&gt;
+&lt;li&gt;How to correlate data/objects between different tools (i.e. how to
+    display information from Nagios, Cacti, MultiBindAdmin and MachDB
+    for a given&amp;nbsp;host?).&lt;/li&gt;
+&lt;li&gt;Do I want to use a templating engine like
+    &lt;a href="http://www.smarty.net/"&gt;Smarty&lt;/a&gt; or hand-code all of the&amp;nbsp;&lt;span class="caps"&gt;HTML&lt;/span&gt;?&lt;/li&gt;
+&lt;li&gt;How will I handle&amp;nbsp;plugins?&lt;/li&gt;
+&lt;li&gt;How much code do I want to re-write and how much can I use as-is
+    from other tools? And, on a related note, how much existing data can
+    I access easily from other tools, vs having to use grabber scripts
+    that dump data in&amp;nbsp;MySQL?&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&lt;strong&gt;Update 2010-02-03&lt;/strong&gt;: I think this may become a semi-official project
+for me at $work, which means that I&amp;#8217;ll be able to dedicate quite a bit
+more time to it. Unfortunately, it also means that I will, most likely,
+have to give up Nathan Hubbard&amp;#8217;s &lt;a href="http://www.machdb.org/"&gt;MachDB&lt;/a&gt; in
+favor of &lt;a href="http://www.ocsinventory-ng.org/"&gt;&lt;span class="caps"&gt;OCS&lt;/span&gt; Inventory &lt;span class="caps"&gt;NG&lt;/span&gt;&lt;/a&gt;, a more
+mature project that already includes inventory support for Linux,
+Windows and&amp;nbsp;Mac.&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Tue, 29 Sep 2009 15:36:00 -0400</pubDate><guid>tag:newblog.jasonantman.com,2009-09-29:2009/09/project-announcement-phpsa/</guid><category>bind</category><category>cacti</category><category>dns</category><category>Nagios</category><category>PHPsa</category><category>Projects</category><category>puppet</category><category>rsyslog</category><category>sysadmin</category><category>syslog</category></item><item><title>DNS Move</title><link>http://newblog.jasonantman.com/2009/09/dns-move/</link><description>&lt;p&gt;Yesterday I finally began moving &lt;span class="caps"&gt;DNS&lt;/span&gt; for my sites from GoDaddy to my own
+in-house system of master/slave
+&lt;a href="https://www.isc.org/software/bind"&gt;&lt;span class="caps"&gt;BIND9&lt;/span&gt;&lt;/a&gt;. While both &lt;span class="caps"&gt;DNS&lt;/span&gt; servers are
+currently at the same location and on the same &lt;span class="caps"&gt;WAN&lt;/span&gt; connection (heck,
+they&amp;#8217;re beind the same router, too), so is all of the rest of my
+infrastructure. Migrating jasonantman.com was definitely the most
+critical task, this has allowed me to easily use my new project,
+&lt;a href="http://multibindadmin.jasonantman.com"&gt;MultiBIND Admin&lt;/a&gt; to manage &lt;span class="caps"&gt;DNS&lt;/span&gt;.
+In addition to just being simpler than using GoDaddy&amp;#8217;s tool, it allows
+me to manage &lt;span class="caps"&gt;DNS&lt;/span&gt; for both the external view and the NATed internal view
+in one tool. I did have a brief mail outage thanks to some incorrect &lt;span class="caps"&gt;MX&lt;/span&gt;
+records being served by the slave, and a few other issues with the
+caching &lt;span class="caps"&gt;DNS&lt;/span&gt; servers at work not expiring the old records, but all seems
+to be well now. It was a relatively smooth transition, though I haven&amp;#8217;t
+yet moved over some of my older less used&amp;nbsp;domains.&lt;/p&gt;
+&lt;p&gt;The next part of my project, when I move the ambulance corps hosted
+services in-house, will be trying to find a decently-priced &lt;span class="caps"&gt;DNS&lt;/span&gt; hosting
+company that will just act as a slave, to keep &lt;span class="caps"&gt;DNS&lt;/span&gt; up if my &lt;span class="caps"&gt;WAN&lt;/span&gt;
+connection goes&amp;nbsp;down.&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Thu, 17 Sep 2009 13:07:00 -0400</pubDate><guid>tag:newblog.jasonantman.com,2009-09-17:2009/09/dns-move/</guid><category>bind</category><category>dns</category><category>multibindadmin</category></item><item><title>DNS - Open Source rules</title><link>http://newblog.jasonantman.com/2009/07/dns-open-source-rules/</link><description>&lt;p&gt;&lt;span class="caps"&gt;DNS&lt;/span&gt; is arguably one of the most important services on the Internet.
+Without it, every domain name and email address we know would be
+meaningless. We&amp;#8217;d be thrown back into the days of &lt;span class="caps"&gt;IP&lt;/span&gt; addresses without
+corresponding names. And, given everything that depends on &lt;span class="caps"&gt;DNS&lt;/span&gt;, it&amp;#8217;s
+also one of the most important services from a security standpoint.
+Compromised &lt;span class="caps"&gt;DNS&lt;/span&gt; servers could cause end-of-the-world havoc for whatever
+zones they&amp;nbsp;control.&lt;/p&gt;
+&lt;p&gt;So here&amp;#8217;s a fact that Microsoft and the other proprietary guys don&amp;#8217;t
+want you to know: &lt;strong&gt;58.65% of &lt;span class="caps"&gt;DNS&lt;/span&gt; servers that are listed as being
+authoritative for .com or .net domains are running the free/open source
+&lt;a href="https://www.isc.org/software/BIND/"&gt;&lt;span class="caps"&gt;ISC&lt;/span&gt; &lt;span class="caps"&gt;BIND&lt;/span&gt;&lt;/a&gt;. Less than 0.3% are using
+a Microsoft product&lt;/strong&gt;. To me, that says&amp;nbsp;something.&lt;/p&gt;
+&lt;p&gt;This is according to the October 2008 &lt;a href="http://dns.measurement-factory.com/surveys/200810.html"&gt;measurement factory &lt;span class="caps"&gt;DNS&lt;/span&gt; server
+survey&lt;/a&gt; of 99+
+Million addresses (618,000+&amp;nbsp;hosts).&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Thu, 23 Jul 2009 13:37:00 -0400</pubDate><guid>tag:newblog.jasonantman.com,2009-07-23:2009/07/dns-open-source-rules/</guid><category>bind</category><category>dns</category><category>market share</category></item><item><title>New Projects</title><link>http://newblog.jasonantman.com/2009/07/new-projects/</link><description>&lt;p&gt;In terms of ongoing projects, I should be updating RackMan sometime
+soon, and also adding the demo&amp;nbsp;site.&lt;/p&gt;
+&lt;p&gt;I&amp;#8217;ve begun to move &lt;span class="caps"&gt;DNS&lt;/span&gt; for all of my domains in-house, mostly because
+since everything is behind &lt;span class="caps"&gt;NAT&lt;/span&gt;, it&amp;#8217;s a real pain to manage &lt;span class="caps"&gt;DNS&lt;/span&gt; entries
+in two places (one of them being GoDaddy&amp;#8217;s web interface). Because of
+the &lt;span class="caps"&gt;NAT&lt;/span&gt; issue, I&amp;#8217;m also writing my own &lt;span class="caps"&gt;BIND&lt;/span&gt; configuration tool,
+currently named &lt;a href="http://multibindadmin.jasonantman.com"&gt;MultiBIND
+Admin&lt;/a&gt;. In addition to managing
+multiple zones in a sane way, it stores all configuration in MySQL.
+Among other things, it can store different &lt;span class="caps"&gt;IP&lt;/span&gt; addresses for A records
+for the inside and outside views. Zone files can either be pulled by a
+script on the name server (push capability is being worked on) or
+downloaded (for uploading to a &lt;span class="caps"&gt;DNS&lt;/span&gt; hosting provider like&amp;nbsp;GoDaddy).&lt;/p&gt;
+&lt;p&gt;For my final project for my &lt;span class="caps"&gt;XML&lt;/span&gt; web design class, I&amp;#8217;m going to be making
+some &amp;#8220;mashup&amp;#8221; with RackMan, Google Maps, Google Visualizer, Nagios, and
+a few other&amp;nbsp;tools&amp;#8230;&lt;/p&gt;
+&lt;p&gt;Stay&amp;nbsp;tuned&amp;#8230;&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Thu, 16 Jul 2009 14:05:00 -0400</pubDate><guid>tag:newblog.jasonantman.com,2009-07-16:2009/07/new-projects/</guid><category>bind</category><category>dns</category><category>google</category><category>PHPsa</category><category>rackman</category></item></channel></rss>

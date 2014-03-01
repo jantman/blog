@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Jason Antman's Blog</title><link href="http://newblog.jasonantman.com/" rel="alternate"></link><link href="http://newblog.jasonantman.com/feeds/tags/release.atom.xml" rel="self"></link><id>http://newblog.jasonantman.com/</id><updated>2012-03-20T18:12:00-04:00</updated><entry><title>Leap Year Windows Azure Cloud Outage</title><link href="http://newblog.jasonantman.com/2012/03/leap-year-windows-azure-cloud-outage/" rel="alternate"></link><updated>2012-03-20T18:12:00-04:00</updated><author><name>admin</name></author><id>tag:newblog.jasonantman.com,2012-03-20:2012/03/leap-year-windows-azure-cloud-outage/</id><summary type="html">&lt;p&gt;I haven&amp;#8217;t talked about Microsoft in quite a while (mainly because I
+don&amp;#8217;t follow mainstream tech news as much anymore), but I happened by a
+very interesting &lt;a href="http://blogs.msdn.com/b/windowsazure/archive/2012/03/09/summary-of-windows-azure-service-disruption-on-feb-29th-2012.aspx"&gt;post on the Windows Azure
+blog&lt;/a&gt;
+the other day. It&amp;#8217;s a very detailed postmortem of the major outage of
+the Windows Azure cloud service which occurred from 4:00 &lt;span class="caps"&gt;PM&lt;/span&gt; &lt;span class="caps"&gt;PST&lt;/span&gt; on
+February 28&lt;sup&gt;th&lt;/sup&gt; through 2:15 &lt;span class="caps"&gt;AM&lt;/span&gt; on March 1&lt;sup&gt;st&lt;/sup&gt;. Before I get into any of
+the details, I should say that it really is a nice, well-done post. And
+the fact that they&amp;#8217;re willing to do such a detailed, public postmortem -
+and admit the failures that they did - is a step in the right direction
+for Microsoft (a company that I don&amp;#8217;t particularly care for, to put it&amp;nbsp;lightly).&lt;/p&gt;
+&lt;p&gt;I&amp;#8217;m going to glance over the majority of the post, though I highly
+recommend that anyone interested in running web-scale services,
+specifically highly available ones, read it. The general overview
+(really just the points that are germane to my discussion) is as
+follows: An agent running inside the guest &lt;span class="caps"&gt;VM&lt;/span&gt; instances (i.e. domU)
+communicates with a counterpart on the host &lt;span class="caps"&gt;OS&lt;/span&gt; (i.e. dom0) over an
+encrypted channel, authenticated by certificate. The certs are generated
+and passed from the guest to the host when the guest instance is first
+initialized, which means when an app is first deployed, scaled out, &lt;span class="caps"&gt;OS&lt;/span&gt;
+updated, or when an app is reinitialized on a new host. This cert was
+generated for a 1-year validity period, by adding 1 to the integer year
+- hence, the generation process failed on February 29th of a leap year,
+as the cert end date wasn&amp;#8217;t valid. When the cert generation failed, the
+guest agent essentially stopped cold. The host agent waited for a 25
+minute timeout, then re-initialized the guest and started over. After
+three of these failures, the host assumes there&amp;#8217;s a hardware error
+(since the guest would have reported a more specific error otherwise),
+declares itself in an error state, and tries to move its current
+workload over to another host. Which re-initializes the guests on that
+host, thereby causing a chain-reaction of failures in this case. Skip
+forward the 2-1/2 hours it took them to identify the problem, and
+further 2-1/2 hours to get a fix ready. They fast-tracked their fix to 7
+clusters that had already been in the process of a software update, but
+ended up with those clusters in an inconsistent state with
+incompatibilities between the guest and host networking subsystems,
+bringing down previously-unaffected instances on these&amp;nbsp;clusters.&lt;/p&gt;
+&lt;p&gt;This whole scenario offers a few important points on both the
+development and operations&amp;nbsp;sides:&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Inputs need error checking, and errors need to be raised.&lt;/strong&gt; So the
+first problem here was the failed cert generation. I&amp;#8217;ll leave alone the
+fact that, in my opinion, doing math on a the integer year of a date is
+a high school or college programming mistake, and never should have been
+made by someone doing platform coding for a major company (believe it or
+not, 25% of years are leap years &amp;lt;/sarcasm&gt;). If whatever code was
+generating the cert was smart enough to check the cert end date validity
+and error out, that error should have been pushed up the stack to
+somewhere where it could be handled - or, at least, sent to a central
+log server that does error&amp;nbsp;trending.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Secure communications when provisioning need an insecure error path.&lt;/strong&gt;
+This is somewhat connected to the previous point. If the normal process
+of creating a new instance and communicating errors up the stack relies
+on certs and authentication or encryption, there should be some method
+of communicating errors with &lt;em&gt;that&lt;/em&gt; process either up the stack, or to a
+separate event correlation/trending system. Errors with a
+certificate-based system are not unusual, and even something as simple
+as a vastly incorrect time set on the guests could have caused this same
+problem. In environments where management/control communication between
+levels of a system are encrypted or authenticated, there should be some
+way for lower levels of the system to deliver a meaningful error message
+&amp;#8220;somewhere&amp;#8221;. Even if this is just a syslog server or web service that
+listens for errors and can escalate a warning when the numbers spike,
+it&amp;#8217;s a useful alarm and debugging&amp;nbsp;tool.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Autonomous systems shouldn&amp;#8217;t lightly assume hardware failures.&lt;/strong&gt; It&amp;#8217;s
+arrogance for a host system to assume that just because it can&amp;#8217;t
+instantiate new guests, a hardware failure exists. This entire incident
+is a perfect example that, at least if hardware error indicators are
+properly monitored, it&amp;#8217;s more likely for a software problem to be
+falsely identified as a hardware problem than the other way around. All
+of my points are somewhat related, but I can think of many more reasons
+why a new guest can&amp;#8217;t be instantiated that are software-related rather
+than&amp;nbsp;hardware-related.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Autonomous control mechanisms need historical trending, and need to
+call for help if this looks wrong.&lt;/strong&gt; These host systems tried to
+instantiate new guests three times, waiting 25 minutes in between, and
+then declared themselves bad and tried to migrate guests to other hosts.
+From what I understand, Microsoft got it right in having a &amp;#8220;kill switch&amp;#8221;
+that prevented further migration of guests. What they didn&amp;#8217;t have right
+was reporting of autonomous actions (guest migration) to a central
+location that performs trending. The 25 minute timeout with three
+attempts is a great safety feature, but if the status of guest creation
+actions was reported to a central server, it would have been much more
+quickly apparent that 100% of guest creations in the past, say, 10
+minutes, had failed - across all clusters. I know plenty of shops that
+do little, if any, real-time analysis and historical comparisons of
+their log data. But when systems are designed to perform self-healing
+and autonomous actions, it&amp;#8217;s imperative that these actions are tracked
+in near-real-time, compared to historical averages, and that deviation
+from a baseline is identified and escalated to&amp;nbsp;humans.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Release procedures are more, not less, important when the sky is
+falling.&lt;/strong&gt; The extended downtime of the last seven clusters was because
+of an improperly &lt;span class="caps"&gt;QA&lt;/span&gt;&amp;#8217;ed update that was pushed out bypassing the normal
+release and testing procedures. As a matter of fact, it was so poorly
+&lt;span class="caps"&gt;QA&lt;/span&gt;&amp;#8217;ed that the update totally broke networking for the guest VMs, and
+was still pushed out. I&amp;#8217;m sure this was more of a management/executive
+decision than one made by the actual engineers, but organizations (even
+management) need to understand that when the sky is falling, services
+are down, and everybody is stressed, it&amp;#8217;s &lt;em&gt;more&lt;/em&gt; likely for mistakes and
+oversights to happen, and this is when a proper, well-documented &lt;span class="caps"&gt;QA&lt;/span&gt; and
+release procedure (including phased rollout) is &lt;em&gt;most&lt;/em&gt; important.
+Failure to follow these procedures results in exactly what happened in
+this case - making an already bad problem much&amp;nbsp;worse.&lt;/p&gt;
+&lt;p&gt;Even &lt;em&gt;I&lt;/em&gt; can&amp;#8217;t blame Microsoft specifically for all this (though the
+whole thing would have been avoided if they just represented timestamps
+as integers like the rest of us&amp;#8230;), but it is a good opportunity for us
+all to learn from a major incident at a &amp;#8220;pretty well known&amp;#8221;&amp;nbsp;company.&lt;/p&gt;
+&lt;p&gt;release procedures are most important when things are already going&amp;nbsp;wrong&lt;/p&gt;</summary><category term="azure"></category><category term="microsoft"></category><category term="outage"></category><category term="release"></category><category term="testing"></category><category term="windows"></category></entry></feed>

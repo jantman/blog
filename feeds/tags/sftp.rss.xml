@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Jason Antman's Blog</title><link>http://newblog.jasonantman.com/</link><description></description><atom:link href="http://newblog.jasonantman.com/feeds/tags/sftp.rss.xml" rel="self"></atom:link><lastBuildDate>Mon, 16 Jul 2012 08:47:00 -0400</lastBuildDate><item><title>Logging OpenSSH SFTP Transactions</title><link>http://newblog.jasonantman.com/2012/07/logging-openssh-sftp-transactions/</link><description>&lt;p&gt;I just came across a really handy post on &lt;a href="https://plus.google.com/117561367404774597588/posts"&gt;David
+Busby&lt;/a&gt;&amp;#8216;s blog:
+&lt;a href="http://blog.oneiroi.co.uk/linux/enable-logging-in-the-sftp-subsystem/"&gt;Enable logging in the &lt;span class="caps"&gt;SFTP&lt;/span&gt; subsystem -
+Oneiroi&lt;/a&gt;.
+From OpenSSH 4.4 on, you can pass arguments to Subsystem calls, and the
+sftp subsystem supports logging to an aribtrary syslog facility and
+priority. Simply adding a line&amp;nbsp;like:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;Subsystem       sftp    /usr/libexec/openssh/sftp-server -f LOCAL5 -l INFO
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;and the appropriate lines to your syslog config will give you a handy
+transfer log&amp;nbsp;like:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;Jul 16 09:22:25 hostname sftp-server[2058]: session opened for local user jantman from [A.B.C.D]
+Jul 16 09:22:26 hostname sftp-server[2058]: open &amp;quot;/home/jantman/temp/sftp_test&amp;quot; flags WRITE,CREATE,TRUNCATE mode 0666
+Jul 16 09:22:45 hostname sftp-server[2058]: close &amp;quot;/home/jantman/temp/sftp_test&amp;quot; bytes read 0 written 1464813
+Jul 16 09:23:08 hostname sftp-server[2058]: session closed for local user jantman from [A.B.C.D]
+Jul 16 09:27:50 hostname sftp-server[2309]: session opened for local user jantman from [A.B.C.D]
+Jul 16 09:27:50 hostname sftp-server[2309]: open &amp;quot;/home/jantman/temp/sftp_test&amp;quot; flags READ mode 0666
+Jul 16 09:27:54 hostname sftp-server[2309]: close &amp;quot;/home/jantman/temp/sftp_test&amp;quot; bytes read 1464813 written 0
+Jul 16 09:27:54 hostname sftp-server[2309]: session closed for local user jantman from [A.B.C.D]
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;If you have syslog write these logs to their own file, remember to setup
+log rotation for&amp;nbsp;them.&lt;/p&gt;
+&lt;p&gt;Unfortunately, I&amp;#8217;m not aware of any way to log &lt;span class="caps"&gt;SCP&lt;/span&gt; file&amp;nbsp;transfers.&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Mon, 16 Jul 2012 08:47:00 -0400</pubDate><guid>tag:newblog.jasonantman.com,2012-07-16:2012/07/logging-openssh-sftp-transactions/</guid><category>logging</category><category>openssh</category><category>sftp</category><category>ssh</category></item><item><title>Centralized Storage via SFTP</title><link>http://newblog.jasonantman.com/2008/04/centralized-storage-via-sftp/</link><description>&lt;p&gt;For quite a while, I&amp;#8217;ve been planning on centralizing a lot of my
+personal storage (documents, miscellaneous stuff) on one machine at
+home. The biggest problem that I have is that, while a &lt;span class="caps"&gt;VPN&lt;/span&gt; would be a
+good solution for my apartment (if I could get
+&lt;a href="http://www.ipcop.org/"&gt;IPcop&lt;/a&gt;to do &lt;span class="caps"&gt;VPN&lt;/span&gt; between two dynamic IPs), it
+doesn&amp;#8217;t really work for my mobile life. My laptop is often connected to
+untrusted wireless, and unknown firewall configurations, so &lt;span class="caps"&gt;VPN&lt;/span&gt; isn&amp;#8217;t
+always the best (and definitely not the easiest) option. Given road
+warrior use, &lt;span class="caps"&gt;NFS&lt;/span&gt; is obviously out of the&amp;nbsp;question.&lt;/p&gt;
+&lt;p&gt;After a little searching, I found the
+&lt;a href="http://fuse.sourceforge.net/sshfs.html"&gt;&lt;span class="caps"&gt;SSHFS&lt;/span&gt;&lt;/a&gt; module for
+&lt;a href="http://fuse.sourceforge.net/"&gt;&lt;span class="caps"&gt;FUSE&lt;/span&gt;&lt;/a&gt;, which allows userspace mounting of
+a &lt;span class="caps"&gt;SFTP&lt;/span&gt; filesystem. Despite some initial hiccups, I managed to get it
+setup on two machines - my laptop and a desktop in the apartment. This
+week I&amp;#8217;ll finish working on the rest of the machines - and eventually
+replace my aging &lt;a href="http://www.jasonantman.com/wiki/index.php/SSH_Gateway_Box"&gt;&lt;span class="caps"&gt;SSH&lt;/span&gt;
+gateway&lt;/a&gt;
+machine (currently a 10-year-old Gateway mini tower) with a
+&lt;a href="http://www.soekris.com/"&gt;Soekris&lt;/a&gt;&amp;nbsp;box.&lt;/p&gt;
+&lt;p&gt;The setup was pretty&amp;nbsp;easy:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Make sure you have public key authentication setup for ssh between
+    the machines, using &lt;span class="caps"&gt;RSA&lt;/span&gt;&amp;nbsp;keys.&lt;/li&gt;
+&lt;li&gt;Make sure fuse, libfuse, and the related packages are&amp;nbsp;installed.&lt;/li&gt;
+&lt;li&gt;Install the sshfs&amp;nbsp;package.&lt;/li&gt;
+&lt;li&gt;Make sure your user is added to the &amp;#8220;trusted&amp;#8221; group (for&amp;nbsp;OpenSuSE).&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;After that, just give it a spin, as the user that you want to mount the
+filesystem&amp;nbsp;as:&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;sshfs hostname:/path/to/mount /path/to/local/mountpoint&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;Once that worked pefectly, I added the following to my &lt;code&gt;.bash_profile&lt;/code&gt;:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="c"&gt;# this handles &lt;span class="caps"&gt;SSHFS&lt;/span&gt; mount of the central-home dir&lt;/span&gt;
+&lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="o"&gt;[&lt;/span&gt; -a /path/to/local/mountpoint &lt;span class="o"&gt;]&lt;/span&gt;; &lt;span class="k"&gt;then&lt;/span&gt;
+&lt;span class="k"&gt;    &lt;/span&gt;&lt;span class="nb"&gt;echo&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;&lt;span class="caps"&gt;HOSTNAME&lt;/span&gt; home is mounted at /path/to/local/mountpoint&amp;quot;&lt;/span&gt;
+&lt;span class="k"&gt;else&lt;/span&gt;
+&lt;span class="k"&gt;    &lt;/span&gt;&lt;span class="nb"&gt;echo&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;Mounting &lt;span class="caps"&gt;HOSTNAME&lt;/span&gt; home at /path/to/local/mountpoint...&amp;quot;&lt;/span&gt;
+    hostname:/path/to/mount /path/to/local/mountpoint&lt;span class="sb"&gt;`&lt;/span&gt;  
+&lt;span class="k"&gt;fi&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Mon, 21 Apr 2008 17:28:00 -0400</pubDate><guid>tag:newblog.jasonantman.com,2008-04-21:2008/04/centralized-storage-via-sftp/</guid><category>fuse</category><category>sftp</category><category>ssh</category><category>sshfs</category><category>storage</category></item></channel></rss>

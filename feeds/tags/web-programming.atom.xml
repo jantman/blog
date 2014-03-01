@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Jason Antman's Blog</title><link href="http://newblog.jasonantman.com/" rel="alternate"></link><link href="http://newblog.jasonantman.com/feeds/tags/web-programming.atom.xml" rel="self"></link><id>http://newblog.jasonantman.com/</id><updated>2010-08-26T08:10:00-04:00</updated><entry><title>Documentation generation for web apps - PHP and JavaScript</title><link href="http://newblog.jasonantman.com/2010/08/documentation-generation-for-web-apps-php-and-javascript/" rel="alternate"></link><updated>2010-08-26T08:10:00-04:00</updated><author><name>admin</name></author><id>tag:newblog.jasonantman.com,2010-08-26:2010/08/documentation-generation-for-web-apps-php-and-javascript/</id><summary type="html">&lt;p&gt;Recently I&amp;#8217;ve been making some changes to a relatively complex ePCR
+(electronic patient care report) program that I wrote for the &lt;a href="http://www.midlandparkambulance.com"&gt;ambulance
+corps&lt;/a&gt;. It&amp;#8217;s a web application
+(available only on our &lt;span class="caps"&gt;LAN&lt;/span&gt;, of course) written in &lt;span class="caps"&gt;PHP&lt;/span&gt;, with a relatively
+large chunk of custom javascript to provide Ajax/&lt;span class="caps"&gt;DHTML&lt;/span&gt; functions. Most
+of the &lt;span class="caps"&gt;PHP&lt;/span&gt; code was already documented and processed with
+&lt;a href="http://www.phpdoc.org/"&gt;phpDocumentor&lt;/a&gt; (phpdoc) to generate &lt;span class="caps"&gt;API&lt;/span&gt;
+documentation. However, since so much of the functionality is
+&lt;span class="caps"&gt;DHTML&lt;/span&gt;-based, there was a lot of looking back to the JavaScript source to
+figure out what was called&amp;nbsp;where.&lt;/p&gt;
+&lt;p&gt;My search for a true multi-language documentation generator was
+relatively fruitless. There&amp;#8217;s
+&lt;a href="http://www.stack.nl/~dimitri/doxygen/"&gt;doxygen&lt;/a&gt; but that needed a Perl
+helper script for javascript files. Since virtually all of the code,
+both &lt;span class="caps"&gt;PHP&lt;/span&gt; and JavaScript, is purely procedural, I was really only
+concerned about docblocks and the functions they&amp;nbsp;precede.&lt;/p&gt;
+&lt;p&gt;Luckily, it occurred to me that JavaScript is pretty close in syntax to
+&lt;span class="caps"&gt;PHP&lt;/span&gt;, and I tend to write them with exactly the same style. A little
+research showed that phpdoc can more or less handle javascript code,
+with a few&amp;nbsp;caveats:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;The code needs to parse as &lt;span class="caps"&gt;PHP&lt;/span&gt;, so things like inline functions mess
+    it&amp;nbsp;up.&lt;/li&gt;
+&lt;li&gt;The default phpDocumentor ini file doesn&amp;#8217;t recognize files with
+    &lt;code&gt;.js&lt;/code&gt; extensions.&lt;/li&gt;
+&lt;li&gt;The files need to have a &amp;lt;?php at the&amp;nbsp;top.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Noting this, I wrote a small script that iterates through a directory of
+&lt;code&gt;.js&lt;/code&gt; files, parses them line by line, pulls out only the function
+declarations (which, hopefully, don&amp;#8217;t also have code on the same line)
+and docblocks, and writes the output (with a &amp;lt;?php at the top) to a
+same-named file in a different&amp;nbsp;directory.&lt;/p&gt;
+&lt;p&gt;The script obviously requires phpdoc to be installed, and also requires
+you to edit the phpDocumentor.ini file (installed with &lt;span class="caps"&gt;PEAR&lt;/span&gt; on my system
+at &lt;code&gt;/usr/share/php5/PEAR/data/PhpDocumentor/phpDocumentor.ini&lt;/code&gt;) and add
+a &amp;#8220;js&amp;#8221; line to the &lt;code&gt;[_phpDocumentor_phpfile_exts]&lt;/code&gt; section to get phpdoc
+to recognize &lt;code&gt;*.js&lt;/code&gt; files.&lt;/p&gt;
+&lt;p&gt;I was easily able to integrate this with a Makefile rule and create a
+single set of cross-linked phpdoc &lt;span class="caps"&gt;API&lt;/span&gt; docs including both &lt;span class="caps"&gt;JS&lt;/span&gt; and &lt;span class="caps"&gt;PHP&lt;/span&gt;
+files. I also added explicit package names (like &amp;#8220;-&lt;span class="caps"&gt;PHP&lt;/span&gt;&amp;#8221; and &amp;#8220;-&lt;span class="caps"&gt;JS&lt;/span&gt;&amp;#8221;) to
+keep things separated a&amp;nbsp;little.&lt;/p&gt;
+&lt;p&gt;The script can be found at:
+&lt;a href="https://github.com/jantman/misc-scripts/blob/master/js2phpdoc.php"&gt;https://github.com/jantman/misc-scripts/blob/master/js2phpdoc.php&lt;/a&gt;.
+It&amp;#8217;s (obviously) free for any use, provided that you follow the license
+terms (leave copyrights intact, send modifications back to me, and
+update the changelog if you modify&amp;nbsp;it).&lt;/p&gt;
+&lt;p&gt;My Makefile rule (which uses a temp directory to both keep the generated
+files separate from the source and keep the file paths as seen by phpdoc
+the same as the actual&amp;nbsp;source):&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="nf"&gt;.&lt;span class="caps"&gt;PHONY&lt;/span&gt;&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="m"&gt;docs&lt;/span&gt;
+
+&lt;span class="nf"&gt;docs&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;
+        mkdir -p temp/js
+        bin/js2phpdoc.php js/ temp/js/
+        cp -r inc temp/
+        cp *.php temp/
+        phpdoc -c docs/default.ini
+        rm -Rf temp
+&lt;/pre&gt;&lt;/div&gt;</summary><category term="documentation"></category><category term="javascript"></category><category term="PHP"></category><category term="web programming"></category></entry><entry><title>Poor PHP</title><link href="http://newblog.jasonantman.com/2007/03/poor-php/" rel="alternate"></link><updated>2007-03-21T16:42:00-04:00</updated><author><name>admin</name></author><id>tag:newblog.jasonantman.com,2007-03-21:2007/03/poor-php/</id><summary type="html">&lt;p&gt;Well, as mentioned below, today I was doing a little research. On the
+futility of a Computer Science major. Specifically, on the fact that the
+overwhelming odds are that in a career in &lt;span class="caps"&gt;IT&lt;/span&gt;, system administration, or
+even web programming, I&amp;#8217;ll probably never apply 90% of what I learn in
+&lt;span class="caps"&gt;CS&lt;/span&gt;&amp;nbsp;courses.&lt;/p&gt;
+&lt;p&gt;So, I went looking for online certificate programs, knowing that most of
+the vendors&amp;#8217; programs run $500 or more just for testing. I came by
+eCertificates.com. And this brings me to another topic&amp;#8230; I clicked on
+the &amp;#8220;Software Programming&amp;#8221; category, and was surprised to see no &lt;span class="caps"&gt;PHP&lt;/span&gt;
+test. On a hunch, I looked under &amp;#8220;Web Design&amp;#8221;, and sure enough, there it&amp;nbsp;was.&lt;/p&gt;
+&lt;p&gt;I know this is a common misconception, and I know that because it plays
+so well with the web, and Apache, &lt;span class="caps"&gt;PHP&lt;/span&gt; has been pigeonholed as a web
+language. Maybe I&amp;#8217;m just crazy, or maybe it&amp;#8217;s just because I know &lt;span class="caps"&gt;PHP&lt;/span&gt;
+better than anything else. But &lt;span class="caps"&gt;PHP&lt;/span&gt; is &lt;em&gt;&lt;span class="caps"&gt;NOT&lt;/span&gt;&lt;/em&gt; a web programming language.
+It is a programming language that happens to work &lt;em&gt;very&lt;/em&gt; well with web&amp;nbsp;applications.&lt;/p&gt;
+&lt;p&gt;Using &lt;code&gt;fread()&lt;/code&gt; and &lt;code&gt;fwrite()&lt;/code&gt; I can slam together a command-line menu-based
+&lt;span class="caps"&gt;PHP&lt;/span&gt; script for administration quicker than I could write the def&amp;#8217;s for a
+Python script. I&amp;#8217;ve done it, I have a number of &lt;span class="caps"&gt;PHP&lt;/span&gt; &lt;span class="caps"&gt;CLI&lt;/span&gt;-based scripts
+running on my machines. Database access with &lt;span class="caps"&gt;PHP&lt;/span&gt; is a no-brainer. And
+one day, when I get around to reading my &amp;#8220;ancient&amp;#8221; pile of books and
+learning NCurses, &lt;span class="caps"&gt;PHP&lt;/span&gt; will be right there with&amp;nbsp;me.&lt;/p&gt;
+&lt;p&gt;So I guess it is just a fact of the modern web mentality. But &lt;span class="caps"&gt;PHP&lt;/span&gt; has
+myriad uses aside from web applications and web content handling. Sure,
+my web site is written in it. But one of my backup scripts is, too. And
+more importantly, if I&amp;#8217;m working with a database that already has a
+&lt;span class="caps"&gt;PHP&lt;/span&gt;-based web frontend, &lt;span class="caps"&gt;PHP&lt;/span&gt; seems like the natural choice for a
+&lt;span class="caps"&gt;CLI&lt;/span&gt;-based administration&amp;nbsp;backend.&lt;/p&gt;</summary><category term="command line"></category><category term="computer science"></category><category term="PHP"></category><category term="programming"></category><category term="web programming"></category></entry></feed>

@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Jason Antman's Blog</title><link href="http://newblog.jasonantman.com/" rel="alternate"></link><link href="http://newblog.jasonantman.com/feeds/tags/xen.atom.xml" rel="self"></link><id>http://newblog.jasonantman.com/</id><updated>2010-04-20T10:46:00-04:00</updated><entry><title>Xen/Etherboot and DHCP Problems</title><link href="http://newblog.jasonantman.com/2010/04/xenetherboot-and-dhcp-problems/" rel="alternate"></link><updated>2010-04-20T10:46:00-04:00</updated><author><name>admin</name></author><id>tag:newblog.jasonantman.com,2010-04-20:2010/04/xenetherboot-and-dhcp-problems/</id><summary type="html">&lt;p&gt;Well, I&amp;#8217;ve spend the better part of the last week or so debugging a
+problem with out new Xen VMs (on one host) not getting &lt;span class="caps"&gt;DHCP&lt;/span&gt; leases.
+Since our &lt;span class="caps"&gt;DHCP&lt;/span&gt; servers (&lt;span class="caps"&gt;ISC&lt;/span&gt; DHCPd 3.0.6) are using Brian Masney&amp;#8217;s &lt;a href="http://personal.cfw.com/~masneyb/"&gt;&lt;span class="caps"&gt;LDAP&lt;/span&gt;
+patch&lt;/a&gt; (which has recently been
+included in &lt;a href="http://www.isc.org/files/release-notes/42b2_0.html"&gt;mainline
+DHCPd&lt;/a&gt;), I assumed
+that this might be the source of some of the&amp;nbsp;problems.&lt;/p&gt;
+&lt;p&gt;The Xen client booting process uses &lt;a href="http://etherboot.org/"&gt;Etherboot&lt;/a&gt;
+(specifically 5.4.2 on my machines) to get &lt;span class="caps"&gt;DHCP&lt;/span&gt; and &lt;span class="caps"&gt;PXE&lt;/span&gt; for the client.
+The Etherboot &lt;span class="caps"&gt;ROM&lt;/span&gt; is generated online with
+&lt;a href="http://rom-o-matic.net/"&gt;&lt;span class="caps"&gt;ROM&lt;/span&gt;-o-Matic&lt;/a&gt; (by the Xen devs) and is then
+packaged into &lt;code&gt;hvmloader&lt;/code&gt; (though I would not find this out until much
+later in my investigation, given the piss-poor documentation about it).
+So, aside from pulling the &lt;span class="caps"&gt;SRPM&lt;/span&gt; for Xen and looking around, I decided I
+couldn&amp;#8217;t really debug much on the client end (I wasn&amp;#8217;t getting any
+&lt;span class="caps"&gt;BIOS&lt;/span&gt;-like messages from Xen, so the client end seemed to be pretty much
+a black&amp;nbsp;box).&lt;/p&gt;
+&lt;p&gt;After a week of re-examining our &lt;span class="caps"&gt;DHCP&lt;/span&gt; servers, moving the client between
+pieces of hardware and different networks, tracing out the &lt;span class="caps"&gt;DHCP&lt;/span&gt; logs,
+and debugging everything in-between, I finally resorted to doing packet
+captures and analyzing them. Last Thursday (my last work day of the
+week), I popped my laptop on the same network, set it up in &lt;span class="caps"&gt;DHCP&lt;/span&gt;, and
+did some captures of the laptop (which worked correctly) and the problem&amp;nbsp;&lt;span class="caps"&gt;VM&lt;/span&gt;.&lt;/p&gt;
+&lt;p&gt;Sometime around 10:00 &lt;span class="caps"&gt;PM&lt;/span&gt;, long after I&amp;#8217;d gotten home, I had opened
+captures of both the good and bad hosts in separate
+&lt;a href="http://www.wireshark.org/"&gt;Wireshark&lt;/a&gt; windows, and was going through
+them line-by-line. I&amp;#8217;d also written a nifty little &lt;a href="/GFX/dhcptest.pl"&gt;Perl
+script&lt;/a&gt; (my weakest language) using
+&lt;a href="http://search.cpan.org/~fvandun/Net-DHCP-0.11/lib/Net/DHCP/Packet.pm"&gt;Net::&lt;span class="caps"&gt;DHCP&lt;/span&gt;::Packet&lt;/a&gt;
+to craft packets identical to the ones from the working and &lt;span class="caps"&gt;FUBAR&lt;/span&gt; hosts,
+and inject them into the network. The only thing I could find different
+was the value of the &amp;#8220;secs&amp;#8221; field of the &lt;span class="caps"&gt;DHCPDISCOVER&lt;/span&gt; packets (octets 9
+and 10), which are supposed to contain the number of seconds that have
+passed since the host started booting (&lt;a href="http://www.faqs.org/rfcs/rfc1541.html"&gt;&lt;span class="caps"&gt;RFC&lt;/span&gt;
+1541&lt;/a&gt;). My laptop (the working
+host) started getting replies from the server at 21 seconds. I took my
+Perl packet-injecting script, and started adjusting the &amp;#8220;secs&amp;#8221; values of
+both the working and bad packets. Sure enough, with identical packets
+from each host, the values converged. Anything with &amp;#8220;secs&amp;#8221; below 2 got
+no response from the &lt;span class="caps"&gt;DHCP&lt;/span&gt; server, anything with 2 or greater got a
+correct&amp;nbsp;lease.&lt;/p&gt;
+&lt;p&gt;Then it hit me. When we used to have a primary/secondary &lt;span class="caps"&gt;DHCP&lt;/span&gt; server
+setup (with manual failover), we&amp;#8217;d configured the secondary server with
+&lt;code&gt;min-secs: 2&lt;/code&gt;, instructing it to not give out any leases to clients with
+a &amp;#8220;secs&amp;#8221; value of under 2, to prevent the secondary server from
+answering if, for some reason, the primary was still online.&amp;nbsp;Bingo.&lt;/p&gt;
+&lt;p&gt;At this point, I&amp;#8217;m waiting to have a meeting of the binds before I add a
+network-level override of &amp;#8220;min-secs: 0&amp;#8221; for the networks in question.
+But I&amp;#8217;m relatively confident that everything will go smoothly from there&amp;nbsp;on.&lt;/p&gt;
+&lt;p&gt;This experience highlighted that one small &amp;#8220;bug&amp;#8221; can confuse 3 people
+for the better part of a&amp;nbsp;week:&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://etherboot.org/"&gt;Etherboot&lt;/a&gt; (at least 5.4.2) doesn&amp;#8217;t increment
+the &amp;#8220;secs&amp;#8221; field in its &lt;span class="caps"&gt;DISCOVER&lt;/span&gt; packets as &lt;span class="caps"&gt;RFC&lt;/span&gt; 1541 suggests. Therefore
+anyone with &amp;#8220;min-secs&amp;#8221; in their dhcpd configuration won&amp;#8217;t ever give out
+a&amp;nbsp;lease.&lt;/p&gt;
+&lt;p&gt;In hindsight, it really was a brain-dead moment. There was a little note
+in the dhcpd logs that I, and the others, totally overlooked:
+&amp;#8220;&lt;span class="caps"&gt;DHCPDISCOVER&lt;/span&gt; (&amp;#8230;) 0 secs &amp;lt; 2&amp;#8221;. I guess I should have turned my brain
+on and realized that those few characters were probably important, and
+there for a reason, no matter how unassuming (and un-error-like) they
+may&amp;nbsp;be&amp;#8230;&lt;/p&gt;</summary><category term="dhcp"></category><category term="dhcpd"></category><category term="etherboot"></category><category term="ldap"></category><category term="pxe"></category><category term="xen"></category></entry><entry><title>Virtualization Options</title><link href="http://newblog.jasonantman.com/2010/03/virtualization-options/" rel="alternate"></link><updated>2010-03-19T20:55:00-04:00</updated><author><name>admin</name></author><id>tag:newblog.jasonantman.com,2010-03-19:2010/03/virtualization-options/</id><summary type="html">&lt;p&gt;As I mentioned in &lt;a href="/2010/03/downtime-past-few-days-coping-with-storms/"&gt;Downtime past few days, coping with
+storms&lt;/a&gt;, as a
+result of some things I noticed with a recent power outage, I&amp;#8217;ve decided
+to take the leap to virtualization. Given the cost of current hardware
+that supports &lt;span class="caps"&gt;HVM&lt;/span&gt; (Intel &lt;span class="caps"&gt;VT&lt;/span&gt;-x or &lt;span class="caps"&gt;AMD&lt;/span&gt;-V ), I immediately decided that I
+might as well give up on any thoughts of doing full virtualization or
+getting new-ish hardware. So I settled on the next step up from what
+have now - a set of &lt;a href="http://h18000.www1.hp.com/products/quickspecs/11504_na/11504_na.HTML"&gt;&lt;span class="caps"&gt;HP&lt;/span&gt; Proliant &lt;span class="caps"&gt;DL360&lt;/span&gt;
+G3&lt;/a&gt;
+servers. I got them with a 90 day warranty from a reputable dealer, dual
+2.8GHz Xeon (512K cache), 2Gb &lt;span class="caps"&gt;RAM&lt;/span&gt;, dual 36.4Gb U320 15k &lt;span class="caps"&gt;RPM&lt;/span&gt; &lt;span class="caps"&gt;SCSI&lt;/span&gt; disks
+and dual power supplies for $99 each. My next step is to decide what
+virtualization software to&amp;nbsp;use.&lt;/p&gt;
+&lt;p&gt;My main goals for the project&amp;nbsp;are:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Lower power consumption through consolidation of&amp;nbsp;servers.&lt;/li&gt;
+&lt;li&gt;Possibility to add capacity or resources by remotely powering up an
+    idle server and migrating VMs to&amp;nbsp;it.&lt;/li&gt;
+&lt;li&gt;Limited fault tolerance - ability to manually restore a &lt;span class="caps"&gt;VM&lt;/span&gt; that was
+    running on failed hardware, onto an idle&amp;nbsp;server.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;I originally thought Xen, just out of reflex. However, given that all of
+my servers have the same base - the same distribution and, ideally, the
+same kernel and patch level - it seemed like a lot of overhead to
+duplicate that for multiple VMs. So I started looking into &lt;a href="http://en.wikipedia.org/wiki/Operating_system-level_virtualization"&gt;&lt;span class="caps"&gt;OS&lt;/span&gt;-level
+virtualization&lt;/a&gt;.
+There are relatively few options, and I&amp;#8217;ll admit that aside from Solaris
+Containers (which I learned about while working at Sun) I don&amp;#8217;t know
+much about it. But &lt;a href="http://www.openvz.org/"&gt;OpenVZ&lt;/a&gt; seems to be the
+front runner in that area. My initial impression was that it made a lot
+of sense - keep one common kernel, but allow containers/virtual
+environments (CTs/VEs) to have, essentially, their own userland.
+Unfortunately, it doesn&amp;#8217;t seem to be as hyped as Xen, and I haven&amp;#8217;t
+heard very much about it in the enterprise context. And it requires
+running a kernel from the OpenVZ project, which means I can&amp;#8217;t just
+script updates through yum as easily as&amp;nbsp;normal.&lt;/p&gt;
+&lt;p&gt;On the up size, OpenVZ would allow me to eliminate the duplication of
+the kernel, and seems to have much less overhead than Xen (and logically
+so). On the down side, I lose the ability to virtualize other OSes,
+kernel versions, or make pre-packaged VMs. I&amp;#8217;ve decided that if I wanted
+to do that, I could dedicate a single&amp;nbsp;machine.&lt;/p&gt;
+&lt;p&gt;I&amp;#8217;ve spent the last day or so doing a lot of research, and have come up
+with the following questions and concerns about OpenVZ which I hope to
+be able to answer (I&amp;#8217;ll post the answers in a&amp;nbsp;follow-up).&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;How do I handle distribution and kernel upgrades? The logical
+    solution would be to migrate the &lt;span class="caps"&gt;CT&lt;/span&gt; to another host while I upgrade
+    &lt;span class="caps"&gt;CT0&lt;/span&gt; (the hardware &lt;span class="caps"&gt;OS&lt;/span&gt;/host/dom0 in Xen speak). But if the guest and
+    host kernels must match, how does this&amp;nbsp;work?&lt;/li&gt;
+&lt;li&gt;Can I do package upgrades within the guest/&lt;span class="caps"&gt;CT&lt;/span&gt; easily? WIll this play
+    well with&amp;nbsp;Puppet?&lt;/li&gt;
+&lt;li&gt;How will I handle backups? Is it logical to run
+    &lt;a href="http://www.bacula.org"&gt;bacula&lt;/a&gt; within each &lt;span class="caps"&gt;CT&lt;/span&gt;, or just on &lt;span class="caps"&gt;CT0&lt;/span&gt;? If
+    just on &lt;span class="caps"&gt;CT0&lt;/span&gt;, how do I easily verify that a particular &lt;span class="caps"&gt;CT&lt;/span&gt; was backed&amp;nbsp;up?&lt;/li&gt;
+&lt;li&gt;WIll everything play well with Puppet? (see&amp;nbsp;below)&lt;/li&gt;
+&lt;li&gt;Am I willing to throw away my KickStart-based installs? And,
+    similarly, am I willing to give up the possibility of migrating from
+    a container to a Xen host or a physical host&amp;nbsp;(easily)?&lt;/li&gt;
+&lt;li&gt;OpenVZ live migration relies on rsync. This means that there&amp;#8217;s a
+    significant delay (compared to shared storage) and also that I can&amp;#8217;t
+    migrate off of a host that&amp;#8217;s down. Is there a way around&amp;nbsp;this?&lt;/li&gt;
+&lt;li&gt;Similarly, live migration requires root &lt;span class="caps"&gt;SSH&lt;/span&gt; key exchange
+    (passwordless) between the hosts. This seems about equivalent to
+    using &lt;code&gt;hosts.equiv&lt;/code&gt;. Do I really want root on one box to mean root
+    on another box (and all of the containers on that&amp;nbsp;box)?&lt;/li&gt;
+&lt;li&gt;Can I still firewall &lt;span class="caps"&gt;CT0&lt;/span&gt;? How will this&amp;nbsp;work?&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;It seems to me that OpenVZ may be significantly less enterprise-class
+than Xen. Sure, this is just my home setup, but I hold it to the same
+standards I use for my work systems. In fact, I usually test new
+technologies at home before I suggest them at work. A lot of the writing
+on the &lt;a href="http://wiki.openvz.org/"&gt;OpenVZ wiki&lt;/a&gt; seems to be riddled with
+spelling errors. They claim &amp;#8220;zero downtime&amp;#8221; live migration, but if they
+have to rsync 2Gb of MySQL tables, that sounds like a lot more than
+&amp;#8220;zero&amp;#8221;. And, most shockingly, the &lt;a href="http://wiki.openvz.org/Hardware_testing"&gt;Hardware
+testing&lt;/a&gt; wiki page talks about
+making sure your hosts aren&amp;#8217;t overclocked or undercooled, and running
+&lt;code&gt;cpuburn&lt;/code&gt; to test your system under high load. Sorry, but the engineers
+at &lt;span class="caps"&gt;HP&lt;/span&gt;, Sun, &lt;span class="caps"&gt;IBM&lt;/span&gt;, etc. handle that for me and most people I know. So, I&amp;#8217;m
+a bit worried about the seriousness of the OpenVZ&amp;nbsp;project.&lt;/p&gt;
+&lt;p&gt;Most worrisome is a post I found in the &lt;a href="http://forum.openvz.org"&gt;OpenVZ
+forum&lt;/a&gt;, &lt;a href="http://forum.openvz.org/index.php?t=msg&amp;amp;goto=14818&amp;amp;"&gt;&amp;#8220;Stopping puppet on hn stops it in all
+&lt;span class="caps"&gt;VE&lt;/span&gt;&amp;#8221;&lt;/a&gt;. It seems
+that, since &lt;span class="caps"&gt;CT0&lt;/span&gt; is aware of all of the guest container processes, they
+show up in ps lists. Most, if not all RedHat init scripts use killproc
+to stop and restart services. This means that a &lt;code&gt;service syslog stop&lt;/code&gt; on
+the &lt;span class="caps"&gt;CT0&lt;/span&gt; (host) will stop &lt;strong&gt;all&lt;/strong&gt; &lt;code&gt;syslog&lt;/code&gt; processes, including all of
+them in the CTs. This seems like a major issue. Sure, I could replace
+&lt;code&gt;killproc&lt;/code&gt; on &lt;span class="caps"&gt;CT0&lt;/span&gt; with a script that parses the process list, isolates
+the PIDs for those running on &lt;span class="caps"&gt;CT0&lt;/span&gt;, and kills them. But what else needs
+to be fixed? Nagios check scripts would need to be adjusted. Is there
+anything else that would come back and bite&amp;nbsp;me?&lt;/p&gt;
+&lt;p&gt;The bottom line is that (I guess this is logical) it seems that
+containers in OpenVZ will seem - and act - a lot less like a logical
+host than they would under&amp;nbsp;Xen.&lt;/p&gt;</summary><category term="OpenVZ"></category><category term="virtualization"></category><category term="xen"></category></entry></feed>

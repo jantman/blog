@@ -1,0 +1,382 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Jason Antman's Blog</title><link>http://newblog.jasonantman.com/</link><description></description><atom:link href="http://newblog.jasonantman.com/feeds/tags/git.rss.xml" rel="self"></atom:link><lastBuildDate>Tue, 14 May 2013 05:00:00 -0400</lastBuildDate><item><title>Git Cheat Sheet</title><link>http://newblog.jasonantman.com/2013/05/git-cheat-sheet/</link><description>&lt;p&gt;I use &lt;a href="http://git-scm.com/"&gt;git&lt;/a&gt; quite a bit these days, both with an
+internal server at work and with a bunch of my projects and random code
+that now live on &lt;a href="https://github.com/jantman/"&gt;my github account&lt;/a&gt;. The
+transition from &lt;span class="caps"&gt;SVN&lt;/span&gt; hasn&amp;#8217;t always been easy. Here&amp;#8217;s a quick cheat sheet
+of some of the things that I usually&amp;nbsp;forget.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;Show diff of the last&amp;nbsp;commit:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;git diff HEAD^..HEAD
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Roll back to version xyz of a specific file &lt;em&gt;(where xyz is a &lt;span class="caps"&gt;SHA1&lt;/span&gt;
+    commit ref)&lt;/em&gt;:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;git checkout xyz path/to/file
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Undo any &lt;em&gt;unstaged&lt;/em&gt; changes to your&amp;nbsp;branch:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;git checkout -f
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Undo any staged and working directory&amp;nbsp;changes:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;git reset --hard
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Update submodules after cloning a&amp;nbsp;repository:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;git submodule update --init
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Rebase on current master to pull in new&amp;nbsp;changes:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;git rebase master
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Rebase on current master, but for files that changed, take our
+    version &lt;em&gt;(for some reason, a plain rebase seems to sometimes show
+    conflicts on files that haven&amp;#8217;t changed in ages on master)&lt;/em&gt;:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;git rebase -s recursive -Xtheirs master
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Delete a local&amp;nbsp;branch:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;git branch -d BranchName
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Delete a remote branch from&amp;nbsp;origin:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;git push origin --delete BranchName
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Roll back your branch to the same state as the branch in&amp;nbsp;origin:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;git reset --hard origin/BranchName
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Revert a specific&amp;nbsp;commit:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;git revert COMMIT_HASH
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Track an upstream branch (i.e. in a project you&amp;nbsp;forked):&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;git remote add --track master upstream https://github.com/user/project.git
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Pull in upstream&amp;nbsp;changes:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;git checkout master &amp;amp;&amp;amp; git fetch upstream &amp;amp;&amp;amp; git merge upstream/master
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Merge &amp;#8220;stuff&amp;#8221; from someone else&amp;#8217;s fork into&amp;nbsp;yours:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;git remote add other-guys-repo URL_TO_REPO
+git fetch other-guys-repo
+git checkout my_new_branch
+git merge other-guys-repo/master
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Prune local branches that have been deleted in the remote&amp;nbsp;(origin):&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;git remote prune origin
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;/li&gt;
+&lt;/ul&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Tue, 14 May 2013 05:00:00 -0400</pubDate><guid>tag:newblog.jasonantman.com,2013-05-14:2013/05/git-cheat-sheet/</guid><category>git</category></item><item><title>Workflow for contributing to GitHub projects</title><link>http://newblog.jasonantman.com/2012/08/workflow-for-contributing-to-github-projects/</link><description>&lt;p&gt;Lately I&amp;#8217;ve been contributing to some open source projects hosted on
+&lt;a href="http://github.com"&gt;github&lt;/a&gt;. I&amp;#8217;m pretty new to git, and the process is a
+bit confusing for beginners. So, here&amp;#8217;s a sample workflow, based on the
+&lt;a href="http://theforeman.org"&gt;The Foreman&lt;/a&gt;&amp;#8216;s &lt;a href="https://github.com/theforeman/foreman"&gt;foreman github
+repository&lt;/a&gt;. Note that I&amp;#8217;m
+developing against the &amp;#8220;develop&amp;#8221; branch of that repository, not the
+master, so that throws in a little difference that isn&amp;#8217;t documented in
+most introductions. To throw in another wrench, I maintan a branch with
+the code that I&amp;#8217;m currently actually using (i.e. the application code
+that I have checked out on the production server), called &amp;#8220;jantman&amp;#8221;.
+This is more or less composed of the upstream &amp;#8220;develop&amp;#8221; branch, with all
+of my finished (but not yet merged in the upstream) topic branches. I&amp;#8217;m
+pretty sure all this is correct, but honestly, I&amp;#8217;m still new enough at
+git that I can&amp;#8217;t make any promises. Unfortunatelty, I haven&amp;#8217;t had the
+time to &lt;em&gt;really&lt;/em&gt; learn git, and I also can&amp;#8217;t find a simple enough
+tutorial that covers all&amp;nbsp;this&amp;#8230;&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Fork the original repository through the GitHub&amp;nbsp;interface.&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;On your machine, clone your&amp;nbsp;fork:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;git clone git@github.com:username/reponame.git &amp;amp;&amp;amp; cd reponame
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Make sure you&amp;#8217;ve&amp;nbsp;setup&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;git config --global branch.autosetupmerge true
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Add your upstream&amp;nbsp;repo:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;git remote add upstream git://github.com/upstream_user/upstream_repo.git
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Fetch it and initialize any&amp;nbsp;submodules:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;git fetch upstream &amp;amp;&amp;amp; git submodule update --init
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Check the current branch (&lt;code&gt;git branch&lt;/code&gt;, let&amp;#8217;s assume it&amp;#8217;s called
+    &amp;#8220;develop&amp;#8221;) and rebase to its&amp;nbsp;upstream:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;git rebase upstream/develop develop
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Create my &amp;#8220;jantman&amp;#8221; branch, which will be the upstream &amp;#8220;develop&amp;#8221;,
+    plus my finished work merged into&amp;nbsp;it:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;git checkout -b jantman origin/develop
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Create a topic branch to do some&amp;nbsp;work:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;git checkout -b NewBranchName jantman
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Periodically, push the topic branch to&amp;nbsp;github:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;git push origin NewBranchName
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;If you commit to this branch from another computer (or someone else
+    commits to it), periodically update your local tracking&amp;nbsp;branch:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;git pull origin NewBranchName
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Periodically, you want to pull in the upstream&amp;nbsp;changes:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;switch to the develop&amp;nbsp;branch:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;git checkout develop
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;grab the latest version of the upstream git&amp;nbsp;repo:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;git fetch upstream
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;rebase develop to mirror the upstream develop&amp;nbsp;branch:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;git rebase upstream/develop develop
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;switch to our personal&amp;nbsp;branch:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;git checkout jantman
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;rebase our personal branch onto develop (pull all the new
+    commits from develop into our personal&amp;nbsp;branch):&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;git rebase develop jantman
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;If we want those new upstream changes to continue down to our
+    topic&amp;nbsp;branches:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;git rebase develop topicBranchName
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;When we&amp;#8217;re done with a topic branch, we want to merge it into our
+    &amp;#8220;personal&amp;#8221;&amp;nbsp;branch:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;    git checkout jantman; git merge --squash node-table-facts
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;and then&amp;nbsp;commit:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;    git commit
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;The &lt;code&gt;--squash&lt;/code&gt; will squash all the history of that branch down to
+one commit. This is generally easier for integration into upstream,
+and assuming the topic branch was created for a single feature or
+bug, should be&amp;nbsp;logical.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;If we&amp;#8217;re sure we don&amp;#8217;t need it anymore, delete the topic branch from
+    our local&amp;nbsp;machine:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;git branch -d topicBranchName
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;and from&amp;nbsp;github:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;git push origin --delete topicBranchName
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Finally, make sure we push our &amp;#8220;personal&amp;#8221; branch back to&amp;nbsp;origin:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;git push origin jantman
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Assuming all went well, you&amp;#8217;ll see the new commit on github, and
+    have a nice pull request&amp;nbsp;button.&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;References:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;a href="http://www.doctrine-project.org/contribute.html"&gt;Contribute -&amp;nbsp;Doctrine-Project&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href="http://qsapp.com/wiki/Github"&gt;Github - Quicksilver&amp;nbsp;Wiki&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href="https://github.com/carmaa/inception/wiki/Contributor-Workflow-with-Github"&gt;Contributor Workflow with Github · carmaa/inception&amp;nbsp;Wiki&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href="http://help.github.com/fork-a-repo/"&gt;Help.GitHub - Fork A&amp;nbsp;Repo&lt;/a&gt;&lt;/li&gt;
+&lt;/ol&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Sat, 11 Aug 2012 09:35:00 -0400</pubDate><guid>tag:newblog.jasonantman.com,2012-08-11:2012/08/workflow-for-contributing-to-github-projects/</guid><category>foreman</category><category>git</category><category>github</category><category>workflow</category></item><item><title>Github as a repository in Redmine</title><link>http://newblog.jasonantman.com/2012/03/github-as-a-repository-in-redmine/</link><description>&lt;p&gt;As a follow-up to my &lt;a href="/2012/03/cvs-to-svn-to-git/"&gt;&lt;span class="caps"&gt;CVS&lt;/span&gt; to &lt;span class="caps"&gt;SVN&lt;/span&gt; to Git&lt;/a&gt;
+post, I have the &lt;a href="http://www.php-ems-tools.com"&gt;&lt;span class="caps"&gt;PHP&lt;/span&gt; &lt;span class="caps"&gt;EMS&lt;/span&gt; Tools&lt;/a&gt;
+repository migrated from my &lt;span class="caps"&gt;SVN&lt;/span&gt; to
+&lt;a href="https://github.com/jantman/php-ems-tools"&gt;github&lt;/a&gt;. Since I&amp;#8217;m moving the
+website and all development to a &lt;a href="http://www.redmine.org/"&gt;Redmine&lt;/a&gt;
+instance, the next step is setting up Github to work as a revision
+control repository in redmine. Well, it&amp;#8217;s dead simple. I just followed
+the instructions for the &lt;a href="http://mentalized.net/journal/2009/08/03/redmine_plugin_github_hook/"&gt;Redmine plugin: Github
+hook&lt;/a&gt;
+, with the exception that I followed the &lt;a href="http://www.redmine.org/projects/redmine/wiki/HowTo_keep_in_sync_your_git_repository_for_redmine"&gt;redmine instructions for
+setting up the repository
+clone&lt;/a&gt;
+instead of Step #2 in the plugin instructions. All worked well, though
+I&amp;#8217;ll admit I only tried it talking to redmine over plain &lt;span class="caps"&gt;HTTP&lt;/span&gt;, not&amp;nbsp;&lt;span class="caps"&gt;HTTPS&lt;/span&gt;.&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Tue, 27 Mar 2012 21:36:00 -0400</pubDate><guid>tag:newblog.jasonantman.com,2012-03-27:2012/03/github-as-a-repository-in-redmine/</guid><category>git</category><category>github</category><category>redmine</category></item><item><title>CVS to SVN to Git</title><link>http://newblog.jasonantman.com/2012/03/cvs-to-svn-to-git/</link><description>&lt;p&gt;Thanks to some new interest, I&amp;#8217;ve decided to resurrect an old project of
+mine, &lt;a href="http://www.php-ems-tools.com"&gt;&lt;span class="caps"&gt;PHP&lt;/span&gt; &lt;span class="caps"&gt;EMS&lt;/span&gt; Tools&lt;/a&gt;. It&amp;#8217;s a web-based
+tool for small emergency services organizations, mainly aimed at
+volunteer &lt;span class="caps"&gt;EMS&lt;/span&gt;/ambulance providers. The tool handles roster tracking,
+scheduling, equipment maintenance and checks, and a bunch of other
+administrative tasks. I first started it in 2007 for the &lt;a href="http://www.midlandparkambulance.com"&gt;Midland Park
+Ambulance Corps&lt;/a&gt; (&lt;span class="caps"&gt;MPAC&lt;/span&gt;), which I
+was a volunteer &lt;span class="caps"&gt;EMT&lt;/span&gt; with from 2005 through 2011. I&amp;#8217;ll admit that it&amp;#8217;s a
+perfect model of how not to run a software project. The first few
+releases are plain awful code. I was keeping the project in &lt;span class="caps"&gt;CVS&lt;/span&gt; at the
+time, and posted some early releases on
+&lt;a href="http://sourceforge.net/projects/php-ems-tools/"&gt;sourceforge&lt;/a&gt; and
+FreshMeat, now &lt;a href="http://freecode.com/projects/php-ems-tools"&gt;FreeCode&lt;/a&gt;.
+Sometime in 2009, I migrated the contents of the trunk of the &lt;span class="caps"&gt;CVS&lt;/span&gt; module
+to a &lt;a href="http://svn.jasonantman.com/php-ems-tools/"&gt;&lt;span class="caps"&gt;SVN&lt;/span&gt; repository&lt;/a&gt;, but
+discarded the history. I also setup a MediaWiki-based website for the
+project, giving some information and mainly asking for feedback. Around
+that time I started working on a new and heavily updated (fixed) version
+for &lt;span class="caps"&gt;MPAC&lt;/span&gt;, but since it appeared that there was no interest in the
+project, and there were many many local customizations and
+organization-specific features, I let their codebase diverge from what
+was released, and as a result, stopped keeping it in version control.
+Until now, when they need to migrate to a new server, and I&amp;#8217;ve also
+gotten some outside interest in the&amp;nbsp;project.&lt;/p&gt;
+&lt;p&gt;So, as of this morning, I was left with at least four code&amp;nbsp;bases:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;the original &lt;a href="http://cvs.jasonantman.com/cgi-bin/viewvc.cgi/cvs/php-ems-tools-trunk/"&gt;&lt;span class="caps"&gt;CVS&lt;/span&gt;
+    repository&lt;/a&gt;
+    with branches and tags and some history, untouched since&amp;nbsp;2007&lt;/li&gt;
+&lt;li&gt;the &lt;a href="http://svn.jasonantman.com/php-ems-tools/"&gt;&lt;span class="caps"&gt;SVN&lt;/span&gt; repository&lt;/a&gt;
+    circa 2009, with only 3 commits, all related to the migration from
+    &lt;span class="caps"&gt;CVS&lt;/span&gt; to&amp;nbsp;&lt;span class="caps"&gt;SVN&lt;/span&gt;&lt;/li&gt;
+&lt;li&gt;a &amp;#8220;release&amp;#8221; tarball that at least one outside organization is
+    actually&amp;nbsp;using.&lt;/li&gt;
+&lt;li&gt;the code that &lt;span class="caps"&gt;MPAC&lt;/span&gt; is running, which has been largely rewritten
+    since 2009, but also contains a lot of organization-specific&amp;nbsp;customizations.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;As a first step, I created a new &lt;span class="caps"&gt;SVN&lt;/span&gt; repository and migrated the
+original &lt;span class="caps"&gt;CVS&lt;/span&gt; repo, complete with history, branches, and tags, to it
+using &lt;a href="http://cvs2svn.tigris.org/"&gt;cvs2svn&lt;/a&gt;, and then removed write
+permissions on the actual module in the repository. This gave me a &lt;span class="caps"&gt;SVN&lt;/span&gt;
+repository with all of the history of previous so-called releases, with
+a trunk matching r1 of the &amp;#8220;current&amp;#8221; &lt;span class="caps"&gt;SVN&lt;/span&gt; repository. I then manually
+applied patches to trunk/ for the two commits in the current &lt;span class="caps"&gt;SVN&lt;/span&gt;
+repository, and set the svn:date revision property to the correct 2009
+date for those commits. I also confirmed that the correct tag matches up
+to the &amp;#8220;release&amp;#8221; tarball mentioned above. So, I&amp;#8217;m down to a &amp;#8220;current&amp;#8221;
+trunk, plus the locally modified code running on &lt;span class="caps"&gt;MPAC&lt;/span&gt;&amp;#8217;s current server.
+My plan of action from this point is as&amp;nbsp;follows:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Move the &lt;span class="caps"&gt;PHP&lt;/span&gt; &lt;span class="caps"&gt;EMS&lt;/span&gt; Tools website from Mediawiki to my local redmine
+    installation, and update the news with a link to this&amp;nbsp;post.&lt;/li&gt;
+&lt;li&gt;Migrate the &lt;span class="caps"&gt;SVN&lt;/span&gt; repository, which now contains full history, to Git
+    hosted at Github. Add Github integration to&amp;nbsp;Redmine.&lt;/li&gt;
+&lt;li&gt;Update freshmeat, sourceforge, and anywhere else online that knows
+    about the&amp;nbsp;project.&lt;/li&gt;
+&lt;li&gt;Working in a git branch, begin converging the code &lt;span class="caps"&gt;MPAC&lt;/span&gt; is currently
+    running with the latest (now git) trunk, trying to provide
+    configuration options for anything organization specific, and
+    testing as I&amp;nbsp;go.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;If all works well, I&amp;#8217;ll end up with &lt;span class="caps"&gt;MPAC&lt;/span&gt; running the current trunk, just
+some different configuration options, and a working, up-to-date release.
+The biggest issues are going to be how I handle the &lt;span class="caps"&gt;MPAC&lt;/span&gt;-specific
+additions and customizations (a lot of stuff hard-coded for our position
+titles, plus our very custom call report and telephone-based call-in
+software, which is pretty tightly linked with the &lt;span class="caps"&gt;PHP&lt;/span&gt; &lt;span class="caps"&gt;EMS&lt;/span&gt; Tools core),
+and how I balance abstracting things to be configurable for other users
+versus getting this all done in a reasonable amount of&amp;nbsp;time.&lt;/p&gt;
+&lt;p&gt;Stay&amp;nbsp;tuned&amp;#8230;&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Sun, 25 Mar 2012 12:11:00 -0400</pubDate><guid>tag:newblog.jasonantman.com,2012-03-25:2012/03/cvs-to-svn-to-git/</guid><category>cvs</category><category>git</category><category>svn</category><category>version control</category></item></channel></rss>

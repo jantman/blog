@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Jason Antman's Blog</title><link>http://newblog.jasonantman.com/</link><description></description><atom:link href="http://newblog.jasonantman.com/feeds/tags/geshi.rss.xml" rel="self"></atom:link><lastBuildDate>Tue, 28 Feb 2012 18:42:00 -0500</lastBuildDate><item><title>Nagios / Icinga Configuration Highlighting with GeSHi</title><link>http://newblog.jasonantman.com/2012/02/nagios-icinga-configuration-highlighting-with-geshi/</link><description>&lt;p&gt;As you may know from former posts, this blog
+(&lt;a href="http://wordpress.org"&gt;WordPress&lt;/a&gt;-powered) and a few
+&lt;a href="http://www.mediawiki.org"&gt;MediaWiki&lt;/a&gt; sites that I have use the
+excellent &lt;span class="caps"&gt;PHP&lt;/span&gt;-based &lt;a href="http://qbnz.com/highlighter/"&gt;GeSHi&lt;/a&gt; syntax
+highlighter. Today I was writing &lt;a href="/2012/02/sending-aim-messages-from-a-perl-script/"&gt;a
+post&lt;/a&gt; that includes
+some Icinga (Nagios) configuration snippets. After a quick search, I
+found a &lt;a href="https://github.com/adepertat/geshi-nagios"&gt;Nagios language file for
+GeSHi&lt;/a&gt; on GitHub. Thanks very
+much to &lt;a href="https://github.com/adepertat"&gt;Albéric de Pertat (adepertat)&lt;/a&gt;
+for writing this and providing it to the&amp;nbsp;public.&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Tue, 28 Feb 2012 18:42:00 -0500</pubDate><guid>tag:newblog.jasonantman.com,2012-02-28:2012/02/nagios-icinga-configuration-highlighting-with-geshi/</guid><category>GeSHi</category><category>icinga</category><category>mediawiki</category><category>Nagios</category><category>PHP</category><category>wordpress</category></item><item><title>WP-Syntax Plugin GeSHi Path Fix</title><link>http://newblog.jasonantman.com/2012/01/wp-syntax-plugin-geshi-path-fix/</link><description>&lt;p&gt;The &lt;a href="http://wordpress.org/extend/plugins/wp-syntax/"&gt;Wp-Syntax&lt;/a&gt; plugin
+for &lt;a href="http://wordpress.org"&gt;WordPress&lt;/a&gt; provides syntax highlighting for
+WordPress blogs via the &lt;a href="http://qbnz.com/highlighter"&gt;GeSHi&lt;/a&gt; &lt;span class="caps"&gt;PHP&lt;/span&gt; syntax
+highlighter. Unfortunately, the plugin includes a builtin version of
+GeSHi (currently 1.0.8.9) in &lt;code&gt;geshi/&lt;/code&gt;. As a result, not only are users
+of the plugin not instructed to use the latest version of GeSHi, but it
+won&amp;#8217;t use a host-wide GeSHi installation that&amp;#8217;s already in the &lt;span class="caps"&gt;PHP&lt;/span&gt;
+include path (i.e. &lt;code&gt;/usr/share/php/&lt;/code&gt;), like the the many &lt;a href="http://pkgs.org/search/?keyword=php-geshi&amp;amp;search_on=name&amp;amp;distro=0&amp;amp;arch=32-bit"&gt;php-geshi
+packages&lt;/a&gt;
+offered by repositories including
+&lt;a href="http://fedoraproject.org/wiki/EPEL"&gt;&lt;span class="caps"&gt;EPEL&lt;/span&gt;&lt;/a&gt; (for Fedora, CentOS and&amp;nbsp;&lt;span class="caps"&gt;RHEL&lt;/span&gt;).&lt;/p&gt;
+&lt;p&gt;The fix is quite simple. Just open &lt;code&gt;wp-syntax.php&lt;/code&gt; in the &lt;code&gt;wp-syntax/&lt;/code&gt;
+plugin directory in your favorite text editor and change the GeSHi
+include line (for &lt;span class="caps"&gt;WP&lt;/span&gt;-Syntax 0.9.12, this is line 53)&amp;nbsp;from:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="x"&gt;include_once(&amp;quot;geshi/geshi.php&amp;quot;);&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;to:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="x"&gt;include_once(&amp;quot;geshi.php&amp;quot;);&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;If you already have GeSHi installed in the &lt;span class="caps"&gt;PHP&lt;/span&gt; include path, just remove
+the &lt;code&gt;geshi&lt;/code&gt; directory in your &lt;code&gt;wp-syntax/&lt;/code&gt; plugin directory, flush the
+WordPress caches (if any), and load a page which uses GeSHi - it should
+now use the host-wide version. If you want to still use a local version
+for wp-syntax, you can move things around to where they &lt;em&gt;should&lt;/em&gt; be in
+the &lt;code&gt;wp-syntax/&lt;/code&gt; plugin&amp;nbsp;directory:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;mv geshi/geshi.php . &lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt; mv geshi/geshi/* geshi/ &lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt; rmdir geshi/geshi
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Note - if you&amp;#8217;re in a shared hosting environment, or are otherwise not
+able to upgrade the php-geshi package on your server yourself, you might
+not want to do&amp;nbsp;this.&lt;/p&gt;
+&lt;p&gt;I also &lt;a href="http://wordpress.org/support/topic/wp-syntax-move-geshi-include-path-to-allow-use-with-host-wide-geshi?replies=1#post-2556903"&gt;posted about this in the WordPress support
+forums&lt;/a&gt;.
+Hopefully the &lt;span class="caps"&gt;WP&lt;/span&gt;-Syntax devs will include this change in the next&amp;nbsp;version&amp;#8230;&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Thu, 12 Jan 2012 19:09:00 -0500</pubDate><guid>tag:newblog.jasonantman.com,2012-01-12:2012/01/wp-syntax-plugin-geshi-path-fix/</guid><category>GeSHi</category><category>PHP</category><category>syntax highlighting</category><category>wordpress</category></item><item><title>Puppet Syntax Highlighting with GeSHi</title><link>http://newblog.jasonantman.com/2012/01/puppet-syntax-highlighting-with-geshi/</link><description>&lt;p&gt;This blog is run on wordpress, and I also do quite a bit in &lt;span class="caps"&gt;PHP&lt;/span&gt;, so I&amp;#8217;m
+familiar with the &lt;a href="http://qbnz.com/highlighter/"&gt;GeSHi&lt;/a&gt; syntax
+highlighter. It&amp;#8217;s &lt;span class="caps"&gt;PHP&lt;/span&gt;-based, and can run both as a Wordpress plugin
+(&lt;a href="http://wordpress.org/extend/plugins/wp-syntax/"&gt;&lt;span class="caps"&gt;WP&lt;/span&gt;-Syntax&lt;/a&gt;) and as a
+&lt;span class="caps"&gt;PHP&lt;/span&gt; module. It also works quite well with the MediaWiki &lt;a href="http://www.mediawiki.org/wiki/Extension:SyntaxHighlight_GeSHi"&gt;SyntaxHighlight
+GeSHi&lt;/a&gt;&amp;nbsp;extension.&lt;/p&gt;
+&lt;p&gt;Today I was documenting some &lt;a href="http://www.puppet.org"&gt;Puppet&lt;/a&gt; code in a
+wiki, and realized that I didn&amp;#8217;t have syntax highlighting. Well, fellow
+Linux sysadmin and puppetmaster Jason Hancock was nice enough to post on
+his blog (&lt;a href="http://geek.jasonhancock.com/2011/10/14/puppet-syntax-highlighting-geshi/"&gt;Puppet Syntax Highlighting with
+GeSHi&lt;/a&gt;)
+that he&amp;#8217;s developed a GeSHi language file for Puppet, available from
+&lt;a href="https://github.com/jasonhancock/geshi-language-files"&gt;GitHub&lt;/a&gt;. Many&amp;nbsp;thanks!&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Wed, 11 Jan 2012 12:32:00 -0500</pubDate><guid>tag:newblog.jasonantman.com,2012-01-11:2012/01/puppet-syntax-highlighting-with-geshi/</guid><category>GeSHi</category><category>mediawiki</category><category>PHP</category><category>puppet</category><category>wordpress</category></item></channel></rss>

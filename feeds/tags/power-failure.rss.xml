@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Jason Antman's Blog</title><link>http://newblog.jasonantman.com/</link><description></description><atom:link href="http://newblog.jasonantman.com/feeds/tags/power-failure.rss.xml" rel="self"></atom:link><lastBuildDate>Thu, 06 Mar 2008 01:02:00 -0500</lastBuildDate><item><title>Cable Management, Power Measurements, Major Outage, Cacti</title><link>http://newblog.jasonantman.com/2008/03/cable-management-power-measurements-major-outage-cacti/</link><description>&lt;p&gt;So, once again, still really busy. But a few new&amp;nbsp;things.&lt;/p&gt;
+&lt;p&gt;First, my racks both at home and at the apartment are atrocious. They
+have no cable management at all. Both started with 1-3 machines, and no
+real plans for upgrades (since they&amp;#8217;re just my personal/development
+machines). Unfortunately, the &amp;#8220;rack&amp;#8221; (a metal workshop shelving unit) at
+home now has 8 machines and a host of ancillary equipment. The one at
+the apartment - an actual 42U rack - has 5 plus a few switches,
+rackmount &lt;span class="caps"&gt;KMM&lt;/span&gt;, etc. They&amp;#8217;re both a jumble of wires in the back.
+Unfortunately, it seems like cable management hardware is *epxensive*.
+$30 for a 2U metal blank with a few plastic split D-rings, or almost $40
+for a 2-meter vertical hunk of plastic channel with slits in the sides?
+So, I&amp;#8217;ve been vaguely considering what it will take to fabricate some
+cable management hardware of my own. Probably just building something
+out of rack blanks for the horizontal off of the switches, and buying
+some sort of vertical channel for power and networking/&lt;span class="caps"&gt;KVM&lt;/span&gt;. Man, those
+&lt;span class="caps"&gt;KVM&lt;/span&gt; cables sure do take up a lot of space. Also at the moment, at home
+my power is all coming directly out of two UPSs, whereas at the
+apartment it&amp;#8217;s straight from mains off of a surge suppressor. I&amp;#8217;s like
+to buy another &lt;span class="caps"&gt;UPS&lt;/span&gt; for the apartment from RefurbUPS.com, where I got the
+ones from home, and also add a &lt;span class="caps"&gt;PDU&lt;/span&gt; at home and a vertical power strip at
+the&amp;nbsp;apartment.&lt;/p&gt;
+&lt;p&gt;Also, at the apartment, the roommates and I have had some discussion
+lately about how much power the machines draw. This mainly stemmed from
+our plans to move this June, into a rented house with two more people.
+This seems to be falling through, so I don&amp;#8217;t have to worry about moving
+and re-cabling everything, but I&amp;#8217;m still interested in finding out how
+much power is being drawn. Granted, my UPSs at home give me a
+more-or-less good idea of power consumption, but I&amp;#8217;d like to know in
+detail. The ideal solution would be a clamp ammeter around the mains
+line to the equipment - one with a serial interface. Unfortunately, I
+can&amp;#8217;t seem to find such a thing, short of a digital multimeter left on
+all the time. So, I guess I&amp;#8217;ll be looking around, and if I can&amp;#8217;t find
+anything specific, maybe I&amp;#8217;ll work on a microcontroller that can read
+1-200mV in 1mV increments, and use it with an inductive clamp ammeter
+(usual output for them is 1mV per&amp;nbsp;A).&lt;/p&gt;
+&lt;p&gt;So, on Monday I got into work and couldn&amp;#8217;t access my mailserver. Weird.
+I never even got any Nagios alerts. I checked Nagios and&amp;#8230; nothing. As
+in no connection. I &lt;span class="caps"&gt;SSH&lt;/span&gt;&amp;#8217;d home and pinged both boxes, but nothing. The
+switch showed the mail server totally offline, and the Nagios box
+plugged connected but &lt;span class="caps"&gt;ZERO&lt;/span&gt; data out. I reset the counters and waited.
+Still nothing. After an hour or so of poking around, I determined that
+both devices were on the same 6-port group on the switch, and nothing
+else there was up too. So, after five long hours, I got someone back
+home to switch the cables. Still nothing. On a hunch, I asked to have
+her check the mail server (the &amp;#8220;new&amp;#8221; Sun Blade 150) and, sure enough, it
+wasn&amp;#8217;t powered on. A click of the power button, and the mail server was
+back online. Along with an ominous last email from Nagios, stating that
+the &lt;span class="caps"&gt;UPS&lt;/span&gt; running my switch lost power, and 6 minutes later, was going
+down hard. Then&amp;nbsp;quiet.&lt;/p&gt;
+&lt;p&gt;I don&amp;#8217;t usually have power outages. So I&amp;#8217;ll admit, when I added some of
+the new machines, I committed a high sin - I &amp;#8220;never got around&amp;#8221; to
+setting up everything power-wise. I also have the switch running off of
+an old BackUPS &lt;span class="caps"&gt;500VA&lt;/span&gt; unit, &lt;span class="caps"&gt;USB&lt;/span&gt;, without automatic self-tests. As a
+result of all&amp;nbsp;this:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;The little &lt;span class="caps"&gt;UPS&lt;/span&gt; powering the switch only held out for 6-7 minutes. As
+    a result, once that died, the bigger units didn&amp;#8217;t even matter, as
+    all hope was lost. This needs to be on a bigger &lt;span class="caps"&gt;UPS&lt;/span&gt; - maybe one of
+    the &lt;span class="caps"&gt;1000VA&lt;/span&gt;&amp;#8217;s until it gets its&amp;#8217;&amp;nbsp;own.&lt;/li&gt;
+&lt;li&gt;APCupsd requires a network to initiate shutdown, so the rest of the
+    machines came down hard (as confirmed by looking through log&amp;nbsp;files).&lt;/li&gt;
+&lt;li&gt;The SunBlade was never setup to power on after power interruption,
+    so it just sat there like a&amp;nbsp;brick.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Most disturbingly, while my Nagios/monitoring box is up (according to
+the switch, power draw figures from the &lt;span class="caps"&gt;UPS&lt;/span&gt;, and the lights, as
+confirmed by someone on-site), it&amp;#8217;s dead. No ping, nothing out. I&amp;#8217;ll
+have to look into it, but it made me realize that this really is my only
+way of analyzing problems. That needs to&amp;nbsp;stop.&lt;/p&gt;
+&lt;p&gt;Maybe one day I&amp;#8217;ll have the money for a nice &lt;a href="http://www.apc.com/products/family/index.cfm?id=223"&gt;SmartUPS
+&lt;span class="caps"&gt;RT&lt;/span&gt;&lt;/a&gt; or even a
+&lt;a href="http://www.apc.com/products/family/index.cfm?id=189"&gt;Symmetra&lt;/a&gt; - though
+getting 208V into my basement is even more of a dream than spending
+$4000 on a&amp;nbsp;&lt;span class="caps"&gt;UPS&lt;/span&gt;.&lt;/p&gt;
+&lt;p&gt;Also, I decided (after all this) to setup graphing of &lt;span class="caps"&gt;UPS&lt;/span&gt; data (load,
+voltage in and out, temp, capacity, run time, etc.). While I haven&amp;#8217;t
+gotten around to setting up &lt;a href="http://www.zenoss.com/"&gt;Zenoss&lt;/a&gt; yet, I did
+a quick (well, 4 hours later I&amp;#8217;m done configuring it)
+&lt;a href="http://www.cacti.net/"&gt;Cacti&lt;/a&gt;installation on my web server (I should
+already have it running on the monitoring box, but who knows what that
+will look like when I get&amp;nbsp;home).&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Thu, 06 Mar 2008 01:02:00 -0500</pubDate><guid>tag:newblog.jasonantman.com,2008-03-06:2008/03/cable-management-power-measurements-major-outage-cacti/</guid><category>apc</category><category>cable management</category><category>cacti</category><category>disaster</category><category>monitoring</category><category>power distribution</category><category>power failure</category><category>rack</category><category>UPS</category></item></channel></rss>

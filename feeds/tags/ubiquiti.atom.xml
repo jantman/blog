@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Jason Antman's Blog</title><link href="http://newblog.jasonantman.com/" rel="alternate"></link><link href="http://newblog.jasonantman.com/feeds/tags/ubiquiti.atom.xml" rel="self"></link><id>http://newblog.jasonantman.com/</id><updated>2011-01-06T16:06:00-05:00</updated><entry><title>Managing Ubiquiti Networks MAC ACLs from a script</title><link href="http://newblog.jasonantman.com/2011/01/managing-ubiquiti-networks-mac-acls-from-a-script/" rel="alternate"></link><updated>2011-01-06T16:06:00-05:00</updated><author><name>admin</name></author><id>tag:newblog.jasonantman.com,2011-01-06:2011/01/managing-ubiquiti-networks-mac-acls-from-a-script/</id><summary type="html">&lt;p&gt;I have a small web-based tool for allowing members of an organization to
+register their wireless &lt;span class="caps"&gt;MAC&lt;/span&gt; addresses, and then automatically adding
+them to the &lt;span class="caps"&gt;MAC&lt;/span&gt; &lt;span class="caps"&gt;ACL&lt;/span&gt; on &lt;a href="http://www.ubnt.com"&gt;Ubiquiti&lt;/a&gt; AirOSv2 APs. It&amp;#8217;s
+a pretty quick hack, along with a simple and ugly web-based tool, but it
+gets the job done for a non-profit with only 25 people. After &lt;a href="http://www.ubnt.com/forum/showthread.php?t=21133"&gt;posting
+about it on the Ubiquiti
+forum&lt;/a&gt; and getting a
+request from someone for the code, I decided to put it out there for
+anyone who wants it. The script is mostly based on SCPing configs to and
+from the &lt;span class="caps"&gt;AP&lt;/span&gt; and SSHing in to run commands, and will need passwordless
+public key auth to the&amp;nbsp;&lt;span class="caps"&gt;AP&lt;/span&gt;.&lt;/p&gt;
+&lt;p&gt;The code itself is in subversion at
+&lt;a href="https://github.com/jantman/misc-scripts/tree/master/ubiquiti-mac-acl"&gt;https://github.com/jantman/misc-scripts/tree/master/ubiquiti-mac-acl&lt;/a&gt;.
+It&amp;#8217;s composed of four&amp;nbsp;files:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href="https://github.com/jantman/misc-scripts/blob/master/ubiquiti-mac-acl/updateAPconfigs.php.inc"&gt;updateAPconfigs.php.inc&lt;/a&gt;&lt;ul&gt;
+&lt;li&gt;the main &lt;span class="caps"&gt;PHP&lt;/span&gt; file with three functions for working with the&amp;nbsp;APs&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;a href="https://github.com/jantman/misc-scripts/blob/master/ubiquiti-mac-acl/wirelessTools.php"&gt;wirelessTools.php&lt;/a&gt;&lt;ul&gt;
+&lt;li&gt;My &lt;span class="caps"&gt;PHP&lt;/span&gt; page for users to add MACs. It&amp;#8217;s pretty rough and is mostly
+based on handling our &lt;span class="caps"&gt;LDAP&lt;/span&gt; authentication/group framework, but it
+gives a fair example of how I store MACs in a MySQL table and then
+rebuild a given &lt;span class="caps"&gt;AP&lt;/span&gt; config file with the current list of MACs. I
+doubt it will be useful to anyone else as more than an&amp;nbsp;example.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;a href="https://github.com/jantman/misc-scripts/blob/master/ubiquiti-mac-acl/wireless.sql"&gt;wireless.sql&lt;/a&gt;&lt;ul&gt;
+&lt;li&gt;The schema for the &lt;span class="caps"&gt;SQL&lt;/span&gt; database I use to store&amp;nbsp;MACs.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;a href="https://github.com/jantman/misc-scripts/blob/master/ubiquiti-mac-acl/README.txt"&gt;&lt;span class="caps"&gt;README&lt;/span&gt;.txt&lt;/a&gt;&lt;ul&gt;
+&lt;li&gt;Readme file including some warnings on the lack of error checking
+in the&amp;nbsp;functions.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Hopefully this will be of some use to someone. I should probably mention
+two important things here. First, the &lt;span class="caps"&gt;AP&lt;/span&gt; only accepts up to 32 &lt;span class="caps"&gt;MAC&lt;/span&gt;
+addresses, so if you feed the &lt;code&gt;makeNewConfigFile()&lt;/code&gt; function an array
+with more than 32, it will just stop at the 32&lt;sup&gt;nd&lt;/sup&gt;. Also, be aware, this
+SCPs a config file to the &lt;span class="caps"&gt;AP&lt;/span&gt;, runs &lt;code&gt;cfgmtd&lt;/code&gt; and the reboots the &lt;span class="caps"&gt;AP&lt;/span&gt;. If
+you send it a bad config file, who knows what will happen. If you allow
+your users to add &lt;span class="caps"&gt;MAC&lt;/span&gt; addresses, your APs will reboot every time someone
+adds&amp;nbsp;one.&lt;/p&gt;
+&lt;p&gt;All I ask is that if you use this, leave a comment to thank me, and if
+you make any changes/additions/bugfixes, please send them back to&amp;nbsp;me.&lt;/p&gt;
+&lt;p&gt;Also, I have some &lt;a href="/2010/03/nagios-check-scripts/"&gt;Nagios check scripts&lt;/a&gt;
+that are useful for Ubiquiti&amp;nbsp;APs.&lt;/p&gt;</summary><category term="airos"></category><category term="mac"></category><category term="PHP"></category><category term="security"></category><category term="ubiquiti"></category><category term="wap"></category><category term="wireless"></category></entry><entry><title>Nagios check scripts</title><link href="http://newblog.jasonantman.com/2010/03/nagios-check-scripts/" rel="alternate"></link><updated>2010-03-16T22:33:00-04:00</updated><author><name>admin</name></author><id>tag:newblog.jasonantman.com,2010-03-16:2010/03/nagios-check-scripts/</id><summary type="html">&lt;p&gt;Last week I added some of my Nagios check scripts to my &lt;a href="https://github.com/jantman/nagios-scripts"&gt;nagios-scripts
+GitHub repository&lt;/a&gt;. Perhaps
+they&amp;#8217;ll be of some use to some other&amp;nbsp;people&amp;#8230;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href="https://github.com/jantman/nagios-scripts/blob/master/check_1wire_temps.php"&gt;check_1wire_temps.php&lt;/a&gt;&lt;ul&gt;
+&lt;li&gt;quick and dirty, built for one specific application, but a good
+starting place for checking Dallas 1-wire temperatures via&amp;nbsp;&lt;span class="caps"&gt;OWFS&lt;/span&gt;.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;a href="https://github.com/jantman/nagios-scripts/blob/master/check_802dot11.php"&gt;check_802dot11.php&lt;/a&gt;&lt;ul&gt;
+&lt;li&gt;A script to check various things in the &lt;span class="caps"&gt;IEEE&lt;/span&gt;-&lt;span class="caps"&gt;802DOT11&lt;/span&gt; &lt;span class="caps"&gt;MIB&lt;/span&gt;, written
+for Ubiquiti APs&amp;nbsp;(&lt;span class="caps"&gt;SNMP&lt;/span&gt;).&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;a href="https://github.com/jantman/nagios-scripts/blob/master/check_frogfoot.php"&gt;check_frogfoot.php&lt;/a&gt;&lt;ul&gt;
+&lt;li&gt;A script to check some stuff from &lt;span class="caps"&gt;FROGFOOT&lt;/span&gt;-&lt;span class="caps"&gt;MIB&lt;/span&gt;, also written for
+Ubiquiti APs&amp;nbsp;(&lt;span class="caps"&gt;SNMP&lt;/span&gt;).&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;a href="https://github.com/jantman/nagios-scripts/blob/master/check_asterisk_iaxpeers"&gt;check_asterisk_iaxpeers&lt;/a&gt;&lt;ul&gt;
+&lt;li&gt;a Python check script to parse the output of rasterisk for &lt;span class="caps"&gt;IAX&lt;/span&gt;
+peer status and latency (includes perf data&amp;nbsp;output).&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;a href="https://github.com/jantman/nagios-scripts/blob/master/check_bacula_job.php"&gt;check_bacula_job.php&lt;/a&gt;&lt;ul&gt;
+&lt;li&gt;A script to connect to the Bacula database and make sure a
+specified job terminated &lt;span class="caps"&gt;OK&lt;/span&gt; and was run on&amp;nbsp;schedule.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;a href="https://github.com/jantman/nagios-scripts/blob/master/check_docsis"&gt;check_docsis&lt;/a&gt;&lt;ul&gt;
+&lt;li&gt;A script to check status and various metrics for cable modems
+implementing the &lt;span class="caps"&gt;DOCSIS&lt;/span&gt; &lt;span class="caps"&gt;MIB&lt;/span&gt; (&lt;span class="caps"&gt;SNMP&lt;/span&gt;). Works with (at least) the
+Motorola SurfBoard modems used by Cablevision (which use
+192.168.100.1 on the &lt;span class="caps"&gt;LAN&lt;/span&gt;&amp;nbsp;side).&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;a href="https://github.com/jantman/nagios-scripts/blob/master/check_syslog_age.php"&gt;check_syslog_age.php&lt;/a&gt;&lt;ul&gt;
+&lt;li&gt;A &lt;span class="caps"&gt;PHP&lt;/span&gt; script which checks (recursively) that the newest file under
+a directory is no more than X seconds old. I use this for checking
+my centralized syslog server, which has logs separated out in
+&lt;code&gt;/var/log/HOSTS/hostname&lt;/code&gt;.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;Update 2011-01-31&lt;/strong&gt; - the
+&lt;a href="https://github.com/jantman/nagios-scripts/blob/master/check_syslog_age.php"&gt;check_syslog_age.php&lt;/a&gt;
+script was updated today to handle an error condition where stat() calls
+in &lt;span class="caps"&gt;PHP&lt;/span&gt; fail on files larger than &lt;span class="caps"&gt;2GB&lt;/span&gt; on 32-bit&amp;nbsp;systems.&lt;/p&gt;</summary><category term="1-wire"></category><category term="asterisk"></category><category term="bacula"></category><category term="DOCSIS"></category><category term="Nagios"></category><category term="snmp"></category><category term="syslog"></category><category term="ubiquiti"></category></entry></feed>

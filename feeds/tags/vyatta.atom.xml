@@ -1,0 +1,580 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Jason Antman's Blog</title><link href="http://newblog.jasonantman.com/" rel="alternate"></link><link href="http://newblog.jasonantman.com/feeds/tags/vyatta.atom.xml" rel="self"></link><id>http://newblog.jasonantman.com/</id><updated>2011-12-24T14:42:00-05:00</updated><entry><title>Vyatta - Showing ISC dhcpd fixed-address leases</title><link href="http://newblog.jasonantman.com/2011/12/vyatta-showing-isc-dhcpd-fixed-address-leases/" rel="alternate"></link><updated>2011-12-24T14:42:00-05:00</updated><author><name>admin</name></author><id>tag:newblog.jasonantman.com,2011-12-24:2011/12/vyatta-showing-isc-dhcpd-fixed-address-leases/</id><summary type="html">&lt;p&gt;&lt;span class="caps"&gt;ISC&lt;/span&gt; &lt;a href="http://www.isc.org/software/dhcp"&gt;dhcpd&lt;/a&gt; has the ability to always
+give a specific &lt;span class="caps"&gt;MAC&lt;/span&gt; address the same &lt;span class="caps"&gt;IP&lt;/span&gt; address &amp;#8220;lease&amp;#8221; using the
+fixed-address configuration option. This is configured in
+&lt;a href="http://www.vyatta.org"&gt;Vyatta&lt;/a&gt; using the &lt;code&gt;static-mapping&lt;/code&gt; configuration
+statement. Unfortunately, since dhcpd doesn&amp;#8217;t store fixed-address leases
+in the &lt;code&gt;dhcpd.leases&lt;/code&gt; file, the Vyatta &lt;code&gt;show dhcp leases&lt;/code&gt; command
+doesn&amp;#8217;t show anything about them - which makes it difficult to debug
+anything dhcp-related if all of the hosts on your network are setup for
+fixed addresses. I found a mention of this on the &lt;a href="http://www.vyatta.org/forum/viewtopic.php?p=121558"&gt;vyatta
+forum&lt;/a&gt;, and also an
+&lt;a href="https://bugzilla.vyatta.com/show_bug.cgi?id=1990"&gt;open bug (1990)&lt;/a&gt; to
+fix it, but no proposed resolution. Since I came across this problem and
+happen to know a bit about &lt;span class="caps"&gt;ISC&lt;/span&gt; dhcpd, I developed both a workaround for
+users (including a perl script) and a possible solution for the Vyatta
+developers to&amp;nbsp;implement.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Workaround for&amp;nbsp;Users:&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;There&amp;#8217;s no way to get dhcpd to store fixed-address hosts in the
+dhcpd.leases file (though it&amp;#8217;s been discussed on the dhcpd-users mailing
+list a few times). There is, however, a way to get dhcpd to log every
+time it sends an &lt;span class="caps"&gt;ACK&lt;/span&gt; to a client. The following Vyatta configuration
+commands will get dhcpd to log all transactions to syslog, will have
+&lt;a href="http://rsyslog.com/"&gt;rsyslog&lt;/a&gt; put that in &lt;code&gt;/var/log/user/dhcpd&lt;/code&gt;. Since
+this log can fill up very quickly on a busy server, the latter two
+commands will tell &lt;a href="https://fedorahosted.org/logrotate/"&gt;logrotate&lt;/a&gt; to
+rotate the log file when it reaches 3000k in size, and keep 5 copies
+(feel free to adjust to your&amp;nbsp;needs):&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="gp"&gt;#&lt;/span&gt; &lt;span class="nb"&gt;set &lt;/span&gt;service dhcp-server global-parameters &lt;span class="s2"&gt;&amp;quot;log-facility local2;&amp;quot;&lt;/span&gt;
+&lt;span class="gp"&gt;#&lt;/span&gt; &lt;span class="nb"&gt;set &lt;/span&gt;system syslog file dhcpd facility local2 level debug
+&lt;span class="gp"&gt;#&lt;/span&gt; &lt;span class="nb"&gt;set &lt;/span&gt;system syslog file dhcpd archive files 5
+&lt;span class="gp"&gt;#&lt;/span&gt; &lt;span class="nb"&gt;set &lt;/span&gt;system syslog file dhcpd archive size 3000
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Once this is done, you can &lt;code&gt;tail -f /var/log/user/dhcpd&lt;/code&gt; to watch &lt;span class="caps"&gt;DHCP&lt;/span&gt;
+discover/request/offer/ack in realtime, or grep through the log file for
+a specific &lt;span class="caps"&gt;IP&lt;/span&gt; or &lt;span class="caps"&gt;MAC&lt;/span&gt;. If you want an easier method, I&amp;#8217;ve written a perl
+script (latest version will always live in &lt;a href="https://github.com/jantman/misc-scripts/blob/master/show_dhcp_fixed_ACKs.pl"&gt;my GitHub misc-scripts
+repo&lt;/a&gt;)
+to grep through &lt;code&gt;/var/log/user/dhcpd&lt;/code&gt; and show the most recent &lt;span class="caps"&gt;DHCPACK&lt;/span&gt;
+for each &lt;span class="caps"&gt;IP&lt;/span&gt; address, sorted by &lt;span class="caps"&gt;IP&lt;/span&gt;. Here&amp;#8217;s the code of the simple script,
+which is more than half comments. To use it, after performing the above
+steps, all you need to do is login to your Vyatta box,
+&lt;code&gt;wget https://raw.github.com/jantman/misc-scripts/master/show_dhcp_fixed_ACKs.pl&lt;/code&gt;
+and then &lt;code&gt;perl show_dhcp_fixed_ACKs.pl&lt;/code&gt;.&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="c1"&gt;#!/usr/bin/perl&lt;/span&gt;
+
+&lt;span class="c1"&gt;#&lt;/span&gt;
+&lt;span class="c1"&gt;# show_dhcp_fixed_ACKs.pl - script to show the most recent &lt;span class="caps"&gt;DHCP&lt;/span&gt; ACKs per &lt;span class="caps"&gt;IP&lt;/span&gt; address for &lt;span class="caps"&gt;ISC&lt;/span&gt; DHCPd,&lt;/span&gt;
+&lt;span class="c1"&gt;#   from a log file. Originally written for Vyatta routers that just show the dynamic leases.&lt;/span&gt;
+&lt;span class="c1"&gt;#&lt;/span&gt;
+&lt;span class="c1"&gt;# To use this, you need to have dhcpd logging to syslog, and your syslog server putting the log file at&lt;/span&gt;
+&lt;span class="c1"&gt;# /var/log/user/dhcpd (or a file path specified by the $logfile variable below.&lt;/span&gt;
+&lt;span class="c1"&gt;#&lt;/span&gt;
+&lt;span class="c1"&gt;# To accomplish this on Vyatta 6.3, run:&lt;/span&gt;
+&lt;span class="c1"&gt;# set service dhcp-server global-parameters &amp;quot;log-facility local2;&amp;quot;&lt;/span&gt;
+&lt;span class="c1"&gt;# set system syslog file dhcpd facility local2 level debug&lt;/span&gt;
+&lt;span class="c1"&gt;# set system syslog file dhcpd archive files 5&lt;/span&gt;
+&lt;span class="c1"&gt;# set system syslog file dhcpd archive size 3000&lt;/span&gt;
+&lt;span class="c1"&gt;# commit&lt;/span&gt;
+&lt;span class="c1"&gt;#&lt;/span&gt;
+&lt;span class="c1"&gt;# Copyright 2011 Jason Antman  All Rights Reserved.&lt;/span&gt;
+&lt;span class="c1"&gt;# This script is free for use by anyone anywhere, provided that you comply with the following terms:&lt;/span&gt;
+&lt;span class="c1"&gt;# 1) Keep this notice and copyright statement intact.&lt;/span&gt;
+&lt;span class="c1"&gt;# 2) Send any substantial changes, improvements or bog fixes back to me at the above address.&lt;/span&gt;
+&lt;span class="c1"&gt;# 3) If you include this in a product or redistribute it, you notify me, and include my name in the credits or changelog.&lt;/span&gt;
+&lt;span class="c1"&gt;#&lt;/span&gt;
+&lt;span class="c1"&gt;# The following &lt;span class="caps"&gt;URL&lt;/span&gt; always points to the newest version of this script. If you obtained it from another source, you should&lt;/span&gt;
+&lt;span class="c1"&gt;# check here:&lt;/span&gt;
+&lt;span class="c1"&gt;# $HeadURL$&lt;/span&gt;
+&lt;span class="c1"&gt;# $LastChangedRevision$&lt;/span&gt;
+&lt;span class="c1"&gt;#&lt;/span&gt;
+&lt;span class="c1"&gt;# &lt;span class="caps"&gt;CHANGELOG&lt;/span&gt;:&lt;/span&gt;
+&lt;span class="c1"&gt;# 2011-12-24 jason@jasonantman.com:&lt;/span&gt;
+&lt;span class="c1"&gt;#    initial version of script&lt;/span&gt;
+&lt;span class="c1"&gt;#&lt;/span&gt;
+&lt;span class="c1"&gt;#&lt;/span&gt;
+
+&lt;span class="k"&gt;use&lt;/span&gt; &lt;span class="n"&gt;strict&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="k"&gt;use&lt;/span&gt; &lt;span class="n"&gt;warnings&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+
+&lt;span class="k"&gt;my&lt;/span&gt; &lt;span class="nv"&gt;$logfile&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;/var/log/user/dhcpd&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+
+&lt;span class="k"&gt;my&lt;/span&gt; &lt;span class="nv"&gt;%data&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;();&lt;/span&gt;
+
+&lt;span class="nb"&gt;open&lt;/span&gt; &lt;span class="n"&gt;&lt;span class="caps"&gt;DF&lt;/span&gt;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nv"&gt;$logfile&lt;/span&gt; &lt;span class="ow"&gt;or&lt;/span&gt; &lt;span class="nb"&gt;die&lt;/span&gt; &lt;span class="vg"&gt;$!&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="k"&gt;while&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt; &lt;span class="k"&gt;my&lt;/span&gt; &lt;span class="nv"&gt;$line&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt;  &lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt; &lt;span class="nv"&gt;$line&lt;/span&gt; &lt;span class="o"&gt;!~&lt;/span&gt; &lt;span class="sr"&gt;m/dhcpd: &lt;span class="caps"&gt;DHCPACK&lt;/span&gt;/&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt; &lt;span class="k"&gt;next&lt;/span&gt;&lt;span class="p"&gt;;}&lt;/span&gt;
+    &lt;span class="nv"&gt;$line&lt;/span&gt; &lt;span class="o"&gt;=~&lt;/span&gt; &lt;span class="sr"&gt;m/([A-Za-z]+ [0-9]+ [0-9]{1,2}:[0-9]{2}:[0-9]{2}) [^\/x]+ dhcpd: &lt;span class="caps"&gt;DHCPACK&lt;/span&gt; on (\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}) to ((?:[0-9a-f]{2}[:-]){5}[0-9a-f]{2}) via (.+)/&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+    &lt;span class="c1"&gt;#print &amp;quot;$1==$2==$3==$4==\n&amp;quot; ;&lt;/span&gt;
+    &lt;span class="nv"&gt;$data&lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;$2&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;mac&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;$3&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+    &lt;span class="nv"&gt;$data&lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;$2&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;date&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;$1&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+    &lt;span class="nv"&gt;$data&lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;$2&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;if&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;$4&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+    &lt;span class="nv"&gt;$data&lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;$2&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;ip&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;$2&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;    
+&lt;span class="p"&gt;}&lt;/span&gt;
+
+&lt;span class="nb"&gt;printf&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;%-18s %-20s %-18s %-10s\n&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;&lt;span class="caps"&gt;IP&lt;/span&gt; Address&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;Hardware Address&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;Date&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;Interface&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;span class="nb"&gt;printf&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;%-18s %-20s %-18s %-10s\n&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;----------&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;----------------&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;----&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;---------&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+
+&lt;span class="c1"&gt;# begin sort by &lt;span class="caps"&gt;IP&lt;/span&gt; address&lt;/span&gt;
+&lt;span class="k"&gt;my&lt;/span&gt; &lt;span class="nv"&gt;@keys&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt;
+  &lt;span class="nb"&gt;map&lt;/span&gt;  &lt;span class="nb"&gt;substr&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;$_&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mi"&gt;4&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;=&amp;gt;&lt;/span&gt;
+  &lt;span class="nb"&gt;sort&lt;/span&gt;
+  &lt;span class="nb"&gt;map&lt;/span&gt;  &lt;span class="nb"&gt;pack&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;C4&amp;#39;&lt;/span&gt; &lt;span class="o"&gt;=&amp;gt;&lt;/span&gt;
+    &lt;span class="sr"&gt;/(\d+)\.(\d+)\.(\d+)\.(\d+)/&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+    &lt;span class="o"&gt;.&lt;/span&gt; &lt;span class="nv"&gt;$_&lt;/span&gt; &lt;span class="o"&gt;=&amp;gt;&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;keys&lt;/span&gt; &lt;span class="nv"&gt;%data&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;span class="c1"&gt;# end sort by &lt;span class="caps"&gt;IP&lt;/span&gt; address&lt;/span&gt;
+
+&lt;span class="k"&gt;foreach&lt;/span&gt; &lt;span class="k"&gt;my&lt;/span&gt; &lt;span class="nv"&gt;$key&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;@keys&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="nb"&gt;printf&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;%-18s %-20s %-18s %-10s\n&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nv"&gt;$data&lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="nv"&gt;$key&lt;/span&gt;&lt;span class="p"&gt;}{&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;ip&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;},&lt;/span&gt; &lt;span class="nv"&gt;$data&lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="nv"&gt;$key&lt;/span&gt;&lt;span class="p"&gt;}{&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;mac&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;},&lt;/span&gt; &lt;span class="nv"&gt;$data&lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="nv"&gt;$key&lt;/span&gt;&lt;span class="p"&gt;}{&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;date&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;},&lt;/span&gt; &lt;span class="nv"&gt;$data&lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="nv"&gt;$key&lt;/span&gt;&lt;span class="p"&gt;}{&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;if&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;});&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;&lt;strong&gt;A solution for&amp;nbsp;Vyatta:&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;I suggested this to Vyatta in a reply to &lt;a href="https://bugzilla.vyatta.com/show_bug.cgi?id=1990"&gt;bug
+1990&lt;/a&gt;. Since they
+already use &lt;a href="http://rsyslog.com/"&gt;rsyslog&lt;/a&gt; which has very powerful
+processing capabilities, it would be easy to have rsyslog parse the
+&lt;span class="caps"&gt;DHCPACK&lt;/span&gt; messages in real time and update some data store (flat files or
+a simple database) with the information. While how to store this would
+be up to the Vyatta guys, I have some rsyslog configuration to parse
+&lt;span class="caps"&gt;DHCPACK&lt;/span&gt; messages and update a MySQL database (with two tables; one for
+most recent &lt;span class="caps"&gt;ACK&lt;/span&gt; per &lt;span class="caps"&gt;IP&lt;/span&gt; address and one for most recent &lt;span class="caps"&gt;ACK&lt;/span&gt; per &lt;span class="caps"&gt;MAC&lt;/span&gt;
+address) that might be of some&amp;nbsp;use:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;$template DHCPACKonIP, &amp;quot;INSERT INTO dhcplog_ip   
+       SET   
+       server_ip=inet_aton(&amp;#39;%fromhost-ip%&amp;#39;),   
+       msg_type=&amp;#39;DHCPACK&amp;#39;,   
+       date=&amp;#39;%timereported:::date-mysql%&amp;#39;,   
+       mac_addr=&amp;#39;%msg:R,ERE,2,BLANK:DHCPACK on ([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}) to (([0-9a-f]{2}:){5}[0-9a-f]{2})( \(([^)]+)\))? via (([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3})|eth0)--end%&amp;#39;,   
+       client_ip=inet_aton(&amp;#39;%msg:R,ERE,1,BLANK:DHCPACK on ([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}) to (([0-9a-f]{2}:){5}[0-9a-f]{2})( \(([^)]+)\))? via (([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3})|eth0)--end%&amp;#39;),   
+       gateway=&amp;#39;%msg:R,ERE,6,BLANK:DHCPACK on ([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}) to (([0-9a-f]{2}:){5}[0-9a-f]{2})( \(([^)]+)\))? via (([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3})|eth0)--end%&amp;#39;,   
+       fullmsg=&amp;#39;%msg%&amp;#39;   
+       ON DUPLICATE KEY UPDATE   
+       server_ip=inet_aton(&amp;#39;%fromhost-ip%&amp;#39;),   
+       date=&amp;#39;%timereported:::date-mysql%&amp;#39;,   
+       mac_addr=&amp;#39;%msg:R,ERE,2,BLANK:DHCPACK on ([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}) to (([0-9a-f]{2}:){5}[0-9a-f]{2})( \(([^)]+)\))? via (([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3})|eth0)--end%&amp;#39;,   
+       gateway=&amp;#39;%msg:R,ERE,6,BLANK:DHCPACK on ([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}) to (([0-9a-f]{2}:){5}[0-9a-f]{2})( \(([^)]+)\))? via (([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3})|eth0)--end%&amp;#39;,   
+       fullmsg=&amp;#39;%msg%&amp;#39;  
+&amp;quot;,SQL
+
+$template DHCPACKonMAC, &amp;quot;INSERT INTO dhcplog_mac   
+       SET   
+       server_ip=inet_aton(&amp;#39;%fromhost-ip%&amp;#39;),   
+       msg_type=&amp;#39;DHCPACK&amp;#39;,   
+       date=&amp;#39;%timereported:::date-mysql%&amp;#39;,   
+       mac_addr=&amp;#39;%msg:R,ERE,2,BLANK:DHCPACK on ([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}) to (([0-9a-f]{2}:){5}[0-9a-f]{2})( \(([^)]+)\))? via (([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3})|eth0)--end%&amp;#39;,   
+       client_ip=inet_aton(&amp;#39;%msg:R,ERE,1,BLANK:DHCPACK on ([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}) to (([0-9a-f]{2}:){5}[0-9a-f]{2})( \(([^)]+)\))? via (([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3})|eth0)--end%&amp;#39;),   
+       gateway=&amp;#39;%msg:R,ERE,6,BLANK:DHCPACK on ([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}) to (([0-9a-f]{2}:){5}[0-9a-f]{2})( \(([^)]+)\))? via (([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3})|eth0)--end%&amp;#39;,   
+       fullmsg=&amp;#39;%msg%&amp;#39;   
+       ON DUPLICATE KEY UPDATE   
+       server_ip=inet_aton(&amp;#39;%fromhost-ip%&amp;#39;),   
+       date=&amp;#39;%timereported:::date-mysql%&amp;#39;,   
+       client_ip=inet_aton(&amp;#39;%msg:R,ERE,1,BLANK:DHCPACK on ([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}) to (([0-9a-f]{2}:){5}[0-9a-f]{2})( \(([^)]+)\))? via (([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3})|eth0)--end%&amp;#39;),   
+       gateway=&amp;#39;%msg:R,ERE,6,BLANK:DHCPACK on ([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}) to (([0-9a-f]{2}:){5}[0-9a-f]{2})( \(([^)]+)\))? via (([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3})|eth0)--end%&amp;#39;,   
+       fullmsg=&amp;#39;%msg%&amp;#39;  
+&amp;quot;,SQL
+
+$template DHCPACKtoIP, &amp;quot;INSERT INTO dhcplog_ip   
+       SET   
+       server_ip=inet_aton(&amp;#39;%fromhost-ip%&amp;#39;),   
+       msg_type=&amp;#39;DHCPACK&amp;#39;,   
+       date=&amp;#39;%timereported:::date-mysql%&amp;#39;,   
+       mac_addr=&amp;#39;%msg:R,ERE,2,BLANK:DHCPACK to ([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}) \((([0-9a-f]{2}:){5}[0-9a-f]{2})\) via (([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3})|eth0)--end%&amp;#39;,   
+       client_ip=inet_aton(&amp;#39;%msg:R,ERE,1,BLANK:DHCPACK to ([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}) \((([0-9a-f]{2}:){5}[0-9a-f]{2})\) via (([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3})|eth0)--end%&amp;#39;),   
+       gateway=&amp;#39;%msg:R,ERE,4,BLANK:DHCPACK to ([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}) \((([0-9a-f]{2}:){5}[0-9a-f]{2})\) via (([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3})|eth0)--end%&amp;#39;,   
+       fullmsg=&amp;#39;%msg%&amp;#39;   
+       ON DUPLICATE KEY UPDATE   
+       server_ip=inet_aton(&amp;#39;%fromhost-ip%&amp;#39;),   
+       date=&amp;#39;%timereported:::date-mysql%&amp;#39;,   
+       mac_addr=&amp;#39;%msg:R,ERE,2,BLANK:DHCPACK to ([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}) \((([0-9a-f]{2}:){5}[0-9a-f]{2})\) via (([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3})|eth0)--end%&amp;#39;,   
+       gateway=&amp;#39;%msg:R,ERE,4,BLANK:DHCPACK to ([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}) \((([0-9a-f]{2}:){5}[0-9a-f]{2})\) via (([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3})|eth0)--end%&amp;#39;,   
+       fullmsg=&amp;#39;%msg%&amp;#39;  
+&amp;quot;,SQL
+
+$template DHCPACKtoMAC, &amp;quot;INSERT INTO dhcplog_mac   
+       SET   
+       server_ip=inet_aton(&amp;#39;%fromhost-ip%&amp;#39;),   
+       msg_type=&amp;#39;DHCPACK&amp;#39;,   
+       date=&amp;#39;%timereported:::date-mysql%&amp;#39;,   
+       mac_addr=&amp;#39;%msg:R,ERE,2,BLANK:DHCPACK to ([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}) \((([0-9a-f]{2}:){5}[0-9a-f]{2})\) via (([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3})|eth0)--end%&amp;#39;,   
+       client_ip=inet_aton(&amp;#39;%msg:R,ERE,1,BLANK:DHCPACK to ([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}) \((([0-9a-f]{2}:){5}[0-9a-f]{2})\) via (([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3})|eth0)--end%&amp;#39;),   
+       gateway=&amp;#39;%msg:R,ERE,4,BLANK:DHCPACK to ([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}) \((([0-9a-f]{2}:){5}[0-9a-f]{2})\) via (([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3})|eth0)--end%&amp;#39;,   
+       fullmsg=&amp;#39;%msg%&amp;#39;   
+       ON DUPLICATE KEY UPDATE   
+       server_ip=inet_aton(&amp;#39;%fromhost-ip%&amp;#39;),   
+       date=&amp;#39;%timereported:::date-mysql%&amp;#39;,   
+       client_ip=inet_aton(&amp;#39;%msg:R,ERE,1,BLANK:DHCPACK to ([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}) \((([0-9a-f]{2}:){5}[0-9a-f]{2})\) via (([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3})|eth0)--end%&amp;#39;),   
+       gateway=&amp;#39;%msg:R,ERE,4,BLANK:DHCPACK to ([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}) \((([0-9a-f]{2}:){5}[0-9a-f]{2})\) via (([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3})|eth0)--end%&amp;#39;,   
+       fullmsg=&amp;#39;%msg%&amp;#39;  
+&amp;quot;,SQL
+
+:msg, startswith, &amp;quot; DHCPACK on&amp;quot; :ommysql:hostname,database,dbuser,dbpass;DHCPACKonIP
+&lt;span class="amp"&gt;&amp;amp;&lt;/span&gt; :ommysql:hostname,database,dbuser,dbpass;DHCPACKonMAC
+&lt;span class="amp"&gt;&amp;amp;&lt;/span&gt; ~ ### &lt;span class="caps"&gt;DISCARD&lt;/span&gt;
+
+if $msg startswith &amp;#39; &lt;span class="caps"&gt;DHCPACK&lt;/span&gt; to&amp;#39; and ( not ( $msg contains &amp;#39;no client hardware address&amp;#39; ) )   
+then :ommysql:hostname,database,dbuser,dbpass;DHCPACKtoMAC
+&lt;span class="amp"&gt;&amp;amp;&lt;/span&gt; :ommysql:hostname,database,dbuser,dbpass;DHCPACKtoIP
+&lt;span class="amp"&gt;&amp;amp;&lt;/span&gt; ~ ### &lt;span class="caps"&gt;DISCARD&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;</summary><category term="dhcpd"></category><category term="rsyslog"></category><category term="vyatta"></category></entry><entry><title>Vyatta NetworkOS router/firewall on Alix board / Compact Flash</title><link href="http://newblog.jasonantman.com/2011/09/vyatta-networkos-routerfirewall-on-alix-board-compact-flash/" rel="alternate"></link><updated>2011-09-30T14:16:00-04:00</updated><author><name>admin</name></author><id>tag:newblog.jasonantman.com,2011-09-30:2011/09/vyatta-networkos-routerfirewall-on-alix-board-compact-flash/</id><summary type="html">&lt;p&gt;With the impending move to an apartment in Georgia and the migration of
+my rack full of servers to a hosting provider, there&amp;#8217;s no longer a need
+for me to run my &lt;a href="http://www.vyatta.org/"&gt;Vyatta &lt;span class="caps"&gt;VC&lt;/span&gt;&lt;/a&gt; router on a beefy
+dual-&lt;span class="caps"&gt;CPU&lt;/span&gt; RAIDed &lt;a href="http://h18000.www1.hp.com/products/quickspecs/11504_na/11504_na.HTML"&gt;&lt;span class="caps"&gt;DL360&lt;/span&gt;
+G3&lt;/a&gt;
+&lt;span class="caps"&gt;HP&lt;/span&gt; Proliant server chassis. I found an older PCEngines &lt;a href="http://pcengines.ch/alix2c1.htm"&gt;Alix
+2c1&lt;/a&gt; single board computer (433 MHz &lt;span class="caps"&gt;AMD&lt;/span&gt;
+Geode &lt;span class="caps"&gt;LX700&lt;/span&gt; , &lt;span class="caps"&gt;128MB&lt;/span&gt; &lt;span class="caps"&gt;DDR&lt;/span&gt; &lt;span class="caps"&gt;DRAM&lt;/span&gt;, CompactFlash (&lt;span class="caps"&gt;CF&lt;/span&gt;) card socket, MiniPCI, 3x
+10/100 ethernet) lying around, and decided to turn that into the new
+router. But I&amp;#8217;ve been so spoiled by Vyatta&amp;#8217;s good performance (well, at
+least on an x86 server) and the &lt;em&gt;real&lt;/em&gt; &lt;span class="caps"&gt;CLI&lt;/span&gt;, so I don&amp;#8217;t think I can go
+back to something like &lt;a href="http://m0n0.ch/wall/"&gt;m0n0wall&lt;/a&gt; or
+&lt;a href="http://www.pfsense.org/"&gt;pfSense&lt;/a&gt;, and since it&amp;#8217;s going to be my only
+network services box (also doing &lt;span class="caps"&gt;DNS&lt;/span&gt;, &lt;span class="caps"&gt;DHCP&lt;/span&gt;, firewalling, &lt;span class="caps"&gt;NAT&lt;/span&gt;, and maybe
+IPsec &lt;span class="caps"&gt;VPN&lt;/span&gt;) it&amp;#8217;s not viable to use the type of older Cisco or Juniper
+hardware that I can&amp;nbsp;afford.&lt;/p&gt;
+&lt;p&gt;The down side is that Vyatta isn&amp;#8217;t really designed or tuned for small
+systems, let alone &lt;span class="caps"&gt;CF&lt;/span&gt; media that doesn&amp;#8217;t take too well to lots of
+writes. So, I&amp;#8217;m going to begin experimentation with doing a &lt;span class="caps"&gt;CF&lt;/span&gt; install
+of the current Vyatta Core 6.3, and we&amp;#8217;ll see how it goes and what
+tuning I do over&amp;nbsp;time.&lt;/p&gt;
+&lt;p&gt;I found two relatively good references; a &lt;a href="http://www.vyatta.org/forum/viewtopic.php?t=502"&gt;post on the vyatta.org
+forum&lt;/a&gt; from 2008,
+relating to Vyatta version 4 (also on the author&amp;#8217;s
+&lt;a href="http://dataflip.blogspot.com/2008/06/optimizing-vyatta-for-compact-flash.html"&gt;blog&lt;/a&gt;),
+and a &lt;a href="http://peytongroup.wordpress.com/2010/02/16/vyatta-community-on-a-compact-flash/"&gt;blog
+post&lt;/a&gt;
+detailing a more complex
+&lt;a href="http://squashfs.sourceforge.net/"&gt;SquashFS&lt;/a&gt;/&lt;a href="http://en.wikipedia.org/wiki/Tmpfs"&gt;tmpfs&lt;/a&gt;/&lt;a href="http://unionfs.filesystems.org/"&gt;UnionFS&lt;/a&gt;
+read-only Vyatta install. Given my relatively short timeframe and little
+free time, I decided to try the former approach for now, and plan to
+make a more customized and tuned &lt;span class="caps"&gt;CF&lt;/span&gt; version of Vyatta in the&amp;nbsp;future.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Creating the actual disk&amp;nbsp;image:&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;My development platform at the moment is an intel-based MacBook Pro,
+running MacOS X 10.6.4 and VirtualBox 4.0.12. As much of a Linux fan as
+I am, my work laptop runs Mac (like everyone else in the office) and
+lately I can&amp;#8217;t guarantee that I&amp;#8217;ll be at my desktop long enough to
+finish anything. The target is an Alix2c1 with a &lt;span class="caps"&gt;2GB&lt;/span&gt; SanDisk Ultra &lt;span class="caps"&gt;CF&lt;/span&gt;
+card (yes, I know an industrial card would be better, but I couldn&amp;#8217;t get
+my hands on one). For starters, I created a new VirtualBox &lt;span class="caps"&gt;VM&lt;/span&gt; with the
+following&amp;nbsp;settings:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;span class="caps"&gt;OS&lt;/span&gt; Type: Linux&amp;nbsp;2.6&lt;/li&gt;
+&lt;li&gt;Base Memory:&amp;nbsp;&lt;span class="caps"&gt;128MB&lt;/span&gt;&lt;/li&gt;
+&lt;li&gt;Boot Order: Floppy, &lt;span class="caps"&gt;CD&lt;/span&gt;-&lt;span class="caps"&gt;ROM&lt;/span&gt;, Hard&amp;nbsp;Disk&lt;/li&gt;
+&lt;li&gt;&lt;span class="caps"&gt;IDE&lt;/span&gt; Controller Primary: mounted vyatta-livecd_VC6.3 &lt;span class="caps"&gt;ISO&lt;/span&gt;&amp;nbsp;image&lt;/li&gt;
+&lt;li&gt;&lt;span class="caps"&gt;IDE&lt;/span&gt; Controller Secondary: &lt;span class="caps"&gt;RAW&lt;/span&gt; &lt;span class="caps"&gt;VMDK&lt;/span&gt; image (created&amp;nbsp;below)&lt;/li&gt;
+&lt;li&gt;Audio:&amp;nbsp;None&lt;/li&gt;
+&lt;li&gt;Network: Disabled &lt;em&gt;(this is important, as Vyatta saves the
+    interfaces by hardware address, and it would require some config
+    editing and reboots to change&amp;nbsp;them)&lt;/em&gt;&lt;/li&gt;
+&lt;li&gt;Serial Port: disconnected (but&amp;nbsp;present)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;One difficulty I ran into on Mac is mounting the raw &lt;span class="caps"&gt;CF&lt;/span&gt; card in the
+VirtualBox guest. I plugged it in via a &lt;span class="caps"&gt;USB&lt;/span&gt; reader, and of course it
+automatically mounted in MacOS. I ejected it and the &lt;code&gt;/dev/disk1&lt;/code&gt; device
+disappeared. It turns out that the full procedure (as far as I could
+tell) for Mac&amp;nbsp;is:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Plug in the &lt;span class="caps"&gt;CF&lt;/span&gt; card and&amp;nbsp;reader.&lt;/li&gt;
+&lt;li&gt;It should automount. Run &lt;code&gt;mount&lt;/code&gt; to see what the actual device is -
+    in my case, the &lt;code&gt;/dev/disk1s1&lt;/code&gt; partition was mounted, so the disk is
+    &lt;code&gt;/dev/disk1&lt;/code&gt;.&lt;/li&gt;
+&lt;li&gt;Run &lt;code&gt;sudo umount -f /dev/disk1&lt;/code&gt;. It seems that the MacOS automounter
+    has a god complex, so you may need to re-run this command quite a
+    few times throughout the process if you get device or resource busy&amp;nbsp;errors.&lt;/li&gt;
+&lt;li&gt;In an appropriate directory, create the raw &lt;span class="caps"&gt;VMDK&lt;/span&gt; image with:
+    &lt;code&gt;VBoxManage internalcommands createrawvmdk -filename rawdisk.vmdk -rawdisk /dev/disk1&lt;/code&gt;.&lt;/li&gt;
+&lt;li&gt;When creating your &lt;span class="caps"&gt;VM&lt;/span&gt;, you&amp;#8217;ll have an option to select Use an
+    Existing Virtual Disk. Use that option, and select the file created
+    in the last&amp;nbsp;step.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Once that&amp;#8217;s done, and you&amp;#8217;ve setup the &lt;span class="caps"&gt;VM&lt;/span&gt; with the raw disk, boot the &lt;span class="caps"&gt;VM&lt;/span&gt;
+(should boot to the Vyatta LiveCD), login as usual for an install
+(vyatta:vyatta), and the the fun&amp;nbsp;begins:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;At the prompt after logging in, &lt;code&gt;sudo su -&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;Edit &lt;code&gt;/opt/vyatta/sbin/install-system&lt;/code&gt; (hint: Vyatta has nano and vi
+    installed. &lt;code&gt;nano -c filename&lt;/code&gt; shows line numbers) and change the
+    &lt;code&gt;ROOT_FSTYPE&lt;/code&gt; variable (line 78 in &lt;span class="caps"&gt;VC6&lt;/span&gt;.3) from &amp;#8220;ext4&amp;#8221; to&amp;nbsp;&amp;#8220;ext2&amp;#8221;.&lt;/li&gt;
+&lt;li&gt;Run &lt;code&gt;install-system&lt;/code&gt;. I used all default options (including one
+    partition) and it seemed to work fine. It took a minute or two to
+    create the ext2 filesystem on my &lt;span class="caps"&gt;2GB&lt;/span&gt; &lt;span class="caps"&gt;CF&lt;/span&gt;&amp;nbsp;card.&lt;/li&gt;
+&lt;li&gt;The file copy took even longer&amp;#8230; so be patient, or have a book&amp;nbsp;handy.&lt;/li&gt;
+&lt;li&gt;When system-install finishes and you get the root prompt back,
+    before rebooting, continue with some minor&amp;nbsp;tweaks:&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;mkdir /mnt/temp&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;mount /dev/sda1 /mnt/temp&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;cd /mnt/temp&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;Edit &lt;code&gt;boot/grub/grub.cfg&lt;/code&gt; and change all occurrences of
+    &amp;#8220;root=&lt;span class="caps"&gt;UUID&lt;/span&gt;=&amp;#8230;&amp;#8221; entries for the &amp;#8220;linux&amp;#8221; lines (lines 13, 18, 23, 28
+    in my grub.cfg) to &amp;#8220;root=/dev/sda1&amp;#8221;. My only real reason for this
+    change is so that I can move my altered config files (config.boot,
+    fstab and grub.cfg) with minimal changes when I upgrade or make a
+    different vyatta &lt;span class="caps"&gt;CF&lt;/span&gt; card, without having to update the &lt;span class="caps"&gt;UUID&lt;/span&gt; for the
+    new&amp;nbsp;partition.&lt;/li&gt;
+&lt;li&gt;Edit &lt;code&gt;etc/fstab&lt;/code&gt; and change the &amp;#8220;&lt;span class="caps"&gt;UUID&lt;/span&gt;=&amp;#8230;&amp;#8221; device to&amp;nbsp;&amp;#8221;/dev/sda1&amp;#8221;.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;shutdown&lt;/code&gt;. Once the &lt;span class="caps"&gt;VM&lt;/span&gt; is stopped, you can remove the &lt;span class="caps"&gt;CF&lt;/span&gt;&amp;nbsp;card.&lt;/li&gt;
+&lt;li&gt;The PCEngines Alix.2 boards use a default serial console speed of
+    38400 baud. Pretty much every network device, plus Linux and Vyatta,
+    use a default speed of 9600 baud. Once I got the &lt;span class="caps"&gt;CF&lt;/span&gt; card installed
+    in the Alix board and hooked it up to my laptop (null modem cable to
+    a &lt;span class="caps"&gt;PL&lt;/span&gt;-2303 based &lt;span class="caps"&gt;USB&lt;/span&gt; to serial adapter, minicom for terminal
+    emulation), I set my terminal emulator to 38400 8N1, powered the
+    board, and then pressed &amp;#8216;s&amp;#8217; during &lt;span class="caps"&gt;POST&lt;/span&gt; to get into &lt;span class="caps"&gt;BIOS&lt;/span&gt; settings.
+    Option &amp;#8216;9&amp;#8217; sets the Alix to 9600 baud, &amp;#8216;Q&amp;#8217; to quit, and &amp;#8216;Y&amp;#8217; to save
+    changes permanently. The board will reboot, and once the terminal
+    emulator is set back to 9600 baud, serial console should work fine
+    both in &lt;span class="caps"&gt;BIOS&lt;/span&gt; and in the&amp;nbsp;&lt;span class="caps"&gt;OS&lt;/span&gt;.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;If all worked well, you should be able to boot into Vyatta and login as
+the default &amp;#8220;vyatta&amp;#8221; user (which you set a password for during the
+install). Assuming you know your way around Vyatta, it&amp;#8217;s pretty standard
+from here, though there are a few things you may want to check or
+configure right&amp;nbsp;away:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;In configuration mode (&lt;code&gt;configure&lt;/code&gt;) run &lt;code&gt;show interfaces&lt;/code&gt;. All of
+    your physical ethernet interfaces should appear, along with their
+    &lt;span class="caps"&gt;MAC&lt;/span&gt;&amp;nbsp;addresses.&lt;/li&gt;
+&lt;li&gt;Some changes to reduce the number of log writes to the &lt;span class="caps"&gt;CF&lt;/span&gt; card:
+    &lt;code&gt;set system syslog console facility all level notice&lt;/code&gt; and
+    &lt;code&gt;set system syslog global facility protocols level notice&lt;/code&gt;.&lt;/li&gt;
+&lt;li&gt;Configure interfaces. with firewalls, &lt;span class="caps"&gt;IP&lt;/span&gt; addresses or &lt;span class="caps"&gt;DHCP&lt;/span&gt;,&amp;nbsp;etc.&lt;/li&gt;
+&lt;li&gt;Do whatever other configuration you need for a minimal system -
+    dhcp, dns, nat,&amp;nbsp;etc.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;And that&amp;#8217;s it - this should give you a working Vyatta system on &lt;span class="caps"&gt;CF&lt;/span&gt; on an
+Alix board. Stay tuned, hopefully in a month or so I&amp;#8217;ll get around to
+customizing it a bit more, based on the second blog entry linked&amp;nbsp;above.&lt;/p&gt;</summary><category term="alix"></category><category term="embedded"></category><category term="network"></category><category term="pcengines"></category><category term="router"></category><category term="vyatta"></category></entry><entry><title>Vyatta VC5 - Snort alerts to syslog</title><link href="http://newblog.jasonantman.com/2011/01/vyatta-vc5-snort-alerts-to-syslog/" rel="alternate"></link><updated>2011-01-30T19:54:00-05:00</updated><author><name>admin</name></author><id>tag:newblog.jasonantman.com,2011-01-30:2011/01/vyatta-vc5-snort-alerts-to-syslog/</id><summary type="html">&lt;p&gt;I&amp;#8217;m running a &lt;a href="http://www.vyatta.org"&gt;Vyatta&lt;/a&gt; vyatta router at home - in
+my opinion it&amp;#8217;s pretty near &amp;#8220;enterprise grade&amp;#8221;, and I&amp;#8217;m running the
+Community/Core (read: no-cost and almost all Free) on commodity hardware
+with great performance. Granted, I&amp;#8217;m still on the older version (5 as
+opposed to the current 6) since an upgrade will require total downtime
+and a spare set of &lt;span class="caps"&gt;SCSI&lt;/span&gt; disks for the machine it&amp;#8217;s on, but it still
+works quite well. Today I decided to enable the
+&lt;a href="http://www.snort.org"&gt;Snort&lt;/a&gt; &lt;span class="caps"&gt;IDS&lt;/span&gt; on the box. It actually worked quite
+well (albeit stuck at older rules until I upgrade to Vyatta &lt;span class="caps"&gt;VC6&lt;/span&gt;) and
+didn&amp;#8217;t put much more load on the box. For the time being I decided to
+just have it alert on problems and not drop anything, as I&amp;#8217;m getting
+pretty high false positives and the older Vyatta version doesn&amp;#8217;t seem to
+have a way to disregard&amp;nbsp;rules.&lt;/p&gt;
+&lt;p&gt;My biggest complaint was that Vyatta didn&amp;#8217;t see fit to allow alerts by
+syslog. I&amp;#8217;m not a big fan of keeping information like &lt;span class="caps"&gt;IDS&lt;/span&gt; logs stuck on
+the router - I don&amp;#8217;t like logging in to it any more than I have to, it
+doesn&amp;#8217;t have much storage, and I&amp;#8217;d also like to keep stuff like this in
+a more secure location. Through a bit of digging, I found the
+&lt;code&gt;/opt/vyatta/share/perl5/VyattaSnortConfig.pm&lt;/code&gt; Perl module which
+generates the Snort config file from Vyatta&amp;#8217;s &lt;span class="caps"&gt;CLI&lt;/span&gt; stuff. Looking through
+the Perl code, I found the definition of the snort.conf output&amp;nbsp;statements:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="k"&gt;my&lt;/span&gt; &lt;span class="nv"&gt;$output_def&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s"&gt;&amp;lt;&amp;lt;&lt;span class="caps"&gt;EOD&lt;/span&gt;;&lt;/span&gt;
+&lt;span class="s"&gt;  output alert_unified: alert, limit $log_limit&lt;/span&gt;
+&lt;span class="s"&gt;  output log_null&lt;/span&gt;
+&lt;span class="s"&gt;&lt;span class="caps"&gt;EOD&lt;/span&gt;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;I simply added a line &lt;code&gt;output alert_syslog: log_local3 log_notice&lt;/code&gt; after the &lt;code&gt;output alert_unified&lt;/code&gt; line.&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="k"&gt;my&lt;/span&gt; &lt;span class="nv"&gt;$output_def&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s"&gt;&amp;lt;&amp;lt;&lt;span class="caps"&gt;EOD&lt;/span&gt;;&lt;/span&gt;
+&lt;span class="s"&gt;  output alert_unified: alert, limit $log_limit&lt;/span&gt;
+&lt;span class="s"&gt;  output alert_syslog: log_local3 log_notice&lt;/span&gt;
+&lt;span class="s"&gt;  output log_null&lt;/span&gt;
+&lt;span class="s"&gt;&lt;span class="caps"&gt;EOD&lt;/span&gt;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;I then went into Vyatta configuration and changed a rule from alert to pass, committed,
+changed back, committed, and &lt;code&gt;/etc/snort/snort.conf&lt;/code&gt; now had my syslog lines. I&amp;#8217;m now 
+getting snort alerts to local3 in syslog, which is fed to my centralized log server. My
+next project is to find or write something which will parse these logs, generate a daily
+summary email, and maybe check them hourly and alert on any big changes. I also might just
+cron an emailing of the output from Vyatta&amp;#8217;s show ips summary command. So far I have over 11,000 events logged in about 12&amp;nbsp;hours.&lt;/p&gt;</summary><category term="security"></category><category term="snort"></category><category term="syslog"></category><category term="vyatta"></category></entry><entry><title>Daily Work - Nagios SNMP traps, Vyatta, JasonAntman.com upgrades</title><link href="http://newblog.jasonantman.com/2009/06/daily-work-nagios-snmp-traps-vyatta-jasonantmancom-upgrades/" rel="alternate"></link><updated>2009-06-27T01:03:00-04:00</updated><author><name>admin</name></author><id>tag:newblog.jasonantman.com,2009-06-27:2009/06/daily-work-nagios-snmp-traps-vyatta-jasonantmancom-upgrades/</id><summary type="html">&lt;p&gt;So it&amp;#8217;s been a very busy day. I was up until 5 &lt;span class="caps"&gt;AM&lt;/span&gt; or so working on
+implementing &lt;a href="http://reductivelabs.com/trac/puppet/"&gt;Puppet&lt;/a&gt; at home.
+I&amp;#8217;m building two new boxes - a storage (centralized home
+directory)/syslog (to MySQL) server and a second web server (possibly
+also to handle Nagios) - and I decided that they&amp;#8217;ll be totally built by
+Puppet. The only thing I had to give up on was setting up the &lt;span class="caps"&gt;NFS&lt;/span&gt; share
+for my home directory on the new storage box and installing and testing
+&lt;a href="http://www.rsyslog.com/"&gt;rsyslog&lt;/a&gt; on&amp;nbsp;it.&lt;/p&gt;
+&lt;p&gt;This afternoon around 7, I started on my weekend projects for &lt;a href="http://www.midlandparkambulance.com"&gt;the
+ambulance corps&lt;/a&gt; - setting up
+&lt;a href="http://www.nagios.org"&gt;Nagios&lt;/a&gt; to receive &lt;span class="caps"&gt;SNMP&lt;/span&gt; traps from the &lt;span class="caps"&gt;APC&lt;/span&gt; &lt;span class="caps"&gt;UPS&lt;/span&gt;
+and moving over to the new &lt;a href="http://www.vyatta.org"&gt;Vyatta&lt;/a&gt;-based router
+(from &lt;a href="http://m0n0.ch/wall/"&gt;m0n0wall&lt;/a&gt;). I&amp;#8217;d attempted the router
+before, but had to rollback - I&amp;#8217;m using an old
+&lt;a href="http://www.bluesocket.com/"&gt;BlueSocket&lt;/a&gt; controller for hardware - it&amp;#8217;s
+just a nice black 1U enclosure with a stock Intel motherboard, &lt;span class="caps"&gt;20GB&lt;/span&gt; &lt;span class="caps"&gt;HDD&lt;/span&gt;,
+&lt;span class="caps"&gt;512MB&lt;/span&gt; &lt;span class="caps"&gt;RAM&lt;/span&gt; and three 10/100 NICs. The first time, I was unable to get
+link on either of the two NICs I was using, so I decided to&amp;nbsp;rollback.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Nagios &lt;span class="caps"&gt;SNMP&lt;/span&gt;&amp;nbsp;Traps&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;I found a good starting point for Nagios &lt;span class="caps"&gt;SNMP&lt;/span&gt; traps on the &lt;a href="http://altinity.blogs.com/dotorg/2006/03/lessons_in_snmp.html"&gt;OpsView
+blog&lt;/a&gt;. I
+setup `snmptrapd` on the Nagios server and hacked together a little
+Python script to just write all of the traps to a file. After some
+testing with `snmptrap` on my laptop, I did a test by pulling the
+power plug of the &lt;span class="caps"&gt;UPS&lt;/span&gt;, waiting about 30 seconds, and then plugging it
+back in. Sure enough, the little old &lt;a href="/2007/03/apc-ap9605-powernet-snmp-card/"&gt;&lt;span class="caps"&gt;AP9605&lt;/span&gt; PowerNet &lt;span class="caps"&gt;SNMP&lt;/span&gt;
+card&lt;/a&gt;
+generated two &lt;span class="caps"&gt;SNMP&lt;/span&gt; traps - one for power loss and one for power regained
+- both of which showed up in the test&amp;nbsp;file&lt;/p&gt;
+&lt;p&gt;The next step will be deciding how to get the traps into Nagios -
+specifically whether I want to go with something heavy-weight, like
+&lt;a href="http://snmptt.sourceforge.net/"&gt;SNMPtt&lt;/a&gt; that can handle other devices,
+or whether I want to code a simple script myself just to deal with the
+&lt;span class="caps"&gt;APC&lt;/span&gt;&amp;nbsp;cards.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Router&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;The main reason why I wanted to make the switch from m0n0 to Vyatta was
+to ease the setup and maintenance of an IPsec tunnel from the ambulance
+&lt;span class="caps"&gt;HQ&lt;/span&gt; to my house, so I could push backups (relatively small) over the &lt;span class="caps"&gt;WAN&lt;/span&gt;
+to my infrastructure (or, rather, have Bacula pull the backups). Another
+big bonus was finally having a way of configuring and checking things
+through &lt;span class="caps"&gt;SSH&lt;/span&gt; without having to port-forward a web &lt;span class="caps"&gt;GUI&lt;/span&gt;. Another bonus of
+having a real Linux system under the router is the ability to make
+custom Nagios check scripts and easily execute them. Something I hadn&amp;#8217;t
+thought of - but became obvious during the switchover - is the ability
+to run full-fledged `tcpdump` on the router&amp;nbsp;itself.&lt;/p&gt;
+&lt;p&gt;After building the new config myself, and confirming that the system ran
+in isolation, I moved it over to production. The first issue was a bit
+of a thinko on my part - the interfaces on the &lt;span class="caps"&gt;BSC&lt;/span&gt; are actually arranged
+on the back of the box like eth0&amp;#8212;&amp;#8212;-eth2&amp;#8212;&amp;#8212;-eth1, so I originally had
+the &lt;span class="caps"&gt;LAN&lt;/span&gt; uplink in the wrong interface. After correcting that and waiting
+for the network to stabilize, I noticed a total external connectivity
+failure. After some troubleshooting - thanks to tcpdump on the router -
+it occurred to me that the (ancient) cable modem needs to be rebooted
+when the router &lt;span class="caps"&gt;MAC&lt;/span&gt;&amp;nbsp;changes.&lt;/p&gt;
+&lt;p&gt;I honestly don&amp;#8217;t remember the other problems that I ran into, but
+eventually I ended up getting almost-full functionality - and then a
+total network outage. A tcpdump on my laptop showed some really really
+weird &lt;span class="caps"&gt;BOOTP&lt;/span&gt; traffic with addresses of 255.255.255.255. After doing some
+troubleshooting and monitoring port counters on the switch, I narrowed
+it down to coming from a single Windows box and the wireless access
+point. After shutting off both ports, things seemed to stabilize. I also
+had some &amp;#8220;martian address&amp;#8221; issues with one of the boxes, but decided to
+roll the box and that solved&amp;nbsp;it.&lt;/p&gt;
+&lt;p&gt;Over the next day or so, I&amp;#8217;ll be reconfiguring Nagios both at home and
+at the ambulance corps to cope with the changes and add in the requisite
+monitoring, and keep an eye on things. Assuming all goes well, I&amp;#8217;ll
+power down the old router on&amp;nbsp;Sunday.&lt;/p&gt;
+&lt;p&gt;On the home front, I&amp;#8217;ve moved over from my old storage machine to the
+old one - essentially just the &lt;span class="caps"&gt;NFS&lt;/span&gt; mount, and moved over a tarball of
+everything else. I also added a 1000Base-&lt;span class="caps"&gt;SX&lt;/span&gt; card to the new box, though
+it appears that I&amp;#8217;m out of fiber patch cords. The old storage box was
+brought down for the first time in about 3 years (aside from brief
+outages for hardware upgrades or array rebuilds). Assuming I got
+everything off of it, it will be relegated to the spares&amp;nbsp;pile.&lt;/p&gt;
+&lt;p&gt;I&amp;#8217;m going to make a serious effort to post on a daily basis, if only for
+my own future reference. I should have the demo of
+&lt;a href="http://rackman.jasonantman.com"&gt;RackMan&lt;/a&gt; out soon, and I&amp;#8217;m also about
+to start on integrating it with Nathan Hubbard&amp;#8217;s
+&lt;a href="http://www.machdb.org/"&gt;MachDB&lt;/a&gt; as well as a &lt;span class="caps"&gt;PHP&lt;/span&gt; script I wrote to pull
+port names and MACs from Cisco switches and associate them with NICs in
+machines. Hopefully I&amp;#8217;ll also have some interesting Puppet stuff out&amp;nbsp;soon.&lt;/p&gt;</summary><category term="apc"></category><category term="bluesocket"></category><category term="Nagios"></category><category term="snmp"></category><category term="vyatta"></category></entry><entry><title>Big Changes to JasonAntman.com</title><link href="http://newblog.jasonantman.com/2009/03/big-changes-to-jasonantmancom/" rel="alternate"></link><updated>2009-03-05T10:22:00-05:00</updated><author><name>admin</name></author><id>tag:newblog.jasonantman.com,2009-03-05:2009/03/big-changes-to-jasonantmancom/</id><summary type="html">&lt;p&gt;Well, I finally broke down and ordered Optimum Business. Come tomorrow,
+I&amp;#8217;ll be moving from Verizon FiOS residential with a dynamic &lt;span class="caps"&gt;IP&lt;/span&gt;, much
+blocked (hence jantman.dyndns.org:10011) and 10Mbps down/2Mbps up to
+Optimum Business with 30 down/5 up, a block of 5 static IPs, and no
+blocked&amp;nbsp;ports.&lt;/p&gt;
+&lt;p&gt;It&amp;#8217;s going to be a crazy weekend. Probably not the best thing the week
+before midterms, but oh well. Tomorrow morning I&amp;#8217;m picking up a 42U rack
+for home to replace the Sears shelving unit my boxes are currently on.
+Cablevision is supposed to be here between 2-5 &lt;span class="caps"&gt;PM&lt;/span&gt; to do the install
+(yes, they insist that for Business they do the install, even though
+it&amp;#8217;s only a 4-foot coax run from the first splitter to the demarc). I&amp;#8217;ve
+got &lt;a href="http://www.vyatta.org"&gt;Vyatta&lt;/a&gt; &lt;span class="caps"&gt;CE5&lt;/span&gt; Beta installed on a &lt;a href="http://h18000.www1.hp.com/products/quickspecs/11049_na/11049_na.HTML"&gt;Proliant
+&lt;span class="caps"&gt;DL360G2&lt;/span&gt;&lt;/a&gt;
+as the new router, ready to go (after some configuration). I&amp;#8217;ll probably
+keep FiOS up until I know the new router is working correctly (I&amp;#8217;ll do a
+test on my management&amp;nbsp;&lt;span class="caps"&gt;VLAN&lt;/span&gt;).&lt;/p&gt;
+&lt;p&gt;Once Optimum and the new router is up, the fun&amp;nbsp;starts:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Forward the appropriate ports on the new router, including 80 (in
+    addition to&amp;nbsp;10011).&lt;/li&gt;
+&lt;li&gt;Bring the old router down and make sure the new one is up,
+    operational, and forwarding all the right&amp;nbsp;ports.&lt;/li&gt;
+&lt;li&gt;Update DynDNS to point to the first &lt;span class="caps"&gt;IP&lt;/span&gt;, used as a catch-all for old
+    DynDNS&amp;nbsp;links.&lt;/li&gt;
+&lt;li&gt;Begin assignment of the 5 IPs (everything will be behind &lt;span class="caps"&gt;NAT&lt;/span&gt;) based
+    on a list of what hosts need valid reverse &lt;span class="caps"&gt;DNS&lt;/span&gt;, and then adding
+    other ports (NATed) as&amp;nbsp;needed.&lt;/li&gt;
+&lt;li&gt;Update &lt;span class="caps"&gt;DNS&lt;/span&gt; for JasonAntman.com and the other&amp;nbsp;domains.&lt;/li&gt;
+&lt;li&gt;Update Optimum reverse&amp;nbsp;&lt;span class="caps"&gt;DNS&lt;/span&gt;.&lt;/li&gt;
+&lt;li&gt;Ensure that everything works as planned, &lt;span class="caps"&gt;DNS&lt;/span&gt; is up, ports are
+    forwarded, and everything is as before (at least in terms of&amp;nbsp;&lt;span class="caps"&gt;HTTP&lt;/span&gt;).&lt;/li&gt;
+&lt;li&gt;Once &lt;span class="caps"&gt;DNS&lt;/span&gt; is up, reconfigure Apache to have a vhost handling any
+    legacy requests to port 10011 and rewrite them to&amp;nbsp;www.jasonantman.com.&lt;/li&gt;
+&lt;li&gt;Setup a vhost for &amp;#8216;www&amp;#8217; that takes URLs that used to be
+    subdirectories (i.e. www.jasonantman.com/blog) and rewrites them to
+    requests for the appropriate subdomain. Simultaneously move
+    everything from the default vhost to name-based&amp;nbsp;vhosts.&lt;/li&gt;
+&lt;li&gt;Ensure that old jantman.dyndns.org:10011 requests are being
+    redirected properly, and requests for subdirectories under the web
+    root are going to the right&amp;nbsp;subdomain.&lt;/li&gt;
+&lt;li&gt;Check that this all works acceptably with the existing
+    blogger-to-wordpress rewrite&amp;nbsp;script.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Finally&lt;/strong&gt; start rolling out some of the new services that I had
+    waiting for the new&amp;nbsp;connection.&lt;/li&gt;
+&lt;li&gt;Start the arduous process of reconfiguring my mail server, moving
+    from Fetchmail from Verizon to an actual mail server, make
+    everything work, and make sure my IPs aren&amp;#8217;t&amp;nbsp;blacklisted.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Ugh.&lt;/strong&gt; Find anywhere in the entire &amp;#8216;net where my old @verizon.net
+    address appeared (especially GoDaddy, DynDNS, other important stuff)
+    and change it to the new jasonantman.com&amp;nbsp;address.&lt;/li&gt;
+&lt;li&gt;Since this is all in my mother&amp;#8217;s basement (there&amp;#8217;s nothing like a
+    mother&amp;#8217;s love, especially when it comes to a constant hum emanating
+    from the ground level of a house), figure out what to do for her
+    when the verizon.net email goes&amp;nbsp;away.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;So I might have some downtime this weekend, but when things come back
+up, I&amp;#8217;ll be done with this DynDNS and Port 10011&amp;nbsp;crap.&lt;/p&gt;</summary><category term="fios"></category><category term="optimum"></category><category term="vyatta"></category></entry><entry><title>Vyatta Initial Impressions</title><link href="http://newblog.jasonantman.com/2009/02/vyatta-initial-impressions/" rel="alternate"></link><updated>2009-02-26T10:06:00-05:00</updated><author><name>admin</name></author><id>tag:newblog.jasonantman.com,2009-02-26:2009/02/vyatta-initial-impressions/</id><summary type="html">&lt;p&gt;I&amp;#8217;m part-way through the major overhaul of my home network (hosting this
+blog and everything else jasonantman.com) that I&amp;#8217;ve been planning for
+quite some time. The current hardware is&amp;#8230; uh&amp;#8230; currently&amp;#8230; described
+on my Hardware
+page, but I soon plan on ditching the wiki and moving to a &lt;span class="caps"&gt;CMS&lt;/span&gt; for my
+entire&amp;nbsp;site.&lt;/p&gt;
+&lt;p&gt;Anyway, so far I&amp;#8217;ve decommissioned my aged &lt;span class="caps"&gt;HP&lt;/span&gt; ProCurve 2424M switch
+and replaced it with used but less-aged Cisco 2948G from &lt;a href="http://horizondatacom.com/"&gt;Horizon
+Datacom&lt;/a&gt; (purchased on Ebay). Quite an
+upgrade. In order to handle network backups a little better, I&amp;#8217;m also
+adding a Cisco 4912G 12-port Gigabit (&lt;span class="caps"&gt;GBIC&lt;/span&gt;) aggregation switch for the
+administrative/backup &lt;span class="caps"&gt;VLAN&lt;/span&gt; - though this was purchased via ebay from
+&lt;a href="http://stores.ebay.com/RedApe-Technologies"&gt;RedApe Technologies&lt;/a&gt; in &lt;span class="caps"&gt;PA&lt;/span&gt;.
+The switch came with 12 &lt;span class="caps"&gt;1000BASE&lt;/span&gt;-&lt;span class="caps"&gt;SX&lt;/span&gt; GBICs, and I plan to do a mix of
+copper (&lt;span class="caps"&gt;1000BASE&lt;/span&gt;-T) where it&amp;#8217;s already available (onboard NICs) and
+&lt;span class="caps"&gt;1000BASE&lt;/span&gt;-&lt;span class="caps"&gt;SX&lt;/span&gt; where there&amp;#8217;s enough room in the box for a&amp;nbsp;card.&lt;/p&gt;
+&lt;p&gt;On the hardware side, I also have 2 new boxes - a set of &lt;span class="caps"&gt;HP&lt;/span&gt; Proliant
+&lt;a href="http://h18000.www1.hp.com/products/quickspecs/11049_na/11049_na.HTML"&gt;&lt;span class="caps"&gt;DL360&lt;/span&gt;
+G2&lt;/a&gt;&amp;#8216;s
+from &lt;a href="http://www.mjsglobal.com/"&gt;&lt;span class="caps"&gt;MJS&lt;/span&gt; Global&lt;/a&gt;, who I&amp;#8217;ve done business
+with before. The prices were great, and though one of them showed up
+with a faulty temperature sensor that prevents boot, &lt;span class="caps"&gt;MJS&lt;/span&gt; has been
+wonderful and is shipping me a replacement motherboard. One of the boxes
+will be running &lt;a href="http://www.vyatta.org/"&gt;Vyatta&lt;/a&gt; (vee-&lt;span class="caps"&gt;AH&lt;/span&gt;-tha) &lt;span class="caps"&gt;VC5&lt;/span&gt;
+router/firewall software, and the other will be a new services box
+running internal &lt;span class="caps"&gt;DNS&lt;/span&gt;, &lt;span class="caps"&gt;DHCP&lt;/span&gt;, &lt;span class="caps"&gt;NTP&lt;/span&gt;, and whatever&amp;nbsp;else.&lt;/p&gt;
+&lt;p&gt;On the hardware side, I&amp;#8217;m also planning some extended downtime a few
+weekends from now, when I should finally have a 42U rack to replace the
+Sears shelves my equipment is now on. It&amp;#8217;ll be a fun-filled evening of
+racking equipment and re-patching everything. Also, hopefully within a
+few weeks, I&amp;#8217;ll be moving my &lt;span class="caps"&gt;WAN&lt;/span&gt; pipe from Verizon FiOS residential to
+Optimum Business, which is essentially re-packaged residential but
+provides 5 static IPs, no blocked ports, and 30 Mbps down/5 Mbps&amp;nbsp;up.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Vyatta&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;When planning this upgrade, I think I looked at every open source router
+package out there, as well as some of the lower-end or older Cisco
+models. I&amp;#8217;m currently running &lt;a href="http://www.ipcop.org/"&gt;IPcop&lt;/a&gt;, which does
+everything I need except it doesn&amp;#8217;t handle multiple &lt;span class="caps"&gt;WAN&lt;/span&gt; IPs, and all
+configuration is via a web interface - which means every time I want to
+make a change remotely (and during the week I&amp;#8217;m not home) I have to
+forward &lt;span class="caps"&gt;HTTPS&lt;/span&gt; over &lt;span class="caps"&gt;SSH&lt;/span&gt;. After doing an extensive feature comparison, I
+ended up narrowing it down to a relative newcomer - Vyatta. Though I
+don&amp;#8217;t know how much of it is marketing hype, they are targeted squarely
+at Cisco, and provide relatively enterprise-level features; a
+JunOS-based &lt;span class="caps"&gt;CLI&lt;/span&gt;, &lt;span class="caps"&gt;BGP&lt;/span&gt;, &lt;span class="caps"&gt;OSPF&lt;/span&gt;, and all of the other important&amp;nbsp;stuff.&lt;/p&gt;
+&lt;p&gt;Yesterday I attempted an install of Vyatta &lt;span class="caps"&gt;CE&lt;/span&gt; 5 Beta on one of the
+&lt;span class="caps"&gt;DL360G2&lt;/span&gt;&amp;#8217;s. The only real problem that I found was the install script
+doesn&amp;#8217;t support &lt;span class="caps"&gt;CCISS&lt;/span&gt; drives, as found in the Proliants, but a few
+manual hacks to the script fixed that. By far the best thing about
+Vyatta is it&amp;#8217;s based on vanilla Debian Lenny, and full root shell access
+is available, so modifying the install script - or even adding
+non-Vyatta packages - is a cinch. I haven&amp;#8217;t really played around with it
+too much, but it appears to be a wonderful mix of Linux and an
+enterprise router &lt;span class="caps"&gt;CLI&lt;/span&gt;. While root has a full &lt;span class="caps"&gt;BASH&lt;/span&gt; shell, and the Vyata
+commands are all done as shell aliases (so users still have access to
+shell primitives and &lt;span class="caps"&gt;OS&lt;/span&gt; commands), configuration is accomplished via a
+JunOS-like command set. You still get &amp;#8220;commit&amp;#8221; and &amp;#8220;rollback&amp;#8221; in config
+mode, and can still do fun things like save and load configs to/from
+tftp, ftp and &lt;em&gt;http&lt;/em&gt;. On the other hand, I doubt I&amp;#8217;ll do config backups
+that way since I can just use scp or&amp;nbsp;sftp.&lt;/p&gt;
+&lt;p&gt;The Vyatta box will probably go home this weekend, and get hooked up to
+the network for config-only use (and I can always get in via iLO on the
+hardware) and hopefully come up sometime in the next few&amp;nbsp;weeks.&lt;/p&gt;
+&lt;p&gt;At this point, the most daunting task is figuring out how to get all of
+the existing links to my site to work - since jantman.dyndns.org will be
+legacy, and most of the site structure will probably change to use
+name-based vhosts. Lately I&amp;#8217;ve been trying to use the real subdomains in
+all of my public links, so the transition (planned for a while) will
+work, but I&amp;#8217;m sure there are still plenty of links out there that will
+need dealing with (maybe keep port 10011 serving &lt;span class="caps"&gt;HTTP&lt;/span&gt; with a massive
+mod_rewrite script to redirect to the right place???), as well as
+checking everything on the web server to make sure there aren&amp;#8217;t any
+absolute URLs (like&amp;nbsp;WordPress).&lt;/p&gt;</summary><category term="cisco"></category><category term="networking"></category><category term="router"></category><category term="vyatta"></category></entry></feed>

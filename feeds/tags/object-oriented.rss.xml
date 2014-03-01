@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Jason Antman's Blog</title><link>http://newblog.jasonantman.com/</link><description></description><atom:link href="http://newblog.jasonantman.com/feeds/tags/object-oriented.rss.xml" rel="self"></atom:link><lastBuildDate>Wed, 21 Feb 2007 16:27:00 -0500</lastBuildDate><item><title>Relational / Object-Oriented Asset Management</title><link>http://newblog.jasonantman.com/2007/02/relational-object-oriented-asset-management/</link><description>&lt;p&gt;I just purchased four new servers, and set out to find some good asset
+management software. Specifically, I&amp;#8217;m looking for a &lt;span class="caps"&gt;PHP&lt;/span&gt; package that
+allows me to track the details of all of my hardware. While software and
+configuration tracking would surely be good for some applications, I
+already have a package to handle&amp;nbsp;that.&lt;/p&gt;
+&lt;p&gt;I searched a few popular sites, including SourceForge, and came up with
+a dozen or so possibilities that looked good. They varied in level of
+detail and features, but all had one common failure - they lack an
+object-oriented or relational approach. What do I mean by that? Most of
+them are designed so that you enter data in a form, it goes into a
+database, and exists just as a table of data. Devices, networks, etc.
+exist&amp;nbsp;independently.&lt;/p&gt;
+&lt;p&gt;What do I want? An object-oriented approach that can handle
+relationships between objects, and hierarchies. Lets design a few
+objects as examples: We&amp;#8217;ll have Networks, Servers, Interfaces, Switches,
+Hard Drives, and UPSs. They each represent the real-world hardware. An
+interface, for our purposes, will be a physical way of connecting two
+devices - an &lt;span class="caps"&gt;NIC&lt;/span&gt;, serial line,&amp;nbsp;etc.&lt;/p&gt;
+&lt;p&gt;If you&amp;#8217;re experienced in object-oriented programming, you can think of
+relationships as inheritance, with an added capability of other&amp;nbsp;references.&lt;/p&gt;
+&lt;p&gt;Our Server object will represent a real-world server. It has components
+(other objects) such as Interfaces, Hard Drives, and&amp;nbsp;others.&lt;/p&gt;
+&lt;p&gt;How does this all pull&amp;nbsp;together?&lt;/p&gt;
+&lt;p&gt;We define, in our asset management software, a Server which has one
+Interface (Ethernet &lt;span class="caps"&gt;NIC&lt;/span&gt; called &amp;#8220;&lt;span class="caps"&gt;NIC1&lt;/span&gt;&amp;#8221;) and three Hard Drives (called
+&lt;span class="caps"&gt;HDD1&lt;/span&gt;-&lt;span class="caps"&gt;HDD3&lt;/span&gt;). The Interface, in turn belongs to a Network (&lt;span class="caps"&gt;LAN&lt;/span&gt;/&lt;span class="caps"&gt;VLAN&lt;/span&gt;), and
+has a field called &amp;#8220;connection&amp;#8221; which references a Interface of a Switch
+object, specifically Interface &amp;#8220;Port1&amp;#8221; on Switch &amp;#8220;Switch1&amp;#8221;. We&amp;#8217;ll define
+one Network called &amp;#8220;&lt;span class="caps"&gt;LAN&lt;/span&gt;&amp;#8221; which is identified by the 192.168.0 &lt;span class="caps"&gt;IP&lt;/span&gt; range
+(a field of the Network object). We create a Switch object, which
+belongs to &lt;span class="caps"&gt;LAN&lt;/span&gt;, has &lt;span class="caps"&gt;IP&lt;/span&gt; 192.168.0.2, and has 24 Interfaces, called
+&amp;#8220;Port1&amp;#8221; through &amp;#8220;Port24&amp;#8221;. This represents a BayStack 450-24T Ethernet
+switch. We&amp;#8217;ll also define a &lt;span class="caps"&gt;UPS&lt;/span&gt; called &amp;#8220;SmartUPS&amp;#8221;, which in turn has an
+Interface which is part of &amp;#8220;&lt;span class="caps"&gt;LAN&lt;/span&gt;&amp;#8221;, Connected to Switch1 on&amp;nbsp;Port21.&lt;/p&gt;
+&lt;p&gt;Now, you see the concept beginning to emerge. We have, in essence, an
+inter-related mesh of objects representing physical hardware and its&amp;#8217;
+properties. This can all be thought of in a three-dimensional form,
+which represents the connections and relationships in our&amp;nbsp;network.&lt;/p&gt;
+&lt;p&gt;The main two advantages of this approach&amp;nbsp;are:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;The ability to quickly recognize relationships between objects. If,
+for example, we looked at a summary page in Switch1, we would see a
+number of static fields describing its properties (manufacturer, model,
+&lt;span class="caps"&gt;IP&lt;/span&gt;, &lt;span class="caps"&gt;MAC&lt;/span&gt;, etc.) as well as a diagram of its&amp;#8217; relationships. Such a
+diagram would look something&amp;nbsp;like:&lt;/li&gt;
+&lt;/ol&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;Port1  -&amp;gt; NIC1 -&amp;gt; Server1
+Port21 -&amp;gt; SmartSlotCard1 -&amp;gt; UPS1
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;It would also have a listing of Networks which this device is a member
+of,&amp;nbsp;specifically:&lt;/p&gt;
+&lt;p&gt;&lt;span class="caps"&gt;LAN&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;In practice, on a web interface, each one of these entries would be a
+link to that object&amp;#8217;s summary. Clicking on &lt;span class="caps"&gt;LAN&lt;/span&gt;, &lt;span class="caps"&gt;UPS1&lt;/span&gt;, Server1, etc.
+would show us the summary of that object, so that we can browse through
+our physical network. Clicking on &lt;span class="caps"&gt;LAN&lt;/span&gt;, for example, would show &lt;span class="caps"&gt;LAN&lt;/span&gt;&amp;#8217;s
+properties, as well as all devices that are members of &lt;span class="caps"&gt;LAN&lt;/span&gt; (related to&amp;nbsp;it).&lt;/p&gt;
+&lt;p&gt;The power of such an approach also relies on binding objects to specific
+pieces of hardware. For example, the disk drives in Server1 (&lt;span class="caps"&gt;HDD1&lt;/span&gt;, &lt;span class="caps"&gt;HDD2&lt;/span&gt;,
+&lt;span class="caps"&gt;HDD3&lt;/span&gt;) would in turn be references to objects representing actual
+physical assets. We can then move these assets around. For example,
+let&amp;#8217;s say that we assign a unique serial number of 000306 at a physical
+hard drive. We now create an object for it, and reference &lt;span class="caps"&gt;HDD3&lt;/span&gt; in
+Server1 to this object. If we reconfigure Server1 (physically) by
+removing &lt;span class="caps"&gt;HDD1&lt;/span&gt; (000306) and place it on a shelf, we could then edit
+Server1&amp;#8217;s &lt;span class="caps"&gt;HDD3&lt;/span&gt; object to be &amp;#8220;empty&amp;#8221;, and have 000306 reassigned to an
+object &amp;#8220;Shelf02&amp;#8221; that represents a physical storage location. By viewing
+the summary for Server1, we would see that &lt;span class="caps"&gt;HDD3&lt;/span&gt; is &amp;#8220;empty&amp;#8221;, but if we
+viewed Shelf02, we would see that 000306 is there, waiting to be used.
+When we add a server, Server2, we could assign 000306 to that server,
+as, say,&amp;nbsp;&lt;span class="caps"&gt;HDD2&lt;/span&gt;.&lt;/p&gt;
+&lt;p&gt;To give another example, &lt;span class="caps"&gt;UPS1&lt;/span&gt; is an uninterruptible power supply. We can
+&amp;#8220;assign&amp;#8221; devices to it, such as Switch1 and Server1. Viewing a summary
+for &lt;span class="caps"&gt;UPS1&lt;/span&gt; would show us that Switch1 and Server1 are connected to it.
+Similarly, viewing the summary for either Server1 or Switch1 would show
+us that they are connected to &lt;span class="caps"&gt;UPS1&lt;/span&gt;. If we add &lt;span class="caps"&gt;UPS2&lt;/span&gt;, we could simply edit
+the Server1 object so that it is connected to &lt;span class="caps"&gt;UPS2&lt;/span&gt;, and the &lt;span class="caps"&gt;UPS1&lt;/span&gt; and
+&lt;span class="caps"&gt;UPS2&lt;/span&gt; objects would show this change&amp;nbsp;automatically.&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Historical tracking. Every change would be accompanied by a person
+responsible, a date and time, a reason, and perhaps other information.
+Exactly how this would be implemented is not decided (whether
+relationships would be marked as &amp;#8216;deleted&amp;#8217; or whether changes would be
+held in a separate table in the database), but the idea is that any
+object would also contain a history of relationships. From our previous
+examples, if we viewed a summary of Server1, we would see that the
+connection to &lt;span class="caps"&gt;UPS1&lt;/span&gt; was severed on a specific date due to a reason such
+as &amp;#8220;overload&amp;#8221; and on that same date, the current connection to &lt;span class="caps"&gt;UPS2&lt;/span&gt; was
+established. Similarly, if we view the summary for &lt;span class="caps"&gt;HDD2&lt;/span&gt; on Server2, we
+would see that the object represents real-world hardware asset #000306.
+Viewing the summary for 000306 would show us that it is a 18.2 Gb &lt;span class="caps"&gt;SCSI&lt;/span&gt;
+drive in a Compaq hot-swap tray, and that it was originally installed in
+Server1, but moved on a certain date for a certain reason to Shelf02,
+and then later moved to&amp;nbsp;Server2.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;The implementation of this concept would most likely come about as a
+web-based &lt;span class="caps"&gt;PHP&lt;/span&gt; front-end with a MySQL database back-end. In order to
+achieve good functionality, there would be a simple interface with quick
+execution of common tasks. Most likely, the names I have used such as
+Server1, &lt;span class="caps"&gt;UPS1&lt;/span&gt;, &lt;span class="caps"&gt;HDD3&lt;/span&gt; on Server1, etc. would just be reference names to a
+real-world hardware object, and its&amp;#8217; data object representation,
+identified by a unique &lt;span class="caps"&gt;ID&lt;/span&gt;. For example, the name &lt;span class="caps"&gt;HDD3&lt;/span&gt; on Server1 would
+really just be a reference to 000306, a Hard Drive&amp;nbsp;object.&lt;/p&gt;
+&lt;p&gt;If we physically removed this drive from Server1 and placed it on
+Shelf02, we would browse to the Server1 page in our web interface, and
+click on &amp;#8220;&lt;span class="caps"&gt;HDD3&lt;/span&gt;&amp;#8221;, which would bring us to a page representing 000306. We
+could then click on a &amp;#8220;Move&amp;#8221; link, bringing us to a form. This allows us
+to enter our name, date and time, reason, etc. and a new location of
+&amp;#8220;Shelf02&amp;#8221;. We click submit and the move information is entered into a
+table, which references all associated objects - Server1, &lt;span class="caps"&gt;HDD3&lt;/span&gt; on
+Server1, 000306, Shelf02, etc. &lt;span class="caps"&gt;HDD3&lt;/span&gt; on Server1 has the reference to
+000306 removed, and a reference to a History object added. Shelf02 has a
+reference to the History object, as well as a reference to 000306,&amp;nbsp;added.&lt;/p&gt;
+&lt;p&gt;Now, viewing &lt;span class="caps"&gt;HDD3&lt;/span&gt; on Server1 would show that there is no physical device
+associated with it (empty), but would give a reference (link) to the
+000306 drive, the History entry for the removal, and the current
+location of 000306 on&amp;nbsp;Shelf02.&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Wed, 21 Feb 2007 16:27:00 -0500</pubDate><guid>tag:newblog.jasonantman.com,2007-02-21:2007/02/relational-object-oriented-asset-management/</guid><category>asset management</category><category>asset tracking</category><category>IT</category><category>object-oriented</category><category>relational</category></item></channel></rss>

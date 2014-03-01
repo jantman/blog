@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Jason Antman's Blog</title><link href="http://newblog.jasonantman.com/" rel="alternate"></link><link href="http://newblog.jasonantman.com/feeds/tags/rdp.atom.xml" rel="self"></link><id>http://newblog.jasonantman.com/</id><updated>2012-04-09T13:52:00-04:00</updated><entry><title>Adjusting the VirtualBox F12 BIOS Boot Prompt Timeout</title><link href="http://newblog.jasonantman.com/2012/04/adjusting-the-virtualbox-f12-bios-boot-prompt-timeout/" rel="alternate"></link><updated>2012-04-09T13:52:00-04:00</updated><author><name>admin</name></author><id>tag:newblog.jasonantman.com,2012-04-09:2012/04/adjusting-the-virtualbox-f12-bios-boot-prompt-timeout/</id><summary type="html">&lt;p&gt;I&amp;#8217;m working from home today, connected by &lt;span class="caps"&gt;VPN&lt;/span&gt;. I&amp;#8217;m in the process of
+testing a bunch of Puppet stuff, and needed to re-image a bunch of
+&lt;a href="https://www.virtualbox.org/"&gt;VirtualBox&lt;/a&gt; VMs on my desktop at work,
+using &lt;span class="caps"&gt;PXE&lt;/span&gt; boot to &lt;a href="https://fedorahosted.org/cobbler/"&gt;Cobbler&lt;/a&gt;. I&amp;#8217;m only
+connected to the desktop by &lt;span class="caps"&gt;SSH&lt;/span&gt;, and running the VMs with &lt;code&gt;VBoxHeadless&lt;/code&gt;
+and connecting to them via &lt;span class="caps"&gt;RDP&lt;/span&gt; (well, &lt;span class="caps"&gt;VRDP&lt;/span&gt;). The problem with this is
+that if I start a &lt;span class="caps"&gt;VM&lt;/span&gt; on my console window, then switch to my &lt;span class="caps"&gt;RDP&lt;/span&gt; client
+and connect, by the time the &lt;span class="caps"&gt;VM&lt;/span&gt; gets keyboard focus, it&amp;#8217;s already past
+the VBox &amp;#8220;Press F12 to select boot device&amp;#8221; prompt and booting from disk.
+I could modify the boot order on the &lt;span class="caps"&gt;VM&lt;/span&gt;, but then that becomes a pain
+when it reboots after the&amp;nbsp;install.&lt;/p&gt;
+&lt;p&gt;Thanks to some of the guys on the &lt;a href="https://www.virtualbox.org/wiki/IRC"&gt;VirtualBox &lt;span class="caps"&gt;IRC&lt;/span&gt;
+channel&lt;/a&gt;, I found out about the
+&lt;code&gt;--bioslogodisplaytime&lt;/code&gt; option for VMs, which controls the length of
+time (in milliseconds) that the boot splash screen is shown (the default
+value seems to be 0). It&amp;#8217;s included in the &lt;a href="http://www.virtualbox.org/manual/ch08.html#vboxmanage-modifyvm"&gt;reference guide to
+VBoxManage&lt;/a&gt;
+in the modifyvm section. Setting this to a value of 10 seconds or so, as
+shown below, is more than enough for me to start the &lt;span class="caps"&gt;VM&lt;/span&gt;, Alt-Tab to my
+&lt;span class="caps"&gt;RDP&lt;/span&gt; client, connect to the &lt;span class="caps"&gt;VM&lt;/span&gt;, and hit &amp;#8216;F12&amp;#8217; to select a one-time
+network&amp;nbsp;boot:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;VBoxManage modifyvm VMNAME --bioslogodisplaytime 10000
+&lt;/pre&gt;&lt;/div&gt;</summary><category term="provisioning"></category><category term="pxe"></category><category term="rdp"></category><category term="sysadmin"></category><category term="vbox"></category><category term="virtualbox"></category><category term="virtualization"></category><category term="vm"></category></entry><entry><title>Using VirtualBox Remotely</title><link href="http://newblog.jasonantman.com/2012/03/using-virtualbox-remotely/" rel="alternate"></link><updated>2012-03-09T12:00:00-05:00</updated><author><name>admin</name></author><id>tag:newblog.jasonantman.com,2012-03-09:2012/03/using-virtualbox-remotely/</id><summary type="html">&lt;p&gt;At work, I have a pretty beefy workstation (a Dell OptiPlex 990 with a
+3.4GHz Intel Core i7-2600 and &lt;span class="caps"&gt;8GB&lt;/span&gt; &lt;span class="caps"&gt;RAM&lt;/span&gt; running Fedora 16) that I usually
+run a few VMs on as my test/development environment. I usually reboot my
+machine every other week or so, and start VirtualBox and my VMs once the
+system boots. All of the VMs are Linux boxes, running test-only, so I
+never really cared about &lt;span class="caps"&gt;RDP&lt;/span&gt; or anything like that. Today I&amp;#8217;m working
+from home and need to setup a new development environment, so here&amp;#8217;s how
+to get VirtualBox working nicely assuming you&amp;#8217;ve never set it up for
+&lt;span class="caps"&gt;VRDP&lt;/span&gt; (its Virtual Remote Desktop Protocol) before, and have a network
+connection (&lt;span class="caps"&gt;LAN&lt;/span&gt; or &lt;span class="caps"&gt;VPN&lt;/span&gt; or something) to the machine running VirtualBox.
+I currently have VirtualBox &lt;span class="caps"&gt;OSE&lt;/span&gt; 4.1.8 installed from
+&lt;a href="http://nonfree.rpmfusion.org/"&gt;rpmfusion&lt;/a&gt; &lt;span class="caps"&gt;RPM&lt;/span&gt;. Most of this can be
+found in &lt;a href="http://www.virtualbox.org/manual/ch07.html"&gt;Chapter 7 of the VirtualBox
+manual&lt;/a&gt;, but here&amp;#8217;s a
+step-by-step&amp;nbsp;method.&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;First, download the Oracle (non-free) Oracle VirtualBox &lt;span class="caps"&gt;VM&lt;/span&gt; Extension
+Pack tarball from the &lt;a href="https://www.virtualbox.org/wiki/Downloads"&gt;VirtualBox Downloads
+Page&lt;/a&gt;, which provides &lt;span class="caps"&gt;VRDP&lt;/span&gt;
+support (as well as support for the virtual &lt;span class="caps"&gt;USB&lt;/span&gt; 2.0 device, Intel &lt;span class="caps"&gt;PXE&lt;/span&gt;
+Boot &lt;span class="caps"&gt;ROM&lt;/span&gt; support for the E1000 &lt;span class="caps"&gt;NIC&lt;/span&gt; driver, and experimental Linux host
+&lt;span class="caps"&gt;PCI&lt;/span&gt; passthrough suport). Then install it&amp;nbsp;using:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;sudo VBoxManage extpack install Oracle_VM_VirtualBox_Extension_Pack-4.1.8-75467.vbox-extpack
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Assuming you have an existing &lt;span class="caps"&gt;VM&lt;/span&gt; (you can list them using &lt;code&gt;VBoxManage list vms&lt;/code&gt;), enable &lt;span class="caps"&gt;VRDP&lt;/span&gt; support on&amp;nbsp;it:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;VBoxManage modifyvm &amp;quot;VM name&amp;quot; --vrde on
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;I like to assign specific ports to &lt;span class="caps"&gt;VRDP&lt;/span&gt; on each &lt;span class="caps"&gt;VM&lt;/span&gt; so I can &amp;#8220;bookmark&amp;#8221;
+them in my &lt;a href="http://kde.org/applications/internet/krdc/"&gt;&lt;span class="caps"&gt;KRDC&lt;/span&gt;&lt;/a&gt; client by
+&lt;span class="caps"&gt;VM&lt;/span&gt; name. I generally start with 10011, as the 10011-10049 range is both
+unassigned and doesn&amp;#8217;t appear in my &lt;code&gt;/etc/services&lt;/code&gt;:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;VBoxManage modifyvm &amp;quot;VM name&amp;quot; --vrdeport 10011
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Start the &lt;span class="caps"&gt;VM&lt;/span&gt;, using VBoxHeadless (shows more debugging/errors, but also
+stays in the foreground, so you&amp;#8217;ll want to use
+&lt;a href="http://www.gnu.org/software/screen/"&gt;screen&lt;/a&gt; or something like&amp;nbsp;it):&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;VBoxHeadless --startvm &amp;quot;VM name&amp;quot;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;If all went well, it should show some output including a confirmation
+that the &lt;span class="caps"&gt;VRDE&lt;/span&gt; server is running on the correct&amp;nbsp;port:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;Oracle VM VirtualBox Headless Interface 4.1.8_OSE
+(C) 2008-2012 Oracle Corporation
+All rights reserved.
+
+VRDE server is listening on port 3389.
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;That&amp;#8217;s it. Assuming you&amp;#8217;re using something like
+&lt;a href="http://www.gnu.org/software/screen/"&gt;screen&lt;/a&gt;, you can start a whole
+bunch of new VMs, and still keep the VBoxHeadless output in case of an&amp;nbsp;error.&lt;/p&gt;</summary><category term="rdp"></category><category term="virtualbox"></category><category term="virtualization"></category><category term="vm"></category></entry></feed>

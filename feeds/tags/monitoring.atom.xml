@@ -1,0 +1,973 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Jason Antman's Blog</title><link href="http://newblog.jasonantman.com/" rel="alternate"></link><link href="http://newblog.jasonantman.com/feeds/tags/monitoring.atom.xml" rel="self"></link><id>http://newblog.jasonantman.com/</id><updated>2012-07-07T06:34:00-04:00</updated><entry><title>Nagios Check Plugin for Rsnapshot Backups</title><link href="http://newblog.jasonantman.com/2012/07/nagios-check-plugin-for-rsnapshot-backups/" rel="alternate"></link><updated>2012-07-07T06:34:00-04:00</updated><author><name>admin</name></author><id>tag:newblog.jasonantman.com,2012-07-07:2012/07/nagios-check-plugin-for-rsnapshot-backups/</id><summary type="html">&lt;p&gt;In a previous post, I described how I do &lt;a href="/2012/01/secure-rsnapshot-backups-over-the-wan-via-ssh/"&gt;Secure rsnapshot backups over
+the &lt;span class="caps"&gt;WAN&lt;/span&gt; via
+&lt;span class="caps"&gt;SSH&lt;/span&gt;&lt;/a&gt;. While my
+layout of rsnapshot configuration files, data, and log files is a bit
+esoteric, I monitor all this with a Nagios check plugin that runs on my
+backup host. It Assumes that the output of
+&lt;a href="http://rsnapshot.org/"&gt;rsnapshot&lt;/a&gt; is written to a text log file, one
+file per host, at a path that matches
+&lt;code&gt;/path_to_log_directory/log_HOSTNAME_YYYYMMDD-HHMMSS.log&lt;/code&gt; where
+&lt;code&gt;HOSTNAME&lt;/code&gt; is the name of the host, and &lt;code&gt;YYYYMMDD-HHMMSS&lt;/code&gt; is a datestamp
+(actually, the script just finds the newest file matching
+&lt;code&gt;log_HOSTNAME_*.log&lt;/code&gt; in that directory). In order to obtain correct
+timing of the runs, which rsnapshot doesn&amp;#8217;t offer, it assumes that you
+trigger rsnapshot through a wrapper script, which runs it once per host
+(inside a loop?) with per-host log files and some logging information
+added,&amp;nbsp;like:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="k"&gt;for &lt;/span&gt;h in 
+&lt;span class="k"&gt;do&lt;/span&gt;
+&lt;span class="k"&gt;    &lt;/span&gt;&lt;span class="nv"&gt;&lt;span class="caps"&gt;LOGFILE&lt;/span&gt;&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;/mnt/backup/rsnapshot/logs/log_${h}_`date +%Y%m%d-%H%M%S`.txt&amp;quot;&lt;/span&gt;
+    &lt;span class="nb"&gt;echo&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;# Starting backup at `date` (`date +%s`)&amp;quot;&lt;/span&gt; &amp;gt;&amp;gt; &lt;span class="s2"&gt;&amp;quot;$&lt;span class="caps"&gt;LOGFILE&lt;/span&gt;&amp;quot;&lt;/span&gt;
+    /usr/bin/rsnapshot -c /etc/rsnapshot-&lt;span class="nv"&gt;$h&lt;/span&gt;.conf daily &amp;amp;&amp;gt;&amp;gt; &lt;span class="s2"&gt;&amp;quot;$&lt;span class="caps"&gt;LOGFILE&lt;/span&gt;&amp;quot;&lt;/span&gt;
+    &lt;span class="nb"&gt;echo&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;# Finished backup at `date` (`date +%s`)&amp;quot;&lt;/span&gt; &amp;gt;&amp;gt; &lt;span class="s2"&gt;&amp;quot;$&lt;span class="caps"&gt;LOGFILE&lt;/span&gt;&amp;quot;&lt;/span&gt;
+&lt;span class="k"&gt;done&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;The &lt;code&gt;check_rsnapshot.pl&lt;/code&gt; plugin uses &lt;code&gt;utils.pm&lt;/code&gt; from Nagios, as well as
+&lt;a href="http://search.cpan.org/~jv/Getopt-Long-2.38/lib/Getopt/Long.pm"&gt;Getopt::Long&lt;/a&gt;,
+&lt;a href="http://search.cpan.org/~makoto/File-Stat-0.01/Stat.pm"&gt;File::stat&lt;/a&gt;,
+&lt;a href="http://search.cpan.org/~flora/perl-5.14.2/lib/File/Basename.pm"&gt;File::Basename&lt;/a&gt;,
+&lt;a href="http://search.cpan.org/~smueller/PathTools-3.33/lib/File/Spec.pm"&gt;File::Spec&lt;/a&gt;
+and
+&lt;a href="http://search.cpan.org/~ferreira/Number-Bytes-Human-0.07/Human.pm"&gt;Number::Bytes::Human&lt;/a&gt;.
+This was one of my first Perl plugins, but seems to be rather
+acceptable. It makes the following checks based on the rsnapshot&amp;nbsp;log:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Backup run in the last X seconds (warning and crit&amp;nbsp;thresholds)&lt;/li&gt;
+&lt;li&gt;Maximum time from start to finish (warning and crit&amp;nbsp;thresholds)&lt;/li&gt;
+&lt;li&gt;Minimum size of backup (warning and crit&amp;nbsp;thresholds)&lt;/li&gt;
+&lt;li&gt;Minimum number of files in backup (warning and crit&amp;nbsp;thresholds)&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;In addition to &lt;code&gt;check_file_age&lt;/code&gt; checks on a number of files that are
+included in backups and I know are modified before each backup run, this
+seems to handle monitoring quite well for me. I certainly preferred
+running &lt;a href="http://www.bacula.org/"&gt;Bacula&lt;/a&gt; and using my MySQL-based
+&lt;a href="https://github.com/jantman/nagios-scripts/blob/master/check_bacula_job.php"&gt;check_bacula_job.php&lt;/a&gt;,
+but as I&amp;#8217;m now backing up 4 machines to my desktop, I no longer have a
+need for Bacula (or&amp;nbsp;tapes).&lt;/p&gt;
+&lt;p&gt;The script itself can be found at
+&lt;a href="https://github.com/jantman/nagios-scripts/blob/master/check_rsnapshot.pl"&gt;github&lt;/a&gt;.&lt;/p&gt;</summary><category term="backups"></category><category term="monitoring"></category><category term="Nagios"></category><category term="rsnapshot"></category><category term="rsync"></category></entry><entry><title>Script to Chart Intervals Between Problem and Recovery from Nagios/Icinga Log Files</title><link href="http://newblog.jasonantman.com/2012/05/script-to-chart-intervals-between-problem-and-recovery-from-nagiosicinga-log-files/" rel="alternate"></link><updated>2012-05-31T13:54:00-04:00</updated><author><name>admin</name></author><id>tag:newblog.jasonantman.com,2012-05-31:2012/05/script-to-chart-intervals-between-problem-and-recovery-from-nagiosicinga-log-files/</id><summary type="html">&lt;p&gt;At work, we use &lt;a href="http://www.icinga.org"&gt;Icinga&lt;/a&gt; (a fork of
+&lt;a href="http://nagios.org/"&gt;Nagios&lt;/a&gt;) for monitoring. We have a few services
+which are restarted or otherwise poked by event handlers, but the
+recovery takes a while - so we often get paged for problems which
+recover in a few minutes. I wrote a small perl script that greps through
+the archived log files for a given regex (service and/or host name) and
+then calculates the time from problem to recovery and graphs those&amp;nbsp;times.&lt;/p&gt;
+&lt;p&gt;The script is called &lt;code&gt;nagios_log_problem_interval.pl&lt;/code&gt; and can be
+downloaded from &lt;a href="https://github.com/jantman/nagios-scripts/blob/master/nagios_log_problem_interval.pl"&gt;my
+github&lt;/a&gt;.
+Below is some sample output, the number of minutes from problem to
+recovery are along the Y axis and the count is along the X&amp;nbsp;axis:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="gp"&gt;&amp;gt;&lt;/span&gt; nagios_log_problem_interval.pl --archivedir&lt;span class="o"&gt;=&lt;/span&gt;/var/icinga/archive --match&lt;span class="o"&gt;=&lt;/span&gt;myhost --backtrack&lt;span class="o"&gt;=&lt;/span&gt;10 myhost;&lt;span class="caps"&gt;HTTP&lt;/span&gt;
+&lt;span class="go"&gt;Count&lt;/span&gt;
+&lt;span class="go"&gt;1:########(8)&lt;/span&gt;
+&lt;span class="go"&gt;2:##(2)&lt;/span&gt;
+&lt;span class="go"&gt;3:#(1)&lt;/span&gt;
+&lt;span class="go"&gt;4:##(2)&lt;/span&gt;
+&lt;span class="go"&gt;5:#######(7)&lt;/span&gt;
+&lt;span class="go"&gt;6:(0)&lt;/span&gt;
+&lt;span class="go"&gt;7:(0)&lt;/span&gt;
+&lt;span class="go"&gt;8:#(1)&lt;/span&gt;
+&lt;span class="go"&gt;9:(0)&lt;/span&gt;
+&lt;span class="go"&gt;10:(0)&lt;/span&gt;
+&lt;span class="go"&gt;11:#(1)&lt;/span&gt;
+&lt;span class="go"&gt;12:(0)&lt;/span&gt;
+&lt;span class="go"&gt;13:#(1)&lt;/span&gt;
+&lt;span class="go"&gt;14:(0)&lt;/span&gt;
+&lt;span class="go"&gt;15:(0)&lt;/span&gt;
+&lt;span class="go"&gt;16-29:(0)&lt;/span&gt;
+&lt;span class="go"&gt;30-59:(0)&lt;/span&gt;
+&lt;span class="go"&gt;60+:(0)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;</summary><category term="chart"></category><category term="icinga"></category><category term="monitoring"></category><category term="Nagios"></category><category term="perl"></category></entry><entry><title>A Collection of Great Links on Monitoring, SysAdmin, Scaling, etc.</title><link href="http://newblog.jasonantman.com/2012/04/a-collection-of-great-links-on-monitoring-sysadmin-scaling-etc/" rel="alternate"></link><updated>2012-04-21T10:24:00-04:00</updated><author><name>admin</name></author><id>tag:newblog.jasonantman.com,2012-04-21:2012/04/a-collection-of-great-links-on-monitoring-sysadmin-scaling-etc/</id><summary type="html">&lt;p&gt;I&amp;#8217;ve had a bunch of tabs open in my browser for a while - stuff that I
+read, thought was wonderful, and wanted to comment on. At risk of
+letting it pile up forever, here&amp;#8217;s a collection of links that I thought
+were really interesting or&amp;nbsp;insightful&amp;#8230;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href="http://blog.mongodb.org/post/172254834/mongodb-is-fantastic-for-logging"&gt;MongoDB is Fantastic for
+    Logging&lt;/a&gt;&lt;ul&gt;
+&lt;li&gt;I was looking into some log storage ideas, and came by this post
+(on the MongoDB blog) about why Mongo is well-suited to storing&amp;nbsp;logs.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;a href="http://www.sonian.com/cloud-monitoring-sensu/"&gt;Sensu&lt;/a&gt; - a
+    Ruby-based cloud-oriented monitoring system. It uses &lt;span class="caps"&gt;AMQP&lt;/span&gt;/RabbitMQ
+    to communicate between the clients and server, which is a really big
+    part of what I think monitoring should&amp;nbsp;be.&lt;/li&gt;
+&lt;li&gt;&lt;a href="http://highscalability.com/"&gt;High Scalability&lt;/a&gt; - this is one of the
+    few blogs I follow on a regular basis. Some really wonderful stuff,
+    and great food for&amp;nbsp;thought.&lt;/li&gt;
+&lt;li&gt;&lt;a href="http://everythingsysadmin.com/2012/03/fear-of-rebooting.html"&gt;Everything Sysadmin: Fear of
+    Rebooting&lt;/a&gt;&lt;ul&gt;
+&lt;li&gt;A great article on Tom Limoncelli&amp;#8217;s blog about why we fear
+rebooting machines and why this is bad - moreover, why we should
+reboot&amp;nbsp;often.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;a href="http://techblog.netflix.com/2012/02/fault-tolerance-in-high-volume.html"&gt;The Netflix Tech Blog: Fault Tolerance in a High Volume,
+    Distributed
+    System&lt;/a&gt;&lt;ul&gt;
+&lt;li&gt;This is a &lt;em&gt;really, really&lt;/em&gt; cool post NetFlix about how latency
+increases in a single subsystem can bring down their whole &lt;span class="caps"&gt;API&lt;/span&gt; in
+seconds, and how they combat this. Really cool&amp;nbsp;stuff.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;a href="http://arstechnica.com/business/news/2012/04/exclusive-a-behind-the-scenes-look-at-facebook-release-engineering.ars/1"&gt;Ars Technica - Exclusive: a behind-the-scenes look at Facebook
+    release
+    engineering&lt;/a&gt;&lt;ul&gt;
+&lt;li&gt;Ars Technical is more or less &amp;#8220;mainstream media&amp;#8221; to me, but this
+is a really interesting writeup on Facebook&amp;#8217;s release engineering
+process, albeit at a higher level. Specifically, it talks about
+their automation, phased rollouts, rollbacks, and how they release
+the Facebook codebase as a single giant binary, sent out via&amp;nbsp;BitTorrent.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;a href="https://github.com/monitoringsucks/blog-posts"&gt;Monitoring Sucks blog posts
+    (github)&lt;/a&gt; - The
+    &amp;#8220;monitoing sucks&amp;#8221; movement really speaks to me, having worked
+    extensively with Nagios, Cacti, and similar technologies.
+    Specifically, having rolled out monitoring in a variety of &amp;#8220;weird&amp;#8221;
+    scenarios (a lot of monitoring devices or whole networks behind &lt;span class="caps"&gt;NAT&lt;/span&gt;,
+    on dynamic &lt;span class="caps"&gt;IP&lt;/span&gt; connections, or otherwise unreachable from a central
+    server), I&amp;#8217;ve felt a lot of pain in the current want of doing
+    things. There are a lot of &lt;strong&gt;really&lt;/strong&gt; good thoughts linked here,
+    especially the &lt;a href="http://jedi.be/blog/2012/01/03/monitoring-wonderland-survey-introduction"&gt;&amp;#8220;wonderland&amp;#8221; series by Patrick
+    Debois&lt;/a&gt;
+    and the &lt;a href="http://holmwood.id.au/~lindsay/2012/01/09/monitoring-sucks-latency-sucks-more"&gt;&amp;#8220;Latency sucks&amp;#8221; series by Lindsay
+    Holmwood&lt;/a&gt;.
+    This really got me thinking about my ideal monitoring system, which
+    among other things, would integrate the &amp;#8220;alerting&amp;#8221; functions of
+    Nagios with graphing/trending and correlation, would be based on
+    some sort of message queue architecture (that supports multiple
+    levels of proxies that could gracefully support &lt;span class="caps"&gt;NAT&lt;/span&gt; and multiple
+    hops), and would be configured almost totally on the originating
+    &amp;#8220;client&amp;#8221; (unlike the pain of distributed&amp;nbsp;Nagios/Icinga).&lt;/li&gt;
+&lt;li&gt;&lt;a href="http://assets.en.oreilly.com/1/event/65/Metrics-driven%20Engineering%20at%20Etsy%20Presentation.pdf"&gt;Mike Brittain - Metrics Driven Engineering at Etsy (3.&lt;span class="caps"&gt;2MB&lt;/span&gt;
+    &lt;span class="caps"&gt;PDF&lt;/span&gt;)&lt;/a&gt;&lt;ul&gt;
+&lt;li&gt;presentation slides. I&amp;#8217;d &lt;em&gt;love&lt;/em&gt; to see the video. Some really good
+ideas about putting the science back into being a SysAdmin. Also
+mentions a few tools I really want to play around with (including
+ganglia, graphite, logster and StatsD). Also mentions adding &lt;span class="caps"&gt;PHP&lt;/span&gt;
+memory usage and time to Apache logs, which I don&amp;#8217;t believe I never
+thought&amp;nbsp;of.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;Some really thoughtful posts from &lt;span class="caps"&gt;R. I.&lt;/span&gt; Pienaar on &lt;a href="http://www.devco.net/archives/2011/03/19/thinking_about_monitoring_frameworks.php"&gt;Thinking about
+    monitoring
+    frameworks&lt;/a&gt;
+    and &lt;a href="http://www.devco.net/archives/2011/04/04/monitoring_framework_composable_architectures.php"&gt;Composable
+    Architectures&lt;/a&gt;.
+    Some really good stuff, but what else would you expect from someone
+    &lt;a href="https://github.com/ripienaar/"&gt;like this&lt;/a&gt;.&lt;/li&gt;
+&lt;/ul&gt;</summary><category term="amqp"></category><category term="etsy"></category><category term="facebook"></category><category term="limoncelli"></category><category term="links"></category><category term="mongodb"></category><category term="monitoring"></category><category term="monitoringsucks"></category><category term="netflix"></category><category term="sensu"></category></entry><entry><title>World of Warcraft Realm Status Check Plugin for Nagios</title><link href="http://newblog.jasonantman.com/2012/03/world-of-warcraft-realm-status-check-plugin-for-nagios/" rel="alternate"></link><updated>2012-03-16T07:40:00-04:00</updated><author><name>admin</name></author><id>tag:newblog.jasonantman.com,2012-03-16:2012/03/world-of-warcraft-realm-status-check-plugin-for-nagios/</id><summary type="html">&lt;p&gt;My wife &lt;a href="http://www.jackieantman.com/"&gt;Jackie&lt;/a&gt;
+(&lt;a href="http://us.battle.net/wow/en/character/Arthas/Syrilia/simple"&gt;Syrilia&lt;/a&gt;)
+is an avid &lt;a href="http://en.wikipedia.org/wiki/World_of_Warcraft"&gt;World of
+Warcraft&lt;/a&gt; player (it&amp;#8217;s a
+&lt;a href="http://en.wikipedia.org/wiki/Massively_multiplayer_online_role-playing_game"&gt;&lt;span class="caps"&gt;MMORPG&lt;/span&gt;&lt;/a&gt;
+with over 10 million players). They have weekly server
+maintenance/update windows every Tuesday morning - total downtime. The
+length is never really fixed, so I looked around to see if there was a
+logical way to notify when the servers came back&amp;nbsp;up.&lt;/p&gt;
+&lt;p&gt;I managed to find a &lt;a href="http://exchange.nagios.org/directory/Plugins/Games/World-of-Warcraft-Realm-status/details"&gt;World of Warcraft Realm status check
+plugin&lt;/a&gt;
+on Nagios Exchange, but it was written to a now-discontinued &lt;span class="caps"&gt;API&lt;/span&gt;. It was
+also last modified in 2008, and I can&amp;#8217;t seem to get in contact with the
+author, Scott A&amp;#8217;Hearn (webmaster@scottahearn.com) - that email returns
+undeliverable, there&amp;#8217;s no email link on the site that his domain now
+redirects to, and the domain scottahearn.com is a (eek) private
+registration in &lt;span class="caps"&gt;WHOIS&lt;/span&gt;, so I don&amp;#8217;t really have any way of finding contact
+information. Regardless, I&amp;#8217;ve modified the script to use the &lt;a href="http://blizzard.github.com/api-wow-docs/#id3381933"&gt;new
+Blizzard &lt;span class="caps"&gt;REST&lt;/span&gt; &lt;span class="caps"&gt;API&lt;/span&gt;&lt;/a&gt;
+and it&amp;#8217;s now working. Of course, this is pulling from Blizzard&amp;#8217;s data
+feed, not doing any actual monitoring itself, and be warned that they
+impose query limits (at the moment, their
+&lt;a href="http://blizzard.github.com/api-wow-docs/#id3379836"&gt;docs&lt;/a&gt; say 3,000
+requests per day for anonymous access; to be nice to them, I only check
+on Tuesdays from 3am-4pm, when I&amp;#8217;m most concerned about it). The updated
+source code is shown below, but the most up-to-date version will always
+live&amp;nbsp;at  &lt;/p&gt;
+&lt;p&gt;&lt;a href="https://github.com/jantman/nagios-scripts/blob/master/check_wow.pl"&gt;https://github.com/jantman/nagios-scripts/blob/master/check_wow.pl&lt;/a&gt;.
+If you want, you can also see a diff of my changes to Scott&amp;#8217;s original
+version on
+&lt;a href="https://github.com/jantman/nagios-scripts/commit/f84eede5256aa6621812e91f0b3b73e91f3b11e8#check_wow.pl"&gt;github&lt;/a&gt;.&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="c1"&gt;#!/usr/bin/perl -w&lt;/span&gt;
+&lt;span class="c1"&gt;#&lt;/span&gt;
+&lt;span class="c1"&gt;# World of Warcraft Realm detector plugin for Nagios&lt;/span&gt;
+&lt;span class="c1"&gt;#&lt;/span&gt;
+&lt;span class="c1"&gt;# Written by Scott A&amp;#39;Hearn (webmaster@scottahearn.com), version 1.2, Last Modified: 07-21-2008&lt;/span&gt;
+&lt;span class="c1"&gt;#&lt;/span&gt;
+&lt;span class="c1"&gt;# Modified by Jason Antman  02-22-2012, to cope with the change from&lt;/span&gt;
+&lt;span class="c1"&gt;# the deprecated worldofwarcraft.com &lt;span class="caps"&gt;XML&lt;/span&gt; feed to the BattleNet &lt;span class="caps"&gt;JSON&lt;/span&gt; &lt;span class="caps"&gt;API&lt;/span&gt;.&lt;/span&gt;
+&lt;span class="c1"&gt;#&lt;/span&gt;
+&lt;span class="c1"&gt;# Usage: ./check_wow -r &lt;/span&gt;
+&lt;span class="c1"&gt;#&lt;/span&gt;
+&lt;span class="c1"&gt;# Description:&lt;/span&gt;
+&lt;span class="c1"&gt;#&lt;/span&gt;
+&lt;span class="c1"&gt;# This plugin will check the status of a World of Warcraft realm, based &lt;/span&gt;
+&lt;span class="c1"&gt;# on input from the battle.net &lt;span class="caps"&gt;JSON&lt;/span&gt; realm status &lt;span class="caps"&gt;API&lt;/span&gt;.&lt;/span&gt;
+&lt;span class="c1"&gt;#&lt;/span&gt;
+&lt;span class="c1"&gt;# Output:&lt;/span&gt;
+&lt;span class="c1"&gt;#&lt;/span&gt;
+&lt;span class="c1"&gt;# If the realm is up, the plugin will&lt;/span&gt;
+&lt;span class="c1"&gt;# return an &lt;span class="caps"&gt;OK&lt;/span&gt; state with a message containing the status of the realm as well &lt;/span&gt;
+&lt;span class="c1"&gt;# as some extended information such as type (PvP, PvE, etc) and population.  &lt;/span&gt;
+&lt;span class="c1"&gt;# If the realm is down, the plugin will return a &lt;span class="caps"&gt;CRITICAL&lt;/span&gt; state with a message&lt;/span&gt;
+&lt;span class="c1"&gt;# containing the status of the realm as well as any available extended &lt;/span&gt;
+&lt;span class="c1"&gt;# information such as type (PvP, PvE, etc) and population. If the realm is&lt;/span&gt;
+&lt;span class="c1"&gt;# shown as currently having a queue, a &lt;span class="caps"&gt;WARNING&lt;/span&gt; state will be returned.&lt;/span&gt;
+&lt;span class="c1"&gt;#&lt;/span&gt;
+&lt;span class="c1"&gt;#&lt;/span&gt;
+&lt;span class="c1"&gt;# If the requested realm is not found, the plugin will&lt;/span&gt;
+&lt;span class="c1"&gt;# return an &lt;span class="caps"&gt;UNKNOWN&lt;/span&gt; state with an appropriate warning message.&lt;/span&gt;
+&lt;span class="c1"&gt;#&lt;/span&gt;
+&lt;span class="c1"&gt;# If there is an invalid [or no] response from the battle.net server,&lt;/span&gt;
+&lt;span class="c1"&gt;# the plugin will return a &lt;span class="caps"&gt;CRITICAL&lt;/span&gt; state.&lt;/span&gt;
+&lt;span class="c1"&gt;#&lt;/span&gt;
+&lt;span class="c1"&gt;# $HeadURL: http://svn.jasonantman.com/public-nagios/check_wow.pl $&lt;/span&gt;
+&lt;span class="c1"&gt;# $LastChangedRevision: 13 $&lt;/span&gt;
+&lt;span class="c1"&gt;#&lt;/span&gt;
+&lt;span class="c1"&gt;# Changelog:&lt;/span&gt;
+&lt;span class="c1"&gt;# 2012-02-22 Jason Antman  (version 1.3):&lt;/span&gt;
+&lt;span class="c1"&gt;#     * modified for new BattleNet &lt;span class="caps"&gt;JSON&lt;/span&gt; &lt;span class="caps"&gt;API&lt;/span&gt;&lt;/span&gt;
+&lt;span class="c1"&gt;#     * added &lt;span class="caps"&gt;WARNING&lt;/span&gt; output if realm has queue&lt;/span&gt;
+&lt;span class="c1"&gt;#&lt;/span&gt;
+&lt;span class="c1"&gt;# 2008-07-21 Scott A&amp;#39;Hearn  (version 1.2):&lt;/span&gt;
+&lt;span class="c1"&gt;#     * version on Nagios Exchange&lt;/span&gt;
+&lt;span class="c1"&gt;#&lt;/span&gt;
+
+&lt;span class="c1"&gt;# use modules&lt;/span&gt;
+&lt;span class="k"&gt;use&lt;/span&gt; &lt;span class="n"&gt;strict&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;             &lt;span class="c1"&gt;# good coding practices&lt;/span&gt;
+&lt;span class="k"&gt;use&lt;/span&gt; &lt;span class="nn"&gt;Getopt::&lt;/span&gt;&lt;span class="n"&gt;Long&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;           &lt;span class="c1"&gt;# command-line option parsing&lt;/span&gt;
+&lt;span class="k"&gt;use&lt;/span&gt; &lt;span class="n"&gt;&lt;span class="caps"&gt;LWP&lt;/span&gt;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;                &lt;span class="c1"&gt;# external content retrieval&lt;/span&gt;
+&lt;span class="k"&gt;use&lt;/span&gt; &lt;span class="n"&gt;&lt;span class="caps"&gt;JSON&lt;/span&gt;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;                               &lt;span class="c1"&gt;# &lt;span class="caps"&gt;JSON&lt;/span&gt; for &lt;span class="caps"&gt;API&lt;/span&gt; reply&lt;/span&gt;
+&lt;span class="k"&gt;use&lt;/span&gt; &lt;span class="n"&gt;lib&lt;/span&gt;  &lt;span class="s"&gt;&amp;quot;/usr/lib/nagios/plugins&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="c1"&gt;# nagios plugins&lt;/span&gt;
+&lt;span class="k"&gt;use&lt;/span&gt; &lt;span class="n"&gt;utils&lt;/span&gt; &lt;span class="sx"&gt;qw(%&lt;span class="caps"&gt;ERRORS&lt;/span&gt; &amp;amp;print_revision &amp;amp;support &amp;amp;usage )&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="c1"&gt;# nagios error and message libraries&lt;/span&gt;
+&lt;span class="k"&gt;use&lt;/span&gt; &lt;span class="nn"&gt;Data::&lt;/span&gt;&lt;span class="n"&gt;Dumper&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;                       &lt;span class="c1"&gt;# debugging&lt;/span&gt;
+
+&lt;span class="c1"&gt;# init global vars&lt;/span&gt;
+&lt;span class="k"&gt;use&lt;/span&gt; &lt;span class="n"&gt;vars&lt;/span&gt; &lt;span class="sx"&gt;qw($&lt;span class="caps"&gt;PROGNAME&lt;/span&gt;)&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="nv"&gt;$&lt;span class="caps"&gt;PROGNAME&lt;/span&gt;&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;check_wow&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="k"&gt;my&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;$ver_string&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nv"&gt;$browser&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nv"&gt;$jsonurl&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nv"&gt;$raw_json&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nv"&gt;$opt_V&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nv"&gt;$opt_h&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nv"&gt;$opt_r&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nv"&gt;$decoded&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;undef&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nb"&gt;undef&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nb"&gt;undef&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nb"&gt;undef&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nb"&gt;undef&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nb"&gt;undef&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nb"&gt;undef&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nb"&gt;undef&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;span class="nv"&gt;$jsonurl&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;http://us.battle.net/api/wow/realm/status?realm=&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="nv"&gt;$ver_string&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;1.3&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+
+&lt;span class="c1"&gt;# init subs&lt;/span&gt;
+&lt;span class="k"&gt;sub &lt;/span&gt;&lt;span class="nf"&gt;print_help&lt;/span&gt; &lt;span class="p"&gt;($$);&lt;/span&gt;
+&lt;span class="p"&gt;sub print_usage ($);&lt;/span&gt;
+
+&lt;span class="p"&gt;# define command-line option handling&lt;/span&gt;
+&lt;span class="p"&gt;Getopt::Long::Configure(&amp;#39;bundling&amp;#39;);&lt;/span&gt;
+&lt;span class="p"&gt;GetOptions(&lt;/span&gt;
+&lt;span class="p"&gt;    &amp;quot;V&amp;quot;   =&amp;gt; \$opt_V, &amp;quot;version&amp;quot; =&amp;gt; \$opt_V,&lt;/span&gt;
+&lt;span class="p"&gt;    &amp;quot;h&amp;quot;   =&amp;gt; \$opt_h, &amp;quot;help&amp;quot;    =&amp;gt; \$opt_h,&lt;/span&gt;
+&lt;span class="p"&gt;    &amp;quot;r=s&amp;quot; =&amp;gt; \$opt_r, &amp;quot;realm=s&amp;quot; =&amp;gt; \$opt_r);&lt;/span&gt;
+
+&lt;span class="p"&gt;# show version info, exit&lt;/span&gt;
+&lt;span class="p"&gt;if ($opt_V) {&lt;/span&gt;
+    &lt;span class="n"&gt;print_revision&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;$&lt;span class="caps"&gt;PROGNAME&lt;/span&gt;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nv"&gt;$ver_string&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+    &lt;span class="nb"&gt;exit&lt;/span&gt; &lt;span class="nv"&gt;$&lt;span class="caps"&gt;ERRORS&lt;/span&gt;&lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;&lt;span class="caps"&gt;OK&lt;/span&gt;&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;};&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+
+&lt;span class="c1"&gt;# show help, exit&lt;/span&gt;
+&lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;$opt_h&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="n"&gt;print_help&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;$&lt;span class="caps"&gt;PROGNAME&lt;/span&gt;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nv"&gt;$ver_string&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+    &lt;span class="nb"&gt;exit&lt;/span&gt; &lt;span class="nv"&gt;$&lt;span class="caps"&gt;ERRORS&lt;/span&gt;&lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;&lt;span class="caps"&gt;OK&lt;/span&gt;&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;};&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+
+&lt;span class="c1"&gt;# get first command-line param&lt;/span&gt;
+&lt;span class="nv"&gt;$opt_r&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nb"&gt;shift&lt;/span&gt; &lt;span class="k"&gt;unless&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;$opt_r&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+
+&lt;span class="c1"&gt;# if no command-line param passed, show usage/help, exit&lt;/span&gt;
+&lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="o"&gt;!&lt;/span&gt; &lt;span class="nv"&gt;$opt_r&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="n"&gt;print_usage&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;$&lt;span class="caps"&gt;PROGNAME&lt;/span&gt;&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+    &lt;span class="nb"&gt;exit&lt;/span&gt; &lt;span class="nv"&gt;$&lt;span class="caps"&gt;ERRORS&lt;/span&gt;&lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;&lt;span class="caps"&gt;UNKNOWN&lt;/span&gt;&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;};&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+
+&lt;span class="c1"&gt;# new browser object, with agent&lt;/span&gt;
+&lt;span class="nv"&gt;$browser&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nn"&gt;&lt;span class="caps"&gt;LWP&lt;/span&gt;::&lt;/span&gt;&lt;span class="n"&gt;UserAgent&lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="k"&gt;new&lt;/span&gt;&lt;span class="p"&gt;();&lt;/span&gt;
+&lt;span class="nv"&gt;$browser&lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="n"&gt;agent&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;check_wow/$ver_string&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+
+&lt;span class="c1"&gt;# retrieve &lt;span class="caps"&gt;JSON&lt;/span&gt; from WoW site&lt;/span&gt;
+&lt;span class="nv"&gt;$jsonurl&lt;/span&gt; &lt;span class="o"&gt;.=&lt;/span&gt; &lt;span class="nv"&gt;$opt_r&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="nv"&gt;$raw_json&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nv"&gt;$browser&lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="n"&gt;request&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nn"&gt;&lt;span class="caps"&gt;HTTP&lt;/span&gt;::&lt;/span&gt;&lt;span class="n"&gt;Request&lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="k"&gt;new&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;&lt;span class="caps"&gt;GET&lt;/span&gt;&lt;/span&gt; &lt;span class="o"&gt;=&amp;gt;&lt;/span&gt; &lt;span class="nv"&gt;$jsonurl&lt;/span&gt;&lt;span class="p"&gt;));&lt;/span&gt;
+
+&lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;$raw_json&lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="n"&gt;is_success&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="c1"&gt;# if success, process&lt;/span&gt;
+    &lt;span class="nv"&gt;$raw_json&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nv"&gt;$raw_json&lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="n"&gt;content&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt; &lt;span class="k"&gt;else&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="c1"&gt;# otherwise, fail &lt;span class="caps"&gt;UNKNOWN&lt;/span&gt;&lt;/span&gt;
+    &lt;span class="k"&gt;print&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;&lt;span class="caps"&gt;UNKNOWN&lt;/span&gt; - Realm &amp;#39;$opt_r&amp;#39; status not received.&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+    &lt;span class="nb"&gt;exit&lt;/span&gt; &lt;span class="nv"&gt;$&lt;span class="caps"&gt;ERRORS&lt;/span&gt;&lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;&lt;span class="caps"&gt;UNKNOWN&lt;/span&gt;&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;};&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+
+&lt;span class="nv"&gt;$decoded&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;decode_json&lt;/span&gt; &lt;span class="nv"&gt;$raw_json&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+
+&lt;span class="k"&gt;if&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;$decoded&lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="n"&gt;realms&lt;/span&gt;&lt;span class="p"&gt;}[&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="n"&gt;status&lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt; &lt;span class="o"&gt;!=&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="k"&gt;print&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;&lt;span class="caps"&gt;CRITICAL&lt;/span&gt; - Realm &amp;quot;&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="nv"&gt;$decoded&lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="n"&gt;realms&lt;/span&gt;&lt;span class="p"&gt;}[&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="n"&gt;name&lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="s"&gt;&amp;quot; Down (&amp;quot;&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="nv"&gt;$decoded&lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="n"&gt;realms&lt;/span&gt;&lt;span class="p"&gt;}[&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="n"&gt;type&lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;, population: &amp;quot;&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="nv"&gt;$decoded&lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="n"&gt;realms&lt;/span&gt;&lt;span class="p"&gt;}[&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="n"&gt;population&lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;)\n&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+    &lt;span class="nb"&gt;exit&lt;/span&gt; &lt;span class="nv"&gt;$&lt;span class="caps"&gt;ERRORS&lt;/span&gt;&lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;&lt;span class="caps"&gt;CRITICAL&lt;/span&gt;&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;};&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt; &lt;span class="k"&gt;elsif&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;$decoded&lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="n"&gt;realms&lt;/span&gt;&lt;span class="p"&gt;}[&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="n"&gt;queue&lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt; &lt;span class="o"&gt;!=&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="k"&gt;print&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;&lt;span class="caps"&gt;WARNING&lt;/span&gt; - Realm &amp;quot;&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="nv"&gt;$decoded&lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="n"&gt;realms&lt;/span&gt;&lt;span class="p"&gt;}[&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="n"&gt;name&lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="s"&gt;&amp;quot; Has Queue (&amp;quot;&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="nv"&gt;$decoded&lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="n"&gt;realms&lt;/span&gt;&lt;span class="p"&gt;}[&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="n"&gt;type&lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;, population: &amp;quot;&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="nv"&gt;$decoded&lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="n"&gt;realms&lt;/span&gt;&lt;span class="p"&gt;}[&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="n"&gt;population&lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;)\n&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+    &lt;span class="nb"&gt;exit&lt;/span&gt; &lt;span class="nv"&gt;$&lt;span class="caps"&gt;ERRORS&lt;/span&gt;&lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;&lt;span class="caps"&gt;WARNING&lt;/span&gt;&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;};&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt; &lt;span class="k"&gt;else&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="k"&gt;print&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;&lt;span class="caps"&gt;OK&lt;/span&gt; - Realm &amp;quot;&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="nv"&gt;$decoded&lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="n"&gt;realms&lt;/span&gt;&lt;span class="p"&gt;}[&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="n"&gt;name&lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="s"&gt;&amp;quot; Up (&amp;quot;&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="nv"&gt;$decoded&lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="n"&gt;realms&lt;/span&gt;&lt;span class="p"&gt;}[&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="n"&gt;type&lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;, population: &amp;quot;&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="nv"&gt;$decoded&lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="n"&gt;realms&lt;/span&gt;&lt;span class="p"&gt;}[&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="n"&gt;population&lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;)\n&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+    &lt;span class="nb"&gt;exit&lt;/span&gt; &lt;span class="nv"&gt;$&lt;span class="caps"&gt;ERRORS&lt;/span&gt;&lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;&lt;span class="caps"&gt;OK&lt;/span&gt;&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;};&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+
+&lt;span class="c1"&gt;# usage function&lt;/span&gt;
+&lt;span class="k"&gt;sub &lt;/span&gt;&lt;span class="nf"&gt;print_usage&lt;/span&gt; &lt;span class="p"&gt;($)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+        &lt;span class="k"&gt;my&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;$&lt;span class="caps"&gt;PROGNAME&lt;/span&gt;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nv"&gt;@_&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+    &lt;span class="k"&gt;print&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;Usage:\n&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+    &lt;span class="k"&gt;print&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;  $&lt;span class="caps"&gt;PROGNAME&lt;/span&gt; [-r | --realm ]\n&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+    &lt;span class="k"&gt;print&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;  $&lt;span class="caps"&gt;PROGNAME&lt;/span&gt; [-h | --help]\n&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+    &lt;span class="k"&gt;print&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;  $&lt;span class="caps"&gt;PROGNAME&lt;/span&gt; [-V | --version]\n&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+
+&lt;span class="c1"&gt;# help function&lt;/span&gt;
+&lt;span class="k"&gt;sub &lt;/span&gt;&lt;span class="nf"&gt;print_help&lt;/span&gt; &lt;span class="p"&gt;($$)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+        &lt;span class="k"&gt;my&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;$&lt;span class="caps"&gt;PROGNAME&lt;/span&gt;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nv"&gt;$ver_string&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nv"&gt;@_&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+    &lt;span class="n"&gt;print_revision&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;$&lt;span class="caps"&gt;PROGNAME&lt;/span&gt;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nv"&gt;$ver_string&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+    &lt;span class="k"&gt;print&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;Copyright (c) 2008 Scott A&amp;#39;Hearn, 2012 Jason Antman\n\n&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+    &lt;span class="n"&gt;print_usage&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;$&lt;span class="caps"&gt;PROGNAME&lt;/span&gt;&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+    &lt;span class="k"&gt;print&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;\n&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+    &lt;span class="k"&gt;print&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;   Standard World of Warcraft realm name, case sensitive.\n&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+    &lt;span class="k"&gt;print&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;\n&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+    &lt;span class="c1"&gt;# support();&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+
+&lt;span class="c1"&gt;# end&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;</summary><category term="blizzard"></category><category term="check plugin"></category><category term="monitoring"></category><category term="Nagios"></category><category term="warcraft"></category><category term="wow"></category></entry><entry><title>Nagios Check Plugin for Linode Monthly Bandwidth Usage</title><link href="http://newblog.jasonantman.com/2012/02/nagios-check-plugin-for-linode-monthly-bandwidth-usage/" rel="alternate"></link><updated>2012-02-29T20:32:00-05:00</updated><author><name>admin</name></author><id>tag:newblog.jasonantman.com,2012-02-29:2012/02/nagios-check-plugin-for-linode-monthly-bandwidth-usage/</id><summary type="html">&lt;p&gt;Since I have most of my public-facing stuff hosted with
+&lt;a href="http://www.linode.com/?r=5c8ad2931b410b55455aadbcf0a8d86d6f698a91"&gt;Linode&lt;/a&gt;,
+and I have a monthly bandwidth cap (albeit one that I&amp;#8217;ll probably never
+come close to), I decided that it would be a good idea to add my monthly
+bandwidth usage to my monitoring system. Luckily, Linode offers this
+(their billing view of it - which is, of course, what I&amp;#8217;m concerned
+about) via their &lt;a href="http://www.linode.com/api/"&gt;&lt;span class="caps"&gt;API&lt;/span&gt;&lt;/a&gt;, and it&amp;#8217;s very nicely
+implemented in &lt;a href="http://michael.thegrebs.com/"&gt;Michael Greb&amp;#8217;s&lt;/a&gt;
+&lt;a href="http://search.cpan.org/~mikegrb/WebService-Linode/"&gt;WebService::Linode&lt;/a&gt;
+Perl (&lt;span class="caps"&gt;CPAN&lt;/span&gt;)&amp;nbsp;module.&lt;/p&gt;
+&lt;p&gt;Using Michael&amp;#8217;s Perl module, I wrote
+&lt;a href="https://github.com/jantman/nagios-scripts/blob/master/check_linode_transfer.pl"&gt;check_linode_transfer.pl&lt;/a&gt;
+(github link) as a Nagios check plugin. It seems to be working fine for
+me, and runs with the embedded perl interpreter, though it may not be
+100% up to par with the Nagios plugin spec (for one, I used utils.pm
+instead of
+&lt;a href="http://search.cpan.org/~tonvoon/Nagios-Plugin-0.36/lib/Nagios/Plugin.pm"&gt;Nagios::Plugin&lt;/a&gt;).
+About the only thing unusual is that I store my &lt;span class="caps"&gt;API&lt;/span&gt; keys in a perl
+module, so you&amp;#8217;ll need to create something like this in your plugin
+directory (usually &lt;code&gt;/usr/lib/nagios/plugins&lt;/code&gt;:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="nb"&gt;package&lt;/span&gt; &lt;span class="n"&gt;api_keys&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+
+&lt;span class="nb"&gt;require&lt;/span&gt; &lt;span class="n"&gt;Exporter&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="nv"&gt;@&lt;span class="caps"&gt;ISA&lt;/span&gt;&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="sx"&gt;qw(Exporter)&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="nv"&gt;@EXPORT_OK&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="sx"&gt;qw($API_KEY_LINODE)&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+
+&lt;span class="nv"&gt;$API_KEY_LINODE&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;yourApiKeyGoesHere&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+
+&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;The latest version of the plugin will always be available at
+&lt;a href="https://github.com/jantman/nagios-scripts/blob/master/check_linode_transfer.pl"&gt;https://github.com/jantman/nagios-scripts/blob/master/check_linode_transfer.pl&lt;/a&gt;.
+The current version is also below. It&amp;#8217;s free for anyone to use under the
+terms of &lt;a href="http://www.gnu.org/licenses/gpl.html"&gt;&lt;span class="caps"&gt;GNU&lt;/span&gt; GPLv3&lt;/a&gt;, though I
+would really like it if any changes/patches/updates are sent back to me
+for inclusion in the latest&amp;nbsp;version.&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="c1"&gt;#! /usr/bin/perl -w&lt;/span&gt;
+
+&lt;span class="c1"&gt;# check_linode_transfer.pl Copyright (C) 2012 Jason Antman &lt;/span&gt;
+&lt;span class="c1"&gt;#&lt;/span&gt;
+&lt;span class="c1"&gt;# Define your Linode &lt;span class="caps"&gt;API&lt;/span&gt; key as $API_KEY_LINODE in api_keys.pm in the plugin library directory&lt;/span&gt;
+&lt;span class="c1"&gt;#  a sample should be included in this distribution.&lt;/span&gt;
+&lt;span class="c1"&gt;#&lt;/span&gt;
+&lt;span class="c1"&gt;# This plugin requires WebService::Linode from &lt;span class="caps"&gt;CPAN&lt;/span&gt;, with a patch - add the following to the end of sub _error{} in Linode/Base.pm:&lt;/span&gt;
+&lt;span class="c1"&gt;#  $self-&amp;gt;{err} = $err; $self-&amp;gt;{errstr} = $errstr;&lt;/span&gt;
+&lt;span class="c1"&gt;# Also - bug in WebService::Linode::Base docs, example, line 3 should be:&lt;/span&gt;
+&lt;span class="c1"&gt;#  my $data = $api-&amp;gt;do_request( api_action =&amp;gt; &amp;#39;domains.list&amp;#39; );&lt;/span&gt;
+&lt;span class="c1"&gt;# not:&lt;/span&gt;
+&lt;span class="c1"&gt;#  my $data = $api-&amp;gt;do_request( action =&amp;gt; &amp;#39;domains.list&amp;#39; );&lt;/span&gt;
+&lt;span class="c1"&gt;#&lt;/span&gt;
+&lt;span class="c1"&gt;##################################################################################&lt;/span&gt;
+&lt;span class="c1"&gt;#&lt;/span&gt;
+&lt;span class="c1"&gt;# This program is free software; you can redistribute it and/or&lt;/span&gt;
+&lt;span class="c1"&gt;# modify it under the terms of the &lt;span class="caps"&gt;GNU&lt;/span&gt; General Public License&lt;/span&gt;
+&lt;span class="c1"&gt;# as published by the Free Software Foundation; either version 2&lt;/span&gt;
+&lt;span class="c1"&gt;# of the License, or (at your option) any later version.&lt;/span&gt;
+&lt;span class="c1"&gt;#&lt;/span&gt;
+&lt;span class="c1"&gt;# This program is distributed in the hope that it will be useful,&lt;/span&gt;
+&lt;span class="c1"&gt;# but &lt;span class="caps"&gt;WITHOUT&lt;/span&gt; &lt;span class="caps"&gt;ANY&lt;/span&gt; &lt;span class="caps"&gt;WARRANTY&lt;/span&gt;; without even the implied warranty&lt;/span&gt;
+&lt;span class="c1"&gt;# of &lt;span class="caps"&gt;MERCHANTABILITY&lt;/span&gt; or &lt;span class="caps"&gt;FITNESS&lt;/span&gt; &lt;span class="caps"&gt;FOR&lt;/span&gt; A &lt;span class="caps"&gt;PARTICULAR&lt;/span&gt; &lt;span class="caps"&gt;PURPOSE&lt;/span&gt;.  See the&lt;/span&gt;
+&lt;span class="c1"&gt;# &lt;span class="caps"&gt;GNU&lt;/span&gt; General Public License for more details.&lt;/span&gt;
+&lt;span class="c1"&gt;#&lt;/span&gt;
+&lt;span class="c1"&gt;# you should have received a copy of the &lt;span class="caps"&gt;GNU&lt;/span&gt; General Public License&lt;/span&gt;
+&lt;span class="c1"&gt;# along with this program (or with Nagios);  if not, write to the&lt;/span&gt;
+&lt;span class="c1"&gt;# Free Software Foundation, Inc., 59 Temple Place - Suite 330,&lt;/span&gt;
+&lt;span class="c1"&gt;# Boston, &lt;span class="caps"&gt;MA&lt;/span&gt; 02111-1307, &lt;span class="caps"&gt;USA&lt;/span&gt;&lt;/span&gt;
+&lt;span class="c1"&gt;#&lt;/span&gt;
+&lt;span class="c1"&gt;##################################################################################&lt;/span&gt;
+&lt;span class="c1"&gt;#&lt;/span&gt;
+&lt;span class="c1"&gt;# The latest version of this plugin can always be obtained from:&lt;/span&gt;
+&lt;span class="c1"&gt;#  $HeadURL$&lt;/span&gt;
+&lt;span class="c1"&gt;#  $LastChangedRevision$&lt;/span&gt;
+&lt;span class="c1"&gt;#&lt;/span&gt;
+
+&lt;span class="k"&gt;use&lt;/span&gt; &lt;span class="n"&gt;strict&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="k"&gt;use&lt;/span&gt; &lt;span class="n"&gt;English&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="k"&gt;use&lt;/span&gt; &lt;span class="nn"&gt;Getopt::&lt;/span&gt;&lt;span class="n"&gt;Long&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="k"&gt;use&lt;/span&gt; &lt;span class="n"&gt;vars&lt;/span&gt; &lt;span class="sx"&gt;qw($&lt;span class="caps"&gt;PROGNAME&lt;/span&gt; $&lt;span class="caps"&gt;REVISION&lt;/span&gt;)&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="k"&gt;use&lt;/span&gt; &lt;span class="n"&gt;lib&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;/usr/lib/nagios/plugins&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="k"&gt;use&lt;/span&gt; &lt;span class="n"&gt;utils&lt;/span&gt; &lt;span class="sx"&gt;qw (%&lt;span class="caps"&gt;ERRORS&lt;/span&gt; &lt;/span&gt;&lt;span class="o"&gt;&amp;amp;&lt;/span&gt;&lt;span class="n"&gt;print_revision&lt;/span&gt; &lt;span class="o"&gt;&amp;amp;&lt;/span&gt;&lt;span class="n"&gt;support&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;span class="k"&gt;use&lt;/span&gt; &lt;span class="n"&gt;api_keys&lt;/span&gt; &lt;span class="sx"&gt;qw($API_KEY_LINODE)&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="k"&gt;use&lt;/span&gt; &lt;span class="nn"&gt;WebService::&lt;/span&gt;&lt;span class="n"&gt;Linode&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="k"&gt;use&lt;/span&gt; &lt;span class="nn"&gt;Data::&lt;/span&gt;&lt;span class="n"&gt;Dumper&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+
+&lt;span class="k"&gt;sub &lt;/span&gt;&lt;span class="nf"&gt;print_help&lt;/span&gt; &lt;span class="p"&gt;();&lt;/span&gt;
+&lt;span class="p"&gt;sub print_usage ();&lt;/span&gt;
+
+&lt;span class="p"&gt;my ($opt_c, $opt_w, $opt_h, $opt_V, $opt_s, $opt_S, $opt_l, $opt_H);&lt;/span&gt;
+&lt;span class="p"&gt;my ($result, $message);&lt;/span&gt;
+
+&lt;span class="p"&gt;$&lt;span class="caps"&gt;PROGNAME&lt;/span&gt;=&amp;quot;check_linode_transfer.pl&amp;quot;;&lt;/span&gt;
+&lt;span class="p"&gt;$&lt;span class="caps"&gt;REVISION&lt;/span&gt;=&amp;#39;1.0&amp;#39;;&lt;/span&gt;
+
+&lt;span class="p"&gt;$opt_w = 60;&lt;/span&gt;
+&lt;span class="p"&gt;$opt_c = 80;&lt;/span&gt;
+
+&lt;span class="p"&gt;Getopt::Long::Configure(&amp;#39;bundling&amp;#39;);&lt;/span&gt;
+&lt;span class="p"&gt;GetOptions(&lt;/span&gt;
+&lt;span class="p"&gt;    &amp;quot;V&amp;quot;   =&amp;gt; \$opt_V, &amp;quot;version&amp;quot; =&amp;gt; \$opt_V,&lt;/span&gt;
+&lt;span class="p"&gt;    &amp;quot;h&amp;quot;   =&amp;gt; \$opt_h, &amp;quot;help&amp;quot;    =&amp;gt; \$opt_h,&lt;/span&gt;
+&lt;span class="p"&gt;    &amp;quot;w=f&amp;quot; =&amp;gt; \$opt_w, &amp;quot;warning=f&amp;quot; =&amp;gt; \$opt_w,&lt;/span&gt;
+&lt;span class="p"&gt;    &amp;quot;c=f&amp;quot; =&amp;gt; \$opt_c, &amp;quot;critical=f&amp;quot; =&amp;gt; \$opt_c&lt;/span&gt;
+&lt;span class="p"&gt;);&lt;/span&gt;
+
+&lt;span class="p"&gt;if ($opt_V) {&lt;/span&gt;
+    &lt;span class="n"&gt;print_revision&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;$&lt;span class="caps"&gt;PROGNAME&lt;/span&gt;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nv"&gt;$&lt;span class="caps"&gt;REVISION&lt;/span&gt;&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+    &lt;span class="nb"&gt;exit&lt;/span&gt; &lt;span class="nv"&gt;$&lt;span class="caps"&gt;ERRORS&lt;/span&gt;&lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;&lt;span class="caps"&gt;OK&lt;/span&gt;&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;};&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+
+&lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;$opt_h&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="n"&gt;print_help&lt;/span&gt;&lt;span class="p"&gt;();&lt;/span&gt;
+    &lt;span class="nb"&gt;exit&lt;/span&gt; &lt;span class="nv"&gt;$&lt;span class="caps"&gt;ERRORS&lt;/span&gt;&lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;&lt;span class="caps"&gt;OK&lt;/span&gt;&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;};&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+
+&lt;span class="nv"&gt;$result&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;&lt;span class="caps"&gt;OK&lt;/span&gt;&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+
+&lt;span class="k"&gt;my&lt;/span&gt; &lt;span class="nv"&gt;$api&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="k"&gt;new&lt;/span&gt; &lt;span class="nn"&gt;WebService::&lt;/span&gt;&lt;span class="n"&gt;Linode&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;apikey&lt;/span&gt; &lt;span class="o"&gt;=&amp;gt;&lt;/span&gt; &lt;span class="nv"&gt;$API_KEY_LINODE&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;nowarn&lt;/span&gt; &lt;span class="o"&gt;=&amp;gt;&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;span class="k"&gt;my&lt;/span&gt; &lt;span class="nv"&gt;$data&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nv"&gt;$api&lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="n"&gt;do_request&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt; &lt;span class="n"&gt;api_action&lt;/span&gt; &lt;span class="o"&gt;=&amp;gt;&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;account.info&amp;#39;&lt;/span&gt; &lt;span class="p"&gt;);&lt;/span&gt;
+&lt;span class="k"&gt;if&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="o"&gt;!&lt;/span&gt; &lt;span class="nv"&gt;$data&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="nv"&gt;$result&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;&lt;span class="caps"&gt;UNKNOWN&lt;/span&gt;&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+    &lt;span class="k"&gt;print&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;&lt;span class="caps"&gt;LINODE&lt;/span&gt; &lt;span class="caps"&gt;TRANSFER&lt;/span&gt; $result: &amp;quot;&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="nv"&gt;$api&lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="n"&gt;errstr&lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;\n&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+    &lt;span class="nb"&gt;exit&lt;/span&gt; &lt;span class="nv"&gt;$&lt;span class="caps"&gt;ERRORS&lt;/span&gt;&lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="nv"&gt;$result&lt;/span&gt;&lt;span class="p"&gt;};&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+
+&lt;span class="k"&gt;my&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;$used&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nv"&gt;$pool&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nv"&gt;$pct&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;$data&lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="n"&gt;TRANSFER_USED&lt;/span&gt;&lt;span class="p"&gt;},&lt;/span&gt; &lt;span class="nv"&gt;$data&lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="n"&gt;TRANSFER_POOL&lt;/span&gt;&lt;span class="p"&gt;},&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+
+&lt;span class="nv"&gt;$pct&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;$used&lt;/span&gt; &lt;span class="o"&gt;/&lt;/span&gt; &lt;span class="nv"&gt;$pool&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="mi"&gt;100&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+
+&lt;span class="k"&gt;if&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;$pct&lt;/span&gt; &lt;span class="o"&gt;&amp;gt;=&lt;/span&gt; &lt;span class="nv"&gt;$opt_c&lt;/span&gt;&lt;span class="p"&gt;){&lt;/span&gt;
+    &lt;span class="nv"&gt;$result&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;&lt;span class="caps"&gt;CRITICAL&lt;/span&gt;&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;span class="k"&gt;elsif&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;$pct&lt;/span&gt; &lt;span class="o"&gt;&amp;gt;=&lt;/span&gt; &lt;span class="nv"&gt;$opt_w&lt;/span&gt;&lt;span class="p"&gt;){&lt;/span&gt;
+    &lt;span class="nv"&gt;$result&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;&lt;span class="caps"&gt;WARNING&lt;/span&gt;&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+
+&lt;span class="k"&gt;print&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;&lt;span class="caps"&gt;LINODE&lt;/span&gt; &lt;span class="caps"&gt;TRANSFER&lt;/span&gt; $result: $pct&amp;quot;&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;%&amp;quot;&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="s"&gt;&amp;quot; of monthly bandwidth used ($used / $pool &lt;span class="caps"&gt;GB&lt;/span&gt;)|usedBW=$used; totalBW=$pool\n&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="nb"&gt;exit&lt;/span&gt; &lt;span class="nv"&gt;$&lt;span class="caps"&gt;ERRORS&lt;/span&gt;&lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="nv"&gt;$result&lt;/span&gt;&lt;span class="p"&gt;};&lt;/span&gt;
+
+&lt;span class="k"&gt;sub &lt;/span&gt;&lt;span class="nf"&gt;print_usage&lt;/span&gt; &lt;span class="p"&gt;()&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="k"&gt;print&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;Usage:\n&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+    &lt;span class="k"&gt;print&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;  $&lt;span class="caps"&gt;PROGNAME&lt;/span&gt; [-w ] [-c ]\n&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+    &lt;span class="k"&gt;print&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;  $&lt;span class="caps"&gt;PROGNAME&lt;/span&gt; [-h | --help]\n&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+    &lt;span class="k"&gt;print&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;  $&lt;span class="caps"&gt;PROGNAME&lt;/span&gt; [-V | --version]\n&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+
+&lt;span class="k"&gt;sub &lt;/span&gt;&lt;span class="nf"&gt;print_help&lt;/span&gt; &lt;span class="p"&gt;()&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="n"&gt;print_revision&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;$&lt;span class="caps"&gt;PROGNAME&lt;/span&gt;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nv"&gt;$&lt;span class="caps"&gt;REVISION&lt;/span&gt;&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+    &lt;span class="k"&gt;print&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;Copyright (c) 2012 Jason Antman\n\n&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+    &lt;span class="n"&gt;print_usage&lt;/span&gt;&lt;span class="p"&gt;();&lt;/span&gt;
+    &lt;span class="k"&gt;print&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;\n&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+    &lt;span class="k"&gt;print&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;    Percent of network transfer used\n&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+    &lt;span class="k"&gt;print&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;\n&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+    &lt;span class="n"&gt;support&lt;/span&gt;&lt;span class="p"&gt;();&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;</summary><category term="linode"></category><category term="monitoring"></category><category term="Nagios"></category><category term="plugin"></category></entry><entry><title>Nagios check_by_ssh and NAT</title><link href="http://newblog.jasonantman.com/2009/10/nagios-check_by_ssh-and-nat/" rel="alternate"></link><updated>2009-10-22T13:58:00-04:00</updated><author><name>admin</name></author><id>tag:newblog.jasonantman.com,2009-10-22:2009/10/nagios-check_by_ssh-and-nat/</id><summary type="html">&lt;p&gt;At a remote location, I have a number of machines to monitor but only
+one &lt;span class="caps"&gt;IP&lt;/span&gt; (dynamic on a residential connection). Most of my remote
+monitoring with Nagios uses check_by_ssh. Previously, I&amp;#8217;d used one
+host for Nagios to &lt;span class="caps"&gt;SSH&lt;/span&gt; to, and then chained together another
+check_by_ssh to reach the remote hosts. Unfortunately, this means
+nothing past the one first host can get monitored if the first host is
+down. All of the other hosts (everything is behind &lt;span class="caps"&gt;NAT&lt;/span&gt;) have &lt;span class="caps"&gt;SSH&lt;/span&gt; visible
+externally on different&amp;nbsp;ports.&lt;/p&gt;
+&lt;p&gt;&lt;span class="caps"&gt;SSH&lt;/span&gt; itself doesn&amp;#8217;t like one &lt;span class="caps"&gt;IP&lt;/span&gt;/hostname with &lt;span class="caps"&gt;SSH&lt;/span&gt; on different ports -
+host key verification will fail, as the &lt;span class="caps"&gt;SSH&lt;/span&gt; client only looks at the
+address that it&amp;#8217;s connecting to, not the port number. Normally, this is
+bypassed by using a &lt;code&gt;.ssh/config&lt;/code&gt; file&amp;nbsp;like:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;Host foo1
+        Hostname foo.example.com
+        HostKeyAlias foo1
+        CheckHostIP no
+        Port 22
+        User nagios
+
+Host foo2
+        Hostname foo.example.com
+        HostKeyAlias foo2
+        CheckHostIP no
+        Port 222
+        User nagios
+
+Host foo3
+        Hostname foo.example.com
+        HostKeyAlias foo3
+        CheckHostIP no
+        Port 10022
+        User nagios
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;And then you &lt;span class="caps"&gt;SSH&lt;/span&gt; using the &amp;#8220;Host&amp;#8221; named in the config file, not the
+actual&amp;nbsp;hostname.&lt;/p&gt;
+&lt;p&gt;Unfortunately, the only way to get check_by_ssh to do this was a bit
+messy, and required defining a bunch of extra macros for each&amp;nbsp;host:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;./check_by_ssh -o Hostname=foo.example.com -o HostKeyAlias=foo1 -o CheckHostIP=no -o Port=222 -o User=nagios -H foo.example.com -C uptime
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;So, I made a quick little patch for check_by_ssh.c (patched against
+the released nagios-plugins-1.4.14)&amp;nbsp;:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="gd"&gt;--- check_by_ssh.c      2009-10-22 14:32:26.000000000 -0400&lt;/span&gt;
+&lt;span class="gi"&gt;+++ check_by_ssh_ORIG.c 2009-10-22 14:12:15.000000000 -0400&lt;/span&gt;
+&lt;span class="gu"&gt;@@ -181,7 +181,6 @@&lt;/span&gt;
+                {&amp;quot;skip&amp;quot;, optional_argument, 0, &amp;#39;S&amp;#39;}, /* backwards compatibility */
+                {&amp;quot;skip-stdout&amp;quot;, optional_argument, 0, &amp;#39;S&amp;#39;},
+                {&amp;quot;skip-stderr&amp;quot;, optional_argument, 0, &amp;#39;E&amp;#39;},
+&lt;span class="gd"&gt;-               {&amp;quot;ssh-config&amp;quot;, optional_argument, 0, &amp;quot;F&amp;quot;},&lt;/span&gt;
+                {&amp;quot;proto1&amp;quot;, no_argument, 0, &amp;#39;1&amp;#39;},
+                {&amp;quot;proto2&amp;quot;, no_argument, 0, &amp;#39;2&amp;#39;},
+                {&amp;quot;use-ipv4&amp;quot;, no_argument, 0, &amp;#39;4&amp;#39;},
+&lt;span class="gu"&gt;@@ -199,7 +198,7 @@&lt;/span&gt;
+                        strcpy (argv[c], &amp;quot;-t&amp;quot;);
+
+        while (1) {
+&lt;span class="gd"&gt;-               c = getopt_long (argc, argv, &amp;quot;Vvh1246fqt:H:O:p:i:u:l:C:S::E::n:s:o:F:&amp;quot;, longopts,&lt;/span&gt;
+&lt;span class="gi"&gt;+               c = getopt_long (argc, argv, &amp;quot;Vvh1246fqt:H:O:p:i:u:l:C:S::E::n:s:o:&amp;quot;, longopts,&lt;/span&gt;
+                                 &amp;amp;option);
+
+                if (c == -1 || c == &lt;span class="caps"&gt;EOF&lt;/span&gt;)
+&lt;span class="gu"&gt;@@ -222,7 +221,7 @@&lt;/span&gt;
+                                timeout_interval = atoi (optarg);
+                        break;
+                case &amp;#39;H&amp;#39;:                                                                       /* host */
+&lt;span class="gd"&gt;-                 /* host_or_die(optarg); */     /* commented out 2009-10-22 by jantman for ssh config file use */&lt;/span&gt;
+&lt;span class="gi"&gt;+                       host_or_die(optarg);&lt;/span&gt;
+                        hostname = optarg;
+                        break;
+                case &amp;#39;p&amp;#39;: /* port number */
+&lt;span class="gu"&gt;@@ -300,12 +299,6 @@&lt;/span&gt;
+                        else
+                                skip_stderr = atoi (optarg);
+                        break;
+&lt;span class="gd"&gt;-               /* added 2009-10-22 by jantman for ssh -F option (config file) */&lt;/span&gt;
+&lt;span class="gd"&gt;-               case &amp;#39;F&amp;#39;:                                                                       /* ssh config file */&lt;/span&gt;
+&lt;span class="gd"&gt;-                       comm_append(&amp;quot;-F&amp;quot;);&lt;/span&gt;
+&lt;span class="gd"&gt;-                       comm_append(optarg);&lt;/span&gt;
+&lt;span class="gd"&gt;-                       break;&lt;/span&gt;
+&lt;span class="gd"&gt;-               /* &lt;span class="caps"&gt;END&lt;/span&gt; added 2009-10-22 by jantman */&lt;/span&gt;
+                case &amp;#39;o&amp;#39;:                                                                       /* Extra options for the ssh command */
+                        comm_append(&amp;quot;-o&amp;quot;);
+                        comm_append(optarg);
+&lt;span class="gu"&gt;@@ -411,8 +404,6 @@&lt;/span&gt;
+   printf (&amp;quot;    %s\n&amp;quot;, _(&amp;quot;Ignore all or (if specified) first n lines on &lt;span class="caps"&gt;STDERR&lt;/span&gt; [optional]&amp;quot;));
+   printf (&amp;quot; %s\n&amp;quot;, &amp;quot;-f&amp;quot;);
+   printf (&amp;quot;    %s\n&amp;quot;, _(&amp;quot;tells ssh to fork rather than create a tty [optional]. This will always return &lt;span class="caps"&gt;OK&lt;/span&gt; if ssh is executed&amp;quot;));
+&lt;span class="gd"&gt;-  printf (&amp;quot; %s\n&amp;quot;, &amp;quot;-F&amp;quot;);&lt;/span&gt;
+&lt;span class="gd"&gt;-  printf (&amp;quot;    %s\n&amp;quot;, _(&amp;quot;path to ssh config file [optional]&amp;quot;));&lt;/span&gt;
+   printf (&amp;quot; %s\n&amp;quot;,&amp;quot;-C, --command=&amp;#39;&lt;span class="caps"&gt;COMMAND&lt;/span&gt; &lt;span class="caps"&gt;STRING&lt;/span&gt;&amp;#39;&amp;quot;);
+   printf (&amp;quot;    %s\n&amp;quot;, _(&amp;quot;command to execute on the remote machine&amp;quot;));
+   printf (&amp;quot; %s\n&amp;quot;,&amp;quot;-l, --logname=&lt;span class="caps"&gt;USERNAME&lt;/span&gt;&amp;quot;);
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;It works fine. The only problem is that I disabled the check that the
+given hostname/&lt;span class="caps"&gt;IP&lt;/span&gt; is valid, so instead of getting a nice &amp;#8220;Invalid
+hostname/address - foobar&amp;#8221; error, you&amp;#8217;ll get the usual &amp;#8220;Remote command
+execution failed: ssh: foobar: Name or service not known&amp;#8221; error (though
+it will still give an exit code of 3). I had to do this because
+check_by_ssh was checking for a valid hostname itself, though &lt;span class="caps"&gt;SSH&lt;/span&gt;
+needs to be passed the &amp;#8220;Host&amp;#8221; alias as defined in the config&amp;nbsp;file.&lt;/p&gt;
+&lt;p&gt;With the patch, we now have something nice and clean&amp;nbsp;like:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;./check_by_ssh -H foo1 -F /home/nagios/.ssh/config -l nagios -i /home/nagios/.ssh/id_dsa -C uptime
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Which only adds the &amp;#8220;-F&amp;#8221; flag to what I was already using, and is safe
+to use for all&amp;nbsp;hosts.&lt;/p&gt;
+&lt;p&gt;When I get a chance, I&amp;#8217;ll figure out a way to gracefully deal with the
+host aliases (&amp;#8220;fake hostnames&amp;#8221;) and submit a patch. Most likely, I&amp;#8217;ll
+add another option so that you have to specify both the actual hostname
+(so it can check that it exists) and the alias used in the config file
+(perhaps&amp;nbsp;&amp;#8221;-a&amp;#8221;?)&lt;/p&gt;</summary><category term="monitoring"></category><category term="Nagios"></category></entry><entry><title>Cable Management, Power Measurements, Major Outage, Cacti</title><link href="http://newblog.jasonantman.com/2008/03/cable-management-power-measurements-major-outage-cacti/" rel="alternate"></link><updated>2008-03-06T01:02:00-05:00</updated><author><name>admin</name></author><id>tag:newblog.jasonantman.com,2008-03-06:2008/03/cable-management-power-measurements-major-outage-cacti/</id><summary type="html">&lt;p&gt;So, once again, still really busy. But a few new&amp;nbsp;things.&lt;/p&gt;
+&lt;p&gt;First, my racks both at home and at the apartment are atrocious. They
+have no cable management at all. Both started with 1-3 machines, and no
+real plans for upgrades (since they&amp;#8217;re just my personal/development
+machines). Unfortunately, the &amp;#8220;rack&amp;#8221; (a metal workshop shelving unit) at
+home now has 8 machines and a host of ancillary equipment. The one at
+the apartment - an actual 42U rack - has 5 plus a few switches,
+rackmount &lt;span class="caps"&gt;KMM&lt;/span&gt;, etc. They&amp;#8217;re both a jumble of wires in the back.
+Unfortunately, it seems like cable management hardware is *epxensive*.
+$30 for a 2U metal blank with a few plastic split D-rings, or almost $40
+for a 2-meter vertical hunk of plastic channel with slits in the sides?
+So, I&amp;#8217;ve been vaguely considering what it will take to fabricate some
+cable management hardware of my own. Probably just building something
+out of rack blanks for the horizontal off of the switches, and buying
+some sort of vertical channel for power and networking/&lt;span class="caps"&gt;KVM&lt;/span&gt;. Man, those
+&lt;span class="caps"&gt;KVM&lt;/span&gt; cables sure do take up a lot of space. Also at the moment, at home
+my power is all coming directly out of two UPSs, whereas at the
+apartment it&amp;#8217;s straight from mains off of a surge suppressor. I&amp;#8217;s like
+to buy another &lt;span class="caps"&gt;UPS&lt;/span&gt; for the apartment from RefurbUPS.com, where I got the
+ones from home, and also add a &lt;span class="caps"&gt;PDU&lt;/span&gt; at home and a vertical power strip at
+the&amp;nbsp;apartment.&lt;/p&gt;
+&lt;p&gt;Also, at the apartment, the roommates and I have had some discussion
+lately about how much power the machines draw. This mainly stemmed from
+our plans to move this June, into a rented house with two more people.
+This seems to be falling through, so I don&amp;#8217;t have to worry about moving
+and re-cabling everything, but I&amp;#8217;m still interested in finding out how
+much power is being drawn. Granted, my UPSs at home give me a
+more-or-less good idea of power consumption, but I&amp;#8217;d like to know in
+detail. The ideal solution would be a clamp ammeter around the mains
+line to the equipment - one with a serial interface. Unfortunately, I
+can&amp;#8217;t seem to find such a thing, short of a digital multimeter left on
+all the time. So, I guess I&amp;#8217;ll be looking around, and if I can&amp;#8217;t find
+anything specific, maybe I&amp;#8217;ll work on a microcontroller that can read
+1-200mV in 1mV increments, and use it with an inductive clamp ammeter
+(usual output for them is 1mV per&amp;nbsp;A).&lt;/p&gt;
+&lt;p&gt;So, on Monday I got into work and couldn&amp;#8217;t access my mailserver. Weird.
+I never even got any Nagios alerts. I checked Nagios and&amp;#8230; nothing. As
+in no connection. I &lt;span class="caps"&gt;SSH&lt;/span&gt;&amp;#8217;d home and pinged both boxes, but nothing. The
+switch showed the mail server totally offline, and the Nagios box
+plugged connected but &lt;span class="caps"&gt;ZERO&lt;/span&gt; data out. I reset the counters and waited.
+Still nothing. After an hour or so of poking around, I determined that
+both devices were on the same 6-port group on the switch, and nothing
+else there was up too. So, after five long hours, I got someone back
+home to switch the cables. Still nothing. On a hunch, I asked to have
+her check the mail server (the &amp;#8220;new&amp;#8221; Sun Blade 150) and, sure enough, it
+wasn&amp;#8217;t powered on. A click of the power button, and the mail server was
+back online. Along with an ominous last email from Nagios, stating that
+the &lt;span class="caps"&gt;UPS&lt;/span&gt; running my switch lost power, and 6 minutes later, was going
+down hard. Then&amp;nbsp;quiet.&lt;/p&gt;
+&lt;p&gt;I don&amp;#8217;t usually have power outages. So I&amp;#8217;ll admit, when I added some of
+the new machines, I committed a high sin - I &amp;#8220;never got around&amp;#8221; to
+setting up everything power-wise. I also have the switch running off of
+an old BackUPS &lt;span class="caps"&gt;500VA&lt;/span&gt; unit, &lt;span class="caps"&gt;USB&lt;/span&gt;, without automatic self-tests. As a
+result of all&amp;nbsp;this:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;The little &lt;span class="caps"&gt;UPS&lt;/span&gt; powering the switch only held out for 6-7 minutes. As
+    a result, once that died, the bigger units didn&amp;#8217;t even matter, as
+    all hope was lost. This needs to be on a bigger &lt;span class="caps"&gt;UPS&lt;/span&gt; - maybe one of
+    the &lt;span class="caps"&gt;1000VA&lt;/span&gt;&amp;#8217;s until it gets its&amp;#8217;&amp;nbsp;own.&lt;/li&gt;
+&lt;li&gt;APCupsd requires a network to initiate shutdown, so the rest of the
+    machines came down hard (as confirmed by looking through log&amp;nbsp;files).&lt;/li&gt;
+&lt;li&gt;The SunBlade was never setup to power on after power interruption,
+    so it just sat there like a&amp;nbsp;brick.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Most disturbingly, while my Nagios/monitoring box is up (according to
+the switch, power draw figures from the &lt;span class="caps"&gt;UPS&lt;/span&gt;, and the lights, as
+confirmed by someone on-site), it&amp;#8217;s dead. No ping, nothing out. I&amp;#8217;ll
+have to look into it, but it made me realize that this really is my only
+way of analyzing problems. That needs to&amp;nbsp;stop.&lt;/p&gt;
+&lt;p&gt;Maybe one day I&amp;#8217;ll have the money for a nice &lt;a href="http://www.apc.com/products/family/index.cfm?id=223"&gt;SmartUPS
+&lt;span class="caps"&gt;RT&lt;/span&gt;&lt;/a&gt; or even a
+&lt;a href="http://www.apc.com/products/family/index.cfm?id=189"&gt;Symmetra&lt;/a&gt; - though
+getting 208V into my basement is even more of a dream than spending
+$4000 on a&amp;nbsp;&lt;span class="caps"&gt;UPS&lt;/span&gt;.&lt;/p&gt;
+&lt;p&gt;Also, I decided (after all this) to setup graphing of &lt;span class="caps"&gt;UPS&lt;/span&gt; data (load,
+voltage in and out, temp, capacity, run time, etc.). While I haven&amp;#8217;t
+gotten around to setting up &lt;a href="http://www.zenoss.com/"&gt;Zenoss&lt;/a&gt; yet, I did
+a quick (well, 4 hours later I&amp;#8217;m done configuring it)
+&lt;a href="http://www.cacti.net/"&gt;Cacti&lt;/a&gt;installation on my web server (I should
+already have it running on the monitoring box, but who knows what that
+will look like when I get&amp;nbsp;home).&lt;/p&gt;</summary><category term="apc"></category><category term="cable management"></category><category term="cacti"></category><category term="disaster"></category><category term="monitoring"></category><category term="power distribution"></category><category term="power failure"></category><category term="rack"></category><category term="UPS"></category></entry><entry><title>Update, Eventum/MySQLTicketing Integration</title><link href="http://newblog.jasonantman.com/2008/02/update-eventummysqlticketing-integration/" rel="alternate"></link><updated>2008-02-21T14:53:00-05:00</updated><author><name>admin</name></author><id>tag:newblog.jasonantman.com,2008-02-21:2008/02/update-eventummysqlticketing-integration/</id><summary type="html">&lt;p&gt;Well I know I haven&amp;#8217;t updated in a while. I have a whole bunch of links
+that I&amp;#8217;d like to comment on, but things have been horribly busy. You can
+find the links in my &lt;a href="http://del.icio.us/jantman/1-toblog"&gt;&amp;#8220;1-toblog&amp;#8221; folder on
+del.icio.us&lt;/a&gt; (prefixed with &amp;#8220;1-&amp;#8221; so
+it shows up at the beginning of my bookmark&amp;nbsp;menu).&lt;/p&gt;
+&lt;p&gt;In monitoring land, I&amp;#8217;ve paused my &lt;a href="http://www.hyperic.com/products/hq_oss.html"&gt;Hyperic
+&lt;span class="caps"&gt;HQ&lt;/span&gt;&lt;/a&gt; &lt;span class="caps"&gt;VM&lt;/span&gt; as I wasn&amp;#8217;t too
+pleased with how the features panned out. I was invited to beta test
+&lt;a href="http://www.groundworkopensource.com/"&gt;Groundwork Open Source&lt;/a&gt; 5.2b, but
+I&amp;#8217;m not crazy about the open-ness of a non-public Beta, and am honestly
+not that intrigued by the small feature set (though, admittedly, they do
+need more documentation on the F/&lt;span class="caps"&gt;OSS&lt;/span&gt; version). I&amp;#8217;d still like to try
+them all, especially &lt;a href="http://www.zenoss.com/product/core"&gt;Zenoss Core&lt;/a&gt;,
+but I&amp;#8217;m pretty busy with class, and things are heating up at work and
+with a few consulting&amp;nbsp;projects.&lt;/p&gt;
+&lt;p&gt;In my &amp;#8220;spare time&amp;#8221; (read: staying up until 5 &lt;span class="caps"&gt;AM&lt;/span&gt; and somehow still
+getting up for work at 9) I&amp;#8217;ve been working on something that&amp;#8217;s been
+bugging me for a while - getting &lt;a href="http://www.nagios.org/"&gt;Nagios&lt;/a&gt; to
+automatically open and update tickets in
+&lt;a href="http://eventum.mysql.org"&gt;Eventum&lt;/a&gt;, the ticketing system that I (and
+MySQL) use. The general idea is to use a &amp;#8220;glue&amp;#8221; script, written in &lt;span class="caps"&gt;PHP&lt;/span&gt;
+(Eventum&amp;#8217;s native language). It will (hopefully) keep track of which
+hosts/services it has opened tickets for (and what the ticket &lt;span class="caps"&gt;ID&lt;/span&gt; is),
+and decide from that whether to open a new ticket or, if one already
+exists for that host/service, update it. It should also handle changes
+to assigned user/group, update categories, priorities, etc. This will
+all be based on a &lt;span class="caps"&gt;DB&lt;/span&gt; table that maps problem severities and
+hosts/services to the users, groups, categories, and priorities that
+they should be&amp;nbsp;assigned.&lt;/p&gt;
+&lt;p&gt;The biggest problem is that I&amp;#8217;m not a whiz at object-oriented &lt;span class="caps"&gt;PHP&lt;/span&gt;, and
+like any good &lt;span class="caps"&gt;OO&lt;/span&gt; program, Eventum is broken down into dozens of objects,
+classes, and files. With the help of the &lt;a href="http://xdebug.org/"&gt;Xdebug debugging extension for
+&lt;span class="caps"&gt;PHP&lt;/span&gt;&lt;/a&gt;, which prints full debugging output including
+stack and function call traces, I&amp;#8217;ve been able to *finally* - after
+about four hours of work - write a simple little 15-line script that
+uses &lt;span class="caps"&gt;ONLY&lt;/span&gt; existing Eventum classes, unmodified (except for a separate
+init.php with some stuff commented out), which gets a list of users
+assigned to an issue. From here, it shouldn&amp;#8217;t be difficult to get full
+issue information and then, hopefully, add and update&amp;nbsp;issues.&lt;/p&gt;
+&lt;p&gt;I have a &lt;a href="http://www.jasonantman.com/wiki/index.php/Monitoring_Ticketing"&gt;basic description of the project on my
+wiki&lt;/a&gt;,
+and the current (development, so could be broken) source code in &lt;span class="caps"&gt;CVS&lt;/span&gt;,
+which can be &lt;a href="http://cvs.jasonantman.com/cvs/Eventum-Nagios/"&gt;seen through ViewVC on my
+site&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;Stay&amp;nbsp;Tuned!&lt;/p&gt;</summary><category term="eventum"></category><category term="monitoring"></category><category term="mysql"></category><category term="programming"></category><category term="ticketing"></category></entry><entry><title>F/OSS Monitoring Comparison - Hyperic Part I</title><link href="http://newblog.jasonantman.com/2008/02/foss-monitoring-comparison-hyperic-part-i/" rel="alternate"></link><updated>2008-02-08T16:54:00-05:00</updated><author><name>admin</name></author><id>tag:newblog.jasonantman.com,2008-02-08:2008/02/foss-monitoring-comparison-hyperic-part-i/</id><summary type="html">&lt;p&gt;So, I&amp;#8217;ve made some headway on the comparison. I have Hyperic installed
+and partly configured, albeit without email alerts yet. I&amp;#8217;ve found some
+serious features that I need missing, but I&amp;#8217;m going to give it a full
+run before I move on to&amp;nbsp;another.&lt;/p&gt;
+&lt;p&gt;The full text, updated a few times a day, is available on &lt;a href="http://www.jasonantman.com/wiki/index.php/Network_Monitoring_Comparison"&gt;my
+wiki&lt;/a&gt;.
+Here&amp;#8217;s a bit of an&amp;nbsp;excerpt:  &lt;/p&gt;
+&lt;h3 id="part-i-installation"&gt;Part I -&amp;nbsp;Installation&lt;/h3&gt;
+&lt;ol&gt;
+&lt;li&gt;setup Xen virtual machine running OpenSuSE 10.3 base packages. (3
+    hours, some server problems, some Xen problems, and some time
+    learning Xen administration from the&amp;nbsp;&lt;span class="caps"&gt;CLI&lt;/span&gt;)&lt;/li&gt;
+&lt;li&gt;Download &lt;code&gt;hyperic-hq-installer-3.2.0-607-x86-linux.tgz&lt;/code&gt; from
+    &lt;a href="http://www.hyperic.com/downloads/dl-hq-oss.html" title="http://www.hyperic.com/downloads/dl-hq-oss.html"&gt;Hyperic&lt;/a&gt;
+    and&amp;nbsp;extract.&lt;/li&gt;
+&lt;li&gt;Browse to
+    &lt;a href="http://support.hyperic.com/confluence/display/DOC/Full+Installation+Guide" title="http://support.hyperic.com/confluence/display/DOC/Full+Installation+Guide"&gt;http://support.hyperic.com/confluence/display/&lt;span class="caps"&gt;DOC&lt;/span&gt;/Full+Installation+Guide&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;code&gt;cd&lt;/code&gt; into &lt;code&gt;hyperic-hq-installer&lt;/code&gt; and run &lt;code&gt;./setup.sh -full&lt;/code&gt;&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;The installation can&amp;#8217;t be run as root (though I assumed it would
+    need root&amp;nbsp;privileges).&lt;/li&gt;
+&lt;li&gt;I selected to install all 3 components - Server, Shell, and&amp;nbsp;Agent.&lt;/li&gt;
+&lt;li&gt;Well, whoops! Sorta stupid to not allow installation as root,
+    when the default location to install to is &lt;code&gt;/home/hyperic&lt;/code&gt;. How
+    do they expect an arbitrary user to install there? Even worse,
+    it appears that the default OpenSuSE 10.3 installation doesn&amp;#8217;t
+    come with &lt;code&gt;sudo&lt;/code&gt; (!!!!) so I can&amp;#8217;t try&amp;nbsp;that.&lt;/li&gt;
+&lt;li&gt;As root, create &lt;code&gt;/home/hyperic&lt;/code&gt; and chown to my&amp;nbsp;user.&lt;/li&gt;
+&lt;li&gt;Repear the above steps (well, hopefully not all of&amp;nbsp;them).&lt;/li&gt;
+&lt;li&gt;Default ports for everything - web &lt;span class="caps"&gt;GUI&lt;/span&gt; on 7080, &lt;span class="caps"&gt;HTTPS&lt;/span&gt; web &lt;span class="caps"&gt;GUI&lt;/span&gt; on
+    7443, jnp service on 2099, mbean server on&amp;nbsp;9093,&lt;/li&gt;
+&lt;li&gt;Change domain names in default URLs to logical ones for my test
+    environment (no real &lt;span class="caps"&gt;DNS&lt;/span&gt;, just IPcop hosts, so
+    devel-hyperic1.localdomian). I hope that I can change these
+    later, or even better that absolute paths aren&amp;#8217;t used too much,
+    as this will screw with my idea of using &lt;span class="caps"&gt;SSH&lt;/span&gt; port forwarding for
+    remote&amp;nbsp;access.&lt;/li&gt;
+&lt;li&gt;Leave the default &lt;span class="caps"&gt;SMTP&lt;/span&gt; server alone and change it later - I
+    odn&amp;#8217;t even have mail running here at the&amp;nbsp;apartment.&lt;/li&gt;
+&lt;li&gt;Use the built-in PostgreSQL database with default port of&amp;nbsp;9432.&lt;/li&gt;
+&lt;li&gt;Go with the defaults for everything after&amp;nbsp;this.&lt;/li&gt;
+&lt;li&gt;Everything runs nicely, and then it tells you to login to
+    another terminal as root and run a script. I&amp;#8217;m not sure I like
+    this method, but I guess it works. Login and do&amp;nbsp;it.&lt;/li&gt;
+&lt;li&gt;How will it start the builtin database? As my user???? Yup.
+    postgres is running as my user. Wonderful. Nothing in the
+    &lt;a href="http://support.hyperic.com/confluence/display/DOC/Full+Installation+Guide" title="http://support.hyperic.com/confluence/display/DOC/Full+Installation+Guide"&gt;install
+    document&lt;/a&gt;
+    mentioned user creation. Was this just assumed? Because in the
+    naive world I live in, most installer scripts (think Nagios)
+    create a user for you, or tell you&amp;nbsp;to.&lt;/li&gt;
+&lt;li&gt;Setup script complete. A few instructions&amp;nbsp;follow&amp;#8230;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Run &lt;code&gt;/home/hyperic/server-3.2.0/bin/hq-server.sh start&lt;/code&gt;&amp;#8230; as my
+    user. &lt;em&gt;Note to self:&lt;/em&gt; setup a user for Postgres and Hyperic. Believe
+    it or not, but it booted - but followed with the message, &amp;#8220;Login to
+    &lt;span class="caps"&gt;HQ&lt;/span&gt; at:
+    &lt;a href="http://127.0.0.1:7080/" title="http://127.0.0.1:7080/"&gt;http://127.0.0.1:7080/&lt;/a&gt;&amp;#8221;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;Browsed to
+    &lt;a href="http://devel-hyperic1:7080/" title="http://devel-hyperic1:7080"&gt;http://devel-hyperic1:7080&lt;/a&gt;
+    and was greeted by a startup page, saying that the server was 18%
+    finished booting. My, I yearn for little C binaries and a &lt;span class="caps"&gt;PHP&lt;/span&gt;&amp;nbsp;frontend.&lt;/li&gt;
+&lt;li&gt;Page turns blank and stops there. I refresh, and get a login page. I
+    enter my username and password, and get a little message box where
+    the &amp;#8220;invalid password&amp;#8221; box usually is - says &amp;#8220;Server is still
+    booting&amp;#8221;. This is over a minute later. I&amp;#8217;m happy to see
+    Apache/Coyote1.1, but would like to be able to get into Hyperic in
+    less time than it takes the machine to boot to a graphical login
+    screen (ok, granted, I&amp;#8217;m running &lt;span class="caps"&gt;XFCE&lt;/span&gt;). In SuSE&amp;#8217;s YaST Xen Monitor,
+    I see that the &lt;span class="caps"&gt;VM&lt;/span&gt; is at 45% of its&amp;#8217; &lt;span class="caps"&gt;464MB&lt;/span&gt; &lt;span class="caps"&gt;RAM&lt;/span&gt;, and 90% &lt;span class="caps"&gt;CPU&lt;/span&gt; - with
+    8.5% consumed by&amp;nbsp;dom0.&lt;/li&gt;
+&lt;li&gt;&lt;span class="caps"&gt;CPU&lt;/span&gt; usage for the &lt;span class="caps"&gt;VM&lt;/span&gt; drops to 1% and I login again. &lt;span class="caps"&gt;BAM&lt;/span&gt;! Hyperic &lt;span class="caps"&gt;HQ&lt;/span&gt;.
+    Aside from the fact that it shows &lt;span class="caps"&gt;NO&lt;/span&gt; resources&amp;#8230; oh&amp;#8230; start the&amp;nbsp;Agent.&lt;/li&gt;
+&lt;li&gt;Start the Agent on the &lt;span class="caps"&gt;VM&lt;/span&gt; running Hyperic. It asks me for the server
+    &lt;span class="caps"&gt;IP&lt;/span&gt; address. What, no &lt;span class="caps"&gt;DNS&lt;/span&gt;? I enter the &lt;span class="caps"&gt;IP&lt;/span&gt; as it is&amp;#8230; for now. I keep
+    everything at defaults, including using the hqadmin username and
+    password. Successfully&amp;nbsp;started.&lt;/li&gt;
+&lt;li&gt;&lt;span class="caps"&gt;BAM&lt;/span&gt;! In Dashboard, I see the auto-discovered host with the right
+    hostname, as well as Tomcat, Agent, JBoss, and PostgreSQL. Amazing!
+    Click &amp;#8220;Add to&amp;nbsp;Inventory&amp;#8221;.&lt;/li&gt;
+&lt;li&gt;Check out the &amp;#8220;Resources&amp;#8221; -&gt; &amp;#8220;Browse&amp;#8221; screen. It knows this machine
+    is OpenSuSE 10.3, and I see my four services (listed above). Of
+    course, no metrics yet, but I see the correct &lt;span class="caps"&gt;IP&lt;/span&gt;, gateway, &lt;span class="caps"&gt;DNS&lt;/span&gt;,
+    vendor (SuSE), kernel version, &lt;span class="caps"&gt;RAM&lt;/span&gt;, architecture, and &lt;span class="caps"&gt;CPU&lt;/span&gt;&amp;nbsp;speed.&lt;/li&gt;
+&lt;li&gt;Looking through the &amp;#8220;Inventory&amp;#8221; screen, I see everything - NICs and
+    MACs, running servers and one service (a &lt;span class="caps"&gt;CPU&lt;/span&gt; resource). What more
+    could a man want in&amp;#8230;let&amp;#8217;s see.. just over an&amp;nbsp;hour!&lt;/li&gt;
+&lt;li&gt;I really *love* the &amp;#8220;Views&amp;#8221; screen which, even out-of-the-box,
+    allows &amp;#8220;Live Exec&amp;#8221; information from cpuinfo, df, ifconfig, netstat,
+    top, who, and&amp;nbsp;more.&lt;/li&gt;
+&lt;li&gt;Well, it&amp;#8217;s 03:35, and I have work and class tomorrow. I think it&amp;#8217;s
+    time to give Part I a rest. But&amp;nbsp;first&amp;#8230;&lt;/li&gt;
+&lt;li&gt;Go to the &amp;#8220;Platform&amp;#8221; page for my one machine and&amp;#8230; &lt;span class="caps"&gt;YES&lt;/span&gt;! Graphs are
+    starting to&amp;nbsp;appear!&lt;/li&gt;
+&lt;li&gt;Following the suggestion
+    &lt;a href="http://support.hyperic.com/confluence/display/DOC/HQ+Quick+Start#HQQuickStart-enableTracking" title="http://support.hyperic.com/confluence/display/DOC/HQ+Quick+Start#HQQuickStart-enableTracking"&gt;here&lt;/a&gt;,
+    I enable log and config tracking on the platform for &lt;code&gt;/var/log/warn&lt;/code&gt;
+    and &lt;code&gt;/etc/hosts&lt;/code&gt;,&amp;nbsp;respecitvely.&lt;/li&gt;
+&lt;li&gt;Before I call it a night (now 03:42), I stop back at the &lt;a href="http://www.hyperic.com/downloads/dl-hq-oss.html" title="http://www.hyperic.com/downloads/dl-hq-oss.html"&gt;downloads
+    page&lt;/a&gt;
+    and grab the Linux x86 Agent for the dom0 machine, hoping to get
+    some physical information as well. While I&amp;#8217;m at it, I grab the Linux
+    &lt;span class="caps"&gt;AMD64&lt;/span&gt; Agent to try on my laptop. I create &amp;#8220;hyperic&amp;#8221; users on each
+    system. On the base Xen server, I give it a shot and get &amp;#8220;Unable to
+    register agent: Error communicating with agent: Unauthorized&amp;#8221;. Same
+    thing on the&amp;nbsp;laptop.&lt;/li&gt;
+&lt;li&gt;Did a little reading
+    &lt;a href="http://support.hyperic.com/confluence/display/DOC/Installation+Non-Windows#InstallationNon-Windows-install" title="http://support.hyperic.com/confluence/display/DOC/Installation+Non-Windows#InstallationNon-Windows-install"&gt;here&lt;/a&gt;.
+    As to keeping all of the defaults, it turns out that both clients
+    had firewalls blocking &lt;span class="caps"&gt;TCP&lt;/span&gt; port 2144. I opened it up on both, and
+    also set the &lt;span class="caps"&gt;IP&lt;/span&gt; address (that the server uses to contact the client)
+    to the correct ones. Viola! Now I have 3 clients connected, and
+    gatheirng data for the next \~16 hours until I have time to check it
+    out&amp;nbsp;agian.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;More to come in Part &lt;span class="caps"&gt;II&lt;/span&gt; tomorrow - actually doing something with
+Hyperic. For&lt;br /&gt;
+now (04:08), time to&amp;nbsp;sleep.&lt;/p&gt;
+&lt;h3 id="part-ii-configuration"&gt;Part &lt;span class="caps"&gt;II&lt;/span&gt; -&amp;nbsp;Configuration&lt;/h3&gt;
+&lt;p&gt;Unfortunately, I haven&amp;#8217;t had much time to play with Hyperic in the two
+days&lt;br /&gt;
+since installation. The most I&amp;#8217;ve really done is setup Agents on my
+laptop,&lt;br /&gt;
+desktop, and the host machine (both dom0 and domU for Hyperic), so that
+they&lt;br /&gt;
+start to collect&amp;nbsp;data.&lt;/p&gt;
+&lt;p&gt;While I found a lot of upsetting stuff in the features list (see below),
+I&lt;br /&gt;
+decided to go ahead and add some other devices. On the network at the&lt;br /&gt;
+apartment, I have two manageable switches (a Linksys and a 3Com) - which
+pretty&lt;br /&gt;
+much make up the sum of non-host equipment. I also have an IPcop box,
+though I&lt;br /&gt;
+assume the standard Linux Agent will handle that. The one item missing
+that I&lt;br /&gt;
+have at home is my set of &lt;span class="caps"&gt;APC&lt;/span&gt; SmartUPS UPSs with &lt;span class="caps"&gt;SNMP&lt;/span&gt; cards, but I guess
+I&amp;#8217;ll&lt;br /&gt;
+just have to skip them for this&amp;nbsp;review.&lt;/p&gt;
+&lt;p&gt;First, I went in and added a platform (Resources-&gt;Browse, Tools
+Menu-&gt;Add&lt;br /&gt;
+Platform) for the 3Com switch (a SuperStack &lt;span class="caps"&gt;II&lt;/span&gt; Switch 3300). It showed&lt;br /&gt;
+successful creation - but nothing else. I went in and entered the &lt;span class="caps"&gt;SNMP&lt;/span&gt;&lt;br /&gt;
+community string, &lt;span class="caps"&gt;IP&lt;/span&gt;, and version (1). In about a minute or so, I
+started to&lt;br /&gt;
+see metrics - Availability, &lt;span class="caps"&gt;IP&lt;/span&gt; Forwards, &lt;span class="caps"&gt;IP&lt;/span&gt; In Receives, an &lt;span class="caps"&gt;IP&lt;/span&gt; In
+Received per&lt;br /&gt;
+Second. While it&amp;#8217;s quite basic, that&amp;#8217;s good for a starting point. While
+the&lt;br /&gt;
+[&lt;a href="http://support.hyperic.com/confluence/display/DOCSHQ30/Network+Device+platform" title="http://support.hyperic.com/confluence/display/DOCSHQ30/Network+Device+platform"&gt;http://support.hyperic.com/confluence/display/&lt;span class="caps"&gt;DOCSHQ30&lt;/span&gt;/Network+Device+platform&lt;/a&gt;&lt;br /&gt;
+Network Device Platform] documentation lists lots of metrics that can
+be&lt;br /&gt;
+enabled, I&amp;#8217;d also like telnet availability and - my big one since I use
+a&lt;br /&gt;
+&amp;#8220;cute&amp;#8221; (crappy) IPcop installation for local &lt;span class="caps"&gt;DNS&lt;/span&gt;, a dig on &lt;span class="caps"&gt;DNS&lt;/span&gt; to make
+sure&lt;br /&gt;
+the entry is there. In the Monitor screen, I was able to enable a bunch
+of&lt;br /&gt;
+additional metrics (by clicking on the &amp;#8220;Show All Metrics&amp;#8221; link), though&lt;br /&gt;
+there&amp;#8217;s also no way (that I can find) to monitor the status of
+individual&lt;br /&gt;&amp;nbsp;ports.&lt;/p&gt;
+&lt;p&gt;Next, I browsed through the &amp;#8220;Administration&amp;#8221; pages, setup a few users,
+and&lt;br /&gt;
+started setting *way* more default metrics for various platforms,
+services,&lt;br /&gt;
+and servers. While I don&amp;#8217;t have mail running yet, that will come this&lt;br /&gt;
+weekend. While I added a lot of things as &amp;#8220;Default On&amp;#8221;, I still need to
+go&lt;br /&gt;
+back and add more things in the templates as&amp;nbsp;Indicators.&lt;/p&gt;
+&lt;p&gt;I also added some escalations, though they&amp;#8217;re quite simple - you can
+notify &lt;span class="caps"&gt;HQ&lt;/span&gt;&lt;br /&gt;
+users or &amp;#8220;other users&amp;#8221; by email or &lt;span class="caps"&gt;SMS&lt;/span&gt;, write to SysLog, or suppress
+alerts&lt;br /&gt;
+for 0 minutes to 24 hours. Hopefully I&amp;#8217;ll also find a plugin for
+Asterisk&lt;br /&gt;
+integration. One striking omission is user groups. Also, the concept of&lt;br /&gt;
+&amp;#8220;Roles&amp;#8221; (maybe their idea of groups?) is only available in the
+Enterprise&lt;br /&gt;&amp;nbsp;version.&lt;/p&gt;
+&lt;p&gt;At this point, I also notice one other majoe issue, though perhaps I&amp;#8217;ll
+find a&lt;br /&gt;
+solution in my experimentation - there doesn&amp;#8217;t be a way to setup
+default&lt;br /&gt;
+alerts for metrics. If they have all of this platform, server, and
+service&lt;br /&gt;
+information defined as default templates, why not just have a way to
+assign&lt;br /&gt;
+default users (and groups) to these objects, and have default alerts&lt;br /&gt;&amp;nbsp;generated?&lt;/p&gt;
+&lt;p&gt;In terms of Apache 2.2 monitoring, out-of-the-box, nothing worked. No
+metrics&lt;br /&gt;
+at all. Firstly, Hyperic requires the mod_status module. Persoanlly,
+I&amp;#8217;d&lt;br /&gt;
+rather handle all of that through a backend, like Nagios. Secondly, it
+got the&lt;br /&gt;
+pidfile and apache2ctl paths wrong. Furthermore, it has no &amp;#8220;smart&amp;#8221;
+checking for resources - while my Apache 2.2 resource config was clearly
+wrong (wrong &lt;span class="caps"&gt;PID&lt;/span&gt; file path, no mod_status), Hyperic didn&amp;#8217;t detect this
+and was showing the resource as&amp;nbsp;&amp;#8220;Down&amp;#8221;.&lt;/p&gt;
+&lt;p&gt;After that, I setup a bunch of alerts for things that I thought would be
+off-kilter a lot (like &lt;span class="caps"&gt;WARN&lt;/span&gt; log entries on my laptop, high memory usage
+on some stressed machines, etc.) as well as log and config file
+monitoring and alerts for them. While I didn&amp;#8217;t have mail working yet, I
+figured I might as well get that stuff&amp;nbsp;running.&lt;/p&gt;
+&lt;p&gt;On the Xen dom0 host that runs the Hyperic vm (box called xenmaster1), I
+wasn&amp;#8217;t able to add config file tracking for any of the /etc/xen/ files.
+At this point I notice some serious shortcomings - not only is it not
+possible to define a template of alerts for a given
+platform/server/service, it&amp;#8217;s also impossible to define a template for
+alerts. I also noticed that it&amp;#8217;s not possible to define groups of
+contacts. This wasn&amp;#8217;t much of a problem for my test installation - the
+alerts are only going to my roommate and I - but it would surely be an
+issue in any larger&amp;nbsp;setting.&lt;/p&gt;
+&lt;p&gt;At this point in configuration, I come to a make-or-break point. With
+some of these shortcomings, I really need a way to call a script with
+alert information when an alert is generated - whether it&amp;#8217;s to dial out
+through Asterisk or just automatically create a ticket for the&amp;nbsp;problem.&lt;/p&gt;
+&lt;p&gt;Adding alerts is a cumbersome process. You have to browse to a page for
+a specific metric - which means going to the page for a specific
+platform, server, or service - and then opening the page for that
+metric. The actual alert creation takes up two pages - one for the
+metric, threshold, and time-based criteria, and a second for who to
+alert. This means that to add alerts for a machine, you need to view the
+platform page as well as the services and servers pages, and each metric&amp;nbsp;therein.&lt;/p&gt;
+&lt;p&gt;I&amp;#8217;ll be posting some more in the days to come. From a &lt;a href="http://forums.hyperic.com/jiveforums/thread.jspa?messageID=14561&amp;amp;#14561"&gt;post at the
+Hyperic
+Forums&lt;/a&gt;,
+I was able to find out that a Xen plugin is in the works, but for the
+Open Source version, the only way to trigger a script is to send an
+email and have it handled by a filter such as&amp;nbsp;Procmail.&lt;/p&gt;</summary><category term="hyperic"></category><category term="monitoring"></category><category term="open source"></category></entry><entry><title>Network Monitoring Trials - Part I</title><link href="http://newblog.jasonantman.com/2008/02/network-monitoring-trials-part-i/" rel="alternate"></link><updated>2008-02-05T20:26:00-05:00</updated><author><name>admin</name></author><id>tag:newblog.jasonantman.com,2008-02-05:2008/02/network-monitoring-trials-part-i/</id><summary type="html">&lt;p&gt;After dinner tonight, I&amp;#8217;m going to start setting up my Xen VMs and
+installing some monitoring software. I&amp;#8217;ve decided that
+&lt;a href="http://www.hyperic.com/"&gt;Hyperic&lt;/a&gt; and &lt;a href="http://www.opennms.org"&gt;OpenNMS&lt;/a&gt;
+will be the first round - mainly because their free versions seem to be
+the most heavy-weight, and will probably take more installation time.
+&lt;a href="http://www.groundworkopensource.com/"&gt;GroundWork Open Source&lt;/a&gt; will come
+sometime later this&amp;nbsp;week.&lt;/p&gt;
+&lt;p&gt;While the research that I did today has led me to start formulating some
+opinions on each of the contestants, I&amp;#8217;m going to withhold comment until
+I get all three up and running, and have done some real work with&amp;nbsp;them.&lt;/p&gt;</summary><category term="groundwork"></category><category term="hyperic"></category><category term="monitoring"></category><category term="opennms"></category></entry></feed>

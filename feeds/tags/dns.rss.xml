@@ -1,0 +1,393 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Jason Antman's Blog</title><link>http://newblog.jasonantman.com/</link><description></description><atom:link href="http://newblog.jasonantman.com/feeds/tags/dns.rss.xml" rel="self"></atom:link><lastBuildDate>Wed, 05 Sep 2012 05:00:00 -0400</lastBuildDate><item><title>Some PowerDNS Links and Interesting Features</title><link>http://newblog.jasonantman.com/2012/09/some-powerdns-links-and-interesting-features/</link><description>&lt;p&gt;At $&lt;span class="caps"&gt;WORK&lt;/span&gt; we lost a disk in the &lt;span class="caps"&gt;RAID1&lt;/span&gt; of one of our external nameservers,
+and it rekindled an occasional discussion of migration from &lt;a&gt;&lt;span class="caps"&gt;ISC&lt;/span&gt;
+&lt;span class="caps"&gt;BIND&lt;/span&gt;&lt;/a&gt; to &lt;a href="http://powerdns.com/content/products.html"&gt;PowerDNS&lt;/a&gt;.
+PowerDNS has separate authoritative and recursive servers, and doesn&amp;#8217;t
+seem to natively support views or split-horizon the way &lt;span class="caps"&gt;BIND&lt;/span&gt; does, but
+it has some really cool features including very mature database
+backends, load balancing, Lua scripting support to modify how recursive
+queries are answered, and geolocation or &lt;span class="caps"&gt;IP&lt;/span&gt;-range based query&amp;nbsp;results.&lt;/p&gt;
+&lt;p&gt;While this project is still just casual research, I thought I&amp;#8217;d share
+some of the useful links and information I&amp;#8217;ve&amp;nbsp;found:&lt;/p&gt;
+&lt;p&gt;PowerDNS&amp;nbsp;Front-ends:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href="http://www.nicmus.com/community.html"&gt;JPowerAdmin&lt;/a&gt; - One of the two
+    most popular, a GPLv3 Java (JBoss &lt;span class="caps"&gt;SEAM&lt;/span&gt;) based web &lt;span class="caps"&gt;UI&lt;/span&gt; with a RESTful
+    &lt;span class="caps"&gt;API&lt;/span&gt;, with support for &amp;#8220;multiple&amp;#8221; database backends. Sponsored by
+    Nicmus, Inc. &lt;a href="http://www.nicmus.com/JPowerAdmin"&gt;Online demo&lt;/a&gt;
+    (demo:demo). Looks nice, simple &lt;span class="caps"&gt;UI&lt;/span&gt;, but no support for&amp;nbsp;split-horizon.&lt;/li&gt;
+&lt;li&gt;&lt;a href="https://www.poweradmin.org"&gt;PowerAdmin&lt;/a&gt; - the other most popular,
+    though it seems to be undergoing a large overhaul at the moment. Has
+    full support for most of PowerDNS&amp;#8217;s features, written in &lt;span class="caps"&gt;PHP&lt;/span&gt;,
+    supports &amp;#8220;large&amp;#8221; databases, fine-grained user permissions, &lt;span class="caps"&gt;RFC&lt;/span&gt;
+    validation, zone templates. &lt;a href="http://demo.poweradmin.org/"&gt;Online
+    demo&lt;/a&gt; (demo:demo). I don&amp;#8217;t really like
+    that it manages the SOAs as full text (without any templating,
+    dropdowns or default values), and that it doesn&amp;#8217;t prepopulate
+    default values for &lt;span class="caps"&gt;TTL&lt;/span&gt; in the new record form, but it looks like a
+    good starting place for someone (like me) who&amp;#8217;s handy with&amp;nbsp;&lt;span class="caps"&gt;PHP&lt;/span&gt;.&lt;/li&gt;
+&lt;li&gt;&lt;a href="http://code.google.com/p/pdns-gui/"&gt;pdns-gui - PowerDNS &lt;span class="caps"&gt;GUI&lt;/span&gt; - Google Project
+    Hosting&lt;/a&gt; - &lt;span class="caps"&gt;PHP&lt;/span&gt;/MySQL &lt;span class="caps"&gt;GUI&lt;/span&gt;.
+    &lt;a href="http://www.powerdns-gui.org/"&gt;Online demo&lt;/a&gt;. Handles templates
+    nicely but won&amp;#8217;t scale to too many of them. Window-based &lt;span class="caps"&gt;UI&lt;/span&gt; is
+    visually pleasing but will probably be a problem for big&amp;nbsp;zones.&lt;/li&gt;
+&lt;li&gt;&lt;a href="http://code.google.com/p/powerdns-webinterface/"&gt;powerdns-webinterface - PowerDNS Webinterface - Google Project
+    Hosting&lt;/a&gt; - A nice
+    but relatively simplistic &lt;span class="caps"&gt;UI&lt;/span&gt; written in &lt;span class="caps"&gt;PHP&lt;/span&gt;. It has some nice
+    features like multi-user authentication (and logging, though I
+    haven&amp;#8217;t looked into how detailed it is), automatic &lt;span class="caps"&gt;SOA&lt;/span&gt; serial
+    update, automatic &lt;span class="caps"&gt;PTR&lt;/span&gt; creation, etc. Unfortunately not geared
+    towards people with lots of domains and multiple records; it has
+    only one template for new domains (and no way to update domains
+    created from a template), no easy filtering, and still treats &lt;span class="caps"&gt;SOA&lt;/span&gt;
+    like a single text&amp;nbsp;record.&lt;/li&gt;
+&lt;li&gt;&lt;a href="http://sourceforge.net/projects/zoneadmin/"&gt;ZoneAdmin |
+    SourceForge.net&lt;/a&gt; and
+    &lt;a&gt;Project website&lt;/a&gt; - Maybe not the fastest tool to use in bulk,
+    but a nice, relatively intuitive and full-featured admin tool.
+    &lt;a href="http://open.megabit.net/demos/ZoneAdmin/"&gt;Online demo&lt;/a&gt;&amp;nbsp;(demo:demo).&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Some links on PowerDNS&amp;nbsp;split-horizon&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href="http://old.nabble.com/Split-Horizon-Scripts-td32843045.html"&gt;Old Nabble - PowerDNS - Split Horizon&amp;nbsp;Scripts&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;It looks to me that split-horizon is going to be the hardest part for
+us, at least to also have a web &lt;span class="caps"&gt;UI&lt;/span&gt; to manage it. It looks like with
+PowerDNS, the most common way to run split horizon &lt;span class="caps"&gt;DNS&lt;/span&gt; (views) is to run
+two separate sets of servers or instances, either on different boxes or
+multi-homed; one for internal and one for external. While that sounds
+like quite a bit of overhead beyond what &lt;span class="caps"&gt;BIND&lt;/span&gt; does, the real problem is
+finding a web &lt;span class="caps"&gt;UI&lt;/span&gt; that supports it; I don&amp;#8217;t care if it&amp;#8217;s in two separate
+databases, but what I want is a logical (web &lt;span class="caps"&gt;UI&lt;/span&gt;) view that has zones
+made up of resource names (i.e. the leftmost column in a zone file) with
+one or two RRs (type, ttl, priority, value) - one for each view. That&amp;#8217;s
+the real catch - all of our machines are in private &lt;span class="caps"&gt;IP&lt;/span&gt; space behind a
+firewall, so I need to be able to manage the internal and external
+records on one screen. While it&amp;#8217;s not exactly scalable, and the code
+stagnated quite a bit once I got it to a point that was usable for me,
+this was the main goal of my &lt;a href="http://multibindadmin.jasonantman.com/"&gt;MultiBIND
+Admin&lt;/a&gt;&amp;nbsp;project.&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Wed, 05 Sep 2012 05:00:00 -0400</pubDate><guid>tag:newblog.jasonantman.com,2012-09-05:2012/09/some-powerdns-links-and-interesting-features/</guid><category>bind</category><category>dns</category><category>multibindadmin</category><category>powerdns</category></item><item><title>PHP Script to Query Linode DNS Manager API</title><link>http://newblog.jasonantman.com/2012/01/php-script-to-query-linode-dns-manager-api/</link><description>&lt;p&gt;I&amp;#8217;m in the process of moving all of my public-facing services, currently
+hosted on a single
+&lt;a href="http://www.linode.com/?r=5c8ad2931b410b55455aadbcf0a8d86d6f698a91"&gt;Linode&lt;/a&gt;,
+to a new virtual machine (still with Linode, of course, just a new
+CentOS 6 &lt;span class="caps"&gt;VM&lt;/span&gt;). Of course, I&amp;#8217;ve got a &lt;em&gt;lot&lt;/em&gt; (about 60) of &lt;span class="caps"&gt;DNS&lt;/span&gt; records,
+spread across 8 domains, that point at the old machine. For name-based
+vhosts in Apache, my usual procedure is to migrate everything over to
+the new host and then change &lt;span class="caps"&gt;DNS&lt;/span&gt;, and once the change propagates (I&amp;#8217;m
+using Linode&amp;#8217;s &lt;span class="caps"&gt;DNS&lt;/span&gt; hosting, so it makes things a &lt;span class="caps"&gt;LOT&lt;/span&gt; easier but I don&amp;#8217;t
+have &lt;code&gt;rndc reload&lt;/code&gt; anymore) I test in a browser and, assuming all is
+well, disable the vhost on the old server. To do all this, I need an
+easy way to get a list of all the &lt;span class="caps"&gt;DNS&lt;/span&gt; records that still point to the
+old&amp;nbsp;machine.&lt;/p&gt;
+&lt;p&gt;Luckily, to augment their web-based control panel (Linode Manager),
+Linode has a pretty full-featured &lt;a href="http://www.linode.com/api/"&gt;&lt;span class="caps"&gt;API&lt;/span&gt;&lt;/a&gt; with
+bindings for Python, Perl, &lt;span class="caps"&gt;PHP&lt;/span&gt;, Ruby, Java and others. While I like
+Python and I&amp;#8217;m starting to learn Perl (by trying to shift most of my
+non-time-sensitive scripting to it) for my new job, &lt;span class="caps"&gt;PHP&lt;/span&gt; is still my
+strongest language (and the majority of my existing administrative
+scripting is written in it, especially handy when it comes time to add a
+web front-end to things). So I wrote the following script to query
+Linode&amp;#8217;s &lt;a href="http://www.linode.com/api/dns"&gt;&lt;span class="caps"&gt;DNS&lt;/span&gt; Manager &lt;span class="caps"&gt;API&lt;/span&gt;&lt;/a&gt; using &lt;a href="https://github.com/krmdrms/linode/"&gt;Kerem
+Durmus&amp;#8217; Linode &lt;span class="caps"&gt;API&lt;/span&gt; &lt;span class="caps"&gt;PHP&lt;/span&gt; wrapper&lt;/a&gt;
+(installation instructions and info at that Github link). The script
+simply writes all Linode &lt;span class="caps"&gt;DNS&lt;/span&gt; records for all zones to a &lt;span class="caps"&gt;CSV&lt;/span&gt; file (this
+could take a while if you have a lot of&amp;nbsp;records&amp;#8230;).&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="x"&gt;   *&lt;/span&gt;
+&lt;span class="x"&gt;   * &lt;span class="caps"&gt;INSTALLATION&lt;/span&gt; (as per krmdrms &lt;span class="caps"&gt;README&lt;/span&gt;):&lt;/span&gt;
+&lt;span class="x"&gt;   *  pear install Net_URL2-0.3.1&lt;/span&gt;
+&lt;span class="x"&gt;   *  pear install HTTP_Request2-0.5.2&lt;/span&gt;
+&lt;span class="x"&gt;   *  pear channel-discover pear.keremdurmus.com&lt;/span&gt;
+&lt;span class="x"&gt;   *  pear install krmdrms/Services_Linode&lt;/span&gt;
+&lt;span class="x"&gt;   *&lt;/span&gt;
+&lt;span class="x"&gt;   * Also requires php-openssl / php5-openssl&lt;/span&gt;
+&lt;span class="x"&gt;   *&lt;/span&gt;
+&lt;span class="x"&gt;   * &lt;span class="caps"&gt;USAGE&lt;/span&gt;: php linodeDnsToCsv.php&lt;/span&gt;
+&lt;span class="x"&gt;   *&lt;/span&gt;
+&lt;span class="x"&gt;   * Copyright 2011 Jason Antman  , all rights reserved.&lt;/span&gt;
+&lt;span class="x"&gt;   * This script is free for use by anyone anywhere, provided that you comply with the following terms:&lt;/span&gt;
+&lt;span class="x"&gt;   * 1) Keep this notice and copyright statement intact.&lt;/span&gt;
+&lt;span class="x"&gt;   * 2) Send any substantial changes, improvements or bog fixes back to me at the above address.&lt;/span&gt;
+&lt;span class="x"&gt;   * 3) If you include this in a product or redistribute it, you notify me, and include my name in the credits or changelog.&lt;/span&gt;
+&lt;span class="x"&gt;   *&lt;/span&gt;
+&lt;span class="x"&gt;   * The following &lt;span class="caps"&gt;URL&lt;/span&gt; always points to the newest version of this script. If you obtained it from another source, you should&lt;/span&gt;
+&lt;span class="x"&gt;   * check here:&lt;/span&gt;
+&lt;span class="x"&gt;   * $HeadURL: http://svn.jasonantman.com/misc-scripts/linodeDnsToCsv.php $&lt;/span&gt;
+&lt;span class="x"&gt;   * $LastChangedRevision: 25 $&lt;/span&gt;
+&lt;span class="x"&gt;   *&lt;/span&gt;
+&lt;span class="x"&gt;   * &lt;span class="caps"&gt;CHANGELOG&lt;/span&gt;:&lt;/span&gt;
+&lt;span class="x"&gt;   * 2011-12-17 Jason Antman :&lt;/span&gt;
+&lt;span class="x"&gt;   *    merged into my svn repo&lt;/span&gt;
+&lt;span class="x"&gt;   * 2011-09-12 Jason Antman :&lt;/span&gt;
+&lt;span class="x"&gt;   *    initial version of script&lt;/span&gt;
+&lt;span class="x"&gt;   *&lt;/span&gt;
+&lt;span class="x"&gt;   */&lt;/span&gt;
+
+&lt;span class="x"&gt;require_once(&amp;quot;/var/www/linode_apikey.php&amp;quot;); // &lt;span class="caps"&gt;PHP&lt;/span&gt; file containing:   define(&amp;quot;API_KEY_LINODE&amp;quot;, &amp;quot;myApiKeyHere&amp;quot;);&lt;/span&gt;
+&lt;span class="x"&gt;require_once(&amp;#39;Services/Linode.php&amp;#39;);&lt;/span&gt;
+
+&lt;span class="x"&gt;// get list of all domains&lt;/span&gt;
+&lt;span class="x"&gt;$domains = array(); // &lt;span class="caps"&gt;DOMAINID&lt;/span&gt; =&amp;gt; domain.tld&lt;/span&gt;
+&lt;span class="x"&gt;try {&lt;/span&gt;
+&lt;span class="x"&gt;  $linode = new Services_Linode(API_KEY_LINODE);&lt;/span&gt;
+&lt;span class="x"&gt;  $result = $linode-&amp;gt;domain_list();&lt;/span&gt;
+
+&lt;span class="x"&gt;  foreach($result[&amp;#39;&lt;span class="caps"&gt;DATA&lt;/span&gt;&amp;#39;] as $domain)&lt;/span&gt;
+&lt;span class="x"&gt;    {&lt;/span&gt;
+&lt;span class="x"&gt;      $domains[$domain[&amp;#39;&lt;span class="caps"&gt;DOMAINID&lt;/span&gt;&amp;#39;]] = $domain[&amp;quot;&lt;span class="caps"&gt;DOMAIN&lt;/span&gt;&amp;quot;];&lt;/span&gt;
+&lt;span class="x"&gt;    }&lt;/span&gt;
+&lt;span class="x"&gt;}&lt;/span&gt;
+&lt;span class="x"&gt;catch (Services_Linode_Exception $e)&lt;/span&gt;
+&lt;span class="x"&gt;{&lt;/span&gt;
+&lt;span class="x"&gt;  echo $e-&amp;gt;getMessage();&lt;/span&gt;
+&lt;span class="x"&gt;}&lt;/span&gt;
+
+&lt;span class="x"&gt;$records = array(); // array of resource records&lt;/span&gt;
+&lt;span class="x"&gt;$linode-&amp;gt;batching = true;&lt;/span&gt;
+&lt;span class="x"&gt;foreach($domains as $id =&amp;gt; $name)&lt;/span&gt;
+&lt;span class="x"&gt;{&lt;/span&gt;
+&lt;span class="x"&gt;  $linode-&amp;gt;domain_resource_list(array(&amp;#39;DomainID&amp;#39; =&amp;gt; $id));&lt;/span&gt;
+&lt;span class="x"&gt;}&lt;/span&gt;
+
+&lt;span class="x"&gt;try {&lt;/span&gt;
+&lt;span class="x"&gt;  $result = $linode-&amp;gt;batchFlush();&lt;/span&gt;
+
+&lt;span class="x"&gt;  foreach($result as $batchPart)&lt;/span&gt;
+&lt;span class="x"&gt;    {&lt;/span&gt;
+&lt;span class="x"&gt;      foreach($batchPart[&amp;#39;&lt;span class="caps"&gt;DATA&lt;/span&gt;&amp;#39;] as $rrec)&lt;/span&gt;
+&lt;span class="x"&gt;    {&lt;/span&gt;
+&lt;span class="x"&gt;      if(! isset($records[$rrec[&amp;#39;&lt;span class="caps"&gt;DOMAINID&lt;/span&gt;&amp;#39;]])){ $records[$rrec[&amp;#39;&lt;span class="caps"&gt;DOMAINID&lt;/span&gt;&amp;#39;]] = array();}&lt;/span&gt;
+&lt;span class="x"&gt;      $records[$rrec[&amp;#39;&lt;span class="caps"&gt;DOMAINID&lt;/span&gt;&amp;#39;]][$rrec[&amp;#39;&lt;span class="caps"&gt;RESOURCEID&lt;/span&gt;&amp;#39;]] = array(&amp;#39;name&amp;#39; =&amp;gt; $rrec[&amp;#39;&lt;span class="caps"&gt;NAME&lt;/span&gt;&amp;#39;], &amp;#39;type&amp;#39; =&amp;gt; $rrec[&amp;#39;&lt;span class="caps"&gt;TYPE&lt;/span&gt;&amp;#39;], &amp;#39;target&amp;#39; =&amp;gt; $rrec[&amp;#39;&lt;span class="caps"&gt;TARGET&lt;/span&gt;&amp;#39;]);&lt;/span&gt;
+&lt;span class="x"&gt;    }&lt;/span&gt;
+&lt;span class="x"&gt;    }&lt;/span&gt;
+&lt;span class="x"&gt;}&lt;/span&gt;
+&lt;span class="x"&gt;catch (Services_Linode_Exception $e)&lt;/span&gt;
+&lt;span class="x"&gt;{&lt;/span&gt;
+&lt;span class="x"&gt;  echo $e-&amp;gt;getMessage();&lt;/span&gt;
+&lt;span class="x"&gt;}&lt;/span&gt;
+
+&lt;span class="x"&gt;echo &amp;#39;&amp;quot;recid&amp;quot;,&amp;quot;domain&amp;quot;,&amp;quot;name&amp;quot;,&amp;quot;type&amp;quot;,&amp;quot;target&amp;quot;&amp;#39;.&amp;quot;\n&amp;quot;;&lt;/span&gt;
+&lt;span class="x"&gt;foreach($domains as $id =&amp;gt; $name)&lt;/span&gt;
+&lt;span class="x"&gt;{&lt;/span&gt;
+&lt;span class="x"&gt;  foreach($records[$id] as $recid =&amp;gt; $arr)&lt;/span&gt;
+&lt;span class="x"&gt;    {&lt;/span&gt;
+&lt;span class="x"&gt;      echo &amp;#39;&amp;quot;&amp;#39;.$recid.&amp;#39;&amp;quot;,&amp;quot;&amp;#39;.$name.&amp;#39;&amp;quot;,&amp;quot;&amp;#39;.$arr[&amp;#39;name&amp;#39;].&amp;#39;&amp;quot;,&amp;quot;&amp;#39;.$arr[&amp;#39;type&amp;#39;].&amp;#39;&amp;quot;,&amp;quot;&amp;#39;.$arr[&amp;#39;target&amp;#39;].&amp;quot;\&amp;quot;\n&amp;quot;;&lt;/span&gt;
+&lt;span class="x"&gt;    }&lt;/span&gt;
+&lt;span class="x"&gt;}&lt;/span&gt;
+
+
+&lt;span class="x"&gt;?&amp;gt;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;That will print out a list containing the Linode &lt;span class="caps"&gt;DNS&lt;/span&gt; record id (recid),
+domain, record name, type and&amp;nbsp;target:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&amp;quot;recid&amp;quot;,&amp;quot;domain&amp;quot;,&amp;quot;name&amp;quot;,&amp;quot;type&amp;quot;,&amp;quot;target&amp;quot;
+&amp;quot;137423&amp;quot;,&amp;quot;jasonantman.com&amp;quot;,&amp;quot;&amp;quot;,&amp;quot;TXT&amp;quot;,&amp;quot;v=spf1 mx:jasonantman.com -all&amp;quot;
+&amp;quot;3597859&amp;quot;,&amp;quot;jasonantman.com&amp;quot;,&amp;quot;&amp;quot;,&amp;quot;MX&amp;quot;,&amp;quot;linode1.jasonantman.com&amp;quot;
+&amp;quot;3488952&amp;quot;,&amp;quot;jasonantman.com&amp;quot;,&amp;quot;&amp;quot;,&amp;quot;mx&amp;quot;,&amp;quot;linode2.jasonantman.com&amp;quot;
+&amp;quot;3472952&amp;quot;,&amp;quot;jasonantman.com&amp;quot;,&amp;quot;blog&amp;quot;,&amp;quot;CNAME&amp;quot;,&amp;quot;linode1.jasonantman.com&amp;quot;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;If you want to, say, search for only records that include host
+&amp;#8220;example&amp;#8221;, you could use grep and awk&amp;nbsp;like:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;php linodeDnsToCsv.php | grep linode1 | grep -v &lt;span class="s1"&gt;&amp;#39;&amp;quot;linode1&amp;quot;,&amp;quot;a&amp;quot;&amp;#39;&lt;/span&gt; | awk -F , &lt;span class="s1"&gt;&amp;#39;{printf &amp;quot;%-27s %-20s %-7s %s\n&amp;quot;, $2, $3, $4, $5}&amp;#39;&lt;/span&gt; | sed &lt;span class="s1"&gt;&amp;#39;s/&amp;quot;//g&amp;#39;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;I hope this helps someone else out, and saves them a few minutes of&amp;nbsp;coding&amp;#8230;&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Fri, 20 Jan 2012 22:49:00 -0500</pubDate><guid>tag:newblog.jasonantman.com,2012-01-20:2012/01/php-script-to-query-linode-dns-manager-api/</guid><category>api</category><category>dns</category><category>linode</category><category>PHP</category><category>sysadmin</category></item><item><title>Thunderbird SSL “Domain Name Mismatch”</title><link>http://newblog.jasonantman.com/2010/02/thunderbird-ssl-domain-name-mismatch/</link><description>&lt;p&gt;Some of my servers that are only for internal/personal use have &lt;span class="caps"&gt;SSL&lt;/span&gt;
+certs with a mismatched hostname. The cert for my mail server is issued
+for the &lt;span class="caps"&gt;CNAME&lt;/span&gt; used for my mail server, not the actual hostname. Of
+course, this means that Thunderbird gives me some annoying errors
+because they&amp;#8217;re&amp;nbsp;worried:&lt;/p&gt;
+&lt;p&gt;&lt;img alt="Domain Name Mismatch in Thunderbird" src="/GFX/Domain_Name_Mismatch.png" /&gt;&lt;/p&gt;
+&lt;p&gt;Luckily, there&amp;#8217;s an
+&lt;a href="https://addons.mozilla.org/en-US/thunderbird/addon/2131"&gt;add-on&lt;/a&gt; called
+&amp;#8220;Remember Mismatched Domains&amp;#8221; that adds a simple &amp;#8220;remember this
+decision&amp;#8221; check box, much like the one now found in Firefox. Problem&amp;nbsp;solved!&lt;/p&gt;
+&lt;p&gt;&lt;img alt="Thunderbird Domain Name Mismatch after
+add-on" src="/GFX/Domain_Name_Mismatch2.png" /&gt;&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Fri, 12 Feb 2010 09:34:00 -0500</pubDate><guid>tag:newblog.jasonantman.com,2010-02-12:2010/02/thunderbird-ssl-domain-name-mismatch/</guid><category>certificates</category><category>dns</category><category>Mozilla</category><category>SSL</category><category>Thunderbird</category></item><item><title>Project Announcement - PHPsa</title><link>http://newblog.jasonantman.com/2009/09/project-announcement-phpsa/</link><description>&lt;p&gt;So, here&amp;#8217;s the &amp;#8220;official&amp;#8221; scoop on the new project that I&amp;#8217;m
+planning/starting to work on. I&amp;#8217;m calling it PHPsa for now, and it&amp;#8217;s
+going to (hopefully) be an integrated dashboard/portal for SysAdmins.
+While there are a number of tools that fit into this general category
+(perhaps with &lt;a href="http://www.alienvault.com/home.php?section=News"&gt;&lt;span class="caps"&gt;OSSIM&lt;/span&gt;&lt;/a&gt;
+being the closest, though it&amp;#8217;s security-minded), I feel that there&amp;#8217;s a
+real gap in terms of tool integration. My daily workflow, which includes
+multiple trips to and correlation among Nagios, Cacti, &lt;span class="caps"&gt;DNS&lt;/span&gt;, &lt;span class="caps"&gt;DHCP&lt;/span&gt;,
+Puppet, logs, and other tools really leaves something to be desired. So,
+I&amp;#8217;m setting out to create a modular SysAdmin dashboard that unifies many
+of the common SysAdmin-related tools into a modular&amp;nbsp;dashboard.&lt;/p&gt;
+&lt;p&gt;The first overall design goals that I&amp;#8217;ve set&amp;nbsp;are:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;A modular, plugin-based architecture that allows admins to select
+    which features/tools they want, and allows easy development of new&amp;nbsp;modules.&lt;/li&gt;
+&lt;li&gt;Design with legacy tools in mind - easy ways to tie in to tools that
+    weren&amp;#8217;t written with PHPsa in mind, both in terms of linking to
+    information and gathering/unifying&amp;nbsp;information.&lt;/li&gt;
+&lt;li&gt;&lt;span class="caps"&gt;RBAC&lt;/span&gt;, including per-module rules and the possibility for a limited
+    read-only view (client/user&amp;nbsp;mode).&lt;/li&gt;
+&lt;li&gt;Use of data sources, specifically web-based/&lt;span class="caps"&gt;REST&lt;/span&gt; APIs where
+    available, and databases otherwise, from existing tools with as
+    little modification as&amp;nbsp;possible.&lt;/li&gt;
+&lt;li&gt;Support for database abstraction, though I&amp;#8217;ll be using&amp;nbsp;MySQL.&lt;/li&gt;
+&lt;li&gt;Eventually, implement &lt;span class="caps"&gt;RSS&lt;/span&gt; feeds of pertinent&amp;nbsp;information.&lt;/li&gt;
+&lt;li&gt;Balance Ajax/&lt;span class="caps"&gt;DHTML&lt;/span&gt; with the desire for important things to have
+    canonical, static, bookmark-able&amp;nbsp;URLs.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;So, here are some of the things that I&amp;#8217;m planning on integrating, with
+obvious bias towards getting my own projects done before I integrate
+pre-existing&amp;nbsp;tools:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href="http://multibindadmin.jasonantman.com"&gt;MultiBindAdmin&lt;/a&gt;, my &lt;span class="caps"&gt;DNS&lt;/span&gt; and
+    &lt;span class="caps"&gt;DHCP&lt;/span&gt; administration tool (specifically geared towards split-view &lt;span class="caps"&gt;DNS&lt;/span&gt;
+    with the inside view behind&amp;nbsp;&lt;span class="caps"&gt;NAT&lt;/span&gt;).&lt;/li&gt;
+&lt;li&gt;&lt;a href="http://rackman.jasonantman.com/"&gt;RackMan&lt;/a&gt;, my tool for mapping
+    devices&amp;#8217; physical locations in racks (and tacking&amp;nbsp;patching).&lt;/li&gt;
+&lt;li&gt;My simple config tool for
+    &lt;a href="http://www.puppetlabs.com"&gt;Puppet&lt;/a&gt;.&lt;/li&gt;
+&lt;li&gt;&lt;a href="http://nagios.org/"&gt;Nagios&lt;/a&gt;.&lt;/li&gt;
+&lt;li&gt;&lt;a href="http://www.cacti.net/"&gt;Cacti&lt;/a&gt;.&lt;/li&gt;
+&lt;li&gt;Nathan Hubbard&amp;#8217;s &lt;a href="http://www.machdb.org/"&gt;MachDB&lt;/a&gt;.&lt;/li&gt;
+&lt;li&gt;&lt;a href="http://www.bacula.org/en/"&gt;Bacula&lt;/a&gt; (monitoring/status&amp;nbsp;only).&lt;/li&gt;
+&lt;li&gt;Syslog via &lt;a href="http://www.rsyslog.com/"&gt;rsyslog&lt;/a&gt; (or any other
+    syslog-to-&lt;span class="caps"&gt;SQL&lt;/span&gt;&amp;nbsp;solution).&lt;/li&gt;
+&lt;li&gt;Possibly a front-end to &lt;a href="http://www.google.com/analytics/"&gt;Google
+    Analytics&lt;/a&gt;.&lt;/li&gt;
+&lt;li&gt;Some of my custom scripts for graphing SpamAssassin, &lt;span class="caps"&gt;DNS&lt;/span&gt; queries,&amp;nbsp;etc.&lt;/li&gt;
+&lt;li&gt;Some sort of Apache log analysis, like
+    &lt;a href="http://www.mrunix.net/webalizer/"&gt;Webalizer&lt;/a&gt;.&lt;/li&gt;
+&lt;li&gt;Mail log analysis, possibly
+    &lt;a href="http://awstats.sourceforge.net/"&gt;AWstats&lt;/a&gt;.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;So, the first big issues that I&amp;#8217;m going to&amp;nbsp;tackle:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;General layout. Specifically, how to handle a more-or-less
+    consistent layout while integrating tools that weren&amp;#8217;t designed for
+    PHPsa. I&amp;#8217;ll probably end up using iFrames (or even a frameset) for
+    tools that don&amp;#8217;t integrate&amp;nbsp;well.&lt;/li&gt;
+&lt;li&gt;How to correlate data/objects between different tools (i.e. how to
+    display information from Nagios, Cacti, MultiBindAdmin and MachDB
+    for a given&amp;nbsp;host?).&lt;/li&gt;
+&lt;li&gt;Do I want to use a templating engine like
+    &lt;a href="http://www.smarty.net/"&gt;Smarty&lt;/a&gt; or hand-code all of the&amp;nbsp;&lt;span class="caps"&gt;HTML&lt;/span&gt;?&lt;/li&gt;
+&lt;li&gt;How will I handle&amp;nbsp;plugins?&lt;/li&gt;
+&lt;li&gt;How much code do I want to re-write and how much can I use as-is
+    from other tools? And, on a related note, how much existing data can
+    I access easily from other tools, vs having to use grabber scripts
+    that dump data in&amp;nbsp;MySQL?&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&lt;strong&gt;Update 2010-02-03&lt;/strong&gt;: I think this may become a semi-official project
+for me at $work, which means that I&amp;#8217;ll be able to dedicate quite a bit
+more time to it. Unfortunately, it also means that I will, most likely,
+have to give up Nathan Hubbard&amp;#8217;s &lt;a href="http://www.machdb.org/"&gt;MachDB&lt;/a&gt; in
+favor of &lt;a href="http://www.ocsinventory-ng.org/"&gt;&lt;span class="caps"&gt;OCS&lt;/span&gt; Inventory &lt;span class="caps"&gt;NG&lt;/span&gt;&lt;/a&gt;, a more
+mature project that already includes inventory support for Linux,
+Windows and&amp;nbsp;Mac.&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Tue, 29 Sep 2009 15:36:00 -0400</pubDate><guid>tag:newblog.jasonantman.com,2009-09-29:2009/09/project-announcement-phpsa/</guid><category>bind</category><category>cacti</category><category>dns</category><category>Nagios</category><category>PHPsa</category><category>Projects</category><category>puppet</category><category>rsyslog</category><category>sysadmin</category><category>syslog</category></item><item><title>DNS Move</title><link>http://newblog.jasonantman.com/2009/09/dns-move/</link><description>&lt;p&gt;Yesterday I finally began moving &lt;span class="caps"&gt;DNS&lt;/span&gt; for my sites from GoDaddy to my own
+in-house system of master/slave
+&lt;a href="https://www.isc.org/software/bind"&gt;&lt;span class="caps"&gt;BIND9&lt;/span&gt;&lt;/a&gt;. While both &lt;span class="caps"&gt;DNS&lt;/span&gt; servers are
+currently at the same location and on the same &lt;span class="caps"&gt;WAN&lt;/span&gt; connection (heck,
+they&amp;#8217;re beind the same router, too), so is all of the rest of my
+infrastructure. Migrating jasonantman.com was definitely the most
+critical task, this has allowed me to easily use my new project,
+&lt;a href="http://multibindadmin.jasonantman.com"&gt;MultiBIND Admin&lt;/a&gt; to manage &lt;span class="caps"&gt;DNS&lt;/span&gt;.
+In addition to just being simpler than using GoDaddy&amp;#8217;s tool, it allows
+me to manage &lt;span class="caps"&gt;DNS&lt;/span&gt; for both the external view and the NATed internal view
+in one tool. I did have a brief mail outage thanks to some incorrect &lt;span class="caps"&gt;MX&lt;/span&gt;
+records being served by the slave, and a few other issues with the
+caching &lt;span class="caps"&gt;DNS&lt;/span&gt; servers at work not expiring the old records, but all seems
+to be well now. It was a relatively smooth transition, though I haven&amp;#8217;t
+yet moved over some of my older less used&amp;nbsp;domains.&lt;/p&gt;
+&lt;p&gt;The next part of my project, when I move the ambulance corps hosted
+services in-house, will be trying to find a decently-priced &lt;span class="caps"&gt;DNS&lt;/span&gt; hosting
+company that will just act as a slave, to keep &lt;span class="caps"&gt;DNS&lt;/span&gt; up if my &lt;span class="caps"&gt;WAN&lt;/span&gt;
+connection goes&amp;nbsp;down.&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Thu, 17 Sep 2009 13:07:00 -0400</pubDate><guid>tag:newblog.jasonantman.com,2009-09-17:2009/09/dns-move/</guid><category>bind</category><category>dns</category><category>multibindadmin</category></item><item><title>DNS - Open Source rules</title><link>http://newblog.jasonantman.com/2009/07/dns-open-source-rules/</link><description>&lt;p&gt;&lt;span class="caps"&gt;DNS&lt;/span&gt; is arguably one of the most important services on the Internet.
+Without it, every domain name and email address we know would be
+meaningless. We&amp;#8217;d be thrown back into the days of &lt;span class="caps"&gt;IP&lt;/span&gt; addresses without
+corresponding names. And, given everything that depends on &lt;span class="caps"&gt;DNS&lt;/span&gt;, it&amp;#8217;s
+also one of the most important services from a security standpoint.
+Compromised &lt;span class="caps"&gt;DNS&lt;/span&gt; servers could cause end-of-the-world havoc for whatever
+zones they&amp;nbsp;control.&lt;/p&gt;
+&lt;p&gt;So here&amp;#8217;s a fact that Microsoft and the other proprietary guys don&amp;#8217;t
+want you to know: &lt;strong&gt;58.65% of &lt;span class="caps"&gt;DNS&lt;/span&gt; servers that are listed as being
+authoritative for .com or .net domains are running the free/open source
+&lt;a href="https://www.isc.org/software/BIND/"&gt;&lt;span class="caps"&gt;ISC&lt;/span&gt; &lt;span class="caps"&gt;BIND&lt;/span&gt;&lt;/a&gt;. Less than 0.3% are using
+a Microsoft product&lt;/strong&gt;. To me, that says&amp;nbsp;something.&lt;/p&gt;
+&lt;p&gt;This is according to the October 2008 &lt;a href="http://dns.measurement-factory.com/surveys/200810.html"&gt;measurement factory &lt;span class="caps"&gt;DNS&lt;/span&gt; server
+survey&lt;/a&gt; of 99+
+Million addresses (618,000+&amp;nbsp;hosts).&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Thu, 23 Jul 2009 13:37:00 -0400</pubDate><guid>tag:newblog.jasonantman.com,2009-07-23:2009/07/dns-open-source-rules/</guid><category>bind</category><category>dns</category><category>market share</category></item><item><title>New Projects</title><link>http://newblog.jasonantman.com/2009/07/new-projects/</link><description>&lt;p&gt;In terms of ongoing projects, I should be updating RackMan sometime
+soon, and also adding the demo&amp;nbsp;site.&lt;/p&gt;
+&lt;p&gt;I&amp;#8217;ve begun to move &lt;span class="caps"&gt;DNS&lt;/span&gt; for all of my domains in-house, mostly because
+since everything is behind &lt;span class="caps"&gt;NAT&lt;/span&gt;, it&amp;#8217;s a real pain to manage &lt;span class="caps"&gt;DNS&lt;/span&gt; entries
+in two places (one of them being GoDaddy&amp;#8217;s web interface). Because of
+the &lt;span class="caps"&gt;NAT&lt;/span&gt; issue, I&amp;#8217;m also writing my own &lt;span class="caps"&gt;BIND&lt;/span&gt; configuration tool,
+currently named &lt;a href="http://multibindadmin.jasonantman.com"&gt;MultiBIND
+Admin&lt;/a&gt;. In addition to managing
+multiple zones in a sane way, it stores all configuration in MySQL.
+Among other things, it can store different &lt;span class="caps"&gt;IP&lt;/span&gt; addresses for A records
+for the inside and outside views. Zone files can either be pulled by a
+script on the name server (push capability is being worked on) or
+downloaded (for uploading to a &lt;span class="caps"&gt;DNS&lt;/span&gt; hosting provider like&amp;nbsp;GoDaddy).&lt;/p&gt;
+&lt;p&gt;For my final project for my &lt;span class="caps"&gt;XML&lt;/span&gt; web design class, I&amp;#8217;m going to be making
+some &amp;#8220;mashup&amp;#8221; with RackMan, Google Maps, Google Visualizer, Nagios, and
+a few other&amp;nbsp;tools&amp;#8230;&lt;/p&gt;
+&lt;p&gt;Stay&amp;nbsp;tuned&amp;#8230;&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Thu, 16 Jul 2009 14:05:00 -0400</pubDate><guid>tag:newblog.jasonantman.com,2009-07-16:2009/07/new-projects/</guid><category>bind</category><category>dns</category><category>google</category><category>PHPsa</category><category>rackman</category></item><item><title>ROUThost DNS problems; GoDaddy and Security through Obscurity</title><link>http://newblog.jasonantman.com/2009/02/routhost-dns-problems-godaddy-and-security-through-obscurity/</link><description>&lt;p&gt;The external-facing web site and (internal use) mailing list for the
+&lt;a href="http://www.midlandparkambulance.com"&gt;ambulance corps&lt;/a&gt; is hosted by
+&lt;a href="http://www.routhost.com"&gt;ROUThost&lt;/a&gt;. Not my choice, it was inherited.
+ROUThost, first off, appears to be a fly-by-night hosting provider that
+just buys a few boxes in a colo facility. I should have known to raise a
+stink when they say you need to fax a copy of your driver&amp;#8217;s license to
+get &lt;span class="caps"&gt;SSH&lt;/span&gt; turned on, and that you have to agree - in legalese - not to
+mess with anyone else&amp;#8217;s configs. Well, last night, &lt;span class="caps"&gt;DNS&lt;/span&gt; for the site went
+down. As in nothing, wouldn&amp;#8217;t resolve at all. I submitted a ticket
+online for ROUThost&amp;#8217;s &amp;#8220;24x7&amp;#8221; support - by the way, they don&amp;#8217;t have a
+phone number, only an online ticket form. After 2h 34m 40s of downtime,
+the issue resolved itself and I downgraded the ticket from &amp;#8220;critical&amp;#8221; to
+medium. Now, 11 hours later, it still hasn&amp;#8217;t been replied to. And my
+emails to support and management - 2 hours ago - are&amp;nbsp;unanswered.&lt;/p&gt;
+&lt;p&gt;Once the problem started, I knew the yearly contract with ROUThost was a
+bad idea - even at $35/year &lt;span class="caps"&gt;USD&lt;/span&gt;. So, given the great experience I&amp;#8217;ve had
+with them as registrar for my myriad domains, I took a look at
+&lt;a href="http://www.godaddy.com"&gt;GoDaddy&amp;#8217;s Site&lt;/a&gt;. They offer shared
+hosting at around $4/month (for shared on a Linux box) and are currently
+offering some deals, so I figured it would be a good idea. I know and
+trust GoDaddy&amp;#8217;s support, and have had an account with them for &lt;em&gt;quite
+some time&lt;/em&gt;.&lt;/p&gt;
+&lt;p&gt;The ambulance corp&amp;#8217;s web site, hosted through ROUThost, does essentially
+three things; provide a minimal web presence (the whole web root is
+probably &amp;lt; 1Mb minus the photo albums), five e-mail forwarders for the
+officers and a &lt;a href="http://www.gnu.org/software/mailman/index.html"&gt;&lt;span class="caps"&gt;GNU&lt;/span&gt;
+MailMan&lt;/a&gt; mailing list
+for internal business. Unfortunately, I couldn&amp;#8217;t find anything in their
+&amp;#8220;features&amp;#8221; list mentioning MialMan or any other listserv, or even what
+&lt;span class="caps"&gt;MTA&lt;/span&gt;/&lt;span class="caps"&gt;MDA&lt;/span&gt; they&amp;nbsp;run.&lt;/p&gt;
+&lt;p&gt;I put a call in to GoDaddy &amp;#8220;Sales/Support&amp;#8221;. The poor guy had never heard
+of MailMan, but asked &amp;#8220;one of the hosting guys&amp;#8221; and was told it would
+only be supported on dedicate hosting accounts. Not exactly financially
+feasible for a mailing list with 30 subscribers, maybe 2 messages a day,
+and a monthly &lt;span class="caps"&gt;HTTP&lt;/span&gt; transfer of under 20Mb. I was told their shared
+hosting packages don&amp;#8217;t include any mailing list/listserv software,
+though they include every &lt;span class="caps"&gt;CMS&lt;/span&gt; and language known to man. Hell-bent to
+get away from ROUThost, I then asked if they ran an &lt;span class="caps"&gt;MDA&lt;/span&gt; that supported
+piping mail to a command, as can be done with .procmailrc. After a brief
+hold (not to sound cynical, but I&amp;#8217;m sure the gentleman was looking up
+&amp;#8220;&lt;span class="caps"&gt;MDA&lt;/span&gt;&amp;#8221;) he came back on the line and told me they didn&amp;#8217;t. I then switched
+to problem-solving mode and asked what &lt;span class="caps"&gt;MTA&lt;/span&gt; and &lt;span class="caps"&gt;MDA&lt;/span&gt; they were running.
+Another brief hold, and I was told &lt;em&gt;&amp;#8220;I can&amp;#8217;t tell you that&amp;#8221;&lt;/em&gt;. Speechless
+for a moment, I asked what that meant; &lt;em&gt;&amp;#8220;we don&amp;#8217;t give out that
+information&amp;#8221;&lt;/em&gt;. Just about ready to begin explaining &lt;span class="caps"&gt;SMTP&lt;/span&gt; headers, I gave
+up and thanked him for his&amp;nbsp;time.&lt;/p&gt;
+&lt;p&gt;Ok, so Sales probably doesn&amp;#8217;t understand &lt;span class="caps"&gt;SMTP&lt;/span&gt; headers. I&amp;#8217;d considered
+trying to find mail from a GoDaddy Linux hosted box and check the
+headers, but I figured I couldn&amp;#8217;t do that before the call ended. So, now
+I&amp;#8217;m left with a dilemma. ROUThost is not, in my opinion, reliable, and
+their support is flat-out nonexistent. 11 hours is far too long to wait
+for a reply to a &amp;#8220;critical&amp;#8221; ticket when someone claims 24x7 support.
+However, by previous experience, GoDaddy would be my next choice - but
+not only do they ot support mailing lists - arguably the most used
+feature of our current hosted account - but they won&amp;#8217;t even tell a
+customer what &lt;span class="caps"&gt;MTA&lt;/span&gt; they&amp;#8217;re running. I&amp;#8217;m too let down by this to telnet 25
+on one of their boxes and see what&amp;nbsp;happens.&lt;/p&gt;
+&lt;p&gt;So what&amp;#8217;s left? I guess waiting until (hopefully some time within the
+next few weeks) I upgrade to Optimum static &lt;span class="caps"&gt;IP&lt;/span&gt; at home, and consider
+running it all there (and hope mains power never goes out for more than
+30&amp;nbsp;minutes?)&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Wed, 25 Feb 2009 11:07:00 -0500</pubDate><guid>tag:newblog.jasonantman.com,2009-02-25:2009/02/routhost-dns-problems-godaddy-and-security-through-obscurity/</guid><category>dns</category><category>godaddy</category><category>hosting</category><category>routhost</category><category>security through obscurity</category><category>support</category></item></channel></rss>

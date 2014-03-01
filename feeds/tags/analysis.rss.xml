@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Jason Antman's Blog</title><link>http://newblog.jasonantman.com/</link><description></description><atom:link href="http://newblog.jasonantman.com/feeds/tags/analysis.rss.xml" rel="self"></atom:link><lastBuildDate>Sat, 17 Mar 2012 11:48:00 -0400</lastBuildDate><item><title>Some Thoughts on Choosing a New Wordpress Theme</title><link>http://newblog.jasonantman.com/2012/03/some-thoughts-on-choosing-a-new-wordpress-theme/</link><description>&lt;p&gt;I think I&amp;#8217;m going to choose a new theme for my blog. The current theme
+is &lt;a href="http://wordpress.org/extend/themes/inove"&gt;iNove&lt;/a&gt; (albeit an older
+version with some custom modifications), and I feel like it looks a bit
+messy and has gotten a bit cluttered, so it&amp;#8217;s time to find something
+new. I like the 2-column layout, and have a few other things I&amp;#8217;m looking
+for - specifically, aside from something with advanced features like
+lots of widget support and hooks, something that has good visual
+separation between different posts and widgets. I also really want
+something, if possible, with relative column widths. My current home and
+work desktops both have dual monitors, and the minimum resolution I have
+on one screen is 1920x1080. When I look at my blog in a maximized
+window, about half the screen width is wasted with empty space. So,
+ideally, I&amp;#8217;d like a theme that&amp;#8217;s based on relative widths, probably with
+a &amp;#8220;min-width&amp;#8221; property so it wouldn&amp;#8217;t get compressed to an absurdly
+narrow width on small&amp;nbsp;screens.&lt;/p&gt;
+&lt;p&gt;I use &lt;a href="http://www.google.com/analytics/"&gt;Google Analytics&lt;/a&gt; (as noted in
+the &lt;a href="/privacy-policy/"&gt;privacy policy&lt;/a&gt;) for visitor statistics on this
+blog (more about that in a moment). So, I took a peek at the breakdown
+of visitors by screen resolution, and saw that for the past year, 94% of
+the 27,500 visits had a screen width of 1024px or more (and the majority
+of the others looked like mobile device resolutions, so they&amp;#8217;d probably
+zoom the page correctly). So, my first gut reaction was to assume that I
+could use a theme approximately 1000px wide. Unfortunately, there&amp;#8217;s two
+main problems with that: first, as mentioned by &lt;a href="http://css-tricks.com/screen-resolution-notequalto-browser-window/"&gt;Chris Coyier on
+&lt;span class="caps"&gt;CSS&lt;/span&gt;-Tricks.com&lt;/a&gt;,
+just because someone has a given screen resolution doesn&amp;#8217;t mean their
+browser window (let alone the viewport) is that size. As a matter of
+fact, I usually have my main browser window set at about 80% of the
+width of one of my monitors, with my instant messaging client
+&lt;a href="http://pidgin.im/"&gt;Pidgin&lt;/a&gt; taking up the rest of the space. So there&amp;#8217;s
+one inaccuracy. There&amp;#8217;s a potentially much greater inaccuracy in my
+stats as well, which I&amp;#8217;m going to discuss in a &lt;a href="/2012/03/inaccuracies-in-google-analytics-for-website-stats/"&gt;separate
+post&lt;/a&gt;.&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Sat, 17 Mar 2012 11:48:00 -0400</pubDate><guid>tag:newblog.jasonantman.com,2012-03-17:2012/03/some-thoughts-on-choosing-a-new-wordpress-theme/</guid><category>analysis</category><category>analytics</category><category>blog</category><category>google</category><category>logging</category><category>stats</category><category>theme</category><category>wordpress</category></item><item><title>Petit for Log Analysis</title><link>http://newblog.jasonantman.com/2012/02/petit-for-log-analysis/</link><description>&lt;p&gt;I recently discovered the
+&lt;a href="http://crunchtools.com/software/petit/"&gt;petit&lt;/a&gt; program for log
+analysis. It&amp;#8217;s a simple tool to pull out useful information from syslog
+logs in a variety of ways. I&amp;#8217;ve only used it a few times so far, mainly
+on logs from problems I&amp;#8217;ve already solved but didn&amp;#8217;t know the cause of
+at first. So far, it&amp;#8217;s proven quite useful. Here are a few&amp;nbsp;examples:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;petit --wordcount /var/log/messages&lt;/code&gt; - displays ordered count of
+    words appearing in the log. My first step, especially if &amp;#8220;warning&amp;#8221;,
+    &amp;#8220;error&amp;#8221; or &amp;#8220;fatal&amp;#8221; shows up near the&amp;nbsp;top&amp;#8230;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;petit --hash --fingerprint /var/log/messages&lt;/code&gt; - hashes the log,
+    removes filters (such as numerics, datestamp), and displays count of
+    matching lines. Absolutely wonderful for web error logs, as it
+    removes client &lt;span class="caps"&gt;IP&lt;/span&gt; addresses, line numbers,&amp;nbsp;etc.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;petit --mgraph /var/log/messages&lt;/code&gt; - graph messages per minute for
+    the first hour of the log (&lt;span class="caps"&gt;ASCII&lt;/span&gt; of&amp;nbsp;course)&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;petit --hgraph /var/log/messages&lt;/code&gt; - same as above, but messages per
+    hour for the first&amp;nbsp;day&lt;/li&gt;
+&lt;li&gt;Petit will also read from stdin with the &amp;#8212;Xgraph options, so you
+    can &lt;code&gt;cat logfile | grep word | petit --mgraph&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Just one note - this tool appears to work only on standard syslog
+formatted logs. If some non-datestamped lines managed to work their way
+into the log (i.e. someone used echo &gt;&gt; logfile instead of &lt;code&gt;logger&lt;/code&gt;),
+it will&amp;nbsp;choke.&lt;/p&gt;
+&lt;p&gt;Many thanks to Scott McCarty for this wonderful&amp;nbsp;tool!&lt;/a&gt;&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Tue, 21 Feb 2012 11:57:00 -0500</pubDate><guid>tag:newblog.jasonantman.com,2012-02-21:2012/02/petit-for-log-analysis/</guid><category>analysis</category><category>log</category><category>logging</category><category>petit</category><category>syslog</category></item></channel></rss>

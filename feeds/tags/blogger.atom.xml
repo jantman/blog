@@ -1,0 +1,239 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Jason Antman's Blog</title><link href="http://newblog.jasonantman.com/" rel="alternate"></link><link href="http://newblog.jasonantman.com/feeds/tags/blogger.atom.xml" rel="self"></link><id>http://newblog.jasonantman.com/</id><updated>2009-02-03T10:13:00-05:00</updated><entry><title>Wordpress Installation, Finished</title><link href="http://newblog.jasonantman.com/2009/02/wordpress-installation-finished/" rel="alternate"></link><updated>2009-02-03T10:13:00-05:00</updated><author><name>admin</name></author><id>tag:newblog.jasonantman.com,2009-02-03:2009/02/wordpress-installation-finished/</id><summary type="html">&lt;p&gt;Found this from a month and a half ago, waiting as a&amp;nbsp;draft:&lt;/p&gt;
+&lt;p&gt;So, I mostly finished the WordPress installation. I got everything for
+WordPress up and running, tested my Blogger &lt;span class="caps"&gt;URL&lt;/span&gt; redirection script and
+then switched over my subdomain&amp;nbsp;redirection.&lt;/p&gt;
+&lt;p&gt;The blogger redirection takes two parts, but is in fact quite simple.
+First, I went into the directory where the Blogger content had lived -
+&lt;code&gt;/srv/www/htdocs/blog&lt;/code&gt; and moved everything in there into another
+directory, out of the way. I then created a .htaccess in the directory&amp;nbsp;like:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="nt"&gt;&amp;lt;IfModule&lt;/span&gt; &lt;span class="s"&gt;mod_rewrite.c&lt;/span&gt;&lt;span class="nt"&gt;&amp;gt;&lt;/span&gt;
+&lt;span class="nb"&gt;RewriteEngine&lt;/span&gt; &lt;span class="k"&gt;On&lt;/span&gt;
+&lt;span class="nb"&gt;RewriteBase&lt;/span&gt; &lt;span class="sx"&gt;/blog/&lt;/span&gt;
+&lt;span class="nb"&gt;RewriteCond&lt;/span&gt; %{REQUEST_FILENAME} !-f
+&lt;span class="nb"&gt;RewriteCond&lt;/span&gt; %{REQUEST_FILENAME} !-d
+&lt;span class="nb"&gt;RewriteRule&lt;/span&gt; .* index.php [L]
+&lt;span class="nt"&gt;&amp;lt;/IfModule&amp;gt;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;All this does is used mod_rewrite to serve blog/index.php up for every
+page request. In index.php, I handle the important &lt;span class="caps"&gt;URL&lt;/span&gt; forms for Blogger
+- archives, tags, feeds, and posts - and redirect to the appropriate
+place. For archives, I just parse out the year and month from the
+Blogger &lt;span class="caps"&gt;URL&lt;/span&gt; and redirect to the proper page for &lt;span class="caps"&gt;WP&lt;/span&gt;. The feed is straight
+redirection. The tags (&amp;#8220;labels&amp;#8221; in Blogger parlance) are pulled out of
+the &lt;span class="caps"&gt;URL&lt;/span&gt;, have spaces (after &lt;code&gt;urldecode()&lt;/code&gt;) replaced with dashes and are
+redirected to the right tag for&amp;nbsp;&lt;span class="caps"&gt;WP&lt;/span&gt;.&lt;/p&gt;
+&lt;p&gt;The posts, on the other hand, were a bit more difficult. My solution
+ended up being parsing the post name out of the &lt;span class="caps"&gt;URL&lt;/span&gt;. When I used the
+import tool, &lt;span class="caps"&gt;WP&lt;/span&gt; kept the original Blogger URLs in the &lt;code&gt;wp_postmeta&lt;/code&gt;
+table with a &lt;code&gt;meta_key&lt;/code&gt; of &amp;#8220;blogger_permalink&amp;#8221;. I just looked for a
+Blogger permalink matching the title from the Blogger &lt;span class="caps"&gt;URL&lt;/span&gt;, found the
+corresponding post &lt;span class="caps"&gt;ID&lt;/span&gt; and redirected to the proper new &lt;span class="caps"&gt;WP&lt;/span&gt;&amp;nbsp;&lt;span class="caps"&gt;URL&lt;/span&gt;.&lt;/p&gt;
+&lt;p&gt;The code for index.php, for me, looks something&amp;nbsp;like:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="cp"&gt;&amp;lt;?php&lt;/span&gt;
+&lt;span class="c1"&gt;// redirect old Blogger URLs in /blog to new WordPress in /wp&lt;/span&gt;
+&lt;span class="nv"&gt;$request&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nb"&gt;mysql_real_escape_string&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;str_replace&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;/blog&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nv"&gt;$_SERVER&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;REQUEST_URI&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;]));&lt;/span&gt;
+
+&lt;span class="c1"&gt;// handle constant stuff like feeds and top-level pages&lt;/span&gt;
+&lt;span class="c1"&gt;// &lt;span class="caps"&gt;TODO&lt;/span&gt;&lt;/span&gt;
+&lt;span class="k"&gt;if&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;strpos&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;$request&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;_archive.html&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+&lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="c1"&gt;// redirect to an archive&lt;/span&gt;
+    &lt;span class="nv"&gt;$request&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nx"&gt;substr&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;$request&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nb"&gt;strpos&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;$request&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;/&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="o"&gt;+&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+    &lt;span class="nv"&gt;$ary&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nb"&gt;explode&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;_&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nv"&gt;$request&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+    &lt;span class="nv"&gt;$redirect_to&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;http://blog.jasonantman.com/&amp;quot;&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="nv"&gt;$ary&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;/&amp;quot;&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="nv"&gt;$ary&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;/&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+    &lt;span class="nx"&gt;header&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;Location: &amp;quot;&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="nv"&gt;$redirect_to&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+    &lt;span class="k"&gt;die&lt;/span&gt;&lt;span class="p"&gt;();&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;span class="k"&gt;elseif&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;strpos&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;$request&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;labels/&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+&lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="c1"&gt;// redirect to a tag page&lt;/span&gt;
+    &lt;span class="nv"&gt;$redirect_to&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nx"&gt;substr&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;$request&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nb"&gt;strpos&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;$request&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;labels/&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="o"&gt;+&lt;/span&gt;&lt;span class="mi"&gt;7&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+    &lt;span class="nv"&gt;$redirect_to&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nb"&gt;str_replace&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;.html&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nv"&gt;$redirect_to&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+    &lt;span class="nv"&gt;$redirect_to&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nb"&gt;urldecode&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;$redirect_to&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+    &lt;span class="nv"&gt;$redirect_to&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nb"&gt;str_replace&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot; &amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;-&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nv"&gt;$redirect_to&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+    &lt;span class="nv"&gt;$redirect_to&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;http://blog.jasonantman.com/tags/&amp;quot;&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;strtolower&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;$redirect_to&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;/&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+    &lt;span class="nx"&gt;header&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;Location: &amp;quot;&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="nv"&gt;$redirect_to&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+    &lt;span class="k"&gt;die&lt;/span&gt;&lt;span class="p"&gt;();&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;span class="k"&gt;elseif&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;strpos&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;$request&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;/blogger.html&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+&lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="c1"&gt;// redirect to main blog&lt;/span&gt;
+    &lt;span class="nx"&gt;header&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;Location: http://blog.jasonantman.com/&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+    &lt;span class="k"&gt;die&lt;/span&gt;&lt;span class="p"&gt;();&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;span class="k"&gt;elseif&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;strpos&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;$request&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;/atom.xml&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+&lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="c1"&gt;// redirect to new feed&lt;/span&gt;
+    &lt;span class="nx"&gt;header&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;Location: http://blog.jasonantman.com/feed/&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+    &lt;span class="k"&gt;die&lt;/span&gt;&lt;span class="p"&gt;();&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+
+&lt;span class="c1"&gt;// handle the posts, months, tags, etc.&lt;/span&gt;
+&lt;span class="nv"&gt;$fail&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="k"&gt;false&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="nv"&gt;$redirect_to&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="nv"&gt;$conn&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nb"&gt;mysql_connect&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;   &lt;span class="k"&gt;or&lt;/span&gt; &lt;span class="k"&gt;die&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;Error. MySQL connection failed at mysql_connect&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;span class="k"&gt;if&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="o"&gt;!&lt;/span&gt; &lt;span class="nv"&gt;$conn&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="nb"&gt;error_log&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;span class="caps"&gt;SCRIPT&lt;/span&gt; &amp;quot;&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="nv"&gt;$_SERVER&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;PHP_SELF&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;: &amp;quot;&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;Unable to connect to MySQL.&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+    &lt;span class="nv"&gt;$fail&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="k"&gt;true&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;span class="nv"&gt;$select&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nb"&gt;mysql_select_db&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;wordpress&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;span class="k"&gt;if&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="o"&gt;!&lt;/span&gt; &lt;span class="nv"&gt;$select&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="nb"&gt;error_log&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;span class="caps"&gt;SCRIPT&lt;/span&gt; &amp;quot;&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="nv"&gt;$_SERVER&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;PHP_SELF&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;: &amp;quot;&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;Unable to select &lt;span class="caps"&gt;DB&lt;/span&gt; wordpress.&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+    &lt;span class="nv"&gt;$fail&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="k"&gt;true&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;span class="nv"&gt;$query&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;&lt;span class="caps"&gt;SELECT&lt;/span&gt; m.meta_key,m.meta_value,p.post_name,p.post_date &lt;span class="caps"&gt;FROM&lt;/span&gt; wp_postmeta &lt;span class="caps"&gt;AS&lt;/span&gt; m &lt;span class="caps"&gt;LEFT&lt;/span&gt; &lt;span class="caps"&gt;JOIN&lt;/span&gt; wp_posts &lt;span class="caps"&gt;AS&lt;/span&gt; p &lt;span class="caps"&gt;ON&lt;/span&gt; m.post_id=p.&lt;span class="caps"&gt;ID&lt;/span&gt; &lt;span class="caps"&gt;WHERE&lt;/span&gt; m.meta_key=&amp;#39;blogger_permalink&amp;#39; &lt;span class="caps"&gt;AND&lt;/span&gt; m.meta_value=&amp;#39;&amp;quot;&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="nv"&gt;$request&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&amp;#39;;&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="nv"&gt;$result&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nb"&gt;mysql_query&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;$query&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;span class="k"&gt;if&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="o"&gt;!&lt;/span&gt; &lt;span class="nv"&gt;$result&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="nb"&gt;error_log&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;span class="caps"&gt;SCRIPT&lt;/span&gt; &amp;quot;&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="nv"&gt;$_SERVER&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;PHP_SELF&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;: &amp;quot;&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;Error in query: &amp;quot;&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="nv"&gt;$query&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot; &lt;span class="caps"&gt;ERROR&lt;/span&gt;: &amp;quot;&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="nb"&gt;mysql_error&lt;/span&gt;&lt;span class="p"&gt;());&lt;/span&gt;
+    &lt;span class="nv"&gt;$fail&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="k"&gt;true&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;span class="k"&gt;if&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;mysql_num_rows&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;$result&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="c1"&gt;// couldn&amp;#39;t find an appropriate page&lt;/span&gt;
+    &lt;span class="c1"&gt;// &lt;span class="caps"&gt;TODO&lt;/span&gt;: find a better way... for now just redirect to the month page&lt;/span&gt;
+    &lt;span class="nv"&gt;$ary&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nb"&gt;explode&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;/&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nv"&gt;$request&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+    &lt;span class="k"&gt;if&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;count&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;$ary&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;&amp;gt;&lt;/span&gt; &lt;span class="mi"&gt;3&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+    &lt;span class="p"&gt;{&lt;/span&gt;
+        &lt;span class="nv"&gt;$redirect_to&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;http://blog.jasonantman.com/&amp;quot;&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="nv"&gt;$ary&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;/&amp;quot;&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="nv"&gt;$ary&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;/&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+    &lt;span class="p"&gt;}&lt;/span&gt;
+    &lt;span class="k"&gt;else&lt;/span&gt;
+    &lt;span class="p"&gt;{&lt;/span&gt;
+        &lt;span class="nv"&gt;$redirect_to&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;http://blog.jasonantman.com/&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+    &lt;span class="p"&gt;}&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;span class="k"&gt;else&lt;/span&gt;
+&lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="nv"&gt;$row&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nb"&gt;mysql_fetch_assoc&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;$result&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+    &lt;span class="nv"&gt;$redirect_to&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;http://blog.jasonantman.com/&amp;quot;&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="nb"&gt;date&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;Y&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nb"&gt;strtotime&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;$row&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;post_date&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;]))&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;/&amp;quot;&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="nb"&gt;date&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;m&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nb"&gt;strtotime&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;$row&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;post_date&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;]))&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;/&amp;quot;&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="nv"&gt;$row&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;post_name&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;];&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+
+&lt;span class="k"&gt;if&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;$fail&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="c1"&gt;// redirect to main page with 302&lt;/span&gt;
+    &lt;span class="nx"&gt;Header&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;Location: http://blog.jasonantman.com/&amp;quot;&lt;/span&gt; &lt;span class="p"&gt;);&lt;/span&gt; &lt;span class="c1"&gt;// implicit 302&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;span class="k"&gt;else&lt;/span&gt;
+&lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="c1"&gt;// redirect to the post or month&lt;/span&gt;
+    &lt;span class="nx"&gt;Header&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;&lt;span class="caps"&gt;HTTP&lt;/span&gt;/1.1 301 Moved Permanently&amp;quot;&lt;/span&gt; &lt;span class="p"&gt;);&lt;/span&gt;
+    &lt;span class="nx"&gt;Header&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;Location: &amp;quot;&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="nv"&gt;$redirect_to&lt;/span&gt; &lt;span class="p"&gt;);&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+
+&lt;span class="cp"&gt;?&amp;gt;&lt;/span&gt;&lt;span class="x"&gt;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;So, it now looks like I&amp;#8217;m pretty much done with setup, and even get to
+keep my links. The one interesting problem that will crop up is due to
+the fact that, at the moment, I&amp;#8217;m hosting off of a dynamically IPed
+residential internet connection, so I&amp;#8217;m at
+&lt;code&gt;http://jantman.dyndns.org:10011&lt;/code&gt;. The problem lies in the fact that
+Blogger used this for its&amp;#8217; URIs and Permalinks, and it seems that
+(though &lt;code&gt;http://blog.jasonantman.com&lt;/code&gt; uses a 302 not a 301 to redirect)
+Google, Technorati, etc. have indexed my site with this hostname and
+port, instead of the redirecting subdomain. Normally this wouldn&amp;#8217;t be a
+problem, but I plan on soon moving to a business hosting account with 5
+static IPs and port 80 open. Which means that soon the subdomain will
+become &amp;#8220;real&amp;#8221;&amp;#8230; and all of those pesky dyndns.org:10011 links will be
+obsolete. The only way I can think of fixing this is, once I make the
+switch to static &lt;span class="caps"&gt;IP&lt;/span&gt; and port 80 (which will also include moving all of
+my subdomains to name-based virtual hosts) I&amp;#8217;ll have to craft
+RewriteRules or redirect rules to replace
+&lt;code&gt;http://jantman.dyndns.org:10011/wp/&lt;/code&gt; with
+&lt;code&gt;http://blog.jasonantman.com/&lt;/code&gt;, update DynDNS with my new static &lt;span class="caps"&gt;IP&lt;/span&gt;, and
+keep a default vhost listening on 10011 to provide rule-based
+redirection to the new subdomain.&amp;nbsp;Eek.&lt;/p&gt;</summary><category term="apache"></category><category term="blogger"></category><category term="dynamic IP"></category><category term="wordpress"></category></entry><entry><title>WordPress… Finally!</title><link href="http://newblog.jasonantman.com/2008/12/wordpress-finally/" rel="alternate"></link><updated>2008-12-17T15:58:00-05:00</updated><author><name>admin</name></author><id>tag:newblog.jasonantman.com,2008-12-17:2008/12/wordpress-finally/</id><summary type="html">&lt;p&gt;Well, I finally bit the bullet. I woke up this morning, got in to work
+(slow day) and said to myself, &amp;#8220;My blog&amp;#8217;s finally moving to WordPress.
+Today.&amp;#8221; So, I read through the docs (really psyched about the Blogger
+import feature), downloaded 2.7 (latest), setup the &lt;span class="caps"&gt;DB&lt;/span&gt; and installed
+away. Once I did the preliminary things like changing the admin password
+and setting up some categories, I set about importing from&amp;nbsp;Blogger.&lt;/p&gt;
+&lt;p&gt;Here was the first of the major issues. Though WordPress has really
+hyped their Blogger importer, they failed to mention that it is totally
+useless if you are self-hosting Blogger and publishing via &lt;span class="caps"&gt;FTP&lt;/span&gt; or &lt;span class="caps"&gt;SFTP&lt;/span&gt;,
+as I was. So, after a lengthy consultation with the great oracle of
+Google, I dedided I had two options - switch Blogger to publish to
+BlogSpot.com and use the &lt;span class="caps"&gt;WP&lt;/span&gt; import tool, or custom hack a script. I must
+admit, it felt a bit pointless&amp;#8230; all of my old posts were in a directry
+at the same level as &lt;span class="caps"&gt;WP&lt;/span&gt;, it seemed quite stupid to have to jump through
+hoops to get that data. Though I&amp;#8217;m not quite sure whether the GData &lt;span class="caps"&gt;API&lt;/span&gt;
+really doesn&amp;#8217;t give access to posts if&amp;nbsp;self-hosted.&lt;/p&gt;
+&lt;p&gt;I migrated publishing of Blogger to BlogSpot.com
+(&lt;a href="http://www.jasonantman.com/jargon/entry.php?id=metasyntactic-variable"&gt;foobarthudgrunt&lt;/a&gt;.blogspot.com),
+despite worries about confusing Google or messing up the little bit of
+ranking I&amp;#8217;ve been able to gain. It successfully imported all 128 of my
+entries, and the few comments. But, as I navigated to the &amp;#8220;Edit&amp;#8221; page to
+have a look, an even bigger problem was apparent. All of the tags from
+Blogger had ended up as categories in &lt;span class="caps"&gt;WP&lt;/span&gt;. So I had no tags for any of my
+posts, and a gazillion categories with only one post in them. Luckily,
+the &lt;span class="caps"&gt;DB&lt;/span&gt; schema is pretty sane, and I qickly figured out that both
+categories and tags are stored in the &lt;code&gt;wp_term_taxonomy&lt;/code&gt; table, and the
+difference between a category and a tag is simply that the &lt;code&gt;taxonomy&lt;/code&gt;
+field is either &amp;#8220;category&amp;#8221; or &amp;#8220;post_tag&amp;#8221;, respectively. So, since I
+hadn&amp;#8217;t added any posts in &lt;span class="caps"&gt;WP&lt;/span&gt; yet, I just changed &lt;code&gt;taxonomy&lt;/code&gt; to
+&amp;#8220;post_tag&amp;#8221; for anything with an &lt;span class="caps"&gt;ID&lt;/span&gt; past the categories I&amp;#8217;d added. And
+it seems to have worked&amp;nbsp;beautifully.&lt;/p&gt;
+&lt;p&gt;Up next, however, was the hard part: sitting down with my list of
+categories and sifting through 128 posts to categorize them. The biggest
+pain is the default edit posts table in the admin interface lists 15
+posts per page, and with a cursory glance at the source I couldn&amp;#8217;t for
+the life of me figure out where that limit is&amp;nbsp;set.&lt;/p&gt;
+&lt;p&gt;Next up, I spent some time looking over the configuration options in &lt;span class="caps"&gt;WP&lt;/span&gt;,
+updating my About page, and listing things to do in the future (more
+static pages, blogroll and links,&amp;nbsp;etc.).&lt;/p&gt;
+&lt;p&gt;I was finally ready to setup pretty URLs. And&amp;#8230; sure enough&amp;#8230; I
+clicked &amp;#8220;submit&amp;#8221; to apply some changes to the default blog &lt;span class="caps"&gt;URL&lt;/span&gt; (my real
+domain, as opposed to the DynDNS domain) and subtitle, and I got kicked
+out of the admin interface. Try as I might, I had no luck logging in. I
+then found that WordPress doesn&amp;#8217;t log anything anywhere - no MySQL log
+and no error messages in the Apache error log. Wondeful. I spent about
+an hour looking through the source, figuring out how the auth method
+works, and trying to set an &lt;span class="caps"&gt;MD5&lt;/span&gt; password. It was obviously apparent that
+the password in the &lt;span class="caps"&gt;DB&lt;/span&gt; for my one user (administrative user) was
+generated by PHPass, not &lt;span class="caps"&gt;MD5&lt;/span&gt;, but the auth function was evaluating
+anything &gt;= 32 characters as PHPass, and the &lt;span class="caps"&gt;MD5&lt;/span&gt; of my password was 32
+characters, so that wouldn&amp;#8217;t work. I tried the &amp;#8220;forgot password&amp;#8221; link
+with both username and email, but no mail was being sent. When I reached
+the 2-1/2 hour mark, I started instrumenting the login code with some
+&lt;code&gt;error_log()&lt;/code&gt; lines to see what was up. I narrowed the problem down to
+the block of code starting at lin 48 in &lt;code&gt;wp-include/user.php&lt;/code&gt; -
+specifically, according to the comments, no credentials were being
+passed but the cookie wasn&amp;#8217;t set. And it&amp;#8217;s silent in that case. So, at
+this point, I&amp;#8217;m totally lost. I decided to clear all of my browser&amp;#8217;s
+cookies and auth info, and try again. No dice. After nearly 3 hours, I
+decided to do a packet capture, and found the horribly simple reason.
+Somewhere in the code, &lt;span class="caps"&gt;WP&lt;/span&gt; is evaluating the &amp;#8220;siteurl&amp;#8221; or &amp;#8220;home&amp;#8221; values
+from wp_options, and using them instead of just doing relative links.
+As a result, when the form submits, Apache keeps returning a 302, and
+the form submission never makes it there. Hopefully this won&amp;#8217;t create a
+problem when I transition from DynDNS to a real static &lt;span class="caps"&gt;IP&lt;/span&gt; and domain&amp;nbsp;name.&lt;/p&gt;
+&lt;p&gt;Next I enabled pretty permalinks, enabled mod_rewrite in the vhost, and
+selected a new template for my blog (though I&amp;#8217;m planning on doing some
+heavy customization). I didn&amp;#8217;t want to leave the default template up for
+too long, in case Google&amp;#8217;s heavy crawling of my site picked up all of
+the new content somehow&amp;#8230; I ended up narrowing it down to three themes,
+coincidentally all designed by
+&lt;a href="http://wordpress.org/extend/themes/profile/mg12"&gt;mg12&lt;/a&gt;:
+&lt;a href="http://wordpress.org/extend/themes/blocks2"&gt;Blocks2&lt;/a&gt;,
+&lt;a href="http://wordpress.org/extend/themes/inove#post-668"&gt;iNove&lt;/a&gt; or
+&lt;a href="http://wordpress.org/extend/themes/elegant-box"&gt;ElegantBox&lt;/a&gt;. I
+installed them all on my box and looked at iNove first, and it was love
+at first&amp;nbsp;sight.&lt;/p&gt;
+&lt;p&gt;So, that&amp;#8217;s where it stands right now. I finally have my blog on
+WordPress and running, and have a theme. The action plan for tonight&amp;nbsp;includes:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Using RewriteRule and a &lt;span class="caps"&gt;PHP&lt;/span&gt; script to point all of the old Blogger
+    URLs to the new WordPress&amp;nbsp;installation.&lt;/li&gt;
+&lt;li&gt;Adding some new static content, and top-bar links to my other&amp;nbsp;sites.&lt;/li&gt;
+&lt;li&gt;Refining the theme a bit,&amp;nbsp;possibly?&lt;/li&gt;
+&lt;li&gt;Adding links to my sites, and to the&amp;nbsp;blogroll.&lt;/li&gt;
+&lt;li&gt;Adding the buttons/plugins for del.icio.us, Digg, Slashdot, reddit,&amp;nbsp;etc.&lt;/li&gt;
+&lt;li&gt;Redirecting my main blog page to&amp;nbsp;WordPress.&lt;/li&gt;
+&lt;li&gt;Redirecting or linking my old feed locations to&amp;nbsp;WordPress.&lt;/li&gt;
+&lt;/ul&gt;</summary><category term="blogger"></category><category term="blogging"></category><category term="PHP"></category><category term="wordpress"></category></entry></feed>

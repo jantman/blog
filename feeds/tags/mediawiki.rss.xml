@@ -1,0 +1,397 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Jason Antman's Blog</title><link>http://newblog.jasonantman.com/</link><description></description><atom:link href="http://newblog.jasonantman.com/feeds/tags/mediawiki.rss.xml" rel="self"></atom:link><lastBuildDate>Thu, 15 Mar 2012 18:10:00 -0400</lastBuildDate><item><title>MediaWiki - Preformatted Text within Lists</title><link>http://newblog.jasonantman.com/2012/03/mediawiki-preformatted-text-within-lists/</link><description>&lt;p&gt;As I discovered this morning, with &lt;a href="http://www.mediawiki.org"&gt;MediaWiki&lt;/a&gt;
+1.5.7+, if you attempt to put a &lt;code&gt;&amp;lt;pre&amp;gt;&lt;/code&gt; wraped block of code within a
+numbered list, the indentation breaks and the numbering starts over
+after the &lt;code&gt;&amp;lt;pre&amp;gt;&lt;/code&gt; block. This was pretty annoying, as I was trying to
+document a procedure including the commands to be run and their
+explanation. It took a few minutes, but I found the solution in the
+&lt;a href="http://meta.wikimedia.org/wiki/Help:Editing_FAQ#Q:_Can_I_put_preformatted_text_inside_a_numbered_list.3F"&gt;wikimedia Help:Editing
+&lt;span class="caps"&gt;FAQ&lt;/span&gt;&lt;/a&gt;
+page, thanks to &lt;a href="http://meta.wikimedia.org/wiki/User:Rompe"&gt;Ulf Rompe&lt;/a&gt;:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;# one
+# two
+#:
+#:here are a couple lines
+#:of preformatted text
+#:
+# and the numbering
+# continues
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;The code lines are indented a bit more than what looks right, but it&amp;nbsp;works.&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Thu, 15 Mar 2012 18:10:00 -0400</pubDate><guid>tag:newblog.jasonantman.com,2012-03-15:2012/03/mediawiki-preformatted-text-within-lists/</guid><category>formatting</category><category>mediawiki</category><category>wiki</category></item><item><title>Nagios / Icinga Configuration Highlighting with GeSHi</title><link>http://newblog.jasonantman.com/2012/02/nagios-icinga-configuration-highlighting-with-geshi/</link><description>&lt;p&gt;As you may know from former posts, this blog
+(&lt;a href="http://wordpress.org"&gt;WordPress&lt;/a&gt;-powered) and a few
+&lt;a href="http://www.mediawiki.org"&gt;MediaWiki&lt;/a&gt; sites that I have use the
+excellent &lt;span class="caps"&gt;PHP&lt;/span&gt;-based &lt;a href="http://qbnz.com/highlighter/"&gt;GeSHi&lt;/a&gt; syntax
+highlighter. Today I was writing &lt;a href="/2012/02/sending-aim-messages-from-a-perl-script/"&gt;a
+post&lt;/a&gt; that includes
+some Icinga (Nagios) configuration snippets. After a quick search, I
+found a &lt;a href="https://github.com/adepertat/geshi-nagios"&gt;Nagios language file for
+GeSHi&lt;/a&gt; on GitHub. Thanks very
+much to &lt;a href="https://github.com/adepertat"&gt;Albéric de Pertat (adepertat)&lt;/a&gt;
+for writing this and providing it to the&amp;nbsp;public.&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Tue, 28 Feb 2012 18:42:00 -0500</pubDate><guid>tag:newblog.jasonantman.com,2012-02-28:2012/02/nagios-icinga-configuration-highlighting-with-geshi/</guid><category>GeSHi</category><category>icinga</category><category>mediawiki</category><category>Nagios</category><category>PHP</category><category>wordpress</category></item><item><title>Using Templates to Track Outdated Content in a Documentation MediaWiki</title><link>http://newblog.jasonantman.com/2012/02/using-templates-to-track-outdated-content-in-a-documentation-mediawiki/</link><description>&lt;p&gt;Both my last and current jobs use &lt;a href="http://www.mediawiki.org/"&gt;MediaWiki&lt;/a&gt;
+for internal documentation. As always happens, some of this
+documentation will inevitably get out-of-date, or totally deprecated. As
+is also the case, many times when we&amp;#8217;re looking for docs in the middle
+of an incident, we don&amp;#8217;t have the time to go back and fix what&amp;#8217;s wrong.
+So, I devised the following template/category system to help keep track
+of these problem&amp;nbsp;pages.&lt;/p&gt;
+&lt;p&gt;First, create some templates that you will apply to the problem pages. I
+use three - one for totally deprecated pages, one for pages that need
+updating, and one for pages that just need cleanup. For the cleanup
+template, in the MediaWiki search box, enter &amp;#8220;Template:Cleanup&amp;#8221; and
+click &amp;#8220;go&amp;#8221;. You should be told that the page doesn&amp;#8217;t exist, and given a
+link to create the page. Create it, and enter the following&amp;nbsp;content:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;[[Image:Cleanup.png]]
+
+&amp;#39;&amp;#39;&amp;#39;This page needs to be cleaned up or reorganized.&amp;#39;&amp;#39;&amp;#39;
+
+[[Category:Pages Needing Cleanup]]
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Now we create a category page for it, &amp;#8220;Category:Pages Needing Cleanup&amp;#8221;,
+with the&amp;nbsp;content:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;__HIDDENCAT__
+
+This category is for pages that are mostly correct and just need minor corrections or reorganization.
+
+&amp;#39;&amp;#39;&amp;#39;To add pages to this category&amp;#39;&amp;#39;&amp;#39;, include the following at the &amp;#39;&amp;#39;&amp;#39;TOP&amp;#39;&amp;#39;&amp;#39; of the page:
+
+{{cleanup}}
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;and save the&amp;nbsp;page.&lt;/p&gt;
+&lt;p&gt;Now there&amp;#8217;s a few other changes we need to make. First, upload the
+Cleanup.png graphic, which I got from wikimedia.org
+&lt;a href="http://upload.wikimedia.org/wikipedia/en/thumb/f/f2/Edit-clear.svg/40px-Edit-clear.svg.png"&gt;here&lt;/a&gt;
+and uploaded as&amp;nbsp;Cleanup.png.&lt;/p&gt;
+&lt;p&gt;If you refresh the Template:Cleanup page, you should now see the image.
+On a side note, &amp;#8220;__HIDDENCAT__&amp;#8221; on the category page prevents that
+category from showing up in the category list at the bottom of the pages
+we add to it, but this only works in MediaWiki 1.13 and&amp;nbsp;up.&lt;/p&gt;
+&lt;p&gt;The last step is to add the &lt;a href="http://www.mediawiki.org/wiki/Template:Mbox"&gt;MediaWiki mbox
+template&lt;/a&gt; and its
+dependencies. While I did this once before, I didn&amp;#8217;t really remember the
+steps, but I found a post on &lt;a href="http://glynor.com/2010/05/the-trouble-with-ambox-and-mbox/"&gt;Glynor&amp;#8217;s
+blog&lt;/a&gt; that
+details them rather&amp;nbsp;nicely:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;Enable the &lt;a href="http://www.mediawiki.org/wiki/Extension:ParserFunctions"&gt;ParserFunctions
+    extension&lt;/a&gt;.
+    There are download and install instructions on the extension page,
+    but you&amp;#8217;ll want to enable string functions. To do this, include the
+    extension in LocalSettings.php&amp;nbsp;like:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="x"&gt;require_once( &amp;quot;$&lt;span class="caps"&gt;IP&lt;/span&gt;/extensions/ParserFunctions/ParserFunctions.php&amp;quot; );&lt;/span&gt;
+&lt;span class="x"&gt;$wgPFEnableStringFunctions = true;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Create a new page in your wiki called &amp;#8220;Mediawiki:Common.css&amp;#8221;, and
+    paste in the content from &lt;a href="http://www.mediawiki.org/wiki/MediaWiki:Common.css"&gt;MediaWiki.org
+    MediaWiki:Common.css&lt;/a&gt;.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;Go to &lt;a href="http://en.wikipedia.org/w/index.php?title=Special:Export"&gt;Wikipedia&amp;#8217;s
+    Special:Export&lt;/a&gt;
+    page, and enter &amp;#8220;Template:Ambox&amp;#8221; in the box, check off &amp;#8220;Include
+    templates&amp;#8221;, and export the template (and all dependencies) to a
+    local &lt;span class="caps"&gt;XML&lt;/span&gt;&amp;nbsp;file.&lt;/li&gt;
+&lt;li&gt;Go to the &amp;#8220;Special:Import&amp;#8221; page of your wiki, and upload the &lt;span class="caps"&gt;XML&lt;/span&gt;
+    file you just grabbed from Wikipedia. This will import the Ambox and
+    mbox templates, as well as their&amp;nbsp;dependencies.&lt;/li&gt;
+&lt;li&gt;Now, if you go back and refresh the Template:Cleanup page you
+    created, you should see the icon and a nice message&amp;nbsp;box:&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&lt;img alt="cleanup message box" src="/GFX/mw_cleanup.png" /&gt;&lt;/p&gt;
+&lt;p&gt;Finally, add the template and category pages for update and&amp;nbsp;deprecated:  &lt;/p&gt;
+&lt;p&gt;&lt;code&gt;Template:Update&lt;/code&gt;&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;[[Image:Warning.png]]
+
+&amp;#39;&amp;#39;&amp;#39;This page is in need of updating. Some information on it may be out of date, and should not be relied on.&amp;#39;&amp;#39;&amp;#39;
+
+[[Category:Pages Needing Updates]]
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;&lt;code&gt;Category:Pages Needing Updates&lt;/code&gt;&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;__HIDDENCAT__
+
+This category keeps track of pages that need changes or updates.
+
+&amp;#39;&amp;#39;&amp;#39;To add pages to this category&amp;#39;&amp;#39;&amp;#39;, include the following at the &amp;#39;&amp;#39;&amp;#39;TOP&amp;#39;&amp;#39;&amp;#39; of the page:
+
+{{update}}
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;&lt;code&gt;Template:Deprecated&lt;/code&gt;&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;[[Image:Critical.png]]
+
+&amp;#39;&amp;#39;&amp;#39;The information on this page is badly out-of-date.&amp;#39;&amp;#39;&amp;#39; It describes a system that is no longer in production or has drastically changed, and &amp;#39;&amp;#39;&amp;#39;needs to be updated or rewritten&amp;#39;&amp;#39;&amp;#39;.
+
+[[Category:Deprecated Content]]
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;&lt;code&gt;Category:Deprecated Content&lt;/code&gt;&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt; __HIDDENCAT__
+
+This category keeps track of pages that are &amp;#39;&amp;#39;&amp;#39;seriously old&amp;#39;&amp;#39;&amp;#39; or otherwise describe systems/hosts/etc. that have seriously changed from what is described in the page.
+
+&amp;#39;&amp;#39;&amp;#39;To add pages to this category&amp;#39;&amp;#39;&amp;#39;, include the following at the &amp;#39;&amp;#39;&amp;#39;TOP&amp;#39;&amp;#39;&amp;#39; of the page:
+
+{{deprecated}}
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;And the download the two images -
+&lt;a href="http://upload.wikimedia.org/wikipedia/commons/9/98/Ambox_deletion.png"&gt;http://upload.wikimedia.org/wikipedia/commons/9/98/Ambox_deletion.png&lt;/a&gt;
+gets uploaded as Critical.png and
+&lt;a href="http://upload.wikimedia.org/wikipedia/en/f/f4/Ambox_content.png"&gt;http://upload.wikimedia.org/wikipedia/en/f/f4/Ambox_content.png&lt;/a&gt;
+gets uploaded as&amp;nbsp;Warning.png.&lt;/p&gt;
+&lt;p&gt;That&amp;#8217;s it. To use this, just add &lt;code&gt;{{cleanup}}&lt;/code&gt;, &lt;code&gt;{{deprecated}}&lt;/code&gt; or
+&lt;code&gt;{{update}}&lt;/code&gt; to the top of a wiki article (adding the &lt;span class="caps"&gt;HTML&lt;/span&gt; comment
+before it is also recommended), and it will add the page to the
+appropriate category and show a nice message box at the top of the&amp;nbsp;page:  &lt;/p&gt;
+&lt;p&gt;Cleanup:  &lt;/p&gt;
+&lt;p&gt;&lt;img alt="cleanup message box" src="/GFX/mw_cleanup.png" /&gt;  &lt;/p&gt;
+&lt;p&gt;Update:  &lt;/p&gt;
+&lt;p&gt;&lt;img alt="update message box" src="/GFX/mw_update.png" /&gt;  &lt;/p&gt;
+&lt;p&gt;Deprecated:  &lt;/p&gt;
+&lt;p&gt;&lt;img alt="deprecated message box" src="/GFX/mw_deprecated.png" /&gt;&lt;/p&gt;
+&lt;p&gt;I also add a link to the top of the main wiki&amp;nbsp;page:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;Things that need to be done: [[:Category:Pages Needing Updates|Pages Needing Updates]], [[:Category:Deprecated Content|Pages with Largely Deprecated Content]], [[:Category:Pages Needing Cleanup|Pages Needing Cleanup]], [[Special:WantedPages|Links to Nonexistent Pages]]
+&lt;/pre&gt;&lt;/div&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Thu, 02 Feb 2012 11:02:00 -0500</pubDate><guid>tag:newblog.jasonantman.com,2012-02-02:2012/02/using-templates-to-track-outdated-content-in-a-documentation-mediawiki/</guid><category>documentation</category><category>mediawiki</category><category>sysadmin</category></item><item><title>Puppet Syntax Highlighting with GeSHi</title><link>http://newblog.jasonantman.com/2012/01/puppet-syntax-highlighting-with-geshi/</link><description>&lt;p&gt;This blog is run on wordpress, and I also do quite a bit in &lt;span class="caps"&gt;PHP&lt;/span&gt;, so I&amp;#8217;m
+familiar with the &lt;a href="http://qbnz.com/highlighter/"&gt;GeSHi&lt;/a&gt; syntax
+highlighter. It&amp;#8217;s &lt;span class="caps"&gt;PHP&lt;/span&gt;-based, and can run both as a Wordpress plugin
+(&lt;a href="http://wordpress.org/extend/plugins/wp-syntax/"&gt;&lt;span class="caps"&gt;WP&lt;/span&gt;-Syntax&lt;/a&gt;) and as a
+&lt;span class="caps"&gt;PHP&lt;/span&gt; module. It also works quite well with the MediaWiki &lt;a href="http://www.mediawiki.org/wiki/Extension:SyntaxHighlight_GeSHi"&gt;SyntaxHighlight
+GeSHi&lt;/a&gt;&amp;nbsp;extension.&lt;/p&gt;
+&lt;p&gt;Today I was documenting some &lt;a href="http://www.puppet.org"&gt;Puppet&lt;/a&gt; code in a
+wiki, and realized that I didn&amp;#8217;t have syntax highlighting. Well, fellow
+Linux sysadmin and puppetmaster Jason Hancock was nice enough to post on
+his blog (&lt;a href="http://geek.jasonhancock.com/2011/10/14/puppet-syntax-highlighting-geshi/"&gt;Puppet Syntax Highlighting with
+GeSHi&lt;/a&gt;)
+that he&amp;#8217;s developed a GeSHi language file for Puppet, available from
+&lt;a href="https://github.com/jasonhancock/geshi-language-files"&gt;GitHub&lt;/a&gt;. Many&amp;nbsp;thanks!&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Wed, 11 Jan 2012 12:32:00 -0500</pubDate><guid>tag:newblog.jasonantman.com,2012-01-11:2012/01/puppet-syntax-highlighting-with-geshi/</guid><category>GeSHi</category><category>mediawiki</category><category>PHP</category><category>puppet</category><category>wordpress</category></item><item><title>Mediawiki Extension - Section Link To Top</title><link>http://newblog.jasonantman.com/2010/08/mediawiki-extension-section-link-to-top/</link><description>&lt;p&gt;While working on a particularly long documentation page in MediaWiki
+today, I came by a convenient little&amp;nbsp;extension:&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://www.mediawiki.org/wiki/Extension:SectionLinkToTop"&gt;Section Link To&amp;nbsp;Top&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;It adds a nice little &amp;#8220;top&amp;#8221; link next to the &amp;#8220;edit&amp;#8221; link in each section
+header. Very useful for &lt;em&gt;long&lt;/em&gt;&amp;nbsp;pages.&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Wed, 18 Aug 2010 13:46:00 -0400</pubDate><guid>tag:newblog.jasonantman.com,2010-08-18:2010/08/mediawiki-extension-section-link-to-top/</guid><category>documentation</category><category>mediawiki</category></item><item><title>Custom MediaWiki Sidebar; New Blog?</title><link>http://newblog.jasonantman.com/2008/06/custom-mediawiki-sidebar-new-blog/</link><description>&lt;p&gt;As you may have noticed, some &lt;a href="http://www.spreadfirefox.com/node&amp;amp;id=238326&amp;amp;t=305"&gt;Firefox
+3&lt;/a&gt;
+&lt;a href="http://www.spreadfirefox.com/?q=affiliates/homepage"&gt;buttons&lt;/a&gt; have
+popped up not only here on my blog, but also on my
+&lt;a href="http://www.jasonantman.com/"&gt;wiki&lt;/a&gt;. While adding the buttons to
+&lt;a href="http://www.blogger.com/"&gt;Blogger&lt;/a&gt; was a simple addition to the
+template, getting them in the sidebar of MediaWiki wasn&amp;#8217;t exactly as
+easy (yeah, I&amp;#8217;m considering the arduous project of moving my whole 102+
+page wiki to &lt;a href="http://drupal.org/"&gt;Drupal&lt;/a&gt; or another good F/&lt;span class="caps"&gt;OSS&lt;/span&gt;&amp;nbsp;&lt;span class="caps"&gt;CMS&lt;/span&gt;).&lt;/p&gt;
+&lt;p&gt;After some serious grepping through the source, and adding &lt;span class="caps"&gt;HTML&lt;/span&gt; comments
+to see where they appeared, I finally found a solution to add the button
+to the MediaWiki sidebar - though I&amp;#8217;d really like it to appear below the
+search box (I guess that&amp;#8217;s something for my to-do list). I&amp;#8217;m using the
+MonoBook skin (though somewhat modified). I&amp;#8217;m using &amp;#8220;MonoBook nouveau&amp;#8221;,
+and it should be the version that shipped with &lt;span class="caps"&gt;MW&lt;/span&gt; 1.10.1. In this
+version, I added the code around line 166. Specifically, this was added
+before the &lt;code&gt;&amp;lt;div id="p-search" class="portlet"&amp;gt;&lt;/code&gt; line, and after the end
+of the &lt;code&gt;foreach ($this-&amp;gt;data['sidebar'] as $bar =&amp;gt; $cont)&lt;/code&gt; loop. This
+threw the button in a box directly above the search box, and below all
+of my sidebar&amp;nbsp;links.&lt;/p&gt;
+&lt;p&gt;The code looked something&amp;nbsp;like:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="cp"&gt;&amp;lt;?php } ?&amp;gt;&lt;/span&gt;
+&lt;span class="c"&gt;&amp;lt;!-- firefox link added to MonoBook.php by jantman 2008-06-18 --&amp;gt;&lt;/span&gt;
+&lt;span class="nt"&gt;&amp;lt;div&lt;/span&gt; &lt;span class="na"&gt;class=&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;portlet&amp;#39;&lt;/span&gt; &lt;span class="na"&gt;id=&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;p-logos&amp;#39;&lt;/span&gt;&lt;span class="nt"&gt;&amp;gt;&lt;/span&gt;
+&lt;span class="nt"&gt;&amp;lt;h5&amp;gt;&lt;/span&gt;Cool Stuff&lt;span class="nt"&gt;&amp;lt;/h5&amp;gt;&lt;/span&gt;
+&lt;span class="nt"&gt;&amp;lt;div&lt;/span&gt; &lt;span class="na"&gt;class=&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;pBody&amp;#39;&lt;/span&gt;&lt;span class="nt"&gt;&amp;gt;&lt;/span&gt;
+&lt;span class="nt"&gt;&amp;lt;ul&amp;gt;&lt;/span&gt;
+&lt;span class="nt"&gt;&amp;lt;li&amp;gt;&amp;lt;a&lt;/span&gt; &lt;span class="na"&gt;href=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;http://www.spreadfirefox.com/node&amp;amp;id=238326&amp;amp;t=305&amp;quot;&lt;/span&gt; &lt;span class="na"&gt;target=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;_blank&amp;quot;&lt;/span&gt;&lt;span class="nt"&gt;&amp;gt;&lt;/span&gt;
+&lt;span class="nt"&gt;&amp;lt;img&lt;/span&gt; &lt;span class="na"&gt;border=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;0&amp;quot;&lt;/span&gt; &lt;span class="na"&gt;alt=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;Firefox 3&amp;quot;&lt;/span&gt; &lt;span class="na"&gt;title=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;Firefox 3&amp;quot;&lt;/span&gt; &lt;span class="na"&gt;src=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;http://sfx-images.mozilla.org/affiliates/Buttons/firefox3/110x32_best-yet.png&amp;quot;&lt;/span&gt;&lt;span class="nt"&gt;/&amp;gt;&lt;/span&gt;
+&lt;span class="nt"&gt;&amp;lt;/a&amp;gt;&lt;/span&gt;
+&lt;span class="nt"&gt;&amp;lt;/li&amp;gt;&lt;/span&gt;
+&lt;span class="nt"&gt;&amp;lt;/ul&amp;gt;&lt;/span&gt;
+&lt;span class="nt"&gt;&amp;lt;/div&amp;gt;&lt;/span&gt;
+&lt;span class="nt"&gt;&amp;lt;/div&amp;gt;&lt;/span&gt;
+&lt;span class="c"&gt;&amp;lt;!-- end firefox link --&amp;gt;&lt;/span&gt;
+&lt;span class="nt"&gt;&amp;lt;div&lt;/span&gt; &lt;span class="na"&gt;id=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;p-search&amp;quot;&lt;/span&gt; &lt;span class="na"&gt;class=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;portlet&amp;quot;&lt;/span&gt;&lt;span class="nt"&gt;&amp;gt;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;In other news, I&amp;#8217;m taking a Data Driven Websites class this summer
+(&lt;span class="caps"&gt;PHP&lt;/span&gt;/MySQL, but for some reason they switched to a Windows server&amp;#8230;
+endless problems, and I can&amp;#8217;t even edit with Nano on the server, let
+alone emacs). Our first project was to build a blog engine, which I&amp;#8217;m
+working on right now. Anyway, it got me thinking&amp;#8230; the one thing that
+Blogger is missing is the ability to post to a given category, and allow
+users to view or subscribe to a specific category (or everything). So I
+think I may look into writing something like that myself, if I can&amp;#8217;t
+find a good alternative that&amp;#8217;s already done and is F/&lt;span class="caps"&gt;OSS&lt;/span&gt;. Regardless,
+I&amp;#8217;ll probably be keeping the Blogger template as well as (ugh) moving
+over all of my current posts, which Blogger chose to store in raw &lt;span class="caps"&gt;HTML&lt;/span&gt;.
+So there&amp;#8217;s going to be a lot of parsing on my&amp;nbsp;future&amp;#8230;&lt;/p&gt;
+&lt;p&gt;&lt;span class="caps"&gt;PS&lt;/span&gt; - When I get a new blog engine, I&amp;#8217;m also going to go for a slightly
+modified template that uses relative widths and placement - so that
+code, like the snippet here, fits the screen&amp;nbsp;correctly.&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Wed, 18 Jun 2008 22:26:00 -0400</pubDate><guid>tag:newblog.jasonantman.com,2008-06-18:2008/06/custom-mediawiki-sidebar-new-blog/</guid><category>blog</category><category>firefox</category><category>mediawiki</category><category>PHP</category></item><item><title>SunSPOT; CarPC; MediaWiki Logging</title><link>http://newblog.jasonantman.com/2008/05/sunspot-carpc-mediawiki-logging/</link><description>&lt;p&gt;Well, finals season is upon me. That&amp;#8217;s probably why I haven&amp;#8217;t been
+posting much lately (I haven&amp;#8217;t even been checking &lt;a href="http://reader.google.com/"&gt;Google
+Reader&lt;/a&gt; - I&amp;#8217;ll have to delete a few thousand
+entries when I get back into the swing of things). I&amp;#8217;ve been pretty
+busy, between studying, projects, and work. I&amp;#8217;ll be working 4 days a
+week through June 20th, as well as taking night classes 4 nigths a week
+(unfortunately not the same 4 days) through July 3, in an effort to
+graduate Rutgers on time (after transferring in and also switching
+majors). Work after June 20th is up in the air - who knows how hard the
+budget cuts will&amp;nbsp;hit.&lt;/p&gt;
+&lt;p&gt;My internship as the Sun Microsystems Campus Ambassador to Rutgers is
+over on May 12th. I got a chance to do the Rutgers &lt;span class="caps"&gt;IT&lt;/span&gt; Vendor Fair with
+Sun, and met a few cool people - especially including Matt McGrath of
+&lt;a href="http://www.conres.com/"&gt;Continental Resources&lt;/a&gt;, a Sun Strategic iForce
+Partner, who&amp;#8217;s doing some wonderful things with the &lt;a href="http://www.sun.com/solutions/landing/industry/education/edu_essentials.jsp"&gt;Sun Education
+Essentials Matching Grant
+Program&lt;/a&gt;,
+and &lt;a href="http://opsamericas.com/"&gt;Skip Paul&lt;/a&gt;, a Linux Systems Engineer for
+Novell&amp;#8217;s Open Platform Solutions group. I also finally cracked open my
+demo set of &lt;a href="http://www.sunspotworld.com/"&gt;SunSPOT&lt;/a&gt;s. Wonderful little
+devices, radio, run Java on the bare metal, and have temperature
+sensors, accelerometers, and liberal I/O. My first development exereice
+will probably be making a temperature and acceleration data logger for
+my truck, but there&amp;#8217;s surely more to come. They&amp;#8217;re&amp;nbsp;great!&lt;/p&gt;
+&lt;p&gt;My newest project - which I&amp;#8217;m hoping to spend nearly the whole summer on
+- is the &lt;a href="http://www.jasonantman.com/tuxtruck/"&gt;TuxTruck&lt;/a&gt;. I&amp;#8217;ve been
+frustrated with the lack of &amp;#8220;smartness&amp;#8221; in my truck (an 06 Ford F-250),
+not to mention having to remember my &lt;span class="caps"&gt;MP3&lt;/span&gt; player so I can listen to
+podcasts on the way to work, and having so many gadgets in my truck. So,
+the solution is obvious: a Linux-based
+&lt;a href="http://en.wikipedia.org/wiki/Carpc"&gt;CarPC&lt;/a&gt;. A nice little Mini-&lt;span class="caps"&gt;ATX&lt;/span&gt; box
+under a seat, with a 7&amp;#8221; pull-out touchscreen in the dash (replacing the
+factory radio). It&amp;#8217;s a big, complicated, and expensive project - but I
+want one, and I could use some experience with smaller systems.&lt;br /&gt;
+The major features I have&amp;nbsp;planned:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Realtime &lt;span class="caps"&gt;GPS&lt;/span&gt;&amp;nbsp;navigation&lt;/li&gt;
+&lt;li&gt;Hands-free bluetooth calls from my cell, with address book, routing
+    to contact address, possibly voice&amp;nbsp;dialing.&lt;/li&gt;
+&lt;li&gt;Realtime&amp;nbsp;weather&lt;/li&gt;
+&lt;li&gt;&lt;span class="caps"&gt;OBD&lt;/span&gt;-&lt;span class="caps"&gt;II&lt;/span&gt; interface, for vehicle diagnostics and fuel
+    efficiency/performance&amp;nbsp;profiling&lt;/li&gt;
+&lt;li&gt;Audio - at a minimum searching and playing MP3s, and automatically
+    downloading podcasts and throwing them in a playlist. Perhaps also
+    an &lt;span class="caps"&gt;AM&lt;/span&gt;/&lt;span class="caps"&gt;FM&lt;/span&gt;&amp;nbsp;tuner&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;It&amp;#8217;s not an easy project. So far, the major challenges seem to&amp;nbsp;be:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;No full-featured &lt;span class="caps"&gt;GPS&lt;/span&gt; navigation package available. The ones that are
+    available don&amp;#8217;t seem to be too easy to integrate into my planned
+    &lt;span class="caps"&gt;GUI&lt;/span&gt;, which will allot them 800x420 pixels (on an 800x480 screen) and
+    requre the bottom toolbar to be always&amp;nbsp;available.&lt;/li&gt;
+&lt;li&gt;How to handle processing of multiple data streams that require
+    near-real-time processing - specifically, &lt;span class="caps"&gt;GPS&lt;/span&gt; with text-to-speech,
+    turn-by-turn directions, plus playing audio, plus responding to an
+    incoming phone call in a timely manner, pausing the audio, and
+    stopping &lt;span class="caps"&gt;GPS&lt;/span&gt; audio but continuing&amp;nbsp;navigation.&lt;/li&gt;
+&lt;li&gt;Whether to install a smaller stereo and use aux input for audio, or
+    totally rip out the stereo, use an amp with the computer as its only
+    input, and then how to control&amp;nbsp;volume?&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;There will be more to come in the future. For now, take a look at &lt;a href="https://github.com/jantman/tuxtruck"&gt;the
+TuxTruck github&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Update Saturday, March 2, 2013&lt;/strong&gt; - I&amp;#8217;m in the process of migrating my
+legacy &lt;span class="caps"&gt;CVS&lt;/span&gt; and Subversion repositories to
+&lt;a href="http://github.com/jantman/"&gt;github.com&lt;/a&gt;. The forgotten &lt;span class="caps"&gt;SVN&lt;/span&gt; repository
+for TuxTruck has been migrated there, and the &lt;span class="caps"&gt;CVS&lt;/span&gt; repository will soon
+be moved there as well. Tuxtruck.org has been permanently taken offline
+and redirected to the GitHub&amp;nbsp;repository.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Mediawiki Logging&lt;/strong&gt; - I recently
+had a situation where I had to confirm how much work someone had done on
+a MediaWiki-based project. The Recent Changes page only goes back 30
+days, and walking through the History of each page is a pain. After
+looking around in the database a bit, I found a few tables of&amp;nbsp;interest:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;Table &amp;#8220;users&amp;#8221; includes fields &amp;#8220;user_touched&amp;#8221; (last time the user
+    was updated) and &amp;#8220;user_editcount&amp;#8221; (a really simple count of the
+    users&amp;#8217; number of&amp;nbsp;edits).&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Table &amp;#8220;recentchanges&amp;#8221; holds a lot of data&amp;#8230; seemingly the entire
+    life of the&amp;nbsp;wiki&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Wed, 07 May 2008 10:03:00 -0400</pubDate><guid>tag:newblog.jasonantman.com,2008-05-07:2008/05/sunspot-carpc-mediawiki-logging/</guid><category>bluetooth</category><category>car</category><category>carpc</category><category>conres</category><category>gps</category><category>linux</category><category>mediawiki</category><category>novell</category><category>obd</category><category>rutgers</category><category>sun</category><category>sunspot</category><category>suse</category><category>tuxtruck</category></item><item><title>Website, Blog, Bacula</title><link>http://newblog.jasonantman.com/2007/10/website-blog-bacula/</link><description>&lt;p&gt;&lt;strong&gt;Website&lt;/strong&gt; - In personal news, I&amp;#8217;ve finished migrating all of the
+information content of &lt;a href="http://www.jasonantman.com"&gt;JasonAntman.com&lt;/a&gt; to
+a wiki, based on &lt;a href="http://www.mediawiki.org"&gt;MediaWiki&lt;/a&gt;. I&amp;#8217;m still
+getting some kinks ironed out, and working on customization, but it
+seems to be coming along very well. It&amp;#8217;s wonderfully easy to update
+information and to link between articles. Most of the content is more
+like notes than articles, but I&amp;#8217;m trying to put most of my SysAdmin and
+programming notes up there, both for my own future reference and that of
+anyone who happens by the site. As always, though, some content will
+just live its&amp;#8217; life as a blog entry, so I encourage searching of my blog
+as well. This is my fourth instance of MeidaWiki, and while I haven&amp;#8217;t
+set them up to play together, they all run wonderfully - and share a lot
+of common configuration (though I have separate instances of the code).
+Hopefully I&amp;#8217;ll do a bunch of reorganization of the wiki sometime, and
+keep adding new content. Some of the newer pages include pages on
+&lt;a href="http://www.jasonantman.com/wiki/index.php/DenyHosts"&gt;DenyHosts&lt;/a&gt; and
+&lt;a href="http://www.jasonantman.com/wiki/index.php/Hpasm"&gt;&lt;span class="caps"&gt;HPASM&lt;/span&gt;&lt;/a&gt; (from my blog&amp;nbsp;post).&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Blog&lt;/strong&gt; - I know the template is awful. It&amp;#8217;s on my list of things to
+do, and should be at the top of the queue in approximately&amp;nbsp;2056.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Bacula&lt;/strong&gt; - Up to now, my backups have been a total kludge. The mere
+explanation of this elicits a feeling of nausea. A shell script on my
+backup storage server executes via cron. Each of the four important
+servers on my network (mail, web, monitoring, and development) have
+shell scripts that handle local backups - tar&amp;#8217;ing up a list of
+directories, MySQL dumps, etc. - then tar gzip the whole thing and plop
+it in a local directory. The backup server executes these scripts and
+then copies the temporary files to its own disk via &lt;span class="caps"&gt;SCP&lt;/span&gt;. All of this is
+handled through an &lt;a href="http://expect.nist.gov/"&gt;expect&lt;/a&gt; script, that runs
+each server consecutively. By morning, I end up with a 6+ hour job
+that&amp;#8217;s finished, and dumped gigs of files on the backup server. Before
+finishing each machine, it deletes any backups on the backup server that
+are older than 10 days. After copying everything, it deletes the
+client&amp;#8217;s local copy. The bottom line is that if a machine goes down, I
+can re-install the &lt;span class="caps"&gt;OS&lt;/span&gt; and all packages, and then have the backups of
+just /etc and user data. Not beautiful. Even worse, my backup storage
+server doesn&amp;#8217;t have a tape drive. When I get around to it, I run a
+script on my development/storage box that copies the latest backups from
+each machine, located on the backup server, to a tempdir and then writes
+them to tape. To top it all off, I have only one network, so all of
+these gigs of data are crawling across my ancient 10/100 switch, along
+with all other connectivity to the outside&amp;nbsp;world.&lt;/p&gt;
+&lt;p&gt;Unfortunately, it doesn&amp;#8217;t look like I&amp;#8217;ll have the money to upgrade to
+Gig-E any time soon, even just for the 5 machines involved. More to the
+point, there&amp;#8217;s no way that I&amp;#8217;ll have the money to buy a manageable Gig-E
+switch that can come anywhere close to my &lt;a href="http://www.jasonantman.com/wiki/index.php/BayStack_450-24T"&gt;BayStack
+450-24T&lt;/a&gt;.
+So, it&amp;#8217;s time to invest&amp;#8230; well&amp;#8230; time&amp;#8230; in a good backup
+infrastructure. After doing a lot of research, I came to two&amp;nbsp;findings:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;The two main options seem to be &lt;a href="http://www.amanda.org/"&gt;&lt;span class="caps"&gt;AMANDA&lt;/span&gt;&lt;/a&gt; and
+    &lt;a href="http://www.bacula.org/"&gt;Bacula&lt;/a&gt;.&lt;/li&gt;
+&lt;li&gt;I don&amp;#8217;t like how &lt;span class="caps"&gt;AMANDA&lt;/span&gt;&amp;nbsp;works.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;So, I&amp;#8217;m going to give Bacula a shot. I did consult the
+&lt;a href="http://www.sage.org/"&gt;&lt;span class="caps"&gt;SAGE&lt;/span&gt;&lt;/a&gt; mailing list for advice, and got some
+recommendations for &lt;a href="http://backuppc.sourceforge.net/"&gt;BackupPC&lt;/a&gt;, but
+Bacula seems to be more my type of thing. Well, I did an install, and
+spent about 8 hours hacking around with the config files. No luck.
+Bacula is designed to be highly modular and scalable, but to be honest,
+I find the config files to be *very* complicated. Furthermore, I
+wasn&amp;#8217;t able to find any good example configurations with documentation.
+After brainstorming for a while (laying in bed watching Law &lt;span class="amp"&gt;&amp;amp;&lt;/span&gt; Order and
+reading the Bacula docs on dead trees) I decided to give in - despite my
+continued efforts to stop using it, I checked
+&lt;a href="http://www.webmin.com"&gt;Webmin&lt;/a&gt; and, surely enough, they have a Bacula
+module. After starting with fresh config files, I was able to get Bacula
+up and running on my development/storage server (a fresh install of
+openSuSE 10.1) as the director. I got a file daemon installed on the web
+server. Everything looked&amp;nbsp;wonderful.&lt;/p&gt;
+&lt;p&gt;The current status: My backup storage server does only that - storage of
+backups. Nothing else. It&amp;#8217;s still running SuSE 9.3. The Bacula RPMs for
+9.3 are from the 1.x tree, and all of my other machines are running
+openSuSE 10.x, with Bacula 2.x. I gave it a shot but, sure enough, a
+Bacula 2.x director won&amp;#8217;t jive with a 1.x storage daemon. And I&amp;#8217;m in
+dependency hell - Bacula 2.x requires upgrades of everything from the C
+libs all the way up. So, I&amp;#8217;m going to give a shot at an upgrade of the
+storage machine via YaST, and see where I&amp;nbsp;get.&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Wed, 10 Oct 2007 13:35:00 -0400</pubDate><guid>tag:newblog.jasonantman.com,2007-10-10:2007/10/website-blog-bacula/</guid><category>bacula</category><category>blog</category><category>jasonantman</category><category>mediawiki</category><category>wiki</category></item></channel></rss>

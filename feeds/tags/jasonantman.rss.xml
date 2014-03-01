@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Jason Antman's Blog</title><link>http://newblog.jasonantman.com/</link><description></description><atom:link href="http://newblog.jasonantman.com/feeds/tags/jasonantman.rss.xml" rel="self"></atom:link><lastBuildDate>Wed, 10 Oct 2007 13:35:00 -0400</lastBuildDate><item><title>Website, Blog, Bacula</title><link>http://newblog.jasonantman.com/2007/10/website-blog-bacula/</link><description>&lt;p&gt;&lt;strong&gt;Website&lt;/strong&gt; - In personal news, I&amp;#8217;ve finished migrating all of the
+information content of &lt;a href="http://www.jasonantman.com"&gt;JasonAntman.com&lt;/a&gt; to
+a wiki, based on &lt;a href="http://www.mediawiki.org"&gt;MediaWiki&lt;/a&gt;. I&amp;#8217;m still
+getting some kinks ironed out, and working on customization, but it
+seems to be coming along very well. It&amp;#8217;s wonderfully easy to update
+information and to link between articles. Most of the content is more
+like notes than articles, but I&amp;#8217;m trying to put most of my SysAdmin and
+programming notes up there, both for my own future reference and that of
+anyone who happens by the site. As always, though, some content will
+just live its&amp;#8217; life as a blog entry, so I encourage searching of my blog
+as well. This is my fourth instance of MeidaWiki, and while I haven&amp;#8217;t
+set them up to play together, they all run wonderfully - and share a lot
+of common configuration (though I have separate instances of the code).
+Hopefully I&amp;#8217;ll do a bunch of reorganization of the wiki sometime, and
+keep adding new content. Some of the newer pages include pages on
+&lt;a href="http://www.jasonantman.com/wiki/index.php/DenyHosts"&gt;DenyHosts&lt;/a&gt; and
+&lt;a href="http://www.jasonantman.com/wiki/index.php/Hpasm"&gt;&lt;span class="caps"&gt;HPASM&lt;/span&gt;&lt;/a&gt; (from my blog&amp;nbsp;post).&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Blog&lt;/strong&gt; - I know the template is awful. It&amp;#8217;s on my list of things to
+do, and should be at the top of the queue in approximately&amp;nbsp;2056.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Bacula&lt;/strong&gt; - Up to now, my backups have been a total kludge. The mere
+explanation of this elicits a feeling of nausea. A shell script on my
+backup storage server executes via cron. Each of the four important
+servers on my network (mail, web, monitoring, and development) have
+shell scripts that handle local backups - tar&amp;#8217;ing up a list of
+directories, MySQL dumps, etc. - then tar gzip the whole thing and plop
+it in a local directory. The backup server executes these scripts and
+then copies the temporary files to its own disk via &lt;span class="caps"&gt;SCP&lt;/span&gt;. All of this is
+handled through an &lt;a href="http://expect.nist.gov/"&gt;expect&lt;/a&gt; script, that runs
+each server consecutively. By morning, I end up with a 6+ hour job
+that&amp;#8217;s finished, and dumped gigs of files on the backup server. Before
+finishing each machine, it deletes any backups on the backup server that
+are older than 10 days. After copying everything, it deletes the
+client&amp;#8217;s local copy. The bottom line is that if a machine goes down, I
+can re-install the &lt;span class="caps"&gt;OS&lt;/span&gt; and all packages, and then have the backups of
+just /etc and user data. Not beautiful. Even worse, my backup storage
+server doesn&amp;#8217;t have a tape drive. When I get around to it, I run a
+script on my development/storage box that copies the latest backups from
+each machine, located on the backup server, to a tempdir and then writes
+them to tape. To top it all off, I have only one network, so all of
+these gigs of data are crawling across my ancient 10/100 switch, along
+with all other connectivity to the outside&amp;nbsp;world.&lt;/p&gt;
+&lt;p&gt;Unfortunately, it doesn&amp;#8217;t look like I&amp;#8217;ll have the money to upgrade to
+Gig-E any time soon, even just for the 5 machines involved. More to the
+point, there&amp;#8217;s no way that I&amp;#8217;ll have the money to buy a manageable Gig-E
+switch that can come anywhere close to my &lt;a href="http://www.jasonantman.com/wiki/index.php/BayStack_450-24T"&gt;BayStack
+450-24T&lt;/a&gt;.
+So, it&amp;#8217;s time to invest&amp;#8230; well&amp;#8230; time&amp;#8230; in a good backup
+infrastructure. After doing a lot of research, I came to two&amp;nbsp;findings:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;The two main options seem to be &lt;a href="http://www.amanda.org/"&gt;&lt;span class="caps"&gt;AMANDA&lt;/span&gt;&lt;/a&gt; and
+    &lt;a href="http://www.bacula.org/"&gt;Bacula&lt;/a&gt;.&lt;/li&gt;
+&lt;li&gt;I don&amp;#8217;t like how &lt;span class="caps"&gt;AMANDA&lt;/span&gt;&amp;nbsp;works.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;So, I&amp;#8217;m going to give Bacula a shot. I did consult the
+&lt;a href="http://www.sage.org/"&gt;&lt;span class="caps"&gt;SAGE&lt;/span&gt;&lt;/a&gt; mailing list for advice, and got some
+recommendations for &lt;a href="http://backuppc.sourceforge.net/"&gt;BackupPC&lt;/a&gt;, but
+Bacula seems to be more my type of thing. Well, I did an install, and
+spent about 8 hours hacking around with the config files. No luck.
+Bacula is designed to be highly modular and scalable, but to be honest,
+I find the config files to be *very* complicated. Furthermore, I
+wasn&amp;#8217;t able to find any good example configurations with documentation.
+After brainstorming for a while (laying in bed watching Law &lt;span class="amp"&gt;&amp;amp;&lt;/span&gt; Order and
+reading the Bacula docs on dead trees) I decided to give in - despite my
+continued efforts to stop using it, I checked
+&lt;a href="http://www.webmin.com"&gt;Webmin&lt;/a&gt; and, surely enough, they have a Bacula
+module. After starting with fresh config files, I was able to get Bacula
+up and running on my development/storage server (a fresh install of
+openSuSE 10.1) as the director. I got a file daemon installed on the web
+server. Everything looked&amp;nbsp;wonderful.&lt;/p&gt;
+&lt;p&gt;The current status: My backup storage server does only that - storage of
+backups. Nothing else. It&amp;#8217;s still running SuSE 9.3. The Bacula RPMs for
+9.3 are from the 1.x tree, and all of my other machines are running
+openSuSE 10.x, with Bacula 2.x. I gave it a shot but, sure enough, a
+Bacula 2.x director won&amp;#8217;t jive with a 1.x storage daemon. And I&amp;#8217;m in
+dependency hell - Bacula 2.x requires upgrades of everything from the C
+libs all the way up. So, I&amp;#8217;m going to give a shot at an upgrade of the
+storage machine via YaST, and see where I&amp;nbsp;get.&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Wed, 10 Oct 2007 13:35:00 -0400</pubDate><guid>tag:newblog.jasonantman.com,2007-10-10:2007/10/website-blog-bacula/</guid><category>bacula</category><category>blog</category><category>jasonantman</category><category>mediawiki</category><category>wiki</category></item></channel></rss>

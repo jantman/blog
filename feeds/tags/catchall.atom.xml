@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Jason Antman's Blog</title><link href="http://newblog.jasonantman.com/" rel="alternate"></link><link href="http://newblog.jasonantman.com/feeds/tags/catchall.atom.xml" rel="self"></link><id>http://newblog.jasonantman.com/</id><updated>2010-04-07T10:10:00-04:00</updated><entry><title>Apache catchall vhost</title><link href="http://newblog.jasonantman.com/2010/04/apache-catchall-vhost/" rel="alternate"></link><updated>2010-04-07T10:10:00-04:00</updated><author><name>admin</name></author><id>tag:newblog.jasonantman.com,2010-04-07:2010/04/apache-catchall-vhost/</id><summary type="html">&lt;p&gt;As mentioned in &lt;a href="/2010/04/bind9-dynamic-dns/"&gt;one of my recent posts&lt;/a&gt;, I occasionally
+have to setup catchall pages in Apache. The general idea is usually that I either want
+a vhost that serves one page for any conceivable request, or that I moved something and
+want to alert the visitor, but provide a formula-based link to the new content. Assuming
+you have &lt;code&gt;mod_rewrite&lt;/code&gt;, this is relatively&amp;nbsp;simple.&lt;/p&gt;
+&lt;p&gt;In your vhost configuration (or .htaccess), you just need two&amp;nbsp;lines:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="nb"&gt;RewriteEngine&lt;/span&gt; &lt;span class="k"&gt;on&lt;/span&gt;
+&lt;span class="nb"&gt;RewriteCond&lt;/span&gt; %{REQUEST_URI} !/index\.php$1
+&lt;span class="nb"&gt;RewriteRule&lt;/span&gt; ^(.*)$ &lt;span class="sx"&gt;/index.php&lt;/span&gt;$1 [L]
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;This will redirect every request for the vhost to &lt;code&gt;/index.php&lt;/code&gt;. Within
+your &lt;span class="caps"&gt;PHP&lt;/span&gt; script, you can access the actual request &lt;span class="caps"&gt;URI&lt;/span&gt; through &lt;code&gt;$_SERVER["REQUEST_URI"]&lt;/code&gt;.
+The script that I&amp;#8217;m currently using for an internal page&amp;nbsp;is:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="x"&gt;$newServer = &amp;quot;http://foo.example.com:12345&amp;quot;;&lt;/span&gt;
+
+&lt;span class="x"&gt;if($_SERVER[&amp;quot;REQUEST_URI&amp;quot;] == &amp;quot;/&amp;quot; || $_SERVER[&amp;quot;REQUEST_URI&amp;quot;] == &amp;quot;/index.php&amp;quot;)&lt;/span&gt;
+&lt;span class="x"&gt;  {&lt;/span&gt;
+&lt;span class="x"&gt;    header(&amp;quot;Location: &amp;quot;.$newServer);&lt;/span&gt;
+&lt;span class="x"&gt;  }&lt;/span&gt;
+&lt;span class="x"&gt;else&lt;/span&gt;
+&lt;span class="x"&gt;  {&lt;/span&gt;
+&lt;span class="x"&gt;    $newURL = $newServer.$_SERVER[&amp;quot;REQUEST_URI&amp;quot;];&lt;/span&gt;
+&lt;span class="x"&gt;    echo &amp;#39;&amp;lt;html&amp;gt;&amp;lt;head&amp;gt;&amp;lt;title&amp;gt;Page Moved&amp;lt;/title&amp;gt;&amp;#39;;&lt;/span&gt;
+&lt;span class="x"&gt;    echo &amp;#39;&amp;lt;&lt;span class="caps"&gt;META&lt;/span&gt; &lt;span class="caps"&gt;HTTP&lt;/span&gt;-&lt;span class="caps"&gt;EQUIV&lt;/span&gt;=&amp;quot;refresh&amp;quot; &lt;span class="caps"&gt;CONTENT&lt;/span&gt;=&amp;quot;5;&lt;span class="caps"&gt;URL&lt;/span&gt;=&amp;#39;.$newURL.&amp;#39;&amp;quot;&amp;gt;&amp;#39;;&lt;/span&gt;
+&lt;span class="x"&gt;    echo &amp;#39;&amp;lt;/head&amp;gt;&amp;lt;body&amp;gt;&amp;#39;;&lt;/span&gt;
+&lt;span class="x"&gt;    echo &amp;#39;&amp;lt;p&amp;gt;The page you are looking for is best found at:&amp;lt;/p&amp;gt;&amp;#39;;&lt;/span&gt;
+&lt;span class="x"&gt;    echo &amp;#39;&amp;lt;p&amp;gt;&amp;lt;strong&amp;gt;&amp;lt;a href=&amp;quot;&amp;#39;.$newURL.&amp;#39;&amp;quot;&amp;gt;&amp;#39;.$newURL.&amp;#39;&amp;lt;/a&amp;gt;&amp;lt;/strong&amp;gt;&amp;lt;/p&amp;gt;&amp;#39;;&lt;/span&gt;
+&lt;span class="x"&gt;    echo &amp;#39;&amp;lt;p&amp;gt;You will be automatically redirected after 5 seconds. If this does not happen, click the link above.&amp;lt;/p&amp;gt;&amp;#39;;&lt;/span&gt;
+&lt;span class="x"&gt;    echo &amp;#39;&amp;lt;/body&amp;gt;&amp;lt;/html&amp;gt;&amp;#39;;&lt;/span&gt;
+&lt;span class="x"&gt;  }&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;This script takes two distinct&amp;nbsp;actions:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;If the requested path is &lt;code&gt;/&lt;/code&gt; or &lt;code&gt;/index.php&lt;/code&gt;, it transparently redirects to a different &lt;span class="caps"&gt;URL&lt;/span&gt; (and&amp;nbsp;port).&lt;/li&gt;
+&lt;li&gt;Otherwise, it displays a &amp;#8220;page moved to&amp;#8221; message and uses a Meta-Refresh to redirect after 5&amp;nbsp;seconds.&lt;/li&gt;
+&lt;/ol&gt;</summary><category term="apache"></category><category term="catchall"></category><category term="PHP"></category><category term="web"></category></entry></feed>

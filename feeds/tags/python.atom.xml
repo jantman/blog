@@ -1,0 +1,393 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Jason Antman's Blog</title><link href="http://newblog.jasonantman.com/" rel="alternate"></link><link href="http://newblog.jasonantman.com/feeds/tags/python.atom.xml" rel="self"></link><id>http://newblog.jasonantman.com/</id><updated>2014-01-01T15:15:00-05:00</updated><entry><title>Planning Migration from WordPress to Static Site</title><link href="http://newblog.jasonantman.com/2014/01/planning-migration-from-wordpress-to-static-site/" rel="alternate"></link><updated>2014-01-01T15:15:00-05:00</updated><author><name>admin</name></author><id>tag:newblog.jasonantman.com,2014-01-01:2014/01/planning-migration-from-wordpress-to-static-site/</id><summary type="html">&lt;p&gt;Right now, this blog, my email, and a whole bunch of other services are
+hosted on a &lt;a href="http://linode.com"&gt;Linode&lt;/a&gt; Xen &lt;span class="caps"&gt;VM&lt;/span&gt;. I don&amp;#8217;t really keep up
+to date with administration and upgrades the way I used to, and
+honestly, I&amp;#8217;d rather spend my time working on other things (like
+actually writing all of the blog posts that I&amp;#8217;ve been planning to. The
+first thing I&amp;#8217;ve identified for migration is this blog itself. It&amp;#8217;s
+currently on WordPress and, frankly, I don&amp;#8217;t either need nor like it.
+But there are some features I like. I&amp;#8217;d like to end up with a static
+site generator, hosted from either S3 or GitHub Pages. I know that means
+I&amp;#8217;ll lost comments (unless I move to a third-party, &lt;span class="caps"&gt;JS&lt;/span&gt;-based comment
+system like &lt;a href="http://disqus.com/"&gt;Disqus&lt;/a&gt;, which means I&amp;#8217;ll lose
+&lt;em&gt;control&lt;/em&gt; over my comments) but I suppose I can live with that. What I
+really want is something simple, static, cheap or free (that I&amp;#8217;ll likely
+put behind a small ec2 instance running nginx for&amp;nbsp;redirects/rewrites).&lt;/p&gt;
+&lt;p&gt;I&amp;#8217;m still in the planning phase, and trying to come up with a
+feature-by-feature comparison of my options. I&amp;#8217;ll likely post that when
+I finally have it done (at the moment it&amp;#8217;s in a very rough &lt;a href="https://docs.google.com/spreadsheet/ccc?key=0AnHh-ye5DNiNdF9DWkJrT2kzSkNsNVp6cjMzLXJ6VEE&amp;amp;usp=sharing"&gt;Google Docs
+spreadsheet&lt;/a&gt;).
+I&amp;#8217;m trying to round up my static site generator options and see which
+ones will do most, if not all, of what I want (though I still haven&amp;#8217;t
+discounted using hosted wordpress if it comes down to it). Here are the
+features I currently &amp;#8220;use&amp;#8221; (have) on my WordPress&amp;nbsp;blog:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;User-defined permalinks to&amp;nbsp;posts&lt;/li&gt;
+&lt;li&gt;Overall &lt;span class="caps"&gt;RSS&lt;/span&gt; feed of blog (currently powered by FeedBurner) and of&amp;nbsp;comments)&lt;/li&gt;
+&lt;li&gt;Categories (a post can be in multiple&amp;nbsp;categories)&lt;/li&gt;
+&lt;li&gt;Tags&lt;/li&gt;
+&lt;li&gt;Category and Tag&amp;nbsp;pages&lt;/li&gt;
+&lt;li&gt;per-Category and per-Tag feeds&amp;nbsp;(&lt;span class="caps"&gt;RSS&lt;/span&gt;)&lt;/li&gt;
+&lt;li&gt;Tag cloud &amp;#8220;widget&amp;#8221; in&amp;nbsp;sidebar&lt;/li&gt;
+&lt;li&gt;Themes. I actually like my current &lt;span class="caps"&gt;WP&lt;/span&gt;&amp;nbsp;theme&amp;#8230;&lt;/li&gt;
+&lt;li&gt;Visitor statistics (currently self-hosted
+    &lt;a href="http://piwik.org/"&gt;Piwik&lt;/a&gt;, formerly Google&amp;nbsp;Analytics)&lt;/li&gt;
+&lt;li&gt;Post publishing via cron&amp;#8217;ed script (&lt;em&gt;see below&lt;/em&gt;)&lt;/li&gt;
+&lt;li&gt;Draft/Pending status (i.e. let me save a partial post, and let me
+    save a complete post but mark it &amp;#8220;pending&amp;#8221; so I can just publish it&amp;nbsp;later)&lt;/li&gt;
+&lt;li&gt;Commenting (this will probably be the big sticking&amp;nbsp;point)&lt;/li&gt;
+&lt;li&gt;Syntax&amp;nbsp;hilighting&lt;/li&gt;
+&lt;li&gt;As &amp;#8220;weird&amp;#8221; as this is, I write all my posts in raw &lt;span class="caps"&gt;HTML&lt;/span&gt;, and am
+    perfectly happy doing&amp;nbsp;that.&lt;/li&gt;
+&lt;li&gt;&lt;span class="dquo"&gt;&amp;#8220;&lt;/span&gt;Subscribe via Email&amp;#8221; FeedBurner&amp;nbsp;widget&lt;/li&gt;
+&lt;li&gt;&lt;span class="caps"&gt;XML&lt;/span&gt;&amp;nbsp;Sitemap&lt;/li&gt;
+&lt;li&gt;Twitter&amp;nbsp;box/widget&lt;/li&gt;
+&lt;li&gt;Pingbacks (not that these are really useful for anything other than
+    spam these&amp;nbsp;days)&lt;/li&gt;
+&lt;li&gt;Automatic or manual post excerpts for feeds,&amp;nbsp;etc.&lt;/li&gt;
+&lt;li&gt;Remote publishing via &lt;span class="caps"&gt;XML&lt;/span&gt;-&lt;span class="caps"&gt;RPC&lt;/span&gt;/Android app (not that I&amp;#8217;ve used it
+    more than once or&amp;nbsp;twice)&lt;/li&gt;
+&lt;li&gt;Advertising - I currently use Google AdSense on my blog. The revenue
+    from my tiny hit count isn&amp;#8217;t enough to offset the cost of a Linode,
+    but if I moved to a much less expensive hosting service, it might be
+    worth considering (you can&amp;#8217;t run ads on the free hosted WordPress,
+    and I doubt you can on GitHub Pages&amp;nbsp;either).&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;I should be updating this post when I do some more research and have a
+comparison of the&amp;nbsp;options.&lt;/p&gt;
+&lt;p&gt;Note on &amp;#8220;Post publishing via cron&amp;#8217;ed script&amp;#8221; - sometimes I sit down and
+write half a dozen or so blog posts at a time. But I don&amp;#8217;t want them all
+to show up immediately, and spam the few people who still use &lt;span class="caps"&gt;RSS&lt;/span&gt;
+readers after the death of Google Reader. So I set the posts to
+&amp;#8220;Pending&amp;#8221; status, and I have a cron&amp;#8217;ed script that runs every weekday
+morning and publishes the one oldest &amp;#8220;pending&amp;#8221; post. Who knows if this
+actually does any good or&amp;nbsp;not&amp;#8230;&lt;/p&gt;</summary><category term="blog"></category><category term="jekyll"></category><category term="pelican"></category><category term="python"></category><category term="static site"></category><category term="wordpress"></category></entry><entry><title>Python script to check a list of URLs for return code, and final return code if redirected</title><link href="http://newblog.jasonantman.com/2013/06/python-script-to-check-a-list-of-urls-for-return-code-and-final-return-code-if-redirected/" rel="alternate"></link><updated>2013-06-10T06:00:00-04:00</updated><author><name>admin</name></author><id>tag:newblog.jasonantman.com,2013-06-10:2013/06/python-script-to-check-a-list-of-urls-for-return-code-and-final-return-code-if-redirected/</id><summary type="html">&lt;p&gt;Every once in a while I need to add a bunch of redirects in Apache.
+Here&amp;#8217;s a handy, dead simple Python script which takes a list of URLs on
+&lt;span class="caps"&gt;STDIN&lt;/span&gt;, and for each one prints out either the response code, or, if the
+response is a redirect, the response code of what is redirected to.
+Pretty useful when you&amp;#8217;ve just added a bunch of redirects and want to
+make sure none of them&amp;nbsp;404.&lt;/p&gt;
+&lt;p&gt;The latest source of this script lives at
+&lt;a href="https://github.com/jantman/misc-scripts/blob/master/check_url_list.py"&gt;https://github.com/jantman/misc-scripts/blob/master/check_url_list.py&lt;/a&gt;.&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="c"&gt;#!/usr/bin/env python&lt;/span&gt;
+&lt;span class="sd"&gt;&amp;quot;&amp;quot;&amp;quot;&lt;/span&gt;
+&lt;span class="sd"&gt;Script to check a list of URLs (passed on stdin) for response code, and for response code of the final path in a series of redirects.&lt;/span&gt;
+&lt;span class="sd"&gt;Outputs (to stdout) a list of count of a given &lt;span class="caps"&gt;URL&lt;/span&gt;, response code, and if redirected, the final &lt;span class="caps"&gt;URL&lt;/span&gt; and its response code&lt;/span&gt;
+
+&lt;span class="sd"&gt;Optionally, with verbose flag, report on all &lt;span class="caps"&gt;URL&lt;/span&gt; checks on &lt;span class="caps"&gt;STDERR&lt;/span&gt;&lt;/span&gt;
+
+&lt;span class="sd"&gt;Copyright 2013 Jason Antman  all rights reserved&lt;/span&gt;
+&lt;span class="sd"&gt;This script is distributed under the terms of the GPLv3, as per the&lt;/span&gt;
+&lt;span class="sd"&gt;&lt;span class="caps"&gt;LICENSE&lt;/span&gt; file in this repository.&lt;/span&gt;
+
+&lt;span class="sd"&gt;The canonical version of this script can be found at:&lt;/span&gt;
+
+&lt;span class="sd"&gt;&amp;quot;&amp;quot;&amp;quot;&lt;/span&gt;
+
+&lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="nn"&gt;sys&lt;/span&gt;
+&lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="nn"&gt;urllib2&lt;/span&gt;
+
+&lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;get_url_nofollow&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;url&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+    &lt;span class="k"&gt;try&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+        &lt;span class="n"&gt;response&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;urllib2&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;urlopen&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;url&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+        &lt;span class="n"&gt;code&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;response&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;getcode&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+        &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="n"&gt;code&lt;/span&gt;
+    &lt;span class="k"&gt;except&lt;/span&gt; &lt;span class="n"&gt;urllib2&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;HTTPError&lt;/span&gt; &lt;span class="k"&gt;as&lt;/span&gt; &lt;span class="n"&gt;e&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+        &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="n"&gt;e&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;code&lt;/span&gt;
+    &lt;span class="k"&gt;except&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+        &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt;
+
+&lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;main&lt;/span&gt;&lt;span class="p"&gt;():&lt;/span&gt;
+    &lt;span class="n"&gt;urls&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;{}&lt;/span&gt;
+
+    &lt;span class="k"&gt;for&lt;/span&gt; &lt;span class="n"&gt;line&lt;/span&gt; &lt;span class="ow"&gt;in&lt;/span&gt; &lt;span class="n"&gt;sys&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;stdin&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;readlines&lt;/span&gt;&lt;span class="p"&gt;():&lt;/span&gt;
+        &lt;span class="n"&gt;line&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;line&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;strip&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+        &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="n"&gt;line&lt;/span&gt; &lt;span class="ow"&gt;not&lt;/span&gt; &lt;span class="ow"&gt;in&lt;/span&gt; &lt;span class="n"&gt;urls&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+            &lt;span class="n"&gt;sys&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;stderr&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;write&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;+ checking &lt;span class="caps"&gt;URL&lt;/span&gt;: &lt;/span&gt;&lt;span class="si"&gt;%s&lt;/span&gt;&lt;span class="se"&gt;\n&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;&lt;/span&gt; &lt;span class="o"&gt;%&lt;/span&gt; &lt;span class="n"&gt;line&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+            &lt;span class="n"&gt;urls&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;line&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;code&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="n"&gt;get_url_nofollow&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;line&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;count&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;
+            &lt;span class="n"&gt;sys&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;stderr&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;write&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;++ &lt;/span&gt;&lt;span class="si"&gt;%s&lt;/span&gt;&lt;span class="se"&gt;\n&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;&lt;/span&gt; &lt;span class="o"&gt;%&lt;/span&gt; &lt;span class="nb"&gt;str&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;urls&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;line&lt;/span&gt;&lt;span class="p"&gt;]))&lt;/span&gt;
+        &lt;span class="k"&gt;else&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+            &lt;span class="n"&gt;urls&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;line&lt;/span&gt;&lt;span class="p"&gt;][&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;count&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;urls&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;line&lt;/span&gt;&lt;span class="p"&gt;][&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;count&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt;
+
+    &lt;span class="k"&gt;for&lt;/span&gt; &lt;span class="n"&gt;url&lt;/span&gt; &lt;span class="ow"&gt;in&lt;/span&gt; &lt;span class="n"&gt;urls&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+        &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="n"&gt;urls&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;url&lt;/span&gt;&lt;span class="p"&gt;][&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;code&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="o"&gt;!=&lt;/span&gt; &lt;span class="mi"&gt;200&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+            &lt;span class="k"&gt;print&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;&lt;/span&gt;&lt;span class="si"&gt;%d&lt;/span&gt;&lt;span class="se"&gt;\t&lt;/span&gt;&lt;span class="si"&gt;%d&lt;/span&gt;&lt;span class="se"&gt;\t&lt;/span&gt;&lt;span class="si"&gt;%s&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;&lt;/span&gt; &lt;span class="o"&gt;%&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;urls&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;url&lt;/span&gt;&lt;span class="p"&gt;][&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;count&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;],&lt;/span&gt; &lt;span class="n"&gt;urls&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;url&lt;/span&gt;&lt;span class="p"&gt;][&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;code&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;],&lt;/span&gt; &lt;span class="n"&gt;url&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+&lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="n"&gt;__name__&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;__main__&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+    &lt;span class="n"&gt;main&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;</summary><category term="http"></category><category term="python"></category><category term="redirect"></category><category term="urllib"></category></entry><entry><title>Pretty-Print a JSON response at the command line</title><link href="http://newblog.jasonantman.com/2012/10/pretty-print-a-json-response-at-the-command-line/" rel="alternate"></link><updated>2012-10-09T14:44:00-04:00</updated><author><name>admin</name></author><id>tag:newblog.jasonantman.com,2012-10-09:2012/10/pretty-print-a-json-response-at-the-command-line/</id><summary type="html">&lt;p&gt;I&amp;#8217;ve been doing some work with &lt;a href="http://www.rabbitmq.com/"&gt;RabbitMQ&lt;/a&gt;
+lately, and have been doing some testing against its &lt;span class="caps"&gt;HTTP&lt;/span&gt;-based &lt;span class="caps"&gt;API&lt;/span&gt;,
+which returns results in &lt;span class="caps"&gt;JSON&lt;/span&gt;. If you&amp;#8217;re looking to pretty-print a &lt;span class="caps"&gt;JSON&lt;/span&gt;
+response for easier viewing, here&amp;#8217;s a nice way to do it at the command
+line using Python and
+&lt;a href="http://docs.python.org/library/json.html"&gt;json.tool&lt;/a&gt;:&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;curl http://username:pass@hostname:55672/api/overview | python -m json.tool&lt;/code&gt;&lt;/p&gt;</summary><category term="curl"></category><category term="json"></category><category term="python"></category><category term="rabbitmq"></category></entry><entry><title>Python script to find dependency cycles in GraphViz dot files</title><link href="http://newblog.jasonantman.com/2012/03/python-script-to-find-dependency-cycles-in-graphviz-dot-files/" rel="alternate"></link><updated>2012-03-28T22:05:00-04:00</updated><author><name>admin</name></author><id>tag:newblog.jasonantman.com,2012-03-28:2012/03/python-script-to-find-dependency-cycles-in-graphviz-dot-files/</id><summary type="html">&lt;p&gt;Using &lt;a href="http://www.graphviz.org/"&gt;GraphViz&lt;/a&gt; to describe configurations is
+relatively popular in the software and systems architecture world; the
+simple text-based format makes it quiet simple, and the directed graph
+(dot file) is a simple method to store a graph of information flow or
+component relationships. &lt;a href="http://puppetlabs.com"&gt;Puppet&lt;/a&gt; includes
+builtin support for &lt;a href="http://docs.puppetlabs.com/guides/faq.html#how-do-i-use-puppets-graphing-support"&gt;generating dot
+graphs&lt;/a&gt;
+of its configuration resources and relationships (both those specified
+by the user, and all relationships including ones generated by Puppet&amp;nbsp;itself).&lt;/p&gt;
+&lt;p&gt;One of the common uses for puppet&amp;#8217;s graphs is to identify dependency
+cycles, as cyclic dependencies cause an error condition. However,
+Puppet&amp;#8217;s own
+&lt;a href="http://docs.puppetlabs.com/guides/faq.html#how-do-i-use-puppets-graphing-support"&gt;&lt;span class="caps"&gt;FAQ&lt;/span&gt;&lt;/a&gt;
+only mentions using the &lt;code&gt;dot&lt;/code&gt; command to generate a &lt;span class="caps"&gt;PNG&lt;/span&gt; graphical
+representation of the the graph. When debugging a recent problem with
+puppet, I ended up with a message&amp;nbsp;like:  &lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;Could not apply complete catalog: Found dependency cycles in the following relationships: Service[puppet] =&amp;gt; File[/var/lib/puppet/yaml/foreman], File[/var/lib/puppet/yaml] =&amp;gt; File[/var/lib/puppet/yaml/foreman], Service[puppet] =&amp;gt; File[/etc/puppet/node.rb], File[fileserver.conf] =&amp;gt; Service[apache], File[namespaceauth.conf] =&amp;gt; Service[apache], File[puppet.conf] =&amp;gt; Service[apache], File[puppet.conf] =&amp;gt; Service[puppet], Service[puppet] =&amp;gt; File[foreman-report.rb], File[/var/lib/puppet/yaml/foreman] =&amp;gt; Package[puppet-server], Service[foreman-proxy] =&amp;gt; Package[puppet-server], File[foreman-proxy-settings.yml] =&amp;gt; Package[puppet-server], Package[foreman-proxy] =&amp;gt; Package[puppet-server], User[foreman-proxy] =&amp;gt; Package[puppet-server], File[/var/lib/puppet/yaml] =&amp;gt; Package[puppet-server], File[foreman-report.rb] =&amp;gt; Package[puppet-server], File[/etc/puppet/node.rb] =&amp;gt; Package[puppet-server], File[/var/lib/puppet/yaml/foreman] =&amp;gt; Exec[create_puppetmaster_certs], Service[foreman-proxy] =&amp;gt; Exec[create_puppetmaster_certs], File[foreman-proxy-settings.yml] =&amp;gt; Exec[create_puppetmaster_certs], Package[foreman-proxy] =&amp;gt; Exec[create_puppetmaster_certs], User[foreman-proxy] =&amp;gt; Exec[create_puppetmaster_certs], File[/var/lib/puppet/yaml] =&amp;gt; Exec[create_puppetmaster_certs], File[foreman-report.rb] =&amp;gt; Exec[create_puppetmaster_certs], File[/etc/puppet/node.rb] =&amp;gt; Exec[create_puppetmaster_certs], File[/var/lib/puppet/yaml/foreman] =&amp;gt; File[/etc/puppet/environments], Service[foreman-proxy] =&amp;gt; File[/etc/puppet/environments], File[foreman-proxy-settings.yml] =&amp;gt; File[/etc/puppet/environments], Package[foreman-proxy] =&amp;gt; File[/etc/puppet/environments], User[foreman-proxy] =&amp;gt; File[/etc/puppet/environments], File[/var/lib/puppet/yaml] =&amp;gt; File[/etc/puppet/environments], File[foreman-report.rb] =&amp;gt; File[/etc/puppet/environments], File[/etc/puppet/node.rb] =&amp;gt; File[/etc/puppet/environments], File[foreman-proxy-settings.yml] =&amp;gt; Service[foreman-proxy], Package[foreman-proxy] =&amp;gt; Service[foreman-proxy], Service[puppet]
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Not exactly easy to follow, or to pull much meaning out of, even if I
+did some slight reformatting by putting in some newlines. I then
+generated the png as described in the Puppet FAQs, but even scrolling
+back and forth on this for 20 minutes didn&amp;#8217;t help: &lt;em&gt;(note: link is to
+the original 14405x665px png)&lt;/em&gt;&lt;br /&gt;
+&lt;a href="/GFX/relationships.dot.png"&gt;&lt;img alt="dot file
+png" src="/GFX/relationships.dot.small.png" /&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;With a little research, I managed to find the
+&lt;a href="http://networkx.lanl.gov"&gt;NetworkX&lt;/a&gt; package for Python; according to
+their site, &amp;#8220;NetworkX is a Python language software package for the
+creation, manipulation, and study of the structure, dynamics, and
+functions of complex networks.&amp;#8221; Among its features are the ability to
+&lt;a href="http://networkx.lanl.gov/reference/drawing.html#module-networkx.drawing.nx_pydot"&gt;read dot
+files&lt;/a&gt;
+using the &lt;a href="http://code.google.com/p/pydot/"&gt;pydot&lt;/a&gt; library, and the
+ability to &lt;a href="http://networkx.lanl.gov/reference/generated/networkx.algorithms.cycles.simple_cycles.html#networkx.algorithms.cycles.simple_cycles"&gt;find simple
+cycles&lt;/a&gt;
+within a graph. In about 20 minutes, I hacked together the dead-simple
+script&amp;nbsp;below.&lt;/p&gt;
+&lt;p&gt;Given a dot file (of the type generated, for example, by Puppet), this
+will output all of the cycles found within the graph. I ran this script
+on the &lt;code&gt;expanded_relationships.dot&lt;/code&gt; file from Puppet, which had 99 nodes
+(nodes on the graph, not puppet clients), and got the following&amp;nbsp;output:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;[&amp;#39;File[foreman-report.rb]&amp;#39;, &amp;#39;File[puppet.conf]&amp;#39;, &amp;#39;Service[puppet]&amp;#39;, &amp;#39;File[foreman-report.rb]&amp;#39;]
+[&amp;#39;File[foreman-report.rb]&amp;#39;, &amp;#39;Package[puppet-server]&amp;#39;, &amp;#39;File[puppet.conf]&amp;#39;, &amp;#39;Service[puppet]&amp;#39;, &amp;#39;File[foreman-report.rb]&amp;#39;]
+[&amp;#39;Package[puppet-server]&amp;#39;, &amp;#39;File[puppet.conf]&amp;#39;, &amp;#39;Service[puppet]&amp;#39;, &amp;#39;Service[foreman-proxy]&amp;#39;, &amp;#39;Package[puppet-server]&amp;#39;]
+[&amp;#39;Package[puppet-server]&amp;#39;, &amp;#39;File[puppet.conf]&amp;#39;, &amp;#39;Service[puppet]&amp;#39;, &amp;#39;File[/etc/puppet/node.rb]&amp;#39;, &amp;#39;Package[puppet-server]&amp;#39;]
+[&amp;#39;Package[puppet-server]&amp;#39;, &amp;#39;File[puppet.conf]&amp;#39;, &amp;#39;Service[puppet]&amp;#39;, &amp;#39;File[foreman-proxy-settings.yml]&amp;#39;, &amp;#39;Service[foreman-proxy]&amp;#39;, &amp;#39;Package[puppet-server]&amp;#39;]
+[&amp;#39;Package[puppet-server]&amp;#39;, &amp;#39;File[puppet.conf]&amp;#39;, &amp;#39;Service[puppet]&amp;#39;, &amp;#39;File[foreman-proxy-settings.yml]&amp;#39;, &amp;#39;Package[puppet-server]&amp;#39;]
+[&amp;#39;Package[puppet-server]&amp;#39;, &amp;#39;File[puppet.conf]&amp;#39;, &amp;#39;Service[puppet]&amp;#39;, &amp;#39;User[foreman-proxy]&amp;#39;, &amp;#39;File[/etc/puppet/node.rb]&amp;#39;, &amp;#39;Package[puppet-server]&amp;#39;]
+[&amp;#39;Package[puppet-server]&amp;#39;, &amp;#39;File[puppet.conf]&amp;#39;, &amp;#39;Service[puppet]&amp;#39;, &amp;#39;User[foreman-proxy]&amp;#39;, &amp;#39;Package[puppet-server]&amp;#39;]
+[&amp;#39;Package[puppet-server]&amp;#39;, &amp;#39;File[puppet.conf]&amp;#39;, &amp;#39;Service[puppet]&amp;#39;, &amp;#39;Package[foreman-proxy]&amp;#39;, &amp;#39;Service[foreman-proxy]&amp;#39;, &amp;#39;Package[puppet-server]&amp;#39;]
+[&amp;#39;Package[puppet-server]&amp;#39;, &amp;#39;File[puppet.conf]&amp;#39;, &amp;#39;Service[puppet]&amp;#39;, &amp;#39;Package[foreman-proxy]&amp;#39;, &amp;#39;File[foreman-proxy-settings.yml]&amp;#39;, &amp;#39;Service[foreman-proxy]&amp;#39;, &amp;#39;Package[puppet-server]&amp;#39;]
+[&amp;#39;Package[puppet-server]&amp;#39;, &amp;#39;File[puppet.conf]&amp;#39;, &amp;#39;Service[puppet]&amp;#39;, &amp;#39;Package[foreman-proxy]&amp;#39;, &amp;#39;File[foreman-proxy-settings.yml]&amp;#39;, &amp;#39;Package[puppet-server]&amp;#39;]
+[&amp;#39;Package[puppet-server]&amp;#39;, &amp;#39;File[puppet.conf]&amp;#39;, &amp;#39;Service[puppet]&amp;#39;, &amp;#39;Package[foreman-proxy]&amp;#39;, &amp;#39;Package[puppet-server]&amp;#39;]
+[&amp;#39;Package[puppet-server]&amp;#39;, &amp;#39;File[puppet.conf]&amp;#39;, &amp;#39;Service[puppet]&amp;#39;, &amp;#39;File[/var/lib/puppet/yaml/foreman]&amp;#39;, &amp;#39;Package[puppet-server]&amp;#39;]
+[&amp;#39;File[/etc/puppet/node.rb]&amp;#39;, &amp;#39;File[puppet.conf]&amp;#39;, &amp;#39;Service[puppet]&amp;#39;, &amp;#39;File[/etc/puppet/node.rb]&amp;#39;]
+[&amp;#39;File[/etc/puppet/node.rb]&amp;#39;, &amp;#39;File[puppet.conf]&amp;#39;, &amp;#39;Service[puppet]&amp;#39;, &amp;#39;User[foreman-proxy]&amp;#39;, &amp;#39;File[/etc/puppet/node.rb]&amp;#39;]
+[&amp;#39;File[puppet.conf]&amp;#39;, &amp;#39;Service[puppet]&amp;#39;, &amp;#39;Service[foreman-proxy]&amp;#39;, &amp;#39;File[puppet.conf]&amp;#39;]
+[&amp;#39;File[puppet.conf]&amp;#39;, &amp;#39;Service[puppet]&amp;#39;, &amp;#39;Package[foreman-proxy]&amp;#39;, &amp;#39;Service[foreman-proxy]&amp;#39;, &amp;#39;File[puppet.conf]&amp;#39;]
+[&amp;#39;File[puppet.conf]&amp;#39;, &amp;#39;Service[puppet]&amp;#39;, &amp;#39;Package[foreman-proxy]&amp;#39;, &amp;#39;File[puppet.conf]&amp;#39;]
+[&amp;#39;File[puppet.conf]&amp;#39;, &amp;#39;Service[puppet]&amp;#39;, &amp;#39;Package[foreman-proxy]&amp;#39;, &amp;#39;File[foreman-proxy-settings.yml]&amp;#39;, &amp;#39;Service[foreman-proxy]&amp;#39;, &amp;#39;File[puppet.conf]&amp;#39;]
+[&amp;#39;File[puppet.conf]&amp;#39;, &amp;#39;Service[puppet]&amp;#39;, &amp;#39;Package[foreman-proxy]&amp;#39;, &amp;#39;File[foreman-proxy-settings.yml]&amp;#39;, &amp;#39;File[puppet.conf]&amp;#39;]
+[&amp;#39;File[puppet.conf]&amp;#39;, &amp;#39;Service[puppet]&amp;#39;, &amp;#39;File[/var/lib/puppet/yaml/foreman]&amp;#39;, &amp;#39;File[puppet.conf]&amp;#39;]
+[&amp;#39;File[puppet.conf]&amp;#39;, &amp;#39;Service[puppet]&amp;#39;, &amp;#39;File[foreman-proxy-settings.yml]&amp;#39;, &amp;#39;Service[foreman-proxy]&amp;#39;, &amp;#39;File[puppet.conf]&amp;#39;]
+[&amp;#39;File[puppet.conf]&amp;#39;, &amp;#39;Service[puppet]&amp;#39;, &amp;#39;File[foreman-proxy-settings.yml]&amp;#39;, &amp;#39;File[puppet.conf]&amp;#39;]
+[&amp;#39;File[puppet.conf]&amp;#39;, &amp;#39;Service[puppet]&amp;#39;, &amp;#39;User[foreman-proxy]&amp;#39;, &amp;#39;File[puppet.conf]&amp;#39;]
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;It probably would have taken me hours to come up with that by hand, let
+alone realize that &lt;code&gt;Service[puppet]&lt;/code&gt; is the common item in all of them,
+and hence the problem. With that little tidbit of information, I managed
+to track down an extraneous &amp;#8220;require puppet&amp;#8221; that this all originated
+from. I sincerely hope that this script will save someone else at least
+as much time as it took me to write (I know it will for&amp;nbsp;me&amp;#8230;).&lt;/p&gt;
+&lt;p&gt;You can always obtain the latest version of this script from
+&lt;a href="https://github.com/jantman/misc-scripts/blob/master/dot_find_cycles.py"&gt;my github repository&lt;/a&gt;
+It&amp;#8217;s free for use
+and distribution, provided that you leave my copyright/attribution and
+source &lt;span class="caps"&gt;URL&lt;/span&gt; notice intact, update the changelog, and send any
+features/fixes back to me. The script is written in Python, and depends
+on the python-networkx, graphviz-python, and pydot packages (all of
+which are available as packages in the default repos of Fedora and
+CentOS at least). For Puppet purposes, I&amp;#8217;d recommend running this on
+&lt;code&gt;expanded_relationships.dot&lt;/code&gt; to get the full&amp;nbsp;information.&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="c"&gt;#!/usr/bin/env python&lt;/span&gt;
+
+&lt;span class="sd"&gt;&amp;quot;&amp;quot;&amp;quot;&lt;/span&gt;
+&lt;span class="sd"&gt;dot_find_cycles.py - uses Pydot and NetworkX to find cycles in a dot file directed graph.&lt;/span&gt;
+
+&lt;span class="sd"&gt;Very helpful for &lt;/span&gt;
+
+&lt;span class="sd"&gt;By Jason Antman  2012.&lt;/span&gt;
+
+&lt;span class="sd"&gt;Free for all use, provided that you send any changes you make back to me, update the changelog, and keep this comment intact.&lt;/span&gt;
+
+&lt;span class="sd"&gt;&lt;span class="caps"&gt;REQUIREMENTS&lt;/span&gt;:&lt;/span&gt;
+&lt;span class="sd"&gt;Python&lt;/span&gt;
+&lt;span class="sd"&gt;python-networkx - &lt;/span&gt;
+&lt;span class="sd"&gt;graphviz-python - &lt;/span&gt;
+&lt;span class="sd"&gt;pydot - &lt;/span&gt;
+&lt;span class="sd"&gt;(all of these are available as native packages at least on CentOS)&lt;/span&gt;
+
+&lt;span class="sd"&gt;&lt;span class="caps"&gt;USAGE&lt;/span&gt;:&lt;/span&gt;
+&lt;span class="sd"&gt;dot_find_cycles.py /path/to/file.dot&lt;/span&gt;
+
+&lt;span class="sd"&gt;The canonical source of this script can always be found from:&lt;/span&gt;
+
+
+&lt;span class="sd"&gt;$HeadURL: http://svn.jasonantman.com/misc-scripts/dot_find_cycles.py $&lt;/span&gt;
+&lt;span class="sd"&gt;$LastChangedRevision: 33 $&lt;/span&gt;
+
+&lt;span class="sd"&gt;&lt;span class="caps"&gt;CHANGELOG&lt;/span&gt;:&lt;/span&gt;
+&lt;span class="sd"&gt;    Wednesday 2012-03-28 Jason Antman :&lt;/span&gt;
+&lt;span class="sd"&gt;        - initial script creation&lt;/span&gt;
+&lt;span class="sd"&gt;&amp;quot;&amp;quot;&amp;quot;&lt;/span&gt;
+
+&lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="nn"&gt;sys&lt;/span&gt;
+&lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;os&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;path&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;access&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;R_OK&lt;/span&gt;
+&lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="nn"&gt;networkx&lt;/span&gt; &lt;span class="kn"&gt;as&lt;/span&gt; &lt;span class="nn"&gt;nx&lt;/span&gt;
+
+&lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;usage&lt;/span&gt;&lt;span class="p"&gt;():&lt;/span&gt;
+    &lt;span class="n"&gt;sys&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;stderr&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;write&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;dot_find_cycles.py by Jason Antman &lt;/span&gt;&lt;span class="se"&gt;\n&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+    &lt;span class="n"&gt;sys&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;stderr&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;write&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;  finds cycles in dot file graphs, such as those from Puppet&lt;/span&gt;&lt;span class="se"&gt;\n\n&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+    &lt;span class="n"&gt;sys&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;stderr&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;write&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;&lt;span class="caps"&gt;USAGE&lt;/span&gt;: dot_find_cycles.py /path/to/file.dot&lt;/span&gt;&lt;span class="se"&gt;\n&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+&lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;main&lt;/span&gt;&lt;span class="p"&gt;():&lt;/span&gt;
+
+    &lt;span class="n"&gt;path&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;&amp;quot;&lt;/span&gt;
+    &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;len&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;sys&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;argv&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;&amp;gt;&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+        &lt;span class="n"&gt;path&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;sys&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;argv&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;
+    &lt;span class="k"&gt;else&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+        &lt;span class="n"&gt;usage&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+        &lt;span class="n"&gt;sys&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;exit&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+    &lt;span class="k"&gt;try&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+        &lt;span class="n"&gt;fh&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nb"&gt;open&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;path&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+    &lt;span class="k"&gt;except&lt;/span&gt; &lt;span class="ne"&gt;IOError&lt;/span&gt; &lt;span class="k"&gt;as&lt;/span&gt; &lt;span class="n"&gt;e&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+        &lt;span class="n"&gt;sys&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;stderr&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;write&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;&lt;span class="caps"&gt;ERROR&lt;/span&gt;: could not read file &amp;quot;&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="n"&gt;path&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;&lt;/span&gt;&lt;span class="se"&gt;\n&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+        &lt;span class="n"&gt;usage&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+        &lt;span class="n"&gt;sys&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;exit&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+    &lt;span class="c"&gt;# read in the specified file, create a networkx DiGraph&lt;/span&gt;
+    &lt;span class="n"&gt;G&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;nx&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;DiGraph&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;nx&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;read_dot&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;path&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+
+    &lt;span class="n"&gt;C&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;nx&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;simple_cycles&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;G&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+    &lt;span class="k"&gt;if&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;len&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;C&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+        &lt;span class="n"&gt;sys&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;exit&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+    &lt;span class="k"&gt;for&lt;/span&gt; &lt;span class="n"&gt;i&lt;/span&gt; &lt;span class="ow"&gt;in&lt;/span&gt; &lt;span class="n"&gt;C&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+        &lt;span class="k"&gt;print&lt;/span&gt; &lt;span class="n"&gt;i&lt;/span&gt;
+
+&lt;span class="c"&gt;# Run&lt;/span&gt;
+&lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="n"&gt;__name__&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;__main__&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+    &lt;span class="n"&gt;main&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;</summary><category term="dot"></category><category term="graph"></category><category term="graphviz"></category><category term="puppet"></category><category term="python"></category></entry><entry><title>Adding Piwik Web Analytics Integration to ViewVC</title><link href="http://newblog.jasonantman.com/2012/03/adding-piwik-web-analytics-integration-to-viewvc/" rel="alternate"></link><updated>2012-03-23T21:15:00-04:00</updated><author><name>admin</name></author><id>tag:newblog.jasonantman.com,2012-03-23:2012/03/adding-piwik-web-analytics-integration-to-viewvc/</id><summary type="html">&lt;p&gt;&lt;strong&gt;Update February 2014:&lt;/strong&gt; Give up the analytics, and just host your code
+on &lt;a href="https://github.com"&gt;GitHub&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;All of my public &lt;a href="http://viewvc.jasonantman.com"&gt;subversion
+repositories&lt;/a&gt; and &lt;a href="http://cvs.jasonantman.com"&gt;&lt;span class="caps"&gt;CVS&lt;/span&gt;
+repositories&lt;/a&gt; are available online through a
+great Python application called &lt;a href="http://viewvc.org/"&gt;ViewVC&lt;/a&gt;, which
+provides a web-based interface to &lt;span class="caps"&gt;CVS&lt;/span&gt; and &lt;span class="caps"&gt;SVN&lt;/span&gt; repositories, as well as
+history browsing, graphical diffs, etc. An amazingly large amount of the
+traffic to my web server is for the vhosts that serve this, so I decided
+that I should add some analytics to it. I&amp;#8217;m in the process of trying out
+&lt;a href="http://piwik.org"&gt;Piwik&lt;/a&gt;, a full-featured, &lt;span class="caps"&gt;GPL&lt;/span&gt;-licensed, self-hosted
+alternative to &lt;a href="http://www.google.com/analytics/"&gt;Google Analytics&lt;/a&gt;. It
+gives lots of useful information like number of visits and unique visits
+per page, search engine keywords, referrers, average time on page,
+bounce rate (number of one-page visits),&amp;nbsp;etc.&lt;/p&gt;
+&lt;p&gt;I have ViewVC installed from the &lt;a href="http://pkgs.repoforge.org/viewvc/"&gt;RPMforge
+packages&lt;/a&gt;, so there&amp;#8217;s one code base
+for both of my vhosts. This means that I can&amp;#8217;t simply slap the tracking
+code at the bottom of the templates and call it a day. I opted to go for
+a nicer solution, and what follows is a patch (diff -u) to the current
+(1.1.13) version of ViewVC that adds a &amp;#8220;piwik&amp;#8221; section to viewvc.conf,
+and adds the piwik tracking code with the specified base &lt;span class="caps"&gt;URL&lt;/span&gt; and site &lt;span class="caps"&gt;ID&lt;/span&gt;
+into all ViewVC pages.&amp;nbsp;Enjoy.&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="gh"&gt;diff -ru viewvc-&lt;span class="caps"&gt;ORIG&lt;/span&gt;/lib/config.py viewvc/lib/config.py&lt;/span&gt;
+&lt;span class="gd"&gt;--- viewvc-&lt;span class="caps"&gt;ORIG&lt;/span&gt;/lib/config.py   2012-01-25 08:31:52.000000000 -0500&lt;/span&gt;
+&lt;span class="gi"&gt;+++ viewvc/lib/config.py    2012-03-23 21:57:08.000000000 -0400&lt;/span&gt;
+&lt;span class="gu"&gt;@@ -108,6 +108,7 @@&lt;/span&gt;
+     &amp;#39;query&amp;#39;,
+     &amp;#39;templates&amp;#39;,
+     &amp;#39;utilities&amp;#39;,
+&lt;span class="gi"&gt;+    &amp;#39;piwik&amp;#39;,&lt;/span&gt;
+     )
+   _force_multi_value = (
+     # Configuration values with multiple, comma-separated values.
+&lt;span class="gu"&gt;@@ -127,6 +128,7 @@&lt;/span&gt;
+                &amp;#39;options&amp;#39;,
+                &amp;#39;templates&amp;#39;,
+                &amp;#39;utilities&amp;#39;,
+&lt;span class="gi"&gt;+               &amp;#39;piwik&amp;#39;,&lt;/span&gt;
+                ),
+     &amp;#39;root&amp;#39;  : (&amp;#39;authz-*&amp;#39;,
+                &amp;#39;options&amp;#39;,
+&lt;span class="gu"&gt;@@ -461,7 +463,14 @@&lt;/span&gt;
+     self.cvsdb.check_database_for_root = 0
+
+     self.query.viewvc_base_url = None
+&lt;span class="gd"&gt;-    &lt;/span&gt;
+&lt;span class="gi"&gt;+&lt;/span&gt;
+&lt;span class="gi"&gt;+    # begin  patch for piwik integration&lt;/span&gt;
+&lt;span class="gi"&gt;+    self.piwik.use_piwik = 0&lt;/span&gt;
+&lt;span class="gi"&gt;+    self.piwik.base_url = &amp;#39;&amp;#39;&lt;/span&gt;
+&lt;span class="gi"&gt;+    self.piwik.site_id = &amp;#39;&amp;#39;&lt;/span&gt;
+&lt;span class="gi"&gt;+    self.piwik.use_jsindex = 0&lt;/span&gt;
+&lt;span class="gi"&gt;+    # end  patch for piwik integration&lt;/span&gt;
+&lt;span class="gi"&gt;+   &lt;/span&gt;
+ def _startswith(somestr, substr):
+   return somestr[:len(substr)] == substr
+
+&lt;span class="gh"&gt;diff -ru viewvc-&lt;span class="caps"&gt;ORIG&lt;/span&gt;/templates/include/footer.ezt viewvc/templates/include/footer.ezt&lt;/span&gt;
+&lt;span class="gd"&gt;--- viewvc-&lt;span class="caps"&gt;ORIG&lt;/span&gt;/templates/include/footer.ezt    2012-01-25 08:31:52.000000000 -0500&lt;/span&gt;
+&lt;span class="gi"&gt;+++ viewvc/templates/include/footer.ezt 2012-03-23 22:03:04.000000000 -0400&lt;/span&gt;
+&lt;span class="gu"&gt;@@ -13,5 +13,17 @@&lt;/span&gt;
+
+
+
+&lt;span class="gi"&gt;+[is cfg.piwik.use_piwik &amp;quot;1&amp;quot;]&lt;/span&gt;
+&lt;span class="gi"&gt;+&lt;/span&gt;
+&lt;span class="gi"&gt;+var pkBaseURL = ((&amp;quot;https:&amp;quot; == document.location.protocol) ? &amp;quot;https://[cfg.piwik.base_url]/&amp;quot; : &amp;quot;http://[cfg.piwik.base_url]/&amp;quot;);&lt;/span&gt;
+&lt;span class="gi"&gt;+document.write(unescape(&amp;quot;%3Cscript src=&amp;#39;&amp;quot; + pkBaseURL + &amp;quot;[is cfg.piwik.use_jsindex &amp;quot;1&amp;quot;]js/[else]piwik.js[end]&amp;#39; type=&amp;#39;text/javascript&amp;#39;%3E%3C/script%3E&amp;quot;));&lt;/span&gt;
+&lt;span class="gi"&gt;+&lt;/span&gt;
+&lt;span class="gi"&gt;+try {&lt;/span&gt;
+&lt;span class="gi"&gt;+var piwikTracker = Piwik.getTracker(pkBaseURL + &amp;quot;piwik.php&amp;quot;, [cfg.piwik.site_id]);&lt;/span&gt;
+&lt;span class="gi"&gt;+piwikTracker.trackPageView();&lt;/span&gt;
+&lt;span class="gi"&gt;+piwikTracker.enableLinkTracking();&lt;/span&gt;
+&lt;span class="gi"&gt;+} catch( err ) {}&lt;/span&gt;
+&lt;span class="gi"&gt;+&lt;/span&gt;
+&lt;span class="gi"&gt;+[else][end]&lt;/span&gt;
+
+
+Only in viewvc-&lt;span class="caps"&gt;ORIG&lt;/span&gt;/templates/include: header.ezt~
+&lt;span class="gh"&gt;diff -ru viewvc-&lt;span class="caps"&gt;ORIG&lt;/span&gt;/viewvc.conf.dist viewvc/viewvc.conf.dist&lt;/span&gt;
+&lt;span class="gd"&gt;--- viewvc-&lt;span class="caps"&gt;ORIG&lt;/span&gt;/viewvc.conf.dist    2012-01-25 08:31:52.000000000 -0500&lt;/span&gt;
+&lt;span class="gi"&gt;+++ viewvc/viewvc.conf.dist 2012-03-23 21:44:02.000000000 -0400&lt;/span&gt;
+&lt;span class="gu"&gt;@@ -1131,3 +1131,29 @@&lt;/span&gt;
+ #viewvc_base_url =
+
+ ##---------------------------------------------------------------------------
+&lt;span class="gi"&gt;+[piwik]&lt;/span&gt;
+&lt;span class="gi"&gt;+&lt;/span&gt;
+&lt;span class="gi"&gt;+## This section enables Piwik  web analytics tracking.&lt;/span&gt;
+&lt;span class="gi"&gt;+## If piwik is enabled (use_piwik = 1) all other options must be specified.&lt;/span&gt;
+&lt;span class="gi"&gt;+##&lt;/span&gt;
+&lt;span class="gi"&gt;+## This is based on a patch by Jason Antman  &lt;/span&gt;
+&lt;span class="gi"&gt;+## to ViewVC 1.1.13, written 2012-03-23.&lt;/span&gt;
+&lt;span class="gi"&gt;+## The latest version of the patch, and information on it, can always be found at:&lt;/span&gt;
+&lt;span class="gi"&gt;+## &lt;/span&gt;
+&lt;span class="gi"&gt;+##&lt;/span&gt;
+&lt;span class="gi"&gt;+##&lt;/span&gt;
+&lt;span class="gi"&gt;+## To enable piwik, change use_piwik to 1. Set to 0 to disable&lt;/span&gt;
+&lt;span class="gi"&gt;+use_piwik = 1&lt;/span&gt;
+&lt;span class="gi"&gt;+##&lt;/span&gt;
+&lt;span class="gi"&gt;+## Set base_url to the hostname and path to your piwik installation, with no trailing slash.&lt;/span&gt;
+&lt;span class="gi"&gt;+## i.e. piwik.example.com or www.example.com/piwik&lt;/span&gt;
+&lt;span class="gi"&gt;+base_url = piwik.example.com&lt;/span&gt;
+&lt;span class="gi"&gt;+##&lt;/span&gt;
+&lt;span class="gi"&gt;+## Set to the numeric id of your website in Piwik&lt;/span&gt;
+&lt;span class="gi"&gt;+site_id = 5&lt;/span&gt;
+&lt;span class="gi"&gt;+##&lt;/span&gt;
+&lt;span class="gi"&gt;+## Set to 1 if you want to use js/index.php to serve the tracking code, &lt;/span&gt;
+&lt;span class="gi"&gt;+## or leave at 0 if you want to call piwik.js directly&lt;/span&gt;
+&lt;span class="gi"&gt;+use_jsindex = 0&lt;/span&gt;
+&lt;span class="gi"&gt;+&lt;/span&gt;
+&lt;span class="gi"&gt;+##---------------------------------------------------------------------------&lt;/span&gt;
+\ No newline at end of file
+&lt;/pre&gt;&lt;/div&gt;</summary><category term="analytics"></category><category term="piwik"></category><category term="python"></category><category term="subversion"></category><category term="svn"></category><category term="tracking"></category><category term="viewvc"></category></entry></feed>

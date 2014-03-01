@@ -1,0 +1,248 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Jason Antman's Blog</title><link>http://newblog.jasonantman.com/</link><description></description><atom:link href="http://newblog.jasonantman.com/feeds/tags/netgear.rss.xml" rel="self"></atom:link><lastBuildDate>Tue, 28 Jun 2011 08:40:00 -0400</lastBuildDate><item><title>Netgear ReadyNAS 1100 Bug causes NFS Failure after reboot - workaround</title><link>http://newblog.jasonantman.com/2011/06/netgear-readynas-1100-bug-causes-nfs-failure-after-reboot-workaround/</link><description>&lt;p&gt;At work, we have a &lt;a href="http://www.readynas.com/?cat=23"&gt;Netgear ReadyNAS
+1100&lt;/a&gt;. It&amp;#8217;s a &lt;span class="caps"&gt;4TB&lt;/span&gt; &lt;span class="caps"&gt;NAS&lt;/span&gt; appliance, a cute
+little 1U half-depth Linux box with 4 &lt;span class="caps"&gt;SATA&lt;/span&gt; disks, a &lt;span class="caps"&gt;RAID&lt;/span&gt; controller, and
+some firmware to do a whole bunch of fancy stuff (mainly geared towards
+consumers and very small shops - all configuration is point-and-click
+web &lt;span class="caps"&gt;UI&lt;/span&gt;). We&amp;#8217;ve been using it for storing archived log data and
+low-priority backups. At the beginning of this problem, it was running
+RAIDiator 4.1.6 firmware since December of last year (over 6 months),
+and hadn&amp;#8217;t had any configuration changes in at least 4&amp;nbsp;months.&lt;/p&gt;
+&lt;p&gt;Last week, I had to power off the unit and remove the power cables for
+some rack maintenance. I went through the usual full shutdown procedure
+in the web &lt;span class="caps"&gt;UI&lt;/span&gt;, and also told it to `fsck` the volumes, as that hadn&amp;#8217;t
+been done in quite some time. Unfortunately, when the unit came back up,
+even after I could log into the web &lt;span class="caps"&gt;UI&lt;/span&gt;, I couldn&amp;#8217;t mount the &lt;span class="caps"&gt;NFS&lt;/span&gt; shares
+on my backup server. I kept getting messages&amp;nbsp;like:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="go"&gt;[root@backup-server ~]# mount -a&lt;/span&gt;
+&lt;span class="go"&gt;mount: mount to &lt;span class="caps"&gt;NFS&lt;/span&gt; server &amp;#39;css-readynas&amp;#39; failed: &lt;span class="caps"&gt;RPC&lt;/span&gt; Error: Program not registered.&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;so my next step was to check &lt;span class="caps"&gt;RPC&lt;/span&gt; status of the readynas, from the
+client. That was also a bit of a&amp;nbsp;surprise:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="go"&gt;[root@backup-server ~]# rpcinfo -p css-readynas                        &lt;/span&gt;
+&lt;span class="go"&gt;   program vers proto   port                                              &lt;/span&gt;
+&lt;span class="go"&gt;    100000    2   tcp    111  portmapper                                  &lt;/span&gt;
+&lt;span class="go"&gt;    100000    2   udp    111  portmapper                                  &lt;/span&gt;
+&lt;span class="go"&gt;    100011    1   udp    620  rquotad                                     &lt;/span&gt;
+&lt;span class="go"&gt;    100011    2   udp    620  rquotad                                     &lt;/span&gt;
+&lt;span class="go"&gt;    100011    1   tcp    623  rquotad                                     &lt;/span&gt;
+&lt;span class="go"&gt;    100011    2   tcp    623  rquotad                                     &lt;/span&gt;
+&lt;span class="go"&gt;    100024    1   udp  32765  status                                      &lt;/span&gt;
+&lt;span class="go"&gt;    100024    1   tcp  32765  status                                      &lt;/span&gt;
+&lt;span class="go"&gt;    100005    1   udp   2051  mountd                                      &lt;/span&gt;
+&lt;span class="go"&gt;    100005    1   tcp   3006  mountd                                      &lt;/span&gt;
+&lt;span class="go"&gt;    100005    2   udp   2051  mountd                                      &lt;/span&gt;
+&lt;span class="go"&gt;    100005    2   tcp   3006  mountd                                      &lt;/span&gt;
+&lt;span class="go"&gt;    100005    3   udp   2051  mountd                                      &lt;/span&gt;
+&lt;span class="go"&gt;    100005    3   tcp   3006  mountd &lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Somewhere in that list is supposed to be nfsd, listening on port 2049.
+Next, I did an nmap (port scan) of the&amp;nbsp;readynas:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="go"&gt;[root@backup-server ~]# nmap -sU -p2047-2050 css-readynas             &lt;/span&gt;
+
+&lt;span class="go"&gt;Starting Nmap 4.11 ( http://www.insecure.org/nmap/ ) at 2011-06-23 15:21 &lt;span class="caps"&gt;EDT&lt;/span&gt;&lt;/span&gt;
+&lt;span class="go"&gt;Interesting ports on css-readynas.rutgers.edu (172.16.25.108):              &lt;/span&gt;
+&lt;span class="go"&gt;&lt;span class="caps"&gt;PORT&lt;/span&gt;     &lt;span class="caps"&gt;STATE&lt;/span&gt;         &lt;span class="caps"&gt;SERVICE&lt;/span&gt;                                              &lt;/span&gt;
+&lt;span class="go"&gt;2047/udp closed        dls                                                  &lt;/span&gt;
+&lt;span class="go"&gt;2048/udp closed        dls-monitor                                          &lt;/span&gt;
+&lt;span class="go"&gt;2049/udp open|filtered nfs                                                  &lt;/span&gt;
+&lt;span class="go"&gt;2050/udp closed        unknown  &lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Interesting. The port scan shows that &lt;em&gt;something&lt;/em&gt; is listening on port
+2049. But rpcinfo doesn&amp;#8217;t seem to recognize it as a &lt;span class="caps"&gt;NFS&lt;/span&gt;&amp;nbsp;server.&lt;/p&gt;
+&lt;p&gt;At this point, through FrontView (the web &lt;span class="caps"&gt;UI&lt;/span&gt;) I backed up the
+configuration and went through a few reboot cycles, with no change. I
+then started tweaking everything I could that I thought would restart
+the &lt;span class="caps"&gt;NFS&lt;/span&gt; server - I added and removed allowed hosts for the &lt;span class="caps"&gt;NFS&lt;/span&gt; share,
+enabled and disabled sync mode, etc. I started searching the &lt;a href="http://www.readynas.com/forum/"&gt;ReadyNAS
+Forum&lt;/a&gt; and found a post that reported a
+very similar problem - &lt;a href="http://www.readynas.com/forum/viewtopic.php?f=20&amp;amp;t=23139"&gt;upnpd grabbing nfsd
+port&lt;/a&gt;. The
+user reported that he was getting the same &amp;#8220;&lt;span class="caps"&gt;RPC&lt;/span&gt; Error: Program not
+registered&amp;#8221; message, and in &lt;code&gt;daemon.log&lt;/code&gt; on the ReadyNAS, found a line
+including &amp;#8220;storage nfsd[1087]: nfssvc: Address already in use&amp;#8221;. I
+remembered that I&amp;#8217;d setup the ReadyNAS to forward all logs to our
+central syslog server and, sure enough, found an identical message that
+something had already bound to &lt;span class="caps"&gt;UDP&lt;/span&gt; port 2049 when &lt;span class="caps"&gt;NFS&lt;/span&gt; was starting. I
+tried confirming that upnpd was disabled and rebooting, but that didn&amp;#8217;t
+help. Grepping my logs for &amp;#8220;nfs&amp;#8221;&amp;nbsp;returned:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;daemon.log:Jun 23 12:43:43 css-readynas nfsd[2331]: nfssvc: Address already in use
+daemon.log:Jun 23 15:26:33 css-readynas nfsd[2724]: nfssvc: Address already in use
+kern.log:Jun 23 11:35:29 css-readynas kernel: Installing knfsd (copyright (C) 1996 okir@monad.swb.de).
+kern.log:Jun 23 12:43:43 css-readynas kernel: NFSD: Using /var/lib/nfs/v4recovery as the NFSv4 state recovery directory
+kern.log:Jun 23 12:43:43 css-readynas kernel: NFSD: starting 90-second grace period
+kern.log:Jun 23 14:56:20 css-readynas kernel: Installing knfsd (copyright (C) 1996 okir@monad.swb.de).
+kern.log:Jun 23 15:12:41 css-readynas kernel: NFSD: starting 90-second grace period
+kern.log:Jun 23 15:26:33 css-readynas kernel: NFSD: Using /var/lib/nfs/v4recovery as the NFSv4 state recovery directory
+kern.log:Jun 23 15:26:33 css-readynas kernel: NFSD: starting 90-second grace period
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;My next step was a few more reboots, with no change. I then upgraded the
+RAIDiator firmware to the latest, 4.1.7. Still no luck. I installed the
+&lt;a href="http://www.readynas.com/?p=4203"&gt;Enable root &lt;span class="caps"&gt;SSH&lt;/span&gt;&lt;/a&gt; addon, and that&amp;#8217;s
+when things became very&amp;nbsp;clear:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="gp"&gt;css-readynas:/var/log#&lt;/span&gt; netstat -unlp
+&lt;span class="go"&gt;Active Internet connections (only servers)&lt;/span&gt;
+&lt;span class="go"&gt;Proto Recv-Q Send-Q Local Address           Foreign Address         State       &lt;span class="caps"&gt;PID&lt;/span&gt;/Program name   &lt;/span&gt;
+&lt;span class="go"&gt;udp        0      0 0.0.0.0:2049            0.0.0.0:*                           794/snmpd           &lt;/span&gt;
+&lt;span class="go"&gt;udp        0      0 0.0.0.0:514             0.0.0.0:*                           673/syslogd         &lt;/span&gt;
+&lt;span class="go"&gt;udp        0      0 172.16.25.108:137       0.0.0.0:*                           1672/nmbd           &lt;/span&gt;
+&lt;span class="go"&gt;udp        0      0 0.0.0.0:137             0.0.0.0:*                           1672/nmbd           &lt;/span&gt;
+&lt;span class="go"&gt;udp        0      0 172.16.25.108:138       0.0.0.0:*                           1672/nmbd           &lt;/span&gt;
+&lt;span class="go"&gt;udp        0      0 0.0.0.0:138             0.0.0.0:*                           1672/nmbd           &lt;/span&gt;
+&lt;span class="go"&gt;udp        0      0 0.0.0.0:161             0.0.0.0:*                           794/snmpd           &lt;/span&gt;
+&lt;span class="go"&gt;udp        0      0 0.0.0.0:162             0.0.0.0:*                           802/snmptrapd       &lt;/span&gt;
+&lt;span class="go"&gt;udp        0      0 0.0.0.0:2086            0.0.0.0:*                           1565/rpc.mountd     &lt;/span&gt;
+&lt;span class="go"&gt;udp        0      0 127.0.0.1:22081         0.0.0.0:*                           1599/raidard        &lt;/span&gt;
+&lt;span class="go"&gt;udp        0      0 172.16.25.108:22081     0.0.0.0:*                           1599/raidard        &lt;/span&gt;
+&lt;span class="go"&gt;udp        0      0 0.0.0.0:22081           0.0.0.0:*                           1599/raidard        &lt;/span&gt;
+&lt;span class="go"&gt;udp        0      0 0.0.0.0:988             0.0.0.0:*                           819/rpc.rquotad     &lt;/span&gt;
+&lt;span class="go"&gt;udp        0      0 0.0.0.0:5353            0.0.0.0:*                           729/avahi-daemon: r &lt;/span&gt;
+&lt;span class="go"&gt;udp        0      0 0.0.0.0:111             0.0.0.0:*                           666/portmap         &lt;/span&gt;
+&lt;span class="go"&gt;udp        0      0 0.0.0.0:881             0.0.0.0:*                           1553/rpc.statd      &lt;/span&gt;
+&lt;span class="go"&gt;udp        0      0 0.0.0.0:32765           0.0.0.0:*                           1553/rpc.statd     &lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;For some &lt;strong&gt;&lt;em&gt;very&lt;/em&gt;&lt;/strong&gt; strange reason, snmpd had bound to port 2049 (the
+nfs port) instead of 161. That left no port for nfs to bind&amp;nbsp;to.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Solution:&lt;/strong&gt;&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="gp"&gt;css-readynas:/var/log#&lt;/span&gt; /etc/init.d/snmpd stop                                                       
+&lt;span class="go"&gt;Stopping network management services: snmpd snmptrapd readynas-agent.                               &lt;/span&gt;
+&lt;span class="gp"&gt;css-readynas:/var/log#&lt;/span&gt; /etc/init.d/nfs-kernel-server start
+&lt;span class="go"&gt;Exporting directories for &lt;span class="caps"&gt;NFS&lt;/span&gt; kernel daemon...done.&lt;/span&gt;
+&lt;span class="go"&gt;Starting &lt;span class="caps"&gt;NFS&lt;/span&gt; kernel daemon:mount: nfsd already mounted or /proc/fs/nfsd/ busy&lt;/span&gt;
+&lt;span class="go"&gt;mount: according to mtab, nfsd is mounted on /proc/fs/nfsd&lt;/span&gt;
+&lt;span class="go"&gt; statd nfsd mountd.&lt;/span&gt;
+&lt;span class="gp"&gt;css-readynas:/var/log#&lt;/span&gt; /etc/init.d/snmpd start
+&lt;span class="go"&gt;Starting network management services: snmpd snmptrapd readynas-agent.&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Stop snmpd, restart nfs-kernel-server so that it grabs port 2049 like it
+should, and then start snmpd back up. If all went well, nfsd should now
+be listening on &lt;span class="caps"&gt;UDP&lt;/span&gt; 2049, and snmpd should be listening on &lt;span class="caps"&gt;UDP&lt;/span&gt; 161 like
+it should. To&amp;nbsp;confirm:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="gp"&gt;css-readynas:/var/log#&lt;/span&gt; netstat -unlp
+&lt;span class="go"&gt;Active Internet connections (only servers)&lt;/span&gt;
+&lt;span class="go"&gt;Proto Recv-Q Send-Q Local Address           Foreign Address         State       &lt;span class="caps"&gt;PID&lt;/span&gt;/Program name&lt;/span&gt;
+&lt;span class="go"&gt;udp        0      0 0.0.0.0:2049            0.0.0.0:*                           -&lt;/span&gt;
+&lt;span class="go"&gt;udp        0      0 0.0.0.0:514             0.0.0.0:*                           673/syslogd&lt;/span&gt;
+&lt;span class="go"&gt;udp        0      0 172.16.25.108:137       0.0.0.0:*                           1672/nmbd&lt;/span&gt;
+&lt;span class="go"&gt;udp        0      0 0.0.0.0:137             0.0.0.0:*                           1672/nmbd&lt;/span&gt;
+&lt;span class="go"&gt;udp        0      0 172.16.25.108:138       0.0.0.0:*                           1672/nmbd&lt;/span&gt;
+&lt;span class="go"&gt;udp        0      0 0.0.0.0:138             0.0.0.0:*                           1672/nmbd&lt;/span&gt;
+&lt;span class="go"&gt;udp        0      0 0.0.0.0:161             0.0.0.0:*                           26161/snmpd&lt;/span&gt;
+&lt;span class="go"&gt;udp        0      0 0.0.0.0:162             0.0.0.0:*                           26163/snmptrapd&lt;/span&gt;
+&lt;span class="go"&gt;udp        0      0 0.0.0.0:2086            0.0.0.0:*                           1565/rpc.mountd&lt;/span&gt;
+&lt;span class="go"&gt;udp        0      0 127.0.0.1:22081         0.0.0.0:*                           1599/raidard&lt;/span&gt;
+&lt;span class="go"&gt;udp        0      0 172.16.25.108:22081     0.0.0.0:*                           1599/raidard&lt;/span&gt;
+&lt;span class="go"&gt;udp        0      0 0.0.0.0:22081           0.0.0.0:*                           1599/raidard&lt;/span&gt;
+&lt;span class="go"&gt;udp        0      0 0.0.0.0:988             0.0.0.0:*                           819/rpc.rquotad&lt;/span&gt;
+&lt;span class="go"&gt;udp        0      0 0.0.0.0:5353            0.0.0.0:*                           729/avahi-daemon: r&lt;/span&gt;
+&lt;span class="go"&gt;udp        0      0 0.0.0.0:2158            0.0.0.0:*                           -&lt;/span&gt;
+&lt;span class="go"&gt;udp        0      0 0.0.0.0:111             0.0.0.0:*                           666/portmap&lt;/span&gt;
+&lt;span class="go"&gt;udp        0      0 0.0.0.0:2160            0.0.0.0:*                           26161/snmpd&lt;/span&gt;
+&lt;span class="go"&gt;udp        0      0 0.0.0.0:881             0.0.0.0:*                           1553/rpc.statd&lt;/span&gt;
+&lt;span class="go"&gt;udp        0      0 0.0.0.0:32765           0.0.0.0:*                           1553/rpc.statd&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;All is well. Now to confirm this from the client&amp;nbsp;machine:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="go"&gt;[root@backup-server ~]# rpcinfo -p css-readynas&lt;/span&gt;
+&lt;span class="go"&gt;   program vers proto   port&lt;/span&gt;
+&lt;span class="go"&gt;    100000    2   tcp    111  portmapper&lt;/span&gt;
+&lt;span class="go"&gt;    100000    2   udp    111  portmapper&lt;/span&gt;
+&lt;span class="go"&gt;    100011    1   udp    988  rquotad&lt;/span&gt;
+&lt;span class="go"&gt;    100011    2   udp    988  rquotad&lt;/span&gt;
+&lt;span class="go"&gt;    100011    1   tcp    991  rquotad&lt;/span&gt;
+&lt;span class="go"&gt;    100011    2   tcp    991  rquotad&lt;/span&gt;
+&lt;span class="go"&gt;    100024    1   udp  32765  status&lt;/span&gt;
+&lt;span class="go"&gt;    100024    1   tcp  32765  status&lt;/span&gt;
+&lt;span class="go"&gt;    100005    1   udp   2086  mountd&lt;/span&gt;
+&lt;span class="go"&gt;    100005    1   tcp   3131  mountd&lt;/span&gt;
+&lt;span class="go"&gt;    100005    2   udp   2086  mountd&lt;/span&gt;
+&lt;span class="go"&gt;    100005    2   tcp   3131  mountd&lt;/span&gt;
+&lt;span class="go"&gt;    100005    3   udp   2086  mountd&lt;/span&gt;
+&lt;span class="go"&gt;    100005    3   tcp   3131  mountd&lt;/span&gt;
+&lt;span class="go"&gt;    100003    2   udp   2049  nfs&lt;/span&gt;
+&lt;span class="go"&gt;    100003    3   udp   2049  nfs&lt;/span&gt;
+&lt;span class="go"&gt;    100003    4   udp   2049  nfs&lt;/span&gt;
+&lt;span class="go"&gt;    100003    2   tcp   2049  nfs&lt;/span&gt;
+&lt;span class="go"&gt;    100003    3   tcp   2049  nfs&lt;/span&gt;
+&lt;span class="go"&gt;    100003    4   tcp   2049  nfs&lt;/span&gt;
+&lt;span class="go"&gt;    100021    1   udp   2158  nlockmgr&lt;/span&gt;
+&lt;span class="go"&gt;    100021    3   udp   2158  nlockmgr&lt;/span&gt;
+&lt;span class="go"&gt;    100021    4   udp   2158  nlockmgr&lt;/span&gt;
+&lt;span class="go"&gt;    100021    1   tcp   4189  nlockmgr&lt;/span&gt;
+&lt;span class="go"&gt;    100021    3   tcp   4189  nlockmgr&lt;/span&gt;
+&lt;span class="go"&gt;    100021    4   tcp   4189  nlockmgr&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Ok, &lt;span class="caps"&gt;NFS&lt;/span&gt; is now there. It all looks good, and re-running &lt;code&gt;mount -a&lt;/code&gt; on
+the client successfully mounts the &lt;span class="caps"&gt;NFS&lt;/span&gt;&amp;nbsp;share.&lt;/p&gt;
+&lt;p&gt;We&amp;#8217;ll see what happens next time I have to reboot the ReadyNAS. In the
+mean time, I&amp;#8217;m going to try to bring this to the attention of Netgear
+support and hope they do something about&amp;nbsp;it.&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Tue, 28 Jun 2011 08:40:00 -0400</pubDate><guid>tag:newblog.jasonantman.com,2011-06-28:2011/06/netgear-readynas-1100-bug-causes-nfs-failure-after-reboot-workaround/</guid><category>appliance</category><category>embedded</category><category>linux</category><category>nas</category><category>netgear</category><category>nfs</category><category>readynas</category></item><item><title>Netgear ReadyNAS 1100 and long UID numbers</title><link>http://newblog.jasonantman.com/2009/06/netgear-readynas-1100-and-long-uid-numbers/</link><description>&lt;p&gt;I spent part of the day installing a &lt;a href="http://www.netgear.com/Products/Storage/ReadyNAS1100.aspx"&gt;Netgear ReadyNAS
+1100&lt;/a&gt; for
+backup storage. It&amp;#8217;s a cute little 1U storage appliance with 4 &lt;span class="caps"&gt;SATA&lt;/span&gt; disk
+bays, two Gig copper ports and about every sort of hokey service you
+could possibly want in something that&amp;#8217;s billed as a small business
+storage server but running a sort-of-scaled-up home appliance &lt;span class="caps"&gt;OS&lt;/span&gt;. That
+being said, it comes at a wonderful price (we bought one empty and added
+4x 1.&lt;span class="caps"&gt;5TB&lt;/span&gt; disks) and runs&amp;nbsp;Linux.&lt;/p&gt;
+&lt;p&gt;I had a few minor issues with the installation (more along the lines of
+trying to do things that weren&amp;#8217;t clearly documented rather than problems
+with the unit). NetGear tech support (&amp;#8220;ProSupport Labs&amp;#8221;) was quite good
+once I got past the first level or two, and Mark H. who helped me with
+most of my issues was one of the best tech support people I&amp;#8217;ve ever
+spoken to. In fact, he probably ties with &lt;a href="/2007/03/managing-g1-proliant-servers-with-modern-linux/"&gt;Paulo from
+&lt;span class="caps"&gt;HP&lt;/span&gt;&lt;/a&gt;
+for the best tech support person I&amp;#8217;ve ever dealt&amp;nbsp;with.&lt;/p&gt;
+&lt;p&gt;Anyway, the only issue with the NetGear installation that we weren&amp;#8217;t
+able to resolve was the fact that the web configuration tool
+(&amp;#8220;Frontview&amp;#8221;) will only accept UIDs of a maximum of five characters.
+Here at Rutgers, we have a unified &lt;span class="caps"&gt;UID&lt;/span&gt; space, with numbers well in
+excess of 100,000. As a result, my plan of having &lt;span class="caps"&gt;NFS&lt;/span&gt; play well wasn&amp;#8217;t
+really going to work. Mark wasn&amp;#8217;t able to come up with a solution
+(obviously - it&amp;#8217;s something that, at best, can get fixed in the next
+version of the firmware) but he took copious notes, had me confirm them,
+and told me he&amp;#8217;d bring it up to the ReadyNAS engineering team when they
+meet Thursday, and will try and e-mail me back to follow up. He also
+spent quite some time on the phone with me, both of us researching what
+kernel the ReadyNAS 4.1.5 firmware runs (2.6.17.8, mostly vanilla Debian
+as per mark) and when long &lt;span class="caps"&gt;UID&lt;/span&gt; support was available (at least 2.4).
+Overall, I was very impressed that Mark knew quite a bit about Linux -
+even more than your average Linux desktop user - and quite a bit about
+the internals of the&amp;nbsp;ReadyNAS.&lt;/p&gt;
+&lt;p&gt;Just on a hunch, after my tech support call, I used the Frontview
+&amp;#8220;Config Backup&amp;#8221; tool&amp;#8217;s &amp;#8220;Users and Groups&amp;#8221; option to backup the user and
+group information. Sure enough, it was just a force-download of a Zip
+archive&amp;#8230; of the pertinent files. I was able to hand-hack /etc/passwd
+and re-upload it, and it seemed to work&amp;nbsp;fine.&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;The following is &lt;strong&gt;&lt;span class="caps"&gt;NOT&lt;/span&gt;&lt;/strong&gt; endorsed by Netgear in any way, shape or form.
+It&amp;#8217;s a hack that may or may not work. Do this at your own risk - I have
+no idea if some future (or past) firmware change might make bad things
+happen, or whether there are some features which don&amp;#8217;t jive with this.
+All I&amp;#8217;ve tested is &lt;span class="caps"&gt;HTTP&lt;/span&gt; logins, the fact that the web interface shows
+the &gt;2\^16 &lt;span class="caps"&gt;UID&lt;/span&gt; correctly, and&amp;nbsp;&lt;span class="caps"&gt;NFS&lt;/span&gt;.&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Procedure:&lt;/strong&gt;&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Create desired user in Frontview tool, leaving &lt;span class="caps"&gt;UID&lt;/span&gt; field blank. (In
+    my case, the user is assigned the next sequential &lt;span class="caps"&gt;UID&lt;/span&gt;,&amp;nbsp;1002).&lt;/li&gt;
+&lt;li&gt;Frontview &amp;#8220;System&amp;#8221; -&gt; &amp;#8220;Config Backup&amp;#8221;, &amp;#8220;Backup&amp;#8221; tab, select only
+    &amp;#8220;Users and&amp;nbsp;Groups&amp;#8221;.&lt;/li&gt;
+&lt;li&gt;Download config files and&amp;nbsp;unzip.&lt;/li&gt;
+&lt;li&gt;Open &lt;code&gt;/etc/passwd&lt;/code&gt; from the config archive in a text editor, change the
+    automatically assigned &lt;span class="caps"&gt;UID&lt;/span&gt; (1002) to the desired &lt;span class="caps"&gt;UID&lt;/span&gt;&amp;nbsp;(101739).&lt;/li&gt;
+&lt;li&gt;Re-zip the directory tree and re-upload to&amp;nbsp;ReadyNAS.&lt;/li&gt;
+&lt;li&gt;Enjoy.&lt;/li&gt;
+&lt;/ol&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Tue, 23 Jun 2009 16:45:00 -0400</pubDate><guid>tag:newblog.jasonantman.com,2009-06-23:2009/06/netgear-readynas-1100-and-long-uid-numbers/</guid><category>debian</category><category>helpdesk</category><category>netgear</category><category>readynas</category></item></channel></rss>

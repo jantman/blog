@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Jason Antman's Blog</title><link href="http://newblog.jasonantman.com/" rel="alternate"></link><link href="http://newblog.jasonantman.com/feeds/tags/disaster-recovery.atom.xml" rel="self"></link><id>http://newblog.jasonantman.com/</id><updated>2011-01-10T09:22:00-05:00</updated><entry><title>Downtime Last Night; Coping with outages on a shoestring budget</title><link href="http://newblog.jasonantman.com/2011/01/downtime-last-night-coping-with-outages-on-a-shoestring-budget/" rel="alternate"></link><updated>2011-01-10T09:22:00-05:00</updated><author><name>admin</name></author><id>tag:newblog.jasonantman.com,2011-01-10:2011/01/downtime-last-night-coping-with-outages-on-a-shoestring-budget/</id><summary type="html">&lt;p&gt;Anyone who tried to visit any of my sites last night, or send me email,
+probably noticed that I dropped off the face of the earth. I take my
+uptime pretty seriously - even with virtually no budget, about 10
+minutes of &lt;span class="caps"&gt;UPS&lt;/span&gt; time, and everything hosted out of my basement. I&amp;#8217;ve only
+had about a &lt;a href="/2010/03/downtime-past-few-days-coping-with-storms/"&gt;6-hour block of
+downtime&lt;/a&gt; in the
+past 21 months, aside from that nothing externally visible except a few
+sub-3-minute hiccups. And the 6 hours was due to a major power outage
+that quickly overwhelmed my &lt;span class="caps"&gt;UPS&lt;/span&gt;. Without a generator, I can&amp;#8217;t really
+blame anyone for that. Anyway, last night into this morning I had
+partial to full outages for about 12 hours. By far the most I&amp;#8217;ve had
+since I literally ripped apart my entire infrastructure, moved it from
+shelves to a rack, and put it back together on the&amp;nbsp;fly.&lt;/p&gt;
+&lt;p&gt;I&amp;#8217;d like to apologize to the few people whose web sites or other
+services I host out of my house. On one hand, I think those few people
+are getting their money&amp;#8217;s worth from their free hosting :) On the other
+hand I know how frustrating it can be, especially when you can&amp;#8217;t even
+resolve &lt;span class="caps"&gt;DNS&lt;/span&gt; and my email is down. Rest assured that this situation
+deeply bothers me, and I&amp;#8217;m already hard at work on plans to at least
+keep people (both the people I do hosting for and their visitors)
+informed if something like this should happen in the&amp;nbsp;future.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;The&amp;nbsp;Story:&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;Well, yesterday afternoon as I was at my father&amp;#8217;s house about an hour
+away, I started to get a slew of &lt;a href="http://www.nagios.org"&gt;Nagios&lt;/a&gt;
+notification SMSes (well, email to &lt;span class="caps"&gt;SMS&lt;/span&gt;). They started at 14:22 and
+stopped after a few minutes, but since I was driving, I didn&amp;#8217;t check
+them. When I got home, I found a scenario I hadn&amp;#8217;t really anticipated -
+the &lt;span class="caps"&gt;TV&lt;/span&gt; worked fine, but I had virtually no connectivity on my cable
+Internet line. I got home around 16:22 and had spotty-at-best
+connectivity. I could get some &lt;span class="caps"&gt;DNS&lt;/span&gt; in and out, but it was pretty much
+impossible to load a web page on my desktop. I was getting Nagios alerts
+out in bursts, and the postfix queue was pretty full. A cursory
+inspection showed both routers (mine and Optimum&amp;#8217;s) online with link,
+the Modem had link and was blinking away, but I was passing &amp;lt; 100 Kbps
+of data. My &lt;span class="caps"&gt;DOCSIS&lt;/span&gt;-&lt;span class="caps"&gt;MIB&lt;/span&gt; checks on the cable modem were spitting back all
+sorts of bad values. Not good. I checked coax connections, rebooted the
+modem and router, and went outside to inspect the aerials and the
+splitters on the outside of the house. Nothing visibly wrong, and no
+positive change after the reboot. Now the modem wasn&amp;#8217;t showing link at
+all, and I couldn&amp;#8217;t even ping its &lt;span class="caps"&gt;LAN&lt;/span&gt;&amp;nbsp;&lt;span class="caps"&gt;IP&lt;/span&gt;.&lt;/p&gt;
+&lt;p&gt;I called Optimum at 17:12 and went through the initial troubleshooting
+with the technical support guy. I told him I&amp;#8217;d already power-cycled the
+modem, and gave him a rundown of the status lights. He confirmed that
+they couldn&amp;#8217;t even see the modem on the &lt;span class="caps"&gt;WAN&lt;/span&gt; side, and would have to send
+a tech out. The big plus to Optimum Business is that, despite it being
+after 5 &lt;span class="caps"&gt;PM&lt;/span&gt; on a Sunday night, I was given an &lt;span class="caps"&gt;ETA&lt;/span&gt; of 2-4 hours. After
+about 15 minutes, I power-cycled the modem again, and was able to get
+link. I was seeing some data pushed through the routers, but only about
+50Kbps. I called Optimum back, spoke with another tech, and was told
+that they couldn&amp;#8217;t even get diagnostics back from the modem, and were
+seeing 94% packet loss on ping. Time to wait for the&amp;nbsp;tech.&lt;/p&gt;
+&lt;p&gt;The field tech arrived at 17:53. Utterly amazing&amp;#8230; about 30 minutes
+after I got off the phone with tech support. I don&amp;#8217;t know if they keep
+their better techs waiting around for business customers, but this guy -
+Jason - was one of the most knowledgeable and experienced that I&amp;#8217;ve ever
+met. He poked around the modem a bit, re-did some of the shoddy work
+that the original installers left, and then climbed the pole to figure
+out what was going on. About half an hour later, he came back with the
+bad news. His test scope wouldn&amp;#8217;t even lock on to the 609MHz carrier
+used for the cable modem, so there was something definitely wrong, and
+it was past the pole in front of the house. He told me they&amp;#8217;d need to
+escalate the problem to the outside plant engineers, but since I was a
+business customer, I could expect some update or fix in 6-18 hours. He
+left around 18:30. Well, I was bummed, but I used the time to get other
+stuff done and start planning for at least minimal &lt;span class="caps"&gt;DR&lt;/span&gt; plans for the&amp;nbsp;future.&lt;/p&gt;
+&lt;p&gt;According to my off-site Nagios, I at least got some mail out and &lt;span class="caps"&gt;SSH&lt;/span&gt; in
+from 19:55 to 20:44, and then had another total loss of connectivity.
+Everything came back around 02:20 today, meaning a full 12 hours of&amp;nbsp;downtime.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Analysis and Future&amp;nbsp;Plans:&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;Well for the foreseeable future I&amp;#8217;m just working my day job and probably
+not doing much (paid) consulting, so purchasing a backup connection is
+out of the question - especially since FiOS charges almost twice what
+Optimum does for static &lt;span class="caps"&gt;IP&lt;/span&gt; service. There&amp;#8217;s really no way I could&amp;#8217;ve
+prevented this outage, and it turns out that the problem wasn&amp;#8217;t even on
+my property, so it&amp;#8217;s not anything I could have fixed myself (or
+prevented by convincing Optimum to let me purchase a spare modem to keep
+on hand). Once again, for something that isn&amp;#8217;t directly money-making for
+me, it&amp;#8217;s not really worth it to try and get hosting as a backup, since
+I&amp;#8217;ve got all sorts of complex postfix configurations, &lt;span class="caps"&gt;BIND&lt;/span&gt; master/slave
+replication, etc. Within my budget, I can&amp;#8217;t really say there&amp;#8217;s anything
+I could do to solve this problem, or to get even half of my services
+back up. My offsite Nagios is behind a dynamic residential cable
+connection, so that won&amp;#8217;t really fix any problems&amp;nbsp;either.&lt;/p&gt;
+&lt;p&gt;My plan for the short-term is to find a static &lt;span class="caps"&gt;IP&lt;/span&gt; somewhere that I can
+run a box behind, add it as a &lt;span class="caps"&gt;NS&lt;/span&gt; record, and at the minimum setup a
+caching Postfix server, a catch-all Apache server with a &amp;#8220;we know about
+it, we&amp;#8217;re coming back soon&amp;#8221; page, and hacked &lt;span class="caps"&gt;BIND&lt;/span&gt; zone files that point
+everything at this one box (albeit with a low&amp;nbsp;&lt;span class="caps"&gt;TTL&lt;/span&gt;).&lt;/p&gt;
+&lt;p&gt;If anyone out there happens to read this, any comments on how to deal
+with a total loss of connectivity on a budget of, say, $15/month above
+the cost of my Optimum&amp;nbsp;connection??&lt;/p&gt;</summary><category term="disaster recovery"></category><category term="downtime"></category><category term="failover"></category><category term="redundancy"></category></entry></feed>

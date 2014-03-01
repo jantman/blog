@@ -1,0 +1,570 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Jason Antman's Blog</title><link>http://newblog.jasonantman.com/</link><description></description><atom:link href="http://newblog.jasonantman.com/feeds/tags/rsyslog.rss.xml" rel="self"></atom:link><lastBuildDate>Sat, 25 Aug 2012 11:33:00 -0400</lastBuildDate><item><title>Puppet facter facts for syslog daemon type and version, symantec netbackup</title><link>http://newblog.jasonantman.com/2012/08/puppet-facter-facts-for-syslog-daemon-type-and-version-symantec-netbackup/</link><description>&lt;p&gt;I have a few more custom facts that I&amp;#8217;ve added to my
+&lt;a href="https://github.com/jantman/puppet-facter-facts"&gt;puppet-facter-facts&lt;/a&gt;
+github&amp;nbsp;repository:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href="https://github.com/jantman/puppet-facter-facts/blob/master/syslog_bin.rb"&gt;syslog_bin&lt;/a&gt;,
+    &lt;a href="https://github.com/jantman/puppet-facter-facts/blob/master/syslog_type.rb"&gt;syslog_type&lt;/a&gt;,
+    and
+    &lt;a href="https://github.com/jantman/puppet-facter-facts/blob/master/syslog_version.rb"&gt;syslog_version&lt;/a&gt;&lt;ul&gt;
+&lt;li&gt;tell the absolute path to the &lt;em&gt;running&lt;/em&gt; syslog binary, its short
+name (basename), and its version as a string. Currently only know
+about &lt;code&gt;/sbin/syslogd&lt;/code&gt; and &lt;code&gt;/sbin/rsyslogd&lt;/code&gt;.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;a href="https://github.com/jantman/puppet-facter-facts/blob/master/has_netbackup.rb"&gt;has_netbackup&lt;/a&gt;&lt;ul&gt;
+&lt;li&gt;tests for presence of the &lt;code&gt;/usr/openv/netbackup/bin&lt;/code&gt; directory,
+created by installation of &lt;a href="http://www.symantec.com/netbackup"&gt;Symantec
+Netbackup&lt;/a&gt;. Useful for making
+generation of include/exclude files conditional on having NetBackup&amp;nbsp;installed.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Hopefully some of these will be of use to someone else as&amp;nbsp;well.&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Sat, 25 Aug 2012 11:33:00 -0400</pubDate><guid>tag:newblog.jasonantman.com,2012-08-25:2012/08/puppet-facter-facts-for-syslog-daemon-type-and-version-symantec-netbackup/</guid><category>facter</category><category>nbu</category><category>netbackup</category><category>puppet</category><category>rsyslog</category><category>syslog</category></item><item><title>Vyatta - Showing ISC dhcpd fixed-address leases</title><link>http://newblog.jasonantman.com/2011/12/vyatta-showing-isc-dhcpd-fixed-address-leases/</link><description>&lt;p&gt;&lt;span class="caps"&gt;ISC&lt;/span&gt; &lt;a href="http://www.isc.org/software/dhcp"&gt;dhcpd&lt;/a&gt; has the ability to always
+give a specific &lt;span class="caps"&gt;MAC&lt;/span&gt; address the same &lt;span class="caps"&gt;IP&lt;/span&gt; address &amp;#8220;lease&amp;#8221; using the
+fixed-address configuration option. This is configured in
+&lt;a href="http://www.vyatta.org"&gt;Vyatta&lt;/a&gt; using the &lt;code&gt;static-mapping&lt;/code&gt; configuration
+statement. Unfortunately, since dhcpd doesn&amp;#8217;t store fixed-address leases
+in the &lt;code&gt;dhcpd.leases&lt;/code&gt; file, the Vyatta &lt;code&gt;show dhcp leases&lt;/code&gt; command
+doesn&amp;#8217;t show anything about them - which makes it difficult to debug
+anything dhcp-related if all of the hosts on your network are setup for
+fixed addresses. I found a mention of this on the &lt;a href="http://www.vyatta.org/forum/viewtopic.php?p=121558"&gt;vyatta
+forum&lt;/a&gt;, and also an
+&lt;a href="https://bugzilla.vyatta.com/show_bug.cgi?id=1990"&gt;open bug (1990)&lt;/a&gt; to
+fix it, but no proposed resolution. Since I came across this problem and
+happen to know a bit about &lt;span class="caps"&gt;ISC&lt;/span&gt; dhcpd, I developed both a workaround for
+users (including a perl script) and a possible solution for the Vyatta
+developers to&amp;nbsp;implement.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Workaround for&amp;nbsp;Users:&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;There&amp;#8217;s no way to get dhcpd to store fixed-address hosts in the
+dhcpd.leases file (though it&amp;#8217;s been discussed on the dhcpd-users mailing
+list a few times). There is, however, a way to get dhcpd to log every
+time it sends an &lt;span class="caps"&gt;ACK&lt;/span&gt; to a client. The following Vyatta configuration
+commands will get dhcpd to log all transactions to syslog, will have
+&lt;a href="http://rsyslog.com/"&gt;rsyslog&lt;/a&gt; put that in &lt;code&gt;/var/log/user/dhcpd&lt;/code&gt;. Since
+this log can fill up very quickly on a busy server, the latter two
+commands will tell &lt;a href="https://fedorahosted.org/logrotate/"&gt;logrotate&lt;/a&gt; to
+rotate the log file when it reaches 3000k in size, and keep 5 copies
+(feel free to adjust to your&amp;nbsp;needs):&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="gp"&gt;#&lt;/span&gt; &lt;span class="nb"&gt;set &lt;/span&gt;service dhcp-server global-parameters &lt;span class="s2"&gt;&amp;quot;log-facility local2;&amp;quot;&lt;/span&gt;
+&lt;span class="gp"&gt;#&lt;/span&gt; &lt;span class="nb"&gt;set &lt;/span&gt;system syslog file dhcpd facility local2 level debug
+&lt;span class="gp"&gt;#&lt;/span&gt; &lt;span class="nb"&gt;set &lt;/span&gt;system syslog file dhcpd archive files 5
+&lt;span class="gp"&gt;#&lt;/span&gt; &lt;span class="nb"&gt;set &lt;/span&gt;system syslog file dhcpd archive size 3000
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Once this is done, you can &lt;code&gt;tail -f /var/log/user/dhcpd&lt;/code&gt; to watch &lt;span class="caps"&gt;DHCP&lt;/span&gt;
+discover/request/offer/ack in realtime, or grep through the log file for
+a specific &lt;span class="caps"&gt;IP&lt;/span&gt; or &lt;span class="caps"&gt;MAC&lt;/span&gt;. If you want an easier method, I&amp;#8217;ve written a perl
+script (latest version will always live in &lt;a href="https://github.com/jantman/misc-scripts/blob/master/show_dhcp_fixed_ACKs.pl"&gt;my GitHub misc-scripts
+repo&lt;/a&gt;)
+to grep through &lt;code&gt;/var/log/user/dhcpd&lt;/code&gt; and show the most recent &lt;span class="caps"&gt;DHCPACK&lt;/span&gt;
+for each &lt;span class="caps"&gt;IP&lt;/span&gt; address, sorted by &lt;span class="caps"&gt;IP&lt;/span&gt;. Here&amp;#8217;s the code of the simple script,
+which is more than half comments. To use it, after performing the above
+steps, all you need to do is login to your Vyatta box,
+&lt;code&gt;wget https://raw.github.com/jantman/misc-scripts/master/show_dhcp_fixed_ACKs.pl&lt;/code&gt;
+and then &lt;code&gt;perl show_dhcp_fixed_ACKs.pl&lt;/code&gt;.&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="c1"&gt;#!/usr/bin/perl&lt;/span&gt;
+
+&lt;span class="c1"&gt;#&lt;/span&gt;
+&lt;span class="c1"&gt;# show_dhcp_fixed_ACKs.pl - script to show the most recent &lt;span class="caps"&gt;DHCP&lt;/span&gt; ACKs per &lt;span class="caps"&gt;IP&lt;/span&gt; address for &lt;span class="caps"&gt;ISC&lt;/span&gt; DHCPd,&lt;/span&gt;
+&lt;span class="c1"&gt;#   from a log file. Originally written for Vyatta routers that just show the dynamic leases.&lt;/span&gt;
+&lt;span class="c1"&gt;#&lt;/span&gt;
+&lt;span class="c1"&gt;# To use this, you need to have dhcpd logging to syslog, and your syslog server putting the log file at&lt;/span&gt;
+&lt;span class="c1"&gt;# /var/log/user/dhcpd (or a file path specified by the $logfile variable below.&lt;/span&gt;
+&lt;span class="c1"&gt;#&lt;/span&gt;
+&lt;span class="c1"&gt;# To accomplish this on Vyatta 6.3, run:&lt;/span&gt;
+&lt;span class="c1"&gt;# set service dhcp-server global-parameters &amp;quot;log-facility local2;&amp;quot;&lt;/span&gt;
+&lt;span class="c1"&gt;# set system syslog file dhcpd facility local2 level debug&lt;/span&gt;
+&lt;span class="c1"&gt;# set system syslog file dhcpd archive files 5&lt;/span&gt;
+&lt;span class="c1"&gt;# set system syslog file dhcpd archive size 3000&lt;/span&gt;
+&lt;span class="c1"&gt;# commit&lt;/span&gt;
+&lt;span class="c1"&gt;#&lt;/span&gt;
+&lt;span class="c1"&gt;# Copyright 2011 Jason Antman  All Rights Reserved.&lt;/span&gt;
+&lt;span class="c1"&gt;# This script is free for use by anyone anywhere, provided that you comply with the following terms:&lt;/span&gt;
+&lt;span class="c1"&gt;# 1) Keep this notice and copyright statement intact.&lt;/span&gt;
+&lt;span class="c1"&gt;# 2) Send any substantial changes, improvements or bog fixes back to me at the above address.&lt;/span&gt;
+&lt;span class="c1"&gt;# 3) If you include this in a product or redistribute it, you notify me, and include my name in the credits or changelog.&lt;/span&gt;
+&lt;span class="c1"&gt;#&lt;/span&gt;
+&lt;span class="c1"&gt;# The following &lt;span class="caps"&gt;URL&lt;/span&gt; always points to the newest version of this script. If you obtained it from another source, you should&lt;/span&gt;
+&lt;span class="c1"&gt;# check here:&lt;/span&gt;
+&lt;span class="c1"&gt;# $HeadURL$&lt;/span&gt;
+&lt;span class="c1"&gt;# $LastChangedRevision$&lt;/span&gt;
+&lt;span class="c1"&gt;#&lt;/span&gt;
+&lt;span class="c1"&gt;# &lt;span class="caps"&gt;CHANGELOG&lt;/span&gt;:&lt;/span&gt;
+&lt;span class="c1"&gt;# 2011-12-24 jason@jasonantman.com:&lt;/span&gt;
+&lt;span class="c1"&gt;#    initial version of script&lt;/span&gt;
+&lt;span class="c1"&gt;#&lt;/span&gt;
+&lt;span class="c1"&gt;#&lt;/span&gt;
+
+&lt;span class="k"&gt;use&lt;/span&gt; &lt;span class="n"&gt;strict&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="k"&gt;use&lt;/span&gt; &lt;span class="n"&gt;warnings&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+
+&lt;span class="k"&gt;my&lt;/span&gt; &lt;span class="nv"&gt;$logfile&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;/var/log/user/dhcpd&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+
+&lt;span class="k"&gt;my&lt;/span&gt; &lt;span class="nv"&gt;%data&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;();&lt;/span&gt;
+
+&lt;span class="nb"&gt;open&lt;/span&gt; &lt;span class="n"&gt;&lt;span class="caps"&gt;DF&lt;/span&gt;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nv"&gt;$logfile&lt;/span&gt; &lt;span class="ow"&gt;or&lt;/span&gt; &lt;span class="nb"&gt;die&lt;/span&gt; &lt;span class="vg"&gt;$!&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="k"&gt;while&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt; &lt;span class="k"&gt;my&lt;/span&gt; &lt;span class="nv"&gt;$line&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt;  &lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt; &lt;span class="nv"&gt;$line&lt;/span&gt; &lt;span class="o"&gt;!~&lt;/span&gt; &lt;span class="sr"&gt;m/dhcpd: &lt;span class="caps"&gt;DHCPACK&lt;/span&gt;/&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt; &lt;span class="k"&gt;next&lt;/span&gt;&lt;span class="p"&gt;;}&lt;/span&gt;
+    &lt;span class="nv"&gt;$line&lt;/span&gt; &lt;span class="o"&gt;=~&lt;/span&gt; &lt;span class="sr"&gt;m/([A-Za-z]+ [0-9]+ [0-9]{1,2}:[0-9]{2}:[0-9]{2}) [^\/x]+ dhcpd: &lt;span class="caps"&gt;DHCPACK&lt;/span&gt; on (\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}) to ((?:[0-9a-f]{2}[:-]){5}[0-9a-f]{2}) via (.+)/&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+    &lt;span class="c1"&gt;#print &amp;quot;$1==$2==$3==$4==\n&amp;quot; ;&lt;/span&gt;
+    &lt;span class="nv"&gt;$data&lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;$2&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;mac&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;$3&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+    &lt;span class="nv"&gt;$data&lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;$2&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;date&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;$1&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+    &lt;span class="nv"&gt;$data&lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;$2&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;if&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;$4&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+    &lt;span class="nv"&gt;$data&lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;$2&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;ip&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;$2&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;    
+&lt;span class="p"&gt;}&lt;/span&gt;
+
+&lt;span class="nb"&gt;printf&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;%-18s %-20s %-18s %-10s\n&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;&lt;span class="caps"&gt;IP&lt;/span&gt; Address&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;Hardware Address&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;Date&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;Interface&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;span class="nb"&gt;printf&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;%-18s %-20s %-18s %-10s\n&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;----------&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;----------------&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;----&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;---------&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+
+&lt;span class="c1"&gt;# begin sort by &lt;span class="caps"&gt;IP&lt;/span&gt; address&lt;/span&gt;
+&lt;span class="k"&gt;my&lt;/span&gt; &lt;span class="nv"&gt;@keys&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt;
+  &lt;span class="nb"&gt;map&lt;/span&gt;  &lt;span class="nb"&gt;substr&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;$_&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mi"&gt;4&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;=&amp;gt;&lt;/span&gt;
+  &lt;span class="nb"&gt;sort&lt;/span&gt;
+  &lt;span class="nb"&gt;map&lt;/span&gt;  &lt;span class="nb"&gt;pack&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;C4&amp;#39;&lt;/span&gt; &lt;span class="o"&gt;=&amp;gt;&lt;/span&gt;
+    &lt;span class="sr"&gt;/(\d+)\.(\d+)\.(\d+)\.(\d+)/&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+    &lt;span class="o"&gt;.&lt;/span&gt; &lt;span class="nv"&gt;$_&lt;/span&gt; &lt;span class="o"&gt;=&amp;gt;&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;keys&lt;/span&gt; &lt;span class="nv"&gt;%data&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;span class="c1"&gt;# end sort by &lt;span class="caps"&gt;IP&lt;/span&gt; address&lt;/span&gt;
+
+&lt;span class="k"&gt;foreach&lt;/span&gt; &lt;span class="k"&gt;my&lt;/span&gt; &lt;span class="nv"&gt;$key&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;@keys&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="nb"&gt;printf&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;%-18s %-20s %-18s %-10s\n&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nv"&gt;$data&lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="nv"&gt;$key&lt;/span&gt;&lt;span class="p"&gt;}{&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;ip&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;},&lt;/span&gt; &lt;span class="nv"&gt;$data&lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="nv"&gt;$key&lt;/span&gt;&lt;span class="p"&gt;}{&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;mac&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;},&lt;/span&gt; &lt;span class="nv"&gt;$data&lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="nv"&gt;$key&lt;/span&gt;&lt;span class="p"&gt;}{&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;date&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;},&lt;/span&gt; &lt;span class="nv"&gt;$data&lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="nv"&gt;$key&lt;/span&gt;&lt;span class="p"&gt;}{&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;if&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;});&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;&lt;strong&gt;A solution for&amp;nbsp;Vyatta:&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;I suggested this to Vyatta in a reply to &lt;a href="https://bugzilla.vyatta.com/show_bug.cgi?id=1990"&gt;bug
+1990&lt;/a&gt;. Since they
+already use &lt;a href="http://rsyslog.com/"&gt;rsyslog&lt;/a&gt; which has very powerful
+processing capabilities, it would be easy to have rsyslog parse the
+&lt;span class="caps"&gt;DHCPACK&lt;/span&gt; messages in real time and update some data store (flat files or
+a simple database) with the information. While how to store this would
+be up to the Vyatta guys, I have some rsyslog configuration to parse
+&lt;span class="caps"&gt;DHCPACK&lt;/span&gt; messages and update a MySQL database (with two tables; one for
+most recent &lt;span class="caps"&gt;ACK&lt;/span&gt; per &lt;span class="caps"&gt;IP&lt;/span&gt; address and one for most recent &lt;span class="caps"&gt;ACK&lt;/span&gt; per &lt;span class="caps"&gt;MAC&lt;/span&gt;
+address) that might be of some&amp;nbsp;use:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;$template DHCPACKonIP, &amp;quot;INSERT INTO dhcplog_ip   
+       SET   
+       server_ip=inet_aton(&amp;#39;%fromhost-ip%&amp;#39;),   
+       msg_type=&amp;#39;DHCPACK&amp;#39;,   
+       date=&amp;#39;%timereported:::date-mysql%&amp;#39;,   
+       mac_addr=&amp;#39;%msg:R,ERE,2,BLANK:DHCPACK on ([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}) to (([0-9a-f]{2}:){5}[0-9a-f]{2})( \(([^)]+)\))? via (([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3})|eth0)--end%&amp;#39;,   
+       client_ip=inet_aton(&amp;#39;%msg:R,ERE,1,BLANK:DHCPACK on ([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}) to (([0-9a-f]{2}:){5}[0-9a-f]{2})( \(([^)]+)\))? via (([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3})|eth0)--end%&amp;#39;),   
+       gateway=&amp;#39;%msg:R,ERE,6,BLANK:DHCPACK on ([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}) to (([0-9a-f]{2}:){5}[0-9a-f]{2})( \(([^)]+)\))? via (([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3})|eth0)--end%&amp;#39;,   
+       fullmsg=&amp;#39;%msg%&amp;#39;   
+       ON DUPLICATE KEY UPDATE   
+       server_ip=inet_aton(&amp;#39;%fromhost-ip%&amp;#39;),   
+       date=&amp;#39;%timereported:::date-mysql%&amp;#39;,   
+       mac_addr=&amp;#39;%msg:R,ERE,2,BLANK:DHCPACK on ([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}) to (([0-9a-f]{2}:){5}[0-9a-f]{2})( \(([^)]+)\))? via (([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3})|eth0)--end%&amp;#39;,   
+       gateway=&amp;#39;%msg:R,ERE,6,BLANK:DHCPACK on ([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}) to (([0-9a-f]{2}:){5}[0-9a-f]{2})( \(([^)]+)\))? via (([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3})|eth0)--end%&amp;#39;,   
+       fullmsg=&amp;#39;%msg%&amp;#39;  
+&amp;quot;,SQL
+
+$template DHCPACKonMAC, &amp;quot;INSERT INTO dhcplog_mac   
+       SET   
+       server_ip=inet_aton(&amp;#39;%fromhost-ip%&amp;#39;),   
+       msg_type=&amp;#39;DHCPACK&amp;#39;,   
+       date=&amp;#39;%timereported:::date-mysql%&amp;#39;,   
+       mac_addr=&amp;#39;%msg:R,ERE,2,BLANK:DHCPACK on ([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}) to (([0-9a-f]{2}:){5}[0-9a-f]{2})( \(([^)]+)\))? via (([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3})|eth0)--end%&amp;#39;,   
+       client_ip=inet_aton(&amp;#39;%msg:R,ERE,1,BLANK:DHCPACK on ([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}) to (([0-9a-f]{2}:){5}[0-9a-f]{2})( \(([^)]+)\))? via (([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3})|eth0)--end%&amp;#39;),   
+       gateway=&amp;#39;%msg:R,ERE,6,BLANK:DHCPACK on ([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}) to (([0-9a-f]{2}:){5}[0-9a-f]{2})( \(([^)]+)\))? via (([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3})|eth0)--end%&amp;#39;,   
+       fullmsg=&amp;#39;%msg%&amp;#39;   
+       ON DUPLICATE KEY UPDATE   
+       server_ip=inet_aton(&amp;#39;%fromhost-ip%&amp;#39;),   
+       date=&amp;#39;%timereported:::date-mysql%&amp;#39;,   
+       client_ip=inet_aton(&amp;#39;%msg:R,ERE,1,BLANK:DHCPACK on ([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}) to (([0-9a-f]{2}:){5}[0-9a-f]{2})( \(([^)]+)\))? via (([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3})|eth0)--end%&amp;#39;),   
+       gateway=&amp;#39;%msg:R,ERE,6,BLANK:DHCPACK on ([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}) to (([0-9a-f]{2}:){5}[0-9a-f]{2})( \(([^)]+)\))? via (([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3})|eth0)--end%&amp;#39;,   
+       fullmsg=&amp;#39;%msg%&amp;#39;  
+&amp;quot;,SQL
+
+$template DHCPACKtoIP, &amp;quot;INSERT INTO dhcplog_ip   
+       SET   
+       server_ip=inet_aton(&amp;#39;%fromhost-ip%&amp;#39;),   
+       msg_type=&amp;#39;DHCPACK&amp;#39;,   
+       date=&amp;#39;%timereported:::date-mysql%&amp;#39;,   
+       mac_addr=&amp;#39;%msg:R,ERE,2,BLANK:DHCPACK to ([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}) \((([0-9a-f]{2}:){5}[0-9a-f]{2})\) via (([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3})|eth0)--end%&amp;#39;,   
+       client_ip=inet_aton(&amp;#39;%msg:R,ERE,1,BLANK:DHCPACK to ([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}) \((([0-9a-f]{2}:){5}[0-9a-f]{2})\) via (([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3})|eth0)--end%&amp;#39;),   
+       gateway=&amp;#39;%msg:R,ERE,4,BLANK:DHCPACK to ([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}) \((([0-9a-f]{2}:){5}[0-9a-f]{2})\) via (([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3})|eth0)--end%&amp;#39;,   
+       fullmsg=&amp;#39;%msg%&amp;#39;   
+       ON DUPLICATE KEY UPDATE   
+       server_ip=inet_aton(&amp;#39;%fromhost-ip%&amp;#39;),   
+       date=&amp;#39;%timereported:::date-mysql%&amp;#39;,   
+       mac_addr=&amp;#39;%msg:R,ERE,2,BLANK:DHCPACK to ([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}) \((([0-9a-f]{2}:){5}[0-9a-f]{2})\) via (([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3})|eth0)--end%&amp;#39;,   
+       gateway=&amp;#39;%msg:R,ERE,4,BLANK:DHCPACK to ([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}) \((([0-9a-f]{2}:){5}[0-9a-f]{2})\) via (([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3})|eth0)--end%&amp;#39;,   
+       fullmsg=&amp;#39;%msg%&amp;#39;  
+&amp;quot;,SQL
+
+$template DHCPACKtoMAC, &amp;quot;INSERT INTO dhcplog_mac   
+       SET   
+       server_ip=inet_aton(&amp;#39;%fromhost-ip%&amp;#39;),   
+       msg_type=&amp;#39;DHCPACK&amp;#39;,   
+       date=&amp;#39;%timereported:::date-mysql%&amp;#39;,   
+       mac_addr=&amp;#39;%msg:R,ERE,2,BLANK:DHCPACK to ([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}) \((([0-9a-f]{2}:){5}[0-9a-f]{2})\) via (([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3})|eth0)--end%&amp;#39;,   
+       client_ip=inet_aton(&amp;#39;%msg:R,ERE,1,BLANK:DHCPACK to ([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}) \((([0-9a-f]{2}:){5}[0-9a-f]{2})\) via (([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3})|eth0)--end%&amp;#39;),   
+       gateway=&amp;#39;%msg:R,ERE,4,BLANK:DHCPACK to ([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}) \((([0-9a-f]{2}:){5}[0-9a-f]{2})\) via (([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3})|eth0)--end%&amp;#39;,   
+       fullmsg=&amp;#39;%msg%&amp;#39;   
+       ON DUPLICATE KEY UPDATE   
+       server_ip=inet_aton(&amp;#39;%fromhost-ip%&amp;#39;),   
+       date=&amp;#39;%timereported:::date-mysql%&amp;#39;,   
+       client_ip=inet_aton(&amp;#39;%msg:R,ERE,1,BLANK:DHCPACK to ([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}) \((([0-9a-f]{2}:){5}[0-9a-f]{2})\) via (([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3})|eth0)--end%&amp;#39;),   
+       gateway=&amp;#39;%msg:R,ERE,4,BLANK:DHCPACK to ([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}) \((([0-9a-f]{2}:){5}[0-9a-f]{2})\) via (([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3})|eth0)--end%&amp;#39;,   
+       fullmsg=&amp;#39;%msg%&amp;#39;  
+&amp;quot;,SQL
+
+:msg, startswith, &amp;quot; DHCPACK on&amp;quot; :ommysql:hostname,database,dbuser,dbpass;DHCPACKonIP
+&lt;span class="amp"&gt;&amp;amp;&lt;/span&gt; :ommysql:hostname,database,dbuser,dbpass;DHCPACKonMAC
+&lt;span class="amp"&gt;&amp;amp;&lt;/span&gt; ~ ### &lt;span class="caps"&gt;DISCARD&lt;/span&gt;
+
+if $msg startswith &amp;#39; &lt;span class="caps"&gt;DHCPACK&lt;/span&gt; to&amp;#39; and ( not ( $msg contains &amp;#39;no client hardware address&amp;#39; ) )   
+then :ommysql:hostname,database,dbuser,dbpass;DHCPACKtoMAC
+&lt;span class="amp"&gt;&amp;amp;&lt;/span&gt; :ommysql:hostname,database,dbuser,dbpass;DHCPACKtoIP
+&lt;span class="amp"&gt;&amp;amp;&lt;/span&gt; ~ ### &lt;span class="caps"&gt;DISCARD&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Sat, 24 Dec 2011 14:42:00 -0500</pubDate><guid>tag:newblog.jasonantman.com,2011-12-24:2011/12/vyatta-showing-isc-dhcpd-fixed-address-leases/</guid><category>dhcpd</category><category>rsyslog</category><category>vyatta</category></item><item><title>Linux Memory Usage and Disk Caching</title><link>http://newblog.jasonantman.com/2011/08/linux-memory-usage-and-disk-caching/</link><description>&lt;p&gt;I recently added some &lt;a href="http://www.cacti.net"&gt;Cacti&lt;/a&gt;-based graphing to a
+number of Linux-based servers prior to rolling out a new service. When I
+was looking over the performance graphs of the initial testing, I
+noticed that memory usage on our &lt;a href="http://www.rsyslog.com"&gt;rsyslog&lt;/a&gt;
+server was near 98%. Looking at &lt;code&gt;top(1)&lt;/code&gt;, I saw numbers that agreed,
+though processor usage was around 99% idle, and no process appeared to
+be using more than 1% of memory. It took me a minute or two to open my
+eyes and see past the panic of memory usage, and finally look at the
+complete output from &lt;code&gt;free(1)&lt;/code&gt;:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;             total       used       free     shared    buffers     cached
+Mem:       8171508    8032632     138876          0     162084    7253716
+-/+ buffers/cache:     616832    7554676
+Swap:      4192956        152    4192804
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;The pertinent part is the last column: &amp;#8220;cached&amp;#8221;. It slipped my mind that
+while rsyslog is writing vast amounts of data to disk, which may or may
+not ever be read back, the kernel is using free memory to cache as much
+of that as it reliably can. Hence the difference between what the kernel
+and userland tools call &amp;#8220;free&amp;#8221;, and what most human beings (or at least
+sysadmins) would consider &amp;#8220;free&amp;#8221; - or, more correctly, &amp;#8220;available for&amp;nbsp;use&amp;#8221;.&lt;/p&gt;
+&lt;p&gt;When I get a chance, maybe I&amp;#8217;ll submit patches to the Cacti Memory Usage
+Percent (&lt;span class="caps"&gt;SNMP&lt;/span&gt;) template to either graph cache separately, or remove it
+from the&amp;nbsp;total.&lt;/p&gt;
+&lt;p&gt;Interestingly, I also found a somewhat cute page entitled &amp;#8220;Help! Linux
+ate my &lt;span class="caps"&gt;RAM&lt;/span&gt;!&amp;#8221; at
+&lt;a href="http://www.linuxatemyram.com/"&gt;http://www.linuxatemyram.com/&lt;/a&gt;.&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Tue, 23 Aug 2011 08:17:00 -0400</pubDate><guid>tag:newblog.jasonantman.com,2011-08-23:2011/08/linux-memory-usage-and-disk-caching/</guid><category>linux</category><category>memory</category><category>rsyslog</category><category>syslog</category></item><item><title>Project Announcement - PHPsa</title><link>http://newblog.jasonantman.com/2009/09/project-announcement-phpsa/</link><description>&lt;p&gt;So, here&amp;#8217;s the &amp;#8220;official&amp;#8221; scoop on the new project that I&amp;#8217;m
+planning/starting to work on. I&amp;#8217;m calling it PHPsa for now, and it&amp;#8217;s
+going to (hopefully) be an integrated dashboard/portal for SysAdmins.
+While there are a number of tools that fit into this general category
+(perhaps with &lt;a href="http://www.alienvault.com/home.php?section=News"&gt;&lt;span class="caps"&gt;OSSIM&lt;/span&gt;&lt;/a&gt;
+being the closest, though it&amp;#8217;s security-minded), I feel that there&amp;#8217;s a
+real gap in terms of tool integration. My daily workflow, which includes
+multiple trips to and correlation among Nagios, Cacti, &lt;span class="caps"&gt;DNS&lt;/span&gt;, &lt;span class="caps"&gt;DHCP&lt;/span&gt;,
+Puppet, logs, and other tools really leaves something to be desired. So,
+I&amp;#8217;m setting out to create a modular SysAdmin dashboard that unifies many
+of the common SysAdmin-related tools into a modular&amp;nbsp;dashboard.&lt;/p&gt;
+&lt;p&gt;The first overall design goals that I&amp;#8217;ve set&amp;nbsp;are:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;A modular, plugin-based architecture that allows admins to select
+    which features/tools they want, and allows easy development of new&amp;nbsp;modules.&lt;/li&gt;
+&lt;li&gt;Design with legacy tools in mind - easy ways to tie in to tools that
+    weren&amp;#8217;t written with PHPsa in mind, both in terms of linking to
+    information and gathering/unifying&amp;nbsp;information.&lt;/li&gt;
+&lt;li&gt;&lt;span class="caps"&gt;RBAC&lt;/span&gt;, including per-module rules and the possibility for a limited
+    read-only view (client/user&amp;nbsp;mode).&lt;/li&gt;
+&lt;li&gt;Use of data sources, specifically web-based/&lt;span class="caps"&gt;REST&lt;/span&gt; APIs where
+    available, and databases otherwise, from existing tools with as
+    little modification as&amp;nbsp;possible.&lt;/li&gt;
+&lt;li&gt;Support for database abstraction, though I&amp;#8217;ll be using&amp;nbsp;MySQL.&lt;/li&gt;
+&lt;li&gt;Eventually, implement &lt;span class="caps"&gt;RSS&lt;/span&gt; feeds of pertinent&amp;nbsp;information.&lt;/li&gt;
+&lt;li&gt;Balance Ajax/&lt;span class="caps"&gt;DHTML&lt;/span&gt; with the desire for important things to have
+    canonical, static, bookmark-able&amp;nbsp;URLs.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;So, here are some of the things that I&amp;#8217;m planning on integrating, with
+obvious bias towards getting my own projects done before I integrate
+pre-existing&amp;nbsp;tools:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href="http://multibindadmin.jasonantman.com"&gt;MultiBindAdmin&lt;/a&gt;, my &lt;span class="caps"&gt;DNS&lt;/span&gt; and
+    &lt;span class="caps"&gt;DHCP&lt;/span&gt; administration tool (specifically geared towards split-view &lt;span class="caps"&gt;DNS&lt;/span&gt;
+    with the inside view behind&amp;nbsp;&lt;span class="caps"&gt;NAT&lt;/span&gt;).&lt;/li&gt;
+&lt;li&gt;&lt;a href="http://rackman.jasonantman.com/"&gt;RackMan&lt;/a&gt;, my tool for mapping
+    devices&amp;#8217; physical locations in racks (and tacking&amp;nbsp;patching).&lt;/li&gt;
+&lt;li&gt;My simple config tool for
+    &lt;a href="http://www.puppetlabs.com"&gt;Puppet&lt;/a&gt;.&lt;/li&gt;
+&lt;li&gt;&lt;a href="http://nagios.org/"&gt;Nagios&lt;/a&gt;.&lt;/li&gt;
+&lt;li&gt;&lt;a href="http://www.cacti.net/"&gt;Cacti&lt;/a&gt;.&lt;/li&gt;
+&lt;li&gt;Nathan Hubbard&amp;#8217;s &lt;a href="http://www.machdb.org/"&gt;MachDB&lt;/a&gt;.&lt;/li&gt;
+&lt;li&gt;&lt;a href="http://www.bacula.org/en/"&gt;Bacula&lt;/a&gt; (monitoring/status&amp;nbsp;only).&lt;/li&gt;
+&lt;li&gt;Syslog via &lt;a href="http://www.rsyslog.com/"&gt;rsyslog&lt;/a&gt; (or any other
+    syslog-to-&lt;span class="caps"&gt;SQL&lt;/span&gt;&amp;nbsp;solution).&lt;/li&gt;
+&lt;li&gt;Possibly a front-end to &lt;a href="http://www.google.com/analytics/"&gt;Google
+    Analytics&lt;/a&gt;.&lt;/li&gt;
+&lt;li&gt;Some of my custom scripts for graphing SpamAssassin, &lt;span class="caps"&gt;DNS&lt;/span&gt; queries,&amp;nbsp;etc.&lt;/li&gt;
+&lt;li&gt;Some sort of Apache log analysis, like
+    &lt;a href="http://www.mrunix.net/webalizer/"&gt;Webalizer&lt;/a&gt;.&lt;/li&gt;
+&lt;li&gt;Mail log analysis, possibly
+    &lt;a href="http://awstats.sourceforge.net/"&gt;AWstats&lt;/a&gt;.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;So, the first big issues that I&amp;#8217;m going to&amp;nbsp;tackle:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;General layout. Specifically, how to handle a more-or-less
+    consistent layout while integrating tools that weren&amp;#8217;t designed for
+    PHPsa. I&amp;#8217;ll probably end up using iFrames (or even a frameset) for
+    tools that don&amp;#8217;t integrate&amp;nbsp;well.&lt;/li&gt;
+&lt;li&gt;How to correlate data/objects between different tools (i.e. how to
+    display information from Nagios, Cacti, MultiBindAdmin and MachDB
+    for a given&amp;nbsp;host?).&lt;/li&gt;
+&lt;li&gt;Do I want to use a templating engine like
+    &lt;a href="http://www.smarty.net/"&gt;Smarty&lt;/a&gt; or hand-code all of the&amp;nbsp;&lt;span class="caps"&gt;HTML&lt;/span&gt;?&lt;/li&gt;
+&lt;li&gt;How will I handle&amp;nbsp;plugins?&lt;/li&gt;
+&lt;li&gt;How much code do I want to re-write and how much can I use as-is
+    from other tools? And, on a related note, how much existing data can
+    I access easily from other tools, vs having to use grabber scripts
+    that dump data in&amp;nbsp;MySQL?&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&lt;strong&gt;Update 2010-02-03&lt;/strong&gt;: I think this may become a semi-official project
+for me at $work, which means that I&amp;#8217;ll be able to dedicate quite a bit
+more time to it. Unfortunately, it also means that I will, most likely,
+have to give up Nathan Hubbard&amp;#8217;s &lt;a href="http://www.machdb.org/"&gt;MachDB&lt;/a&gt; in
+favor of &lt;a href="http://www.ocsinventory-ng.org/"&gt;&lt;span class="caps"&gt;OCS&lt;/span&gt; Inventory &lt;span class="caps"&gt;NG&lt;/span&gt;&lt;/a&gt;, a more
+mature project that already includes inventory support for Linux,
+Windows and&amp;nbsp;Mac.&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Tue, 29 Sep 2009 15:36:00 -0400</pubDate><guid>tag:newblog.jasonantman.com,2009-09-29:2009/09/project-announcement-phpsa/</guid><category>bind</category><category>cacti</category><category>dns</category><category>Nagios</category><category>PHPsa</category><category>Projects</category><category>puppet</category><category>rsyslog</category><category>sysadmin</category><category>syslog</category></item><item><title>rsyslog on CentOS5</title><link>http://newblog.jasonantman.com/2009/09/rsyslog-on-centos5/</link><description>&lt;p&gt;&lt;strong&gt;Update July 2011&lt;/strong&gt; - We&amp;#8217;ve been using rsyslog for our centralized
+syslog infrastructure at &lt;a href="http://services.rutgers.edu/"&gt;work&lt;/a&gt; (site
+being redesigned at the moment) for about a year now. As a result, our
+colleagues at &lt;a href="http://oss.rutgers.edu"&gt;Rutgers University Open System
+Solutions&lt;/a&gt; have been nice enough to include
+rsyslog in their &lt;a href="http://koji.rutgers.edu"&gt;koji&lt;/a&gt; build system. Updated
+packages of rsyslog for CentOS 5 x86 and x86_64 are available
+&lt;a href="http://koji.rutgers.edu/koji/buildinfo?buildID=2140"&gt;here&lt;/a&gt;. Please be
+aware that they have some dependencies of specific &lt;span class="caps"&gt;RU&lt;/span&gt; versions. It&amp;#8217;s
+probably best if you download the source &lt;span class="caps"&gt;RPM&lt;/span&gt; and build it yourself using
+rpmbuild. The current &lt;a href="http://koji.rutgers.edu/koji/rpminfo?rpmID=14051"&gt;5.6.2 source
+package&lt;/a&gt; includes a
+CentOS 5 spec file and other related scripts. This &lt;span class="caps"&gt;RPM&lt;/span&gt; repository is
+only open to the public as a courtesy, so please download once at most
+and distribute it to your servers&amp;nbsp;yourself.&lt;/p&gt;
+&lt;p&gt;Having finally setup my storage server (I know it&amp;#8217;s not much, but for me
+starting with &lt;span class="caps"&gt;1TB&lt;/span&gt; is wonderful), I actually got around to redoing my
+centralized logging infrastructure. Here&amp;#8217;s a small summary of what I
+have to&amp;nbsp;handle:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;logs from 15 hosts at 2 locations, including Cisco devices and a mix
+    of syslog and syslog-ng Linux&amp;nbsp;boxen.&lt;/li&gt;
+&lt;li&gt;Remote location logs forwarded to one server at remote location,
+    then to centralized log server via &lt;span class="caps"&gt;SSH&lt;/span&gt; port&amp;nbsp;forwarding.&lt;/li&gt;
+&lt;li&gt;48-hour retention of full iptables border firewall logs (\~&amp;nbsp;&lt;span class="caps"&gt;3GB&lt;/span&gt;/day).&lt;/li&gt;
+&lt;li&gt;Future plans to have all logs stored in&amp;nbsp;MySQL.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;I&amp;#8217;d previously had most of the boxes logging to an older host with low
+disk space, but had to discontinue this due to lack of storage. Having
+assessed the options, and with definite plans to log to a database, I
+decided to go with &lt;a href="http://www.rsyslog.com"&gt;rsyslog&lt;/a&gt; for the centralized&amp;nbsp;host.&lt;/p&gt;
+&lt;p&gt;Unfortunately, stable rsyslog is up to 4.4.x, with 5.x in development,
+and the newest package I could find for CentOS was 2.something. So, I
+set about building it from source. It was a *very* difficult build on
+my machine (CentOS 5.3, 2.6.18-128.el5 #1 &lt;span class="caps"&gt;SMP&lt;/span&gt; i686). Unfortunately, I
+don&amp;#8217;t have an &lt;span class="caps"&gt;RPM&lt;/span&gt; build environment setup, but here&amp;#8217;s how I accomplished&amp;nbsp;it:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;If not already done, &lt;code&gt;yum install rpmforge-release&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;yum install gnutls-devel gnutls libatomic\_ops-devel gcc43 java-1.6.0-openjdk-devel&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;Download
+    &lt;a href="http://rsyslog.com/Downloads-index-req-viewdownload-cid-1-orderby-dateD.phtml"&gt;rsyslog-4.5.2&lt;/a&gt;
+    (currently Beta). Extract, &lt;code&gt;cd&lt;/code&gt; into the&amp;nbsp;directory.&lt;/li&gt;
+&lt;li&gt;To test the performance difference from MySQL,
+    &lt;code&gt;yum install php-pgsql postgresql postgresql-devel postgresql-libs postgresql-server&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;Edit the &lt;code&gt;configure&lt;/code&gt; script, add &lt;code&gt;-DHAVE\_ATOMIC\_BUILTINS&lt;/code&gt;
+    to the &lt;code&gt;DEFS&lt;/code&gt; line (28936 in this&amp;nbsp;version).&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;export CC=/usr/bin/gcc43&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;export CCDEPMODE="depmode=gcc4"&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;export CFLAGS="-O3 -march=i686"&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;./configure --enable-mysql --enable-omtemplate --enable-gnutls --enable-pgsql&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;make &amp;amp;&amp;amp; make install&lt;/code&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;For my system, I used the &lt;code&gt;/etc/sysconfig/rsyslog&lt;/code&gt; and &lt;code&gt;/etc/init.d/rsyslog&lt;/code&gt;
+from the 2.x rsyslog RPMs, with some modifications as&amp;nbsp;follows:&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;/etc/sysconfig/rsyslog&lt;/code&gt; &lt;em&gt;(comments have been removed to save space)&lt;/em&gt;:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;# -c4   version 4 compatibility mode
+# -x     disable DNS for remote messages (don&amp;#39;t want it to hang if DNS is down
+# -4     IPv4 only
+SYSLOGD_OPTIONS=&amp;quot;-c4 -x -4&amp;quot;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;&lt;code&gt;/etc/init.d/rsyslog&lt;/code&gt; &lt;em&gt;(comments have been removed to save space)&lt;/em&gt;:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="c"&gt;#!/bin/bash&lt;/span&gt;
+&lt;span class="c"&gt;#&lt;/span&gt;
+&lt;span class="c"&gt;# rsyslog        Starts rsyslogd.&lt;/span&gt;
+&lt;span class="c"&gt;#&lt;/span&gt;
+&lt;span class="c"&gt;#&lt;/span&gt;
+&lt;span class="c"&gt;# chkconfig: - 12 88&lt;/span&gt;
+&lt;span class="c"&gt;# description: Syslog is the facility by which many daemons use to log   &lt;/span&gt;
+&lt;span class="c"&gt;# messages to various system log files.  It is a good idea to always   &lt;/span&gt;
+&lt;span class="c"&gt;# run rsyslog.&lt;/span&gt;
+&lt;span class="c"&gt;### &lt;span class="caps"&gt;BEGIN&lt;/span&gt; &lt;span class="caps"&gt;INIT&lt;/span&gt; &lt;span class="caps"&gt;INFO&lt;/span&gt;&lt;/span&gt;
+&lt;span class="c"&gt;# Provides: $syslog&lt;/span&gt;
+&lt;span class="c"&gt;# Required-Start: $local_fs $network $remote_fs&lt;/span&gt;
+&lt;span class="c"&gt;# Required-Stop: $local_fs $network $remote_fs&lt;/span&gt;
+&lt;span class="c"&gt;# Default-Stop: 0 1 2 3 4 5 6&lt;/span&gt;
+&lt;span class="c"&gt;# Short-Description: Enhanced system logging and kernel message trapping daemons&lt;/span&gt;
+&lt;span class="c"&gt;# Description: Rsyslog is an enhanced multi-threaded syslogd supporting,&lt;/span&gt;
+&lt;span class="c"&gt;#              among others, MySQL, syslog/tcp, &lt;span class="caps"&gt;RFC&lt;/span&gt; 3195, permitted&lt;/span&gt;
+&lt;span class="c"&gt;#              sender lists, filtering on any message part, and fine&lt;/span&gt;
+&lt;span class="c"&gt;#              grain output format control.&lt;/span&gt;
+&lt;span class="c"&gt;### &lt;span class="caps"&gt;END&lt;/span&gt; &lt;span class="caps"&gt;INIT&lt;/span&gt; &lt;span class="caps"&gt;INFO&lt;/span&gt;&lt;/span&gt;
+
+&lt;span class="c"&gt;# Source function library.&lt;/span&gt;
+. /etc/init.d/functions
+
+&lt;span class="nv"&gt;&lt;span class="caps"&gt;RETVAL&lt;/span&gt;&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;0
+
+start&lt;span class="o"&gt;()&lt;/span&gt; &lt;span class="o"&gt;{&lt;/span&gt;
+        &lt;span class="o"&gt;[&lt;/span&gt; -x /sbin/rsyslogd &lt;span class="o"&gt;]&lt;/span&gt; &lt;span class="o"&gt;||&lt;/span&gt; &lt;span class="nb"&gt;exit &lt;/span&gt;5
+
+        &lt;span class="c"&gt;# Do not start rsyslog when sysklogd is running&lt;/span&gt;
+        &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="o"&gt;[&lt;/span&gt; -e /var/run/syslogd.pid &lt;span class="o"&gt;]&lt;/span&gt; ; &lt;span class="k"&gt;then&lt;/span&gt;
+&lt;span class="k"&gt;                &lt;/span&gt;&lt;span class="nb"&gt;echo&lt;/span&gt; &lt;span class="s2"&gt;$&amp;quot;Shut down sysklogd before you run rsyslog&amp;quot;&lt;/span&gt;;
+                &lt;span class="nb"&gt;exit &lt;/span&gt;1;
+        &lt;span class="k"&gt;fi&lt;/span&gt;
+
+        &lt;span class="c"&gt;# Source config&lt;/span&gt;
+        &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="o"&gt;[&lt;/span&gt; -f /etc/sysconfig/rsyslog &lt;span class="o"&gt;]&lt;/span&gt; ; &lt;span class="k"&gt;then&lt;/span&gt;
+                . /etc/sysconfig/rsyslog
+        &lt;span class="k"&gt;else&lt;/span&gt;
+&lt;span class="k"&gt;                &lt;/span&gt;&lt;span class="nv"&gt;SYSLOGD_OPTIONS&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;-m 0&amp;quot;&lt;/span&gt;
+        &lt;span class="k"&gt;fi&lt;/span&gt;
+
+&lt;span class="k"&gt;        if&lt;/span&gt; &lt;span class="o"&gt;[&lt;/span&gt; -z &lt;span class="s2"&gt;&amp;quot;$SYSLOG_UMASK&amp;quot;&lt;/span&gt; &lt;span class="o"&gt;]&lt;/span&gt; ; &lt;span class="k"&gt;then&lt;/span&gt;
+&lt;span class="k"&gt;              &lt;/span&gt;&lt;span class="nv"&gt;SYSLOG_UMASK&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;077;
+        &lt;span class="k"&gt;fi&lt;/span&gt;
+&lt;span class="k"&gt;        &lt;/span&gt;&lt;span class="nb"&gt;umask&lt;/span&gt; &lt;span class="nv"&gt;$SYSLOG_UMASK&lt;/span&gt;
+
+        &lt;span class="nb"&gt;echo&lt;/span&gt; -n &lt;span class="s2"&gt;$&amp;quot;Starting system logger: &amp;quot;&lt;/span&gt;
+        daemon rsyslogd &lt;span class="nv"&gt;$SYSLOGD_OPTIONS&lt;/span&gt;
+        &lt;span class="nv"&gt;&lt;span class="caps"&gt;RETVAL&lt;/span&gt;&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nv"&gt;$?&lt;/span&gt;
+        &lt;span class="nb"&gt;echo&lt;/span&gt;
+        &lt;span class="o"&gt;[&lt;/span&gt; &lt;span class="nv"&gt;$&lt;span class="caps"&gt;RETVAL&lt;/span&gt;&lt;/span&gt; -eq 0 &lt;span class="o"&gt;]&lt;/span&gt; &lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt; touch /var/lock/subsys/rsyslog
+        &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="nv"&gt;$&lt;span class="caps"&gt;RETVAL&lt;/span&gt;&lt;/span&gt;
+&lt;span class="o"&gt;}&lt;/span&gt;
+stop&lt;span class="o"&gt;()&lt;/span&gt; &lt;span class="o"&gt;{&lt;/span&gt;
+        &lt;span class="nb"&gt;echo&lt;/span&gt; -n &lt;span class="s2"&gt;$&amp;quot;Shutting down system logger: &amp;quot;&lt;/span&gt;
+        killproc rsyslogd
+        &lt;span class="nv"&gt;&lt;span class="caps"&gt;RETVAL&lt;/span&gt;&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nv"&gt;$?&lt;/span&gt;
+        &lt;span class="nb"&gt;echo&lt;/span&gt;
+        &lt;span class="o"&gt;[&lt;/span&gt; &lt;span class="nv"&gt;$&lt;span class="caps"&gt;RETVAL&lt;/span&gt;&lt;/span&gt; -eq 0 &lt;span class="o"&gt;]&lt;/span&gt; &lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt; rm -f /var/lock/subsys/rsyslog
+        &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="nv"&gt;$&lt;span class="caps"&gt;RETVAL&lt;/span&gt;&lt;/span&gt;
+&lt;span class="o"&gt;}&lt;/span&gt;
+reload&lt;span class="o"&gt;()&lt;/span&gt;  &lt;span class="o"&gt;{&lt;/span&gt;
+    &lt;span class="nv"&gt;&lt;span class="caps"&gt;RETVAL&lt;/span&gt;&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;1
+    &lt;span class="nv"&gt;syslog&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="sb"&gt;`&lt;/span&gt;cat /var/run/rsyslogd.pid 2&amp;gt;/dev/null&lt;span class="sb"&gt;`&lt;/span&gt;
+    &lt;span class="nb"&gt;echo&lt;/span&gt; -n &lt;span class="s2"&gt;&amp;quot;Reloading system logger...&amp;quot;&lt;/span&gt;
+    &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="o"&gt;[&lt;/span&gt; -n &lt;span class="s2"&gt;&amp;quot;${syslog}&amp;quot;&lt;/span&gt; &lt;span class="o"&gt;]&lt;/span&gt; &lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class="o"&gt;[&lt;/span&gt; -e /proc/&lt;span class="s2"&gt;&amp;quot;${syslog}&amp;quot;&lt;/span&gt; &lt;span class="o"&gt;]&lt;/span&gt;; &lt;span class="k"&gt;then&lt;/span&gt;
+&lt;span class="k"&gt;        &lt;/span&gt;&lt;span class="nb"&gt;kill&lt;/span&gt; -&lt;span class="caps"&gt;HUP&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;$syslog&amp;quot;&lt;/span&gt;;
+        &lt;span class="nv"&gt;&lt;span class="caps"&gt;RETVAL&lt;/span&gt;&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nv"&gt;$?&lt;/span&gt;
+    &lt;span class="k"&gt;fi&lt;/span&gt;
+&lt;span class="k"&gt;    if&lt;/span&gt; &lt;span class="o"&gt;[&lt;/span&gt; &lt;span class="nv"&gt;$&lt;span class="caps"&gt;RETVAL&lt;/span&gt;&lt;/span&gt; -ne 0 &lt;span class="o"&gt;]&lt;/span&gt;; &lt;span class="k"&gt;then&lt;/span&gt;
+&lt;span class="k"&gt;        &lt;/span&gt;failure
+    &lt;span class="k"&gt;else&lt;/span&gt;
+&lt;span class="k"&gt;        &lt;/span&gt;success
+    &lt;span class="k"&gt;fi&lt;/span&gt;
+&lt;span class="k"&gt;    &lt;/span&gt;&lt;span class="nb"&gt;echo&lt;/span&gt;
+&lt;span class="nb"&gt;    &lt;/span&gt;&lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="nv"&gt;$&lt;span class="caps"&gt;RETVAL&lt;/span&gt;&lt;/span&gt;
+&lt;span class="o"&gt;}&lt;/span&gt;
+rhstatus&lt;span class="o"&gt;()&lt;/span&gt; &lt;span class="o"&gt;{&lt;/span&gt;
+        status rsyslogd
+&lt;span class="o"&gt;}&lt;/span&gt;
+restart&lt;span class="o"&gt;()&lt;/span&gt; &lt;span class="o"&gt;{&lt;/span&gt;
+        stop
+        start
+&lt;span class="o"&gt;}&lt;/span&gt;
+
+&lt;span class="k"&gt;case&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;$1&amp;quot;&lt;/span&gt; in
+  start&lt;span class="o"&gt;)&lt;/span&gt;
+        start
+        ;;
+  stop&lt;span class="o"&gt;)&lt;/span&gt;
+        stop
+        ;;
+  restart&lt;span class="o"&gt;)&lt;/span&gt;
+        restart
+        ;;
+  reload|force-reload&lt;span class="o"&gt;)&lt;/span&gt;
+        reload
+        ;;
+  status&lt;span class="o"&gt;)&lt;/span&gt;
+        rhstatus
+        ;;
+  condrestart&lt;span class="o"&gt;)&lt;/span&gt;
+        &lt;span class="o"&gt;[&lt;/span&gt; -f /var/lock/subsys/rsyslog &lt;span class="o"&gt;]&lt;/span&gt; &lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt; restart &lt;span class="o"&gt;||&lt;/span&gt; :
+        ;;
+  *&lt;span class="o"&gt;)&lt;/span&gt;
+        &lt;span class="nb"&gt;echo&lt;/span&gt; &lt;span class="s2"&gt;$&amp;quot;Usage: $0 {start|stop|restart|reload|force-reload|condrestart}&amp;quot;&lt;/span&gt;
+        &lt;span class="nb"&gt;exit &lt;/span&gt;2
+&lt;span class="k"&gt;esac&lt;/span&gt;
+
+&lt;span class="nb"&gt;exit&lt;/span&gt; &lt;span class="nv"&gt;$?&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;&lt;strong&gt;My rsyslog.conf file&lt;/strong&gt;:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;# uncomment next line for debugging, use graphvis to see the graph
+#$GenerateConfigGraph /root/rsyslog-graph.dot
+$ModLoad imklog
+$ModLoad imtcp
+$ModLoad imudp
+$ModLoad imuxsock
+
+# template
+$template RemoteHost,&amp;quot;/var/log/HOSTS/%HOSTNAME%/%$YEAR%/%$MONTH%/%$DAY%/%syslogfacility-text%.log&amp;quot;
+# used for Cisco, vanilla syslog when we can&amp;#39;t parse host name
+$template RemoteFromHost,&amp;quot;/var/log/HOSTS/%FROMHOST%/%$YEAR%/%$MONTH%/%$DAY%/%syslogfacility-text%.log&amp;quot;
+
+# NOTE - we can&amp;#39;t bind UDP to a ruleset, so it enters the local RuleSet
+#   and has to be dealt with here
+
+$RuleSet local
+
+# for cisco, vyatta - doesn&amp;#39;t send hostname, need to use IP manually
+:fromhost, isequal, &amp;quot;192.168.0.99&amp;quot; ?RemoteFromHost
+:fromhost, isequal, &amp;quot;192.168.0.99&amp;quot; ~
+:fromhost, isequal, &amp;quot;192.168.0.103&amp;quot; ?RemoteFromHost
+:fromhost, isequal, &amp;quot;192.168.0.103&amp;quot; ~
+:fromhost, isequal, &amp;quot;192.168.0.97&amp;quot; ?RemoteFromHost
+:fromhost, isequal, &amp;quot;192.168.0.97&amp;quot; ~
+:fromhost, isequal, &amp;quot;192.168.0.111&amp;quot; ?RemoteFromHost
+:fromhost, isequal, &amp;quot;192.168.0.111&amp;quot; ~
+# anything from a remote host gets logged as such
+:source, isequal, &amp;quot;&amp;quot; ?RemoteHost
+:source, isequal, &amp;quot;&amp;quot; ~
+
+#
+# LOCAL LOGGING
+#
+
+kern.*                                                 /var/log/messages
+*.info;mail.none;authpriv.none;cron.none                /var/log/messages
+authpriv.*                                              /var/log/secure
+mail.*                                                  -/var/log/maillog
+cron.*                                                  /var/log/cron
+*.emerg                                                 *
+uucp,news.crit                                          /var/log/spooler
+local7.*                                                /var/log/boot.log
+
+# use the local RuleSet as default
+$DefaultRuleset local
+
+#
+# BEGIN centralized logging stuff added 2009-09-16 by jantman
+#
+
+# define ruleset for remote logging
+$RuleSet remote
+
+*.* ?RemoteHost
+
+# bind ruleset to tcp listener
+$InputTCPServerBindRuleset remote
+# and activate it:
+$InputTCPServerRun 5000
+
+$UDPServerRun 514
+$UDPServerRun 5000
+
+#
+# END remote logging
+#
+&lt;/pre&gt;&lt;/div&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Thu, 17 Sep 2009 15:45:00 -0400</pubDate><guid>tag:newblog.jasonantman.com,2009-09-17:2009/09/rsyslog-on-centos5/</guid><category>centos</category><category>logging</category><category>rsyslog</category><category>syslog</category></item></channel></rss>

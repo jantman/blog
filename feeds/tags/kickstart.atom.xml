@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Jason Antman's Blog</title><link href="http://newblog.jasonantman.com/" rel="alternate"></link><link href="http://newblog.jasonantman.com/feeds/tags/kickstart.atom.xml" rel="self"></link><id>http://newblog.jasonantman.com/</id><updated>2009-05-06T08:42:00-04:00</updated><entry><title>Building a Rebuild-able Site</title><link href="http://newblog.jasonantman.com/2009/05/building-a-rebuild-able-site/" rel="alternate"></link><updated>2009-05-06T08:42:00-04:00</updated><author><name>admin</name></author><id>tag:newblog.jasonantman.com,2009-05-06:2009/05/building-a-rebuild-able-site/</id><summary type="html">&lt;p&gt;At $&lt;span class="caps"&gt;WORK&lt;/span&gt;, my group runs about two dozen servers that provide services
+for over 60,000 users. They&amp;#8217;re a mix of Windows and Linux, with some old
+Solaris stuff thrown in there. The one thing they have in common is
+they&amp;#8217;re all hand-built, hand-configured, and old. They&amp;#8217;ve been around
+for a while. At the moment, we don&amp;#8217;t even have an adequate backup&amp;nbsp;system.&lt;/p&gt;
+&lt;p&gt;So, being the closest thing to a SysAdmin we have (my official title is
+still Student Systems Programmer), it&amp;#8217;s my job to build a new
+installation, configuration and backup infrastructure. We&amp;#8217;ve already
+standardized on &lt;a href="http://www.centos.org"&gt;CentOS&lt;/a&gt; as a University-wide
+distro, and have a local full mirror, so I don&amp;#8217;t need to choose a
+distro. I do, however, have to plan the installation and backup
+architecture. The main requirements&amp;nbsp;are:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Lowest overall time for bare-metal recovery to a working&amp;nbsp;system.&lt;/li&gt;
+&lt;li&gt;Ease of use, as people other than myself will need to administer it
+    (so they should be able to do so from a cheat sheet in the&amp;nbsp;wiki).&lt;/li&gt;
+&lt;li&gt;Repeatability - it should be easy and intuitive to make an
+    almost-exact-copy of a&amp;nbsp;machine.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;I started a thread a few days ago on the &lt;span class="caps"&gt;SAGE&lt;/span&gt; mailing list, which you
+can find
+&lt;a href="http://mailman.sage.org/pipermail/sage-members/2009/msg00447.html"&gt;here&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;At the moment, it looks like the general idea that I&amp;#8217;m going with is to
+use &lt;a href="http://fedoraproject.org/wiki/Anaconda/Kickstart"&gt;Kickstart&lt;/a&gt; to
+install the systems, using a basic and minimal Kickstart file. Basic
+package selection (minimalist) with just what&amp;#8217;s needed to configure the
+system with a hostname and network settings for the management &lt;span class="caps"&gt;VLAN&lt;/span&gt;.
+I&amp;#8217;ll then have Kickstart install and configure a configuration
+management package - I&amp;#8217;m leaning towards
+&lt;a href="http://reductivelabs.com/products/puppet/"&gt;Puppet&lt;/a&gt; over
+&lt;a href="http://www.cfengine.org/"&gt;Cfengine&lt;/a&gt; and am starting testing. The config
+management software will handle all of the customization for the system
+(everything different from the base generic Kickstart install) so it&amp;#8217;s
+all kept under the control of config management from step&amp;nbsp;1.&lt;/p&gt;
+&lt;p&gt;The final part is a backup system, mainly for whatever eventually -
+whether out of human error or simple laziness - ends up out of the
+config management system&amp;#8217;s control. Our previous &lt;span class="caps"&gt;SA&lt;/span&gt; had settled on
+&lt;a href="http://www.zmanda.com/"&gt;Zmanda&lt;/a&gt;, the paid version of
+&lt;a href="http://www.amanda.org/"&gt;Amanda&lt;/a&gt;, which comes with specific plugins for
+MySQL and &lt;span class="caps"&gt;MSSQL&lt;/span&gt;. I&amp;#8217;m also looking at &lt;a href="http://www.bacula.org"&gt;Bacula&lt;/a&gt;,
+mainly because of its&amp;#8217; advanced features, scheduling (especially the new
+scheduling in Bacula 3) and&amp;nbsp;scalability.&lt;/p&gt;
+&lt;p&gt;The beauty that I see in having Kickstart do something minimal and then
+letting Puppet handle the rest is that (especially since we&amp;#8217;ve
+standardized on SunFire X4100&amp;#8217;s with identical configurations) I can
+kickstart and rack up a few spare machines, and to get them up and
+running all I need to do is power them up (iLOM) and tell Puppet what to
+make&amp;nbsp;them.&lt;/p&gt;
+&lt;p&gt;I&amp;#8217;m currently starting testing of both Puppet itself and getting
+Kickstart to start the puppet install and daemon (instructions from
+&lt;a href="http://watzmann.net/blog/index.php?cat=21"&gt;David Lutterkort&amp;#8217;s blog (Red Hat software
+engineer)&lt;/a&gt;). We&amp;#8217;ll see how
+everything&amp;nbsp;goes&amp;#8230;&lt;/p&gt;</summary><category term="backup"></category><category term="configuration"></category><category term="kickstart"></category><category term="linux"></category><category term="puppet"></category><category term="recovery"></category><category term="work"></category></entry></feed>

@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Jason Antman's Blog</title><link>http://newblog.jasonantman.com/</link><description></description><atom:link href="http://newblog.jasonantman.com/feeds/tags/ddns.rss.xml" rel="self"></atom:link><lastBuildDate>Wed, 07 Apr 2010 09:04:00 -0400</lastBuildDate><item><title>BIND9 Dynamic DNS</title><link>http://newblog.jasonantman.com/2010/04/bind9-dynamic-dns/</link><description>&lt;p&gt;I needed a better solution for Dynamic &lt;span class="caps"&gt;DNS&lt;/span&gt; than
+&lt;a href="http://www.dyndns.org"&gt;dyndns.org&lt;/a&gt; for something, so I set about
+setting up &lt;span class="caps"&gt;DDNS&lt;/span&gt; through my &lt;span class="caps"&gt;BIND9&lt;/span&gt; servers. I found a number of very
+helpful blog posts, including &lt;a href="http://linux.yyz.us/nsupdate/"&gt;nsupdate: Painless Dynamic
+&lt;span class="caps"&gt;DNS&lt;/span&gt;&lt;/a&gt;, &lt;a href="http://linux.yyz.us/dns/ddns-server.html"&gt;Painless &lt;span class="caps"&gt;DDNS&lt;/span&gt; part 2: the
+server&lt;/a&gt;, &lt;a href="http://ops.ietf.org/dns/dynupd/secure-ddns-howto.html"&gt;Secure dynamic &lt;span class="caps"&gt;DNS&lt;/span&gt;
+howto&lt;/a&gt; and &lt;a href="http://www.oceanwave.com/technical-resources/unix-admin/nsupdate.html"&gt;A
+&lt;span class="caps"&gt;DDNS&lt;/span&gt; Server Using &lt;span class="caps"&gt;BIND&lt;/span&gt; and
+Nsupdate&lt;/a&gt;.
+Of course, the &lt;a href="http://www.zytrax.com/books/dns/ch7/statements.html"&gt;&lt;span class="caps"&gt;BIND&lt;/span&gt; configuration statement
+reference&lt;/a&gt; was also
+very&amp;nbsp;helpful.&lt;/p&gt;
+&lt;p&gt;The whole process was relatively&amp;nbsp;simple&amp;#8230;&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Add an &lt;span class="caps"&gt;RR&lt;/span&gt; for the host I want, in the appropriate&amp;nbsp;zone.&lt;/li&gt;
+&lt;li&gt;Generate &lt;span class="caps"&gt;TSIG&lt;/span&gt; keys, distribute them to the&amp;nbsp;client.&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Make sure you have logging enabled for things of interest in your
+    &lt;code&gt;logging&lt;/code&gt; section of &lt;code&gt;named.conf&lt;/code&gt;:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;category dnssec { syslog_info; };
+category update { syslog_info; };
+category security { syslog_info; };
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Create a keys.conf file for your keys (you &lt;em&gt;do&lt;/em&gt; split your configs
+    out into usable chunks,&amp;nbsp;right?):&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;key foo.example.com. {
+    algorithm HMAC-MD5.SIG-ALG.REG.INT;
+    secret &amp;quot;this is your secret here (after Key: in the .private file)&amp;quot;;
+};
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;and include it in &lt;code&gt;named.conf&lt;/code&gt; like:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;include &amp;quot;/etc/named.d/keys.conf&amp;quot;;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Set an
+    &lt;a href="http://www.zytrax.com/books/dns/ch7/xfer.html#update-policy"&gt;&lt;code&gt;update-policy&lt;/code&gt;&lt;/a&gt;
+    statement in &lt;code&gt;named.conf&lt;/code&gt;. I just added mine to a specific zone in a
+    specific view (external), as that&amp;#8217;s the only place I would
+    conceivably want updates right&amp;nbsp;now.&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;update-policy {
+    grant * self * A TXT;
+};
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Assuming your &lt;span class="caps"&gt;TSIG&lt;/span&gt; keys are named for specific RRs, this will let
+any client (with a valid key setup on the server) update its own &lt;span class="caps"&gt;RR&lt;/span&gt;
+and nothing&amp;nbsp;else.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Finally, I created a script for ddns updates on the client. Since I
+    want to be able to fire off this script manually or via cron (if I
+    have to reload &lt;span class="caps"&gt;BIND&lt;/span&gt;, and until I make the needed changes to
+    MultiBINDadmin), I bypassed the usual dhclient stuff and manually
+    grab the current &lt;span class="caps"&gt;IP&lt;/span&gt; from the interface of interest. I symlinked this
+    in &lt;code&gt;/etc/dhcp3/dhclient-exit-hooks.d&lt;/code&gt; so it will run on &lt;span class="caps"&gt;DHCP&lt;/span&gt;&amp;nbsp;updates.&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="c"&gt;#!/bin/bash&lt;/span&gt;
+&lt;span class="nv"&gt;&lt;span class="caps"&gt;IFACE&lt;/span&gt;&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;eth0&amp;quot;&lt;/span&gt;
+&lt;span class="nv"&gt;&lt;span class="caps"&gt;TTL&lt;/span&gt;&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;3600
+&lt;span class="nv"&gt;&lt;span class="caps"&gt;SERVER&lt;/span&gt;&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;ns1.example.com
+&lt;span class="nv"&gt;&lt;span class="caps"&gt;HOSTNAME&lt;/span&gt;&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;foo.example.com
+&lt;span class="nv"&gt;&lt;span class="caps"&gt;ZONE&lt;/span&gt;&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;example.com
+&lt;span class="nv"&gt;&lt;span class="caps"&gt;KEYFILE&lt;/span&gt;&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;/root/ddns-keys/Kfoo.example.com.+157+12345.private
+
+&lt;span class="nv"&gt;new_ip_address&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="sb"&gt;`&lt;/span&gt;ifconfig &lt;span class="nv"&gt;$&lt;span class="caps"&gt;IFACE&lt;/span&gt;&lt;/span&gt; | grep &lt;span class="s2"&gt;&amp;quot;inet addr:&amp;quot;&lt;/span&gt; | awk &lt;span class="s1"&gt;&amp;#39;{print $2}&amp;#39;&lt;/span&gt; | awk -F &lt;span class="s2"&gt;&amp;quot;:&amp;quot;&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;{print $2}&amp;#39;&lt;/span&gt;&lt;span class="sb"&gt;`&lt;/span&gt;
+&lt;span class="nv"&gt;new_ip_address&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="k"&gt;${&lt;/span&gt;&lt;span class="nv"&gt;new_ip_address&lt;/span&gt;&lt;span class="p"&gt;/ /&lt;/span&gt;&lt;span class="k"&gt;}&lt;/span&gt;
+
+nsupdate -v -k &lt;span class="nv"&gt;$&lt;span class="caps"&gt;KEYFILE&lt;/span&gt;&lt;/span&gt; &lt;span class="s"&gt;&amp;lt;&amp;lt; &lt;span class="caps"&gt;EOF&lt;/span&gt;&lt;/span&gt;
+&lt;span class="s"&gt;server $&lt;span class="caps"&gt;SERVER&lt;/span&gt;&lt;/span&gt;
+&lt;span class="s"&gt;zone $&lt;span class="caps"&gt;ZONE&lt;/span&gt;&lt;/span&gt;
+&lt;span class="s"&gt;update delete $&lt;span class="caps"&gt;HOSTNAME&lt;/span&gt; A&lt;/span&gt;
+&lt;span class="s"&gt;update add $&lt;span class="caps"&gt;HOSTNAME&lt;/span&gt; $&lt;span class="caps"&gt;TTL&lt;/span&gt; A $new_ip_address&lt;/span&gt;
+&lt;span class="s"&gt;send&lt;/span&gt;
+&lt;span class="s"&gt;&lt;span class="caps"&gt;EOF&lt;/span&gt;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;When I finally got things setup, my only problem was with permissions on
+the zone file directories, which was easily corrected.Once this was
+straightened out, my &lt;code&gt;nsupdate&lt;/code&gt; script ran flawlessly, and the update
+was instantly (thanks to using &amp;#8220;notify&amp;#8221;) propagated out to the slave&amp;nbsp;server.&lt;/p&gt;
+&lt;p&gt;The only problem that I now have is one of my own creation - I use a
+small &lt;span class="caps"&gt;PHP&lt;/span&gt; application that I wrote
+(&lt;a href="http://multibindadmin.jasonantman.com/"&gt;MultiBINDadmin&lt;/a&gt;) to manage
+&lt;span class="caps"&gt;DNS&lt;/span&gt;. It&amp;#8217;s incredibly easy, as it keeps track of internal and external
+IPs, and everything else, for my zones, and triggers a pull on the
+master &lt;span class="caps"&gt;BIND&lt;/span&gt; server via the web interface. The only problem I now have is
+that this messes with &lt;span class="caps"&gt;DDNS&lt;/span&gt; updates. First, if I make changes in the web
+interface and there&amp;#8217;s already been a &lt;span class="caps"&gt;DDNS&lt;/span&gt; update that day, the zone
+serial generated by MultiBINDadmin will match the automatically
+incremented serial generated by the &lt;span class="caps"&gt;BIND&lt;/span&gt; server. Second, and more
+troubling, when the &lt;span class="caps"&gt;BIND&lt;/span&gt; server reloads, it loses the dynamic update. So
+when I push changes to a zone from the web interface, my dynamic updates
+go&amp;nbsp;away.&lt;/p&gt;
+&lt;p&gt;For the short-term, I&amp;#8217;m just going to check the zone serial before I
+make any updates and, if need be, manually increment it in the web tool.
+As to losing the dynamic updates, I&amp;#8217;m just going to have cron on the
+client fire the &lt;code&gt;nsupdate&lt;/code&gt; script every 30 minutes. I also did a little
+kludge, setup a vhost on one of my web servers to answer for the dynamic
+host (as a catch-all page), and set the &lt;span class="caps"&gt;IP&lt;/span&gt; of my web server as the
+hard-coded &lt;span class="caps"&gt;RR&lt;/span&gt; address in the zone file. If someone tries to use the new
+(&lt;span class="caps"&gt;DDNS&lt;/span&gt; through my &lt;span class="caps"&gt;BIND&lt;/span&gt; server) address for &lt;span class="caps"&gt;HTTP&lt;/span&gt; and for some reason the
+current dynamic address disappeared (&lt;span class="caps"&gt;BIND&lt;/span&gt; reloaded), they&amp;#8217;ll get a
+little page with a message and the old dyndns.org-based&amp;nbsp;&lt;span class="caps"&gt;URL&lt;/span&gt;.&lt;/p&gt;
+&lt;p&gt;When I get around to it (or when this becomes a problem), I&amp;#8217;ll make two
+changes to&amp;nbsp;MultiBINDadmin:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Before it pushes an update, check the current serial for the zone
+    (ok, this may be a bit interesting, as the internal and external
+    zones could have different serials) and increment from&amp;nbsp;that.&lt;/li&gt;
+&lt;li&gt;Have a &amp;#8220;&lt;span class="caps"&gt;DDNS&lt;/span&gt;&amp;#8221; flag in the database and &lt;span class="caps"&gt;GUI&lt;/span&gt; for RRs. For all flagged
+    RRs, try to get the (unfortunately external) current address and
+    update the record in the &lt;span class="caps"&gt;DB&lt;/span&gt; before the&amp;nbsp;push.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;The real question here, which I haven&amp;#8217;t looked into yet, is how I can
+interrogate &lt;span class="caps"&gt;BIND&lt;/span&gt; about RRs for the external zone from an internal&amp;nbsp;host.&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Wed, 07 Apr 2010 09:04:00 -0400</pubDate><guid>tag:newblog.jasonantman.com,2010-04-07:2010/04/bind9-dynamic-dns/</guid><category>bind</category><category>ddns</category><category>dhcp</category><category>multibindadmin</category></item></channel></rss>

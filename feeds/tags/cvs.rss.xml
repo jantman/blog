@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Jason Antman's Blog</title><link>http://newblog.jasonantman.com/</link><description></description><atom:link href="http://newblog.jasonantman.com/feeds/tags/cvs.rss.xml" rel="self"></atom:link><lastBuildDate>Sun, 25 Mar 2012 12:11:00 -0400</lastBuildDate><item><title>CVS to SVN to Git</title><link>http://newblog.jasonantman.com/2012/03/cvs-to-svn-to-git/</link><description>&lt;p&gt;Thanks to some new interest, I&amp;#8217;ve decided to resurrect an old project of
+mine, &lt;a href="http://www.php-ems-tools.com"&gt;&lt;span class="caps"&gt;PHP&lt;/span&gt; &lt;span class="caps"&gt;EMS&lt;/span&gt; Tools&lt;/a&gt;. It&amp;#8217;s a web-based
+tool for small emergency services organizations, mainly aimed at
+volunteer &lt;span class="caps"&gt;EMS&lt;/span&gt;/ambulance providers. The tool handles roster tracking,
+scheduling, equipment maintenance and checks, and a bunch of other
+administrative tasks. I first started it in 2007 for the &lt;a href="http://www.midlandparkambulance.com"&gt;Midland Park
+Ambulance Corps&lt;/a&gt; (&lt;span class="caps"&gt;MPAC&lt;/span&gt;), which I
+was a volunteer &lt;span class="caps"&gt;EMT&lt;/span&gt; with from 2005 through 2011. I&amp;#8217;ll admit that it&amp;#8217;s a
+perfect model of how not to run a software project. The first few
+releases are plain awful code. I was keeping the project in &lt;span class="caps"&gt;CVS&lt;/span&gt; at the
+time, and posted some early releases on
+&lt;a href="http://sourceforge.net/projects/php-ems-tools/"&gt;sourceforge&lt;/a&gt; and
+FreshMeat, now &lt;a href="http://freecode.com/projects/php-ems-tools"&gt;FreeCode&lt;/a&gt;.
+Sometime in 2009, I migrated the contents of the trunk of the &lt;span class="caps"&gt;CVS&lt;/span&gt; module
+to a &lt;a href="http://svn.jasonantman.com/php-ems-tools/"&gt;&lt;span class="caps"&gt;SVN&lt;/span&gt; repository&lt;/a&gt;, but
+discarded the history. I also setup a MediaWiki-based website for the
+project, giving some information and mainly asking for feedback. Around
+that time I started working on a new and heavily updated (fixed) version
+for &lt;span class="caps"&gt;MPAC&lt;/span&gt;, but since it appeared that there was no interest in the
+project, and there were many many local customizations and
+organization-specific features, I let their codebase diverge from what
+was released, and as a result, stopped keeping it in version control.
+Until now, when they need to migrate to a new server, and I&amp;#8217;ve also
+gotten some outside interest in the&amp;nbsp;project.&lt;/p&gt;
+&lt;p&gt;So, as of this morning, I was left with at least four code&amp;nbsp;bases:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;the original &lt;a href="http://cvs.jasonantman.com/cgi-bin/viewvc.cgi/cvs/php-ems-tools-trunk/"&gt;&lt;span class="caps"&gt;CVS&lt;/span&gt;
+    repository&lt;/a&gt;
+    with branches and tags and some history, untouched since&amp;nbsp;2007&lt;/li&gt;
+&lt;li&gt;the &lt;a href="http://svn.jasonantman.com/php-ems-tools/"&gt;&lt;span class="caps"&gt;SVN&lt;/span&gt; repository&lt;/a&gt;
+    circa 2009, with only 3 commits, all related to the migration from
+    &lt;span class="caps"&gt;CVS&lt;/span&gt; to&amp;nbsp;&lt;span class="caps"&gt;SVN&lt;/span&gt;&lt;/li&gt;
+&lt;li&gt;a &amp;#8220;release&amp;#8221; tarball that at least one outside organization is
+    actually&amp;nbsp;using.&lt;/li&gt;
+&lt;li&gt;the code that &lt;span class="caps"&gt;MPAC&lt;/span&gt; is running, which has been largely rewritten
+    since 2009, but also contains a lot of organization-specific&amp;nbsp;customizations.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;As a first step, I created a new &lt;span class="caps"&gt;SVN&lt;/span&gt; repository and migrated the
+original &lt;span class="caps"&gt;CVS&lt;/span&gt; repo, complete with history, branches, and tags, to it
+using &lt;a href="http://cvs2svn.tigris.org/"&gt;cvs2svn&lt;/a&gt;, and then removed write
+permissions on the actual module in the repository. This gave me a &lt;span class="caps"&gt;SVN&lt;/span&gt;
+repository with all of the history of previous so-called releases, with
+a trunk matching r1 of the &amp;#8220;current&amp;#8221; &lt;span class="caps"&gt;SVN&lt;/span&gt; repository. I then manually
+applied patches to trunk/ for the two commits in the current &lt;span class="caps"&gt;SVN&lt;/span&gt;
+repository, and set the svn:date revision property to the correct 2009
+date for those commits. I also confirmed that the correct tag matches up
+to the &amp;#8220;release&amp;#8221; tarball mentioned above. So, I&amp;#8217;m down to a &amp;#8220;current&amp;#8221;
+trunk, plus the locally modified code running on &lt;span class="caps"&gt;MPAC&lt;/span&gt;&amp;#8217;s current server.
+My plan of action from this point is as&amp;nbsp;follows:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Move the &lt;span class="caps"&gt;PHP&lt;/span&gt; &lt;span class="caps"&gt;EMS&lt;/span&gt; Tools website from Mediawiki to my local redmine
+    installation, and update the news with a link to this&amp;nbsp;post.&lt;/li&gt;
+&lt;li&gt;Migrate the &lt;span class="caps"&gt;SVN&lt;/span&gt; repository, which now contains full history, to Git
+    hosted at Github. Add Github integration to&amp;nbsp;Redmine.&lt;/li&gt;
+&lt;li&gt;Update freshmeat, sourceforge, and anywhere else online that knows
+    about the&amp;nbsp;project.&lt;/li&gt;
+&lt;li&gt;Working in a git branch, begin converging the code &lt;span class="caps"&gt;MPAC&lt;/span&gt; is currently
+    running with the latest (now git) trunk, trying to provide
+    configuration options for anything organization specific, and
+    testing as I&amp;nbsp;go.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;If all works well, I&amp;#8217;ll end up with &lt;span class="caps"&gt;MPAC&lt;/span&gt; running the current trunk, just
+some different configuration options, and a working, up-to-date release.
+The biggest issues are going to be how I handle the &lt;span class="caps"&gt;MPAC&lt;/span&gt;-specific
+additions and customizations (a lot of stuff hard-coded for our position
+titles, plus our very custom call report and telephone-based call-in
+software, which is pretty tightly linked with the &lt;span class="caps"&gt;PHP&lt;/span&gt; &lt;span class="caps"&gt;EMS&lt;/span&gt; Tools core),
+and how I balance abstracting things to be configurable for other users
+versus getting this all done in a reasonable amount of&amp;nbsp;time.&lt;/p&gt;
+&lt;p&gt;Stay&amp;nbsp;tuned&amp;#8230;&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Sun, 25 Mar 2012 12:11:00 -0400</pubDate><guid>tag:newblog.jasonantman.com,2012-03-25:2012/03/cvs-to-svn-to-git/</guid><category>cvs</category><category>git</category><category>svn</category><category>version control</category></item><item><title>Access control in ViewVC</title><link>http://newblog.jasonantman.com/2007/07/access-control-in-viewvc/</link><description>&lt;p&gt;ViewVC (www.viewvc.org), a popular web-based frontend to &lt;span class="caps"&gt;CVS&lt;/span&gt; and &lt;span class="caps"&gt;SVN&lt;/span&gt;,
+has no access control mechanism, nor does &lt;span class="caps"&gt;CVS&lt;/span&gt;. As a result, when using
+ViewVC, anyone who can see the web page can browse, download, and view
+files in the entire &lt;span class="caps"&gt;CVS&lt;/span&gt; repository. While I initially loved this, as I
+used &lt;span class="caps"&gt;CVS&lt;/span&gt; only for &lt;span class="caps"&gt;GPL&lt;/span&gt;&amp;#8217;d projects and snippets of useful code, after a
+while I decided to put some admin scripts in &lt;span class="caps"&gt;CVS&lt;/span&gt;. Most of them aren&amp;#8217;t
+really sensitive, but provide a bit more of a look at the workings of my
+systems than I had&amp;nbsp;hoped.&lt;/p&gt;
+&lt;p&gt;I tried unsuccessfully to implement Apache Auth on the &lt;span class="caps"&gt;URL&lt;/span&gt;. After
+sitting around for a while, I hit upon a wonderfully simply (yes,
+inelegent)&amp;nbsp;solution.&lt;/p&gt;
+&lt;p&gt;Being that ViewVC runs as a &lt;span class="caps"&gt;CGI&lt;/span&gt; script, it runs as the user and group of
+the webserver - in my case, user &amp;#8216;www&amp;#8217; and group &amp;#8216;wwwrun&amp;#8217;. How to
+protect one directory in the repository from being viewed with viewvc?
+Well, the &lt;span class="caps"&gt;CVS&lt;/span&gt; user &amp;#8216;cvsuser&amp;#8217; runs as a member of group &amp;#8216;users&amp;#8217;. My main
+username, &amp;#8216;jantman&amp;#8217;, owns all of the files in the repo. As a result, the
+permissions required for &lt;span class="caps"&gt;CVS&lt;/span&gt; to run currectly and for all local users to
+use it, are simply to have the directories in the repository owned by
+some user and the group &amp;#8216;users&amp;#8217;, while giving both user and group rx
+permissions to the directory (and, obviously, the user at least should
+have&amp;nbsp;rwx).&lt;/p&gt;
+&lt;p&gt;To protect a given directory/module &amp;#8220;foo&amp;#8221; in your cvsroot from being
+viewed under&amp;nbsp;ViewVC:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Make sure the directory is owned by someuser and group&amp;nbsp;&amp;#8216;users&amp;#8217;.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;chmod -R o-rwx foo"&lt;/code&gt; - no permissions at all for&amp;nbsp;&amp;#8216;other&amp;#8217;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;As your web server (and, therefore, the &lt;span class="caps"&gt;CGI&lt;/span&gt; script viewvc.cgi) run as
+user &amp;#8216;www&amp;#8217; and group &amp;#8216;wwwrun&amp;#8217;, they cannot access the directory &amp;#8216;foo&amp;#8217; at
+all. When you attempt to view the file listing or any file in ViewVC,
+you get a read error (incorrect&amp;nbsp;permissions).&lt;/p&gt;
+&lt;p&gt;A kludge? Yes. Are there ways around it? Yes. But it gets the job done,
+and allows me to continue using my existing&amp;nbsp;infrastructure.&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Wed, 25 Jul 2007 12:00:00 -0400</pubDate><guid>tag:newblog.jasonantman.com,2007-07-25:2007/07/access-control-in-viewvc/</guid><category>cvs</category><category>viewvc</category></item></channel></rss>

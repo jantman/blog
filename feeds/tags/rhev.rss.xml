@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Jason Antman's Blog</title><link>http://newblog.jasonantman.com/</link><description></description><atom:link href="http://newblog.jasonantman.com/feeds/tags/rhev.rss.xml" rel="self"></atom:link><lastBuildDate>Fri, 07 Sep 2012 05:00:00 -0400</lastBuildDate><item><title>Getting oVirt up and running</title><link>http://newblog.jasonantman.com/2012/09/getting-ovirt-up-and-running/</link><description>&lt;p&gt;The bulk of this post was written way back in April 2012. If you&amp;#8217;re just
+coming here, and looking to setup oVirt, you should probably &lt;a href="#postscript"&gt;skip down
+to the postscript&lt;/a&gt; for an update, and ignore most of the
+content here (as it&amp;#8217;s applicable to an older oVirt&amp;nbsp;version).&lt;/p&gt;
+&lt;p&gt;I recently started setting up &lt;a href="http://www.ovirt.org"&gt;oVirt&lt;/a&gt;, the
+community version of Red Hat Enterprise Virtualization, at work for some
+testing (mainly a &amp;#8220;sandbox&amp;#8221; &lt;span class="caps"&gt;VM&lt;/span&gt; environment, and because
+&lt;a href="http://theforeman.org/"&gt;Foreman&lt;/a&gt;
+&lt;a href="http://blog.theforeman.org/2012/03/vnc-support-built-in-foreman.html"&gt;supports&lt;/a&gt;
+it). To start with, I had two nodes, each with two dual-core Xeon
+processors (&lt;span class="caps"&gt;VT&lt;/span&gt;-x capable) with &lt;span class="caps"&gt;20GB&lt;/span&gt; &lt;span class="caps"&gt;RAM&lt;/span&gt;, one with &lt;span class="caps"&gt;600GB&lt;/span&gt; internal storage
+and one with &lt;span class="caps"&gt;140GB&lt;/span&gt; internal. While oVirt&amp;#8217;s documentation isn&amp;#8217;t exactly
+wonderful, I found a blgo post by Jason Brooks, &lt;a href="http://blog.jebpages.com/archives/how-to-get-up-and-running-with-ovirt/"&gt;How to Get Up and
+Running with
+oVirt&lt;/a&gt;,
+which gives a great walkthrough of getting the oVirt Engine setup on a
+machine, and also setting up that same machine as a &lt;span class="caps"&gt;VM&lt;/span&gt; host. As oVirt is
+still fairly young, this is all done on Fedora. I performed my
+installation via Cobbler, though I&amp;#8217;m afraid to admit it was an entirely
+manual, interactive&amp;nbsp;install.&lt;/p&gt;
+&lt;p&gt;I did run into a few bumps during Jason&amp;#8217;s tutorial. In step 15, adding
+the data &lt;span class="caps"&gt;NFS&lt;/span&gt; export as a Storage Domain, I was unable to add the &lt;span class="caps"&gt;NFS&lt;/span&gt;
+export. I found the &lt;a href="http://www.ovirt.org/wiki/Troubleshooting_NFS_Storage_Issues"&gt;Troubleshooting &lt;span class="caps"&gt;NFS&lt;/span&gt; Storage Issues page on the
+oVirt
+wiki&lt;/a&gt;,
+ensured that SELinux was disabled and that the export had the correct
+permissions, confirmed that &lt;code&gt;/etc/nfsmount.conf&lt;/code&gt; specified &lt;code&gt;Nfsvers=3&lt;/code&gt;,
+rebooted, and then ran the &lt;code&gt;nfs-check.py&lt;/code&gt; script. At this point, I was
+able to add the other storage domains in steps 15 and&amp;nbsp;16.&lt;/p&gt;
+&lt;p&gt;My second issue was that even on Fedora 16, I simply can&amp;#8217;t get the spice
+client (through the &lt;code&gt;spice-xpi&lt;/code&gt; browser plugin) to work. As far as I can
+tell from the logs, it looks like &lt;code&gt;spicec&lt;/code&gt; is being sent a value of
+&amp;#8220;None&amp;#8221; for the secured port parameter, instead of the correct port
+number. I assume this is a bug in oVirt, but I&amp;#8217;ll revisit this problem
+when I have time. In the mean time, I changed my test &lt;span class="caps"&gt;VM&lt;/span&gt; to use &lt;span class="caps"&gt;VNC&lt;/span&gt;,
+which is launched by installing the &lt;code&gt;ovirt-engine-cli&lt;/code&gt; package (see
+below) on your client computer, connecting to the oVirt &lt;span class="caps"&gt;API&lt;/span&gt; with&amp;nbsp;ovirt-shell:  &lt;/p&gt;
+&lt;p&gt;&lt;code&gt;ovirt-shell --connect --url=https://ovirt-engine.example.com:8443/api --user=admin@internal --password adminpassword&lt;/code&gt;&lt;br /&gt;
+and then running &lt;code&gt;console vm_name&lt;/code&gt;. This launches the &lt;code&gt;vncviewer&lt;/code&gt;
+binary, which is in the &amp;#8220;tigervnc&amp;#8221; package on&amp;nbsp;Fedora.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Installing&amp;nbsp;ovirt-engine-cli&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;To run &lt;code&gt;ovirt-shell&lt;/code&gt; on your workstation (Fedora 16, of course&amp;#8230;)
+you&amp;#8217;ll need the ovirt-engine-cli and ovirt-engine-sdk packages. I
+manually downloaded them from
+&lt;a href="http://www.ovirt.org/releases/nightly/fedora/16/"&gt;http://www.ovirt.org/releases/nightly/fedora/16/&lt;/a&gt;,
+versions 2.1.3 and 1.6.2, respecitively. The &lt;span class="caps"&gt;SDK&lt;/span&gt; and &lt;span class="caps"&gt;CLI&lt;/span&gt; are python
+based, so there are a few Python dependencies, all of which were
+automatically solved by yum. I know there are &lt;span class="caps"&gt;SDK&lt;/span&gt; and &lt;span class="caps"&gt;CLI&lt;/span&gt; packages out
+there for other distros, but haven&amp;#8217;t tried them&amp;nbsp;yet.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Installing Linux&amp;nbsp;Guests&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;Installing a CentOS 6.2 x86_64 guest was relatively straightforward,
+and my usual kickstart infrastructure worked fine. The only catch was
+the VirtIO storage interface, which shows up as &lt;code&gt;/dev/vdx&lt;/code&gt; instead of
+&lt;code&gt;/dev/sdx&lt;/code&gt;; I just added another kickstart metadata option in Cobbler
+that allows me to use &lt;code&gt;sdx&lt;/code&gt; by specifying &amp;#8220;virtual=yes&amp;#8221; (for our VMWare
+hosts), or &lt;code&gt;vdx&lt;/code&gt; by specifying&amp;nbsp;&amp;#8220;virtual=ovirt&amp;#8221;.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Setting up&amp;nbsp;Authentication&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;As installed, oVirt only has one user, &amp;#8220;admin@internal&amp;#8221;; it requires an
+external directory service for user authentication. Currently, it
+supports &lt;span class="caps"&gt;IPA&lt;/span&gt;, Red Hat&amp;#8217;s Enterprise Identity Management tool (combines
+&lt;span class="caps"&gt;RHEL&lt;/span&gt;, oVirt Directory Server, Kerberos and &lt;span class="caps"&gt;NTP&lt;/span&gt;; perhaps
+&lt;a href="http://freeipa.org"&gt;FreeIPA&lt;/a&gt; would work as well?) and Microsoft Active
+Directory. As much as I&amp;#8217;d like to give &lt;span class="caps"&gt;IPA&lt;/span&gt; or FreeIPA a try, my company
+already has an &lt;span class="caps"&gt;AD&lt;/span&gt; infrastructure, so I opted to go that route.
+Documentation is given in the &lt;a href="http://www.ovirt.org/wiki/File:OVirt-3.0-Installation_Guide-en-US.pdf"&gt;oVirt 3.0 Installation
+Guide&lt;/a&gt;,
+starting on page 96. Unfortunately, I was never about to get &lt;span class="caps"&gt;AD&lt;/span&gt; auth
+working correctly, so I just worked with the one admin&amp;nbsp;user.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Adding a&amp;nbsp;Node&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;The biggest issue I had was adding the second node to oVirt. I attempted
+to use the &lt;span class="caps"&gt;DVD&lt;/span&gt; Import feature of Cobbler on the &lt;a href="http://www.ovirt.org/get-ovirt/"&gt;oVirt Node Image
+&lt;span class="caps"&gt;ISO&lt;/span&gt;&lt;/a&gt;, but that failed. I then found the
+image&amp;#8217;s &lt;code&gt;LiveOS/livecd-iso-to-pxeboot&lt;/code&gt; script and used that to make a
+kernerl and initrd, and kernel parameters, for Cobbler. &lt;span class="caps"&gt;PXE&lt;/span&gt; works&amp;nbsp;fine.&lt;/p&gt;
+&lt;p&gt;&lt;a name="postscript"&gt;&lt;/a&gt;&lt;strong&gt;Postscript:&lt;/strong&gt; I ended up blowing away my
+oVirt installation in favor of testing other things. At some point, the
+engine install got corrupted in a way that I just couldn&amp;#8217;t fix; even
+though I spent all day one Saturday working on it, it took more time
+than I could allocate to a personal project. So this post is really
+semi-complete at best. However, there is some good news. Jason Brooks&amp;#8217;
+original post, &lt;a href="http://blog.jebpages.com/archives/how-to-get-up-and-running-with-ovirt/"&gt;How to Get Up and Running with
+oVirt&lt;/a&gt;,
+was written for oVirt 3.0, as was this post. Since then, there has been
+a new release, &lt;a href="http://wiki.ovirt.org/wiki/OVirt_3.1_release_notes"&gt;oVirt
+3.1&lt;/a&gt;, which
+apparently has a better &lt;span class="caps"&gt;UI&lt;/span&gt; and a better installer. Jason Brooks has a
+new post, &lt;a href="http://blog.jebpages.com/archives/up-and-running-with-ovirt-3-1-edition/"&gt;Up and Running with oVirt, 3.1
+Edition&lt;/a&gt;,
+which covers installation and configuration of both an all-in-one
+machine and a separate node. If you&amp;#8217;re looking to try oVirt, I&amp;#8217;d
+recommend you give that a shot. Unfortunately (and strangely, given that
+this is supposed to be the &amp;#8220;upstream&amp;#8221; of RedHat&amp;#8217;s proprietary &lt;span class="caps"&gt;RHEV&lt;/span&gt;) it&amp;#8217;s
+still all based on&amp;nbsp;Fedora.&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Fri, 07 Sep 2012 05:00:00 -0400</pubDate><guid>tag:newblog.jasonantman.com,2012-09-07:2012/09/getting-ovirt-up-and-running/</guid><category>fedora</category><category>kvm</category><category>ovirt</category><category>qemu</category><category>redhat</category><category>rhev</category><category>spice</category><category>virtualization</category></item></channel></rss>

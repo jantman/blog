@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Jason Antman's Blog</title><link href="http://newblog.jasonantman.com/" rel="alternate"></link><link href="http://newblog.jasonantman.com/feeds/tags/inventory.atom.xml" rel="self"></link><id>http://newblog.jasonantman.com/</id><updated>2010-09-16T10:28:00-04:00</updated><entry><title>Getting Sun iLOM information within Linux</title><link href="http://newblog.jasonantman.com/2010/09/getting-sun-ilom-information-within-linux/" rel="alternate"></link><updated>2010-09-16T10:28:00-04:00</updated><author><name>admin</name></author><id>tag:newblog.jasonantman.com,2010-09-16:2010/09/getting-sun-ilom-information-within-linux/</id><summary type="html">&lt;p&gt;At work, I&amp;#8217;m starting to implement &lt;a href="http://www.ocsinventory-ng.org/"&gt;&lt;span class="caps"&gt;OCS&lt;/span&gt; Inventory
+&lt;span class="caps"&gt;NG&lt;/span&gt;&lt;/a&gt; on our Linux boxes to keep track of
+hardware. Part of the plan is also that we have a
+&lt;a href="http://www.mediawiki.org"&gt;MediaWiki&lt;/a&gt; installation for internal
+documentation, and articles for every host (named as the hostname). I&amp;#8217;m
+going to pull data from &lt;span class="caps"&gt;OCS&lt;/span&gt; into the articles based on hostname (via a
+&lt;span class="caps"&gt;PHP&lt;/span&gt; include) so the documentation will automatically include up-to-date
+information on&amp;nbsp;hardware.&lt;/p&gt;
+&lt;p&gt;Since we&amp;#8217;re moving to MySQL-backed &lt;span class="caps"&gt;DHCP&lt;/span&gt;, I decided that it would also be
+nice to include &lt;span class="caps"&gt;DHCP&lt;/span&gt; information and links to our web tool to edit the
+host (like setting &lt;span class="caps"&gt;PXE&lt;/span&gt; boot information). This is pretty easy for the
+ethX interfaces, as &lt;span class="caps"&gt;OCS&lt;/span&gt; collects &lt;span class="caps"&gt;MAC&lt;/span&gt; addresses and I can search our &lt;span class="caps"&gt;DHCP&lt;/span&gt;
+database for them. However, it isn&amp;#8217;t as simple for the iLOM interface,
+which (obviously) &lt;span class="caps"&gt;OCS&lt;/span&gt; knows nothing about - though it&amp;#8217;s arguably one of
+the most-forgotten things on our&amp;nbsp;machines.&lt;/p&gt;
+&lt;p&gt;I know that &lt;span class="caps"&gt;HP&lt;/span&gt; Proliant servers have the nice little &lt;span class="caps"&gt;HP&lt;/span&gt; &lt;span class="caps"&gt;PSP&lt;/span&gt; (Proliant
+Support Pack) that includes tools such as &lt;code&gt;hpasmcli&lt;/code&gt;, but Sun doesn&amp;#8217;t
+have anything like that. (We just have one &lt;span class="caps"&gt;HP&lt;/span&gt; box in production right
+now, but I&amp;#8217;ll probably be adding support for it&amp;nbsp;soon).&lt;/p&gt;
+&lt;p&gt;Enter &lt;a href="http://openipmi.sourceforge.net/"&gt;OpenIPMI&lt;/a&gt;. The iLOM has an &lt;span class="caps"&gt;IPMI&lt;/span&gt;
+interface, and the standard OpenIPMI-tools package in CentOS
+repositories has the ipmitool required to get the relevant information.
+A call is pretty simple: &lt;code&gt;ipmitool -l open lan print 1&lt;/code&gt; yields something&amp;nbsp;like:  &lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;Set in Progress         : Set Complete
+Auth Type Support       : NONE MD2 MD5 PASSWORD
+Auth Type Enable        : Callback : MD2 MD5 PASSWORD
+                        : User     : MD2 MD5 PASSWORD
+                        : Operator : MD2 MD5 PASSWORD
+                        : Admin    : MD2 MD5 PASSWORD
+                        : OEM      :
+IP Address Source       : DHCP Address
+IP Address              : 172.16.xxx.xxx
+Subnet Mask             : 255.255.255.224
+MAC Address             : 00:14:4f:xx:xx:xx
+SNMP Community String   : xxxxxx
+IP Header               : TTL=0x00 Flags=0x00 Precedence=0x00 TOS=0x00
+BMC ARP Control         : ARP Responses Disabled, Gratuitous ARP Disabled
+Gratituous ARP Intrvl   : 5.0 seconds
+Default Gateway IP      : 172.16.xx.xx
+Default Gateway MAC     : 00:00:00:00:00:00
+Backup Gateway IP       : 0.0.0.0
+Backup Gateway MAC      : 00:00:00:00:00:00
+802.1q VLAN ID          : Disabled
+802.1q VLAN Priority    : 0
+RMCP+ Cipher Suites     : 2,3,0
+Cipher Suite Priv Max   : XXXXXXXXXXXXXXX
+                        :     X=Cipher Suite Unused
+                        :     c=CALLBACK
+                        :     u=USER
+                        :     o=OPERATOR
+                        :     a=ADMIN
+                        :     O=OEM
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Now it&amp;#8217;s just a matter of integrating this into ocsinventory-agent,
+having it run the command if present (and Sun hardware), and parsing the
+results. Once I have some actual code done, I&amp;#8217;ll pass it&amp;nbsp;along.&lt;/p&gt;
+&lt;p&gt;Many thanks to &lt;code&gt;pseud0&lt;/code&gt; on the Sun forums for answering my
+&lt;a href="http://forums.sun.com/thread.jspa?messageID=11049794#11049794"&gt;question&lt;/a&gt;
+about&amp;nbsp;this.&lt;/p&gt;</summary><category term="inventory"></category><category term="ipmi"></category><category term="ipmitool"></category><category term="ocs-inventory"></category><category term="sun"></category><category term="sunfire"></category><category term="sysadmin"></category></entry><entry><title>Hardware Inventory System</title><link href="http://newblog.jasonantman.com/2008/09/hardware-inventory-system/" rel="alternate"></link><updated>2008-09-12T13:01:00-04:00</updated><author><name>admin</name></author><id>tag:newblog.jasonantman.com,2008-09-12:2008/09/hardware-inventory-system/</id><summary type="html">&lt;p&gt;After a few crazy weeks at work, the pay check is finally here, and I&amp;#8217;ve
+decided to allocate some of the money to hardware upgrades of my
+personal machines. While &lt;a href="http://www.nagios.org"&gt;Nagios&lt;/a&gt; gives me a good
+idea of where performance is a problem, I&amp;#8217;m still running a large amount
+of &amp;#8220;legacy&amp;#8221; hardware (my home router/firewall is a 350MHz P-&lt;span class="caps"&gt;II&lt;/span&gt; desktop)
+and hardware age is a significant factor in my upgrade&amp;nbsp;plans.&lt;/p&gt;
+&lt;p&gt;So, I set out looking for a program (most likely some backend scripts
+that dump data to MySQL, and then a &lt;span class="caps"&gt;PHP&lt;/span&gt; front-end) to perform a hardware
+inventory - essentially, run a script on each box, find out the system
+details, and dump it in a &lt;span class="caps"&gt;DB&lt;/span&gt;. Now that my pool of upgrade candidates is
+above a dozen machines, at multiple locations, some of which are
+single-use boxes often neglected/forgotten, doing this in my head isn&amp;#8217;t
+the&amp;nbsp;easiest.&lt;/p&gt;
+&lt;p&gt;So, while I&amp;#8217;ve been googling and searching some mailing list archives,
+I&amp;#8217;m also developing a set of&amp;nbsp;requirements.&lt;/p&gt;
+&lt;p&gt;The chief&amp;nbsp;requirements:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Ability to run a script on a remote machine and have the results
+    returned in a meaningful format. Most likely, a single script, run
+    as root (&lt;span class="caps"&gt;SUID&lt;/span&gt; or sudo) that returns nice, formatted, &lt;span class="caps"&gt;SQL&lt;/span&gt;-ready
+    results (so the parsing of platform-specific command output will
+    happen on the client, with every client returning a normalized data&amp;nbsp;set).&lt;/li&gt;
+&lt;li&gt;Ability to track hardware changes - i.e. disks swapped from one box
+    to another, &lt;span class="caps"&gt;NIC&lt;/span&gt; replacement, processor upgrade,&amp;nbsp;etc.&lt;/li&gt;
+&lt;li&gt;Each piece of hardware tracked individually, allowing future support
+    of fully tracking components, spares,&amp;nbsp;etc.&lt;/li&gt;
+&lt;li&gt;Support for future barcoding of components and physically-performed&amp;nbsp;inventory.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Some of the data that I&amp;#8217;d like&amp;nbsp;collected:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Data on a machine stored by chassis vendor name and serial
+    numer/service&amp;nbsp;tag.&lt;/li&gt;
+&lt;li&gt;Hostname associated with each&amp;nbsp;box.&lt;/li&gt;
+&lt;li&gt;Architecture, number of CPUs/cores and type, model, speed, socket
+    (for upgrade&amp;nbsp;planning/ordering).&lt;/li&gt;
+&lt;li&gt;Motherboard model/manufacturer, serial number, &lt;span class="caps"&gt;HW&lt;/span&gt; and &lt;span class="caps"&gt;SW&lt;/span&gt;/&lt;span class="caps"&gt;FW&lt;/span&gt;
+    revisions, manufacture&amp;nbsp;date.&lt;/li&gt;
+&lt;li&gt;Storage (internal &lt;span class="amp"&gt;&amp;amp;&lt;/span&gt; directly connected external) - type, interface,
+    capacity, specifications/manufacturer and&amp;nbsp;model.&lt;/li&gt;
+&lt;li&gt;Amount fo &lt;span class="caps"&gt;RAM&lt;/span&gt;, type of &lt;span class="caps"&gt;RAM&lt;/span&gt;, and configuration of cards (number of
+    empty&amp;nbsp;slots).&lt;/li&gt;
+&lt;li&gt;&lt;span class="caps"&gt;PCI&lt;/span&gt; card configuration - number and type/mfr/model of cards, as well
+    as number of empty&amp;nbsp;slots&lt;/li&gt;
+&lt;li&gt;For all NICs - &lt;span class="caps"&gt;MAC&lt;/span&gt; addresses, current IPs, as well as link
+    type/speed and connected&amp;nbsp;switch/port.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;I&amp;#8217;d also like some level of software inventory, especially for those
+machines that may be running &amp;#8220;forgotten&amp;#8221;&amp;nbsp;services:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href="http://nmap.org/"&gt;nmap&lt;/a&gt; scan&amp;nbsp;results.&lt;/li&gt;
+&lt;li&gt;&lt;span class="caps"&gt;OS&lt;/span&gt;-generated list of running services, with &lt;span class="caps"&gt;GUI&lt;/span&gt; including a
+    blacklist of &amp;#8220;default&amp;#8221; services not to be displayed, and possibly
+    also cross-links to Nagios&amp;nbsp;status.&lt;/li&gt;
+&lt;li&gt;Possibly a parsed output from ps, using a blacklist as shown&amp;nbsp;above.&lt;/li&gt;
+&lt;li&gt;If a firewall is running on the system, a list of all open&amp;nbsp;ports.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;I&amp;#8217;ll be checking out some options today. Unfortunately, I have a feeling
+that there&amp;#8217;s most likely nothing that supports my requirements, and I&amp;#8217;ll
+probably end up implementing a lot of this&amp;nbsp;myself.&lt;/p&gt;</summary><category term="configuration"></category><category term="inventory"></category></entry></feed>

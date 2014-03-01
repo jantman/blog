@@ -1,0 +1,744 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Jason Antman's Blog</title><link>http://newblog.jasonantman.com/</link><description></description><atom:link href="http://newblog.jasonantman.com/feeds/categories/monitoring.rss.xml" rel="self"></atom:link><lastBuildDate>Sat, 07 Jul 2012 06:34:00 -0400</lastBuildDate><item><title>Nagios Check Plugin for Rsnapshot Backups</title><link>http://newblog.jasonantman.com/2012/07/nagios-check-plugin-for-rsnapshot-backups/</link><description>&lt;p&gt;In a previous post, I described how I do &lt;a href="/2012/01/secure-rsnapshot-backups-over-the-wan-via-ssh/"&gt;Secure rsnapshot backups over
+the &lt;span class="caps"&gt;WAN&lt;/span&gt; via
+&lt;span class="caps"&gt;SSH&lt;/span&gt;&lt;/a&gt;. While my
+layout of rsnapshot configuration files, data, and log files is a bit
+esoteric, I monitor all this with a Nagios check plugin that runs on my
+backup host. It Assumes that the output of
+&lt;a href="http://rsnapshot.org/"&gt;rsnapshot&lt;/a&gt; is written to a text log file, one
+file per host, at a path that matches
+&lt;code&gt;/path_to_log_directory/log_HOSTNAME_YYYYMMDD-HHMMSS.log&lt;/code&gt; where
+&lt;code&gt;HOSTNAME&lt;/code&gt; is the name of the host, and &lt;code&gt;YYYYMMDD-HHMMSS&lt;/code&gt; is a datestamp
+(actually, the script just finds the newest file matching
+&lt;code&gt;log_HOSTNAME_*.log&lt;/code&gt; in that directory). In order to obtain correct
+timing of the runs, which rsnapshot doesn&amp;#8217;t offer, it assumes that you
+trigger rsnapshot through a wrapper script, which runs it once per host
+(inside a loop?) with per-host log files and some logging information
+added,&amp;nbsp;like:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="k"&gt;for &lt;/span&gt;h in 
+&lt;span class="k"&gt;do&lt;/span&gt;
+&lt;span class="k"&gt;    &lt;/span&gt;&lt;span class="nv"&gt;&lt;span class="caps"&gt;LOGFILE&lt;/span&gt;&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;/mnt/backup/rsnapshot/logs/log_${h}_`date +%Y%m%d-%H%M%S`.txt&amp;quot;&lt;/span&gt;
+    &lt;span class="nb"&gt;echo&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;# Starting backup at `date` (`date +%s`)&amp;quot;&lt;/span&gt; &amp;gt;&amp;gt; &lt;span class="s2"&gt;&amp;quot;$&lt;span class="caps"&gt;LOGFILE&lt;/span&gt;&amp;quot;&lt;/span&gt;
+    /usr/bin/rsnapshot -c /etc/rsnapshot-&lt;span class="nv"&gt;$h&lt;/span&gt;.conf daily &amp;amp;&amp;gt;&amp;gt; &lt;span class="s2"&gt;&amp;quot;$&lt;span class="caps"&gt;LOGFILE&lt;/span&gt;&amp;quot;&lt;/span&gt;
+    &lt;span class="nb"&gt;echo&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;# Finished backup at `date` (`date +%s`)&amp;quot;&lt;/span&gt; &amp;gt;&amp;gt; &lt;span class="s2"&gt;&amp;quot;$&lt;span class="caps"&gt;LOGFILE&lt;/span&gt;&amp;quot;&lt;/span&gt;
+&lt;span class="k"&gt;done&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;The &lt;code&gt;check_rsnapshot.pl&lt;/code&gt; plugin uses &lt;code&gt;utils.pm&lt;/code&gt; from Nagios, as well as
+&lt;a href="http://search.cpan.org/~jv/Getopt-Long-2.38/lib/Getopt/Long.pm"&gt;Getopt::Long&lt;/a&gt;,
+&lt;a href="http://search.cpan.org/~makoto/File-Stat-0.01/Stat.pm"&gt;File::stat&lt;/a&gt;,
+&lt;a href="http://search.cpan.org/~flora/perl-5.14.2/lib/File/Basename.pm"&gt;File::Basename&lt;/a&gt;,
+&lt;a href="http://search.cpan.org/~smueller/PathTools-3.33/lib/File/Spec.pm"&gt;File::Spec&lt;/a&gt;
+and
+&lt;a href="http://search.cpan.org/~ferreira/Number-Bytes-Human-0.07/Human.pm"&gt;Number::Bytes::Human&lt;/a&gt;.
+This was one of my first Perl plugins, but seems to be rather
+acceptable. It makes the following checks based on the rsnapshot&amp;nbsp;log:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Backup run in the last X seconds (warning and crit&amp;nbsp;thresholds)&lt;/li&gt;
+&lt;li&gt;Maximum time from start to finish (warning and crit&amp;nbsp;thresholds)&lt;/li&gt;
+&lt;li&gt;Minimum size of backup (warning and crit&amp;nbsp;thresholds)&lt;/li&gt;
+&lt;li&gt;Minimum number of files in backup (warning and crit&amp;nbsp;thresholds)&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;In addition to &lt;code&gt;check_file_age&lt;/code&gt; checks on a number of files that are
+included in backups and I know are modified before each backup run, this
+seems to handle monitoring quite well for me. I certainly preferred
+running &lt;a href="http://www.bacula.org/"&gt;Bacula&lt;/a&gt; and using my MySQL-based
+&lt;a href="https://github.com/jantman/nagios-scripts/blob/master/check_bacula_job.php"&gt;check_bacula_job.php&lt;/a&gt;,
+but as I&amp;#8217;m now backing up 4 machines to my desktop, I no longer have a
+need for Bacula (or&amp;nbsp;tapes).&lt;/p&gt;
+&lt;p&gt;The script itself can be found at
+&lt;a href="https://github.com/jantman/nagios-scripts/blob/master/check_rsnapshot.pl"&gt;github&lt;/a&gt;.&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Sat, 07 Jul 2012 06:34:00 -0400</pubDate><guid>tag:newblog.jasonantman.com,2012-07-07:2012/07/nagios-check-plugin-for-rsnapshot-backups/</guid><category>backups</category><category>monitoring</category><category>Nagios</category><category>rsnapshot</category><category>rsync</category></item><item><title>World of Warcraft Realm Status Check Plugin for Nagios</title><link>http://newblog.jasonantman.com/2012/03/world-of-warcraft-realm-status-check-plugin-for-nagios/</link><description>&lt;p&gt;My wife &lt;a href="http://www.jackieantman.com/"&gt;Jackie&lt;/a&gt;
+(&lt;a href="http://us.battle.net/wow/en/character/Arthas/Syrilia/simple"&gt;Syrilia&lt;/a&gt;)
+is an avid &lt;a href="http://en.wikipedia.org/wiki/World_of_Warcraft"&gt;World of
+Warcraft&lt;/a&gt; player (it&amp;#8217;s a
+&lt;a href="http://en.wikipedia.org/wiki/Massively_multiplayer_online_role-playing_game"&gt;&lt;span class="caps"&gt;MMORPG&lt;/span&gt;&lt;/a&gt;
+with over 10 million players). They have weekly server
+maintenance/update windows every Tuesday morning - total downtime. The
+length is never really fixed, so I looked around to see if there was a
+logical way to notify when the servers came back&amp;nbsp;up.&lt;/p&gt;
+&lt;p&gt;I managed to find a &lt;a href="http://exchange.nagios.org/directory/Plugins/Games/World-of-Warcraft-Realm-status/details"&gt;World of Warcraft Realm status check
+plugin&lt;/a&gt;
+on Nagios Exchange, but it was written to a now-discontinued &lt;span class="caps"&gt;API&lt;/span&gt;. It was
+also last modified in 2008, and I can&amp;#8217;t seem to get in contact with the
+author, Scott A&amp;#8217;Hearn (webmaster@scottahearn.com) - that email returns
+undeliverable, there&amp;#8217;s no email link on the site that his domain now
+redirects to, and the domain scottahearn.com is a (eek) private
+registration in &lt;span class="caps"&gt;WHOIS&lt;/span&gt;, so I don&amp;#8217;t really have any way of finding contact
+information. Regardless, I&amp;#8217;ve modified the script to use the &lt;a href="http://blizzard.github.com/api-wow-docs/#id3381933"&gt;new
+Blizzard &lt;span class="caps"&gt;REST&lt;/span&gt; &lt;span class="caps"&gt;API&lt;/span&gt;&lt;/a&gt;
+and it&amp;#8217;s now working. Of course, this is pulling from Blizzard&amp;#8217;s data
+feed, not doing any actual monitoring itself, and be warned that they
+impose query limits (at the moment, their
+&lt;a href="http://blizzard.github.com/api-wow-docs/#id3379836"&gt;docs&lt;/a&gt; say 3,000
+requests per day for anonymous access; to be nice to them, I only check
+on Tuesdays from 3am-4pm, when I&amp;#8217;m most concerned about it). The updated
+source code is shown below, but the most up-to-date version will always
+live&amp;nbsp;at  &lt;/p&gt;
+&lt;p&gt;&lt;a href="https://github.com/jantman/nagios-scripts/blob/master/check_wow.pl"&gt;https://github.com/jantman/nagios-scripts/blob/master/check_wow.pl&lt;/a&gt;.
+If you want, you can also see a diff of my changes to Scott&amp;#8217;s original
+version on
+&lt;a href="https://github.com/jantman/nagios-scripts/commit/f84eede5256aa6621812e91f0b3b73e91f3b11e8#check_wow.pl"&gt;github&lt;/a&gt;.&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="c1"&gt;#!/usr/bin/perl -w&lt;/span&gt;
+&lt;span class="c1"&gt;#&lt;/span&gt;
+&lt;span class="c1"&gt;# World of Warcraft Realm detector plugin for Nagios&lt;/span&gt;
+&lt;span class="c1"&gt;#&lt;/span&gt;
+&lt;span class="c1"&gt;# Written by Scott A&amp;#39;Hearn (webmaster@scottahearn.com), version 1.2, Last Modified: 07-21-2008&lt;/span&gt;
+&lt;span class="c1"&gt;#&lt;/span&gt;
+&lt;span class="c1"&gt;# Modified by Jason Antman  02-22-2012, to cope with the change from&lt;/span&gt;
+&lt;span class="c1"&gt;# the deprecated worldofwarcraft.com &lt;span class="caps"&gt;XML&lt;/span&gt; feed to the BattleNet &lt;span class="caps"&gt;JSON&lt;/span&gt; &lt;span class="caps"&gt;API&lt;/span&gt;.&lt;/span&gt;
+&lt;span class="c1"&gt;#&lt;/span&gt;
+&lt;span class="c1"&gt;# Usage: ./check_wow -r &lt;/span&gt;
+&lt;span class="c1"&gt;#&lt;/span&gt;
+&lt;span class="c1"&gt;# Description:&lt;/span&gt;
+&lt;span class="c1"&gt;#&lt;/span&gt;
+&lt;span class="c1"&gt;# This plugin will check the status of a World of Warcraft realm, based &lt;/span&gt;
+&lt;span class="c1"&gt;# on input from the battle.net &lt;span class="caps"&gt;JSON&lt;/span&gt; realm status &lt;span class="caps"&gt;API&lt;/span&gt;.&lt;/span&gt;
+&lt;span class="c1"&gt;#&lt;/span&gt;
+&lt;span class="c1"&gt;# Output:&lt;/span&gt;
+&lt;span class="c1"&gt;#&lt;/span&gt;
+&lt;span class="c1"&gt;# If the realm is up, the plugin will&lt;/span&gt;
+&lt;span class="c1"&gt;# return an &lt;span class="caps"&gt;OK&lt;/span&gt; state with a message containing the status of the realm as well &lt;/span&gt;
+&lt;span class="c1"&gt;# as some extended information such as type (PvP, PvE, etc) and population.  &lt;/span&gt;
+&lt;span class="c1"&gt;# If the realm is down, the plugin will return a &lt;span class="caps"&gt;CRITICAL&lt;/span&gt; state with a message&lt;/span&gt;
+&lt;span class="c1"&gt;# containing the status of the realm as well as any available extended &lt;/span&gt;
+&lt;span class="c1"&gt;# information such as type (PvP, PvE, etc) and population. If the realm is&lt;/span&gt;
+&lt;span class="c1"&gt;# shown as currently having a queue, a &lt;span class="caps"&gt;WARNING&lt;/span&gt; state will be returned.&lt;/span&gt;
+&lt;span class="c1"&gt;#&lt;/span&gt;
+&lt;span class="c1"&gt;#&lt;/span&gt;
+&lt;span class="c1"&gt;# If the requested realm is not found, the plugin will&lt;/span&gt;
+&lt;span class="c1"&gt;# return an &lt;span class="caps"&gt;UNKNOWN&lt;/span&gt; state with an appropriate warning message.&lt;/span&gt;
+&lt;span class="c1"&gt;#&lt;/span&gt;
+&lt;span class="c1"&gt;# If there is an invalid [or no] response from the battle.net server,&lt;/span&gt;
+&lt;span class="c1"&gt;# the plugin will return a &lt;span class="caps"&gt;CRITICAL&lt;/span&gt; state.&lt;/span&gt;
+&lt;span class="c1"&gt;#&lt;/span&gt;
+&lt;span class="c1"&gt;# $HeadURL: http://svn.jasonantman.com/public-nagios/check_wow.pl $&lt;/span&gt;
+&lt;span class="c1"&gt;# $LastChangedRevision: 13 $&lt;/span&gt;
+&lt;span class="c1"&gt;#&lt;/span&gt;
+&lt;span class="c1"&gt;# Changelog:&lt;/span&gt;
+&lt;span class="c1"&gt;# 2012-02-22 Jason Antman  (version 1.3):&lt;/span&gt;
+&lt;span class="c1"&gt;#     * modified for new BattleNet &lt;span class="caps"&gt;JSON&lt;/span&gt; &lt;span class="caps"&gt;API&lt;/span&gt;&lt;/span&gt;
+&lt;span class="c1"&gt;#     * added &lt;span class="caps"&gt;WARNING&lt;/span&gt; output if realm has queue&lt;/span&gt;
+&lt;span class="c1"&gt;#&lt;/span&gt;
+&lt;span class="c1"&gt;# 2008-07-21 Scott A&amp;#39;Hearn  (version 1.2):&lt;/span&gt;
+&lt;span class="c1"&gt;#     * version on Nagios Exchange&lt;/span&gt;
+&lt;span class="c1"&gt;#&lt;/span&gt;
+
+&lt;span class="c1"&gt;# use modules&lt;/span&gt;
+&lt;span class="k"&gt;use&lt;/span&gt; &lt;span class="n"&gt;strict&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;             &lt;span class="c1"&gt;# good coding practices&lt;/span&gt;
+&lt;span class="k"&gt;use&lt;/span&gt; &lt;span class="nn"&gt;Getopt::&lt;/span&gt;&lt;span class="n"&gt;Long&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;           &lt;span class="c1"&gt;# command-line option parsing&lt;/span&gt;
+&lt;span class="k"&gt;use&lt;/span&gt; &lt;span class="n"&gt;&lt;span class="caps"&gt;LWP&lt;/span&gt;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;                &lt;span class="c1"&gt;# external content retrieval&lt;/span&gt;
+&lt;span class="k"&gt;use&lt;/span&gt; &lt;span class="n"&gt;&lt;span class="caps"&gt;JSON&lt;/span&gt;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;                               &lt;span class="c1"&gt;# &lt;span class="caps"&gt;JSON&lt;/span&gt; for &lt;span class="caps"&gt;API&lt;/span&gt; reply&lt;/span&gt;
+&lt;span class="k"&gt;use&lt;/span&gt; &lt;span class="n"&gt;lib&lt;/span&gt;  &lt;span class="s"&gt;&amp;quot;/usr/lib/nagios/plugins&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="c1"&gt;# nagios plugins&lt;/span&gt;
+&lt;span class="k"&gt;use&lt;/span&gt; &lt;span class="n"&gt;utils&lt;/span&gt; &lt;span class="sx"&gt;qw(%&lt;span class="caps"&gt;ERRORS&lt;/span&gt; &amp;amp;print_revision &amp;amp;support &amp;amp;usage )&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="c1"&gt;# nagios error and message libraries&lt;/span&gt;
+&lt;span class="k"&gt;use&lt;/span&gt; &lt;span class="nn"&gt;Data::&lt;/span&gt;&lt;span class="n"&gt;Dumper&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;                       &lt;span class="c1"&gt;# debugging&lt;/span&gt;
+
+&lt;span class="c1"&gt;# init global vars&lt;/span&gt;
+&lt;span class="k"&gt;use&lt;/span&gt; &lt;span class="n"&gt;vars&lt;/span&gt; &lt;span class="sx"&gt;qw($&lt;span class="caps"&gt;PROGNAME&lt;/span&gt;)&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="nv"&gt;$&lt;span class="caps"&gt;PROGNAME&lt;/span&gt;&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;check_wow&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="k"&gt;my&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;$ver_string&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nv"&gt;$browser&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nv"&gt;$jsonurl&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nv"&gt;$raw_json&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nv"&gt;$opt_V&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nv"&gt;$opt_h&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nv"&gt;$opt_r&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nv"&gt;$decoded&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;undef&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nb"&gt;undef&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nb"&gt;undef&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nb"&gt;undef&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nb"&gt;undef&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nb"&gt;undef&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nb"&gt;undef&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nb"&gt;undef&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;span class="nv"&gt;$jsonurl&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;http://us.battle.net/api/wow/realm/status?realm=&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="nv"&gt;$ver_string&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;1.3&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+
+&lt;span class="c1"&gt;# init subs&lt;/span&gt;
+&lt;span class="k"&gt;sub &lt;/span&gt;&lt;span class="nf"&gt;print_help&lt;/span&gt; &lt;span class="p"&gt;($$);&lt;/span&gt;
+&lt;span class="p"&gt;sub print_usage ($);&lt;/span&gt;
+
+&lt;span class="p"&gt;# define command-line option handling&lt;/span&gt;
+&lt;span class="p"&gt;Getopt::Long::Configure(&amp;#39;bundling&amp;#39;);&lt;/span&gt;
+&lt;span class="p"&gt;GetOptions(&lt;/span&gt;
+&lt;span class="p"&gt;    &amp;quot;V&amp;quot;   =&amp;gt; \$opt_V, &amp;quot;version&amp;quot; =&amp;gt; \$opt_V,&lt;/span&gt;
+&lt;span class="p"&gt;    &amp;quot;h&amp;quot;   =&amp;gt; \$opt_h, &amp;quot;help&amp;quot;    =&amp;gt; \$opt_h,&lt;/span&gt;
+&lt;span class="p"&gt;    &amp;quot;r=s&amp;quot; =&amp;gt; \$opt_r, &amp;quot;realm=s&amp;quot; =&amp;gt; \$opt_r);&lt;/span&gt;
+
+&lt;span class="p"&gt;# show version info, exit&lt;/span&gt;
+&lt;span class="p"&gt;if ($opt_V) {&lt;/span&gt;
+    &lt;span class="n"&gt;print_revision&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;$&lt;span class="caps"&gt;PROGNAME&lt;/span&gt;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nv"&gt;$ver_string&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+    &lt;span class="nb"&gt;exit&lt;/span&gt; &lt;span class="nv"&gt;$&lt;span class="caps"&gt;ERRORS&lt;/span&gt;&lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;&lt;span class="caps"&gt;OK&lt;/span&gt;&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;};&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+
+&lt;span class="c1"&gt;# show help, exit&lt;/span&gt;
+&lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;$opt_h&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="n"&gt;print_help&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;$&lt;span class="caps"&gt;PROGNAME&lt;/span&gt;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nv"&gt;$ver_string&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+    &lt;span class="nb"&gt;exit&lt;/span&gt; &lt;span class="nv"&gt;$&lt;span class="caps"&gt;ERRORS&lt;/span&gt;&lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;&lt;span class="caps"&gt;OK&lt;/span&gt;&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;};&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+
+&lt;span class="c1"&gt;# get first command-line param&lt;/span&gt;
+&lt;span class="nv"&gt;$opt_r&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nb"&gt;shift&lt;/span&gt; &lt;span class="k"&gt;unless&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;$opt_r&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+
+&lt;span class="c1"&gt;# if no command-line param passed, show usage/help, exit&lt;/span&gt;
+&lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="o"&gt;!&lt;/span&gt; &lt;span class="nv"&gt;$opt_r&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="n"&gt;print_usage&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;$&lt;span class="caps"&gt;PROGNAME&lt;/span&gt;&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+    &lt;span class="nb"&gt;exit&lt;/span&gt; &lt;span class="nv"&gt;$&lt;span class="caps"&gt;ERRORS&lt;/span&gt;&lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;&lt;span class="caps"&gt;UNKNOWN&lt;/span&gt;&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;};&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+
+&lt;span class="c1"&gt;# new browser object, with agent&lt;/span&gt;
+&lt;span class="nv"&gt;$browser&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nn"&gt;&lt;span class="caps"&gt;LWP&lt;/span&gt;::&lt;/span&gt;&lt;span class="n"&gt;UserAgent&lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="k"&gt;new&lt;/span&gt;&lt;span class="p"&gt;();&lt;/span&gt;
+&lt;span class="nv"&gt;$browser&lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="n"&gt;agent&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;check_wow/$ver_string&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+
+&lt;span class="c1"&gt;# retrieve &lt;span class="caps"&gt;JSON&lt;/span&gt; from WoW site&lt;/span&gt;
+&lt;span class="nv"&gt;$jsonurl&lt;/span&gt; &lt;span class="o"&gt;.=&lt;/span&gt; &lt;span class="nv"&gt;$opt_r&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="nv"&gt;$raw_json&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nv"&gt;$browser&lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="n"&gt;request&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nn"&gt;&lt;span class="caps"&gt;HTTP&lt;/span&gt;::&lt;/span&gt;&lt;span class="n"&gt;Request&lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="k"&gt;new&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;&lt;span class="caps"&gt;GET&lt;/span&gt;&lt;/span&gt; &lt;span class="o"&gt;=&amp;gt;&lt;/span&gt; &lt;span class="nv"&gt;$jsonurl&lt;/span&gt;&lt;span class="p"&gt;));&lt;/span&gt;
+
+&lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;$raw_json&lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="n"&gt;is_success&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="c1"&gt;# if success, process&lt;/span&gt;
+    &lt;span class="nv"&gt;$raw_json&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nv"&gt;$raw_json&lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="n"&gt;content&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt; &lt;span class="k"&gt;else&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="c1"&gt;# otherwise, fail &lt;span class="caps"&gt;UNKNOWN&lt;/span&gt;&lt;/span&gt;
+    &lt;span class="k"&gt;print&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;&lt;span class="caps"&gt;UNKNOWN&lt;/span&gt; - Realm &amp;#39;$opt_r&amp;#39; status not received.&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+    &lt;span class="nb"&gt;exit&lt;/span&gt; &lt;span class="nv"&gt;$&lt;span class="caps"&gt;ERRORS&lt;/span&gt;&lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;&lt;span class="caps"&gt;UNKNOWN&lt;/span&gt;&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;};&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+
+&lt;span class="nv"&gt;$decoded&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;decode_json&lt;/span&gt; &lt;span class="nv"&gt;$raw_json&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+
+&lt;span class="k"&gt;if&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;$decoded&lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="n"&gt;realms&lt;/span&gt;&lt;span class="p"&gt;}[&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="n"&gt;status&lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt; &lt;span class="o"&gt;!=&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="k"&gt;print&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;&lt;span class="caps"&gt;CRITICAL&lt;/span&gt; - Realm &amp;quot;&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="nv"&gt;$decoded&lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="n"&gt;realms&lt;/span&gt;&lt;span class="p"&gt;}[&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="n"&gt;name&lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="s"&gt;&amp;quot; Down (&amp;quot;&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="nv"&gt;$decoded&lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="n"&gt;realms&lt;/span&gt;&lt;span class="p"&gt;}[&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="n"&gt;type&lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;, population: &amp;quot;&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="nv"&gt;$decoded&lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="n"&gt;realms&lt;/span&gt;&lt;span class="p"&gt;}[&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="n"&gt;population&lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;)\n&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+    &lt;span class="nb"&gt;exit&lt;/span&gt; &lt;span class="nv"&gt;$&lt;span class="caps"&gt;ERRORS&lt;/span&gt;&lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;&lt;span class="caps"&gt;CRITICAL&lt;/span&gt;&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;};&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt; &lt;span class="k"&gt;elsif&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;$decoded&lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="n"&gt;realms&lt;/span&gt;&lt;span class="p"&gt;}[&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="n"&gt;queue&lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt; &lt;span class="o"&gt;!=&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="k"&gt;print&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;&lt;span class="caps"&gt;WARNING&lt;/span&gt; - Realm &amp;quot;&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="nv"&gt;$decoded&lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="n"&gt;realms&lt;/span&gt;&lt;span class="p"&gt;}[&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="n"&gt;name&lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="s"&gt;&amp;quot; Has Queue (&amp;quot;&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="nv"&gt;$decoded&lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="n"&gt;realms&lt;/span&gt;&lt;span class="p"&gt;}[&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="n"&gt;type&lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;, population: &amp;quot;&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="nv"&gt;$decoded&lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="n"&gt;realms&lt;/span&gt;&lt;span class="p"&gt;}[&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="n"&gt;population&lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;)\n&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+    &lt;span class="nb"&gt;exit&lt;/span&gt; &lt;span class="nv"&gt;$&lt;span class="caps"&gt;ERRORS&lt;/span&gt;&lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;&lt;span class="caps"&gt;WARNING&lt;/span&gt;&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;};&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt; &lt;span class="k"&gt;else&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="k"&gt;print&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;&lt;span class="caps"&gt;OK&lt;/span&gt; - Realm &amp;quot;&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="nv"&gt;$decoded&lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="n"&gt;realms&lt;/span&gt;&lt;span class="p"&gt;}[&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="n"&gt;name&lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="s"&gt;&amp;quot; Up (&amp;quot;&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="nv"&gt;$decoded&lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="n"&gt;realms&lt;/span&gt;&lt;span class="p"&gt;}[&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="n"&gt;type&lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;, population: &amp;quot;&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="nv"&gt;$decoded&lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="n"&gt;realms&lt;/span&gt;&lt;span class="p"&gt;}[&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="n"&gt;population&lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;)\n&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+    &lt;span class="nb"&gt;exit&lt;/span&gt; &lt;span class="nv"&gt;$&lt;span class="caps"&gt;ERRORS&lt;/span&gt;&lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;&lt;span class="caps"&gt;OK&lt;/span&gt;&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;};&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+
+&lt;span class="c1"&gt;# usage function&lt;/span&gt;
+&lt;span class="k"&gt;sub &lt;/span&gt;&lt;span class="nf"&gt;print_usage&lt;/span&gt; &lt;span class="p"&gt;($)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+        &lt;span class="k"&gt;my&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;$&lt;span class="caps"&gt;PROGNAME&lt;/span&gt;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nv"&gt;@_&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+    &lt;span class="k"&gt;print&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;Usage:\n&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+    &lt;span class="k"&gt;print&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;  $&lt;span class="caps"&gt;PROGNAME&lt;/span&gt; [-r | --realm ]\n&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+    &lt;span class="k"&gt;print&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;  $&lt;span class="caps"&gt;PROGNAME&lt;/span&gt; [-h | --help]\n&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+    &lt;span class="k"&gt;print&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;  $&lt;span class="caps"&gt;PROGNAME&lt;/span&gt; [-V | --version]\n&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+
+&lt;span class="c1"&gt;# help function&lt;/span&gt;
+&lt;span class="k"&gt;sub &lt;/span&gt;&lt;span class="nf"&gt;print_help&lt;/span&gt; &lt;span class="p"&gt;($$)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+        &lt;span class="k"&gt;my&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;$&lt;span class="caps"&gt;PROGNAME&lt;/span&gt;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nv"&gt;$ver_string&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nv"&gt;@_&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+    &lt;span class="n"&gt;print_revision&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;$&lt;span class="caps"&gt;PROGNAME&lt;/span&gt;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nv"&gt;$ver_string&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+    &lt;span class="k"&gt;print&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;Copyright (c) 2008 Scott A&amp;#39;Hearn, 2012 Jason Antman\n\n&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+    &lt;span class="n"&gt;print_usage&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;$&lt;span class="caps"&gt;PROGNAME&lt;/span&gt;&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+    &lt;span class="k"&gt;print&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;\n&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+    &lt;span class="k"&gt;print&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;   Standard World of Warcraft realm name, case sensitive.\n&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+    &lt;span class="k"&gt;print&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;\n&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+    &lt;span class="c1"&gt;# support();&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+
+&lt;span class="c1"&gt;# end&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Fri, 16 Mar 2012 07:40:00 -0400</pubDate><guid>tag:newblog.jasonantman.com,2012-03-16:2012/03/world-of-warcraft-realm-status-check-plugin-for-nagios/</guid><category>blizzard</category><category>check plugin</category><category>monitoring</category><category>Nagios</category><category>warcraft</category><category>wow</category></item><item><title>Nagios Check Plugin for Linode Monthly Bandwidth Usage</title><link>http://newblog.jasonantman.com/2012/02/nagios-check-plugin-for-linode-monthly-bandwidth-usage/</link><description>&lt;p&gt;Since I have most of my public-facing stuff hosted with
+&lt;a href="http://www.linode.com/?r=5c8ad2931b410b55455aadbcf0a8d86d6f698a91"&gt;Linode&lt;/a&gt;,
+and I have a monthly bandwidth cap (albeit one that I&amp;#8217;ll probably never
+come close to), I decided that it would be a good idea to add my monthly
+bandwidth usage to my monitoring system. Luckily, Linode offers this
+(their billing view of it - which is, of course, what I&amp;#8217;m concerned
+about) via their &lt;a href="http://www.linode.com/api/"&gt;&lt;span class="caps"&gt;API&lt;/span&gt;&lt;/a&gt;, and it&amp;#8217;s very nicely
+implemented in &lt;a href="http://michael.thegrebs.com/"&gt;Michael Greb&amp;#8217;s&lt;/a&gt;
+&lt;a href="http://search.cpan.org/~mikegrb/WebService-Linode/"&gt;WebService::Linode&lt;/a&gt;
+Perl (&lt;span class="caps"&gt;CPAN&lt;/span&gt;)&amp;nbsp;module.&lt;/p&gt;
+&lt;p&gt;Using Michael&amp;#8217;s Perl module, I wrote
+&lt;a href="https://github.com/jantman/nagios-scripts/blob/master/check_linode_transfer.pl"&gt;check_linode_transfer.pl&lt;/a&gt;
+(github link) as a Nagios check plugin. It seems to be working fine for
+me, and runs with the embedded perl interpreter, though it may not be
+100% up to par with the Nagios plugin spec (for one, I used utils.pm
+instead of
+&lt;a href="http://search.cpan.org/~tonvoon/Nagios-Plugin-0.36/lib/Nagios/Plugin.pm"&gt;Nagios::Plugin&lt;/a&gt;).
+About the only thing unusual is that I store my &lt;span class="caps"&gt;API&lt;/span&gt; keys in a perl
+module, so you&amp;#8217;ll need to create something like this in your plugin
+directory (usually &lt;code&gt;/usr/lib/nagios/plugins&lt;/code&gt;:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="nb"&gt;package&lt;/span&gt; &lt;span class="n"&gt;api_keys&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+
+&lt;span class="nb"&gt;require&lt;/span&gt; &lt;span class="n"&gt;Exporter&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="nv"&gt;@&lt;span class="caps"&gt;ISA&lt;/span&gt;&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="sx"&gt;qw(Exporter)&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="nv"&gt;@EXPORT_OK&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="sx"&gt;qw($API_KEY_LINODE)&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+
+&lt;span class="nv"&gt;$API_KEY_LINODE&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;yourApiKeyGoesHere&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+
+&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;The latest version of the plugin will always be available at
+&lt;a href="https://github.com/jantman/nagios-scripts/blob/master/check_linode_transfer.pl"&gt;https://github.com/jantman/nagios-scripts/blob/master/check_linode_transfer.pl&lt;/a&gt;.
+The current version is also below. It&amp;#8217;s free for anyone to use under the
+terms of &lt;a href="http://www.gnu.org/licenses/gpl.html"&gt;&lt;span class="caps"&gt;GNU&lt;/span&gt; GPLv3&lt;/a&gt;, though I
+would really like it if any changes/patches/updates are sent back to me
+for inclusion in the latest&amp;nbsp;version.&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="c1"&gt;#! /usr/bin/perl -w&lt;/span&gt;
+
+&lt;span class="c1"&gt;# check_linode_transfer.pl Copyright (C) 2012 Jason Antman &lt;/span&gt;
+&lt;span class="c1"&gt;#&lt;/span&gt;
+&lt;span class="c1"&gt;# Define your Linode &lt;span class="caps"&gt;API&lt;/span&gt; key as $API_KEY_LINODE in api_keys.pm in the plugin library directory&lt;/span&gt;
+&lt;span class="c1"&gt;#  a sample should be included in this distribution.&lt;/span&gt;
+&lt;span class="c1"&gt;#&lt;/span&gt;
+&lt;span class="c1"&gt;# This plugin requires WebService::Linode from &lt;span class="caps"&gt;CPAN&lt;/span&gt;, with a patch - add the following to the end of sub _error{} in Linode/Base.pm:&lt;/span&gt;
+&lt;span class="c1"&gt;#  $self-&amp;gt;{err} = $err; $self-&amp;gt;{errstr} = $errstr;&lt;/span&gt;
+&lt;span class="c1"&gt;# Also - bug in WebService::Linode::Base docs, example, line 3 should be:&lt;/span&gt;
+&lt;span class="c1"&gt;#  my $data = $api-&amp;gt;do_request( api_action =&amp;gt; &amp;#39;domains.list&amp;#39; );&lt;/span&gt;
+&lt;span class="c1"&gt;# not:&lt;/span&gt;
+&lt;span class="c1"&gt;#  my $data = $api-&amp;gt;do_request( action =&amp;gt; &amp;#39;domains.list&amp;#39; );&lt;/span&gt;
+&lt;span class="c1"&gt;#&lt;/span&gt;
+&lt;span class="c1"&gt;##################################################################################&lt;/span&gt;
+&lt;span class="c1"&gt;#&lt;/span&gt;
+&lt;span class="c1"&gt;# This program is free software; you can redistribute it and/or&lt;/span&gt;
+&lt;span class="c1"&gt;# modify it under the terms of the &lt;span class="caps"&gt;GNU&lt;/span&gt; General Public License&lt;/span&gt;
+&lt;span class="c1"&gt;# as published by the Free Software Foundation; either version 2&lt;/span&gt;
+&lt;span class="c1"&gt;# of the License, or (at your option) any later version.&lt;/span&gt;
+&lt;span class="c1"&gt;#&lt;/span&gt;
+&lt;span class="c1"&gt;# This program is distributed in the hope that it will be useful,&lt;/span&gt;
+&lt;span class="c1"&gt;# but &lt;span class="caps"&gt;WITHOUT&lt;/span&gt; &lt;span class="caps"&gt;ANY&lt;/span&gt; &lt;span class="caps"&gt;WARRANTY&lt;/span&gt;; without even the implied warranty&lt;/span&gt;
+&lt;span class="c1"&gt;# of &lt;span class="caps"&gt;MERCHANTABILITY&lt;/span&gt; or &lt;span class="caps"&gt;FITNESS&lt;/span&gt; &lt;span class="caps"&gt;FOR&lt;/span&gt; A &lt;span class="caps"&gt;PARTICULAR&lt;/span&gt; &lt;span class="caps"&gt;PURPOSE&lt;/span&gt;.  See the&lt;/span&gt;
+&lt;span class="c1"&gt;# &lt;span class="caps"&gt;GNU&lt;/span&gt; General Public License for more details.&lt;/span&gt;
+&lt;span class="c1"&gt;#&lt;/span&gt;
+&lt;span class="c1"&gt;# you should have received a copy of the &lt;span class="caps"&gt;GNU&lt;/span&gt; General Public License&lt;/span&gt;
+&lt;span class="c1"&gt;# along with this program (or with Nagios);  if not, write to the&lt;/span&gt;
+&lt;span class="c1"&gt;# Free Software Foundation, Inc., 59 Temple Place - Suite 330,&lt;/span&gt;
+&lt;span class="c1"&gt;# Boston, &lt;span class="caps"&gt;MA&lt;/span&gt; 02111-1307, &lt;span class="caps"&gt;USA&lt;/span&gt;&lt;/span&gt;
+&lt;span class="c1"&gt;#&lt;/span&gt;
+&lt;span class="c1"&gt;##################################################################################&lt;/span&gt;
+&lt;span class="c1"&gt;#&lt;/span&gt;
+&lt;span class="c1"&gt;# The latest version of this plugin can always be obtained from:&lt;/span&gt;
+&lt;span class="c1"&gt;#  $HeadURL$&lt;/span&gt;
+&lt;span class="c1"&gt;#  $LastChangedRevision$&lt;/span&gt;
+&lt;span class="c1"&gt;#&lt;/span&gt;
+
+&lt;span class="k"&gt;use&lt;/span&gt; &lt;span class="n"&gt;strict&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="k"&gt;use&lt;/span&gt; &lt;span class="n"&gt;English&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="k"&gt;use&lt;/span&gt; &lt;span class="nn"&gt;Getopt::&lt;/span&gt;&lt;span class="n"&gt;Long&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="k"&gt;use&lt;/span&gt; &lt;span class="n"&gt;vars&lt;/span&gt; &lt;span class="sx"&gt;qw($&lt;span class="caps"&gt;PROGNAME&lt;/span&gt; $&lt;span class="caps"&gt;REVISION&lt;/span&gt;)&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="k"&gt;use&lt;/span&gt; &lt;span class="n"&gt;lib&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;/usr/lib/nagios/plugins&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="k"&gt;use&lt;/span&gt; &lt;span class="n"&gt;utils&lt;/span&gt; &lt;span class="sx"&gt;qw (%&lt;span class="caps"&gt;ERRORS&lt;/span&gt; &lt;/span&gt;&lt;span class="o"&gt;&amp;amp;&lt;/span&gt;&lt;span class="n"&gt;print_revision&lt;/span&gt; &lt;span class="o"&gt;&amp;amp;&lt;/span&gt;&lt;span class="n"&gt;support&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;span class="k"&gt;use&lt;/span&gt; &lt;span class="n"&gt;api_keys&lt;/span&gt; &lt;span class="sx"&gt;qw($API_KEY_LINODE)&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="k"&gt;use&lt;/span&gt; &lt;span class="nn"&gt;WebService::&lt;/span&gt;&lt;span class="n"&gt;Linode&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="k"&gt;use&lt;/span&gt; &lt;span class="nn"&gt;Data::&lt;/span&gt;&lt;span class="n"&gt;Dumper&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+
+&lt;span class="k"&gt;sub &lt;/span&gt;&lt;span class="nf"&gt;print_help&lt;/span&gt; &lt;span class="p"&gt;();&lt;/span&gt;
+&lt;span class="p"&gt;sub print_usage ();&lt;/span&gt;
+
+&lt;span class="p"&gt;my ($opt_c, $opt_w, $opt_h, $opt_V, $opt_s, $opt_S, $opt_l, $opt_H);&lt;/span&gt;
+&lt;span class="p"&gt;my ($result, $message);&lt;/span&gt;
+
+&lt;span class="p"&gt;$&lt;span class="caps"&gt;PROGNAME&lt;/span&gt;=&amp;quot;check_linode_transfer.pl&amp;quot;;&lt;/span&gt;
+&lt;span class="p"&gt;$&lt;span class="caps"&gt;REVISION&lt;/span&gt;=&amp;#39;1.0&amp;#39;;&lt;/span&gt;
+
+&lt;span class="p"&gt;$opt_w = 60;&lt;/span&gt;
+&lt;span class="p"&gt;$opt_c = 80;&lt;/span&gt;
+
+&lt;span class="p"&gt;Getopt::Long::Configure(&amp;#39;bundling&amp;#39;);&lt;/span&gt;
+&lt;span class="p"&gt;GetOptions(&lt;/span&gt;
+&lt;span class="p"&gt;    &amp;quot;V&amp;quot;   =&amp;gt; \$opt_V, &amp;quot;version&amp;quot; =&amp;gt; \$opt_V,&lt;/span&gt;
+&lt;span class="p"&gt;    &amp;quot;h&amp;quot;   =&amp;gt; \$opt_h, &amp;quot;help&amp;quot;    =&amp;gt; \$opt_h,&lt;/span&gt;
+&lt;span class="p"&gt;    &amp;quot;w=f&amp;quot; =&amp;gt; \$opt_w, &amp;quot;warning=f&amp;quot; =&amp;gt; \$opt_w,&lt;/span&gt;
+&lt;span class="p"&gt;    &amp;quot;c=f&amp;quot; =&amp;gt; \$opt_c, &amp;quot;critical=f&amp;quot; =&amp;gt; \$opt_c&lt;/span&gt;
+&lt;span class="p"&gt;);&lt;/span&gt;
+
+&lt;span class="p"&gt;if ($opt_V) {&lt;/span&gt;
+    &lt;span class="n"&gt;print_revision&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;$&lt;span class="caps"&gt;PROGNAME&lt;/span&gt;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nv"&gt;$&lt;span class="caps"&gt;REVISION&lt;/span&gt;&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+    &lt;span class="nb"&gt;exit&lt;/span&gt; &lt;span class="nv"&gt;$&lt;span class="caps"&gt;ERRORS&lt;/span&gt;&lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;&lt;span class="caps"&gt;OK&lt;/span&gt;&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;};&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+
+&lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;$opt_h&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="n"&gt;print_help&lt;/span&gt;&lt;span class="p"&gt;();&lt;/span&gt;
+    &lt;span class="nb"&gt;exit&lt;/span&gt; &lt;span class="nv"&gt;$&lt;span class="caps"&gt;ERRORS&lt;/span&gt;&lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;&lt;span class="caps"&gt;OK&lt;/span&gt;&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;};&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+
+&lt;span class="nv"&gt;$result&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;&lt;span class="caps"&gt;OK&lt;/span&gt;&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+
+&lt;span class="k"&gt;my&lt;/span&gt; &lt;span class="nv"&gt;$api&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="k"&gt;new&lt;/span&gt; &lt;span class="nn"&gt;WebService::&lt;/span&gt;&lt;span class="n"&gt;Linode&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;apikey&lt;/span&gt; &lt;span class="o"&gt;=&amp;gt;&lt;/span&gt; &lt;span class="nv"&gt;$API_KEY_LINODE&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;nowarn&lt;/span&gt; &lt;span class="o"&gt;=&amp;gt;&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;span class="k"&gt;my&lt;/span&gt; &lt;span class="nv"&gt;$data&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nv"&gt;$api&lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="n"&gt;do_request&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt; &lt;span class="n"&gt;api_action&lt;/span&gt; &lt;span class="o"&gt;=&amp;gt;&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;account.info&amp;#39;&lt;/span&gt; &lt;span class="p"&gt;);&lt;/span&gt;
+&lt;span class="k"&gt;if&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="o"&gt;!&lt;/span&gt; &lt;span class="nv"&gt;$data&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="nv"&gt;$result&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;&lt;span class="caps"&gt;UNKNOWN&lt;/span&gt;&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+    &lt;span class="k"&gt;print&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;&lt;span class="caps"&gt;LINODE&lt;/span&gt; &lt;span class="caps"&gt;TRANSFER&lt;/span&gt; $result: &amp;quot;&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="nv"&gt;$api&lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="n"&gt;errstr&lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;\n&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+    &lt;span class="nb"&gt;exit&lt;/span&gt; &lt;span class="nv"&gt;$&lt;span class="caps"&gt;ERRORS&lt;/span&gt;&lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="nv"&gt;$result&lt;/span&gt;&lt;span class="p"&gt;};&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+
+&lt;span class="k"&gt;my&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;$used&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nv"&gt;$pool&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nv"&gt;$pct&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;$data&lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="n"&gt;TRANSFER_USED&lt;/span&gt;&lt;span class="p"&gt;},&lt;/span&gt; &lt;span class="nv"&gt;$data&lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="n"&gt;TRANSFER_POOL&lt;/span&gt;&lt;span class="p"&gt;},&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+
+&lt;span class="nv"&gt;$pct&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;$used&lt;/span&gt; &lt;span class="o"&gt;/&lt;/span&gt; &lt;span class="nv"&gt;$pool&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="mi"&gt;100&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+
+&lt;span class="k"&gt;if&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;$pct&lt;/span&gt; &lt;span class="o"&gt;&amp;gt;=&lt;/span&gt; &lt;span class="nv"&gt;$opt_c&lt;/span&gt;&lt;span class="p"&gt;){&lt;/span&gt;
+    &lt;span class="nv"&gt;$result&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;&lt;span class="caps"&gt;CRITICAL&lt;/span&gt;&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;span class="k"&gt;elsif&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;$pct&lt;/span&gt; &lt;span class="o"&gt;&amp;gt;=&lt;/span&gt; &lt;span class="nv"&gt;$opt_w&lt;/span&gt;&lt;span class="p"&gt;){&lt;/span&gt;
+    &lt;span class="nv"&gt;$result&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;&lt;span class="caps"&gt;WARNING&lt;/span&gt;&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+
+&lt;span class="k"&gt;print&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;&lt;span class="caps"&gt;LINODE&lt;/span&gt; &lt;span class="caps"&gt;TRANSFER&lt;/span&gt; $result: $pct&amp;quot;&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;%&amp;quot;&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="s"&gt;&amp;quot; of monthly bandwidth used ($used / $pool &lt;span class="caps"&gt;GB&lt;/span&gt;)|usedBW=$used; totalBW=$pool\n&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="nb"&gt;exit&lt;/span&gt; &lt;span class="nv"&gt;$&lt;span class="caps"&gt;ERRORS&lt;/span&gt;&lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="nv"&gt;$result&lt;/span&gt;&lt;span class="p"&gt;};&lt;/span&gt;
+
+&lt;span class="k"&gt;sub &lt;/span&gt;&lt;span class="nf"&gt;print_usage&lt;/span&gt; &lt;span class="p"&gt;()&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="k"&gt;print&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;Usage:\n&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+    &lt;span class="k"&gt;print&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;  $&lt;span class="caps"&gt;PROGNAME&lt;/span&gt; [-w ] [-c ]\n&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+    &lt;span class="k"&gt;print&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;  $&lt;span class="caps"&gt;PROGNAME&lt;/span&gt; [-h | --help]\n&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+    &lt;span class="k"&gt;print&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;  $&lt;span class="caps"&gt;PROGNAME&lt;/span&gt; [-V | --version]\n&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+
+&lt;span class="k"&gt;sub &lt;/span&gt;&lt;span class="nf"&gt;print_help&lt;/span&gt; &lt;span class="p"&gt;()&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="n"&gt;print_revision&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;$&lt;span class="caps"&gt;PROGNAME&lt;/span&gt;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nv"&gt;$&lt;span class="caps"&gt;REVISION&lt;/span&gt;&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+    &lt;span class="k"&gt;print&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;Copyright (c) 2012 Jason Antman\n\n&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+    &lt;span class="n"&gt;print_usage&lt;/span&gt;&lt;span class="p"&gt;();&lt;/span&gt;
+    &lt;span class="k"&gt;print&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;\n&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+    &lt;span class="k"&gt;print&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;    Percent of network transfer used\n&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+    &lt;span class="k"&gt;print&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;\n&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+    &lt;span class="n"&gt;support&lt;/span&gt;&lt;span class="p"&gt;();&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Wed, 29 Feb 2012 20:32:00 -0500</pubDate><guid>tag:newblog.jasonantman.com,2012-02-29:2012/02/nagios-check-plugin-for-linode-monthly-bandwidth-usage/</guid><category>linode</category><category>monitoring</category><category>Nagios</category><category>plugin</category></item><item><title>Nagios / Icinga Configuration Highlighting with GeSHi</title><link>http://newblog.jasonantman.com/2012/02/nagios-icinga-configuration-highlighting-with-geshi/</link><description>&lt;p&gt;As you may know from former posts, this blog
+(&lt;a href="http://wordpress.org"&gt;WordPress&lt;/a&gt;-powered) and a few
+&lt;a href="http://www.mediawiki.org"&gt;MediaWiki&lt;/a&gt; sites that I have use the
+excellent &lt;span class="caps"&gt;PHP&lt;/span&gt;-based &lt;a href="http://qbnz.com/highlighter/"&gt;GeSHi&lt;/a&gt; syntax
+highlighter. Today I was writing &lt;a href="/2012/02/sending-aim-messages-from-a-perl-script/"&gt;a
+post&lt;/a&gt; that includes
+some Icinga (Nagios) configuration snippets. After a quick search, I
+found a &lt;a href="https://github.com/adepertat/geshi-nagios"&gt;Nagios language file for
+GeSHi&lt;/a&gt; on GitHub. Thanks very
+much to &lt;a href="https://github.com/adepertat"&gt;Albéric de Pertat (adepertat)&lt;/a&gt;
+for writing this and providing it to the&amp;nbsp;public.&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Tue, 28 Feb 2012 18:42:00 -0500</pubDate><guid>tag:newblog.jasonantman.com,2012-02-28:2012/02/nagios-icinga-configuration-highlighting-with-geshi/</guid><category>GeSHi</category><category>icinga</category><category>mediawiki</category><category>Nagios</category><category>PHP</category><category>wordpress</category></item><item><title>Sending AOL Instant Messenger (AIM) Messages from a Perl Script</title><link>http://newblog.jasonantman.com/2012/02/sending-aim-messages-from-a-perl-script/</link><description>&lt;p&gt;I&amp;#8217;ve been doing some work on &lt;a href="http://www.icinga.org"&gt;icinga&lt;/a&gt; (a Nagios
+fork) and wanted to implement notification via &lt;span class="caps"&gt;AOL&lt;/span&gt; Instant Messenger
+(&lt;span class="caps"&gt;AIM&lt;/span&gt;), since I&amp;#8217;m almost always signed on when I&amp;#8217;m at a computer.
+Unfortunately, most of the
+&lt;a href="http://vuksan.com/linux/nagios_scripts.html#send_aim_messages"&gt;scripts&lt;/a&gt;
+that I could find use
+&lt;a href="http://search.cpan.org/~friffin/Net-AIM-TOC-0.97/TOC.pm"&gt;Net::&lt;span class="caps"&gt;AIM&lt;/span&gt;::&lt;span class="caps"&gt;TOC&lt;/span&gt;&lt;/a&gt;
+which implements a now-defunct protocol. So, I found Perl&amp;#8217;s
+&lt;a href="http://search.cpan.org/~toddr/Net-OSCAR-1.928/lib/Net/OSCAR.pm"&gt;Net::&lt;span class="caps"&gt;OSCAR&lt;/span&gt;&lt;/a&gt;
+and &lt;a href="http://moo.net/code/aim.html"&gt;James Nonnemaker&amp;#8217;s script&lt;/a&gt;, and
+decided to rework them into something a bit more&amp;nbsp;full-featured.&lt;/p&gt;
+&lt;p&gt;The below script sends a single &lt;span class="caps"&gt;IM&lt;/span&gt; to a single contact via the command
+line (using a specified &lt;span class="caps"&gt;AIM&lt;/span&gt; username and password). It&amp;#8217;s intended to be
+a Nagios notification script (using the configurations shown below), but
+could be used for any purpose. The most up-to-date version of the script
+will be available at:
+&lt;a href="https://github.com/jantman/nagios-scripts/blob/master/send_aim.pl"&gt;github.com/jantman/public-nagios/master/send_aim.pl&lt;/a&gt;&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="c1"&gt;#!/usr/bin/perl&lt;/span&gt;
+
+&lt;span class="c1"&gt;#&lt;/span&gt;
+&lt;span class="c1"&gt;# Script to send &lt;span class="caps"&gt;AIM&lt;/span&gt; messages from the command line&lt;/span&gt;
+&lt;span class="c1"&gt;#&lt;/span&gt;
+&lt;span class="c1"&gt;# Copyright 2012 Jason Antman  &lt;/span&gt;
+&lt;span class="c1"&gt;# based on the simple version (C) 2008 James Nonnemaker / james[at]ustelcom[dot]net &lt;/span&gt;
+&lt;span class="c1"&gt;#    found at: &lt;/span&gt;
+&lt;span class="c1"&gt;#&lt;/span&gt;
+&lt;span class="c1"&gt;# The canonical, up-to-date version of this script can be found at:&lt;/span&gt;
+&lt;span class="c1"&gt;#  &lt;/span&gt;
+&lt;span class="c1"&gt;#&lt;/span&gt;
+&lt;span class="c1"&gt;# For updates, news, etc., see:&lt;/span&gt;
+&lt;span class="c1"&gt;#  &lt;/span&gt;
+&lt;span class="c1"&gt;#&lt;/span&gt;
+&lt;span class="c1"&gt;# $HeadURL$&lt;/span&gt;
+&lt;span class="c1"&gt;# $LastChangedRevision$&lt;/span&gt;
+&lt;span class="c1"&gt;#&lt;/span&gt;
+
+&lt;span class="k"&gt;use&lt;/span&gt; &lt;span class="n"&gt;strict&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="k"&gt;use&lt;/span&gt; &lt;span class="n"&gt;warnings&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="k"&gt;use&lt;/span&gt; &lt;span class="nn"&gt;Net::&lt;/span&gt;&lt;span class="n"&gt;&lt;span class="caps"&gt;OSCAR&lt;/span&gt;&lt;/span&gt; &lt;span class="sx"&gt;qw(:standard)&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="k"&gt;use&lt;/span&gt; &lt;span class="nn"&gt;Getopt::&lt;/span&gt;&lt;span class="n"&gt;Long&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+
+&lt;span class="k"&gt;my&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;$screenname&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nv"&gt;$passwd&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nv"&gt;$ToSn&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nv"&gt;$Msg&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;span class="k"&gt;my&lt;/span&gt; &lt;span class="nv"&gt;$&lt;span class="caps"&gt;VERSION&lt;/span&gt;&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;r17&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+
+&lt;span class="k"&gt;my&lt;/span&gt; &lt;span class="nv"&gt;$result&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;GetOptions&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;screenname=s&amp;quot;&lt;/span&gt; &lt;span class="o"&gt;=&amp;gt;&lt;/span&gt; &lt;span class="o"&gt;\&lt;/span&gt;&lt;span class="nv"&gt;$screenname&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+              &lt;span class="s"&gt;&amp;quot;password=s&amp;quot;&lt;/span&gt;   &lt;span class="o"&gt;=&amp;gt;&lt;/span&gt; &lt;span class="o"&gt;\&lt;/span&gt;&lt;span class="nv"&gt;$passwd&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+              &lt;span class="s"&gt;&amp;quot;to=s&amp;quot;&lt;/span&gt;         &lt;span class="o"&gt;=&amp;gt;&lt;/span&gt; &lt;span class="o"&gt;\&lt;/span&gt;&lt;span class="nv"&gt;$ToSn&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+
+&lt;span class="k"&gt;if&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="o"&gt;!&lt;/span&gt; &lt;span class="nv"&gt;$screenname&lt;/span&gt; &lt;span class="o"&gt;||&lt;/span&gt; &lt;span class="o"&gt;!&lt;/span&gt; &lt;span class="nv"&gt;$passwd&lt;/span&gt; &lt;span class="o"&gt;||&lt;/span&gt; &lt;span class="o"&gt;!&lt;/span&gt; &lt;span class="nv"&gt;$ToSn&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="k"&gt;print&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;send_aim.pl $&lt;span class="caps"&gt;VERSION&lt;/span&gt; by Jason Antman \n\n&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+    &lt;span class="k"&gt;print&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;&lt;span class="caps"&gt;USAGE&lt;/span&gt;: send_aim.pl --screenname= --password= --to=\n\n&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+
+&lt;span class="c1"&gt;# slurp message from &lt;span class="caps"&gt;STDIN&lt;/span&gt;&lt;/span&gt;
+&lt;span class="k"&gt;my&lt;/span&gt; &lt;span class="nv"&gt;$holdTerminator&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="vg"&gt;$/&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="nb"&gt;undef&lt;/span&gt; &lt;span class="vg"&gt;$/&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="nv"&gt;$Msg&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="vg"&gt;$/&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nv"&gt;$holdTerminator&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="k"&gt;my&lt;/span&gt; &lt;span class="nv"&gt;@lines&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nb"&gt;split&lt;/span&gt; &lt;span class="sr"&gt;/$holdTerminator/&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nv"&gt;$Msg&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="nv"&gt;$Msg&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;init&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="nv"&gt;$Msg&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nb"&gt;join&lt;/span&gt; &lt;span class="nv"&gt;$holdTerminator&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nv"&gt;@lines&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+
+&lt;span class="k"&gt;my&lt;/span&gt; &lt;span class="nv"&gt;$oscar&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nn"&gt;Net::&lt;/span&gt;&lt;span class="n"&gt;&lt;span class="caps"&gt;OSCAR&lt;/span&gt;&lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="k"&gt;new&lt;/span&gt;&lt;span class="p"&gt;();&lt;/span&gt;
+&lt;span class="nv"&gt;$oscar&lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="n"&gt;loglevel&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;span class="nv"&gt;$oscar&lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="n"&gt;signon&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;$screenname&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nv"&gt;$passwd&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+
+&lt;span class="nv"&gt;$oscar&lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="n"&gt;set_callback_snac_unknown&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="o"&gt;\&amp;amp;&lt;/span&gt;&lt;span class="n"&gt;snac_unknown&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;span class="nv"&gt;$oscar&lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="n"&gt;set_callback_im_ok&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="o"&gt;\&amp;amp;&lt;/span&gt;&lt;span class="n"&gt;log_out&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;span class="nv"&gt;$oscar&lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="n"&gt;set_callback_signon_done&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="o"&gt;\&amp;amp;&lt;/span&gt;&lt;span class="n"&gt;do_it&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+
+&lt;span class="k"&gt;while&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="nv"&gt;$oscar&lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="n"&gt;do_one_loop&lt;/span&gt;&lt;span class="p"&gt;();&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+
+&lt;span class="k"&gt;sub &lt;/span&gt;&lt;span class="nf"&gt;do_it&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="nv"&gt;$oscar&lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="n"&gt;send_im&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;$ToSn&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nv"&gt;$Msg&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+
+&lt;span class="k"&gt;sub &lt;/span&gt;&lt;span class="nf"&gt;log_out&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="nv"&gt;$oscar&lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="n"&gt;signoff&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+    &lt;span class="nb"&gt;exit&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+
+&lt;span class="k"&gt;sub &lt;/span&gt;&lt;span class="nf"&gt;snac_unknown&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="k"&gt;my&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;$oscar&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nv"&gt;$connection&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nv"&gt;$snac&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nv"&gt;$data&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nv"&gt;@_&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+    &lt;span class="c1"&gt;# just use this to override the default snac_unknown handler, which prints a data dump of the packet&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;The command line usage is pretty simple - it takes the message to send
+on stdin and parameters for the sender&amp;#8217;s screen name and password, and
+the recipient&amp;#8217;s screen name,&amp;nbsp;like:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="nb"&gt;echo&lt;/span&gt; -e &lt;span class="s2"&gt;&amp;quot;Hello\nworld\n&amp;quot;&lt;/span&gt; | send_aim.pl --screenname&lt;span class="o"&gt;=&lt;/span&gt;mySN --password&lt;span class="o"&gt;=&lt;/span&gt;myPass --to&lt;span class="o"&gt;=&lt;/span&gt;recipientSN
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;The Icinga configs that I used for this are as follows. I just used the
+default Icinga 1.6 notify by email commands, since &lt;span class="caps"&gt;AIM&lt;/span&gt; should handle the
+full length&amp;nbsp;fine.&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;# host notification command
+define command{
+        command_name    notify-host-by-aim
+        command_line    /usr/bin/printf &amp;quot;%b&amp;quot; &amp;quot;***** Icinga *****\n\nNotification Type: $NOTIFICATIONTYPE$\nHost: $HOSTNAME$\nState: $HOSTSTATE$\nAddress: $HOSTADDRESS$\nInfo: $HOSTOUTPUT$\n\nDate/Time: $LONGDATETIME$\n&amp;quot; | /usr/lib/nagios/plugins/notification/send_aim.pl --screenname=mySN --password=myPass --to=$CONTACTADDRESS1$
+}
+
+# service notification command
+define command{
+        command_name    notify-service-by-aim
+        command_line    /usr/bin/printf &amp;quot;%b&amp;quot; &amp;quot;***** Icinga *****\n\nNotification Type: $NOTIFICATIONTYPE$\n\nService: $SERVICEDESC$\nHost: $HOSTALIAS$\nAddress: $HOSTADDRESS$\nState: $SERVICESTATE$\n\nDate/Time: $LONGDATETIME$\n\nAdditional Info:\n\n$SERVICEOUTPUT$\n&amp;quot; | /usr/lib/nagios/plugins/notification/send_aim.pl --screenname=mySN --password=myPass --to=$CONTACTADDRESS1$
+}
+
+# example contact
+define contact{
+        contact_name                    joeadmin
+        alias                           Joe Admin
+        use                             generic-with-AIM-contact
+        email                           joeadmin@example.com
+        pager                           5555555555@vtext.com
+        address1                        joeAdminSN ; AIM screen name
+}
+&lt;/pre&gt;&lt;/div&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Tue, 28 Feb 2012 18:33:00 -0500</pubDate><guid>tag:newblog.jasonantman.com,2012-02-28:2012/02/sending-aim-messages-from-a-perl-script/</guid><category>aim</category><category>aol</category><category>icinga</category><category>instant messenger</category><category>Nagios</category><category>notifications</category><category>perl</category></item><item><title>Nagios check scripts</title><link>http://newblog.jasonantman.com/2010/03/nagios-check-scripts/</link><description>&lt;p&gt;Last week I added some of my Nagios check scripts to my &lt;a href="https://github.com/jantman/nagios-scripts"&gt;nagios-scripts
+GitHub repository&lt;/a&gt;. Perhaps
+they&amp;#8217;ll be of some use to some other&amp;nbsp;people&amp;#8230;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href="https://github.com/jantman/nagios-scripts/blob/master/check_1wire_temps.php"&gt;check_1wire_temps.php&lt;/a&gt;&lt;ul&gt;
+&lt;li&gt;quick and dirty, built for one specific application, but a good
+starting place for checking Dallas 1-wire temperatures via&amp;nbsp;&lt;span class="caps"&gt;OWFS&lt;/span&gt;.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;a href="https://github.com/jantman/nagios-scripts/blob/master/check_802dot11.php"&gt;check_802dot11.php&lt;/a&gt;&lt;ul&gt;
+&lt;li&gt;A script to check various things in the &lt;span class="caps"&gt;IEEE&lt;/span&gt;-&lt;span class="caps"&gt;802DOT11&lt;/span&gt; &lt;span class="caps"&gt;MIB&lt;/span&gt;, written
+for Ubiquiti APs&amp;nbsp;(&lt;span class="caps"&gt;SNMP&lt;/span&gt;).&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;a href="https://github.com/jantman/nagios-scripts/blob/master/check_frogfoot.php"&gt;check_frogfoot.php&lt;/a&gt;&lt;ul&gt;
+&lt;li&gt;A script to check some stuff from &lt;span class="caps"&gt;FROGFOOT&lt;/span&gt;-&lt;span class="caps"&gt;MIB&lt;/span&gt;, also written for
+Ubiquiti APs&amp;nbsp;(&lt;span class="caps"&gt;SNMP&lt;/span&gt;).&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;a href="https://github.com/jantman/nagios-scripts/blob/master/check_asterisk_iaxpeers"&gt;check_asterisk_iaxpeers&lt;/a&gt;&lt;ul&gt;
+&lt;li&gt;a Python check script to parse the output of rasterisk for &lt;span class="caps"&gt;IAX&lt;/span&gt;
+peer status and latency (includes perf data&amp;nbsp;output).&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;a href="https://github.com/jantman/nagios-scripts/blob/master/check_bacula_job.php"&gt;check_bacula_job.php&lt;/a&gt;&lt;ul&gt;
+&lt;li&gt;A script to connect to the Bacula database and make sure a
+specified job terminated &lt;span class="caps"&gt;OK&lt;/span&gt; and was run on&amp;nbsp;schedule.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;a href="https://github.com/jantman/nagios-scripts/blob/master/check_docsis"&gt;check_docsis&lt;/a&gt;&lt;ul&gt;
+&lt;li&gt;A script to check status and various metrics for cable modems
+implementing the &lt;span class="caps"&gt;DOCSIS&lt;/span&gt; &lt;span class="caps"&gt;MIB&lt;/span&gt; (&lt;span class="caps"&gt;SNMP&lt;/span&gt;). Works with (at least) the
+Motorola SurfBoard modems used by Cablevision (which use
+192.168.100.1 on the &lt;span class="caps"&gt;LAN&lt;/span&gt;&amp;nbsp;side).&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;a href="https://github.com/jantman/nagios-scripts/blob/master/check_syslog_age.php"&gt;check_syslog_age.php&lt;/a&gt;&lt;ul&gt;
+&lt;li&gt;A &lt;span class="caps"&gt;PHP&lt;/span&gt; script which checks (recursively) that the newest file under
+a directory is no more than X seconds old. I use this for checking
+my centralized syslog server, which has logs separated out in
+&lt;code&gt;/var/log/HOSTS/hostname&lt;/code&gt;.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;Update 2011-01-31&lt;/strong&gt; - the
+&lt;a href="https://github.com/jantman/nagios-scripts/blob/master/check_syslog_age.php"&gt;check_syslog_age.php&lt;/a&gt;
+script was updated today to handle an error condition where stat() calls
+in &lt;span class="caps"&gt;PHP&lt;/span&gt; fail on files larger than &lt;span class="caps"&gt;2GB&lt;/span&gt; on 32-bit&amp;nbsp;systems.&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Tue, 16 Mar 2010 22:33:00 -0400</pubDate><guid>tag:newblog.jasonantman.com,2010-03-16:2010/03/nagios-check-scripts/</guid><category>1-wire</category><category>asterisk</category><category>bacula</category><category>DOCSIS</category><category>Nagios</category><category>snmp</category><category>syslog</category><category>ubiquiti</category></item><item><title>Parsing Nagios status.dat in PHP</title><link>http://newblog.jasonantman.com/2010/02/parsing-nagios-status-dat-in-php/</link><description>&lt;p&gt;&lt;strong&gt;If you&amp;#8217;re just looking for the script or &lt;span class="caps"&gt;PHP&lt;/span&gt; module&lt;/strong&gt;, you can get
+them at:
+&lt;a href="http://github.com/jantman/php-nagios-xml"&gt;http://github.com/jantman/php-nagios-xml&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;A while ago (back in late 2008), I wrote a &lt;span class="caps"&gt;PHP&lt;/span&gt; script that parses the
+Nagios status.dat file into an associative array. My original use was to
+output &lt;span class="caps"&gt;XML&lt;/span&gt; which was then read by another script on another server and
+used for a small custom &lt;span class="caps"&gt;GUI&lt;/span&gt;. It&amp;#8217;s a very simple &lt;span class="caps"&gt;PHP&lt;/span&gt; script that just
+takes the path of the status.dat file (which, obviously, must be
+readable by the user running the&amp;nbsp;script).&lt;/p&gt;
+&lt;p&gt;At that time, I was using Nagios v2. Since then, I&amp;#8217;ve moved to Nagios
+v3, and have updated the script to include the ability to parse v3
+status.dat files, as well as a function to detect the version of a
+status file. I also refactored the code so that the parsing functions
+are all contained in a single file (statusXML.php.inc) which is safe to
+include in other scripts. The actual statusXML.php file now just
+includes examples of how to call all of the functions and output &lt;span class="caps"&gt;XML&lt;/span&gt;
+(though it is equally useful to output the serialized array, or use it&amp;nbsp;directly).&lt;/p&gt;
+&lt;p&gt;Since I posted my script online, two people have been kind enough to
+send back their&amp;nbsp;modifications:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href="http://www.krzywanski.net/"&gt;Artur Krzywański&lt;/a&gt; modified the original
+    (&lt;a href="https://github.com/jantman/php-nagios-xml/blob/9926602ef4868a898661b6ea0f430ff8ccba4dd3/parseNagiosXML.php"&gt;r4&lt;/a&gt;)
+    version of
+    &lt;a href="https://github.com/jantman/php-nagios-xml/blob/master/statusXML.php"&gt;statusXML.php&lt;/a&gt;
+    to allow selection of the keys to be&amp;nbsp;returned.&lt;/li&gt;
+&lt;li&gt;Whitham D. Reeve &lt;span class="caps"&gt;II&lt;/span&gt; of &lt;a href="http://www.gci.com"&gt;General Communication,
+    Inc.&lt;/a&gt;, who needed higher performance for a very
+    large status file, rewrote my script in C as a &lt;span class="caps"&gt;PHP&lt;/span&gt;&amp;nbsp;module.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Both of these generous contributions have been included in my &lt;a href="https://github.com/jantman/php-nagios-xml"&gt;Github
+repository&lt;/a&gt; as of the current
+commit. Unfortunately, due to my delay in putting my Nagios3 code into
+svn, both of these contributions are &lt;strong&gt;Nagios v2&lt;/strong&gt;&amp;nbsp;only.&lt;/p&gt;
+&lt;p&gt;As time permits, I plan on merging Artur&amp;#8217;s changes into the current
+version of statusXML.php.inc. Unfortunately, C isn&amp;#8217;t one of my strong
+points, but I plan on also updating Whitham&amp;#8217;s &lt;span class="caps"&gt;PHP&lt;/span&gt; module code to work
+with Nagios3 as soon as&amp;nbsp;possible.&lt;/p&gt;
+&lt;p&gt;Stay tuned for updates, and thanks to both gentlemen for contributing
+their work. I&amp;#8217;m always interested in hearing how people are using my
+code, and how they are making it&amp;nbsp;better.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Also:&lt;/strong&gt; While I added this project to &lt;a href="http://exchange.nagios.org/"&gt;Nagios
+Exchange&lt;/a&gt;, and plan on adding it to
+&lt;a href="http://www.monitoringexchange.org/"&gt;Monitoring Exchange&lt;/a&gt;, I don&amp;#8217;t
+always keep those sites up to date (I can&amp;#8217;t access Nagios Exchange right
+now, and who knows if I&amp;#8217;ll have time to update it tomorrow). I
+&lt;em&gt;strongly&lt;/em&gt; recommend directly checking out from Git at
+&lt;a href="https://github.com/jantman/php-nagios-xml"&gt;https://github.com/jantman/php-nagios-xml&lt;/a&gt;.&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Sun, 21 Feb 2010 22:42:00 -0500</pubDate><guid>tag:newblog.jasonantman.com,2010-02-21:2010/02/parsing-nagios-status-dat-in-php/</guid><category>Nagios</category><category>PHP</category><category>xml</category></item><item><title>Nagios and check plugins run as root</title><link>http://newblog.jasonantman.com/2009/11/nagios-and-check-plugins-run-as-root/</link><description>&lt;p&gt;No matter how much we may not like it, and no matter how insecure it can
+potentially be, we occasionally have to run Nagios check scripts
+(written in scripting languages) as root. (On a side note, this method
+is also used for my
+&lt;a href="http://multibindadmin.jasonantman.com/"&gt;MultiBindAdmin&lt;/a&gt; project&amp;#8217;s &lt;span class="caps"&gt;DNS&lt;/span&gt;
+file push). Here&amp;#8217;s how to do&amp;nbsp;it:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Write your check script in the language of your choice and test as&amp;nbsp;root.&lt;/li&gt;
+&lt;li&gt;Grab
+    &lt;a href="https://github.com/jantman/nagios-scripts/master/setuid-prog.c"&gt;setuid-prog.c&lt;/a&gt;
+    from&amp;nbsp;GitHub.&lt;/li&gt;
+&lt;li&gt;uncomment the &lt;span class="caps"&gt;DEFINE&lt;/span&gt; for FULL_PATH, change the string to the full
+    path to your&amp;nbsp;script.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Be sure&lt;/strong&gt; your script is owned by root, and is chmod &lt;strong&gt;at most&lt;/strong&gt;&amp;nbsp;755.&lt;/li&gt;
+&lt;li&gt;Compile setuid-prog.c:
+    &lt;code&gt;gcc -o {check_script_name}-wrapper setuid-prog.c&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;Put the resulting binary in your plugin&amp;nbsp;directory.&lt;/li&gt;
+&lt;li&gt;Assuming your checks run as user nagios and group nagios, chown the
+    binary to root:nagios and chmod&amp;nbsp;4755.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;This allows the use of the &lt;span class="caps"&gt;SUID&lt;/span&gt; bit with&amp;nbsp;scripts.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Use at your own risk.&lt;/strong&gt; I only recommend this on systems where the
+Nagios account is strongly authenticated, and where &lt;span class="caps"&gt;ALL&lt;/span&gt; users are&amp;nbsp;trusted.&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Thu, 05 Nov 2009 17:05:00 -0500</pubDate><guid>tag:newblog.jasonantman.com,2009-11-05:2009/11/nagios-and-check-plugins-run-as-root/</guid><category>Nagios</category></item><item><title>Nagios check_by_ssh and NAT</title><link>http://newblog.jasonantman.com/2009/10/nagios-check_by_ssh-and-nat/</link><description>&lt;p&gt;At a remote location, I have a number of machines to monitor but only
+one &lt;span class="caps"&gt;IP&lt;/span&gt; (dynamic on a residential connection). Most of my remote
+monitoring with Nagios uses check_by_ssh. Previously, I&amp;#8217;d used one
+host for Nagios to &lt;span class="caps"&gt;SSH&lt;/span&gt; to, and then chained together another
+check_by_ssh to reach the remote hosts. Unfortunately, this means
+nothing past the one first host can get monitored if the first host is
+down. All of the other hosts (everything is behind &lt;span class="caps"&gt;NAT&lt;/span&gt;) have &lt;span class="caps"&gt;SSH&lt;/span&gt; visible
+externally on different&amp;nbsp;ports.&lt;/p&gt;
+&lt;p&gt;&lt;span class="caps"&gt;SSH&lt;/span&gt; itself doesn&amp;#8217;t like one &lt;span class="caps"&gt;IP&lt;/span&gt;/hostname with &lt;span class="caps"&gt;SSH&lt;/span&gt; on different ports -
+host key verification will fail, as the &lt;span class="caps"&gt;SSH&lt;/span&gt; client only looks at the
+address that it&amp;#8217;s connecting to, not the port number. Normally, this is
+bypassed by using a &lt;code&gt;.ssh/config&lt;/code&gt; file&amp;nbsp;like:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;Host foo1
+        Hostname foo.example.com
+        HostKeyAlias foo1
+        CheckHostIP no
+        Port 22
+        User nagios
+
+Host foo2
+        Hostname foo.example.com
+        HostKeyAlias foo2
+        CheckHostIP no
+        Port 222
+        User nagios
+
+Host foo3
+        Hostname foo.example.com
+        HostKeyAlias foo3
+        CheckHostIP no
+        Port 10022
+        User nagios
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;And then you &lt;span class="caps"&gt;SSH&lt;/span&gt; using the &amp;#8220;Host&amp;#8221; named in the config file, not the
+actual&amp;nbsp;hostname.&lt;/p&gt;
+&lt;p&gt;Unfortunately, the only way to get check_by_ssh to do this was a bit
+messy, and required defining a bunch of extra macros for each&amp;nbsp;host:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;./check_by_ssh -o Hostname=foo.example.com -o HostKeyAlias=foo1 -o CheckHostIP=no -o Port=222 -o User=nagios -H foo.example.com -C uptime
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;So, I made a quick little patch for check_by_ssh.c (patched against
+the released nagios-plugins-1.4.14)&amp;nbsp;:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="gd"&gt;--- check_by_ssh.c      2009-10-22 14:32:26.000000000 -0400&lt;/span&gt;
+&lt;span class="gi"&gt;+++ check_by_ssh_ORIG.c 2009-10-22 14:12:15.000000000 -0400&lt;/span&gt;
+&lt;span class="gu"&gt;@@ -181,7 +181,6 @@&lt;/span&gt;
+                {&amp;quot;skip&amp;quot;, optional_argument, 0, &amp;#39;S&amp;#39;}, /* backwards compatibility */
+                {&amp;quot;skip-stdout&amp;quot;, optional_argument, 0, &amp;#39;S&amp;#39;},
+                {&amp;quot;skip-stderr&amp;quot;, optional_argument, 0, &amp;#39;E&amp;#39;},
+&lt;span class="gd"&gt;-               {&amp;quot;ssh-config&amp;quot;, optional_argument, 0, &amp;quot;F&amp;quot;},&lt;/span&gt;
+                {&amp;quot;proto1&amp;quot;, no_argument, 0, &amp;#39;1&amp;#39;},
+                {&amp;quot;proto2&amp;quot;, no_argument, 0, &amp;#39;2&amp;#39;},
+                {&amp;quot;use-ipv4&amp;quot;, no_argument, 0, &amp;#39;4&amp;#39;},
+&lt;span class="gu"&gt;@@ -199,7 +198,7 @@&lt;/span&gt;
+                        strcpy (argv[c], &amp;quot;-t&amp;quot;);
+
+        while (1) {
+&lt;span class="gd"&gt;-               c = getopt_long (argc, argv, &amp;quot;Vvh1246fqt:H:O:p:i:u:l:C:S::E::n:s:o:F:&amp;quot;, longopts,&lt;/span&gt;
+&lt;span class="gi"&gt;+               c = getopt_long (argc, argv, &amp;quot;Vvh1246fqt:H:O:p:i:u:l:C:S::E::n:s:o:&amp;quot;, longopts,&lt;/span&gt;
+                                 &amp;amp;option);
+
+                if (c == -1 || c == &lt;span class="caps"&gt;EOF&lt;/span&gt;)
+&lt;span class="gu"&gt;@@ -222,7 +221,7 @@&lt;/span&gt;
+                                timeout_interval = atoi (optarg);
+                        break;
+                case &amp;#39;H&amp;#39;:                                                                       /* host */
+&lt;span class="gd"&gt;-                 /* host_or_die(optarg); */     /* commented out 2009-10-22 by jantman for ssh config file use */&lt;/span&gt;
+&lt;span class="gi"&gt;+                       host_or_die(optarg);&lt;/span&gt;
+                        hostname = optarg;
+                        break;
+                case &amp;#39;p&amp;#39;: /* port number */
+&lt;span class="gu"&gt;@@ -300,12 +299,6 @@&lt;/span&gt;
+                        else
+                                skip_stderr = atoi (optarg);
+                        break;
+&lt;span class="gd"&gt;-               /* added 2009-10-22 by jantman for ssh -F option (config file) */&lt;/span&gt;
+&lt;span class="gd"&gt;-               case &amp;#39;F&amp;#39;:                                                                       /* ssh config file */&lt;/span&gt;
+&lt;span class="gd"&gt;-                       comm_append(&amp;quot;-F&amp;quot;);&lt;/span&gt;
+&lt;span class="gd"&gt;-                       comm_append(optarg);&lt;/span&gt;
+&lt;span class="gd"&gt;-                       break;&lt;/span&gt;
+&lt;span class="gd"&gt;-               /* &lt;span class="caps"&gt;END&lt;/span&gt; added 2009-10-22 by jantman */&lt;/span&gt;
+                case &amp;#39;o&amp;#39;:                                                                       /* Extra options for the ssh command */
+                        comm_append(&amp;quot;-o&amp;quot;);
+                        comm_append(optarg);
+&lt;span class="gu"&gt;@@ -411,8 +404,6 @@&lt;/span&gt;
+   printf (&amp;quot;    %s\n&amp;quot;, _(&amp;quot;Ignore all or (if specified) first n lines on &lt;span class="caps"&gt;STDERR&lt;/span&gt; [optional]&amp;quot;));
+   printf (&amp;quot; %s\n&amp;quot;, &amp;quot;-f&amp;quot;);
+   printf (&amp;quot;    %s\n&amp;quot;, _(&amp;quot;tells ssh to fork rather than create a tty [optional]. This will always return &lt;span class="caps"&gt;OK&lt;/span&gt; if ssh is executed&amp;quot;));
+&lt;span class="gd"&gt;-  printf (&amp;quot; %s\n&amp;quot;, &amp;quot;-F&amp;quot;);&lt;/span&gt;
+&lt;span class="gd"&gt;-  printf (&amp;quot;    %s\n&amp;quot;, _(&amp;quot;path to ssh config file [optional]&amp;quot;));&lt;/span&gt;
+   printf (&amp;quot; %s\n&amp;quot;,&amp;quot;-C, --command=&amp;#39;&lt;span class="caps"&gt;COMMAND&lt;/span&gt; &lt;span class="caps"&gt;STRING&lt;/span&gt;&amp;#39;&amp;quot;);
+   printf (&amp;quot;    %s\n&amp;quot;, _(&amp;quot;command to execute on the remote machine&amp;quot;));
+   printf (&amp;quot; %s\n&amp;quot;,&amp;quot;-l, --logname=&lt;span class="caps"&gt;USERNAME&lt;/span&gt;&amp;quot;);
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;It works fine. The only problem is that I disabled the check that the
+given hostname/&lt;span class="caps"&gt;IP&lt;/span&gt; is valid, so instead of getting a nice &amp;#8220;Invalid
+hostname/address - foobar&amp;#8221; error, you&amp;#8217;ll get the usual &amp;#8220;Remote command
+execution failed: ssh: foobar: Name or service not known&amp;#8221; error (though
+it will still give an exit code of 3). I had to do this because
+check_by_ssh was checking for a valid hostname itself, though &lt;span class="caps"&gt;SSH&lt;/span&gt;
+needs to be passed the &amp;#8220;Host&amp;#8221; alias as defined in the config&amp;nbsp;file.&lt;/p&gt;
+&lt;p&gt;With the patch, we now have something nice and clean&amp;nbsp;like:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;./check_by_ssh -H foo1 -F /home/nagios/.ssh/config -l nagios -i /home/nagios/.ssh/id_dsa -C uptime
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Which only adds the &amp;#8220;-F&amp;#8221; flag to what I was already using, and is safe
+to use for all&amp;nbsp;hosts.&lt;/p&gt;
+&lt;p&gt;When I get a chance, I&amp;#8217;ll figure out a way to gracefully deal with the
+host aliases (&amp;#8220;fake hostnames&amp;#8221;) and submit a patch. Most likely, I&amp;#8217;ll
+add another option so that you have to specify both the actual hostname
+(so it can check that it exists) and the alias used in the config file
+(perhaps&amp;nbsp;&amp;#8221;-a&amp;#8221;?)&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Thu, 22 Oct 2009 13:58:00 -0400</pubDate><guid>tag:newblog.jasonantman.com,2009-10-22:2009/10/nagios-check_by_ssh-and-nat/</guid><category>monitoring</category><category>Nagios</category></item></channel></rss>

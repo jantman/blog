@@ -1,0 +1,541 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Jason Antman's Blog</title><link href="http://newblog.jasonantman.com/" rel="alternate"></link><link href="http://newblog.jasonantman.com/feeds/tags/logging.atom.xml" rel="self"></link><id>http://newblog.jasonantman.com/</id><updated>2012-07-16T08:47:00-04:00</updated><entry><title>Logging OpenSSH SFTP Transactions</title><link href="http://newblog.jasonantman.com/2012/07/logging-openssh-sftp-transactions/" rel="alternate"></link><updated>2012-07-16T08:47:00-04:00</updated><author><name>admin</name></author><id>tag:newblog.jasonantman.com,2012-07-16:2012/07/logging-openssh-sftp-transactions/</id><summary type="html">&lt;p&gt;I just came across a really handy post on &lt;a href="https://plus.google.com/117561367404774597588/posts"&gt;David
+Busby&lt;/a&gt;&amp;#8216;s blog:
+&lt;a href="http://blog.oneiroi.co.uk/linux/enable-logging-in-the-sftp-subsystem/"&gt;Enable logging in the &lt;span class="caps"&gt;SFTP&lt;/span&gt; subsystem -
+Oneiroi&lt;/a&gt;.
+From OpenSSH 4.4 on, you can pass arguments to Subsystem calls, and the
+sftp subsystem supports logging to an aribtrary syslog facility and
+priority. Simply adding a line&amp;nbsp;like:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;Subsystem       sftp    /usr/libexec/openssh/sftp-server -f LOCAL5 -l INFO
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;and the appropriate lines to your syslog config will give you a handy
+transfer log&amp;nbsp;like:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;Jul 16 09:22:25 hostname sftp-server[2058]: session opened for local user jantman from [A.B.C.D]
+Jul 16 09:22:26 hostname sftp-server[2058]: open &amp;quot;/home/jantman/temp/sftp_test&amp;quot; flags WRITE,CREATE,TRUNCATE mode 0666
+Jul 16 09:22:45 hostname sftp-server[2058]: close &amp;quot;/home/jantman/temp/sftp_test&amp;quot; bytes read 0 written 1464813
+Jul 16 09:23:08 hostname sftp-server[2058]: session closed for local user jantman from [A.B.C.D]
+Jul 16 09:27:50 hostname sftp-server[2309]: session opened for local user jantman from [A.B.C.D]
+Jul 16 09:27:50 hostname sftp-server[2309]: open &amp;quot;/home/jantman/temp/sftp_test&amp;quot; flags READ mode 0666
+Jul 16 09:27:54 hostname sftp-server[2309]: close &amp;quot;/home/jantman/temp/sftp_test&amp;quot; bytes read 1464813 written 0
+Jul 16 09:27:54 hostname sftp-server[2309]: session closed for local user jantman from [A.B.C.D]
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;If you have syslog write these logs to their own file, remember to setup
+log rotation for&amp;nbsp;them.&lt;/p&gt;
+&lt;p&gt;Unfortunately, I&amp;#8217;m not aware of any way to log &lt;span class="caps"&gt;SCP&lt;/span&gt; file&amp;nbsp;transfers.&lt;/p&gt;</summary><category term="logging"></category><category term="openssh"></category><category term="sftp"></category><category term="ssh"></category></entry><entry><title>Apache httpd - logging for sites with and without load balancing</title><link href="http://newblog.jasonantman.com/2012/05/apache-httpd-logging-for-sites-with-and-without-load-balancing/" rel="alternate"></link><updated>2012-05-30T09:46:00-04:00</updated><author><name>admin</name></author><id>tag:newblog.jasonantman.com,2012-05-30:2012/05/apache-httpd-logging-for-sites-with-and-without-load-balancing/</id><summary type="html">&lt;p&gt;There are a few unfortunate places where I have an Apache httpd server
+serving multiple vhosts, some behind a F5 BigIp load balancer and some
+with direct traffic. For sites behind the &lt;span class="caps"&gt;LB&lt;/span&gt;, the remote &lt;span class="caps"&gt;IP&lt;/span&gt;/host will
+always show up as the &lt;span class="caps"&gt;LB&lt;/span&gt;&amp;#8217;s &lt;span class="caps"&gt;IP&lt;/span&gt;/host, not that of the actual client. Using
+the default configuration with LogFormat directives in &lt;code&gt;httpd.conf&lt;/code&gt;,
+this means that either we need to define log formats per-vhost or lose
+the client &lt;span class="caps"&gt;IP&lt;/span&gt; in one of our scenarios (&lt;span class="caps"&gt;LB&lt;/span&gt; or no&amp;nbsp;&lt;span class="caps"&gt;LB&lt;/span&gt;).&lt;/p&gt;
+&lt;p&gt;I came by a simple solution to this on &lt;a href="http://www.maretmanu.org/homepage/inform/apache-forwarded.php"&gt;Emmanuel
+Chantréau&lt;/a&gt;&amp;#8216;s
+blog, and here is my condensed version of it. It sets an environment
+variable (&amp;#8220;bigip-request&amp;#8221;) if the BIOrigClientAddr request header is set
+(this header holds the client&amp;#8217;s &lt;span class="caps"&gt;IP&lt;/span&gt;; it&amp;#8217;s the BigIp proprietary version
+of the X-Forwarded-For header. You could easily substitute that more
+standard header in the following snippet) and then sets the &amp;#8220;combined&amp;#8221;
+LogFormat based on that variable - a version using BIOrigClientAddr if
+it is set, and a version using the normal &amp;#8220;%h&amp;#8221; remote host&amp;nbsp;otherwise.&lt;/p&gt;
+&lt;p&gt;In&amp;nbsp;httpd.conf:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="c"&gt;# set the &amp;quot;bigip-request&amp;quot; env variable to &amp;quot;1&amp;quot; if there is a BIOrigClientAddr header in the request                                                                                                   &lt;/span&gt;
+&lt;span class="nb"&gt;SetEnvIf&lt;/span&gt; BIOrigClientAddr . bigip-request
+&lt;span class="c"&gt;# we&amp;#39;ll use this following LogFormat (BIOrigClientAddr in place of remote host) as &amp;quot;combined&amp;quot; &lt;span class="caps"&gt;IF&lt;/span&gt; the bigip-request env variable is set                                                                     &lt;/span&gt;
+&lt;span class="nb"&gt;LogFormat&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;%{BIOrigClientAddr}i %l %u %t %v \&amp;quot;%r\&amp;quot; %&amp;gt;s %b \&amp;quot;%{Referer}i\&amp;quot; \&amp;quot;%{User-Agent}i\&amp;quot;&amp;quot;&lt;/span&gt; combined_lb
+&lt;span class="c"&gt;# else we&amp;#39;ll use this one (remote host &lt;span class="caps"&gt;IP&lt;/span&gt; address) as &amp;quot;combined&amp;quot; &lt;span class="caps"&gt;IF&lt;/span&gt; the bigip-request env variable is &lt;span class="caps"&gt;NOT&lt;/span&gt; set                                                                                   &lt;/span&gt;
+&lt;span class="nb"&gt;LogFormat&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;%h %l %u %t %v \&amp;quot;%r\&amp;quot; %&amp;gt;s %b \&amp;quot;%{Referer}i\&amp;quot; \&amp;quot;%{User-Agent}i\&amp;quot;&amp;quot;&lt;/span&gt; combined
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;And then in our vhost&amp;nbsp;configuration:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="c"&gt;# use this log format if we&amp;#39;re behind an &lt;span class="caps"&gt;LB&lt;/span&gt;&lt;/span&gt;
+&lt;span class="nb"&gt;CustomLog&lt;/span&gt; logs/&amp;lt;%= domain %&amp;gt;_access_log combined env=!bigip-request
+&lt;span class="c"&gt;# or this format if we&amp;#39;re not&lt;/span&gt;
+&lt;span class="nb"&gt;CustomLog&lt;/span&gt; logs/&amp;lt;%= domain %&amp;gt;_access_log combined_lb env=bigip-request
+&lt;/pre&gt;&lt;/div&gt;</summary><category term="apache"></category><category term="bigip"></category><category term="f5"></category><category term="httpd"></category><category term="load balancer"></category><category term="logging"></category></entry><entry><title>Some Thoughts on Choosing a New Wordpress Theme</title><link href="http://newblog.jasonantman.com/2012/03/some-thoughts-on-choosing-a-new-wordpress-theme/" rel="alternate"></link><updated>2012-03-17T11:48:00-04:00</updated><author><name>admin</name></author><id>tag:newblog.jasonantman.com,2012-03-17:2012/03/some-thoughts-on-choosing-a-new-wordpress-theme/</id><summary type="html">&lt;p&gt;I think I&amp;#8217;m going to choose a new theme for my blog. The current theme
+is &lt;a href="http://wordpress.org/extend/themes/inove"&gt;iNove&lt;/a&gt; (albeit an older
+version with some custom modifications), and I feel like it looks a bit
+messy and has gotten a bit cluttered, so it&amp;#8217;s time to find something
+new. I like the 2-column layout, and have a few other things I&amp;#8217;m looking
+for - specifically, aside from something with advanced features like
+lots of widget support and hooks, something that has good visual
+separation between different posts and widgets. I also really want
+something, if possible, with relative column widths. My current home and
+work desktops both have dual monitors, and the minimum resolution I have
+on one screen is 1920x1080. When I look at my blog in a maximized
+window, about half the screen width is wasted with empty space. So,
+ideally, I&amp;#8217;d like a theme that&amp;#8217;s based on relative widths, probably with
+a &amp;#8220;min-width&amp;#8221; property so it wouldn&amp;#8217;t get compressed to an absurdly
+narrow width on small&amp;nbsp;screens.&lt;/p&gt;
+&lt;p&gt;I use &lt;a href="http://www.google.com/analytics/"&gt;Google Analytics&lt;/a&gt; (as noted in
+the &lt;a href="/privacy-policy/"&gt;privacy policy&lt;/a&gt;) for visitor statistics on this
+blog (more about that in a moment). So, I took a peek at the breakdown
+of visitors by screen resolution, and saw that for the past year, 94% of
+the 27,500 visits had a screen width of 1024px or more (and the majority
+of the others looked like mobile device resolutions, so they&amp;#8217;d probably
+zoom the page correctly). So, my first gut reaction was to assume that I
+could use a theme approximately 1000px wide. Unfortunately, there&amp;#8217;s two
+main problems with that: first, as mentioned by &lt;a href="http://css-tricks.com/screen-resolution-notequalto-browser-window/"&gt;Chris Coyier on
+&lt;span class="caps"&gt;CSS&lt;/span&gt;-Tricks.com&lt;/a&gt;,
+just because someone has a given screen resolution doesn&amp;#8217;t mean their
+browser window (let alone the viewport) is that size. As a matter of
+fact, I usually have my main browser window set at about 80% of the
+width of one of my monitors, with my instant messaging client
+&lt;a href="http://pidgin.im/"&gt;Pidgin&lt;/a&gt; taking up the rest of the space. So there&amp;#8217;s
+one inaccuracy. There&amp;#8217;s a potentially much greater inaccuracy in my
+stats as well, which I&amp;#8217;m going to discuss in a &lt;a href="/2012/03/inaccuracies-in-google-analytics-for-website-stats/"&gt;separate
+post&lt;/a&gt;.&lt;/p&gt;</summary><category term="analysis"></category><category term="analytics"></category><category term="blog"></category><category term="google"></category><category term="logging"></category><category term="stats"></category><category term="theme"></category><category term="wordpress"></category></entry><entry><title>Inaccuracies in Google Analytics for Website Stats</title><link href="http://newblog.jasonantman.com/2012/03/inaccuracies-in-google-analytics-for-website-stats/" rel="alternate"></link><updated>2012-03-17T11:46:00-04:00</updated><author><name>admin</name></author><id>tag:newblog.jasonantman.com,2012-03-17:2012/03/inaccuracies-in-google-analytics-for-website-stats/</id><summary type="html">&lt;p&gt;I use Google Analytics for visitor stats on this blog. Not because I&amp;#8217;m
+trying to direct-market to my readers or become Big Brother, but for a
+number of simple&amp;nbsp;reasons:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;It&amp;#8217;s simple - no software for me to update, and nothing that needs
+    to run on my server and read through giant log files every night.
+    Google does it all for&amp;nbsp;me.&lt;/li&gt;
+&lt;li&gt;It gives a lot more information than I can get from just web server&amp;nbsp;logs.&lt;/li&gt;
+&lt;li&gt;Because of Google&amp;#8217;s &amp;#8220;big brother&amp;#8221; tracking, and the vast number of
+    sites that they track people on, I can tell things I&amp;#8217;d have no other
+    way of knowing, like how long someone stayed on my&amp;nbsp;page.&lt;/li&gt;
+&lt;li&gt;They tell me &lt;em&gt;useful&lt;/em&gt; stats like which search keywords brought the
+    most people to my site and which posts are the most popular, which I
+    keep in mind when writing new stuff and updating older&amp;nbsp;posts.&lt;/li&gt;
+&lt;li&gt;They tell me information about client operating system and browser
+    version, which I think tells quite a bit about my&amp;nbsp;audience.&lt;/li&gt;
+&lt;li&gt;As far as I know, they&amp;#8217;re pretty good at filtering out anything
+    other than an actual human&amp;nbsp;visitor.&lt;/li&gt;
+&lt;li&gt;They tell me stats that have no real use to me, but are just cook -
+    like what countries my visitors are from, what type of Internet
+    connection they&amp;#8217;re on, their screen resolution,&amp;nbsp;etc.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Obviously not for google, but for me, all of these stats are totally
+anonymous - I just get percentages or numbers of visits, it&amp;#8217;s not like I
+can see all of the details per-&lt;span class="caps"&gt;IP&lt;/span&gt; address. The most important aspect to
+me is just the ease of use - I sign up and put a little snippet of code
+on my pages, and I get an amazing dashboard interface with all of this
+information. Nothing to install and update on my server, and (most
+importantly, since I&amp;#8217;m now running everything of mine on one virtualized
+server) no massive program to run as a cron job that has to read all my
+server log&amp;nbsp;files.&lt;/p&gt;
+&lt;p&gt;Last week I was talking with a couple of my co-workers, specifically
+about the stats that I get from Google Analytics. While I know it&amp;#8217;s not
+uncommon to run &lt;a href="http://noscript.net/"&gt;NoScript&lt;/a&gt; especially among the
+more security- and privacy-conscious groups of people, I was a bit
+disturbed to hear that they all block Google&amp;#8217;s tracking code in their
+browsers via NoScript. I assume there&amp;#8217;s also a percentage of people who
+still just turn off JavaScript alltogether (although I can&amp;#8217;t imagine how
+they use the modern Web), and many who use the &lt;a href="http://tools.google.com/dlpage/gaoptout?hl=en"&gt;Google Analytics
+Opt-Out&lt;/a&gt; feature. So,
+especially with as technical an audience as I have, I guess that means
+I&amp;#8217;m likely missing a large number of visitors in my stats. On one hand,
+I want to respect the privacy of my visitors, and respect their desire
+to opt-out of advanced tracking. On the other hand, since I no longer
+parse web server logs for statistics, these privacy-conscious visitors
+aren&amp;#8217;t even showing up in what I think of as my monthly visit count, or
+in my information on what posts and search keywords are most popular,
+which I only use for &amp;#8220;good&amp;#8221; purposes - to make my blog more useful. So
+that&amp;#8217;s a bit of a&amp;nbsp;conundrum.&lt;/p&gt;
+&lt;p&gt;I&amp;#8217;ll admit that I do run &lt;a href="https://www.google.com/adsense/"&gt;Google AdSense
+Ads&lt;/a&gt; on my blog, and I&amp;#8217;m sure there are
+some people who block the ads. On one hand, that upsets me a bit; I run
+this blog to try and share information that I find or learn with others,
+and the hosting costs aren&amp;#8217;t insignificant. If I can get paid to just
+show some ads, to try and help offset the cost of running the site, I
+think that&amp;#8217;s good. And if other people can help support the site by just
+letting the ads stay on the page, why not? On the other hand, my hosting
+costs $50/month (granted the server also handles all of my email, and a
+&lt;em&gt;whole bunch&lt;/em&gt; of other sites). I&amp;#8217;ve been participating in Google AdSense
+since March 5, 2010 (two years and two weeks), and my &amp;#8220;estimated
+earnings&amp;#8221; are currently $80. The payout is in $100 increments. So, I
+haven&amp;#8217;t seen a cent from it in two years, so I&amp;#8217;ve given up being
+concerned with it. If you want to be nice, and find my posts
+interesting, click on one of the ads. Unfortunately, unless I get
+famous, the ads aren&amp;#8217;t going to come close to offsetting even part of
+the cost of running the&amp;nbsp;site.&lt;/p&gt;
+&lt;p&gt;Google itself
+&lt;a href="http://support.google.com/googleanalytics/bin/answer.py?hl=en&amp;amp;answer=55610"&gt;says&lt;/a&gt;,
+&amp;#8220;In order for Google Analytics to record a visit, the visitor must have
+JavaScript, images, and cookies enabled for your website.&amp;#8221; There seems
+to be some buzz about this on the &amp;#8216;net, and I&amp;#8217;ve seen
+&lt;a href="http://garmahis.com/tips/google-analytics/#use-Google-Analytics-without-JavaScript"&gt;a&lt;/a&gt;
+&lt;a href="http://djangosnippets.org/snippets/2338/"&gt;number&lt;/a&gt;
+&lt;a href="http://translate.google.com/translate?hl=en&amp;amp;sl=nl&amp;amp;u=http://andrescholten.nl/google-analytics-zonder-javascript/"&gt;of&lt;/a&gt;
+(translated; &lt;a href="http://andrescholten.nl/google-analytics-zonder-javascript/"&gt;original post in
+Dutch&lt;/a&gt;)
+posts advocating building a request to a Google Analytics &lt;span class="caps"&gt;GIF&lt;/span&gt; manually
+on the server side, and then including it as an image element inside a
+&lt;code&gt;&amp;lt;noscript&amp;gt;&lt;/code&gt; tag in the page. While this is probably one of the nicer
+solutions (and much more likely to reduce double-counting), it doesn&amp;#8217;t
+capture any of the advanced data (screen resolution, etc.) that
+JavaScript-based Analytics does, and more importantly, I imagine that
+many of the Ad blocking extensions also block traffic to
+google-analytics.com, so this is an incremental improvement at best.
+There are also
+&lt;a href="http://www.vdgraaf.info/google-analytics-without-javascript.html"&gt;quite&lt;/a&gt;
+&lt;a href="http://blog.datalicious.com/google-analytics-without-javascript-rss-xml-e"&gt;a&lt;/a&gt;
+&lt;a href="http://blogs.walkerart.org/newmedia/2009/11/12/building-walkers-mobile-site-google-analytics-without-javascript-pt2/"&gt;few&lt;/a&gt;
+posts about how to make a request to Analytics purely server-side. This
+has a few disadvantages as well; it bypasses the google domain
+blacklisting problem that the client-side image has, but it also means
+you lose the client &lt;span class="caps"&gt;IP&lt;/span&gt; address (and therefore geolocation), and that you
+double-track any user who allows javascript (so you need a separate
+profile, and then need to average out the results). It also means that
+you track every search engine and bot that crawls your site, and
+possibly every person who clicks a link and then hits &amp;#8220;back&amp;#8221; before the
+page finishes loading. I found another blogger who &lt;a href="http://www.realityburst.com/battle-of-the-inaccuracies-how-accurate-is-google-analyticsawstatsstatpress"&gt;commented
+about&lt;/a&gt;
+the wide disparity he saw between Google Analytics, the
+&lt;a href="http://wordpress.org/extend/plugins/statpress/"&gt;StatsPress&lt;/a&gt; WordPress
+plugin, and &lt;a href="http://awstats.sourceforge.net/"&gt;AWstats&lt;/a&gt; (a server-side
+log file&amp;nbsp;analyzer).&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;So what&amp;#8217;s the&amp;nbsp;solution?&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;Most of the options have a down side, but I&amp;#8217;m looking for something
+that&amp;#8217;s the best I can reasonably do. As much as I&amp;#8217;d rather not, I&amp;#8217;m
+going to look into self-hosted alternatives to Google Analytics (a
+self-hosted JavaScript-based stats provider), in the hopes that NoScript
+users will be more friendly to scripts coming from my own domain, and
+sending requests to my own domain, than ones from Google or other major
+trackers. I don&amp;#8217;t think I want to try anything that parses web server
+logs as a primary approach, as I don&amp;#8217;t think I could ever get a
+meaningful comparison to Google Analytics or something else&amp;nbsp;JavaScript-based.&lt;/p&gt;
+&lt;p&gt;I did have one other idea which I think is interesting, though a bit of
+an overhead. I could have Apache (or, more likely, a Perl script called
+in the Apache configuration) generate a random string for each request,
+and save it in an Apache environment variable. The environment variable
+would then be added to a field in the server logs, and also added (via
+&lt;span class="caps"&gt;PHP&lt;/span&gt; or whatever else generates the pages server-side) as a custom
+parameter for the &lt;span class="caps"&gt;JS&lt;/span&gt; tracking code, enabling page hits to be correlated
+between the &lt;span class="caps"&gt;JS&lt;/span&gt; tracking and the server logs. Assuming the &lt;span class="caps"&gt;JS&lt;/span&gt; tacking
+backend stores its data in a sane format (and as raw data, not just
+aggregated), and at the cost of a serious performance penalty, a
+server-side statistics program like
+&lt;a href="http://awstats.sourceforge.net/"&gt;AWstats&lt;/a&gt; or
+&lt;a href="http://www.webalizer.org/"&gt;Webalizer&lt;/a&gt; could be patched to lookup the
+unique identifier in the &lt;span class="caps"&gt;JS&lt;/span&gt; stats data store, and ignore all hits which
+were tracked that&amp;nbsp;way.&lt;/p&gt;
+&lt;p&gt;I&amp;#8217;m going to start by looking into self-hosted open source alternatives
+to Google Analytics, which I&amp;#8217;ll post about sometime hopefully&amp;nbsp;soon.&lt;/p&gt;</summary><category term="analytics"></category><category term="google"></category><category term="logging"></category><category term="statistics"></category><category term="stats"></category></entry><entry><title>Petit for Log Analysis</title><link href="http://newblog.jasonantman.com/2012/02/petit-for-log-analysis/" rel="alternate"></link><updated>2012-02-21T11:57:00-05:00</updated><author><name>admin</name></author><id>tag:newblog.jasonantman.com,2012-02-21:2012/02/petit-for-log-analysis/</id><summary type="html">&lt;p&gt;I recently discovered the
+&lt;a href="http://crunchtools.com/software/petit/"&gt;petit&lt;/a&gt; program for log
+analysis. It&amp;#8217;s a simple tool to pull out useful information from syslog
+logs in a variety of ways. I&amp;#8217;ve only used it a few times so far, mainly
+on logs from problems I&amp;#8217;ve already solved but didn&amp;#8217;t know the cause of
+at first. So far, it&amp;#8217;s proven quite useful. Here are a few&amp;nbsp;examples:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;petit --wordcount /var/log/messages&lt;/code&gt; - displays ordered count of
+    words appearing in the log. My first step, especially if &amp;#8220;warning&amp;#8221;,
+    &amp;#8220;error&amp;#8221; or &amp;#8220;fatal&amp;#8221; shows up near the&amp;nbsp;top&amp;#8230;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;petit --hash --fingerprint /var/log/messages&lt;/code&gt; - hashes the log,
+    removes filters (such as numerics, datestamp), and displays count of
+    matching lines. Absolutely wonderful for web error logs, as it
+    removes client &lt;span class="caps"&gt;IP&lt;/span&gt; addresses, line numbers,&amp;nbsp;etc.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;petit --mgraph /var/log/messages&lt;/code&gt; - graph messages per minute for
+    the first hour of the log (&lt;span class="caps"&gt;ASCII&lt;/span&gt; of&amp;nbsp;course)&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;petit --hgraph /var/log/messages&lt;/code&gt; - same as above, but messages per
+    hour for the first&amp;nbsp;day&lt;/li&gt;
+&lt;li&gt;Petit will also read from stdin with the &amp;#8212;Xgraph options, so you
+    can &lt;code&gt;cat logfile | grep word | petit --mgraph&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Just one note - this tool appears to work only on standard syslog
+formatted logs. If some non-datestamped lines managed to work their way
+into the log (i.e. someone used echo &gt;&gt; logfile instead of &lt;code&gt;logger&lt;/code&gt;),
+it will&amp;nbsp;choke.&lt;/p&gt;
+&lt;p&gt;Many thanks to Scott McCarty for this wonderful&amp;nbsp;tool!&lt;/a&gt;&lt;/p&gt;</summary><category term="analysis"></category><category term="log"></category><category term="logging"></category><category term="petit"></category><category term="syslog"></category></entry><entry><title>php-suhosin syslog issues</title><link href="http://newblog.jasonantman.com/2011/10/php-suhosin-syslog-issues/" rel="alternate"></link><updated>2011-10-21T10:24:00-04:00</updated><author><name>admin</name></author><id>tag:newblog.jasonantman.com,2011-10-21:2011/10/php-suhosin-syslog-issues/</id><summary type="html">&lt;p&gt;I just installed php-&lt;a href="http://www.hardened-php.net/suhosin/"&gt;suhosin&lt;/a&gt;
+0.9.29 from &lt;span class="caps"&gt;EPEL&lt;/span&gt; on a CentOS 5.6 box. I&amp;#8217;m running a whole bunch of
+name-based vhosts in Apache, and have a bunch of web apps, so I opted to
+run suhosin in simulation mode (don&amp;#8217;t actually block anything, but log
+errors) and have it log via syslog to a single file. Unfortunately, when
+I configured this, the syslog messages started showing up in the wrong
+place, apparently with the wrong facility &lt;em&gt;and&lt;/em&gt; priority. After some
+roundabout debugging (at first assuming syslogd to be the problem), I
+determined that, for whatever really strange reason (perhaps an
+incorrect syslog.h on the &lt;span class="caps"&gt;EPEL&lt;/span&gt; box that built the suhosin package?) the
+LOG_* constants were incorrect. I looked up the correct integer values
+in &lt;code&gt;/usr/include/sys/syslog.h&lt;/code&gt; and the following configuration
+directives accomplished the task&amp;nbsp;correctly:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="na"&gt;suhosin.log.syslog.facility&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;128&lt;/span&gt;
+&lt;span class="c1"&gt;; 128 = LOG_LOCAL0&lt;/span&gt;
+
+&lt;span class="na"&gt;suhosin.log.syslog.priority&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;5&lt;/span&gt;
+&lt;span class="c1"&gt;; 5 = LOG_NOTICE&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;This one line puts suhosin into simulation mode, where it only logs
+errors instead of enforcing on&amp;nbsp;them:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="na"&gt;suhosin.simulation&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;On&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;</summary><category term="centos"></category><category term="logging"></category><category term="PHP"></category><category term="security"></category><category term="suhosin"></category><category term="syslog"></category></entry><entry><title>MySQL General Query Log and Awk Trimming Columns</title><link href="http://newblog.jasonantman.com/2010/12/mysql-general-query-log-and-awk-trimming-columns/" rel="alternate"></link><updated>2010-12-21T11:45:00-05:00</updated><author><name>admin</name></author><id>tag:newblog.jasonantman.com,2010-12-21:2010/12/mysql-general-query-log-and-awk-trimming-columns/</id><summary type="html">&lt;p&gt;So today I started to implement a number of complex regex-based rules
+and templates to get &lt;a href="http://www.rsyslog.com"&gt;rsyslog&lt;/a&gt; to parse &lt;span class="caps"&gt;ISC&lt;/span&gt;
+DHCPd logs in realtime. Unfortunately one of my templates must have been
+wrong, because I started seeing some errors about a field that cannot be
+blank in &lt;code&gt;/var/log/messages&lt;/code&gt;. Unfortunately, rsyslog doesn&amp;#8217;t log the
+query that raised the error, or the name of the template, or anything
+else useful - just that there was a database error. With over a dozen
+new templates, this didn&amp;#8217;t help much. But the following technique&amp;nbsp;did:&lt;/p&gt;
+&lt;p&gt;MySQLd has a &lt;a href="http://dev.mysql.com/doc/refman/5.1/en/query-log.html"&gt;General Query
+Log&lt;/a&gt; that can be
+activated by addling a line&amp;nbsp;like:  &lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;log=/tmp/query.log`
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;to &lt;code&gt;/etc/my.cnf&lt;/code&gt; under the &lt;code&gt;[mysqld]&lt;/code&gt; section. This will log *all*
+queries to the specified log file, even if they resulted in an error or
+did not manipulate&amp;nbsp;data.&lt;/p&gt;
+&lt;p&gt;I couldn&amp;#8217;t find documentation on the log file format, but I observed
+that each line appeared to begin with some whitespace, then a number
+(perhaps a connection or section number, or maybe some sort of query
+ordering number), then the word &amp;#8220;Query&amp;#8221;, then the query. The following
+awk expression prints everything from the third column on, dropping the
+first two columns (the number and&amp;nbsp;&amp;#8220;Query&amp;#8221;):  &lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;awk &lt;span class="s1"&gt;&amp;#39;{ for (i=2; i&amp;lt;=&lt;span class="caps"&gt;NF&lt;/span&gt;; i++) printf &amp;quot;%s &amp;quot;, $i; printf &amp;quot;\n&amp;quot;; }&amp;#39;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;For easy analysis, the output of that can be piped into &lt;code&gt;sort&lt;/code&gt; and then
+&lt;code&gt;uniq&lt;/code&gt;.&lt;/p&gt;</summary><category term="awk"></category><category term="database"></category><category term="logging"></category><category term="mysql"></category></entry><entry><title>rsyslog on CentOS5</title><link href="http://newblog.jasonantman.com/2009/09/rsyslog-on-centos5/" rel="alternate"></link><updated>2009-09-17T15:45:00-04:00</updated><author><name>admin</name></author><id>tag:newblog.jasonantman.com,2009-09-17:2009/09/rsyslog-on-centos5/</id><summary type="html">&lt;p&gt;&lt;strong&gt;Update July 2011&lt;/strong&gt; - We&amp;#8217;ve been using rsyslog for our centralized
+syslog infrastructure at &lt;a href="http://services.rutgers.edu/"&gt;work&lt;/a&gt; (site
+being redesigned at the moment) for about a year now. As a result, our
+colleagues at &lt;a href="http://oss.rutgers.edu"&gt;Rutgers University Open System
+Solutions&lt;/a&gt; have been nice enough to include
+rsyslog in their &lt;a href="http://koji.rutgers.edu"&gt;koji&lt;/a&gt; build system. Updated
+packages of rsyslog for CentOS 5 x86 and x86_64 are available
+&lt;a href="http://koji.rutgers.edu/koji/buildinfo?buildID=2140"&gt;here&lt;/a&gt;. Please be
+aware that they have some dependencies of specific &lt;span class="caps"&gt;RU&lt;/span&gt; versions. It&amp;#8217;s
+probably best if you download the source &lt;span class="caps"&gt;RPM&lt;/span&gt; and build it yourself using
+rpmbuild. The current &lt;a href="http://koji.rutgers.edu/koji/rpminfo?rpmID=14051"&gt;5.6.2 source
+package&lt;/a&gt; includes a
+CentOS 5 spec file and other related scripts. This &lt;span class="caps"&gt;RPM&lt;/span&gt; repository is
+only open to the public as a courtesy, so please download once at most
+and distribute it to your servers&amp;nbsp;yourself.&lt;/p&gt;
+&lt;p&gt;Having finally setup my storage server (I know it&amp;#8217;s not much, but for me
+starting with &lt;span class="caps"&gt;1TB&lt;/span&gt; is wonderful), I actually got around to redoing my
+centralized logging infrastructure. Here&amp;#8217;s a small summary of what I
+have to&amp;nbsp;handle:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;logs from 15 hosts at 2 locations, including Cisco devices and a mix
+    of syslog and syslog-ng Linux&amp;nbsp;boxen.&lt;/li&gt;
+&lt;li&gt;Remote location logs forwarded to one server at remote location,
+    then to centralized log server via &lt;span class="caps"&gt;SSH&lt;/span&gt; port&amp;nbsp;forwarding.&lt;/li&gt;
+&lt;li&gt;48-hour retention of full iptables border firewall logs (\~&amp;nbsp;&lt;span class="caps"&gt;3GB&lt;/span&gt;/day).&lt;/li&gt;
+&lt;li&gt;Future plans to have all logs stored in&amp;nbsp;MySQL.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;I&amp;#8217;d previously had most of the boxes logging to an older host with low
+disk space, but had to discontinue this due to lack of storage. Having
+assessed the options, and with definite plans to log to a database, I
+decided to go with &lt;a href="http://www.rsyslog.com"&gt;rsyslog&lt;/a&gt; for the centralized&amp;nbsp;host.&lt;/p&gt;
+&lt;p&gt;Unfortunately, stable rsyslog is up to 4.4.x, with 5.x in development,
+and the newest package I could find for CentOS was 2.something. So, I
+set about building it from source. It was a *very* difficult build on
+my machine (CentOS 5.3, 2.6.18-128.el5 #1 &lt;span class="caps"&gt;SMP&lt;/span&gt; i686). Unfortunately, I
+don&amp;#8217;t have an &lt;span class="caps"&gt;RPM&lt;/span&gt; build environment setup, but here&amp;#8217;s how I accomplished&amp;nbsp;it:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;If not already done, &lt;code&gt;yum install rpmforge-release&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;yum install gnutls-devel gnutls libatomic\_ops-devel gcc43 java-1.6.0-openjdk-devel&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;Download
+    &lt;a href="http://rsyslog.com/Downloads-index-req-viewdownload-cid-1-orderby-dateD.phtml"&gt;rsyslog-4.5.2&lt;/a&gt;
+    (currently Beta). Extract, &lt;code&gt;cd&lt;/code&gt; into the&amp;nbsp;directory.&lt;/li&gt;
+&lt;li&gt;To test the performance difference from MySQL,
+    &lt;code&gt;yum install php-pgsql postgresql postgresql-devel postgresql-libs postgresql-server&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;Edit the &lt;code&gt;configure&lt;/code&gt; script, add &lt;code&gt;-DHAVE\_ATOMIC\_BUILTINS&lt;/code&gt;
+    to the &lt;code&gt;DEFS&lt;/code&gt; line (28936 in this&amp;nbsp;version).&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;export CC=/usr/bin/gcc43&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;export CCDEPMODE="depmode=gcc4"&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;export CFLAGS="-O3 -march=i686"&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;./configure --enable-mysql --enable-omtemplate --enable-gnutls --enable-pgsql&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;make &amp;amp;&amp;amp; make install&lt;/code&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;For my system, I used the &lt;code&gt;/etc/sysconfig/rsyslog&lt;/code&gt; and &lt;code&gt;/etc/init.d/rsyslog&lt;/code&gt;
+from the 2.x rsyslog RPMs, with some modifications as&amp;nbsp;follows:&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;/etc/sysconfig/rsyslog&lt;/code&gt; &lt;em&gt;(comments have been removed to save space)&lt;/em&gt;:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;# -c4   version 4 compatibility mode
+# -x     disable DNS for remote messages (don&amp;#39;t want it to hang if DNS is down
+# -4     IPv4 only
+SYSLOGD_OPTIONS=&amp;quot;-c4 -x -4&amp;quot;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;&lt;code&gt;/etc/init.d/rsyslog&lt;/code&gt; &lt;em&gt;(comments have been removed to save space)&lt;/em&gt;:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="c"&gt;#!/bin/bash&lt;/span&gt;
+&lt;span class="c"&gt;#&lt;/span&gt;
+&lt;span class="c"&gt;# rsyslog        Starts rsyslogd.&lt;/span&gt;
+&lt;span class="c"&gt;#&lt;/span&gt;
+&lt;span class="c"&gt;#&lt;/span&gt;
+&lt;span class="c"&gt;# chkconfig: - 12 88&lt;/span&gt;
+&lt;span class="c"&gt;# description: Syslog is the facility by which many daemons use to log   &lt;/span&gt;
+&lt;span class="c"&gt;# messages to various system log files.  It is a good idea to always   &lt;/span&gt;
+&lt;span class="c"&gt;# run rsyslog.&lt;/span&gt;
+&lt;span class="c"&gt;### &lt;span class="caps"&gt;BEGIN&lt;/span&gt; &lt;span class="caps"&gt;INIT&lt;/span&gt; &lt;span class="caps"&gt;INFO&lt;/span&gt;&lt;/span&gt;
+&lt;span class="c"&gt;# Provides: $syslog&lt;/span&gt;
+&lt;span class="c"&gt;# Required-Start: $local_fs $network $remote_fs&lt;/span&gt;
+&lt;span class="c"&gt;# Required-Stop: $local_fs $network $remote_fs&lt;/span&gt;
+&lt;span class="c"&gt;# Default-Stop: 0 1 2 3 4 5 6&lt;/span&gt;
+&lt;span class="c"&gt;# Short-Description: Enhanced system logging and kernel message trapping daemons&lt;/span&gt;
+&lt;span class="c"&gt;# Description: Rsyslog is an enhanced multi-threaded syslogd supporting,&lt;/span&gt;
+&lt;span class="c"&gt;#              among others, MySQL, syslog/tcp, &lt;span class="caps"&gt;RFC&lt;/span&gt; 3195, permitted&lt;/span&gt;
+&lt;span class="c"&gt;#              sender lists, filtering on any message part, and fine&lt;/span&gt;
+&lt;span class="c"&gt;#              grain output format control.&lt;/span&gt;
+&lt;span class="c"&gt;### &lt;span class="caps"&gt;END&lt;/span&gt; &lt;span class="caps"&gt;INIT&lt;/span&gt; &lt;span class="caps"&gt;INFO&lt;/span&gt;&lt;/span&gt;
+
+&lt;span class="c"&gt;# Source function library.&lt;/span&gt;
+. /etc/init.d/functions
+
+&lt;span class="nv"&gt;&lt;span class="caps"&gt;RETVAL&lt;/span&gt;&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;0
+
+start&lt;span class="o"&gt;()&lt;/span&gt; &lt;span class="o"&gt;{&lt;/span&gt;
+        &lt;span class="o"&gt;[&lt;/span&gt; -x /sbin/rsyslogd &lt;span class="o"&gt;]&lt;/span&gt; &lt;span class="o"&gt;||&lt;/span&gt; &lt;span class="nb"&gt;exit &lt;/span&gt;5
+
+        &lt;span class="c"&gt;# Do not start rsyslog when sysklogd is running&lt;/span&gt;
+        &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="o"&gt;[&lt;/span&gt; -e /var/run/syslogd.pid &lt;span class="o"&gt;]&lt;/span&gt; ; &lt;span class="k"&gt;then&lt;/span&gt;
+&lt;span class="k"&gt;                &lt;/span&gt;&lt;span class="nb"&gt;echo&lt;/span&gt; &lt;span class="s2"&gt;$&amp;quot;Shut down sysklogd before you run rsyslog&amp;quot;&lt;/span&gt;;
+                &lt;span class="nb"&gt;exit &lt;/span&gt;1;
+        &lt;span class="k"&gt;fi&lt;/span&gt;
+
+        &lt;span class="c"&gt;# Source config&lt;/span&gt;
+        &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="o"&gt;[&lt;/span&gt; -f /etc/sysconfig/rsyslog &lt;span class="o"&gt;]&lt;/span&gt; ; &lt;span class="k"&gt;then&lt;/span&gt;
+                . /etc/sysconfig/rsyslog
+        &lt;span class="k"&gt;else&lt;/span&gt;
+&lt;span class="k"&gt;                &lt;/span&gt;&lt;span class="nv"&gt;SYSLOGD_OPTIONS&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;-m 0&amp;quot;&lt;/span&gt;
+        &lt;span class="k"&gt;fi&lt;/span&gt;
+
+&lt;span class="k"&gt;        if&lt;/span&gt; &lt;span class="o"&gt;[&lt;/span&gt; -z &lt;span class="s2"&gt;&amp;quot;$SYSLOG_UMASK&amp;quot;&lt;/span&gt; &lt;span class="o"&gt;]&lt;/span&gt; ; &lt;span class="k"&gt;then&lt;/span&gt;
+&lt;span class="k"&gt;              &lt;/span&gt;&lt;span class="nv"&gt;SYSLOG_UMASK&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;077;
+        &lt;span class="k"&gt;fi&lt;/span&gt;
+&lt;span class="k"&gt;        &lt;/span&gt;&lt;span class="nb"&gt;umask&lt;/span&gt; &lt;span class="nv"&gt;$SYSLOG_UMASK&lt;/span&gt;
+
+        &lt;span class="nb"&gt;echo&lt;/span&gt; -n &lt;span class="s2"&gt;$&amp;quot;Starting system logger: &amp;quot;&lt;/span&gt;
+        daemon rsyslogd &lt;span class="nv"&gt;$SYSLOGD_OPTIONS&lt;/span&gt;
+        &lt;span class="nv"&gt;&lt;span class="caps"&gt;RETVAL&lt;/span&gt;&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nv"&gt;$?&lt;/span&gt;
+        &lt;span class="nb"&gt;echo&lt;/span&gt;
+        &lt;span class="o"&gt;[&lt;/span&gt; &lt;span class="nv"&gt;$&lt;span class="caps"&gt;RETVAL&lt;/span&gt;&lt;/span&gt; -eq 0 &lt;span class="o"&gt;]&lt;/span&gt; &lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt; touch /var/lock/subsys/rsyslog
+        &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="nv"&gt;$&lt;span class="caps"&gt;RETVAL&lt;/span&gt;&lt;/span&gt;
+&lt;span class="o"&gt;}&lt;/span&gt;
+stop&lt;span class="o"&gt;()&lt;/span&gt; &lt;span class="o"&gt;{&lt;/span&gt;
+        &lt;span class="nb"&gt;echo&lt;/span&gt; -n &lt;span class="s2"&gt;$&amp;quot;Shutting down system logger: &amp;quot;&lt;/span&gt;
+        killproc rsyslogd
+        &lt;span class="nv"&gt;&lt;span class="caps"&gt;RETVAL&lt;/span&gt;&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nv"&gt;$?&lt;/span&gt;
+        &lt;span class="nb"&gt;echo&lt;/span&gt;
+        &lt;span class="o"&gt;[&lt;/span&gt; &lt;span class="nv"&gt;$&lt;span class="caps"&gt;RETVAL&lt;/span&gt;&lt;/span&gt; -eq 0 &lt;span class="o"&gt;]&lt;/span&gt; &lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt; rm -f /var/lock/subsys/rsyslog
+        &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="nv"&gt;$&lt;span class="caps"&gt;RETVAL&lt;/span&gt;&lt;/span&gt;
+&lt;span class="o"&gt;}&lt;/span&gt;
+reload&lt;span class="o"&gt;()&lt;/span&gt;  &lt;span class="o"&gt;{&lt;/span&gt;
+    &lt;span class="nv"&gt;&lt;span class="caps"&gt;RETVAL&lt;/span&gt;&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;1
+    &lt;span class="nv"&gt;syslog&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="sb"&gt;`&lt;/span&gt;cat /var/run/rsyslogd.pid 2&amp;gt;/dev/null&lt;span class="sb"&gt;`&lt;/span&gt;
+    &lt;span class="nb"&gt;echo&lt;/span&gt; -n &lt;span class="s2"&gt;&amp;quot;Reloading system logger...&amp;quot;&lt;/span&gt;
+    &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="o"&gt;[&lt;/span&gt; -n &lt;span class="s2"&gt;&amp;quot;${syslog}&amp;quot;&lt;/span&gt; &lt;span class="o"&gt;]&lt;/span&gt; &lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class="o"&gt;[&lt;/span&gt; -e /proc/&lt;span class="s2"&gt;&amp;quot;${syslog}&amp;quot;&lt;/span&gt; &lt;span class="o"&gt;]&lt;/span&gt;; &lt;span class="k"&gt;then&lt;/span&gt;
+&lt;span class="k"&gt;        &lt;/span&gt;&lt;span class="nb"&gt;kill&lt;/span&gt; -&lt;span class="caps"&gt;HUP&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;$syslog&amp;quot;&lt;/span&gt;;
+        &lt;span class="nv"&gt;&lt;span class="caps"&gt;RETVAL&lt;/span&gt;&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nv"&gt;$?&lt;/span&gt;
+    &lt;span class="k"&gt;fi&lt;/span&gt;
+&lt;span class="k"&gt;    if&lt;/span&gt; &lt;span class="o"&gt;[&lt;/span&gt; &lt;span class="nv"&gt;$&lt;span class="caps"&gt;RETVAL&lt;/span&gt;&lt;/span&gt; -ne 0 &lt;span class="o"&gt;]&lt;/span&gt;; &lt;span class="k"&gt;then&lt;/span&gt;
+&lt;span class="k"&gt;        &lt;/span&gt;failure
+    &lt;span class="k"&gt;else&lt;/span&gt;
+&lt;span class="k"&gt;        &lt;/span&gt;success
+    &lt;span class="k"&gt;fi&lt;/span&gt;
+&lt;span class="k"&gt;    &lt;/span&gt;&lt;span class="nb"&gt;echo&lt;/span&gt;
+&lt;span class="nb"&gt;    &lt;/span&gt;&lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="nv"&gt;$&lt;span class="caps"&gt;RETVAL&lt;/span&gt;&lt;/span&gt;
+&lt;span class="o"&gt;}&lt;/span&gt;
+rhstatus&lt;span class="o"&gt;()&lt;/span&gt; &lt;span class="o"&gt;{&lt;/span&gt;
+        status rsyslogd
+&lt;span class="o"&gt;}&lt;/span&gt;
+restart&lt;span class="o"&gt;()&lt;/span&gt; &lt;span class="o"&gt;{&lt;/span&gt;
+        stop
+        start
+&lt;span class="o"&gt;}&lt;/span&gt;
+
+&lt;span class="k"&gt;case&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;$1&amp;quot;&lt;/span&gt; in
+  start&lt;span class="o"&gt;)&lt;/span&gt;
+        start
+        ;;
+  stop&lt;span class="o"&gt;)&lt;/span&gt;
+        stop
+        ;;
+  restart&lt;span class="o"&gt;)&lt;/span&gt;
+        restart
+        ;;
+  reload|force-reload&lt;span class="o"&gt;)&lt;/span&gt;
+        reload
+        ;;
+  status&lt;span class="o"&gt;)&lt;/span&gt;
+        rhstatus
+        ;;
+  condrestart&lt;span class="o"&gt;)&lt;/span&gt;
+        &lt;span class="o"&gt;[&lt;/span&gt; -f /var/lock/subsys/rsyslog &lt;span class="o"&gt;]&lt;/span&gt; &lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt; restart &lt;span class="o"&gt;||&lt;/span&gt; :
+        ;;
+  *&lt;span class="o"&gt;)&lt;/span&gt;
+        &lt;span class="nb"&gt;echo&lt;/span&gt; &lt;span class="s2"&gt;$&amp;quot;Usage: $0 {start|stop|restart|reload|force-reload|condrestart}&amp;quot;&lt;/span&gt;
+        &lt;span class="nb"&gt;exit &lt;/span&gt;2
+&lt;span class="k"&gt;esac&lt;/span&gt;
+
+&lt;span class="nb"&gt;exit&lt;/span&gt; &lt;span class="nv"&gt;$?&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;&lt;strong&gt;My rsyslog.conf file&lt;/strong&gt;:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;# uncomment next line for debugging, use graphvis to see the graph
+#$GenerateConfigGraph /root/rsyslog-graph.dot
+$ModLoad imklog
+$ModLoad imtcp
+$ModLoad imudp
+$ModLoad imuxsock
+
+# template
+$template RemoteHost,&amp;quot;/var/log/HOSTS/%HOSTNAME%/%$YEAR%/%$MONTH%/%$DAY%/%syslogfacility-text%.log&amp;quot;
+# used for Cisco, vanilla syslog when we can&amp;#39;t parse host name
+$template RemoteFromHost,&amp;quot;/var/log/HOSTS/%FROMHOST%/%$YEAR%/%$MONTH%/%$DAY%/%syslogfacility-text%.log&amp;quot;
+
+# NOTE - we can&amp;#39;t bind UDP to a ruleset, so it enters the local RuleSet
+#   and has to be dealt with here
+
+$RuleSet local
+
+# for cisco, vyatta - doesn&amp;#39;t send hostname, need to use IP manually
+:fromhost, isequal, &amp;quot;192.168.0.99&amp;quot; ?RemoteFromHost
+:fromhost, isequal, &amp;quot;192.168.0.99&amp;quot; ~
+:fromhost, isequal, &amp;quot;192.168.0.103&amp;quot; ?RemoteFromHost
+:fromhost, isequal, &amp;quot;192.168.0.103&amp;quot; ~
+:fromhost, isequal, &amp;quot;192.168.0.97&amp;quot; ?RemoteFromHost
+:fromhost, isequal, &amp;quot;192.168.0.97&amp;quot; ~
+:fromhost, isequal, &amp;quot;192.168.0.111&amp;quot; ?RemoteFromHost
+:fromhost, isequal, &amp;quot;192.168.0.111&amp;quot; ~
+# anything from a remote host gets logged as such
+:source, isequal, &amp;quot;&amp;quot; ?RemoteHost
+:source, isequal, &amp;quot;&amp;quot; ~
+
+#
+# LOCAL LOGGING
+#
+
+kern.*                                                 /var/log/messages
+*.info;mail.none;authpriv.none;cron.none                /var/log/messages
+authpriv.*                                              /var/log/secure
+mail.*                                                  -/var/log/maillog
+cron.*                                                  /var/log/cron
+*.emerg                                                 *
+uucp,news.crit                                          /var/log/spooler
+local7.*                                                /var/log/boot.log
+
+# use the local RuleSet as default
+$DefaultRuleset local
+
+#
+# BEGIN centralized logging stuff added 2009-09-16 by jantman
+#
+
+# define ruleset for remote logging
+$RuleSet remote
+
+*.* ?RemoteHost
+
+# bind ruleset to tcp listener
+$InputTCPServerBindRuleset remote
+# and activate it:
+$InputTCPServerRun 5000
+
+$UDPServerRun 514
+$UDPServerRun 5000
+
+#
+# END remote logging
+#
+&lt;/pre&gt;&lt;/div&gt;</summary><category term="centos"></category><category term="logging"></category><category term="rsyslog"></category><category term="syslog"></category></entry></feed>

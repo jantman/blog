@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Jason Antman's Blog</title><link>http://newblog.jasonantman.com/</link><description></description><atom:link href="http://newblog.jasonantman.com/feeds/tags/timestamp.rss.xml" rel="self"></atom:link><lastBuildDate>Tue, 11 Jun 2013 07:09:00 -0400</lastBuildDate><item><title>Quick Tip: Timestamping bash history</title><link>http://newblog.jasonantman.com/2013/06/quick-tip-timestamping-bash-history/</link><description>&lt;p&gt;Here&amp;#8217;s a tiny little snippet that I have in my &lt;code&gt;.bashrc&lt;/code&gt; which really
+comes in handy when trying to figure out what I did on a system when.
+One of the first things I do when (eek) building out or working on a
+one-off machine (or setting up a new laptop/desktop, as I am right now)
+is set this in bashrc for my user and root, so I can go back and
+document the setup process with a little more ease and sanity. Just add
+this (it&amp;#8217;s just a &lt;a href="http://linux.die.net/man/3/strftime"&gt;strftime (3)&lt;/a&gt;
+format string &lt;a href="http://www.gnu.org/software/bash/manual/bashref.html#index-HISTTIMEFORMAT"&gt;according to the
+docs&lt;/a&gt;,
+so adjust as desired) to &lt;code&gt;.bashrc&lt;/code&gt;:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="nb"&gt;export &lt;/span&gt;&lt;span class="nv"&gt;&lt;span class="caps"&gt;HISTTIMEFORMAT&lt;/span&gt;&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;%F %T &amp;quot;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;and bash will store commented-out integer timestamps before each line in
+&lt;code&gt;.bash_history&lt;/code&gt; like&amp;nbsp;so:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="gp"&gt;#&lt;/span&gt;1370950005
+&lt;span class="go"&gt;less .bashrc&lt;/span&gt;
+&lt;span class="gp"&gt;#&lt;/span&gt;1370950017
+&lt;span class="go"&gt;history &lt;/span&gt;
+&lt;span class="gp"&gt;#&lt;/span&gt;1370950279
+&lt;span class="go"&gt;tail -30 .bash_history &lt;/span&gt;
+&lt;span class="gp"&gt;#&lt;/span&gt;1370950293
+&lt;span class="go"&gt;exit&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;the output of &lt;code&gt;history&lt;/code&gt; now uses the specified time&amp;nbsp;format:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt; 997  2013-06-11 07:26:45 less .bashrc
+ 998  2013-06-11 07:26:57 history 
+ 999  2013-06-11 07:31:19 tail -30 .bash_history 
+1000  2013-06-11 07:31:33 exit
+&lt;/pre&gt;&lt;/div&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Tue, 11 Jun 2013 07:09:00 -0400</pubDate><guid>tag:newblog.jasonantman.com,2013-06-11:2013/06/quick-tip-timestamping-bash-history/</guid><category>bash</category><category>history</category><category>shell</category><category>timestamp</category></item><item><title>Readable Nagios Log Timestamps</title><link>http://newblog.jasonantman.com/2012/10/readable-nagios-log-timestamps/</link><description>&lt;p&gt;If you&amp;#8217;re like me and most humans, the Nagios logfile timestamp (a unix
+timestamp) isn&amp;#8217;t terribly useful when trying to grep through the logs
+and correlate&amp;nbsp;events:  &lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="gp"&gt;#&lt;/span&gt; head -2 nagios.log
+&lt;span class="go"&gt;[1350360000] &lt;span class="caps"&gt;LOG&lt;/span&gt; &lt;span class="caps"&gt;ROTATION&lt;/span&gt;: &lt;span class="caps"&gt;DAILY&lt;/span&gt;&lt;/span&gt;
+&lt;span class="go"&gt;[1350360000] &lt;span class="caps"&gt;LOG&lt;/span&gt; &lt;span class="caps"&gt;VERSION&lt;/span&gt;: 2.0&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Here&amp;#8217;s a nifty Perl one-liner that you can pipe your logs&amp;nbsp;through:  &lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="n"&gt;perl&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;pe&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;s/(\\d+)/localtime($1)/e&amp;#39;&lt;/span&gt;  
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;to get nicer output&amp;nbsp;like:  &lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="c1"&gt;# head -2 nagios.log&lt;/span&gt;
+&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;Tue&lt;/span&gt; &lt;span class="n"&gt;Oct&lt;/span&gt; &lt;span class="mi"&gt;16&lt;/span&gt; &lt;span class="mo"&gt;00&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="mo"&gt;00&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="mo"&gt;00&lt;/span&gt; &lt;span class="mi"&gt;2012&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="n"&gt;&lt;span class="caps"&gt;LOG&lt;/span&gt;&lt;/span&gt; &lt;span class="n"&gt;&lt;span class="caps"&gt;ROTATION&lt;/span&gt;:&lt;/span&gt; &lt;span class="n"&gt;&lt;span class="caps"&gt;DAILY&lt;/span&gt;&lt;/span&gt;
+&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;Tue&lt;/span&gt; &lt;span class="n"&gt;Oct&lt;/span&gt; &lt;span class="mi"&gt;16&lt;/span&gt; &lt;span class="mo"&gt;00&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="mo"&gt;00&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="mo"&gt;00&lt;/span&gt; &lt;span class="mi"&gt;2012&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="n"&gt;&lt;span class="caps"&gt;LOG&lt;/span&gt;&lt;/span&gt; &lt;span class="n"&gt;&lt;span class="caps"&gt;VERSION&lt;/span&gt;:&lt;/span&gt; &lt;span class="mf"&gt;2.0&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Wed, 17 Oct 2012 05:00:00 -0400</pubDate><guid>tag:newblog.jasonantman.com,2012-10-17:2012/10/readable-nagios-log-timestamps/</guid><category>icinga</category><category>Nagios</category><category>perl</category><category>timestamp</category></item><item><title>Quick and Simple Timestamping of Debug Logs</title><link>http://newblog.jasonantman.com/2011/09/quick-and-simple-timestamping-of-debug-logs/</link><description>&lt;p&gt;I&amp;#8217;ve been having some issues that may be
+&lt;a href="http://puppetlabs.com/"&gt;Puppet&lt;/a&gt;-related. Unfortunately, Puppet (at
+least the old 0.25.4 client that I&amp;#8217;m running) doesn&amp;#8217;t timestamp the
+debug logs sent to stdout. I know it&amp;#8217;s hanging somewhere, but I need
+concrete numbers to look at. Here&amp;#8217;s a wonderfully simple bash script
+that timestamps everything sent to it on stdin, and echoes it back to&amp;nbsp;stdout:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="c"&gt;#!/bin/bash&lt;/span&gt;
+
+&lt;span class="nv"&gt;&lt;span class="caps"&gt;DATECMD&lt;/span&gt;&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;date +%H:%M:%S&amp;#39;&lt;/span&gt;
+
+&lt;span class="k"&gt;while &lt;/span&gt;&lt;span class="nb"&gt;read &lt;/span&gt;line; &lt;span class="k"&gt;do&lt;/span&gt;
+&lt;span class="k"&gt;    &lt;/span&gt;&lt;span class="nb"&gt;echo&lt;/span&gt; -e &lt;span class="s2"&gt;&amp;quot;$($&lt;span class="caps"&gt;DATECMD&lt;/span&gt;) $line&amp;quot;&lt;/span&gt;
+&lt;span class="k"&gt;done&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Call it as simply as: &lt;code&gt;command | ~/bin/ts&lt;/code&gt;, or maybe like
+&lt;code&gt;command 2&amp;gt;&amp;amp;1 | ~/bin/ts | tee foo.log&lt;/code&gt;. Dead simple, but very helpful
+when the developers didn&amp;#8217;t think to timestamp debug log&amp;nbsp;output.&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Thu, 08 Sep 2011 07:06:00 -0400</pubDate><guid>tag:newblog.jasonantman.com,2011-09-08:2011/09/quick-and-simple-timestamping-of-debug-logs/</guid><category>debugging</category><category>logs</category><category>puppet</category><category>sysadmin</category><category>timestamp</category></item><item><title>My Birthday!</title><link>http://newblog.jasonantman.com/2009/02/my-birthday/</link><description>&lt;p&gt;I happened to be working with some timestamps today and noticed that
+we&amp;#8217;re starting to get into territory like &lt;code&gt;1234094400&lt;/code&gt;. So, being the
+geek that I am, I wondered when we&amp;#8217;d finally hit &lt;code&gt;1234567890&lt;/code&gt;. The
+answer is 2009-02-13T18:31:30-05:00, which happens to be 18:31:30 on my
+birthday.&amp;nbsp;Yay!&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Fri, 06 Feb 2009 23:35:00 -0500</pubDate><guid>tag:newblog.jasonantman.com,2009-02-06:2009/02/my-birthday/</guid><category>birthday</category><category>timestamp</category></item></channel></rss>

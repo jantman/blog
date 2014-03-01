@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<meta name="viewport" content="width=1024, user-scalable=no">
+
+	<title>New Puppet Part 2 - Workflow - SUPPORT-3399 - jantman</title>
+	
+	<!-- Required stylesheet -->
+	<link rel="stylesheet" href="deckjs/core/deck.core.css">
+	
+	<!-- Extension CSS files go here. Remove or add as needed. -->
+	<link rel="stylesheet" href="deckjs/extensions/goto/deck.goto.css">
+	<link rel="stylesheet" href="deckjs/extensions/menu/deck.menu.css">
+	<link rel="stylesheet" href="deckjs/extensions/navigation/deck.navigation.css">
+	<link rel="stylesheet" href="deckjs/extensions/status/deck.status.css">
+	<link rel="stylesheet" href="deckjs/extensions/hash/deck.hash.css">
+	<link rel="stylesheet" href="deckjs/extensions/scale/deck.scale.css">
+
+	<!-- Style theme. More available in /themes/style/ or create your own. -->
+	<link rel="stylesheet" href="deckjs/themes/style/web-2.0.css">
+	
+	<!-- Transition theme. More available in /themes/transition/ or create your own. -->
+	<!-- <link rel="stylesheet" href="../deckjs/themes/transition/horizontal-slide.css"> -->
+	
+	<!-- Required Modernizr file -->
+	<script src="deckjs/modernizr.custom.js"></script>
+
+<!-- custom CSS for table(s) -->
+<style type="text/css">
+.deck-container table { border-collapse:collapse; }
+.deck-container table, .deck-container tr, .deck-container th, .deck-container td { border: 1px solid black; }
+</style>
+<!-- END custom CSS for table(s) -->
+
+</head>
+<body class="deck-container">
+
+<!-- Begin slides. Just make elements with a class of slide. -->
+<section class="slide">
+	<h1>New Puppet Env (Part 2)<br />Workflow<br /><span style="font-size: 0.5em;">Jason Antman<br /><a href="https://twitter.com/j_antman">@j_antman</a><br />Cox Media Group Technology</span></h1>
+</section>
+<section class="slide">
+	<h2>Goal</h2>
+	<ul>
+		<li>To create a reliable, repeatable, safe workflow for the development and testing of Puppet modules and code, and the promotion of that code through dev, test and production environments.</li>
+		<li>Usable by all of Technology (ops, automation, dev)</li>
+		<li>Able to be implemented in the near-term</li>
+		<li>Designed with future workflow and test additions in mind</li>
+	</ul>
+</section>
+<section class="slide">
+	<h2>Phase 2</h2>
+	<p>We know there are lots of cool technologies that can help us</p>
+	<ul>
+		<li>Real CI</li>
+		<li>rspec, server-spec and the like</li>
+		<li>Vagrant and VM stacks</li>
+		<ul>
+			<li>for automated testing</li>
+			<li>for manual testing, spun up by a script or hudson job</li>
+		</ul>
+		<li>prod-like local dev environment as first test env</li>
+		<li>ESPN's recent huge Puppet rollout - what would they do differently? "Implement MCollective FIRST."</li>
+	</ul>
+	<p>These are Phase 2 concerns. Let's focus on the biggest win in the short term, and getting something working rather than finished (for the time being, this will be a living/evolving system).</p>
+</section>
+<section class="slide">
+	<h2>Overall Workflow</h2>
+	<ol>
+		<li>Develop something... somewhere (local machine?)</li>
+		<li>pre-commit checks for initial smoke test; push to origin</li>
+		<li>automatically checked out as an env on dev puppetmaster</li>
+		<li>do some testing (manual? automated?) in a dev environment</li>
+		<li>code review</li>
+		<li>run job to deploy to a test environment (i.e. one tie lane)</li>
+		<ul>
+			<li>job does some automated tests, which must pass for it to work</li>
+			<li>job verifies successful run in dev environment?</li>
+			<li>do some testing (manual? automated?)</li>
+		</ul>
+		<li>request promotion to production</li>
+		<ul>
+			<li>some automated tests here?</li>
+			<li>verify successful puppet runs on this commit ref on all hosts in test environment</li>
+		</ul>
+		<li>merged to master</li>
+		<li>deploy everywhere that's on master (everywhere not currently testing something else)</li>
+	</ol>
+</section>
+<section class="slide">
+	<h2>Safety Precautions</h2>
+	<ul>
+		<li>all branch merges are handled by Hudson</li>
+		<li>anyone can create their own branch</li>
+		<li>only hudson (or a "special" user for emergencies) can merge</li>
+		<ul>
+			<li>or only that user can merge to master or a list of per-env branches/tags?</li>
+			<li>CMs probably know the best way to handle this</li>
+		</ul>
+		<li>desired result is only Hudson can merge to the code that non-dev envs are running off of</li>
+		<ul>
+			<li>except for engineers/CMs in an emergency</li>
+			<li>how to prevent engineers from doing this routinely?</li>
+		</ul>
+	</ul>
+</section>
+<section class="slide">
+	<h2>2. Commit Hooks</h2>
+	<ul>
+		<li>do we want these client-side or server-side?</li>
+		<li>do we want to allow broken code to be committed, just to save state?</li>
+		<li>pre-commit client hooks:</li>
+		<ul>
+			<li><tt>puppet parser validate</tt> on changed .pp files</li>
+			<li><tt>puppet-lint</tt> on changed .pp files</li>
+			<li>ERB syntax check on changed .erb files</li>
+		</ul>
+		<li>server-side hooks:</li>
+		<ul>
+			<li>catalog compile for a specified set of nodes?</li>
+		</ul>
+	</ul>
+</section>
+<section class="slide">
+	<h2>Development Environment</h2>
+	<p>We'll need to set some standards on the environment in which Puppet code is developed. My suggestions are that we have (available for use in pre-commit hooks) at a minimum:</p>
+	<ul>
+		<li>working local puppet install</li>
+		<ul>
+			<li><tt>puppet parser validate</tt></li>
+		</ul>
+		<li>working Ruby installation</li>
+		<ul>
+			<li>erb template syntax checks</li>
+			<li>puppet-lint style validation tool</li>
+		</ul>
+	</ul>
+</section>
+<section class="slide">
+	<h2>3. Checked out on dev puppetmaster</h2>
+	<ul>
+		<li>all newly pushed branches are checked out on dev puppetmaster</li>
+		<ul>
+			<li>cronjob or commit hook?</li>
+		</ul>
+		<li>all new changes pushed to origin are pulled on dev puppetmaster</li>
+		<li>these become environments</li>
+		<li>cleanup job to remove inactive environments (no changes in > X days)</li>
+	</ul>
+</section>
+<section class="slide">
+	<h2>4. testing in dev environment</h2>
+	<ul>
+		<li>manual first?</li>
+		<li>Hudson trigger?</li>
+		<li>what of this can we automate?</li>
+	</ul>
+</section>
+<section class="slide">
+	<h2>5. Code Review</h2>
+	<p>Yeah, we know how to do this. No changes from current workflow.</p>
+	<p>We should probably document what we want to see in testing.</p>
+</section>
+<section class="slide">
+	<h2>6. Deploy to test environment</h2>
+	<ul>
+		<li>select one of the Test Integration (QA) Environments as test environment</li>
+		<li>all previous test requirements must have passed for this branch, with no code changes (changed HEAD ref is dirty branch).</li>
+		<li>hudson deploys the selected branch to the test environment</li>
+		<ul>
+			<li>merge? tags? how?</li>
+		</ul>
+		<li>before deploy, hudson runs some smoke tests?</li>
+		<ul>
+			<li>parser validate, erb, etc.?</li>
+			<li>try a catalog compile?</li>
+		</ul>
+		<li>before deploy, hudson queries puppetdb to ensure that commit ran at least once on a node? on an FE? (more on this later)</li>
+	</ul>
+</section>
+<section class="slide">
+	<h2>After deploy to test environment</h2>
+	<ul>
+		<li>hudson triggers puppet runs in that environment??</li>
+		<li>hudson triggers some other sort of testing in that environment?</li>
+		<li>manual testing against that environment?</li>
+		<ul>
+			<li>document what we want done</li>
+		</ul>
+	</ul>
+</section>
+<section class="slide">
+	<h2>7. Request Promotion to Production</h2>
+	<ul>
+		<li>Hudson queries PuppetDB - that commit ref must have run successfully on all nodes in the test environment</li>
+		<ul>
+			<li>Hudson needs to know what environment we deployed to before (step 6)</li>
+			<li>if not, job fails, merge not allowed</li>
+		</ul>
+		<li>anything else???</li>
+		<li>continue...</li>
+	</ul>
+</section>
+<section class="slide">
+	<h2>8. Merged to Master</h2>
+	<p>Hudson merges the branch/tag/whatever to master</p>
+</section>
+<section class="slide">
+	<h2>9. Deploy Master</h2>
+	<p>When something is promoted to prod and merged to master...</p>
+	<ul>
+		<li>notify in #tech-ops and #automation IRC channels</li>
+		<li>pull master on the prod puppetmaster</li>
+		<li>pull master on the test puppetmaster, for all branches/envs on master</li>
+		<li>pull master on the dev puppetmaster, for all branches/envs on master</li>
+	</ul>
+</section>
+<section class="slide">
+	<h2>Administrative Overrides</h2>
+	<ul>
+		<li>we need a way for someone (engineer) to manually force something to master</li>
+		<li>we should have some way (just docs? training?) to prevent engineers from doing this if it's not an emergency</li>
+	</ul>
+</section>
+<section class="slide">
+	<h2>PuppetDB Verification</h2>
+	<p>PuppetDB will store all reports from all nodes (well, each env's PuppetDB instance). We set config_version on the puppet master to be the git commit ref. This *should* be in the reports, and if not, we can work something out to make it a fact.</p>
+	<p>PuppetDB knows whether the last run on a node was a success or failure.</p>
+	<p>This should allow us to query PuppetDB and confirm that all nodes in a list (dev/test, tieX environment, etc.) successfully applied a <em>specific commit ref</em>, to confirm that a puppet commit was actually tested where we think it was, and successfully ran.</p>
+	<ul>
+		<li><a href="https://github.com/nedap/pypuppetdb">pypuppetdb</a> or <a href="https://github.com/arcus-io/puppetdb-python">puppetdb-python</a> or roll our own?</li>
+		<li>also note, some cool things that can be done with PuppetDB from the CLI, using community tools:</li>
+		<ul>
+			<li><tt>puppet query nodes 'processorcount > 16 and manufacturer ~"Dell.*"'</tt></li>
+			<li><tt>puppet ls</tt> - Puppet Face to list all files on current host managed by Puppet</li>
+		</ul>
+	</ul>
+</section>
+<section class="slide">
+	<h2>Puppet Catalog Compile</h2>
+	<p>On the puppet master, we can use <tt>puppet catalog compile</tt> to compile the catalog for a specified node. It outputs in JSON and uses facts from <tt>$vardir/yaml/</tt>. This can at least be used to catch compile-time errors.</p>
+</section>
+<section class="slide">
+	<h2>Some notes about git</h2>
+	<ul>
+		<li>repo-per-module?</li>
+		<ul>
+			<li>the way the community seems to be heading</li>
+			<li>current best practice?</li>
+			<li>would allow us to deploy an env with one module pinned to a version, and the rest up-to-date</li>
+		</ul>
+		<li>rename our current git repo, or move the modules into modules/</li>
+		<ul>
+			<li>probably want some configs in git too</li>
+			<li>utility scripts</li>
+			<li>should version-control most of <tt>/etc/puppet</tt></li>
+		</ul>
+	</ul>
+</section>
+<section class="slide">
+	<h2>Community Modules</h2>
+	<ul>
+		<li>puppet-librarian</li>
+		<ul>
+			<li>manages EVERYTHING - needs to know about every module</li>
+			<li>every module needs to be independently installable/versionable (git repo-per-module)</li>
+			<li>or we need working modulefiles for all our modules, and then we can use the "path" hack to get it to know about local modules. And we need to update them.</li>
+		</ul>
+		<li><tt>puppet module</tt> tool</li>
+		<ul>
+			<li>can only install from Forge</li>
+			<li>would need to run our own "local" forge to use arbitrary git/github modules</li>
+		</ul>
+		<li>homegrown script</li>
+		<ul>
+		        <li>we can get it to do whatever we want</li>
+			<ul>
+			  <li>install or upgrade a module from a git ref</li>
+			  <li>keep track of file md5sums, or check git log, so it won't clobber local changes</li>
+			<ul>
+			<li>really shouldn't be THAT hard</li>
+			<li>release to the community</li>
+		</ul>
+	</ul>
+</section>
+<section class="slide">
+	<h2>Some Coolness</h2>
+	<ul>
+		<li>have a #notifications or #puppet channel?</li>
+		<li>when a job finishes, ping the person who ran it in channel</li>
+		<li>when a test fails, ping the person who ran the job, with a link to the test info/output</li>
+		<li>opslog all changes/prod or TIE deploys</li>
+	</ul>
+</section>
+<section class="slide">
+	<h2>Puppet Module/Code Standards</h2>
+	<ul>
+		<li>we should follow the style guide, as implemented by puppet-lint</li>
+		<li>module organization and layout as defined in the <a href="http://docs.puppetlabs.com/puppet/3/reference/modules_fundamentals.html">Puppet3 docs</a></li>
+		<li>let's make a template module a la <a href="https://github.com/example42/Example42-templates">Example42-templates</a></li>
+		<li>See also <a href="http://spredzy.wordpress.com/2013/04/02/create-puppet-modules-with-solid-foundations/">Create Puppet Modules with Solid Foundations</a></li>
+		<li><a href="https://docs.google.com/document/d/15wafKemFhIGus7fuvG_16FloRf25xIFNCF3hDGKSZpI/edit">Beginner's Guide to Modules</a> - very good doc on module design, layout, standards, etc.</li>
+	</ul>
+</section>
+<section class="slide">
+	<h2>The Future - Phase 2</h2>
+	<ul>
+		<li>Real CI? <a href="https://github.com/tmm1/test-queue">tmm1/test-queue</a> for parallel tests?</li>
+		<li>rspec, <a href="http://rspec-puppet.com">puppet-spec</a>, <a href="http://serverspec.org/">server-spec</a>, <a href="https://github.com/puppetlabs/rspec-system">rspec-system</a>, etc.</li>
+		<ul>
+			<li>server-spec is really cool. we should use it to verify newly built hosts.</li>
+		</ul>
+		<li>Vagrant and VM stacks (like <a href="https://github.com/adrienthebo/oscar">oscar</a>)</li>
+		<ul>
+			<li>for automated testing</li>
+		</ul>
+		<li>prod-like local dev environment as first test env</li>
+		<li>checking for present, complete, and correctly formatted docs (especially puppetdoc file headers)</li>
+		<li>mcollective-triggered test runs</li>
+		<ul>
+			<li>noop first</li>
+			<li>target specific nodes with filters</li>
+			<li>target specific resources with tags</li>
+			<li>validate changes and then apply</li>
+		</ul>
+		<li><a href="https://github.com/dalen/puppet-puppetdbquery">dalen-puppetdbquery</a> - query puppetDB via a function in puppet code</li>
+	</ul>
+</section>
+<section class="slide">
+	<h2>Preview of Phase 2 Workflow</h2>
+	<ol>
+		<li>Develop something on a prod-like local dev environment</li>
+		<li>pre-commit checks for initial smoke test; push to origin</li>
+		<li>Hudson job sees the new push, kicks off static tests (rspec) and compile tests</li>
+		<li>if successful, automatically checked out as an env on dev puppetmaster</li>
+		<li>do your manual testing</li>
+		<li>code review</li>
+		<li>press a button in Hudson</li>
+		<li>stands up a VM stack with Vagrant</li>
+		<ul>
+		        <li>2 stacks - one running on master, 1 just kickstarted</li>
+			<li>does a puppet run on all VMs, confirms success on all of them</li>
+			<li>runs server-spec tests</li>
+		</ul>
+		<li>if successful, deploys to a test env (tieX), uses mcollective to trigger puppet runs on all nodes</li>
+		<ul>
+			<li>job verifies successful run in environment</li>
+			<li>any failures signal a failure of the process</li>
+		</ul>
+		<li>checks to see that code review is shipped. if not, delays job until it is.</li>
+		<li>deploy current build to ALL non-prod environments on master, begin mcollective phased puppet runs</li>
+		<li>if any new failures are introduced, process fails, environments that were on master are reverted and re-run</li>
+		<li>code marked "ready for prod deploy"</li>
+		<li>manual button-push merges to master, pulls on prod puppet master, begins phased prod puppet apply</li>
+		<li>this whole process is reported in IRC</li>
+	</ol>
+</section>
+<section class="slide">
+	<h2>Other future stuff I found (or remembered) recently</h2>
+	<ul>
+		<li>https://github.com/duritong/puppet-sysctl - used by Mozilla</li>
+		<li>https://github.com/puppetlabs/puppetlabs-firewall - used by Mozilla</li>
+		<li>run stages - packages, then files, then services - should allow us to provision in one puppet run if done right. We should define a few stages and start making use of them</li>
+		<ul>
+			<li>Might fix (at least some of) our firstrun.sh stuff</li>
+		</ul>
+		<li>we could totally eliminate firstrun.sh if we used stages, GPG, and a secure account that can add servers to AD</li>
+		<li>anchoring: <a href="https://wiki.mozilla.org/ReleaseEngineering/PuppetAgain/HowTo/Anchor_Classes">Mozilla wiki article</a> and <a href="http://docs.puppetlabs.com/puppet/3/reference/lang_containment.html#workaround-the-anchor-pattern">Puppet 3 docs - Anchor Pattern</a></li>
+		<li>try to remove cmg-specific stuff from modules if it can be moved to ENC</li>
+		<li>try to remove references that cross module boundaries</li>
+		<li>ENC hashes and create_resources</li>
+		<li><a href="https://github.com/rodjek/puppet-graph">rodjek/puppet-graph</a> - dependency graphs for arbitrary puppet code</li>
+		<li><a href="https://github.com/rodjek/puppet-logrotate">rodjek/puppet-logrotate</a> - a more puppet-like way to logrotate</li>
+		<li><a href="https://github.com/rodjek/puppet-profiler">rodjek/puppet-profiler</a> - which resources are taking the longest. maybe a good regression test.</li>
+	</ul>
+</section>
+
+<!-- End slides. -->
+
+
+<!-- Begin extension snippets. Add or remove as needed. -->
+
+<!-- deck.navigation snippet -->
+<a href="#" class="deck-prev-link" title="Previous">&#8592;</a>
+<a href="#" class="deck-next-link" title="Next">&#8594;</a>
+
+<!-- deck.status snippet -->
+<p class="deck-status">
+	<span class="deck-status-current"></span>
+	/
+	<span class="deck-status-total"></span>
+</p>
+
+<!-- deck.goto snippet -->
+<form action="." method="get" class="goto-form">
+	<label for="goto-slide">Go to slide:</label>
+	<input type="text" name="slidenum" id="goto-slide" list="goto-datalist">
+	<datalist id="goto-datalist"></datalist>
+	<input type="submit" value="Go">
+</form>
+
+<!-- deck.hash snippet -->
+<a href="." title="Permalink to this slide" class="deck-permalink">#</a>
+
+<!-- End extension snippets. -->
+
+
+<!-- Required JS files. -->
+<script src="deckjs/jquery-1.7.2.min.js"></script>
+<script src="deckjs/core/deck.core.js"></script>
+
+<!-- Extension JS files. Add or remove as needed. -->
+<script src="deckjs/core/deck.core.js"></script>
+<script src="deckjs/extensions/hash/deck.hash.js"></script>
+<script src="deckjs/extensions/menu/deck.menu.js"></script>
+<script src="deckjs/extensions/goto/deck.goto.js"></script>
+<script src="deckjs/extensions/status/deck.status.js"></script>
+<script src="deckjs/extensions/navigation/deck.navigation.js"></script>
+<script src="deckjs/extensions/scale/deck.scale.js"></script>
+
+<!-- Initialize the deck. You can put this in an external file if desired. -->
+<script>
+	$(function() {
+		$.deck('.slide');
+	});
+</script>
+</body>
+</html>

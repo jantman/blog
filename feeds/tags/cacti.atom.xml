@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Jason Antman's Blog</title><link href="http://newblog.jasonantman.com/" rel="alternate"></link><link href="http://newblog.jasonantman.com/feeds/tags/cacti.atom.xml" rel="self"></link><id>http://newblog.jasonantman.com/</id><updated>2009-09-29T15:36:00-04:00</updated><entry><title>Project Announcement - PHPsa</title><link href="http://newblog.jasonantman.com/2009/09/project-announcement-phpsa/" rel="alternate"></link><updated>2009-09-29T15:36:00-04:00</updated><author><name>admin</name></author><id>tag:newblog.jasonantman.com,2009-09-29:2009/09/project-announcement-phpsa/</id><summary type="html">&lt;p&gt;So, here&amp;#8217;s the &amp;#8220;official&amp;#8221; scoop on the new project that I&amp;#8217;m
+planning/starting to work on. I&amp;#8217;m calling it PHPsa for now, and it&amp;#8217;s
+going to (hopefully) be an integrated dashboard/portal for SysAdmins.
+While there are a number of tools that fit into this general category
+(perhaps with &lt;a href="http://www.alienvault.com/home.php?section=News"&gt;&lt;span class="caps"&gt;OSSIM&lt;/span&gt;&lt;/a&gt;
+being the closest, though it&amp;#8217;s security-minded), I feel that there&amp;#8217;s a
+real gap in terms of tool integration. My daily workflow, which includes
+multiple trips to and correlation among Nagios, Cacti, &lt;span class="caps"&gt;DNS&lt;/span&gt;, &lt;span class="caps"&gt;DHCP&lt;/span&gt;,
+Puppet, logs, and other tools really leaves something to be desired. So,
+I&amp;#8217;m setting out to create a modular SysAdmin dashboard that unifies many
+of the common SysAdmin-related tools into a modular&amp;nbsp;dashboard.&lt;/p&gt;
+&lt;p&gt;The first overall design goals that I&amp;#8217;ve set&amp;nbsp;are:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;A modular, plugin-based architecture that allows admins to select
+    which features/tools they want, and allows easy development of new&amp;nbsp;modules.&lt;/li&gt;
+&lt;li&gt;Design with legacy tools in mind - easy ways to tie in to tools that
+    weren&amp;#8217;t written with PHPsa in mind, both in terms of linking to
+    information and gathering/unifying&amp;nbsp;information.&lt;/li&gt;
+&lt;li&gt;&lt;span class="caps"&gt;RBAC&lt;/span&gt;, including per-module rules and the possibility for a limited
+    read-only view (client/user&amp;nbsp;mode).&lt;/li&gt;
+&lt;li&gt;Use of data sources, specifically web-based/&lt;span class="caps"&gt;REST&lt;/span&gt; APIs where
+    available, and databases otherwise, from existing tools with as
+    little modification as&amp;nbsp;possible.&lt;/li&gt;
+&lt;li&gt;Support for database abstraction, though I&amp;#8217;ll be using&amp;nbsp;MySQL.&lt;/li&gt;
+&lt;li&gt;Eventually, implement &lt;span class="caps"&gt;RSS&lt;/span&gt; feeds of pertinent&amp;nbsp;information.&lt;/li&gt;
+&lt;li&gt;Balance Ajax/&lt;span class="caps"&gt;DHTML&lt;/span&gt; with the desire for important things to have
+    canonical, static, bookmark-able&amp;nbsp;URLs.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;So, here are some of the things that I&amp;#8217;m planning on integrating, with
+obvious bias towards getting my own projects done before I integrate
+pre-existing&amp;nbsp;tools:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href="http://multibindadmin.jasonantman.com"&gt;MultiBindAdmin&lt;/a&gt;, my &lt;span class="caps"&gt;DNS&lt;/span&gt; and
+    &lt;span class="caps"&gt;DHCP&lt;/span&gt; administration tool (specifically geared towards split-view &lt;span class="caps"&gt;DNS&lt;/span&gt;
+    with the inside view behind&amp;nbsp;&lt;span class="caps"&gt;NAT&lt;/span&gt;).&lt;/li&gt;
+&lt;li&gt;&lt;a href="http://rackman.jasonantman.com/"&gt;RackMan&lt;/a&gt;, my tool for mapping
+    devices&amp;#8217; physical locations in racks (and tacking&amp;nbsp;patching).&lt;/li&gt;
+&lt;li&gt;My simple config tool for
+    &lt;a href="http://www.puppetlabs.com"&gt;Puppet&lt;/a&gt;.&lt;/li&gt;
+&lt;li&gt;&lt;a href="http://nagios.org/"&gt;Nagios&lt;/a&gt;.&lt;/li&gt;
+&lt;li&gt;&lt;a href="http://www.cacti.net/"&gt;Cacti&lt;/a&gt;.&lt;/li&gt;
+&lt;li&gt;Nathan Hubbard&amp;#8217;s &lt;a href="http://www.machdb.org/"&gt;MachDB&lt;/a&gt;.&lt;/li&gt;
+&lt;li&gt;&lt;a href="http://www.bacula.org/en/"&gt;Bacula&lt;/a&gt; (monitoring/status&amp;nbsp;only).&lt;/li&gt;
+&lt;li&gt;Syslog via &lt;a href="http://www.rsyslog.com/"&gt;rsyslog&lt;/a&gt; (or any other
+    syslog-to-&lt;span class="caps"&gt;SQL&lt;/span&gt;&amp;nbsp;solution).&lt;/li&gt;
+&lt;li&gt;Possibly a front-end to &lt;a href="http://www.google.com/analytics/"&gt;Google
+    Analytics&lt;/a&gt;.&lt;/li&gt;
+&lt;li&gt;Some of my custom scripts for graphing SpamAssassin, &lt;span class="caps"&gt;DNS&lt;/span&gt; queries,&amp;nbsp;etc.&lt;/li&gt;
+&lt;li&gt;Some sort of Apache log analysis, like
+    &lt;a href="http://www.mrunix.net/webalizer/"&gt;Webalizer&lt;/a&gt;.&lt;/li&gt;
+&lt;li&gt;Mail log analysis, possibly
+    &lt;a href="http://awstats.sourceforge.net/"&gt;AWstats&lt;/a&gt;.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;So, the first big issues that I&amp;#8217;m going to&amp;nbsp;tackle:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;General layout. Specifically, how to handle a more-or-less
+    consistent layout while integrating tools that weren&amp;#8217;t designed for
+    PHPsa. I&amp;#8217;ll probably end up using iFrames (or even a frameset) for
+    tools that don&amp;#8217;t integrate&amp;nbsp;well.&lt;/li&gt;
+&lt;li&gt;How to correlate data/objects between different tools (i.e. how to
+    display information from Nagios, Cacti, MultiBindAdmin and MachDB
+    for a given&amp;nbsp;host?).&lt;/li&gt;
+&lt;li&gt;Do I want to use a templating engine like
+    &lt;a href="http://www.smarty.net/"&gt;Smarty&lt;/a&gt; or hand-code all of the&amp;nbsp;&lt;span class="caps"&gt;HTML&lt;/span&gt;?&lt;/li&gt;
+&lt;li&gt;How will I handle&amp;nbsp;plugins?&lt;/li&gt;
+&lt;li&gt;How much code do I want to re-write and how much can I use as-is
+    from other tools? And, on a related note, how much existing data can
+    I access easily from other tools, vs having to use grabber scripts
+    that dump data in&amp;nbsp;MySQL?&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&lt;strong&gt;Update 2010-02-03&lt;/strong&gt;: I think this may become a semi-official project
+for me at $work, which means that I&amp;#8217;ll be able to dedicate quite a bit
+more time to it. Unfortunately, it also means that I will, most likely,
+have to give up Nathan Hubbard&amp;#8217;s &lt;a href="http://www.machdb.org/"&gt;MachDB&lt;/a&gt; in
+favor of &lt;a href="http://www.ocsinventory-ng.org/"&gt;&lt;span class="caps"&gt;OCS&lt;/span&gt; Inventory &lt;span class="caps"&gt;NG&lt;/span&gt;&lt;/a&gt;, a more
+mature project that already includes inventory support for Linux,
+Windows and&amp;nbsp;Mac.&lt;/p&gt;</summary><category term="bind"></category><category term="cacti"></category><category term="dns"></category><category term="Nagios"></category><category term="PHPsa"></category><category term="Projects"></category><category term="puppet"></category><category term="rsyslog"></category><category term="sysadmin"></category><category term="syslog"></category></entry><entry><title>Cable Management, Power Measurements, Major Outage, Cacti</title><link href="http://newblog.jasonantman.com/2008/03/cable-management-power-measurements-major-outage-cacti/" rel="alternate"></link><updated>2008-03-06T01:02:00-05:00</updated><author><name>admin</name></author><id>tag:newblog.jasonantman.com,2008-03-06:2008/03/cable-management-power-measurements-major-outage-cacti/</id><summary type="html">&lt;p&gt;So, once again, still really busy. But a few new&amp;nbsp;things.&lt;/p&gt;
+&lt;p&gt;First, my racks both at home and at the apartment are atrocious. They
+have no cable management at all. Both started with 1-3 machines, and no
+real plans for upgrades (since they&amp;#8217;re just my personal/development
+machines). Unfortunately, the &amp;#8220;rack&amp;#8221; (a metal workshop shelving unit) at
+home now has 8 machines and a host of ancillary equipment. The one at
+the apartment - an actual 42U rack - has 5 plus a few switches,
+rackmount &lt;span class="caps"&gt;KMM&lt;/span&gt;, etc. They&amp;#8217;re both a jumble of wires in the back.
+Unfortunately, it seems like cable management hardware is *epxensive*.
+$30 for a 2U metal blank with a few plastic split D-rings, or almost $40
+for a 2-meter vertical hunk of plastic channel with slits in the sides?
+So, I&amp;#8217;ve been vaguely considering what it will take to fabricate some
+cable management hardware of my own. Probably just building something
+out of rack blanks for the horizontal off of the switches, and buying
+some sort of vertical channel for power and networking/&lt;span class="caps"&gt;KVM&lt;/span&gt;. Man, those
+&lt;span class="caps"&gt;KVM&lt;/span&gt; cables sure do take up a lot of space. Also at the moment, at home
+my power is all coming directly out of two UPSs, whereas at the
+apartment it&amp;#8217;s straight from mains off of a surge suppressor. I&amp;#8217;s like
+to buy another &lt;span class="caps"&gt;UPS&lt;/span&gt; for the apartment from RefurbUPS.com, where I got the
+ones from home, and also add a &lt;span class="caps"&gt;PDU&lt;/span&gt; at home and a vertical power strip at
+the&amp;nbsp;apartment.&lt;/p&gt;
+&lt;p&gt;Also, at the apartment, the roommates and I have had some discussion
+lately about how much power the machines draw. This mainly stemmed from
+our plans to move this June, into a rented house with two more people.
+This seems to be falling through, so I don&amp;#8217;t have to worry about moving
+and re-cabling everything, but I&amp;#8217;m still interested in finding out how
+much power is being drawn. Granted, my UPSs at home give me a
+more-or-less good idea of power consumption, but I&amp;#8217;d like to know in
+detail. The ideal solution would be a clamp ammeter around the mains
+line to the equipment - one with a serial interface. Unfortunately, I
+can&amp;#8217;t seem to find such a thing, short of a digital multimeter left on
+all the time. So, I guess I&amp;#8217;ll be looking around, and if I can&amp;#8217;t find
+anything specific, maybe I&amp;#8217;ll work on a microcontroller that can read
+1-200mV in 1mV increments, and use it with an inductive clamp ammeter
+(usual output for them is 1mV per&amp;nbsp;A).&lt;/p&gt;
+&lt;p&gt;So, on Monday I got into work and couldn&amp;#8217;t access my mailserver. Weird.
+I never even got any Nagios alerts. I checked Nagios and&amp;#8230; nothing. As
+in no connection. I &lt;span class="caps"&gt;SSH&lt;/span&gt;&amp;#8217;d home and pinged both boxes, but nothing. The
+switch showed the mail server totally offline, and the Nagios box
+plugged connected but &lt;span class="caps"&gt;ZERO&lt;/span&gt; data out. I reset the counters and waited.
+Still nothing. After an hour or so of poking around, I determined that
+both devices were on the same 6-port group on the switch, and nothing
+else there was up too. So, after five long hours, I got someone back
+home to switch the cables. Still nothing. On a hunch, I asked to have
+her check the mail server (the &amp;#8220;new&amp;#8221; Sun Blade 150) and, sure enough, it
+wasn&amp;#8217;t powered on. A click of the power button, and the mail server was
+back online. Along with an ominous last email from Nagios, stating that
+the &lt;span class="caps"&gt;UPS&lt;/span&gt; running my switch lost power, and 6 minutes later, was going
+down hard. Then&amp;nbsp;quiet.&lt;/p&gt;
+&lt;p&gt;I don&amp;#8217;t usually have power outages. So I&amp;#8217;ll admit, when I added some of
+the new machines, I committed a high sin - I &amp;#8220;never got around&amp;#8221; to
+setting up everything power-wise. I also have the switch running off of
+an old BackUPS &lt;span class="caps"&gt;500VA&lt;/span&gt; unit, &lt;span class="caps"&gt;USB&lt;/span&gt;, without automatic self-tests. As a
+result of all&amp;nbsp;this:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;The little &lt;span class="caps"&gt;UPS&lt;/span&gt; powering the switch only held out for 6-7 minutes. As
+    a result, once that died, the bigger units didn&amp;#8217;t even matter, as
+    all hope was lost. This needs to be on a bigger &lt;span class="caps"&gt;UPS&lt;/span&gt; - maybe one of
+    the &lt;span class="caps"&gt;1000VA&lt;/span&gt;&amp;#8217;s until it gets its&amp;#8217;&amp;nbsp;own.&lt;/li&gt;
+&lt;li&gt;APCupsd requires a network to initiate shutdown, so the rest of the
+    machines came down hard (as confirmed by looking through log&amp;nbsp;files).&lt;/li&gt;
+&lt;li&gt;The SunBlade was never setup to power on after power interruption,
+    so it just sat there like a&amp;nbsp;brick.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Most disturbingly, while my Nagios/monitoring box is up (according to
+the switch, power draw figures from the &lt;span class="caps"&gt;UPS&lt;/span&gt;, and the lights, as
+confirmed by someone on-site), it&amp;#8217;s dead. No ping, nothing out. I&amp;#8217;ll
+have to look into it, but it made me realize that this really is my only
+way of analyzing problems. That needs to&amp;nbsp;stop.&lt;/p&gt;
+&lt;p&gt;Maybe one day I&amp;#8217;ll have the money for a nice &lt;a href="http://www.apc.com/products/family/index.cfm?id=223"&gt;SmartUPS
+&lt;span class="caps"&gt;RT&lt;/span&gt;&lt;/a&gt; or even a
+&lt;a href="http://www.apc.com/products/family/index.cfm?id=189"&gt;Symmetra&lt;/a&gt; - though
+getting 208V into my basement is even more of a dream than spending
+$4000 on a&amp;nbsp;&lt;span class="caps"&gt;UPS&lt;/span&gt;.&lt;/p&gt;
+&lt;p&gt;Also, I decided (after all this) to setup graphing of &lt;span class="caps"&gt;UPS&lt;/span&gt; data (load,
+voltage in and out, temp, capacity, run time, etc.). While I haven&amp;#8217;t
+gotten around to setting up &lt;a href="http://www.zenoss.com/"&gt;Zenoss&lt;/a&gt; yet, I did
+a quick (well, 4 hours later I&amp;#8217;m done configuring it)
+&lt;a href="http://www.cacti.net/"&gt;Cacti&lt;/a&gt;installation on my web server (I should
+already have it running on the monitoring box, but who knows what that
+will look like when I get&amp;nbsp;home).&lt;/p&gt;</summary><category term="apc"></category><category term="cable management"></category><category term="cacti"></category><category term="disaster"></category><category term="monitoring"></category><category term="power distribution"></category><category term="power failure"></category><category term="rack"></category><category term="UPS"></category></entry></feed>

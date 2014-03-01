@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Jason Antman's Blog</title><link>http://newblog.jasonantman.com/</link><description></description><atom:link href="http://newblog.jasonantman.com/feeds/tags/hostname.rss.xml" rel="self"></atom:link><lastBuildDate>Wed, 14 Oct 2009 14:45:00 -0400</lastBuildDate><item><title>Puppet problems with hostname in autosign.conf - Invalid pattern</title><link>http://newblog.jasonantman.com/2009/10/puppet-problems-with-hostname-in-autosignconf-invalid-pattern/</link><description>&lt;p&gt;In playing with Puppet (0.24.8 on clients and server) today (well,
+building a new host) I came by a strange error when I ran puppet on the&amp;nbsp;client:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;err: Could not request certificate: Certificate retrieval failed: Invalid pattern css-storemanager
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;The thing that was so strange is that &amp;#8220;css-storemanager&amp;#8221; is the name of
+a host at my site, controlled by Puppet, but it has nothing to do with
+the host I was building. They&amp;#8217;re different boxes, on different subnets,
+in different rooms. One is a SunFire and the other is an &lt;span class="caps"&gt;HP&lt;/span&gt;&amp;nbsp;desktop.&lt;/p&gt;
+&lt;p&gt;Google turned up nothing. Running puppetmasterd with &lt;code&gt;--debug --trace&lt;/code&gt;
+yielded:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;info: Listening on port 8140
+notice: Starting Puppet server version 0.24.8
+notice: Allowing unauthenticated client ccf-hill019-12.example.edu(172.x.x.x) access to puppetca.getcert
+/usr/lib/ruby/site_ruby/1.8/puppet/network/authstore.rb:289:in `parse&amp;#39;
+/usr/lib/ruby/site_ruby/1.8/puppet/network/authstore.rb:170:in `pattern=&amp;#39;
+/usr/lib/ruby/site_ruby/1.8/puppet/network/authstore.rb:151:in `initialize&amp;#39;
+/usr/lib/ruby/site_ruby/1.8/puppet/network/authstore.rb:80:in `new&amp;#39;
+/usr/lib/ruby/site_ruby/1.8/puppet/network/authstore.rb:80:in `store&amp;#39;
+/usr/lib/ruby/site_ruby/1.8/puppet/network/authstore.rb:20:in `allow&amp;#39;
+/usr/lib/ruby/site_ruby/1.8/puppet/network/handler/ca.rb:54:in `autosign?&amp;#39;
+/usr/lib/ruby/site_ruby/1.8/puppet/network/handler/ca.rb:51:in `each&amp;#39;
+/usr/lib/ruby/site_ruby/1.8/puppet/network/handler/ca.rb:51:in `autosign?&amp;#39;
+/usr/lib/ruby/site_ruby/1.8/puppet/network/handler/ca.rb:50:in `open&amp;#39;
+/usr/lib/ruby/site_ruby/1.8/puppet/network/handler/ca.rb:50:in `autosign?&amp;#39;
+/usr/lib/ruby/site_ruby/1.8/puppet/network/handler/ca.rb:112:in `getcert&amp;#39;
+/usr/lib/ruby/site_ruby/1.8/rubygems/custom_require.rb:31:in `to_proc&amp;#39;
+/usr/lib/ruby/site_ruby/1.8/puppet/network/xmlrpc/processor.rb:52:in `call&amp;#39;
+/usr/lib/ruby/site_ruby/1.8/puppet/network/xmlrpc/processor.rb:52:in `protect_service&amp;#39;
+/usr/lib/ruby/site_ruby/1.8/puppet/network/xmlrpc/processor.rb:85:in `setup_processor&amp;#39;
+/usr/lib/ruby/1.8/xmlrpc/server.rb:336:in `call&amp;#39;
+/usr/lib/ruby/1.8/xmlrpc/server.rb:336:in `dispatch&amp;#39;
+/usr/lib/ruby/1.8/xmlrpc/server.rb:323:in `each&amp;#39;
+/usr/lib/ruby/1.8/xmlrpc/server.rb:323:in `dispatch&amp;#39;
+/usr/lib/ruby/1.8/xmlrpc/server.rb:366:in `call_method&amp;#39;
+/usr/lib/ruby/1.8/xmlrpc/server.rb:378:in `handle&amp;#39;
+/usr/lib/ruby/site_ruby/1.8/puppet/network/xmlrpc/processor.rb:44:in `process&amp;#39;
+/usr/lib/ruby/site_ruby/1.8/puppet/network/xmlrpc/webrick_servlet.rb:68:in `service&amp;#39;
+/usr/lib/ruby/1.8/webrick/httpserver.rb:104:in `service&amp;#39;
+/usr/lib/ruby/1.8/webrick/httpserver.rb:65:in `run&amp;#39;
+/usr/lib/ruby/1.8/webrick/server.rb:173:in `start_thread&amp;#39;
+/usr/lib/ruby/1.8/webrick/server.rb:162:in `start&amp;#39;
+/usr/lib/ruby/1.8/webrick/server.rb:162:in `start_thread&amp;#39;
+/usr/lib/ruby/1.8/webrick/server.rb:95:in `start&amp;#39;
+/usr/lib/ruby/1.8/webrick/server.rb:92:in `each&amp;#39;
+/usr/lib/ruby/1.8/webrick/server.rb:92:in `start&amp;#39;
+/usr/lib/ruby/1.8/webrick/server.rb:23:in `start&amp;#39;
+/usr/lib/ruby/1.8/webrick/server.rb:82:in `start&amp;#39;
+/usr/lib/ruby/site_ruby/1.8/puppet.rb:293:in `start&amp;#39;
+/usr/lib/ruby/site_ruby/1.8/puppet.rb:144:in `newthread&amp;#39;
+/usr/lib/ruby/site_ruby/1.8/puppet.rb:143:in `initialize&amp;#39;
+/usr/lib/ruby/site_ruby/1.8/puppet.rb:143:in `new&amp;#39;
+/usr/lib/ruby/site_ruby/1.8/puppet.rb:143:in `newthread&amp;#39;
+/usr/lib/ruby/site_ruby/1.8/puppet.rb:291:in `start&amp;#39;
+/usr/lib/ruby/site_ruby/1.8/puppet.rb:290:in `each&amp;#39;
+/usr/lib/ruby/site_ruby/1.8/puppet.rb:290:in `start&amp;#39;
+/usr/sbin/puppetmasterd:285
+err: Invalid pattern css-storemanager
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;After a bit of investigation into that trace, I found the following code
+in &lt;code&gt;/usr/lib/ruby/site_ruby/1.8/puppet/network/authstore.rb&lt;/code&gt; starting on
+line&amp;nbsp;242:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;            &lt;span class="c1"&gt;# Parse our input pattern and figure out what kind of allowal&lt;/span&gt;
+            &lt;span class="c1"&gt;# statement it is.  The output of this is used for later matching.&lt;/span&gt;
+            &lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;parse&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;value&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+                &lt;span class="k"&gt;case&lt;/span&gt; &lt;span class="n"&gt;value&lt;/span&gt;
+                &lt;span class="k"&gt;when&lt;/span&gt; &lt;span class="sr"&gt;/^(\d+\.){1,3}\*$/&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="c1"&gt;# an ip address with a &amp;#39;*&amp;#39; at the end&lt;/span&gt;
+                    &lt;span class="vi"&gt;@name&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="ss"&gt;:ip&lt;/span&gt;
+                    &lt;span class="n"&gt;match&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="vg"&gt;$1&lt;/span&gt;
+                    &lt;span class="n"&gt;match&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;sub!&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;.&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+                    &lt;span class="n"&gt;ary&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;value&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;split&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;.&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+                    &lt;span class="n"&gt;mask&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="k"&gt;case&lt;/span&gt; &lt;span class="n"&gt;ary&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;index&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;match&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+                    &lt;span class="k"&gt;when&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="mi"&gt;8&lt;/span&gt;
+                    &lt;span class="k"&gt;when&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="mi"&gt;16&lt;/span&gt;
+                    &lt;span class="k"&gt;when&lt;/span&gt; &lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="mi"&gt;24&lt;/span&gt;
+                    &lt;span class="k"&gt;else&lt;/span&gt;
+                        &lt;span class="k"&gt;raise&lt;/span&gt; &lt;span class="no"&gt;AuthStoreError&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;Invalid &lt;span class="caps"&gt;IP&lt;/span&gt; pattern %s&amp;quot;&lt;/span&gt; &lt;span class="o"&gt;%&lt;/span&gt; &lt;span class="n"&gt;value&lt;/span&gt;
+                    &lt;span class="k"&gt;end&lt;/span&gt;
+
+                    &lt;span class="vi"&gt;@length&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;mask&lt;/span&gt;
+
+                    &lt;span class="n"&gt;ary&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;pop&lt;/span&gt;
+                    &lt;span class="k"&gt;while&lt;/span&gt; &lt;span class="n"&gt;ary&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;length&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;&lt;/span&gt; &lt;span class="mi"&gt;4&lt;/span&gt;
+                        &lt;span class="n"&gt;ary&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;push&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;0&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+                    &lt;span class="k"&gt;end&lt;/span&gt;
+
+                    &lt;span class="k"&gt;begin&lt;/span&gt;
+                        &lt;span class="vi"&gt;@pattern&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="no"&gt;IPAddr&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;new&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;ary&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;join&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;.&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;/&amp;quot;&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="n"&gt;mask&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;to_s&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+                    &lt;span class="k"&gt;rescue&lt;/span&gt; &lt;span class="no"&gt;ArgumentError&lt;/span&gt; &lt;span class="o"&gt;=&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;detail&lt;/span&gt;
+                        &lt;span class="k"&gt;raise&lt;/span&gt; &lt;span class="no"&gt;AuthStoreError&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;Invalid &lt;span class="caps"&gt;IP&lt;/span&gt; address pattern %s&amp;quot;&lt;/span&gt; &lt;span class="o"&gt;%&lt;/span&gt; &lt;span class="n"&gt;value&lt;/span&gt;
+                    &lt;span class="k"&gt;end&lt;/span&gt;
+                &lt;span class="k"&gt;when&lt;/span&gt; &lt;span class="sr"&gt;/^([a-zA-Z][-\w]*\.)+[-\w]+$/&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="c1"&gt;# a full hostname&lt;/span&gt;
+                    &lt;span class="vi"&gt;@name&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="ss"&gt;:domain&lt;/span&gt;
+                    &lt;span class="vi"&gt;@pattern&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;munge_name&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;value&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+                &lt;span class="k"&gt;when&lt;/span&gt; &lt;span class="sr"&gt;/^\*(\.([a-zA-Z][-\w]*)){1,}$/&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="c1"&gt;# *.domain.com&lt;/span&gt;
+                    &lt;span class="vi"&gt;@name&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="ss"&gt;:domain&lt;/span&gt;
+                    &lt;span class="vi"&gt;@pattern&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;munge_name&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;value&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+                    &lt;span class="vi"&gt;@pattern&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;pop&lt;/span&gt; &lt;span class="c1"&gt;# take off the &amp;#39;*&amp;#39;&lt;/span&gt;
+                    &lt;span class="vi"&gt;@length&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="vi"&gt;@pattern&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;length&lt;/span&gt;
+                &lt;span class="k"&gt;else&lt;/span&gt;
+                    &lt;span class="c1"&gt;# Else, use the IPAddr class to determine if we&amp;#39;ve got a&lt;/span&gt;
+                    &lt;span class="c1"&gt;# valid &lt;span class="caps"&gt;IP&lt;/span&gt; address.&lt;/span&gt;
+                    &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="n"&gt;value&lt;/span&gt; &lt;span class="o"&gt;=~&lt;/span&gt; &lt;span class="sr"&gt;/\/(\d+)$/&lt;/span&gt;
+                        &lt;span class="vi"&gt;@length&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nb"&gt;Integer&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="vg"&gt;$1&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+                    &lt;span class="k"&gt;end&lt;/span&gt;
+                    &lt;span class="k"&gt;begin&lt;/span&gt;
+                        &lt;span class="vi"&gt;@pattern&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="no"&gt;IPAddr&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;new&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;value&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+                    &lt;span class="k"&gt;rescue&lt;/span&gt; &lt;span class="no"&gt;ArgumentError&lt;/span&gt; &lt;span class="o"&gt;=&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;detail&lt;/span&gt;
+                        &lt;span class="k"&gt;raise&lt;/span&gt; &lt;span class="no"&gt;AuthStoreError&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;Invalid pattern %s&amp;quot;&lt;/span&gt; &lt;span class="o"&gt;%&lt;/span&gt; &lt;span class="n"&gt;value&lt;/span&gt;
+                    &lt;span class="k"&gt;end&lt;/span&gt;
+                    &lt;span class="vi"&gt;@name&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="ss"&gt;:ip&lt;/span&gt;
+                &lt;span class="k"&gt;end&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Following the trace back, I took a look at
+&lt;code&gt;/usr/lib/ruby/site_ruby/1.8/puppet/network/handler/ca.rb&lt;/code&gt; starting at
+line&amp;nbsp;50:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;            &lt;span class="n"&gt;auth&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="ss"&gt;Puppet&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="ss"&gt;:Network&lt;/span&gt;&lt;span class="o"&gt;::&lt;/span&gt;&lt;span class="no"&gt;AuthStore&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;new&lt;/span&gt;
+            &lt;span class="no"&gt;File&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;open&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;autosign&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt; &lt;span class="o"&gt;|&lt;/span&gt;&lt;span class="n"&gt;f&lt;/span&gt;&lt;span class="o"&gt;|&lt;/span&gt;
+                &lt;span class="n"&gt;f&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;each&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt; &lt;span class="o"&gt;|&lt;/span&gt;&lt;span class="n"&gt;line&lt;/span&gt;&lt;span class="o"&gt;|&lt;/span&gt;
+                    &lt;span class="k"&gt;next&lt;/span&gt; &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="n"&gt;line&lt;/span&gt; &lt;span class="o"&gt;=~&lt;/span&gt; &lt;span class="sr"&gt;/^\s*#/&lt;/span&gt;
+                    &lt;span class="k"&gt;next&lt;/span&gt; &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="n"&gt;line&lt;/span&gt; &lt;span class="o"&gt;=~&lt;/span&gt; &lt;span class="sr"&gt;/^\s*$/&lt;/span&gt;
+                    &lt;span class="n"&gt;auth&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;allow&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;line&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;chomp&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+                &lt;span class="p"&gt;}&lt;/span&gt;
+            &lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;After looking at this, it clicked that it must be what evaluates
+autosign.conf. Taking a look at mine, one line stood out: a line
+containing only &amp;#8220;css-storemanager&amp;#8221;, not a &lt;span class="caps"&gt;FQDN&lt;/span&gt; like all the rest. The
+parse() function in authstore.rb only accepts &lt;span class="caps"&gt;IP&lt;/span&gt; addresses and FQDNs (or
+&lt;span class="caps"&gt;IP&lt;/span&gt; addresses ending in a wildcard, or wildcard FQDNs). It appears to
+choke on hostnames (a string that doesn&amp;#8217;t match an &lt;span class="caps"&gt;FQDN&lt;/span&gt; or &lt;span class="caps"&gt;IP&lt;/span&gt;).
+Interestingly, it also evaluates in order, and stops evaluating
+autosign.conf once it finds a match. So, if you&amp;#8217;re a Bad Person like me,
+and left autosign turned on for all of your hosts, you wouldn&amp;#8217;t notice
+this until you try and build a new&amp;nbsp;box.&lt;/p&gt;
+&lt;p&gt;To solve this, just remove any offending lines from&amp;nbsp;autosign.conf.&lt;/p&gt;
+&lt;p&gt;I&amp;#8217;ve filed a bug report on the Puppet Trac: &lt;a href="http://projects.reductivelabs.com/issues/2723"&gt;Issue
+2723&lt;/a&gt;.&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Wed, 14 Oct 2009 14:45:00 -0400</pubDate><guid>tag:newblog.jasonantman.com,2009-10-14:2009/10/puppet-problems-with-hostname-in-autosignconf-invalid-pattern/</guid><category>autosign.conf</category><category>hostname</category><category>puppet</category></item></channel></rss>

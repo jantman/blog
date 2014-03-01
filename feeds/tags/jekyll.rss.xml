@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Jason Antman's Blog</title><link>http://newblog.jasonantman.com/</link><description></description><atom:link href="http://newblog.jasonantman.com/feeds/tags/jekyll.rss.xml" rel="self"></atom:link><lastBuildDate>Wed, 01 Jan 2014 15:15:00 -0500</lastBuildDate><item><title>Planning Migration from WordPress to Static Site</title><link>http://newblog.jasonantman.com/2014/01/planning-migration-from-wordpress-to-static-site/</link><description>&lt;p&gt;Right now, this blog, my email, and a whole bunch of other services are
+hosted on a &lt;a href="http://linode.com"&gt;Linode&lt;/a&gt; Xen &lt;span class="caps"&gt;VM&lt;/span&gt;. I don&amp;#8217;t really keep up
+to date with administration and upgrades the way I used to, and
+honestly, I&amp;#8217;d rather spend my time working on other things (like
+actually writing all of the blog posts that I&amp;#8217;ve been planning to. The
+first thing I&amp;#8217;ve identified for migration is this blog itself. It&amp;#8217;s
+currently on WordPress and, frankly, I don&amp;#8217;t either need nor like it.
+But there are some features I like. I&amp;#8217;d like to end up with a static
+site generator, hosted from either S3 or GitHub Pages. I know that means
+I&amp;#8217;ll lost comments (unless I move to a third-party, &lt;span class="caps"&gt;JS&lt;/span&gt;-based comment
+system like &lt;a href="http://disqus.com/"&gt;Disqus&lt;/a&gt;, which means I&amp;#8217;ll lose
+&lt;em&gt;control&lt;/em&gt; over my comments) but I suppose I can live with that. What I
+really want is something simple, static, cheap or free (that I&amp;#8217;ll likely
+put behind a small ec2 instance running nginx for&amp;nbsp;redirects/rewrites).&lt;/p&gt;
+&lt;p&gt;I&amp;#8217;m still in the planning phase, and trying to come up with a
+feature-by-feature comparison of my options. I&amp;#8217;ll likely post that when
+I finally have it done (at the moment it&amp;#8217;s in a very rough &lt;a href="https://docs.google.com/spreadsheet/ccc?key=0AnHh-ye5DNiNdF9DWkJrT2kzSkNsNVp6cjMzLXJ6VEE&amp;amp;usp=sharing"&gt;Google Docs
+spreadsheet&lt;/a&gt;).
+I&amp;#8217;m trying to round up my static site generator options and see which
+ones will do most, if not all, of what I want (though I still haven&amp;#8217;t
+discounted using hosted wordpress if it comes down to it). Here are the
+features I currently &amp;#8220;use&amp;#8221; (have) on my WordPress&amp;nbsp;blog:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;User-defined permalinks to&amp;nbsp;posts&lt;/li&gt;
+&lt;li&gt;Overall &lt;span class="caps"&gt;RSS&lt;/span&gt; feed of blog (currently powered by FeedBurner) and of&amp;nbsp;comments)&lt;/li&gt;
+&lt;li&gt;Categories (a post can be in multiple&amp;nbsp;categories)&lt;/li&gt;
+&lt;li&gt;Tags&lt;/li&gt;
+&lt;li&gt;Category and Tag&amp;nbsp;pages&lt;/li&gt;
+&lt;li&gt;per-Category and per-Tag feeds&amp;nbsp;(&lt;span class="caps"&gt;RSS&lt;/span&gt;)&lt;/li&gt;
+&lt;li&gt;Tag cloud &amp;#8220;widget&amp;#8221; in&amp;nbsp;sidebar&lt;/li&gt;
+&lt;li&gt;Themes. I actually like my current &lt;span class="caps"&gt;WP&lt;/span&gt;&amp;nbsp;theme&amp;#8230;&lt;/li&gt;
+&lt;li&gt;Visitor statistics (currently self-hosted
+    &lt;a href="http://piwik.org/"&gt;Piwik&lt;/a&gt;, formerly Google&amp;nbsp;Analytics)&lt;/li&gt;
+&lt;li&gt;Post publishing via cron&amp;#8217;ed script (&lt;em&gt;see below&lt;/em&gt;)&lt;/li&gt;
+&lt;li&gt;Draft/Pending status (i.e. let me save a partial post, and let me
+    save a complete post but mark it &amp;#8220;pending&amp;#8221; so I can just publish it&amp;nbsp;later)&lt;/li&gt;
+&lt;li&gt;Commenting (this will probably be the big sticking&amp;nbsp;point)&lt;/li&gt;
+&lt;li&gt;Syntax&amp;nbsp;hilighting&lt;/li&gt;
+&lt;li&gt;As &amp;#8220;weird&amp;#8221; as this is, I write all my posts in raw &lt;span class="caps"&gt;HTML&lt;/span&gt;, and am
+    perfectly happy doing&amp;nbsp;that.&lt;/li&gt;
+&lt;li&gt;&lt;span class="dquo"&gt;&amp;#8220;&lt;/span&gt;Subscribe via Email&amp;#8221; FeedBurner&amp;nbsp;widget&lt;/li&gt;
+&lt;li&gt;&lt;span class="caps"&gt;XML&lt;/span&gt;&amp;nbsp;Sitemap&lt;/li&gt;
+&lt;li&gt;Twitter&amp;nbsp;box/widget&lt;/li&gt;
+&lt;li&gt;Pingbacks (not that these are really useful for anything other than
+    spam these&amp;nbsp;days)&lt;/li&gt;
+&lt;li&gt;Automatic or manual post excerpts for feeds,&amp;nbsp;etc.&lt;/li&gt;
+&lt;li&gt;Remote publishing via &lt;span class="caps"&gt;XML&lt;/span&gt;-&lt;span class="caps"&gt;RPC&lt;/span&gt;/Android app (not that I&amp;#8217;ve used it
+    more than once or&amp;nbsp;twice)&lt;/li&gt;
+&lt;li&gt;Advertising - I currently use Google AdSense on my blog. The revenue
+    from my tiny hit count isn&amp;#8217;t enough to offset the cost of a Linode,
+    but if I moved to a much less expensive hosting service, it might be
+    worth considering (you can&amp;#8217;t run ads on the free hosted WordPress,
+    and I doubt you can on GitHub Pages&amp;nbsp;either).&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;I should be updating this post when I do some more research and have a
+comparison of the&amp;nbsp;options.&lt;/p&gt;
+&lt;p&gt;Note on &amp;#8220;Post publishing via cron&amp;#8217;ed script&amp;#8221; - sometimes I sit down and
+write half a dozen or so blog posts at a time. But I don&amp;#8217;t want them all
+to show up immediately, and spam the few people who still use &lt;span class="caps"&gt;RSS&lt;/span&gt;
+readers after the death of Google Reader. So I set the posts to
+&amp;#8220;Pending&amp;#8221; status, and I have a cron&amp;#8217;ed script that runs every weekday
+morning and publishes the one oldest &amp;#8220;pending&amp;#8221; post. Who knows if this
+actually does any good or&amp;nbsp;not&amp;#8230;&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Wed, 01 Jan 2014 15:15:00 -0500</pubDate><guid>tag:newblog.jasonantman.com,2014-01-01:2014/01/planning-migration-from-wordpress-to-static-site/</guid><category>blog</category><category>jekyll</category><category>pelican</category><category>python</category><category>static site</category><category>wordpress</category></item></channel></rss>

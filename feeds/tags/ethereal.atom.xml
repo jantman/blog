@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Jason Antman's Blog</title><link href="http://newblog.jasonantman.com/" rel="alternate"></link><link href="http://newblog.jasonantman.com/feeds/tags/ethereal.atom.xml" rel="self"></link><id>http://newblog.jasonantman.com/</id><updated>2011-04-26T10:50:00-04:00</updated><entry><title>Using wireshark to capture packets from a remote host</title><link href="http://newblog.jasonantman.com/2011/04/using-wireshark-to-capture-packets-from-a-remote-host/" rel="alternate"></link><updated>2011-04-26T10:50:00-04:00</updated><author><name>admin</name></author><id>tag:newblog.jasonantman.com,2011-04-26:2011/04/using-wireshark-to-capture-packets-from-a-remote-host/</id><summary type="html">&lt;p&gt;I spend a fair amount of my time debugging network and service problems
+on a few racks of Linux servers. Of course, they&amp;#8217;re located in a data
+center (yes, just downstairs, but still not quite as comfortable as my
+office), and they&amp;#8217;re all command-line only - no sense in using up &lt;span class="caps"&gt;RAM&lt;/span&gt;
+and &lt;span class="caps"&gt;CPU&lt;/span&gt; to run a graphical &lt;span class="caps"&gt;UI&lt;/span&gt; on a box that should just be serving
+remote clients. I used to go through the arduous task of running a
+command line &lt;a href="http://www.tcpdump.org/"&gt;&lt;code&gt;tcpdump&lt;/code&gt;&lt;/a&gt; session on the server
+until I thought I had enough packets, then SCPing it over to my
+workstation and opening the file in
+&lt;a href="http://www.wireshark.org/"&gt;wireshark&lt;/a&gt; (formerly Ethereal). Fortunately,
+thanks to a
+&lt;a href="http://linuxexplore.wordpress.com/2010/05/30/remote-packet-capture-using-wireshark-tcpdump/"&gt;post&lt;/a&gt;
+on Rahul Panwar&amp;#8217;s &lt;a href="http://linuxexplore.wordpress.com/"&gt;Linux Explore
+blog&lt;/a&gt; (which seems to be sadly
+neglected), I found a much easier way to do it. I&amp;#8217;ve summarized that
+post here, added a little explanation, and also made some useful
+comments for people working on Red Hat/CentOS and&amp;nbsp;OpenSuSE.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;What you&amp;nbsp;need:&lt;/strong&gt;&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Source system (the server you want to capture packets on) that you
+    have &lt;span class="caps"&gt;SSH&lt;/span&gt; access to, with tcpdump installed, and available to your
+    user (either directly, or via sudo without&amp;nbsp;password).&lt;/li&gt;
+&lt;li&gt;Destination system (where you run graphical Wireshark) with
+    wireshark installed and working, and &lt;code&gt;mkfifo&lt;/code&gt; available.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&lt;strong&gt;Procedure:&lt;/strong&gt;&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;On the destination system, if you haven&amp;#8217;t already done&amp;nbsp;so,&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;mkfifo /tmp/packet_capture
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;This creates a &lt;a href="http://en.wikipedia.org/wiki/Named_pipe"&gt;named pipe&lt;/a&gt;
+where the source packet data (via ssh) will be written and Wireshark
+will read it from. You can use any name or location you want, but
+&lt;code&gt;/tmp/packet_capture&lt;/code&gt; is pretty&amp;nbsp;logical.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;On your destination system, open up Wireshark (we do this now, since
+    on many systems it required the root password to start). In the
+    &amp;#8220;Capture&amp;#8221; menu, select &amp;#8220;Options&amp;#8221;. In the &amp;#8220;Interface&amp;#8221; box, type in
+    the path to the &lt;span class="caps"&gt;FIFO&lt;/span&gt; you created (&lt;code&gt;/tmp/packet_capture&lt;/code&gt;). You should
+    press the Start button before running the next command - I recommend
+    typing the command in a terminal window, pressing start, then
+    hitting enter in the terminal to run the&amp;nbsp;command.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;On the destination system,&amp;nbsp;run&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;ssh user@source-hostname &lt;span class="s2"&gt;&amp;quot;sudo /usr/sbin/tcpdump -s 0 -U -n -w - -i eth0 not port 22&amp;quot;&lt;/span&gt; &amp;gt; /tmp/packet_capture
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;This will &lt;span class="caps"&gt;SSH&lt;/span&gt; to the source system (&lt;code&gt;source-hostname&lt;/code&gt;, either by
+hostname or &lt;span class="caps"&gt;IP&lt;/span&gt;) as the specified user (&lt;code&gt;user&lt;/code&gt;) and execute
+&lt;code&gt;sudo /usr/sbin/tcpdump&lt;/code&gt;. Omit the &amp;#8220;sudo&amp;#8221; if you don&amp;#8217;t need it,
+though if you do, you&amp;#8217;ll need passwordless access. Options passed to
+tcpdump are: &amp;#8220;-s 0&amp;#8221; snarf entire packets, no length limit; &amp;#8220;-U&amp;#8221;
+packet-buffered output - write each complete packet to output once
+it&amp;#8217;s captured, rather than waiting for a buffer to fill up; &amp;#8220;-n&amp;#8221;
+don&amp;#8217;t convert addresses to hostnames; &amp;#8220;-w -&amp;#8221; write raw packets to
+&lt;span class="caps"&gt;STDOUT&lt;/span&gt; (which will be passed through the &lt;span class="caps"&gt;SSH&lt;/span&gt; tunnel and become
+&lt;span class="caps"&gt;STDOUT&lt;/span&gt; of the &amp;#8220;ssh&amp;#8221; command on the destination machine); &amp;#8220;-i eth0&amp;#8221;
+capture on interface eth0; &amp;#8220;not port 22&amp;#8221; a tcpdump filter expression
+to prevent capturing our own &lt;span class="caps"&gt;SSH&lt;/span&gt; packets (more on this below). The
+final &amp;#8220;&gt; /tmp/packet_capture&amp;#8221; redirects the &lt;span class="caps"&gt;STDOUT&lt;/span&gt; of the ssh
+program (the raw packets from tcpdump on the source machine) to the
+&lt;code&gt;/tmp/packet_capture&lt;/code&gt; &lt;span class="caps"&gt;FIFO&lt;/span&gt;.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;When you&amp;#8217;re ready to stop the capture, just Ctrl+C the &lt;span class="caps"&gt;SSH&lt;/span&gt; command
+    in the terminal window. Wireshark will automatically stop capturing,
+    and you can save the capture file or play around with it. To capture
+    again, you&amp;#8217;ll need to restart the capture in Wireshark and then run
+    the ssh command&amp;nbsp;again.&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&lt;strong&gt;A note on network usage and tcpdump&amp;nbsp;filters&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;This is a relatively bandwidth intensive procedure. If you use the &amp;#8220;not
+port 22&amp;#8221; tcpdump filter (shown above) on the source machine, all traffic
+over eth0 (other than &lt;span class="caps"&gt;SSH&lt;/span&gt;) on that machine will be duplicated within an
+&lt;span class="caps"&gt;SSH&lt;/span&gt; tunnel. So you have double the traffic, plus the overhead of
+tunneling all that within &lt;span class="caps"&gt;SSH&lt;/span&gt; to the destination machine. If you&amp;#8217;re
+capturing data from a busy machine this way, you could easily saturate
+the uplink and wreak all sorts of havoc. As a result, I&amp;#8217;d recommend
+making the tcpdump filter as specific as you can while still retaining
+the data you need. If you can replace it with a filter for specific
+ports (i.e. &lt;code&gt;'(port 67 or port 68)'&lt;/code&gt; for &lt;span class="caps"&gt;DHCP&lt;/span&gt;) or specific hosts, that
+should cut down on the amount of data you actually have to pass through
+the&amp;nbsp;tunnel.&lt;/p&gt;</summary><category term="ethereal"></category><category term="linux"></category><category term="sysadmin"></category><category term="tcpdump"></category><category term="troubleshooting"></category><category term="wireshark"></category></entry></feed>

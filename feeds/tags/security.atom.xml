@@ -1,0 +1,862 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Jason Antman's Blog</title><link href="http://newblog.jasonantman.com/" rel="alternate"></link><link href="http://newblog.jasonantman.com/feeds/tags/security.atom.xml" rel="self"></link><id>http://newblog.jasonantman.com/</id><updated>2012-10-24T12:01:00-04:00</updated><entry><title>Random Links for Wednesday, October 24th</title><link href="http://newblog.jasonantman.com/2012/10/random-links-for-wednesday-october-24th/" rel="alternate"></link><updated>2012-10-24T12:01:00-04:00</updated><author><name>admin</name></author><id>tag:newblog.jasonantman.com,2012-10-24:2012/10/random-links-for-wednesday-october-24th/</id><summary type="html">&lt;p&gt;Some random interesting links from Slashdot for&amp;nbsp;today:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href="http://news.slashdot.org/story/12/10/23/2038220/the-greatest-battle-of-the-personal-computing-revolution-lies-ahead"&gt;The Greatest Battle of the Personal Computing Revolution Lies Ahead
+    -
+    Slashdot&lt;/a&gt;.
+    A bit of a rant, but makes some good points that are close to my
+    heart, and unfortunately far from the thoughts of many&amp;nbsp;non-techies.&lt;/li&gt;
+&lt;li&gt;&lt;a href="http://tos-dr.info/"&gt;Terms of Service; Didn&amp;#8217;t Read&lt;/a&gt; - an
+    interesting&amp;nbsp;project&lt;/li&gt;
+&lt;li&gt;&lt;a href="http://yro.slashdot.org/story/12/10/21/208206/how-patent-trolls-harm-the-economy"&gt;How Patent Trolls Harm the Economy -
+    Slashdot&lt;/a&gt;&lt;ul&gt;
+&lt;li&gt;another issue close to my&amp;nbsp;heart&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;a href="http://www.datacenterknowledge.com/archives/2012/10/17/how-google-cools-its-armada-of-servers/"&gt;How Google Cools Its Armada of Servers » Data Center&amp;nbsp;Knowledge&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href="http://www.google.com/about/datacenters/gallery/#/"&gt;Data centers – Google Data
+    centers&lt;/a&gt; - A
+    photo tour of Google data centers, by Google, along with a &lt;a href="https://plus.google.com/+google/posts/Gk8ScjPX23n"&gt;Google+
+    post&lt;/a&gt; about the
+    architecture photographer who did this&amp;nbsp;work.&lt;/li&gt;
+&lt;li&gt;&lt;a href="http://tech.slashdot.org/story/12/10/22/0518231/darpa-funds-a-300-software-defined-radio-for-hackers"&gt;&lt;span class="caps"&gt;DARPA&lt;/span&gt; Funds a $300 Software-Defined Radio For Hackers -
+    Slashdot&lt;/a&gt;&lt;ul&gt;
+&lt;li&gt;way&amp;nbsp;cool.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;a href="http://map.honeynet.org/"&gt;Honeynet Map&lt;/a&gt; - &amp;#8220;realtime&amp;#8221; map of
+    cybersecurity incidents, from the Honeynet&amp;nbsp;Project.&lt;/li&gt;
+&lt;li&gt;&lt;a href="http://science.slashdot.org/story/12/10/17/1741225/malware-is-rampant-on-medical-devices-in-hospitals"&gt;Malware Is &amp;#8216;Rampant&amp;#8217; On Medical Devices In Hospitals -
+    Slashdot&lt;/a&gt;&lt;ul&gt;
+&lt;li&gt;a bit scary, but unfortunately not that hard to guess. I&amp;#8217;ve seen
+(probably unpatched) Windows 2000 workstations on hospital&amp;nbsp;networks.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;To top off the scary posts: &lt;a href="http://news.slashdot.org/story/12/10/17/0325236/researcher-reverse-engineers-pacemaker-transmitter-to-deliver-deadly-shocks"&gt;Researcher Reverse-Engineers Pacemaker
+    Transmitter To Deliver Deadly Shocks -&amp;nbsp;Slashdot&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;</summary><category term="appliancization"></category><category term="cooling"></category><category term="datacenter"></category><category term="google"></category><category term="healthcare"></category><category term="legal"></category><category term="links"></category><category term="malware"></category><category term="pacemaker"></category><category term="patents"></category><category term="radio"></category><category term="SDR"></category><category term="security"></category></entry><entry><title>Secure rsnapshot backups over the WAN via SSH</title><link href="http://newblog.jasonantman.com/2012/01/secure-rsnapshot-backups-over-the-wan-via-ssh/" rel="alternate"></link><updated>2012-01-15T17:26:00-05:00</updated><author><name>admin</name></author><id>tag:newblog.jasonantman.com,2012-01-15:2012/01/secure-rsnapshot-backups-over-the-wan-via-ssh/</id><summary type="html">&lt;p&gt;Since I moved all of my &lt;span class="caps"&gt;WAN&lt;/span&gt;-facing stuff (mail, web, this blog, svn
+etc.) to a virtual server with &lt;a href="http://www.linode.com"&gt;Linode&lt;/a&gt;, and just
+have a desktop at home, it&amp;#8217;s no longer practical to use
+&lt;a href="http://www.bacula.org/"&gt;Bacula&lt;/a&gt; for backups. Linode manages daily and
+weekly backups through their backup service, but they&amp;#8217;ll only restore a
+full filesystem at a time. I wanted something that would keep daily and
+weekly incremental backups long enough that I could find a file changed
+(or accidentally deleted) a few days or weeks ago. Since I&amp;#8217;d be backing
+up to my desktop at home (which is on a residential dynamic &lt;span class="caps"&gt;IP&lt;/span&gt;
+connection), the logical solution was something using
+&lt;a href="http://rsync.samba.org/"&gt;rsync&lt;/a&gt;. Even better than that is the
+&lt;a href="http://rsnapshot.org/"&gt;rsnapshot&lt;/a&gt; tool, which builds upon rsync and
+hard links to manage incremental backups with as little disk usage as
+possible (though I&amp;#8217;d certainly recommend excluding log&amp;nbsp;files).&lt;/p&gt;
+&lt;p&gt;I&amp;#8217;m pretty strict about security. Since my home connection has a dynamic
+&lt;span class="caps"&gt;IP&lt;/span&gt;, things are a bit more complicated - I can&amp;#8217;t push from the server, I
+can&amp;#8217;t &lt;span class="caps"&gt;ACL&lt;/span&gt; or firewall the server to just my home &lt;span class="caps"&gt;IP&lt;/span&gt;, and an IPsec &lt;span class="caps"&gt;VPN&lt;/span&gt;
+would be difficult to accomplish (not to mention add a lot of overhead
+to big file transfers). So, I opted for a solution that uses &lt;span class="caps"&gt;SSH&lt;/span&gt;
+key-based authentication, forced comands, and a C&amp;nbsp;wrapper.&lt;/p&gt;
+&lt;p&gt;The configuration of rsync and rsnapshot is mostly out of the scope of
+this post. There are plenty of good resources for that, so I&amp;#8217;ll just
+cover the things that won&amp;#8217;t be found in most tutorials. Also, I&amp;#8217;ll be
+referring to the remote machine to be backed up as the &amp;#8220;remote host&amp;#8221; and
+the local machine which triggers the backup and stores the data as the
+&amp;#8220;local&amp;nbsp;host&amp;#8221;.&lt;/p&gt;
+&lt;h2 id="local-host-setup-part-i"&gt;Local Host Setup - Part&amp;nbsp;I&lt;/h2&gt;
+&lt;ol&gt;
+&lt;li&gt;Choose and create a directory to store your backups in. I have a &lt;span class="caps"&gt;1TB&lt;/span&gt;
+    external disk mounted at &lt;code&gt;/mnt/backup/&lt;/code&gt;, so I chose
+    &lt;code&gt;/mnt/backup/rsnapshot/&lt;/code&gt;.&lt;/li&gt;
+&lt;li&gt;Generate two sets of password-less &lt;span class="caps"&gt;SSH&lt;/span&gt; keys using the &lt;code&gt;ssh-keygen&lt;/code&gt;
+    program. One will be used to run the rsync command on the remote
+    host, the other will be used to trigger your pre- and post-backup
+    scripts. Name them accordingly (i.e.
+    &amp;#8220;remoteHostname_remoteBackupUsername_cmd&amp;#8221; and
+    &amp;#8220;remoteHostname_remoteBackupUsername_rsync&amp;#8221;). Now, get (scp) the
+    public key for each pair to the remote&amp;nbsp;host.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id="remote-host-setup"&gt;Remote Host&amp;nbsp;Setup&lt;/h2&gt;
+&lt;ol&gt;
+&lt;li&gt;Ensure that rsync is installed on the&amp;nbsp;host.&lt;/li&gt;
+&lt;li&gt;Create a user to run the backups. I called this user &amp;#8220;rsyncuser&amp;#8221;.
+    Create a home directory, and a group for the user. Do not set a
+    password (you don&amp;#8217;t want password&amp;nbsp;logins).&lt;/li&gt;
+&lt;li&gt;Copy the public key files you created above to the user&amp;#8217;s &lt;code&gt;~/.ssh/&lt;/code&gt;
+    directory.&lt;/li&gt;
+&lt;li&gt;Cat the &amp;#8220;remoteHostname_remoteBackupUsername_cmd&amp;#8221; public key into
+    the user&amp;#8217;s &lt;code&gt;~/.ssh/authorized_keys&lt;/code&gt; file.&lt;/li&gt;
+&lt;li&gt;Now comes the first fun part. Let&amp;#8217;s assume that your pre- and
+    post-backup scripts are &lt;code&gt;/root/bin/rsnapshot-pre.sh&lt;/code&gt; and
+    &lt;code&gt;/root/bin/rsnapshot-post.sh&lt;/code&gt;, respectively. As root, grab a copy of
+    cmd-wrapper.c (from
+    &lt;a href="https://github.com/jantman/misc-scripts/blob/master/cmd-wrapper.c"&gt;GitHub&lt;/a&gt;
+    or at the bottom of this post). Modify for your use - the only thing
+    likely to change is line 38, which ensures it will only run for a
+    member of &lt;span class="caps"&gt;GID&lt;/span&gt; 502. Change this to rsyncuser&amp;#8217;s &lt;span class="caps"&gt;GID&lt;/span&gt;. Compile the
+    wrapper with &lt;code&gt;gcc -o cmd-wrapper cmd-wrapper.c&lt;/code&gt;. Copy it to
+    rsyncuser&amp;#8217;s home directory (/home/rsyncuser), &lt;code&gt;chown root:rsyncuser&lt;/code&gt;
+    and &lt;code&gt;chmod 4750&lt;/code&gt;. Yes, this sets the &lt;span class="caps"&gt;SUID&lt;/span&gt; bit. The program will now
+    be owned by root, and runnable &lt;em&gt;as root&lt;/em&gt; by rsyncuser (or, more
+    specifically, any member of the rsyncuser&amp;nbsp;group).&lt;/li&gt;
+&lt;li&gt;Open rsyncuser&amp;#8217;s &lt;code&gt;.ssh/authorized_keys&lt;/code&gt; file in a text editor. At
+    the beginning of the &amp;#8220;remoteHostname_remoteBackupUsername_cmd&amp;#8221; key
+    line, prepend &lt;code&gt;command="/home/rsyncuser/cmd-wrapper"&lt;/code&gt;. This sets up
+    &lt;span class="caps"&gt;SSH&lt;/span&gt; forced command (there&amp;#8217;s a good overview in &lt;a href="http://oreilly.com/catalog/sshtdg/chapter/ch08.html"&gt;O&amp;#8217;Reilly&amp;#8217;s &lt;span class="caps"&gt;SSH&lt;/span&gt;: The
+    Definitive
+    Guide&lt;/a&gt;) so that
+    when this key is used to login, it will directly execute
+    &lt;code&gt;/home/rsyncuser/cmd-wrapper&lt;/code&gt; and then exit, without allowing access
+    to anything&amp;nbsp;else.&lt;/li&gt;
+&lt;li&gt;Add rsyncuser to &lt;code&gt;AllowUsers&lt;/code&gt; in &lt;code&gt;/etc/ssh/sshd_config&lt;/code&gt; (you &lt;em&gt;do&lt;/em&gt;
+    limit user access via &lt;span class="caps"&gt;SSH&lt;/span&gt;, right?) and then reload&amp;nbsp;sshd.&lt;/li&gt;
+&lt;li&gt;Now, if you &lt;span class="caps"&gt;SSH&lt;/span&gt; to rsyncuser@remoteHost from the local host, using
+    the &amp;#8220;_cmd&amp;#8221; ssh key and a command of &amp;#8220;pre&amp;#8221; (i.e.
+    &lt;code&gt;ssh -i /path/to/remoteHostname_remoteBackupUsername_cmd rsyncuser@remoteHost pre&lt;/code&gt;),
+    it should execute &lt;code&gt;/root/bin/rsnapshot-pre.sh&lt;/code&gt; ad root, and you
+    should see the output&amp;nbsp;locally.&lt;/li&gt;
+&lt;li&gt;Repeat the above step for the post-backup script (replacing &amp;#8220;pre&amp;#8221;
+    above with &amp;#8220;post&amp;#8221;). You should now have your pre- and post-backup
+    scripts working, and triggered remotely. &lt;em&gt;(Note: these steps, and
+    some of the other setup here, is a bit more complex so that it will
+    work better with rsnapshot backups of multiple remote&amp;nbsp;hosts.)&lt;/em&gt;&lt;/li&gt;
+&lt;li&gt;Cat the &amp;#8220;remoteHostname_remoteBackupUsername_rsync&amp;#8221; public key
+    into the backup user&amp;#8217;s &lt;code&gt;~/.ssh/authorized_keys&lt;/code&gt; file.&lt;/li&gt;
+&lt;li&gt;As root, grab a copy of rsync-wrapper.c (from
+    &lt;a href="https://github.com/jantman/misc-scripts/blob/master/rsync-wrapper.c"&gt;GitHub&lt;/a&gt;
+    or at the bottom of this post). Modify for your use - the only thing
+    likely to change is line 38, which ensures it will only run for a
+    member of &lt;span class="caps"&gt;GID&lt;/span&gt; 502 (change this to rsyncuser&amp;#8217;s &lt;span class="caps"&gt;GID&lt;/span&gt;), and perhaps the
+    path of or arguments passed to rsync (the wrapper will call
+    &lt;code&gt;/usr/bin/rsync --server --sender -vlogDtprRe.iLsf --numeric-ids . /&lt;/code&gt;).
+    Compile the wrapper with &lt;code&gt;gcc -o rsync-wrapper rsync-wrapper.c&lt;/code&gt;.
+    Copy it to rsyncuser&amp;#8217;s home directory (/home/rsyncuser),
+    &lt;code&gt;chown root:rsyncuser&lt;/code&gt; and &lt;code&gt;chmod 4750&lt;/code&gt;.&lt;/li&gt;
+&lt;li&gt;Open rsyncuser&amp;#8217;s &lt;code&gt;.ssh/authorized_keys&lt;/code&gt; file in a text editor. At
+    the beginning of the &amp;#8220;remoteHostname_remoteBackupUsername_rsync&amp;#8221;
+    key line, prepend &lt;code&gt;command="/home/rsyncuser/rsync-wrapper"&lt;/code&gt;. This
+    will run rsync with the arguments specified in rsync-wrapper.c every
+    time this key is used to&amp;nbsp;login.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id="local-host-setup-part-ii"&gt;Local Host Setup - Part&amp;nbsp;&lt;span class="caps"&gt;II&lt;/span&gt;&lt;/h2&gt;
+&lt;p&gt;I use totally separate configs for each host that I backup, to keep
+things clean and to let me enable, disable, or tweak one remote backup
+without affecting the&amp;nbsp;others.&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;Create host-specific pre- and post-backup scripts. I put them in
+    &lt;code&gt;/etc/rsnapshot.d/&lt;/code&gt;.
+    &lt;code&gt;/etc/rsnapshot.d/pre-remoteHostName.sh&lt;/code&gt;:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="c"&gt;#!/bin/bash&lt;/span&gt;
+
+&lt;span class="c"&gt;# do anything else needed on the local system before a backup&lt;/span&gt;
+ssh -i /path/to/remoteHostname_remoteBackupUsername_cmd rsyncuser@remoteHost pre
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;&lt;code&gt;/etc/rsnapshot.d/post-remoteHostName.sh&lt;/code&gt;:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="c"&gt;#!/bin/bash&lt;/span&gt;
+
+&lt;span class="c"&gt;# do anything else needed on the local system after a backup&lt;/span&gt;
+ssh -i /path/to/remoteHostname_remoteBackupUsername_cmd rsyncuser@remoteHost post
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Setup a set of rsync include and exclude files (see &lt;code&gt;man rsync(1)&lt;/code&gt;,
+    &lt;code&gt;--include-from=&lt;/code&gt; and &lt;code&gt;--exclude-from=&lt;/code&gt;). I put mine at
+    &lt;code&gt;/etc/rsnapshot.d/rsync-include-remoteHostName.txt&lt;/code&gt; and
+    &lt;code&gt;/etc/rsnapshot.d/rsync-exclude-remoteHostName.txt&lt;/code&gt;, respectively.
+    (Examples included at the bottom of this&amp;nbsp;post).&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Configure rsnapshot. I use a separate config file for each remote
+    host. Copy the default &lt;code&gt;/etc/rsnapshot.conf&lt;/code&gt; to
+    &lt;code&gt;/etc/rsnapshot-remoteHostName.conf&lt;/code&gt;. The important items are
+    &lt;code&gt;rsync_short_args&lt;/code&gt;, &lt;code&gt;rsync_long_args&lt;/code&gt;, &lt;code&gt;ssh_args&lt;/code&gt;, &lt;code&gt;cmd_preexec&lt;/code&gt;,
+    &lt;code&gt;cmd_postexec&lt;/code&gt; and &lt;code&gt;backup&lt;/code&gt;. Here&amp;#8217;s an example of my config file,
+    with comments and blank lines&amp;nbsp;removed:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;config_version  1.2
+snapshot_root   /mnt/backup/rsnapshot/
+cmd_cp          /bin/cp
+cmd_rm          /bin/rm
+cmd_rsync       /usr/bin/rsync
+cmd_ssh         /usr/bin/ssh
+cmd_logger      /bin/logger
+cmd_du          /usr/bin/du
+cmd_rsnapshot_diff      /usr/bin/rsnapshot-diff
+interval        daily   14 # save 14 daily backups
+interval        weekly  6 # save 6 weekly backups
+verbose         2
+loglevel        3
+logfile /var/log/rsnapshot-remoteHostName.log
+lockfile        /var/run/rsnapshot-remoteHostName.pid
+rsync_short_args        -a
+rsync_long_args --delete --numeric-ids --relative --delete-excluded
+ssh_args        -i /path/to/remoteHostname_remoteBackupUsername_rsync
+exclude_file    /etc/rsnapshot.d/rsync-exclude-remoteHostName.txt
+include_file    /etc/rsnapshot.d/rsync-include-remoteHostName.txt
+link_dest       1
+use_lazy_deletes        1
+cmd_preexec     /etc/rsnapshot.d/pre-remoteHostName.sh
+cmd_postexec    /etc/rsnapshot.d/post-remoteHostName.sh
+backup  rsyncuser@remoteHostName:/      remoteHostName/
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;The &lt;code&gt;backup&lt;/code&gt; line is what tells rsync what to back up (&lt;code&gt;/&lt;/code&gt; on
+remoteHostName, logging in as rsyncuser), and where to back up to&amp;nbsp;(snapshot_root/remoteHostName/).&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Create two scripts that will actually trigger the backups, which
+    I&amp;#8217;ll call &lt;code&gt;/root/bin/rsnapshot-daily.sh&lt;/code&gt; and &lt;code&gt;/root/bin/rsnapshot-weekly.sh&lt;/code&gt;:&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;/root/bin/rsnapshot-daily.sh&lt;/code&gt;:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="c"&gt;#!/bin/bash&lt;/span&gt;
+
+/usr/bin/rsnapshot -c /etc/rsnapshot-remoteHostName.conf daily
+&lt;span class="c"&gt;# add other hosts here; note, they&amp;#39;ll run in series&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;&lt;code&gt;/root/bin/rsnapshot-weekly.sh&lt;/code&gt;:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="c"&gt;#!/bin/bash&lt;/span&gt;
+
+/usr/bin/rsnapshot -c /etc/rsnapshot-remoteHostName.conf weekly
+&lt;span class="c"&gt;# add other hosts here; note, they&amp;#39;ll run in series&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Add two entries to root&amp;#8217;s croontab to run the rsnapshot backups.
+    Adjust the following days and times to your&amp;nbsp;liking:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;0 1 * * Mon /root/bin/rsnapshot-weekly.sh # run the weekly backups every Monday at 01:00
+30 2 * * * /root/bin/rsnapshot-daily.sh # run the daily backups every day at 02:30, which *should* be after the weekly finished on Monday morning
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Check, after the next scheduled runs, that everything appears to
+    have run correctly. If you want, you can manually trigger the daily
+    script and watch what happens. If you do this more than once, you
+    should delete the directories it creates, or else rotation will be
+    messed up. If you have issues with rsync, aside from the usual
+    troubleshooting, check that rsync-wrapper.c is calling rsync with
+    the same arguments that rsnapshot is sending. It may be useful to
+    use my
+    &lt;a href="https://github.com/jantman/misc-scripts/blob/master/print-cmd.sh"&gt;print-cmd.sh&lt;/a&gt;
+    script in place of the &amp;#8220;rsync-wrapper&amp;#8221; forced command. This script
+    will simply log the command rsnapshot calls via&amp;nbsp;&lt;span class="caps"&gt;SSH&lt;/span&gt;.&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Assuming all of this worked, you should now have a fairly secure
+&lt;span class="caps"&gt;SSH&lt;/span&gt;-based remotely-triggered backup system. In a follow-up post I
+provide my &lt;a href="/2012/02/nagios-check-plugin-for-rsnapshot-backups/"&gt;Nagios Check Plugin for Rsnapshot
+Backups&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;The referenced scripts, config files, etc. are&amp;nbsp;below:&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;cmd-wrapper.c&lt;/code&gt;:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="cp"&gt;#include &lt;/span&gt;
+&lt;span class="cp"&gt;#include &lt;/span&gt;
+&lt;span class="cp"&gt;#include &lt;/span&gt;
+&lt;span class="cp"&gt;#include &lt;/span&gt;
+&lt;span class="cp"&gt;#include &lt;/span&gt;
+&lt;span class="cp"&gt;#include &lt;/span&gt;
+
+&lt;span class="cm"&gt;/********************************************&lt;/span&gt;
+&lt;span class="cm"&gt; * Wrapper - Secure Yourself                &lt;/span&gt;
+&lt;span class="cm"&gt; *                                          &lt;/span&gt;
+&lt;span class="cm"&gt; * 2007 - Mike Golvach - eggi@comcast.net   &lt;/span&gt;
+&lt;span class="cm"&gt; * Modified 2012 by Jason Antman  &lt;/span&gt;
+&lt;span class="cm"&gt; *  - configured for use as pre- and post-backup script wrapper&lt;/span&gt;
+&lt;span class="cm"&gt; *                                          &lt;/span&gt;
+&lt;span class="cm"&gt; * &lt;span class="caps"&gt;USAGE&lt;/span&gt;: cmd-wrapper [pre|post]&lt;/span&gt;
+&lt;span class="cm"&gt; *&lt;/span&gt;
+&lt;span class="cm"&gt; * $HeadURL: http://svn.jasonantman.com/misc-scripts/cmd-wrapper.c $&lt;/span&gt;
+&lt;span class="cm"&gt; * $LastChangedRevision: 26 $&lt;/span&gt;
+&lt;span class="cm"&gt; *                                          &lt;/span&gt;
+&lt;span class="cm"&gt; ********************************************/&lt;/span&gt;
+
+&lt;span class="cm"&gt;/* Creative Commons Attribution-Noncommercial-Share Alike 3.0 United States License */&lt;/span&gt;
+
+&lt;span class="cm"&gt;/* Define global variables */&lt;/span&gt;
+
+&lt;span class="kt"&gt;int&lt;/span&gt; &lt;span class="n"&gt;gid&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+
+&lt;span class="cm"&gt;/* main(int argc, char **argv) - main process loop */&lt;/span&gt;
+
+&lt;span class="kt"&gt;int&lt;/span&gt; &lt;span class="nf"&gt;main&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kt"&gt;int&lt;/span&gt; &lt;span class="n"&gt;argc&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="kt"&gt;char&lt;/span&gt; &lt;span class="o"&gt;**&lt;/span&gt;&lt;span class="n"&gt;argv&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="kt"&gt;char&lt;/span&gt; &lt;span class="o"&gt;**&lt;/span&gt;&lt;span class="n"&gt;envp&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="p"&gt;{&lt;/span&gt;
+  &lt;span class="kt"&gt;char&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="n"&gt;origcmd&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+
+  &lt;span class="n"&gt;origcmd&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;getenv&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;SSH_ORIGINAL_COMMAND&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+
+  &lt;span class="cm"&gt;/* printf (&amp;quot;Original Command:%s\n&amp;quot;, origcmd); */&lt;/span&gt;
+
+  &lt;span class="cm"&gt;/* Set euid and egid to actual user */&lt;/span&gt;
+
+  &lt;span class="n"&gt;gid&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;getgid&lt;/span&gt;&lt;span class="p"&gt;();&lt;/span&gt;
+  &lt;span class="n"&gt;setegid&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;getgid&lt;/span&gt;&lt;span class="p"&gt;());&lt;/span&gt;
+  &lt;span class="n"&gt;seteuid&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;getuid&lt;/span&gt;&lt;span class="p"&gt;());&lt;/span&gt;
+
+  &lt;span class="cm"&gt;/* Confirm user is in &lt;span class="caps"&gt;GROUP&lt;/span&gt;(502) group */&lt;/span&gt;
+
+  &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt; &lt;span class="n"&gt;gid&lt;/span&gt; &lt;span class="o"&gt;!=&lt;/span&gt; &lt;span class="mi"&gt;502&lt;/span&gt; &lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="n"&gt;printf&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;User Not Authorized! Exiting...&lt;/span&gt;&lt;span class="se"&gt;\n&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+    &lt;span class="n"&gt;exit&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+  &lt;span class="p"&gt;}&lt;/span&gt;
+
+  &lt;span class="cm"&gt;/* Check argc count only at this point */&lt;/span&gt;
+
+  &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt; &lt;span class="n"&gt;argc&lt;/span&gt; &lt;span class="o"&gt;!=&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt; &lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="n"&gt;printf&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;Usage: cmd-wrapper [pre|post]&lt;/span&gt;&lt;span class="se"&gt;\n&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+    &lt;span class="n"&gt;exit&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+  &lt;span class="p"&gt;}&lt;/span&gt;
+
+  &lt;span class="cm"&gt;/* Set uid, gid, euid and egid to root */&lt;/span&gt;
+
+  &lt;span class="n"&gt;setegid&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+  &lt;span class="n"&gt;seteuid&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+  &lt;span class="n"&gt;setgid&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+  &lt;span class="n"&gt;setuid&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+
+  &lt;span class="cm"&gt;/* Check argv for proper arguments and run&lt;/span&gt;
+&lt;span class="cm"&gt;   * the corresponding script, if invoked.&lt;/span&gt;
+&lt;span class="cm"&gt;   */&lt;/span&gt;
+
+  &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt; &lt;span class="n"&gt;strncmp&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;origcmd&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;pre&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mi"&gt;3&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt; &lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;execl&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;/root/bin/rsnapshot-pre.sh&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;rsnapshot-pre.sh&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nb"&gt;&lt;span class="caps"&gt;NULL&lt;/span&gt;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+      &lt;span class="n"&gt;perror&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;Execl:&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+    &lt;span class="p"&gt;}&lt;/span&gt;
+  &lt;span class="p"&gt;}&lt;/span&gt; &lt;span class="k"&gt;else&lt;/span&gt; &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt; &lt;span class="n"&gt;strncmp&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;origcmd&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;post&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mi"&gt;4&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt; &lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;execl&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;/root/bin/rsnapshot-post.sh&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;rsnapshot-post.sh&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nb"&gt;&lt;span class="caps"&gt;NULL&lt;/span&gt;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+      &lt;span class="n"&gt;perror&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;Execl:&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+    &lt;span class="p"&gt;}&lt;/span&gt;
+  &lt;span class="p"&gt;}&lt;/span&gt; &lt;span class="k"&gt;else&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="n"&gt;printf&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;&lt;span class="caps"&gt;ERROR&lt;/span&gt;: Invalid command: %s&lt;/span&gt;&lt;span class="se"&gt;\n&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;origcmd&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+    &lt;span class="n"&gt;printf&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;Usage: &lt;span class="caps"&gt;COMMAND&lt;/span&gt; [pre|post]&lt;/span&gt;&lt;span class="se"&gt;\n&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+    &lt;span class="n"&gt;exit&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+  &lt;span class="p"&gt;}&lt;/span&gt;
+  &lt;span class="n"&gt;exit&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;&lt;code&gt;rsync-wrapper.c&lt;/code&gt;:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="cp"&gt;#include &lt;/span&gt;
+&lt;span class="cp"&gt;#include &lt;/span&gt;
+&lt;span class="cp"&gt;#include &lt;/span&gt;
+&lt;span class="cp"&gt;#include &lt;/span&gt;
+&lt;span class="cp"&gt;#include &lt;/span&gt;
+
+&lt;span class="cm"&gt;/********************************************&lt;/span&gt;
+&lt;span class="cm"&gt; * Wrapper - Secure Yourself                &lt;/span&gt;
+&lt;span class="cm"&gt; *                                          &lt;/span&gt;
+&lt;span class="cm"&gt; * 2007 - Mike Golvach - eggi@comcast.net   &lt;/span&gt;
+&lt;span class="cm"&gt; * Modified 2012 by Jason Antman  &lt;/span&gt;
+&lt;span class="cm"&gt; *  - configured for use as rsync wrapper&lt;/span&gt;
+&lt;span class="cm"&gt; *                                          &lt;/span&gt;
+&lt;span class="cm"&gt; * $HeadURL: http://svn.jasonantman.com/misc-scripts/rsync-wrapper.c $&lt;/span&gt;
+&lt;span class="cm"&gt; * $LastChangedRevision: 26 $&lt;/span&gt;
+&lt;span class="cm"&gt; *                                          &lt;/span&gt;
+&lt;span class="cm"&gt; ********************************************/&lt;/span&gt;
+
+&lt;span class="cm"&gt;/* Creative Commons Attribution-Noncommercial-Share Alike 3.0 United States License */&lt;/span&gt;
+
+&lt;span class="cm"&gt;/* Define global variables */&lt;/span&gt;
+
+&lt;span class="kt"&gt;int&lt;/span&gt; &lt;span class="n"&gt;gid&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+
+&lt;span class="cm"&gt;/* main(int argc, char **argv) - main process loop */&lt;/span&gt;
+
+&lt;span class="kt"&gt;int&lt;/span&gt; &lt;span class="nf"&gt;main&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kt"&gt;int&lt;/span&gt; &lt;span class="n"&gt;argc&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="kt"&gt;char&lt;/span&gt; &lt;span class="o"&gt;**&lt;/span&gt;&lt;span class="n"&gt;argv&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="p"&gt;{&lt;/span&gt;
+
+  &lt;span class="cm"&gt;/* Set euid and egid to actual user */&lt;/span&gt;
+
+  &lt;span class="n"&gt;gid&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;getgid&lt;/span&gt;&lt;span class="p"&gt;();&lt;/span&gt;
+  &lt;span class="n"&gt;setegid&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;getgid&lt;/span&gt;&lt;span class="p"&gt;());&lt;/span&gt;
+  &lt;span class="n"&gt;seteuid&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;getuid&lt;/span&gt;&lt;span class="p"&gt;());&lt;/span&gt;
+
+  &lt;span class="cm"&gt;/* Confirm user is in &lt;span class="caps"&gt;GROUP&lt;/span&gt;(502) group */&lt;/span&gt;
+
+  &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt; &lt;span class="n"&gt;gid&lt;/span&gt; &lt;span class="o"&gt;!=&lt;/span&gt; &lt;span class="mi"&gt;502&lt;/span&gt; &lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="n"&gt;printf&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;User Not Authorized! Exiting...&lt;/span&gt;&lt;span class="se"&gt;\n&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+    &lt;span class="n"&gt;exit&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+  &lt;span class="p"&gt;}&lt;/span&gt;
+
+  &lt;span class="cm"&gt;/* Check argc count only at this point */&lt;/span&gt;
+
+  &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt; &lt;span class="n"&gt;argc&lt;/span&gt; &lt;span class="o"&gt;!=&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt; &lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="n"&gt;printf&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;Usage: rsync-wrapper&lt;/span&gt;&lt;span class="se"&gt;\n&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+    &lt;span class="n"&gt;exit&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+  &lt;span class="p"&gt;}&lt;/span&gt;
+
+  &lt;span class="cm"&gt;/* Set uid, gid, euid and egid to root */&lt;/span&gt;
+
+  &lt;span class="n"&gt;setegid&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+  &lt;span class="n"&gt;seteuid&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+  &lt;span class="n"&gt;setgid&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+  &lt;span class="n"&gt;setuid&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+
+  &lt;span class="cm"&gt;/* Check argv for proper arguments and run&lt;/span&gt;
+&lt;span class="cm"&gt;   * the corresponding script, if invoked.&lt;/span&gt;
+&lt;span class="cm"&gt;   */&lt;/span&gt;
+  &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;execl&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;/usr/bin/rsync&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;rsync&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;--server&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;--sender&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;-vlogDtprRe.iLsf&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;--numeric-ids&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;.&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;/&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nb"&gt;&lt;span class="caps"&gt;NULL&lt;/span&gt;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="n"&gt;perror&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;Execl:&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+  &lt;span class="p"&gt;}&lt;/span&gt;
+  &lt;span class="n"&gt;exit&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;&lt;code&gt;/etc/rsnapshot.d/rsync-include-remoteHostName.txt&lt;/code&gt;:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;# Include
++ /dev/console
++ /dev/initctl
++ /dev/null
++ /dev/zero
++ /usr/local/*
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;&lt;code&gt;/etc/rsnapshot.d/rsync-exclude-remoteHostName.txt&lt;/code&gt;:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;# Exclude
+- /cgroup/*
+- /dev/*
+- /lib/*
+- lost+found/
+- /proc/*
+- /sys/
+- /tmp/
+- /var/log/*
+&lt;/pre&gt;&lt;/div&gt;</summary><category term="backups"></category><category term="linode"></category><category term="rsnapshot"></category><category term="rsync"></category><category term="security"></category><category term="ssh"></category><category term="wrapper"></category></entry><entry><title>php-suhosin syslog issues</title><link href="http://newblog.jasonantman.com/2011/10/php-suhosin-syslog-issues/" rel="alternate"></link><updated>2011-10-21T10:24:00-04:00</updated><author><name>admin</name></author><id>tag:newblog.jasonantman.com,2011-10-21:2011/10/php-suhosin-syslog-issues/</id><summary type="html">&lt;p&gt;I just installed php-&lt;a href="http://www.hardened-php.net/suhosin/"&gt;suhosin&lt;/a&gt;
+0.9.29 from &lt;span class="caps"&gt;EPEL&lt;/span&gt; on a CentOS 5.6 box. I&amp;#8217;m running a whole bunch of
+name-based vhosts in Apache, and have a bunch of web apps, so I opted to
+run suhosin in simulation mode (don&amp;#8217;t actually block anything, but log
+errors) and have it log via syslog to a single file. Unfortunately, when
+I configured this, the syslog messages started showing up in the wrong
+place, apparently with the wrong facility &lt;em&gt;and&lt;/em&gt; priority. After some
+roundabout debugging (at first assuming syslogd to be the problem), I
+determined that, for whatever really strange reason (perhaps an
+incorrect syslog.h on the &lt;span class="caps"&gt;EPEL&lt;/span&gt; box that built the suhosin package?) the
+LOG_* constants were incorrect. I looked up the correct integer values
+in &lt;code&gt;/usr/include/sys/syslog.h&lt;/code&gt; and the following configuration
+directives accomplished the task&amp;nbsp;correctly:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="na"&gt;suhosin.log.syslog.facility&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;128&lt;/span&gt;
+&lt;span class="c1"&gt;; 128 = LOG_LOCAL0&lt;/span&gt;
+
+&lt;span class="na"&gt;suhosin.log.syslog.priority&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;5&lt;/span&gt;
+&lt;span class="c1"&gt;; 5 = LOG_NOTICE&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;This one line puts suhosin into simulation mode, where it only logs
+errors instead of enforcing on&amp;nbsp;them:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="na"&gt;suhosin.simulation&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;On&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;</summary><category term="centos"></category><category term="logging"></category><category term="PHP"></category><category term="security"></category><category term="suhosin"></category><category term="syslog"></category></entry><entry><title>Consolidation of nmap port scan results to HTML table</title><link href="http://newblog.jasonantman.com/2011/01/consolidation-of-nmap-port-scan-results-to-html-table/" rel="alternate"></link><updated>2011-01-30T20:00:00-05:00</updated><author><name>admin</name></author><id>tag:newblog.jasonantman.com,2011-01-30:2011/01/consolidation-of-nmap-port-scan-results-to-html-table/</id><summary type="html">&lt;p&gt;I spent a good part of the weekend auditing the security of my
+infrastructure at home, since I haven&amp;#8217;t given it much attention lately.
+One of my first steps was doing a port scan with
+&lt;a href="http://www.nmap.org"&gt;nmap&lt;/a&gt; of my public IPs from a remote host, both to
+make sure there&amp;#8217;s nothing showing up that shouldn&amp;#8217;t be and to get an
+idea of what a potential attacker might see. However, given all of
+nmap&amp;#8217;s options for different &lt;span class="caps"&gt;TCP&lt;/span&gt; scans, it seemed like a lot of data to
+sort through. Without finding any good solution in my cursory search, I
+wrote up a little &lt;span class="caps"&gt;PHP&lt;/span&gt; script that takes any number of &lt;span class="caps"&gt;XML&lt;/span&gt; nmap scan
+files on the command line, parses out the hosts and ports found in each
+of them, and presents a nice table showing the result for each host/port
+for each scan&amp;nbsp;file.&lt;/p&gt;
+&lt;p&gt;The current version of the script can be found at
+&lt;a href="https://github.com/jantman/misc-scripts/blob/master/nmap-xml-to-table.php"&gt;https://github.com/jantman/misc-scripts/blob/master/nmap-xml-to-table.php&lt;/a&gt;,
+and simply called as &lt;code&gt;./nmap-xml-to-table.php file1.xml file2.xml [...]&lt;/code&gt;
+and outputs &lt;span class="caps"&gt;HTML&lt;/span&gt; to&amp;nbsp;stdout.&lt;/p&gt;</summary><category term="nmap"></category><category term="security"></category></entry><entry><title>Vyatta VC5 - Snort alerts to syslog</title><link href="http://newblog.jasonantman.com/2011/01/vyatta-vc5-snort-alerts-to-syslog/" rel="alternate"></link><updated>2011-01-30T19:54:00-05:00</updated><author><name>admin</name></author><id>tag:newblog.jasonantman.com,2011-01-30:2011/01/vyatta-vc5-snort-alerts-to-syslog/</id><summary type="html">&lt;p&gt;I&amp;#8217;m running a &lt;a href="http://www.vyatta.org"&gt;Vyatta&lt;/a&gt; vyatta router at home - in
+my opinion it&amp;#8217;s pretty near &amp;#8220;enterprise grade&amp;#8221;, and I&amp;#8217;m running the
+Community/Core (read: no-cost and almost all Free) on commodity hardware
+with great performance. Granted, I&amp;#8217;m still on the older version (5 as
+opposed to the current 6) since an upgrade will require total downtime
+and a spare set of &lt;span class="caps"&gt;SCSI&lt;/span&gt; disks for the machine it&amp;#8217;s on, but it still
+works quite well. Today I decided to enable the
+&lt;a href="http://www.snort.org"&gt;Snort&lt;/a&gt; &lt;span class="caps"&gt;IDS&lt;/span&gt; on the box. It actually worked quite
+well (albeit stuck at older rules until I upgrade to Vyatta &lt;span class="caps"&gt;VC6&lt;/span&gt;) and
+didn&amp;#8217;t put much more load on the box. For the time being I decided to
+just have it alert on problems and not drop anything, as I&amp;#8217;m getting
+pretty high false positives and the older Vyatta version doesn&amp;#8217;t seem to
+have a way to disregard&amp;nbsp;rules.&lt;/p&gt;
+&lt;p&gt;My biggest complaint was that Vyatta didn&amp;#8217;t see fit to allow alerts by
+syslog. I&amp;#8217;m not a big fan of keeping information like &lt;span class="caps"&gt;IDS&lt;/span&gt; logs stuck on
+the router - I don&amp;#8217;t like logging in to it any more than I have to, it
+doesn&amp;#8217;t have much storage, and I&amp;#8217;d also like to keep stuff like this in
+a more secure location. Through a bit of digging, I found the
+&lt;code&gt;/opt/vyatta/share/perl5/VyattaSnortConfig.pm&lt;/code&gt; Perl module which
+generates the Snort config file from Vyatta&amp;#8217;s &lt;span class="caps"&gt;CLI&lt;/span&gt; stuff. Looking through
+the Perl code, I found the definition of the snort.conf output&amp;nbsp;statements:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="k"&gt;my&lt;/span&gt; &lt;span class="nv"&gt;$output_def&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s"&gt;&amp;lt;&amp;lt;&lt;span class="caps"&gt;EOD&lt;/span&gt;;&lt;/span&gt;
+&lt;span class="s"&gt;  output alert_unified: alert, limit $log_limit&lt;/span&gt;
+&lt;span class="s"&gt;  output log_null&lt;/span&gt;
+&lt;span class="s"&gt;&lt;span class="caps"&gt;EOD&lt;/span&gt;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;I simply added a line &lt;code&gt;output alert_syslog: log_local3 log_notice&lt;/code&gt; after the &lt;code&gt;output alert_unified&lt;/code&gt; line.&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="k"&gt;my&lt;/span&gt; &lt;span class="nv"&gt;$output_def&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s"&gt;&amp;lt;&amp;lt;&lt;span class="caps"&gt;EOD&lt;/span&gt;;&lt;/span&gt;
+&lt;span class="s"&gt;  output alert_unified: alert, limit $log_limit&lt;/span&gt;
+&lt;span class="s"&gt;  output alert_syslog: log_local3 log_notice&lt;/span&gt;
+&lt;span class="s"&gt;  output log_null&lt;/span&gt;
+&lt;span class="s"&gt;&lt;span class="caps"&gt;EOD&lt;/span&gt;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;I then went into Vyatta configuration and changed a rule from alert to pass, committed,
+changed back, committed, and &lt;code&gt;/etc/snort/snort.conf&lt;/code&gt; now had my syslog lines. I&amp;#8217;m now 
+getting snort alerts to local3 in syslog, which is fed to my centralized log server. My
+next project is to find or write something which will parse these logs, generate a daily
+summary email, and maybe check them hourly and alert on any big changes. I also might just
+cron an emailing of the output from Vyatta&amp;#8217;s show ips summary command. So far I have over 11,000 events logged in about 12&amp;nbsp;hours.&lt;/p&gt;</summary><category term="security"></category><category term="snort"></category><category term="syslog"></category><category term="vyatta"></category></entry><entry><title>Managing Ubiquiti Networks MAC ACLs from a script</title><link href="http://newblog.jasonantman.com/2011/01/managing-ubiquiti-networks-mac-acls-from-a-script/" rel="alternate"></link><updated>2011-01-06T16:06:00-05:00</updated><author><name>admin</name></author><id>tag:newblog.jasonantman.com,2011-01-06:2011/01/managing-ubiquiti-networks-mac-acls-from-a-script/</id><summary type="html">&lt;p&gt;I have a small web-based tool for allowing members of an organization to
+register their wireless &lt;span class="caps"&gt;MAC&lt;/span&gt; addresses, and then automatically adding
+them to the &lt;span class="caps"&gt;MAC&lt;/span&gt; &lt;span class="caps"&gt;ACL&lt;/span&gt; on &lt;a href="http://www.ubnt.com"&gt;Ubiquiti&lt;/a&gt; AirOSv2 APs. It&amp;#8217;s
+a pretty quick hack, along with a simple and ugly web-based tool, but it
+gets the job done for a non-profit with only 25 people. After &lt;a href="http://www.ubnt.com/forum/showthread.php?t=21133"&gt;posting
+about it on the Ubiquiti
+forum&lt;/a&gt; and getting a
+request from someone for the code, I decided to put it out there for
+anyone who wants it. The script is mostly based on SCPing configs to and
+from the &lt;span class="caps"&gt;AP&lt;/span&gt; and SSHing in to run commands, and will need passwordless
+public key auth to the&amp;nbsp;&lt;span class="caps"&gt;AP&lt;/span&gt;.&lt;/p&gt;
+&lt;p&gt;The code itself is in subversion at
+&lt;a href="https://github.com/jantman/misc-scripts/tree/master/ubiquiti-mac-acl"&gt;https://github.com/jantman/misc-scripts/tree/master/ubiquiti-mac-acl&lt;/a&gt;.
+It&amp;#8217;s composed of four&amp;nbsp;files:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href="https://github.com/jantman/misc-scripts/blob/master/ubiquiti-mac-acl/updateAPconfigs.php.inc"&gt;updateAPconfigs.php.inc&lt;/a&gt;&lt;ul&gt;
+&lt;li&gt;the main &lt;span class="caps"&gt;PHP&lt;/span&gt; file with three functions for working with the&amp;nbsp;APs&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;a href="https://github.com/jantman/misc-scripts/blob/master/ubiquiti-mac-acl/wirelessTools.php"&gt;wirelessTools.php&lt;/a&gt;&lt;ul&gt;
+&lt;li&gt;My &lt;span class="caps"&gt;PHP&lt;/span&gt; page for users to add MACs. It&amp;#8217;s pretty rough and is mostly
+based on handling our &lt;span class="caps"&gt;LDAP&lt;/span&gt; authentication/group framework, but it
+gives a fair example of how I store MACs in a MySQL table and then
+rebuild a given &lt;span class="caps"&gt;AP&lt;/span&gt; config file with the current list of MACs. I
+doubt it will be useful to anyone else as more than an&amp;nbsp;example.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;a href="https://github.com/jantman/misc-scripts/blob/master/ubiquiti-mac-acl/wireless.sql"&gt;wireless.sql&lt;/a&gt;&lt;ul&gt;
+&lt;li&gt;The schema for the &lt;span class="caps"&gt;SQL&lt;/span&gt; database I use to store&amp;nbsp;MACs.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;a href="https://github.com/jantman/misc-scripts/blob/master/ubiquiti-mac-acl/README.txt"&gt;&lt;span class="caps"&gt;README&lt;/span&gt;.txt&lt;/a&gt;&lt;ul&gt;
+&lt;li&gt;Readme file including some warnings on the lack of error checking
+in the&amp;nbsp;functions.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Hopefully this will be of some use to someone. I should probably mention
+two important things here. First, the &lt;span class="caps"&gt;AP&lt;/span&gt; only accepts up to 32 &lt;span class="caps"&gt;MAC&lt;/span&gt;
+addresses, so if you feed the &lt;code&gt;makeNewConfigFile()&lt;/code&gt; function an array
+with more than 32, it will just stop at the 32&lt;sup&gt;nd&lt;/sup&gt;. Also, be aware, this
+SCPs a config file to the &lt;span class="caps"&gt;AP&lt;/span&gt;, runs &lt;code&gt;cfgmtd&lt;/code&gt; and the reboots the &lt;span class="caps"&gt;AP&lt;/span&gt;. If
+you send it a bad config file, who knows what will happen. If you allow
+your users to add &lt;span class="caps"&gt;MAC&lt;/span&gt; addresses, your APs will reboot every time someone
+adds&amp;nbsp;one.&lt;/p&gt;
+&lt;p&gt;All I ask is that if you use this, leave a comment to thank me, and if
+you make any changes/additions/bugfixes, please send them back to&amp;nbsp;me.&lt;/p&gt;
+&lt;p&gt;Also, I have some &lt;a href="/2010/03/nagios-check-scripts/"&gt;Nagios check scripts&lt;/a&gt;
+that are useful for Ubiquiti&amp;nbsp;APs.&lt;/p&gt;</summary><category term="airos"></category><category term="mac"></category><category term="PHP"></category><category term="security"></category><category term="ubiquiti"></category><category term="wap"></category><category term="wireless"></category></entry><entry><title>How to make software distribution secure</title><link href="http://newblog.jasonantman.com/2010/09/how-to-make-software-distribution-secure/" rel="alternate"></link><updated>2010-09-17T12:42:00-04:00</updated><author><name>admin</name></author><id>tag:newblog.jasonantman.com,2010-09-17:2010/09/how-to-make-software-distribution-secure/</id><summary type="html">&lt;p&gt;We were seeing some strange behavior with Mac client machines on the
+network lately, specifically with &lt;span class="caps"&gt;DNS&lt;/span&gt; queries (I&amp;#8217;d guess that a lot of
+it has to do with
+&lt;a href="http://en.wikipedia.org/wiki/Bonjour_(software)"&gt;Bonjour&lt;/a&gt;), but the
+discussion touched on the &lt;a href="http://isc.sans.edu/diary.html?storyid=3595"&gt;&lt;span class="caps"&gt;DNS&lt;/span&gt;
+Changer&lt;/a&gt;
+&lt;a href="http://www.dnschanger.com/"&gt;trojan&lt;/a&gt; for Mac. I&amp;#8217;d really never heard
+about it before, and after some basic reading, it really got me thinking
+about the state of software packaging, updates, and distribution.
+Granted, some of my observations would require sweeping changes to how
+packaging is handled (even on the *nixes), and would require buy-in
+from more than just the vendor and distributor (well, I guess &lt;span class="caps"&gt;MS&lt;/span&gt; can
+probably pressure ISVs to do whatever they want), but seems to be the
+only way to keep appliancization from becoming the solution to security
+issues. I&amp;#8217;ve written about this
+&lt;a href="/2009/12/book-comments-the-future-of-the-internet-and-how-to-stop-it-by-jonathan-zittrain/"&gt;before&lt;/a&gt;,
+and a while ago in respect to
+&lt;a href="/2008/10/my-biggest-problem-with-linux/"&gt;Linux&lt;/a&gt;, but here&amp;#8217;s my current
+take on what needs to be done to software packaging to allow our
+machines to stay secure, no matter what &lt;span class="caps"&gt;OS&lt;/span&gt; they&amp;nbsp;run.&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;Allow packages to be installed as a user.&lt;/strong&gt; This is a mammoth task
+    under Windows or Mac, but still an issue under Linux. The &lt;span class="caps"&gt;DNS&lt;/span&gt;
+    Changer trojan is a case in point - there&amp;#8217;s no reason a &amp;#8220;video
+    codec&amp;#8221; would need to be installed system-wide, and if that were
+    simply installed user-specific, the malicious installer would never
+    have the privileges to change system-wide &lt;span class="caps"&gt;DNS&lt;/span&gt; settings. This is also
+    a big issue under Linux. Yum, apt, rpm, etc. should (if run as a
+    non-root user) install packages in a user-local path under &lt;code&gt;/home&lt;/code&gt;
+    by default. Of course, this would mean many things would need to
+    change in order to cope - perhaps even a change to the
+    &lt;a href="http://www.linuxfoundation.org/collaborate/workgroups/lsb"&gt;&lt;span class="caps"&gt;LSB&lt;/span&gt;&lt;/a&gt;&amp;nbsp;spec.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Warn about inconsistencies on package installation.&lt;/strong&gt; The package
+    installation program should warn a user (whether installing packages
+    system-wide or local to a user) if the package is going to modify
+    system-wide files, i.e. files not specifically placed by that
+    package and that package&amp;nbsp;only.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Real package management for Windows and Mac&lt;/strong&gt; It&amp;#8217;s about time that
+    Apple and Microsoft admit that people without billions in funding
+    can come up with good ideas. Get rid of these Installer programs
+    (the many many different ones). Each &lt;span class="caps"&gt;OS&lt;/span&gt; should pick a package
+    format, develop a yum-like (or, even better, zypper-like) package
+    management program that understands repositories. I don&amp;#8217;t know how
+    they&amp;#8217;d cope with the pervasive license keys and &lt;span class="caps"&gt;DRM&lt;/span&gt; in the non-nix
+    world, but I&amp;#8217;m sure they could figure out a way that still allowed
+    sane package management. The idea here is that vendors run
+    repositories and are responsible for their &lt;span class="caps"&gt;GPG&lt;/span&gt; keys, so trojans
+    claiming to be an update to a given vendor&amp;#8217;s software would be
+    rejected. Also, isn&amp;#8217;t it about time that you can update all your
+    software on Windows or Mac through one&amp;nbsp;tool?&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Filesystem-based &lt;span class="caps"&gt;IDS&lt;/span&gt; for Windows and Mac&lt;/strong&gt; Assuming it will take a
+    while to get everyone onboard with the packaging idea, and noting
+    that users of these OSes like installing applications from arbitrary
+    sources, there should be an &lt;span class="caps"&gt;OS&lt;/span&gt;-level feature to audit all filesystem
+    changes made by untrusted/unsigned applications, and a way to alert
+    the user to these changes if they appear suspisious (essentially
+    what &lt;a href="http://www.safer-networking.org"&gt;Spybot Search &lt;span class="amp"&gt;&amp;amp;&lt;/span&gt; Destroy /
+    TeaTimer&lt;/a&gt; do, but builtin to the&amp;nbsp;&lt;span class="caps"&gt;OS&lt;/span&gt;).&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Vendor support of packaging/repositories&lt;/strong&gt; - Along with the idea
+    of repositories, vendors should have a trust or signing system for
+    ISVs signing keys. If users are installing arbitrary software,
+    making them trust an arbitrary key won&amp;#8217;t do anything to improve
+    security. Microsoft and Apple need to run a &lt;span class="caps"&gt;CA&lt;/span&gt; that signs the
+    package signing keys of their ISVs. The also - and here&amp;#8217;s the big
+    one - need to have a parallel framework for &amp;#8220;independent
+    developers&amp;#8221;. I.e. something that doesn&amp;#8217;t cost any money for the
+    packagers, and allows them to at least give a &amp;#8220;this person is who
+    they say they are&amp;#8221;&amp;nbsp;message.&lt;/li&gt;
+&lt;li&gt;Finally, &lt;strong&gt;Make package management pervasive&lt;/strong&gt; - Have a real push to
+    apply the packaging and signing keys standard to all software for
+    the&amp;nbsp;&lt;span class="caps"&gt;OS&lt;/span&gt;.&lt;/li&gt;
+&lt;li&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;On a final note, applicable to both the current state of Linux packaging
+and my ideas about Mac and Windows&amp;#8230; &lt;span class="caps"&gt;DNS&lt;/span&gt; is the ideal method of key
+distribution (granted, yes, this just means that the security of the
+packager&amp;#8217;s &lt;span class="caps"&gt;DNS&lt;/span&gt; records, and their servers and signing key, is just more
+of an issue). But even with Yum and Zypper, it seems to me to be logical
+that the packager&amp;#8217;s public key should be stored in a &lt;span class="caps"&gt;DNS&lt;/span&gt; record (or at a
+&lt;span class="caps"&gt;URL&lt;/span&gt; stored in a &lt;span class="caps"&gt;DNS&lt;/span&gt; &lt;span class="caps"&gt;TXT&lt;/span&gt; record). That way, it wouldn&amp;#8217;t be up to an end
+user to import and trust a key, they&amp;#8217;d just have to trust the repository
+(i.e. software.adobe.com) and the package manager would pull down the
+key and verify that package X in software.adobe.com is, in fact, signed
+by the software.adobe.com&amp;nbsp;key.&lt;/p&gt;</summary><category term="linux"></category><category term="mac"></category><category term="packaging"></category><category term="security"></category><category term="software"></category><category term="windows"></category></entry><entry><title>How To Wipe a Bunch of Machines Quickly</title><link href="http://newblog.jasonantman.com/2009/02/how-to-wipe-a-bunch-of-machines-quickly/" rel="alternate"></link><updated>2009-02-03T15:51:00-05:00</updated><author><name>admin</name></author><id>tag:newblog.jasonantman.com,2009-02-03:2009/02/how-to-wipe-a-bunch-of-machines-quickly/</id><summary type="html">&lt;p&gt;&lt;strong&gt;Updated 2009-03-05, see&amp;nbsp;bottom.&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;At work the other week, we decommissioned 24 old desktops - Dell &lt;span class="caps"&gt;GX280&lt;/span&gt;&amp;#8217;s
+that were used in the student labs as print release stations. They
+didn&amp;#8217;t have anything sensitive on them, just Windows &lt;span class="caps"&gt;XP&lt;/span&gt;, but with
+licensing and all we have to wipe Windows off of them before surplussing
+them. Since there were 24 of them, it wasn&amp;#8217;t exactly going to be the
+quickest task. Moreover, the &lt;span class="caps"&gt;GX280&lt;/span&gt;&amp;#8217;s we used don&amp;#8217;t have &lt;em&gt;any&lt;/em&gt; removable
+media&amp;nbsp;drives.&lt;/p&gt;
+&lt;p&gt;A few people mentioned &lt;a href="http://www.dban.org/"&gt;Darik&amp;#8217;s Boot And Nuke&lt;/a&gt;
+(&lt;span class="caps"&gt;DBAN&lt;/span&gt;), which is a bootable Linux distro (&lt;span class="caps"&gt;CD&lt;/span&gt; or floppy) aimed at wiping
+all of the fixed disks attached to a machine. While they do offer an
+&amp;#8220;Enterprise&amp;#8221; version that supports network booting (and logging wipe
+verifications to a central machine), the pricing isn&amp;#8217;t exactly favorable
+for a small project (or something that just needs Windows to go away,
+not a DoD-grade 7-pass overwrite with random data). Between the lack of
+a &lt;span class="caps"&gt;CD&lt;/span&gt; drive and the apparent need to select wiping options at boot, this
+didn&amp;#8217;t seem to be the best method for&amp;nbsp;me.&lt;/p&gt;
+&lt;p&gt;Luckily, with a little googling, I came by the
+&lt;a href="https://fedorahosted.org/cobbler/"&gt;Cobbler&lt;/a&gt; project, a ready-to-run
+install server aimed at automating network-based &lt;span class="caps"&gt;OS&lt;/span&gt; installation. It
+turns out that Cobbler has a wiki article on &lt;a href="https://fedorahosted.org/cobbler/wiki/SystemRetirement"&gt;system
+retirement&lt;/a&gt; that
+deals with using Cobbler to automate a network boot of &lt;span class="caps"&gt;DBAN&lt;/span&gt;. Cobbler
+takes control of &lt;span class="caps"&gt;DHCP&lt;/span&gt; and &lt;span class="caps"&gt;TFTP&lt;/span&gt;, boots the machine(s) to a &lt;span class="caps"&gt;PXE&lt;/span&gt; boot menu,
+and allows selection of one of the cobbler&amp;nbsp;&amp;#8220;profiles&amp;#8221;.&lt;/p&gt;
+&lt;p&gt;The general procedure is something along these&amp;nbsp;lines:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Get the &lt;span class="caps"&gt;DBAN&lt;/span&gt; iso and grab the .ima image off of it. Loopback mount&amp;nbsp;it.&lt;/li&gt;
+&lt;li&gt;Copy the &lt;code&gt;initrd&lt;/code&gt; and kernel into &lt;code&gt;/opt/cobbler/dban&lt;/code&gt; as
+    &lt;code&gt;initrd.img&lt;/code&gt; and &lt;code&gt;vmlinuz&lt;/code&gt;,&amp;nbsp;respectively.&lt;/li&gt;
+&lt;li&gt;Assuming you have cobblerd running (cobbler check), add a Distro for
+    &lt;span class="caps"&gt;DBAN&lt;/span&gt;:
+    &lt;code&gt;cobbler distro add --name=DBAN-1.0.7-i386 --kernel=/opt/cobbler/dban/vmlinuz --initrd=/opt/cobbler/dban/initrd.img --kopts="root=/dev/ram0 init=/rc nuke=dwipe floppy=0,16,cmos"&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;Add a Profile for it:
+    &lt;code&gt;cobbler profile add --name=DBAN-1.0.7-i386 --distro=DBAN-1.0.7-i386&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;cobbler sync&lt;/code&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Assuming all went well, when we &lt;span class="caps"&gt;PXE&lt;/span&gt; boot a machine on the same &lt;span class="caps"&gt;LAN&lt;/span&gt; as
+the Cobbler system, we&amp;#8217;ll get &lt;span class="caps"&gt;DHCP&lt;/span&gt; and a &lt;span class="caps"&gt;PXE&lt;/span&gt; boot menu which will list
+&lt;code&gt;DBAN-1.0.7.i386&lt;/code&gt; as one of the options. On some of the &lt;span class="caps"&gt;GX280&lt;/span&gt;&amp;#8217;s that I
+did, I had to go into the &lt;span class="caps"&gt;BIOS&lt;/span&gt; and enable &lt;span class="caps"&gt;PXE&lt;/span&gt; boot (or select &lt;span class="caps"&gt;PXE&lt;/span&gt; from
+the &lt;span class="caps"&gt;BIOS&lt;/span&gt; boot menu). Now, when &lt;span class="caps"&gt;DBAN&lt;/span&gt; boots, we&amp;#8217;ll get the standard dmesg
+output and then a selection screen allowing us to pick a wipe type (I
+used the single pass all zeros for just getting rid of the old &lt;span class="caps"&gt;OS&lt;/span&gt;) and
+select which disks to wipe. If you use the default wipe, just press
+&amp;#8220;space&amp;#8221; to select all disks and then &amp;#8220;F10&amp;#8221; to begin the&amp;nbsp;wipe.&lt;/p&gt;
+&lt;p&gt;This process allowed me to wipe 7 machines at once (8 port &lt;span class="caps"&gt;KVM&lt;/span&gt;, 1 port
+for the server). With a better &lt;span class="caps"&gt;KVM&lt;/span&gt; or (even better yet) a totally
+automatic system as described below, it would essentially be limited to
+whatever the server and network hardware will&amp;nbsp;handle.&lt;/p&gt;
+&lt;p&gt;To add a little more automation, we can run
+&lt;code&gt;cobbler system add --name=default --profile=DBAN-1.0.7-i386&lt;/code&gt; which adds
+a default profile to Cobbler, saying that any machines with MACs not
+specifically assigned to a profile should boot the &lt;span class="caps"&gt;DBAN&lt;/span&gt; profile, and
+bypassing the &lt;span class="caps"&gt;PXE&lt;/span&gt; boot&amp;nbsp;menu.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;&lt;span class="caps"&gt;WARNING&lt;/span&gt;:&lt;/strong&gt; what follows will setup Cobbler and &lt;span class="caps"&gt;DBAN&lt;/span&gt; to automatically
+wipe all &lt;span class="caps"&gt;PXE&lt;/span&gt;-booting devices without &lt;span class="caps"&gt;ANY&lt;/span&gt; human intervention. Use at your
+own risk and, for God&amp;#8217;s sake, don&amp;#8217;t plug your server into a production
+network (I recommend this only in a lab environment with a dedicated
+switch, all machines in one physical area, and no possibility of getting
+on the same &amp;#8216;net as production&amp;nbsp;machines).&lt;/p&gt;
+&lt;p&gt;It&amp;#8217;s theoretically possible to totally automate this setup. According to
+the &lt;span class="caps"&gt;DBAN&lt;/span&gt; docs, it will also accept kernel options (kopts) that effect
+how dnuke works - specifically, &lt;code&gt;--autonuke&lt;/code&gt; to tell it to wipe without
+human intervention and a method option such as &lt;code&gt;--method=zero&lt;/code&gt; to select
+the wipe method. This means that if we &lt;span class="caps"&gt;PXE&lt;/span&gt; boot with kernel options set
+to &lt;code&gt;nuke="dwipe --autonuke --method=zero"&lt;/code&gt; we should go straight to the
+dwipe utility (the heart of &lt;span class="caps"&gt;DBAN&lt;/span&gt;) and automatically wipe all disks by
+writing zeros once - without operator intervention. Unfortunately,
+there&amp;#8217;s a &lt;a href="https://fedorahosted.org/cobbler/ticket/148"&gt;bug&lt;/a&gt; in the
+current (1.4.0) Cobbler which prevents quote-encapsulated strings in
+kopts, meaning that we can&amp;#8217;t set one kernel option to a string with
+whitespace as needed here. If this bug is fixed, it should allow this
+process to work without any operator intervention, assuming the clients
+will &lt;span class="caps"&gt;PXE&lt;/span&gt;&amp;nbsp;boot.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Updated 2009-03-05&lt;/strong&gt; I haven&amp;#8217;t tested it yet, but apparently the
+Cobbler bug preventing complex kernel options has &lt;a href="https://fedorahosted.org/pipermail/cobbler/2009-February/002874.html"&gt;been
+fixed&lt;/a&gt;.
+The fix should be included in the 1.4.3 release and is currently in the
+development&amp;nbsp;tree.&lt;/p&gt;</summary><category term="automation"></category><category term="cobbler"></category><category term="dban"></category><category term="pxe"></category><category term="retirement"></category><category term="security"></category><category term="wiping"></category></entry><entry><title>Internet Security, Microsoft Lies</title><link href="http://newblog.jasonantman.com/2008/09/internet-security-microsoft-lies/" rel="alternate"></link><updated>2008-09-16T23:24:00-04:00</updated><author><name>admin</name></author><id>tag:newblog.jasonantman.com,2008-09-16:2008/09/internet-security-microsoft-lies/</id><summary type="html">&lt;p&gt;&lt;strong&gt;Internet&amp;nbsp;Security&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;So, this semester I&amp;#8217;m taking a class on Internet Security. Our textbook
+is &lt;a href="http://search.barnesandnoble.com/booksearch/isbninquiry.asp?ean=1423901304"&gt;Management of Internet Security, 2nd
+Edition&lt;/a&gt;
+by Michael E. Whitman and Herbert J. Mattord. It seems pretty basic, and
+very much focused on the management side of things (as opposed to
+technical). The table of contents is as&amp;nbsp;follows:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Introduction to the Management of Information&amp;nbsp;Security&lt;/li&gt;
+&lt;li&gt;Planning for&amp;nbsp;Security&lt;/li&gt;
+&lt;li&gt;Planning for&amp;nbsp;Contingencies&lt;/li&gt;
+&lt;li&gt;Information Security&amp;nbsp;Policy&lt;/li&gt;
+&lt;li&gt;Developing the Security&amp;nbsp;Program&lt;/li&gt;
+&lt;li&gt;Security Management Models and&amp;nbsp;Practices&lt;/li&gt;
+&lt;li&gt;Risk Management: Identifying and Assessing&amp;nbsp;Risk&lt;/li&gt;
+&lt;li&gt;Risk Management: Assessing and Controlling&amp;nbsp;Risk&lt;/li&gt;
+&lt;li&gt;Protection&amp;nbsp;Mechanisms&lt;/li&gt;
+&lt;li&gt;Personnel and&amp;nbsp;Security&lt;/li&gt;
+&lt;li&gt;Law and&amp;nbsp;Ethics&lt;/li&gt;
+&lt;li&gt;Information Security Project&amp;nbsp;Management&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Now, given that it&amp;#8217;s really a &amp;#8220;management&amp;#8221; book, I can&amp;#8217;t say I&amp;#8217;m
+surprised that it reads like an essay that was graded on a scale of
+buzzwords-per-sentence. However, it seems to be missing the one chapter
+that&amp;#8217;s the most important - actually, the only chapter that would be in
+the book if I wrote it - &amp;#8220;How to get management to allocate the money
+you need for proper security.&amp;#8221; In fact, skimming over the book, I found
+a lot of content on general management planning, job descriptions,
+sample policies, and a lot of other pie-in-the-sky stuff, but not one
+concrete section dedicated to the most difficult part of security -
+getting the &amp;#8220;resources&amp;#8221; to do it&amp;nbsp;right!&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Microsoft&amp;nbsp;Lies&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;Why we would spend time analyzing corporate mission statements in an
+Internet Security class, I have no idea. That seems, to me, too much
+like what we covered in &amp;#8220;Management of Technological Organizations.&amp;#8221;
+But, we do, and one of the examples used is &lt;a href="http://www.microsoft.com/About/default.mspx"&gt;Microsoft&amp;#8217;s Mission and
+Values statement&lt;/a&gt;. Perhaps,
+being the F/&lt;span class="caps"&gt;OSS&lt;/span&gt; advocate that I am, my reading of it was a bit cynical.
+Let&amp;#8217;s take a look at&amp;nbsp;it.&lt;/p&gt;
+&lt;p&gt;&lt;span class="dquo"&gt;&amp;#8220;&lt;/span&gt;At Microsoft, our mission and values are to help people and business
+throughout the world realize their full potential.&amp;#8221; Well, we&amp;#8217;re off to a
+good start. Aside from the fact that they want you to realize that
+potential using &lt;strong&gt;only their software&lt;/strong&gt;, and use their power and money
+to actively monopolize (or attempt to) most industries that they enter,
+this seems pretty&amp;nbsp;run-of-the-mill.&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;Corporate Citizenship:&lt;/em&gt;&amp;#8220;Every successful corporation has &lt;em&gt;a
+responsibility to use its resources and influence to make a positive
+impact on the world and its people&lt;/em&gt;. Microsoft’s Global Citizenship
+Initiative is focused on mobilizing our resources across the company and
+around the world, to create opportunities in the communities where we do
+business, and to &lt;em&gt;fulfill our commitment to serving the public good
+through innovative technologies and partnerships&lt;/em&gt;.&amp;#8221; Well. Now we&amp;#8217;re
+getting somewhere. Apparently &amp;#8220;a positive impact on the world and its
+people&amp;#8221; is defined as trying to monopolize every sector that Microsoft
+touches, whether attempting to crush and then buy-out the competition,
+or through flat-out
+&lt;a href="http://en.wikipedia.org/wiki/Fear,_uncertainty_and_doubt"&gt;&lt;span class="caps"&gt;FUD&lt;/span&gt;&lt;/a&gt; and
+billion-dollar marketing campaigns. Hmm&amp;#8230; innovative partnerships&amp;#8230; as
+in&amp;nbsp;Novell?&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;Legal and Corporate Affairs:&lt;/em&gt;&amp;#8220;Microsoft’s Legal and Corporate Affairs
+Group works on the cutting edge of business and regulatory issues around
+the world.&amp;#8221; Well, I can&amp;#8217;t argue with that, they sure are on the cutting
+edge. What started with Bill Gates mailing out whiny letters about
+pirated Altair &lt;span class="caps"&gt;BASIC&lt;/span&gt; has now turned into a global juggernaut, capable of
+forcing the creation of &lt;span class="caps"&gt;ISO&lt;/span&gt; standards at their whim, and successfully
+quashing any dissent about obviously flawed and under-reviewed
+&amp;#8220;standards&amp;#8221; (which, in fact, simply describe current software, rather
+than setting any real&amp;nbsp;standard).&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;Values:&lt;/em&gt;As a company, and as individuals, we value &lt;strong&gt;integrity&lt;/strong&gt;,
+&lt;strong&gt;honesty&lt;/strong&gt;, &lt;strong&gt;openness&lt;/strong&gt;, personal excellence, &lt;strong&gt;constructive
+self-criticism&lt;/strong&gt;, &lt;strong&gt;continual self-improvement&lt;/strong&gt;, and &lt;strong&gt;mutual
+respect&lt;/strong&gt;. We are committed to our customers and partners and have a
+passion for technology. We take on big challenges, and pride ourselves
+on seeing them through. &lt;strong&gt;We hold ourselves accountable to our
+customers&lt;/strong&gt;, shareholders, partners, and employees by honoring our
+commitments, providing results, and &lt;strong&gt;striving for the highest
+quality&lt;/strong&gt;.&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;integrity&lt;/strong&gt; - i.e. not creating a draft &lt;span class="caps"&gt;ISO&lt;/span&gt; standard and then
+    &lt;a href="http://www.networkworld.com/news/2007/083007-microsoft-employee-offered-incentives-for.html"&gt;offering monetary incentives for
+    acceptance&lt;/a&gt;.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;honesty&lt;/strong&gt; - when it works. Intentionally making Vista-Capable
+    labeling so ambiguous that it even &lt;a href="http://www.nytimes.com/2008/03/09/business/09digi.html?_r=1&amp;amp;oref=slogin"&gt;confuses Microsoft
+    executives&lt;/a&gt;?&amp;nbsp;Fine.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;openness&lt;/strong&gt; um&amp;#8230; did they seriously say that? Openness like&amp;#8230;
+    protocol interoperability? Standards that can be implemented without
+    patent violations? An &amp;#8220;Open Specification Promise&amp;#8221; that doesn&amp;#8217;t come
+    with a &lt;a href="http://www.microsoft.com/interop/osp/default.mspx"&gt;three page
+    &lt;span class="caps"&gt;FAQ&lt;/span&gt;&lt;/a&gt;? Nope. Not&amp;nbsp;Microsoft.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;constructive self-criticism&lt;/strong&gt; - Ok, I&amp;#8217;ll give them this one. They
+    do, rarely, criticize themselves. Though &amp;#8220;constructive&amp;#8221; usually
+    means making comments about the poor design of a previous product,
+    and suggesting that everyone upgrade to the new&amp;nbsp;version.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;continual self-improvement&lt;/strong&gt; - I&amp;#8217;ll give them this one too. In
+    fact, they&amp;#8217;re so crazy about it that they&amp;#8217;ve been improving the same
+    codebase for&amp;nbsp;decades!&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;mutual respect&lt;/strong&gt; - See&amp;nbsp;above.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;We hold ourselves accountable to our customers&lt;/strong&gt; - Ok. They &lt;em&gt;are&lt;/em&gt;
+    offering to allow users to &lt;a href="http://download.microsoft.com/download/5/f/4/5f4c83d3-833e-4f11-8cbd-699b0c164182/royaltyoemreferencesheet.pdf"&gt;downgrade from Vista to
+    &lt;span class="caps"&gt;XP&lt;/span&gt;&lt;/a&gt;.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;striving for the highest quality&lt;/strong&gt; - I don&amp;#8217;t think so. They&amp;#8217;re
+    striving for products that have the highest &lt;em&gt;market share&lt;/em&gt;. As long
+    as the quality is acceptable to the majority of users, and the
+    products do what the majority of users need, that&amp;#8217;s fine. But
+    wait&amp;#8230; apparently they even missed &lt;em&gt;that&lt;/em&gt; goal with&amp;nbsp;Vista.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;This is just the opinion of one person. My motivations may be diverse,
+and surely there&amp;#8217;s a bit of zealotry in there. After all, if Ford told
+me I couldn&amp;#8217;t put fog lights on my car myself, I had to bring it to the
+dealer and pay $400, I&amp;#8217;d stop buying their cars - and make sure everyone
+else knew what they did. But there&amp;#8217;s also my ever-present desire to make
+sure people know both sides of the story, and all the facts. The
+mainstream media (specifically dumbed-down television) rarely reports on
+the less cheerful side of Microsoft, like the &lt;span class="caps"&gt;ISO&lt;/span&gt; &amp;#8220;standard&amp;#8221;
+&lt;a href="http://www.networkworld.com/news/2007/083007-microsoft-employee-offered-incentives-for.html"&gt;scandal&lt;/a&gt;,
+or the &lt;a href="http://www.nytimes.com/2008/03/09/business/09digi.html?_r=1&amp;amp;oref=slogin"&gt;Vista
+letters&lt;/a&gt;,
+or the
+&lt;a href="http://yro.slashdot.org/article.pl?sid=08/04/22/2032232&amp;amp;from=rss"&gt;Vista-Capable&lt;/a&gt;
+fiasco. And I find this to be horribly disturbing. Many people don&amp;#8217;t
+realize that there &lt;em&gt;are&lt;/em&gt; alternatives to Microsoft products, even ones
+that are provided by such big names as &lt;a href="http://www.sun.com"&gt;Sun
+Microsystems&lt;/a&gt; and &lt;a href="http://www.ibm.com"&gt;&lt;span class="caps"&gt;IBM&lt;/span&gt;&lt;/a&gt;. But,
+most striking, is Microsoft&amp;#8217;s overwhelming monopoly. Windows&amp;#8217; market
+share is currently
+&lt;a href="http://marketshare.hitslink.com/report.aspx?qprid=8"&gt;90.66%&lt;/a&gt; or higher.
+I ask you, what other industries which affect not only consumers, but
+nearly every aspect of our daily lives (as computing does) would be
+allowed to have such a monopoly? It has happened in many other American
+industries - oil, steel, the railroads, telephone service. Where is the
+government&amp;nbsp;now?&lt;/p&gt;
+&lt;p&gt;What happened to the America that made massive monopolies illegal? Have
+we forgotten a supremely part of our history that began in 1980 with the
+Sherman Act? Or even the recent events with Bell? In order to truly
+stimulate competition in the software industry, and provide for not only
+choice but the improved quality, reliability, and security that comes
+with true software competition, something needs to be done. For
+starters, how about breaking Microsoft into separate entities - browser,
+Office, &lt;span class="caps"&gt;OS&lt;/span&gt;, server, etc. And - the important part - preventing any
+package sales, discounts, or bundling between the separate types of
+software (and separate&amp;nbsp;companies).&lt;/p&gt;</summary><category term="microsoft"></category><category term="rutgers"></category><category term="school"></category><category term="security"></category></entry></feed>

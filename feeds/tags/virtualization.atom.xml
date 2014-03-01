@@ -1,0 +1,391 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Jason Antman's Blog</title><link href="http://newblog.jasonantman.com/" rel="alternate"></link><link href="http://newblog.jasonantman.com/feeds/tags/virtualization.atom.xml" rel="self"></link><id>http://newblog.jasonantman.com/</id><updated>2012-09-07T05:00:00-04:00</updated><entry><title>Getting oVirt up and running</title><link href="http://newblog.jasonantman.com/2012/09/getting-ovirt-up-and-running/" rel="alternate"></link><updated>2012-09-07T05:00:00-04:00</updated><author><name>admin</name></author><id>tag:newblog.jasonantman.com,2012-09-07:2012/09/getting-ovirt-up-and-running/</id><summary type="html">&lt;p&gt;The bulk of this post was written way back in April 2012. If you&amp;#8217;re just
+coming here, and looking to setup oVirt, you should probably &lt;a href="#postscript"&gt;skip down
+to the postscript&lt;/a&gt; for an update, and ignore most of the
+content here (as it&amp;#8217;s applicable to an older oVirt&amp;nbsp;version).&lt;/p&gt;
+&lt;p&gt;I recently started setting up &lt;a href="http://www.ovirt.org"&gt;oVirt&lt;/a&gt;, the
+community version of Red Hat Enterprise Virtualization, at work for some
+testing (mainly a &amp;#8220;sandbox&amp;#8221; &lt;span class="caps"&gt;VM&lt;/span&gt; environment, and because
+&lt;a href="http://theforeman.org/"&gt;Foreman&lt;/a&gt;
+&lt;a href="http://blog.theforeman.org/2012/03/vnc-support-built-in-foreman.html"&gt;supports&lt;/a&gt;
+it). To start with, I had two nodes, each with two dual-core Xeon
+processors (&lt;span class="caps"&gt;VT&lt;/span&gt;-x capable) with &lt;span class="caps"&gt;20GB&lt;/span&gt; &lt;span class="caps"&gt;RAM&lt;/span&gt;, one with &lt;span class="caps"&gt;600GB&lt;/span&gt; internal storage
+and one with &lt;span class="caps"&gt;140GB&lt;/span&gt; internal. While oVirt&amp;#8217;s documentation isn&amp;#8217;t exactly
+wonderful, I found a blgo post by Jason Brooks, &lt;a href="http://blog.jebpages.com/archives/how-to-get-up-and-running-with-ovirt/"&gt;How to Get Up and
+Running with
+oVirt&lt;/a&gt;,
+which gives a great walkthrough of getting the oVirt Engine setup on a
+machine, and also setting up that same machine as a &lt;span class="caps"&gt;VM&lt;/span&gt; host. As oVirt is
+still fairly young, this is all done on Fedora. I performed my
+installation via Cobbler, though I&amp;#8217;m afraid to admit it was an entirely
+manual, interactive&amp;nbsp;install.&lt;/p&gt;
+&lt;p&gt;I did run into a few bumps during Jason&amp;#8217;s tutorial. In step 15, adding
+the data &lt;span class="caps"&gt;NFS&lt;/span&gt; export as a Storage Domain, I was unable to add the &lt;span class="caps"&gt;NFS&lt;/span&gt;
+export. I found the &lt;a href="http://www.ovirt.org/wiki/Troubleshooting_NFS_Storage_Issues"&gt;Troubleshooting &lt;span class="caps"&gt;NFS&lt;/span&gt; Storage Issues page on the
+oVirt
+wiki&lt;/a&gt;,
+ensured that SELinux was disabled and that the export had the correct
+permissions, confirmed that &lt;code&gt;/etc/nfsmount.conf&lt;/code&gt; specified &lt;code&gt;Nfsvers=3&lt;/code&gt;,
+rebooted, and then ran the &lt;code&gt;nfs-check.py&lt;/code&gt; script. At this point, I was
+able to add the other storage domains in steps 15 and&amp;nbsp;16.&lt;/p&gt;
+&lt;p&gt;My second issue was that even on Fedora 16, I simply can&amp;#8217;t get the spice
+client (through the &lt;code&gt;spice-xpi&lt;/code&gt; browser plugin) to work. As far as I can
+tell from the logs, it looks like &lt;code&gt;spicec&lt;/code&gt; is being sent a value of
+&amp;#8220;None&amp;#8221; for the secured port parameter, instead of the correct port
+number. I assume this is a bug in oVirt, but I&amp;#8217;ll revisit this problem
+when I have time. In the mean time, I changed my test &lt;span class="caps"&gt;VM&lt;/span&gt; to use &lt;span class="caps"&gt;VNC&lt;/span&gt;,
+which is launched by installing the &lt;code&gt;ovirt-engine-cli&lt;/code&gt; package (see
+below) on your client computer, connecting to the oVirt &lt;span class="caps"&gt;API&lt;/span&gt; with&amp;nbsp;ovirt-shell:  &lt;/p&gt;
+&lt;p&gt;&lt;code&gt;ovirt-shell --connect --url=https://ovirt-engine.example.com:8443/api --user=admin@internal --password adminpassword&lt;/code&gt;&lt;br /&gt;
+and then running &lt;code&gt;console vm_name&lt;/code&gt;. This launches the &lt;code&gt;vncviewer&lt;/code&gt;
+binary, which is in the &amp;#8220;tigervnc&amp;#8221; package on&amp;nbsp;Fedora.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Installing&amp;nbsp;ovirt-engine-cli&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;To run &lt;code&gt;ovirt-shell&lt;/code&gt; on your workstation (Fedora 16, of course&amp;#8230;)
+you&amp;#8217;ll need the ovirt-engine-cli and ovirt-engine-sdk packages. I
+manually downloaded them from
+&lt;a href="http://www.ovirt.org/releases/nightly/fedora/16/"&gt;http://www.ovirt.org/releases/nightly/fedora/16/&lt;/a&gt;,
+versions 2.1.3 and 1.6.2, respecitively. The &lt;span class="caps"&gt;SDK&lt;/span&gt; and &lt;span class="caps"&gt;CLI&lt;/span&gt; are python
+based, so there are a few Python dependencies, all of which were
+automatically solved by yum. I know there are &lt;span class="caps"&gt;SDK&lt;/span&gt; and &lt;span class="caps"&gt;CLI&lt;/span&gt; packages out
+there for other distros, but haven&amp;#8217;t tried them&amp;nbsp;yet.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Installing Linux&amp;nbsp;Guests&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;Installing a CentOS 6.2 x86_64 guest was relatively straightforward,
+and my usual kickstart infrastructure worked fine. The only catch was
+the VirtIO storage interface, which shows up as &lt;code&gt;/dev/vdx&lt;/code&gt; instead of
+&lt;code&gt;/dev/sdx&lt;/code&gt;; I just added another kickstart metadata option in Cobbler
+that allows me to use &lt;code&gt;sdx&lt;/code&gt; by specifying &amp;#8220;virtual=yes&amp;#8221; (for our VMWare
+hosts), or &lt;code&gt;vdx&lt;/code&gt; by specifying&amp;nbsp;&amp;#8220;virtual=ovirt&amp;#8221;.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Setting up&amp;nbsp;Authentication&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;As installed, oVirt only has one user, &amp;#8220;admin@internal&amp;#8221;; it requires an
+external directory service for user authentication. Currently, it
+supports &lt;span class="caps"&gt;IPA&lt;/span&gt;, Red Hat&amp;#8217;s Enterprise Identity Management tool (combines
+&lt;span class="caps"&gt;RHEL&lt;/span&gt;, oVirt Directory Server, Kerberos and &lt;span class="caps"&gt;NTP&lt;/span&gt;; perhaps
+&lt;a href="http://freeipa.org"&gt;FreeIPA&lt;/a&gt; would work as well?) and Microsoft Active
+Directory. As much as I&amp;#8217;d like to give &lt;span class="caps"&gt;IPA&lt;/span&gt; or FreeIPA a try, my company
+already has an &lt;span class="caps"&gt;AD&lt;/span&gt; infrastructure, so I opted to go that route.
+Documentation is given in the &lt;a href="http://www.ovirt.org/wiki/File:OVirt-3.0-Installation_Guide-en-US.pdf"&gt;oVirt 3.0 Installation
+Guide&lt;/a&gt;,
+starting on page 96. Unfortunately, I was never about to get &lt;span class="caps"&gt;AD&lt;/span&gt; auth
+working correctly, so I just worked with the one admin&amp;nbsp;user.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Adding a&amp;nbsp;Node&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;The biggest issue I had was adding the second node to oVirt. I attempted
+to use the &lt;span class="caps"&gt;DVD&lt;/span&gt; Import feature of Cobbler on the &lt;a href="http://www.ovirt.org/get-ovirt/"&gt;oVirt Node Image
+&lt;span class="caps"&gt;ISO&lt;/span&gt;&lt;/a&gt;, but that failed. I then found the
+image&amp;#8217;s &lt;code&gt;LiveOS/livecd-iso-to-pxeboot&lt;/code&gt; script and used that to make a
+kernerl and initrd, and kernel parameters, for Cobbler. &lt;span class="caps"&gt;PXE&lt;/span&gt; works&amp;nbsp;fine.&lt;/p&gt;
+&lt;p&gt;&lt;a name="postscript"&gt;&lt;/a&gt;&lt;strong&gt;Postscript:&lt;/strong&gt; I ended up blowing away my
+oVirt installation in favor of testing other things. At some point, the
+engine install got corrupted in a way that I just couldn&amp;#8217;t fix; even
+though I spent all day one Saturday working on it, it took more time
+than I could allocate to a personal project. So this post is really
+semi-complete at best. However, there is some good news. Jason Brooks&amp;#8217;
+original post, &lt;a href="http://blog.jebpages.com/archives/how-to-get-up-and-running-with-ovirt/"&gt;How to Get Up and Running with
+oVirt&lt;/a&gt;,
+was written for oVirt 3.0, as was this post. Since then, there has been
+a new release, &lt;a href="http://wiki.ovirt.org/wiki/OVirt_3.1_release_notes"&gt;oVirt
+3.1&lt;/a&gt;, which
+apparently has a better &lt;span class="caps"&gt;UI&lt;/span&gt; and a better installer. Jason Brooks has a
+new post, &lt;a href="http://blog.jebpages.com/archives/up-and-running-with-ovirt-3-1-edition/"&gt;Up and Running with oVirt, 3.1
+Edition&lt;/a&gt;,
+which covers installation and configuration of both an all-in-one
+machine and a separate node. If you&amp;#8217;re looking to try oVirt, I&amp;#8217;d
+recommend you give that a shot. Unfortunately (and strangely, given that
+this is supposed to be the &amp;#8220;upstream&amp;#8221; of RedHat&amp;#8217;s proprietary &lt;span class="caps"&gt;RHEV&lt;/span&gt;) it&amp;#8217;s
+still all based on&amp;nbsp;Fedora.&lt;/p&gt;</summary><category term="fedora"></category><category term="kvm"></category><category term="ovirt"></category><category term="qemu"></category><category term="redhat"></category><category term="rhev"></category><category term="spice"></category><category term="virtualization"></category></entry><entry><title>Adjusting the VirtualBox F12 BIOS Boot Prompt Timeout</title><link href="http://newblog.jasonantman.com/2012/04/adjusting-the-virtualbox-f12-bios-boot-prompt-timeout/" rel="alternate"></link><updated>2012-04-09T13:52:00-04:00</updated><author><name>admin</name></author><id>tag:newblog.jasonantman.com,2012-04-09:2012/04/adjusting-the-virtualbox-f12-bios-boot-prompt-timeout/</id><summary type="html">&lt;p&gt;I&amp;#8217;m working from home today, connected by &lt;span class="caps"&gt;VPN&lt;/span&gt;. I&amp;#8217;m in the process of
+testing a bunch of Puppet stuff, and needed to re-image a bunch of
+&lt;a href="https://www.virtualbox.org/"&gt;VirtualBox&lt;/a&gt; VMs on my desktop at work,
+using &lt;span class="caps"&gt;PXE&lt;/span&gt; boot to &lt;a href="https://fedorahosted.org/cobbler/"&gt;Cobbler&lt;/a&gt;. I&amp;#8217;m only
+connected to the desktop by &lt;span class="caps"&gt;SSH&lt;/span&gt;, and running the VMs with &lt;code&gt;VBoxHeadless&lt;/code&gt;
+and connecting to them via &lt;span class="caps"&gt;RDP&lt;/span&gt; (well, &lt;span class="caps"&gt;VRDP&lt;/span&gt;). The problem with this is
+that if I start a &lt;span class="caps"&gt;VM&lt;/span&gt; on my console window, then switch to my &lt;span class="caps"&gt;RDP&lt;/span&gt; client
+and connect, by the time the &lt;span class="caps"&gt;VM&lt;/span&gt; gets keyboard focus, it&amp;#8217;s already past
+the VBox &amp;#8220;Press F12 to select boot device&amp;#8221; prompt and booting from disk.
+I could modify the boot order on the &lt;span class="caps"&gt;VM&lt;/span&gt;, but then that becomes a pain
+when it reboots after the&amp;nbsp;install.&lt;/p&gt;
+&lt;p&gt;Thanks to some of the guys on the &lt;a href="https://www.virtualbox.org/wiki/IRC"&gt;VirtualBox &lt;span class="caps"&gt;IRC&lt;/span&gt;
+channel&lt;/a&gt;, I found out about the
+&lt;code&gt;--bioslogodisplaytime&lt;/code&gt; option for VMs, which controls the length of
+time (in milliseconds) that the boot splash screen is shown (the default
+value seems to be 0). It&amp;#8217;s included in the &lt;a href="http://www.virtualbox.org/manual/ch08.html#vboxmanage-modifyvm"&gt;reference guide to
+VBoxManage&lt;/a&gt;
+in the modifyvm section. Setting this to a value of 10 seconds or so, as
+shown below, is more than enough for me to start the &lt;span class="caps"&gt;VM&lt;/span&gt;, Alt-Tab to my
+&lt;span class="caps"&gt;RDP&lt;/span&gt; client, connect to the &lt;span class="caps"&gt;VM&lt;/span&gt;, and hit &amp;#8216;F12&amp;#8217; to select a one-time
+network&amp;nbsp;boot:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;VBoxManage modifyvm VMNAME --bioslogodisplaytime 10000
+&lt;/pre&gt;&lt;/div&gt;</summary><category term="provisioning"></category><category term="pxe"></category><category term="rdp"></category><category term="sysadmin"></category><category term="vbox"></category><category term="virtualbox"></category><category term="virtualization"></category><category term="vm"></category></entry><entry><title>Using VirtualBox Remotely</title><link href="http://newblog.jasonantman.com/2012/03/using-virtualbox-remotely/" rel="alternate"></link><updated>2012-03-09T12:00:00-05:00</updated><author><name>admin</name></author><id>tag:newblog.jasonantman.com,2012-03-09:2012/03/using-virtualbox-remotely/</id><summary type="html">&lt;p&gt;At work, I have a pretty beefy workstation (a Dell OptiPlex 990 with a
+3.4GHz Intel Core i7-2600 and &lt;span class="caps"&gt;8GB&lt;/span&gt; &lt;span class="caps"&gt;RAM&lt;/span&gt; running Fedora 16) that I usually
+run a few VMs on as my test/development environment. I usually reboot my
+machine every other week or so, and start VirtualBox and my VMs once the
+system boots. All of the VMs are Linux boxes, running test-only, so I
+never really cared about &lt;span class="caps"&gt;RDP&lt;/span&gt; or anything like that. Today I&amp;#8217;m working
+from home and need to setup a new development environment, so here&amp;#8217;s how
+to get VirtualBox working nicely assuming you&amp;#8217;ve never set it up for
+&lt;span class="caps"&gt;VRDP&lt;/span&gt; (its Virtual Remote Desktop Protocol) before, and have a network
+connection (&lt;span class="caps"&gt;LAN&lt;/span&gt; or &lt;span class="caps"&gt;VPN&lt;/span&gt; or something) to the machine running VirtualBox.
+I currently have VirtualBox &lt;span class="caps"&gt;OSE&lt;/span&gt; 4.1.8 installed from
+&lt;a href="http://nonfree.rpmfusion.org/"&gt;rpmfusion&lt;/a&gt; &lt;span class="caps"&gt;RPM&lt;/span&gt;. Most of this can be
+found in &lt;a href="http://www.virtualbox.org/manual/ch07.html"&gt;Chapter 7 of the VirtualBox
+manual&lt;/a&gt;, but here&amp;#8217;s a
+step-by-step&amp;nbsp;method.&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;First, download the Oracle (non-free) Oracle VirtualBox &lt;span class="caps"&gt;VM&lt;/span&gt; Extension
+Pack tarball from the &lt;a href="https://www.virtualbox.org/wiki/Downloads"&gt;VirtualBox Downloads
+Page&lt;/a&gt;, which provides &lt;span class="caps"&gt;VRDP&lt;/span&gt;
+support (as well as support for the virtual &lt;span class="caps"&gt;USB&lt;/span&gt; 2.0 device, Intel &lt;span class="caps"&gt;PXE&lt;/span&gt;
+Boot &lt;span class="caps"&gt;ROM&lt;/span&gt; support for the E1000 &lt;span class="caps"&gt;NIC&lt;/span&gt; driver, and experimental Linux host
+&lt;span class="caps"&gt;PCI&lt;/span&gt; passthrough suport). Then install it&amp;nbsp;using:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;sudo VBoxManage extpack install Oracle_VM_VirtualBox_Extension_Pack-4.1.8-75467.vbox-extpack
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Assuming you have an existing &lt;span class="caps"&gt;VM&lt;/span&gt; (you can list them using &lt;code&gt;VBoxManage list vms&lt;/code&gt;), enable &lt;span class="caps"&gt;VRDP&lt;/span&gt; support on&amp;nbsp;it:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;VBoxManage modifyvm &amp;quot;VM name&amp;quot; --vrde on
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;I like to assign specific ports to &lt;span class="caps"&gt;VRDP&lt;/span&gt; on each &lt;span class="caps"&gt;VM&lt;/span&gt; so I can &amp;#8220;bookmark&amp;#8221;
+them in my &lt;a href="http://kde.org/applications/internet/krdc/"&gt;&lt;span class="caps"&gt;KRDC&lt;/span&gt;&lt;/a&gt; client by
+&lt;span class="caps"&gt;VM&lt;/span&gt; name. I generally start with 10011, as the 10011-10049 range is both
+unassigned and doesn&amp;#8217;t appear in my &lt;code&gt;/etc/services&lt;/code&gt;:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;VBoxManage modifyvm &amp;quot;VM name&amp;quot; --vrdeport 10011
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Start the &lt;span class="caps"&gt;VM&lt;/span&gt;, using VBoxHeadless (shows more debugging/errors, but also
+stays in the foreground, so you&amp;#8217;ll want to use
+&lt;a href="http://www.gnu.org/software/screen/"&gt;screen&lt;/a&gt; or something like&amp;nbsp;it):&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;VBoxHeadless --startvm &amp;quot;VM name&amp;quot;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;If all went well, it should show some output including a confirmation
+that the &lt;span class="caps"&gt;VRDE&lt;/span&gt; server is running on the correct&amp;nbsp;port:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;Oracle VM VirtualBox Headless Interface 4.1.8_OSE
+(C) 2008-2012 Oracle Corporation
+All rights reserved.
+
+VRDE server is listening on port 3389.
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;That&amp;#8217;s it. Assuming you&amp;#8217;re using something like
+&lt;a href="http://www.gnu.org/software/screen/"&gt;screen&lt;/a&gt;, you can start a whole
+bunch of new VMs, and still keep the VBoxHeadless output in case of an&amp;nbsp;error.&lt;/p&gt;</summary><category term="rdp"></category><category term="virtualbox"></category><category term="virtualization"></category><category term="vm"></category></entry><entry><title>Virtualization Options</title><link href="http://newblog.jasonantman.com/2010/03/virtualization-options/" rel="alternate"></link><updated>2010-03-19T20:55:00-04:00</updated><author><name>admin</name></author><id>tag:newblog.jasonantman.com,2010-03-19:2010/03/virtualization-options/</id><summary type="html">&lt;p&gt;As I mentioned in &lt;a href="/2010/03/downtime-past-few-days-coping-with-storms/"&gt;Downtime past few days, coping with
+storms&lt;/a&gt;, as a
+result of some things I noticed with a recent power outage, I&amp;#8217;ve decided
+to take the leap to virtualization. Given the cost of current hardware
+that supports &lt;span class="caps"&gt;HVM&lt;/span&gt; (Intel &lt;span class="caps"&gt;VT&lt;/span&gt;-x or &lt;span class="caps"&gt;AMD&lt;/span&gt;-V ), I immediately decided that I
+might as well give up on any thoughts of doing full virtualization or
+getting new-ish hardware. So I settled on the next step up from what
+have now - a set of &lt;a href="http://h18000.www1.hp.com/products/quickspecs/11504_na/11504_na.HTML"&gt;&lt;span class="caps"&gt;HP&lt;/span&gt; Proliant &lt;span class="caps"&gt;DL360&lt;/span&gt;
+G3&lt;/a&gt;
+servers. I got them with a 90 day warranty from a reputable dealer, dual
+2.8GHz Xeon (512K cache), 2Gb &lt;span class="caps"&gt;RAM&lt;/span&gt;, dual 36.4Gb U320 15k &lt;span class="caps"&gt;RPM&lt;/span&gt; &lt;span class="caps"&gt;SCSI&lt;/span&gt; disks
+and dual power supplies for $99 each. My next step is to decide what
+virtualization software to&amp;nbsp;use.&lt;/p&gt;
+&lt;p&gt;My main goals for the project&amp;nbsp;are:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Lower power consumption through consolidation of&amp;nbsp;servers.&lt;/li&gt;
+&lt;li&gt;Possibility to add capacity or resources by remotely powering up an
+    idle server and migrating VMs to&amp;nbsp;it.&lt;/li&gt;
+&lt;li&gt;Limited fault tolerance - ability to manually restore a &lt;span class="caps"&gt;VM&lt;/span&gt; that was
+    running on failed hardware, onto an idle&amp;nbsp;server.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;I originally thought Xen, just out of reflex. However, given that all of
+my servers have the same base - the same distribution and, ideally, the
+same kernel and patch level - it seemed like a lot of overhead to
+duplicate that for multiple VMs. So I started looking into &lt;a href="http://en.wikipedia.org/wiki/Operating_system-level_virtualization"&gt;&lt;span class="caps"&gt;OS&lt;/span&gt;-level
+virtualization&lt;/a&gt;.
+There are relatively few options, and I&amp;#8217;ll admit that aside from Solaris
+Containers (which I learned about while working at Sun) I don&amp;#8217;t know
+much about it. But &lt;a href="http://www.openvz.org/"&gt;OpenVZ&lt;/a&gt; seems to be the
+front runner in that area. My initial impression was that it made a lot
+of sense - keep one common kernel, but allow containers/virtual
+environments (CTs/VEs) to have, essentially, their own userland.
+Unfortunately, it doesn&amp;#8217;t seem to be as hyped as Xen, and I haven&amp;#8217;t
+heard very much about it in the enterprise context. And it requires
+running a kernel from the OpenVZ project, which means I can&amp;#8217;t just
+script updates through yum as easily as&amp;nbsp;normal.&lt;/p&gt;
+&lt;p&gt;On the up size, OpenVZ would allow me to eliminate the duplication of
+the kernel, and seems to have much less overhead than Xen (and logically
+so). On the down side, I lose the ability to virtualize other OSes,
+kernel versions, or make pre-packaged VMs. I&amp;#8217;ve decided that if I wanted
+to do that, I could dedicate a single&amp;nbsp;machine.&lt;/p&gt;
+&lt;p&gt;I&amp;#8217;ve spent the last day or so doing a lot of research, and have come up
+with the following questions and concerns about OpenVZ which I hope to
+be able to answer (I&amp;#8217;ll post the answers in a&amp;nbsp;follow-up).&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;How do I handle distribution and kernel upgrades? The logical
+    solution would be to migrate the &lt;span class="caps"&gt;CT&lt;/span&gt; to another host while I upgrade
+    &lt;span class="caps"&gt;CT0&lt;/span&gt; (the hardware &lt;span class="caps"&gt;OS&lt;/span&gt;/host/dom0 in Xen speak). But if the guest and
+    host kernels must match, how does this&amp;nbsp;work?&lt;/li&gt;
+&lt;li&gt;Can I do package upgrades within the guest/&lt;span class="caps"&gt;CT&lt;/span&gt; easily? WIll this play
+    well with&amp;nbsp;Puppet?&lt;/li&gt;
+&lt;li&gt;How will I handle backups? Is it logical to run
+    &lt;a href="http://www.bacula.org"&gt;bacula&lt;/a&gt; within each &lt;span class="caps"&gt;CT&lt;/span&gt;, or just on &lt;span class="caps"&gt;CT0&lt;/span&gt;? If
+    just on &lt;span class="caps"&gt;CT0&lt;/span&gt;, how do I easily verify that a particular &lt;span class="caps"&gt;CT&lt;/span&gt; was backed&amp;nbsp;up?&lt;/li&gt;
+&lt;li&gt;WIll everything play well with Puppet? (see&amp;nbsp;below)&lt;/li&gt;
+&lt;li&gt;Am I willing to throw away my KickStart-based installs? And,
+    similarly, am I willing to give up the possibility of migrating from
+    a container to a Xen host or a physical host&amp;nbsp;(easily)?&lt;/li&gt;
+&lt;li&gt;OpenVZ live migration relies on rsync. This means that there&amp;#8217;s a
+    significant delay (compared to shared storage) and also that I can&amp;#8217;t
+    migrate off of a host that&amp;#8217;s down. Is there a way around&amp;nbsp;this?&lt;/li&gt;
+&lt;li&gt;Similarly, live migration requires root &lt;span class="caps"&gt;SSH&lt;/span&gt; key exchange
+    (passwordless) between the hosts. This seems about equivalent to
+    using &lt;code&gt;hosts.equiv&lt;/code&gt;. Do I really want root on one box to mean root
+    on another box (and all of the containers on that&amp;nbsp;box)?&lt;/li&gt;
+&lt;li&gt;Can I still firewall &lt;span class="caps"&gt;CT0&lt;/span&gt;? How will this&amp;nbsp;work?&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;It seems to me that OpenVZ may be significantly less enterprise-class
+than Xen. Sure, this is just my home setup, but I hold it to the same
+standards I use for my work systems. In fact, I usually test new
+technologies at home before I suggest them at work. A lot of the writing
+on the &lt;a href="http://wiki.openvz.org/"&gt;OpenVZ wiki&lt;/a&gt; seems to be riddled with
+spelling errors. They claim &amp;#8220;zero downtime&amp;#8221; live migration, but if they
+have to rsync 2Gb of MySQL tables, that sounds like a lot more than
+&amp;#8220;zero&amp;#8221;. And, most shockingly, the &lt;a href="http://wiki.openvz.org/Hardware_testing"&gt;Hardware
+testing&lt;/a&gt; wiki page talks about
+making sure your hosts aren&amp;#8217;t overclocked or undercooled, and running
+&lt;code&gt;cpuburn&lt;/code&gt; to test your system under high load. Sorry, but the engineers
+at &lt;span class="caps"&gt;HP&lt;/span&gt;, Sun, &lt;span class="caps"&gt;IBM&lt;/span&gt;, etc. handle that for me and most people I know. So, I&amp;#8217;m
+a bit worried about the seriousness of the OpenVZ&amp;nbsp;project.&lt;/p&gt;
+&lt;p&gt;Most worrisome is a post I found in the &lt;a href="http://forum.openvz.org"&gt;OpenVZ
+forum&lt;/a&gt;, &lt;a href="http://forum.openvz.org/index.php?t=msg&amp;amp;goto=14818&amp;amp;"&gt;&amp;#8220;Stopping puppet on hn stops it in all
+&lt;span class="caps"&gt;VE&lt;/span&gt;&amp;#8221;&lt;/a&gt;. It seems
+that, since &lt;span class="caps"&gt;CT0&lt;/span&gt; is aware of all of the guest container processes, they
+show up in ps lists. Most, if not all RedHat init scripts use killproc
+to stop and restart services. This means that a &lt;code&gt;service syslog stop&lt;/code&gt; on
+the &lt;span class="caps"&gt;CT0&lt;/span&gt; (host) will stop &lt;strong&gt;all&lt;/strong&gt; &lt;code&gt;syslog&lt;/code&gt; processes, including all of
+them in the CTs. This seems like a major issue. Sure, I could replace
+&lt;code&gt;killproc&lt;/code&gt; on &lt;span class="caps"&gt;CT0&lt;/span&gt; with a script that parses the process list, isolates
+the PIDs for those running on &lt;span class="caps"&gt;CT0&lt;/span&gt;, and kills them. But what else needs
+to be fixed? Nagios check scripts would need to be adjusted. Is there
+anything else that would come back and bite&amp;nbsp;me?&lt;/p&gt;
+&lt;p&gt;The bottom line is that (I guess this is logical) it seems that
+containers in OpenVZ will seem - and act - a lot less like a logical
+host than they would under&amp;nbsp;Xen.&lt;/p&gt;</summary><category term="OpenVZ"></category><category term="virtualization"></category><category term="xen"></category></entry><entry><title>Microsoft and Novell Deliver Joint Virtualization Solution - or do they?</title><link href="http://newblog.jasonantman.com/2008/09/microsoft-and-novell-deliver-joint-virtualization-solution-or-do-they/" rel="alternate"></link><updated>2008-09-11T11:40:00-04:00</updated><author><name>admin</name></author><id>tag:newblog.jasonantman.com,2008-09-11:2008/09/microsoft-and-novell-deliver-joint-virtualization-solution-or-do-they/</id><summary type="html">&lt;p&gt;From PRNewsWire: &lt;a href="http://www.prnewswire.com/cgi-bin/stories.pl?ACCT=104&amp;amp;STORY=/www/story/09-11-2008/0004883058&amp;amp;EDATE="&gt;Microsoft and Novell Deliver Joint Virtualization
+Solution Through
+Partners&lt;/a&gt;.
+The headline of the press release: &amp;#8220;Supported by Dell and other channel
+partners, solution includes &lt;span class="caps"&gt;SUSE&lt;/span&gt; Linux Enterprise Server running as
+optimized guest on Windows Server 2008&amp;nbsp;Hyper-V.&amp;#8221;&lt;/p&gt;
+&lt;p&gt;Now, maybe I&amp;#8217;m not up on the news regarding my favorite distribution,
+but it seems to me that a deal allowing SuSE to be virtualized as a
+&lt;strong&gt;guest&lt;/strong&gt; under Windows is not only &amp;#8220;joint&amp;#8221;, but plain moronic. Despite
+the marketing efforts of Microsoft, Unix-based systems (including Linux)
+have always had the upper hand in availability, reliability, and&amp;nbsp;performance.&lt;/p&gt;
+&lt;p&gt;I must say, from what I&amp;#8217;ve heard, Windows Server is getting *much*
+better in these areas - and I&amp;#8217;ve even heard that the latest version
+includes an option to install without a graphical environment, and even
+includes a command-line that&amp;#8217;s useful. It&amp;#8217;s about&amp;nbsp;time.&lt;/p&gt;
+&lt;p&gt;However, it seems to me, that any virtualization deal between Microsoft
+and a Linux distributor can provide only one logical solution: Windows
+Server virtualized as a guest in a high-availability Linux host. More
+importantly, without the insane per-processor licensing - a per-&lt;span class="caps"&gt;VM&lt;/span&gt;
+instance license that&amp;#8217;s hardware-agnostic and allows VMs to be migrated
+across hardware as the admin sees&amp;nbsp;fit.&lt;/p&gt;
+&lt;p&gt;Oh, and one more insight. If Microsoft wants to be a serious player in
+the virtualization arena, here&amp;#8217;s a few &amp;#8220;simple&amp;#8221;&amp;nbsp;steps:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Get Windows Server to work correctly under Xen, VirtualBox, etc.
+    Certify it. Provide the correct guest &lt;span class="caps"&gt;OS&lt;/span&gt; tool&amp;nbsp;packages&lt;/li&gt;
+&lt;li&gt;Provide simple management of Windows in a virtualized environment -
+    minimally, a standard &lt;span class="caps"&gt;SSH&lt;/span&gt; server that&amp;#8217;s compatible with OpenSSH, a
+    &lt;span class="caps"&gt;GUI&lt;/span&gt;-less environment, and a serial&amp;nbsp;console.&lt;/li&gt;
+&lt;li&gt;Get rid of per-processor licenses. Provide a basic license that
+    allows for, say, 10 VMs to be running at once, and allows as many
+    installs as needed - the only licensing is based on the amount of
+    VMs actually running. i.e., if you have 10 VMs and one gets
+    corrupted, you can bring that one down and online a back-up image,
+    without violating the&amp;nbsp;license.&lt;/li&gt;
+&lt;li&gt;Make licensing processor-agnostic. Want to migrate a Xen &lt;span class="caps"&gt;VM&lt;/span&gt; (Windows
+    guest) from a dual-core Pentium to an 8-core Xeon, or even a 16
+    processor &lt;span class="caps"&gt;SPARC&lt;/span&gt;? Sure, no&amp;nbsp;problem.&lt;/li&gt;
+&lt;/ol&gt;</summary><category term="microsoft"></category><category term="novell"></category><category term="suse"></category><category term="virtualization"></category></entry><entry><title>Links for 2008-02-23</title><link href="http://newblog.jasonantman.com/2008/02/links-for-2008-02-23/" rel="alternate"></link><updated>2008-02-25T11:20:00-05:00</updated><author><name>admin</name></author><id>tag:newblog.jasonantman.com,2008-02-25:2008/02/links-for-2008-02-23/</id><summary type="html">&lt;p&gt;Some links for&amp;nbsp;today:&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://arstechnica.com/news.ars/post/20080221-microsoft-launches-new-open-standards-interoperability-push.html"&gt;Microsoft&amp;#8217;s new promised on interoperability, open standards.
+etc.&lt;/a&gt;
+- somewhat ironic given the Office Open &lt;span class="caps"&gt;XML&lt;/span&gt; debacle on &amp;#8220;standards&amp;#8221;. &lt;a href="http://arstechnica.com/journals/linux.ars/2008/02/21/red-hat-not-impressed-with-microsofts-interoperability-plans"&gt;And
+Red Hat&amp;#8217;s worries about
+it&lt;/a&gt;.
+(Ars&amp;nbsp;Technica)&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://www.groklaw.net/article.php?story=20080221184924826"&gt;Groklaw&amp;#8217;s lengthy analysis of the
+promises&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://blogs.zdnet.com/threatchaos/"&gt;Pakistan removed from the Internet, causes global YouTube
+outage&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://www.guardian.co.uk/theguardian/2008/feb/23/internet.usa"&gt;A Guardian article on the WikiLeaks
+debacle&lt;/a&gt;
+- perhaps the biggest affront to the First Amendment this&amp;nbsp;year.&lt;/p&gt;
+&lt;p&gt;An&lt;a href="http://www.informationweek.com/story/showArticle.jhtml?articleID=206800800&amp;amp;cid=RSSfeed_IWK_All"&gt;InformationWeek article about some guys from BlackHat &lt;span class="caps"&gt;D.C.&lt;/span&gt; who said
+that they will be able to crack &lt;span class="caps"&gt;GSM&lt;/span&gt; encryption in under 30 minutes with
+$1,000 of technology or 30 seconds with
+$100,000&lt;/a&gt;
+(FPGAs - Maybe a cluster of&amp;nbsp;&lt;span class="caps"&gt;PS3&lt;/span&gt;&amp;#8217;s?)&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://citp.princeton.edu/memory/"&gt;A Princeton Unviersity blog about cold boots possibly able to crack the
+Windows BitLocker system&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://blog.mozilla.com/blog/2008/02/21/500-million-firefox-downloads-complete-500-million-grains-in-progress/"&gt;Yay! Firefox has hit its&amp;#8217; 500 Millionth
+download!!!&lt;/a&gt;
+And there was much&amp;nbsp;rejoicing&amp;#8230;&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://arstechnica.com/news.ars/post/20080219-opera-browser-market-isnt-functioning-thanks-to-microsoft.html"&gt;An ArsTechnica article on Internet Explorer, what should be done to fix
+it, and how there can still be a non-standards-compliant
+browser&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://jeremy.linuxquestions.org/"&gt;Jeremy&amp;#8217;s Blog&lt;/a&gt; - the mind behind
+&lt;a href="http://www.linuxquestions.org/"&gt;LinuxQuestions.org&lt;/a&gt; - &lt;a href="http://jeremy.linuxquestions.org/2008/02/21/2007-linuxquestionsorg-members-choice-award-winners/"&gt;provides a recap
+of the 2007 &lt;span class="caps"&gt;LQ&lt;/span&gt; Members&amp;#8217; Choice
+awards&lt;/a&gt;.
+Some interesting winners were VirtualBox for virtualization package,
+Debain for server distro, Knoppix for Live Distro, Eclipse for &lt;span class="caps"&gt;IDE&lt;/span&gt;/Web
+Development Environment, Python for language of the year, and - much to
+my chagrin - vi/vim for&amp;nbsp;editor.&lt;/p&gt;
+&lt;p&gt;A &lt;a href="http://www.linuxjournal.com/content/whats-next-open-source-and-public-media"&gt;LinuxJournal article on What&amp;#8217;s Next for Open Source and Public
+Meida&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://www.linuxinsider.com/rsstory/61803.html"&gt;LinuxInsider - &lt;span class="caps"&gt;EU&lt;/span&gt; taking Microsoft&amp;#8217;s promises with a grain of
+salt&lt;/a&gt;, noting that &lt;span class="caps"&gt;MS&lt;/span&gt;
+has made &amp;#8220;at least four similar statements&amp;#8221; in the&amp;nbsp;past.&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://utcc.utoronto.ca/~cks/space/blog/"&gt;Chris Siebenmann&lt;/a&gt; - &lt;a href="http://utcc.utoronto.ca/~cks/space/blog/tech/SharingRisk"&gt;Where
+the risk is with virtualization (and
+iSCSI)&lt;/a&gt; and
+&lt;a href="http://utcc.utoronto.ca/~cks/space/blog/sysadmin/WirelessMachineRoom"&gt;Wireless, machine rooms, and the Asus
+eeePC&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://www.ibm.com/developerworks/library/x-ooxmlstandard.html?ca=dgr-lnxw06OOXMLBigDeal&amp;amp;S_TACT=105AGX59&amp;amp;S_CMP=GR"&gt;&lt;span class="caps"&gt;IBM&lt;/span&gt; DeveloperWorks - &lt;span class="caps"&gt;OOXML&lt;/span&gt;: What&amp;#8217;s the big
+deal?&lt;/a&gt;
+- outlining the technical objections to &lt;span class="caps"&gt;OOXML&lt;/span&gt; as a standard. Linked from
+a &lt;a href="http://rootprompt.org/article.php3?article=11548"&gt;rootprompt.org&lt;/a&gt;
+article mentioning that &amp;#8220;&lt;span class="caps"&gt;OOXML&lt;/span&gt; is essentially a complete replication of
+every chunk of data that a Microsoft Office application might possibly
+save in a&amp;nbsp;file&amp;#8221;.&lt;/p&gt;
+&lt;p&gt;Slashdot &lt;span class="caps"&gt;YRO&lt;/span&gt; - &lt;a href="http://yro.slashdot.org/article.pl?sid=08/02/25/0159250&amp;amp;from=rss"&gt;a guy who got hist stock photos stolen, entered into a
+long legal battle, and
+won&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;Microsoft&amp;#8217;s &lt;a href="http://seattlepi.nwsource.com/business/352442_vista23.html"&gt;Windows Vista Capable lawsuit granted class-action
+status&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;A &lt;a href="http://www.washingtonpost.com/wp-dyn/content/article/2008/02/23/AR2008022300693.html"&gt;Washington Post article on Hans Reiser&amp;#8217;s Geek Defense
+strategy&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;A &lt;a href="http://apple.slashdot.org/article.pl?sid=08/02/23/1915254&amp;amp;from=rss"&gt;Slashdot post linking to news that Apple sent a cease-and-decist
+order to the Hymn
+Project&lt;/a&gt;,
+which produces software to remove &lt;span class="caps"&gt;DRM&lt;/span&gt; from iTunes songs. Apple had their
+&lt;span class="caps"&gt;ISP&lt;/span&gt; remove all download links. (I guess the only solution is for us all
+to buy bandwidth right from a&amp;nbsp;&lt;span class="caps"&gt;NSP&lt;/span&gt;&amp;#8230;)&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://news.yahoo.com/s/ap/20080222/ap_on_hi_te/yahoo_shareholder_lawsuit"&gt;Yahoo&amp;#8217;s shareholders are suing it for not gobbling up the Microsoft
+deal&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://arstechnica.com/news.ars/post/20080220-disgruntled-customer-sues-comcast-over-p2p-throttling.html"&gt;Comcast getting sued &lt;span class="caps"&gt;AGAIN&lt;/span&gt; for &lt;span class="caps"&gt;P2P&lt;/span&gt;
+filtering&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://blog.wired.com/music/2008/02/riaa-training-v.html"&gt;A leaked &lt;span class="caps"&gt;RIAA&lt;/span&gt; training video for
+prosecutors&lt;/a&gt;,
+going so far as to say that &lt;span class="caps"&gt;IP&lt;/span&gt; piracy can lead to arrests for drugs,
+weapons, or terrorism. It also includes instructions on how to get a
+&lt;span class="caps"&gt;RIAA&lt;/span&gt; investigator certified as a court&amp;nbsp;expert.&lt;/p&gt;
+&lt;p&gt;A &lt;a href="http://www.nytimes.com/2008/02/21/fashion/21webgirls.html?_r=2&amp;amp;oref=slogin&amp;amp;oref=slogin"&gt;New York Times article on - gasp - women using the
+Internet&lt;/a&gt;.
+Linked from &lt;a href="http://yesthattom.livejournal.com"&gt;Tom Limoncelli&amp;#8217;s blog&lt;/a&gt;.&lt;/p&gt;</summary><category term="apple"></category><category term="bitlocker"></category><category term="cellphone"></category><category term="EU"></category><category term="firefox"></category><category term="gsm"></category><category term="microsoft"></category><category term="ooxml"></category><category term="pakistan"></category><category term="riaa"></category><category term="virtualization"></category><category term="wikileaks"></category><category term="windows"></category><category term="youtube"></category></entry></feed>

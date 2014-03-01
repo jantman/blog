@@ -1,0 +1,1035 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Jason Antman's Blog</title><link>http://newblog.jasonantman.com/</link><description></description><atom:link href="http://newblog.jasonantman.com/feeds/tags/sysadmin.rss.xml" rel="self"></atom:link><lastBuildDate>Mon, 13 May 2013 05:00:00 -0400</lastBuildDate><item><title>Search for a small-scale but automated RPM build system</title><link>http://newblog.jasonantman.com/2013/05/search-for-a-small-scale-but-automated-rpm-build-system/</link><description>&lt;p&gt;&lt;strong&gt;This post is part of a series of older draft posts from a few months
+ago that I&amp;#8217;m just getting around to publishing. Unfortunately, I have
+yet to find a build system that meets my requirements (see the last&amp;nbsp;paragraph).&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;At work, we have a handful - currently a really small number - of &lt;span class="caps"&gt;RPM&lt;/span&gt;
+packages that we need to build and deploy internally for our CentOS
+server infrastructure. A number of them are just pulled down from
+specific third-party repositories and rebuilt to have the vendor set as
+us, and some are internally patched or developed software. We run
+websites, and on the product side, we&amp;#8217;re a
+Python/&lt;a href="https://www.djangoproject.com/"&gt;Django&lt;/a&gt; shop (in fact, probably
+one of the largest Django apps out there). We don&amp;#8217;t deploy our Django
+apps via &lt;span class="caps"&gt;RPM&lt;/span&gt;, so building and distributing RPMs is definitely not one of
+our core competencies. In fact, we really only want to do it when we&amp;#8217;re
+testing/deploying a new distro, or when an upstream package is&amp;nbsp;updated.&lt;/p&gt;
+&lt;p&gt;Last week I pulled a ticket to deploy &lt;a href="http://nodejs.org/"&gt;node.js&lt;/a&gt; to
+one of our build hosts, and we&amp;#8217;ve got a few things in the pipeline that
+also rely on it. I found the
+&lt;a href="https://github.com/puppetlabs/puppetlabs-nodejs"&gt;puppetlabs-nodejs&lt;/a&gt;
+module on Github that&amp;#8217;s supposed to install it on &lt;span class="caps"&gt;RHEL&lt;/span&gt;/CentOS, but it
+pulls packages from
+&lt;a href="http://patches.fedorapeople.org/oldnode/stable/"&gt;http://patches.fedorapeople.org/oldnode/stable/&lt;/a&gt;,
+and the newest version of nodejs there is 0.6.18, which is quite old. I
+can&amp;#8217;t find any actively maintained sources of newer nodejs packages for
+&lt;span class="caps"&gt;RHEL&lt;/span&gt;/CentOS (yeah, I know, that&amp;#8217;s one down side to the
+distributions&amp;#8230;). However, I did find that nodejs 0.9.5 is being &lt;a href="http://koji.fedoraproject.org/koji/packageinfo?packageID=15154"&gt;built
+for Fedora 18/19 in the Fedora build
+system&lt;/a&gt;,
+is already in the Fedora 18 Testing and Fedora Rawhide repos, but is
+failing its &lt;span class="caps"&gt;EL6&lt;/span&gt; builds in their system. The decision I&amp;#8217;ve come to is to
+use the puppetlabs-nodejs module to install it, but try and rebuild the
+Fedora 18 RPMs under CentOS 5 and&amp;nbsp;6.&lt;/p&gt;
+&lt;p&gt;So that&amp;#8217;s the background. Now, my current task: to search for an &lt;span class="caps"&gt;RPM&lt;/span&gt;
+build system for my current job. My core requirements, in no specific
+order,&amp;nbsp;are:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Be relatively easy and quick to use for people who have a specfile
+    or &lt;span class="caps"&gt;SRPM&lt;/span&gt; and want to be able to &amp;#8220;ensure =&gt; present&amp;#8221; the finished &lt;span class="caps"&gt;RPM&lt;/span&gt;
+    on a system. i.e., require as little per-package configuration as&amp;nbsp;possible.&lt;/li&gt;
+&lt;li&gt;Be able to handle rebuilding &amp;#8220;all&amp;#8221; of our RPMs when we roll out a
+    new distro version. Doesn&amp;#8217;t necessarily need to be automatic, but
+    should be relatively&amp;nbsp;simple.&lt;/li&gt;
+&lt;li&gt;Ideally, not need to be running constantly - i.e. something that
+    will cope well with build hosts being VMs that are shut down when
+    they&amp;#8217;re not&amp;nbsp;needed.&lt;/li&gt;
+&lt;li&gt;Handle automatically putting successfully built packages into a
+    repository, ideally with some sort of (manual) promotion process
+    from staging to&amp;nbsp;stable.&lt;/li&gt;
+&lt;li&gt;Have minimal external (infrastructure) dependencies that we can&amp;#8217;t
+    satisfy with existing&amp;nbsp;systems.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;So, the first step was to research existing &lt;span class="caps"&gt;RPM&lt;/span&gt; build systems and how
+others do this. Here&amp;#8217;s a list of what I could find online, though most
+of these are from distributions and software vendors/projects, not
+end-user companies that are only building for internal&amp;nbsp;use.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href="https://fedorahosted.org/koji/wiki"&gt;Koji&lt;/a&gt; is the build system used
+    by &lt;a href="http://fedoraproject.org/wiki/Koji"&gt;Fedora&lt;/a&gt; and RedHat. It&amp;#8217;s
+    about as full-featured as any can be, and I&amp;#8217;m familiar with it from
+    my time at &lt;a href="http://koji.rutgers.edu/koji/"&gt;Rutgers University&lt;/a&gt;, as
+    it&amp;#8217;s used to maintain their CentOS/&lt;span class="caps"&gt;RHEL&lt;/span&gt; packages. It&amp;#8217;s based largely
+    on Mock. However, &lt;a href="http://fedoraproject.org/wiki/Koji/ServerHowTo"&gt;setting up the build
+    server&lt;/a&gt; is no
+    trivial task; there are few installations outside of Fedora/RedHat,
+    and it relies on either Kerberos or an &lt;span class="caps"&gt;SSL&lt;/span&gt; &lt;span class="caps"&gt;CA&lt;/span&gt; infrastructure to
+    authenticate machines and clients. So, it&amp;#8217;s designed for too large a
+    scale and too much infrastructure for&amp;nbsp;me.&lt;/li&gt;
+&lt;li&gt;&lt;span class="caps"&gt;PLD&lt;/span&gt; Linux has a &lt;a href="https://www.pld-linux.org/developingpld/builderscript"&gt;builder
+    script&lt;/a&gt; that
+    seems to automate &lt;code&gt;rpmbuild&lt;/code&gt; as well as fetching sources and
+    resolving/building dependencies. I haven&amp;#8217;t looked at the script yet,
+    but apparently it&amp;#8217;s in &lt;span class="caps"&gt;PLD&lt;/span&gt;&amp;#8217;s &amp;#8220;rpm-build-tools&amp;#8221;&amp;nbsp;package.&lt;/li&gt;
+&lt;li&gt;&lt;span class="caps"&gt;PLD&lt;/span&gt; Linux also has a &lt;span class="caps"&gt;CVS&lt;/span&gt; repository for something called
+    &lt;a href="http://cvs.pld-linux.org/cgi-bin/cvsweb/pld-builder.new"&gt;pld-builder.new&lt;/a&gt;.
+    The
+    &lt;a href="http://cvs.pld-linux.org/cgi-bin/cvsweb/pld-builder.new/doc/README?rev=1.5"&gt;&lt;span class="caps"&gt;README&lt;/span&gt;&lt;/a&gt;
+    and
+    &lt;a href="http://cvs.pld-linux.org/cgi-bin/cvsweb/pld-builder.new/doc/ARCHITECTURE?rev=1.6"&gt;&lt;span class="caps"&gt;ARCHITECTURE&lt;/span&gt;&lt;/a&gt;
+    files make it sound like a relatively simple mainly-Python system
+    that builds &lt;span class="caps"&gt;SRPMS&lt;/span&gt; and binary packages when requested, and most
+    importantly, seems like a simple system that uses little more than
+    shared filesystem access for communication and&amp;nbsp;coordination.&lt;/li&gt;
+&lt;li&gt;&lt;span class="caps"&gt;ALT&lt;/span&gt; Linux has &lt;a href="http://en.altlinux.org/Sisyphus"&gt;Sisyphus&lt;/a&gt;, which
+    combines repository management and web interface tools, package
+    building and testing tools, and&amp;nbsp;more.&lt;/li&gt;
+&lt;li&gt;The Dries &lt;span class="caps"&gt;RPM&lt;/span&gt; repository uses (or at least used&amp;#8230; my reference is
+    quite old) &lt;a href="http://dries.ulyssis.org/rpm/pydar2/index.html"&gt;pydar2&lt;/a&gt;,
+    &amp;#8220;a distributed client/server program which allows you to build
+    multiple spec files on multiple distribution/architecture
+    combinations automatically.&amp;#8221; That sounds like it could be what I
+    need, but the last update says that it isn&amp;#8217;t finished yet, and that
+    was in &lt;strong&gt;2005&lt;/strong&gt;.&lt;/li&gt;
+&lt;li&gt;Mandriva Linux has pretty extensive information on their build
+    system &lt;a href="http://wiki.mandriva.com/en/Category:Build_System"&gt;on their
+    wiki&lt;/a&gt; and a
+    &lt;a href="http://wiki.mandriva.com/en/Development/Packaging/BuildSystem/Theory"&gt;build system theory
+    page&lt;/a&gt;,
+    but it seems to be largely a hodgepodge of shell scripts and
+    cronjobs, and is likely not a candidate for use by anyone other than
+    its&amp;nbsp;designers.&lt;/li&gt;
+&lt;li&gt;Argeo provides the &lt;a href="https://www.argeo.org/wiki/SLC"&gt;&lt;span class="caps"&gt;SLC&lt;/span&gt; framework&lt;/a&gt;
+    which has a &amp;#8220;&lt;span class="caps"&gt;RPM&lt;/span&gt; Factory&amp;#8221; component, but I can&amp;#8217;t seem to find much
+    more than a wiki page, and can&amp;#8217;t tell if it&amp;#8217;s a build automation
+    system or just handles mocking packages and putting them in a repo
+    on a single&amp;nbsp;host.&lt;/li&gt;
+&lt;li&gt;Dag Wieers&amp;#8217; repositories use (or used) a set of python scripts
+    called &lt;a href="http://dag.wieers.com/home-made/dar/"&gt;&lt;span class="caps"&gt;DAR&lt;/span&gt;, &amp;#8220;Dynamic Apt Repository
+    builder&amp;#8221;&lt;/a&gt;. They&amp;#8217;re on
+    &lt;a href="https://github.com/dagwieers/dar"&gt;github&lt;/a&gt; but are listed as &amp;#8220;old&amp;#8221;
+    and haven&amp;#8217;t been updated in at least 2 years. The features sound
+    quite interesting, and though it&amp;#8217;s based on the Apt repo format, it
+    might provide some good ideas for implementing a similar&amp;nbsp;system.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;Update four months later:&lt;/strong&gt; I&amp;#8217;ve yet to find a build system that meets
+my requirements above. For the moment I&amp;#8217;m only managing \~20 packages,
+so my &amp;#8220;build system&amp;#8221; is a single shell script that reads in some
+environment variables and runs through using
+&lt;a href="http://fedoraproject.org/wiki/Projects/Mock"&gt;mock&lt;/a&gt; to build them in the
+correct order (including pushing the finished RPMs back into the local
+repository that mock reads from) and then pushing the finished packages
+to our internal repository. Maybe when I have some spare time, I&amp;#8217;ll
+consider a project to either make a slightly better (but simple) &lt;span class="caps"&gt;RPM&lt;/span&gt;
+build system based on Python, or get our
+&lt;a href="http://jenkins-ci.org/"&gt;Jenkins&lt;/a&gt; install to handle this for&amp;nbsp;me.&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Mon, 13 May 2013 05:00:00 -0400</pubDate><guid>tag:newblog.jasonantman.com,2013-05-13:2013/05/search-for-a-small-scale-but-automated-rpm-build-system/</guid><category>build</category><category>linux</category><category>nodejs</category><category>package</category><category>packaging</category><category>repository</category><category>rpm</category><category>rpmbuild</category><category>software</category><category>sysadmin</category><category>yum</category></item><item><title>Some questions from a tech interview with a big Internet company</title><link>http://newblog.jasonantman.com/2012/09/some-questions-from-a-tech-interview-with-a-big-internet-company/</link><description>&lt;p&gt;A while back, I did a technical phone screen with a big online &amp;#8220;social&amp;#8221;
+company (I won&amp;#8217;t say who, but they&amp;#8217;re a household name, growing fast,
+and doing cool things; that doesn&amp;#8217;t leave &lt;em&gt;too&lt;/em&gt; many options). I rarely
+remember to write down interview questions, but I was cleaning out my
+desk this morning and came by a ripped-out sheet of notebook paper with
+a handful of the interview questions written on it. Most of them weren&amp;#8217;t
+terribly difficult, or terribly unusual for competent technical
+interviewers, but since I happen to actually have the list written down,
+I though I&amp;#8217;d share it. I don&amp;#8217;t remember why the programming questions
+are all Python; likely, I was asked to choose between Python (which I&amp;#8217;ve
+used, though not lately), Ruby (which I can barely muddle my way through
+reading on a good day), and something else I don&amp;#8217;t know. Here are some
+of&amp;nbsp;them&amp;#8230;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;What is an inode? What does it&amp;nbsp;store?&lt;/li&gt;
+&lt;li&gt;What is a hard&amp;nbsp;link?&lt;/li&gt;
+&lt;li&gt;What is the difference between a hard link and a soft&amp;nbsp;link?&lt;/li&gt;
+&lt;li&gt;What is a list in&amp;nbsp;Python?&lt;/li&gt;
+&lt;li&gt;Name some data structures that you&amp;#8217;d use in Python. Describe them,
+    and tell me why you would use&amp;nbsp;them.&lt;/li&gt;
+&lt;li&gt;How would you list all the man pages containing the keyword&amp;nbsp;&amp;#8220;date&amp;#8221;?&lt;/li&gt;
+&lt;li&gt;If the &lt;code&gt;chmod&lt;/code&gt; binary had its permissions set to &lt;code&gt;000&lt;/code&gt;, how would
+    you fix&amp;nbsp;it?&lt;/li&gt;
+&lt;/ul&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Wed, 12 Sep 2012 05:00:00 -0400</pubDate><guid>tag:newblog.jasonantman.com,2012-09-12:2012/09/some-questions-from-a-tech-interview-with-a-big-internet-company/</guid><category>hiring</category><category>interview</category><category>questions</category><category>sysadmin</category></item><item><title>Interesting Systems Links for September 3, 2012</title><link>http://newblog.jasonantman.com/2012/09/interesting-systems-links-for-september-3-2012/</link><description>&lt;p&gt;Here is a small selection of sysadmin links that I recently found, and
+wanted to&amp;nbsp;share:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href="http://codeascraft.etsy.com/2012/05/22/blameless-postmortems/"&gt;Blameless PostMortems and a Just Culture - Code as
+    Craft&lt;/a&gt;&lt;ul&gt;
+&lt;li&gt;some really good ideas about a culture that recognizes and seeks
+to remedy human errors, rather than punishing and generating&amp;nbsp;fear.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;a href="http://agilesysadmin.net/pillar-one"&gt;The first pillar: We alert on what we draw - Agile&amp;nbsp;Sysadmin&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href="http://www.masterzen.fr/2010/11/14/puppet-ssl-explained/"&gt;Puppet &lt;span class="caps"&gt;SSL&lt;/span&gt; explained - Masterzen&amp;#8217;s&amp;nbsp;Blog&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href="http://www.infoq.com/news/2011/05/unix-orchestration"&gt;Unix Orchestration Roundup: Tools for Programmatic Systems&amp;nbsp;Administration&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Mon, 03 Sep 2012 09:42:00 -0400</pubDate><guid>tag:newblog.jasonantman.com,2012-09-03:2012/09/interesting-systems-links-for-september-3-2012/</guid><category>devops</category><category>links</category><category>portmortem</category><category>sysadmin</category></item><item><title>Patch to Puppet Dashboard 1.2.10 to show arbitrary facts in the main node table</title><link>http://newblog.jasonantman.com/2012/08/patch-to-puppet-dashboard-1-2-10-to-show-arbitrary-facts-in-the-main-node-table/</link><description>&lt;p&gt;We use &lt;a href="http://puppetlabs.com/puppet/related-projects/dashboard/"&gt;Puppet
+Dashboard&lt;/a&gt; at
+work to view the status of our puppet nodes. While it&amp;#8217;s very handy,
+there&amp;#8217;s one feature I really wanted: the ability to show the value of
+arbitrary puppet facts in the main node table on the home page.
+Specifically, the facts we use for environment (we have eng/dev, qa,
+prod, and test puppet environments), zone (physical location) and last
+applied configuration version. I&amp;#8217;m not terribly experience with Ruby,
+but I managed to muddle my way through a working patch to do this, along
+with options in the settings file to enable it and configure the facts.
+You&amp;#8217;ll need to restart dashboard (or your web server) to change the
+facts, of course. The commit is currently &lt;a href="https://github.com/jantman/puppet-dashboard/commit/5364e2b0188d18ae62c355279e58c7ce6d7db654"&gt;available on
+github&lt;/a&gt;,
+but it doesn&amp;#8217;t strictly follow the &lt;a href="https://github.com/puppetlabs/puppet-dashboard/blob/master/CONTRIBUTING.md"&gt;puppet-dashboard contributing
+checklist&lt;/a&gt;
+so I may have to redo&amp;nbsp;it.&lt;/p&gt;
+&lt;p&gt;Here&amp;#8217;s a&amp;nbsp;screenshot:&lt;/p&gt;
+&lt;p&gt;&lt;a href="/GFX/dashboard_after_patch.png"&gt;&lt;img alt="Dashboard screenshot after
+patch" src="/GFX/dashboard_after_patch_sm.png" /&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;And here&amp;#8217;s that the configuration section added to settings.yml looks&amp;nbsp;like:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="c1"&gt;# Enables display of arbitrary node facts in &amp;quot;home&amp;quot; page node table, between node name and latest report time&lt;/span&gt;
+&lt;span class="l-Scalar-Plain"&gt;enable_home_facts&lt;/span&gt;&lt;span class="p-Indicator"&gt;:&lt;/span&gt; &lt;span class="l-Scalar-Plain"&gt;true&lt;/span&gt;
+
+&lt;span class="c1"&gt;# If enable_home_facts is true, the fact names and column headings to display. Simply repeat the following two line pairs&lt;/span&gt;
+&lt;span class="c1"&gt;# as needed:&lt;/span&gt;
+&lt;span class="c1"&gt;#- name: &amp;#39;factname&amp;#39;&lt;/span&gt;
+&lt;span class="c1"&gt;#  heading: &amp;#39;heading text&amp;#39;&lt;/span&gt;
+&lt;span class="l-Scalar-Plain"&gt;home_facts&lt;/span&gt;&lt;span class="p-Indicator"&gt;:&lt;/span&gt; 
+&lt;span class="p-Indicator"&gt;-&lt;/span&gt; &lt;span class="l-Scalar-Plain"&gt;name&lt;/span&gt;&lt;span class="p-Indicator"&gt;:&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;environment&amp;#39;&lt;/span&gt;
+  &lt;span class="l-Scalar-Plain"&gt;heading&lt;/span&gt;&lt;span class="p-Indicator"&gt;:&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;Env&amp;#39;&lt;/span&gt;
+&lt;span class="p-Indicator"&gt;-&lt;/span&gt; &lt;span class="l-Scalar-Plain"&gt;name&lt;/span&gt;&lt;span class="p-Indicator"&gt;:&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;zone&amp;#39;&lt;/span&gt;
+  &lt;span class="l-Scalar-Plain"&gt;heading&lt;/span&gt;&lt;span class="p-Indicator"&gt;:&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;Zone&amp;#39;&lt;/span&gt;
+&lt;span class="p-Indicator"&gt;-&lt;/span&gt; &lt;span class="l-Scalar-Plain"&gt;name&lt;/span&gt;&lt;span class="p-Indicator"&gt;:&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;catalog_config_version&amp;#39;&lt;/span&gt;
+  &lt;span class="l-Scalar-Plain"&gt;heading&lt;/span&gt;&lt;span class="p-Indicator"&gt;:&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;Cfg&lt;/span&gt;&lt;span class="nv"&gt; &lt;/span&gt;&lt;span class="s"&gt;Ver&amp;#39;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;If I feel really adventurous, I&amp;#8217;d like to implement my other big wish,
+some sort of pop-up list of links, based on arbitrary facts (mainly
+hostname and fqdn) for each node - something where I can mouse over the
+node name/table cell, and see links (static URLs with node
+name/fqdn/other facts plugged in) to things like Nagios/Icinga, our
+backup system,&amp;nbsp;etc.&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Sat, 11 Aug 2012 10:34:00 -0400</pubDate><guid>tag:newblog.jasonantman.com,2012-08-11:2012/08/patch-to-puppet-dashboard-1-2-10-to-show-arbitrary-facts-in-the-main-node-table/</guid><category>dashboard</category><category>facts</category><category>puppet</category><category>ruby</category><category>sysadmin</category></item><item><title>Dear Mom and Dad - or, a book about what I actually do</title><link>http://newblog.jasonantman.com/2012/08/dear-mom-and-dad-or-a-book-about-what-i-actually-do/</link><description>&lt;p&gt;I&amp;#8217;ve followed &lt;a href="http://everythingsysadmin.com/"&gt;Tom Limoncelli&amp;#8217;s blog&lt;/a&gt;
+for quite a while; his books &lt;a href="http://everythingsysadmin.com/aboutbook.html"&gt;The Practice of System and Network
+Administration&lt;/a&gt; and &lt;a href="http://www.tomontime.com/"&gt;Time
+Management for System Administrators&lt;/a&gt; were
+infinitely helpful in the early days of my professional life, and are
+among the few (literally, 4 or 5) books that live on my desk. His
+insight and information into the soft skills of &lt;span class="caps"&gt;SA&lt;/span&gt; work - time
+management, hiring, working in teams, etc. - is not only excellent, but
+also all too rare in a largely technical&amp;nbsp;field.&lt;/p&gt;
+&lt;p&gt;Anyway, Tom posted the below article to his blog about a book that
+recently came out, &lt;a href="http://www.amazon.com/dp/0195374126/tomontime-20"&gt;&amp;#8220;Taming Information Technology: Lessons from Studies
+of System Administrators&amp;#8221; by Eser Kandogan, Paul Maglio, Eben Haber and
+John Bailey&lt;/a&gt;. I
+haven&amp;#8217;t read the book yet, and at $56, it&amp;#8217;s going to be a while before
+my book budget recovers enough to justify it. But going on what I&amp;#8217;ve
+read from Tom and others, I want it. Not only do I want to read it, but
+I want to pass it around to my parents and in-laws and everyone else who
+has asked what I do for a living, and I found myself at a loss for a
+less-than-6-hour-long explanation. So, here&amp;#8217;s what Tom wrote on&amp;nbsp;it:&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;Dear Mom And&amp;nbsp;Dad,&lt;/p&gt;
+&lt;p&gt;Many times I&amp;#8217;ve tried to explain to you what I do for a living.
+&amp;#8220;Computer system administrator&amp;#8221; or &amp;#8220;sysadmin&amp;#8221; is a career that is
+difficult to explain and I&amp;#8217;m sure my attempts have left you even more
+confused. I have good news. Oxford University Press has just published
+a book by 4 scientists who video taped sysadmins doing their job,
+analysed what they do, and explains it to the non-computer person.
+They do it by telling compelling stories of sysadmins at work plus
+they give interesting analysis with great&amp;nbsp;insight.&lt;/p&gt;
+&lt;p&gt;Why did they do this? Because businesses depend on technology more and
+more and that means they depend on sysadmins more and more. Yet most
+CEOs don&amp;#8217;t understand what we do. The scientists made some interesting
+discoveries: that our jobs are high-stress, high-risk, and highly
+collaborative. We invent our own tools, often on the spot, to solve
+complex problems. We are men and women of every age group. It is a
+career unlike any other. These are things that most people don&amp;#8217;t know
+about our profession. The book is very engaging: Some of the chapters
+read like the opening scene of &amp;#8220;Indiana Jones&amp;#8221;; others like &amp;#8220;Gorillas
+in the Mist.&amp;#8221; Kandogan, Maglio, Haber and Bailey have put together a
+very serious, scientific book with care and&amp;nbsp;compassion.&lt;/p&gt;
+&lt;p&gt;I&amp;#8217;m not one of the sysadmins they studied but every story they tell
+reminds me of real experiences I have&amp;nbsp;had.&lt;/p&gt;
+&lt;p&gt;I hope you enjoy reading this book. I know I&amp;nbsp;did.&lt;/p&gt;
+&lt;p&gt;Pre-order it here:
+&lt;a href="http://www.amazon.com/dp/0195374126/tomontime-20"&gt;http://www.amazon.com/dp/0195374126/tomontime-20&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;Sincerely your son,&lt;br /&gt;&amp;nbsp;Tom&lt;/p&gt;
+&lt;p&gt;&lt;span class="caps"&gt;P.S.&lt;/span&gt; In all seriousness, I read a preview copy of this book and highly
+recommend it to others. You may have seen the authors speak at Usenix
+&lt;span class="caps"&gt;LISA&lt;/span&gt; or &lt;span class="caps"&gt;LOPSA&lt;/span&gt; &lt;span class="caps"&gt;PICC&lt;/span&gt; conferences where they showed clips of the video
+tapes they made. The book conveys the same stories, plus many more,
+with interesting analysis. If you think that the profession of system
+administration would benefit from non-sysadmins better understanding
+what we do, I highly recommend you pre-order this book and share it.
+You can pre-order it here: &lt;a href="http://www.amazon.com/dp/0195374126/tomontime-20"&gt;&amp;#8220;Taming Information Technology: Lessons
+from Studies of System Administrators&amp;#8221; by Eser Kandogan, Paul Maglio,
+Eben Haber and John&amp;nbsp;Bailey&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;More about the book here:
+&lt;a href="http://everythingsysadmin.com/2012/07/kandogan.html"&gt;http://everythingsysadmin.com/2012/07/kandogan.html&lt;/a&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;If you have any interest, I encourage you to go out and buy the book. If
+you know someone who&amp;#8217;s an &lt;span class="caps"&gt;SA&lt;/span&gt;, you should buy them the book. If you can
+justify any sort of book budget at work, you should buy the book. And
+while you&amp;#8217;re at it, if you haven&amp;#8217;t read Tom&amp;#8217;s other books, you should
+buy those too. You might be in the unfortunate position - like I am - of
+probably never being able to implement most of his suggestions at work,
+but at least you&amp;#8217;ll be aware of&amp;nbsp;them&amp;#8230;&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Sun, 05 Aug 2012 08:52:00 -0400</pubDate><guid>tag:newblog.jasonantman.com,2012-08-05:2012/08/dear-mom-and-dad-or-a-book-about-what-i-actually-do/</guid><category>books</category><category>limoncelli</category><category>sysadmin</category></item><item><title>SysAdmin Links of The Day</title><link>http://newblog.jasonantman.com/2012/04/sysadmin-links-of-the-day/</link><description>&lt;p&gt;A few links that I&amp;#8217;ve had in my &amp;#8220;mention in a blog post&amp;#8221; category for a&amp;nbsp;while:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href="http://blogs.msdn.com/b/windowsazure/archive/2012/03/09/summary-of-windows-azure-service-disruption-on-feb-29th-2012.aspx"&gt;Summary of Windows Azure Service Disruption on Feb 29th, 2012 -
+    Windows Azure - Site Home - &lt;span class="caps"&gt;MSDN&lt;/span&gt;
+    Blogs&lt;/a&gt;&lt;ul&gt;
+&lt;li&gt;a &lt;em&gt;very&lt;/em&gt; detailed and interesting post on what caused the Windows
+Azure cloud outage on February 29th, 2012. &lt;span class="caps"&gt;IMHO&lt;/span&gt; many of these
+failures were predictable, and the bulk of the outage was caused by
+a combination of inputs not being checked for validity in code, or
+the invalid case not being handled&amp;nbsp;properly.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;a href="http://highscalability.com/blog/2012/3/12/google-taming-the-long-latency-tail-when-more-machines-equal.html"&gt;High Scalability - High Scalability - Google: Taming the Long
+    Latency Tail - When More Machines Equals Worse&amp;nbsp;Results&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href="http://everythingsysadmin.com/2012/03/fear-of-rebooting.html"&gt;Everything Sysadmin: Fear of&amp;nbsp;Rebooting&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href="http://everythingsysadmin.com/2012/03/using-statements-of-undeniable.html"&gt;Everything Sysadmin: Using statements of &amp;#8220;Undeniable&amp;nbsp;Value&amp;#8221;&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Tue, 24 Apr 2012 21:18:00 -0400</pubDate><guid>tag:newblog.jasonantman.com,2012-04-24:2012/04/sysadmin-links-of-the-day/</guid><category>azure</category><category>failure</category><category>microsoft</category><category>sysadmin</category></item><item><title>What Does a Sysadmin Look Like in 10 Years?</title><link>http://newblog.jasonantman.com/2012/04/what-does-a-sysadmin-look-like-in-10-years/</link><description>&lt;p&gt;I just read a wondeful blog post by Adam Fletcher, &lt;a href="http://www.thesimplelogic.com/2011/03/22/what-does-a-sysadmin-look-like-in-10-years/"&gt;What Does A Sysadmin
+Look Like In 10
+Years?&lt;/a&gt;.
+This almost totally describes what I see as the future of system
+administors/engineers/architects, and DevOps. And what I try, or want,
+to do. It&amp;#8217;s the most accurate and succinct description I&amp;#8217;ve ever&amp;nbsp;read.&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Sun, 15 Apr 2012 22:29:00 -0400</pubDate><guid>tag:newblog.jasonantman.com,2012-04-15:2012/04/what-does-a-sysadmin-look-like-in-10-years/</guid><category>engineer</category><category>sysadmin</category></item><item><title>Adjusting the VirtualBox F12 BIOS Boot Prompt Timeout</title><link>http://newblog.jasonantman.com/2012/04/adjusting-the-virtualbox-f12-bios-boot-prompt-timeout/</link><description>&lt;p&gt;I&amp;#8217;m working from home today, connected by &lt;span class="caps"&gt;VPN&lt;/span&gt;. I&amp;#8217;m in the process of
+testing a bunch of Puppet stuff, and needed to re-image a bunch of
+&lt;a href="https://www.virtualbox.org/"&gt;VirtualBox&lt;/a&gt; VMs on my desktop at work,
+using &lt;span class="caps"&gt;PXE&lt;/span&gt; boot to &lt;a href="https://fedorahosted.org/cobbler/"&gt;Cobbler&lt;/a&gt;. I&amp;#8217;m only
+connected to the desktop by &lt;span class="caps"&gt;SSH&lt;/span&gt;, and running the VMs with &lt;code&gt;VBoxHeadless&lt;/code&gt;
+and connecting to them via &lt;span class="caps"&gt;RDP&lt;/span&gt; (well, &lt;span class="caps"&gt;VRDP&lt;/span&gt;). The problem with this is
+that if I start a &lt;span class="caps"&gt;VM&lt;/span&gt; on my console window, then switch to my &lt;span class="caps"&gt;RDP&lt;/span&gt; client
+and connect, by the time the &lt;span class="caps"&gt;VM&lt;/span&gt; gets keyboard focus, it&amp;#8217;s already past
+the VBox &amp;#8220;Press F12 to select boot device&amp;#8221; prompt and booting from disk.
+I could modify the boot order on the &lt;span class="caps"&gt;VM&lt;/span&gt;, but then that becomes a pain
+when it reboots after the&amp;nbsp;install.&lt;/p&gt;
+&lt;p&gt;Thanks to some of the guys on the &lt;a href="https://www.virtualbox.org/wiki/IRC"&gt;VirtualBox &lt;span class="caps"&gt;IRC&lt;/span&gt;
+channel&lt;/a&gt;, I found out about the
+&lt;code&gt;--bioslogodisplaytime&lt;/code&gt; option for VMs, which controls the length of
+time (in milliseconds) that the boot splash screen is shown (the default
+value seems to be 0). It&amp;#8217;s included in the &lt;a href="http://www.virtualbox.org/manual/ch08.html#vboxmanage-modifyvm"&gt;reference guide to
+VBoxManage&lt;/a&gt;
+in the modifyvm section. Setting this to a value of 10 seconds or so, as
+shown below, is more than enough for me to start the &lt;span class="caps"&gt;VM&lt;/span&gt;, Alt-Tab to my
+&lt;span class="caps"&gt;RDP&lt;/span&gt; client, connect to the &lt;span class="caps"&gt;VM&lt;/span&gt;, and hit &amp;#8216;F12&amp;#8217; to select a one-time
+network&amp;nbsp;boot:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;VBoxManage modifyvm VMNAME --bioslogodisplaytime 10000
+&lt;/pre&gt;&lt;/div&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Mon, 09 Apr 2012 13:52:00 -0400</pubDate><guid>tag:newblog.jasonantman.com,2012-04-09:2012/04/adjusting-the-virtualbox-f12-bios-boot-prompt-timeout/</guid><category>provisioning</category><category>pxe</category><category>rdp</category><category>sysadmin</category><category>vbox</category><category>virtualbox</category><category>virtualization</category><category>vm</category></item><item><title>GNU Screen and Multiple Regions</title><link>http://newblog.jasonantman.com/2012/02/gnu-screen-and-multiple-regions/</link><description>&lt;p&gt;Since I always seem to forget this wonderful feature of &lt;a href="http://www.gnu.org/software/screen/"&gt;&lt;span class="caps"&gt;GNU&lt;/span&gt;
+screen&lt;/a&gt; (probably one of the pieces
+of software I use the most every&amp;nbsp;day)&amp;#8230;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;To split the current region horizontally into two equal regions:
+    &lt;code&gt;C-a S&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;To switch between those regions: &lt;code&gt;C-a Tab&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;To close all regions but the current one: &lt;code&gt;C-a Q&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;This is absolutely invaluable for watching logs on multiple machines at&amp;nbsp;once.&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Fri, 03 Feb 2012 09:13:00 -0500</pubDate><guid>tag:newblog.jasonantman.com,2012-02-03:2012/02/gnu-screen-and-multiple-regions/</guid><category>console</category><category>screen</category><category>sysadmin</category></item><item><title>Using Templates to Track Outdated Content in a Documentation MediaWiki</title><link>http://newblog.jasonantman.com/2012/02/using-templates-to-track-outdated-content-in-a-documentation-mediawiki/</link><description>&lt;p&gt;Both my last and current jobs use &lt;a href="http://www.mediawiki.org/"&gt;MediaWiki&lt;/a&gt;
+for internal documentation. As always happens, some of this
+documentation will inevitably get out-of-date, or totally deprecated. As
+is also the case, many times when we&amp;#8217;re looking for docs in the middle
+of an incident, we don&amp;#8217;t have the time to go back and fix what&amp;#8217;s wrong.
+So, I devised the following template/category system to help keep track
+of these problem&amp;nbsp;pages.&lt;/p&gt;
+&lt;p&gt;First, create some templates that you will apply to the problem pages. I
+use three - one for totally deprecated pages, one for pages that need
+updating, and one for pages that just need cleanup. For the cleanup
+template, in the MediaWiki search box, enter &amp;#8220;Template:Cleanup&amp;#8221; and
+click &amp;#8220;go&amp;#8221;. You should be told that the page doesn&amp;#8217;t exist, and given a
+link to create the page. Create it, and enter the following&amp;nbsp;content:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;[[Image:Cleanup.png]]
+
+&amp;#39;&amp;#39;&amp;#39;This page needs to be cleaned up or reorganized.&amp;#39;&amp;#39;&amp;#39;
+
+[[Category:Pages Needing Cleanup]]
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Now we create a category page for it, &amp;#8220;Category:Pages Needing Cleanup&amp;#8221;,
+with the&amp;nbsp;content:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;__HIDDENCAT__
+
+This category is for pages that are mostly correct and just need minor corrections or reorganization.
+
+&amp;#39;&amp;#39;&amp;#39;To add pages to this category&amp;#39;&amp;#39;&amp;#39;, include the following at the &amp;#39;&amp;#39;&amp;#39;TOP&amp;#39;&amp;#39;&amp;#39; of the page:
+
+{{cleanup}}
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;and save the&amp;nbsp;page.&lt;/p&gt;
+&lt;p&gt;Now there&amp;#8217;s a few other changes we need to make. First, upload the
+Cleanup.png graphic, which I got from wikimedia.org
+&lt;a href="http://upload.wikimedia.org/wikipedia/en/thumb/f/f2/Edit-clear.svg/40px-Edit-clear.svg.png"&gt;here&lt;/a&gt;
+and uploaded as&amp;nbsp;Cleanup.png.&lt;/p&gt;
+&lt;p&gt;If you refresh the Template:Cleanup page, you should now see the image.
+On a side note, &amp;#8220;__HIDDENCAT__&amp;#8221; on the category page prevents that
+category from showing up in the category list at the bottom of the pages
+we add to it, but this only works in MediaWiki 1.13 and&amp;nbsp;up.&lt;/p&gt;
+&lt;p&gt;The last step is to add the &lt;a href="http://www.mediawiki.org/wiki/Template:Mbox"&gt;MediaWiki mbox
+template&lt;/a&gt; and its
+dependencies. While I did this once before, I didn&amp;#8217;t really remember the
+steps, but I found a post on &lt;a href="http://glynor.com/2010/05/the-trouble-with-ambox-and-mbox/"&gt;Glynor&amp;#8217;s
+blog&lt;/a&gt; that
+details them rather&amp;nbsp;nicely:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;Enable the &lt;a href="http://www.mediawiki.org/wiki/Extension:ParserFunctions"&gt;ParserFunctions
+    extension&lt;/a&gt;.
+    There are download and install instructions on the extension page,
+    but you&amp;#8217;ll want to enable string functions. To do this, include the
+    extension in LocalSettings.php&amp;nbsp;like:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="x"&gt;require_once( &amp;quot;$&lt;span class="caps"&gt;IP&lt;/span&gt;/extensions/ParserFunctions/ParserFunctions.php&amp;quot; );&lt;/span&gt;
+&lt;span class="x"&gt;$wgPFEnableStringFunctions = true;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Create a new page in your wiki called &amp;#8220;Mediawiki:Common.css&amp;#8221;, and
+    paste in the content from &lt;a href="http://www.mediawiki.org/wiki/MediaWiki:Common.css"&gt;MediaWiki.org
+    MediaWiki:Common.css&lt;/a&gt;.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;Go to &lt;a href="http://en.wikipedia.org/w/index.php?title=Special:Export"&gt;Wikipedia&amp;#8217;s
+    Special:Export&lt;/a&gt;
+    page, and enter &amp;#8220;Template:Ambox&amp;#8221; in the box, check off &amp;#8220;Include
+    templates&amp;#8221;, and export the template (and all dependencies) to a
+    local &lt;span class="caps"&gt;XML&lt;/span&gt;&amp;nbsp;file.&lt;/li&gt;
+&lt;li&gt;Go to the &amp;#8220;Special:Import&amp;#8221; page of your wiki, and upload the &lt;span class="caps"&gt;XML&lt;/span&gt;
+    file you just grabbed from Wikipedia. This will import the Ambox and
+    mbox templates, as well as their&amp;nbsp;dependencies.&lt;/li&gt;
+&lt;li&gt;Now, if you go back and refresh the Template:Cleanup page you
+    created, you should see the icon and a nice message&amp;nbsp;box:&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&lt;img alt="cleanup message box" src="/GFX/mw_cleanup.png" /&gt;&lt;/p&gt;
+&lt;p&gt;Finally, add the template and category pages for update and&amp;nbsp;deprecated:  &lt;/p&gt;
+&lt;p&gt;&lt;code&gt;Template:Update&lt;/code&gt;&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;[[Image:Warning.png]]
+
+&amp;#39;&amp;#39;&amp;#39;This page is in need of updating. Some information on it may be out of date, and should not be relied on.&amp;#39;&amp;#39;&amp;#39;
+
+[[Category:Pages Needing Updates]]
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;&lt;code&gt;Category:Pages Needing Updates&lt;/code&gt;&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;__HIDDENCAT__
+
+This category keeps track of pages that need changes or updates.
+
+&amp;#39;&amp;#39;&amp;#39;To add pages to this category&amp;#39;&amp;#39;&amp;#39;, include the following at the &amp;#39;&amp;#39;&amp;#39;TOP&amp;#39;&amp;#39;&amp;#39; of the page:
+
+{{update}}
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;&lt;code&gt;Template:Deprecated&lt;/code&gt;&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;[[Image:Critical.png]]
+
+&amp;#39;&amp;#39;&amp;#39;The information on this page is badly out-of-date.&amp;#39;&amp;#39;&amp;#39; It describes a system that is no longer in production or has drastically changed, and &amp;#39;&amp;#39;&amp;#39;needs to be updated or rewritten&amp;#39;&amp;#39;&amp;#39;.
+
+[[Category:Deprecated Content]]
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;&lt;code&gt;Category:Deprecated Content&lt;/code&gt;&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt; __HIDDENCAT__
+
+This category keeps track of pages that are &amp;#39;&amp;#39;&amp;#39;seriously old&amp;#39;&amp;#39;&amp;#39; or otherwise describe systems/hosts/etc. that have seriously changed from what is described in the page.
+
+&amp;#39;&amp;#39;&amp;#39;To add pages to this category&amp;#39;&amp;#39;&amp;#39;, include the following at the &amp;#39;&amp;#39;&amp;#39;TOP&amp;#39;&amp;#39;&amp;#39; of the page:
+
+{{deprecated}}
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;And the download the two images -
+&lt;a href="http://upload.wikimedia.org/wikipedia/commons/9/98/Ambox_deletion.png"&gt;http://upload.wikimedia.org/wikipedia/commons/9/98/Ambox_deletion.png&lt;/a&gt;
+gets uploaded as Critical.png and
+&lt;a href="http://upload.wikimedia.org/wikipedia/en/f/f4/Ambox_content.png"&gt;http://upload.wikimedia.org/wikipedia/en/f/f4/Ambox_content.png&lt;/a&gt;
+gets uploaded as&amp;nbsp;Warning.png.&lt;/p&gt;
+&lt;p&gt;That&amp;#8217;s it. To use this, just add &lt;code&gt;{{cleanup}}&lt;/code&gt;, &lt;code&gt;{{deprecated}}&lt;/code&gt; or
+&lt;code&gt;{{update}}&lt;/code&gt; to the top of a wiki article (adding the &lt;span class="caps"&gt;HTML&lt;/span&gt; comment
+before it is also recommended), and it will add the page to the
+appropriate category and show a nice message box at the top of the&amp;nbsp;page:  &lt;/p&gt;
+&lt;p&gt;Cleanup:  &lt;/p&gt;
+&lt;p&gt;&lt;img alt="cleanup message box" src="/GFX/mw_cleanup.png" /&gt;  &lt;/p&gt;
+&lt;p&gt;Update:  &lt;/p&gt;
+&lt;p&gt;&lt;img alt="update message box" src="/GFX/mw_update.png" /&gt;  &lt;/p&gt;
+&lt;p&gt;Deprecated:  &lt;/p&gt;
+&lt;p&gt;&lt;img alt="deprecated message box" src="/GFX/mw_deprecated.png" /&gt;&lt;/p&gt;
+&lt;p&gt;I also add a link to the top of the main wiki&amp;nbsp;page:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;Things that need to be done: [[:Category:Pages Needing Updates|Pages Needing Updates]], [[:Category:Deprecated Content|Pages with Largely Deprecated Content]], [[:Category:Pages Needing Cleanup|Pages Needing Cleanup]], [[Special:WantedPages|Links to Nonexistent Pages]]
+&lt;/pre&gt;&lt;/div&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Thu, 02 Feb 2012 11:02:00 -0500</pubDate><guid>tag:newblog.jasonantman.com,2012-02-02:2012/02/using-templates-to-track-outdated-content-in-a-documentation-mediawiki/</guid><category>documentation</category><category>mediawiki</category><category>sysadmin</category></item><item><title>PHP Script to Query Linode DNS Manager API</title><link>http://newblog.jasonantman.com/2012/01/php-script-to-query-linode-dns-manager-api/</link><description>&lt;p&gt;I&amp;#8217;m in the process of moving all of my public-facing services, currently
+hosted on a single
+&lt;a href="http://www.linode.com/?r=5c8ad2931b410b55455aadbcf0a8d86d6f698a91"&gt;Linode&lt;/a&gt;,
+to a new virtual machine (still with Linode, of course, just a new
+CentOS 6 &lt;span class="caps"&gt;VM&lt;/span&gt;). Of course, I&amp;#8217;ve got a &lt;em&gt;lot&lt;/em&gt; (about 60) of &lt;span class="caps"&gt;DNS&lt;/span&gt; records,
+spread across 8 domains, that point at the old machine. For name-based
+vhosts in Apache, my usual procedure is to migrate everything over to
+the new host and then change &lt;span class="caps"&gt;DNS&lt;/span&gt;, and once the change propagates (I&amp;#8217;m
+using Linode&amp;#8217;s &lt;span class="caps"&gt;DNS&lt;/span&gt; hosting, so it makes things a &lt;span class="caps"&gt;LOT&lt;/span&gt; easier but I don&amp;#8217;t
+have &lt;code&gt;rndc reload&lt;/code&gt; anymore) I test in a browser and, assuming all is
+well, disable the vhost on the old server. To do all this, I need an
+easy way to get a list of all the &lt;span class="caps"&gt;DNS&lt;/span&gt; records that still point to the
+old&amp;nbsp;machine.&lt;/p&gt;
+&lt;p&gt;Luckily, to augment their web-based control panel (Linode Manager),
+Linode has a pretty full-featured &lt;a href="http://www.linode.com/api/"&gt;&lt;span class="caps"&gt;API&lt;/span&gt;&lt;/a&gt; with
+bindings for Python, Perl, &lt;span class="caps"&gt;PHP&lt;/span&gt;, Ruby, Java and others. While I like
+Python and I&amp;#8217;m starting to learn Perl (by trying to shift most of my
+non-time-sensitive scripting to it) for my new job, &lt;span class="caps"&gt;PHP&lt;/span&gt; is still my
+strongest language (and the majority of my existing administrative
+scripting is written in it, especially handy when it comes time to add a
+web front-end to things). So I wrote the following script to query
+Linode&amp;#8217;s &lt;a href="http://www.linode.com/api/dns"&gt;&lt;span class="caps"&gt;DNS&lt;/span&gt; Manager &lt;span class="caps"&gt;API&lt;/span&gt;&lt;/a&gt; using &lt;a href="https://github.com/krmdrms/linode/"&gt;Kerem
+Durmus&amp;#8217; Linode &lt;span class="caps"&gt;API&lt;/span&gt; &lt;span class="caps"&gt;PHP&lt;/span&gt; wrapper&lt;/a&gt;
+(installation instructions and info at that Github link). The script
+simply writes all Linode &lt;span class="caps"&gt;DNS&lt;/span&gt; records for all zones to a &lt;span class="caps"&gt;CSV&lt;/span&gt; file (this
+could take a while if you have a lot of&amp;nbsp;records&amp;#8230;).&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="x"&gt;   *&lt;/span&gt;
+&lt;span class="x"&gt;   * &lt;span class="caps"&gt;INSTALLATION&lt;/span&gt; (as per krmdrms &lt;span class="caps"&gt;README&lt;/span&gt;):&lt;/span&gt;
+&lt;span class="x"&gt;   *  pear install Net_URL2-0.3.1&lt;/span&gt;
+&lt;span class="x"&gt;   *  pear install HTTP_Request2-0.5.2&lt;/span&gt;
+&lt;span class="x"&gt;   *  pear channel-discover pear.keremdurmus.com&lt;/span&gt;
+&lt;span class="x"&gt;   *  pear install krmdrms/Services_Linode&lt;/span&gt;
+&lt;span class="x"&gt;   *&lt;/span&gt;
+&lt;span class="x"&gt;   * Also requires php-openssl / php5-openssl&lt;/span&gt;
+&lt;span class="x"&gt;   *&lt;/span&gt;
+&lt;span class="x"&gt;   * &lt;span class="caps"&gt;USAGE&lt;/span&gt;: php linodeDnsToCsv.php&lt;/span&gt;
+&lt;span class="x"&gt;   *&lt;/span&gt;
+&lt;span class="x"&gt;   * Copyright 2011 Jason Antman  , all rights reserved.&lt;/span&gt;
+&lt;span class="x"&gt;   * This script is free for use by anyone anywhere, provided that you comply with the following terms:&lt;/span&gt;
+&lt;span class="x"&gt;   * 1) Keep this notice and copyright statement intact.&lt;/span&gt;
+&lt;span class="x"&gt;   * 2) Send any substantial changes, improvements or bog fixes back to me at the above address.&lt;/span&gt;
+&lt;span class="x"&gt;   * 3) If you include this in a product or redistribute it, you notify me, and include my name in the credits or changelog.&lt;/span&gt;
+&lt;span class="x"&gt;   *&lt;/span&gt;
+&lt;span class="x"&gt;   * The following &lt;span class="caps"&gt;URL&lt;/span&gt; always points to the newest version of this script. If you obtained it from another source, you should&lt;/span&gt;
+&lt;span class="x"&gt;   * check here:&lt;/span&gt;
+&lt;span class="x"&gt;   * $HeadURL: http://svn.jasonantman.com/misc-scripts/linodeDnsToCsv.php $&lt;/span&gt;
+&lt;span class="x"&gt;   * $LastChangedRevision: 25 $&lt;/span&gt;
+&lt;span class="x"&gt;   *&lt;/span&gt;
+&lt;span class="x"&gt;   * &lt;span class="caps"&gt;CHANGELOG&lt;/span&gt;:&lt;/span&gt;
+&lt;span class="x"&gt;   * 2011-12-17 Jason Antman :&lt;/span&gt;
+&lt;span class="x"&gt;   *    merged into my svn repo&lt;/span&gt;
+&lt;span class="x"&gt;   * 2011-09-12 Jason Antman :&lt;/span&gt;
+&lt;span class="x"&gt;   *    initial version of script&lt;/span&gt;
+&lt;span class="x"&gt;   *&lt;/span&gt;
+&lt;span class="x"&gt;   */&lt;/span&gt;
+
+&lt;span class="x"&gt;require_once(&amp;quot;/var/www/linode_apikey.php&amp;quot;); // &lt;span class="caps"&gt;PHP&lt;/span&gt; file containing:   define(&amp;quot;API_KEY_LINODE&amp;quot;, &amp;quot;myApiKeyHere&amp;quot;);&lt;/span&gt;
+&lt;span class="x"&gt;require_once(&amp;#39;Services/Linode.php&amp;#39;);&lt;/span&gt;
+
+&lt;span class="x"&gt;// get list of all domains&lt;/span&gt;
+&lt;span class="x"&gt;$domains = array(); // &lt;span class="caps"&gt;DOMAINID&lt;/span&gt; =&amp;gt; domain.tld&lt;/span&gt;
+&lt;span class="x"&gt;try {&lt;/span&gt;
+&lt;span class="x"&gt;  $linode = new Services_Linode(API_KEY_LINODE);&lt;/span&gt;
+&lt;span class="x"&gt;  $result = $linode-&amp;gt;domain_list();&lt;/span&gt;
+
+&lt;span class="x"&gt;  foreach($result[&amp;#39;&lt;span class="caps"&gt;DATA&lt;/span&gt;&amp;#39;] as $domain)&lt;/span&gt;
+&lt;span class="x"&gt;    {&lt;/span&gt;
+&lt;span class="x"&gt;      $domains[$domain[&amp;#39;&lt;span class="caps"&gt;DOMAINID&lt;/span&gt;&amp;#39;]] = $domain[&amp;quot;&lt;span class="caps"&gt;DOMAIN&lt;/span&gt;&amp;quot;];&lt;/span&gt;
+&lt;span class="x"&gt;    }&lt;/span&gt;
+&lt;span class="x"&gt;}&lt;/span&gt;
+&lt;span class="x"&gt;catch (Services_Linode_Exception $e)&lt;/span&gt;
+&lt;span class="x"&gt;{&lt;/span&gt;
+&lt;span class="x"&gt;  echo $e-&amp;gt;getMessage();&lt;/span&gt;
+&lt;span class="x"&gt;}&lt;/span&gt;
+
+&lt;span class="x"&gt;$records = array(); // array of resource records&lt;/span&gt;
+&lt;span class="x"&gt;$linode-&amp;gt;batching = true;&lt;/span&gt;
+&lt;span class="x"&gt;foreach($domains as $id =&amp;gt; $name)&lt;/span&gt;
+&lt;span class="x"&gt;{&lt;/span&gt;
+&lt;span class="x"&gt;  $linode-&amp;gt;domain_resource_list(array(&amp;#39;DomainID&amp;#39; =&amp;gt; $id));&lt;/span&gt;
+&lt;span class="x"&gt;}&lt;/span&gt;
+
+&lt;span class="x"&gt;try {&lt;/span&gt;
+&lt;span class="x"&gt;  $result = $linode-&amp;gt;batchFlush();&lt;/span&gt;
+
+&lt;span class="x"&gt;  foreach($result as $batchPart)&lt;/span&gt;
+&lt;span class="x"&gt;    {&lt;/span&gt;
+&lt;span class="x"&gt;      foreach($batchPart[&amp;#39;&lt;span class="caps"&gt;DATA&lt;/span&gt;&amp;#39;] as $rrec)&lt;/span&gt;
+&lt;span class="x"&gt;    {&lt;/span&gt;
+&lt;span class="x"&gt;      if(! isset($records[$rrec[&amp;#39;&lt;span class="caps"&gt;DOMAINID&lt;/span&gt;&amp;#39;]])){ $records[$rrec[&amp;#39;&lt;span class="caps"&gt;DOMAINID&lt;/span&gt;&amp;#39;]] = array();}&lt;/span&gt;
+&lt;span class="x"&gt;      $records[$rrec[&amp;#39;&lt;span class="caps"&gt;DOMAINID&lt;/span&gt;&amp;#39;]][$rrec[&amp;#39;&lt;span class="caps"&gt;RESOURCEID&lt;/span&gt;&amp;#39;]] = array(&amp;#39;name&amp;#39; =&amp;gt; $rrec[&amp;#39;&lt;span class="caps"&gt;NAME&lt;/span&gt;&amp;#39;], &amp;#39;type&amp;#39; =&amp;gt; $rrec[&amp;#39;&lt;span class="caps"&gt;TYPE&lt;/span&gt;&amp;#39;], &amp;#39;target&amp;#39; =&amp;gt; $rrec[&amp;#39;&lt;span class="caps"&gt;TARGET&lt;/span&gt;&amp;#39;]);&lt;/span&gt;
+&lt;span class="x"&gt;    }&lt;/span&gt;
+&lt;span class="x"&gt;    }&lt;/span&gt;
+&lt;span class="x"&gt;}&lt;/span&gt;
+&lt;span class="x"&gt;catch (Services_Linode_Exception $e)&lt;/span&gt;
+&lt;span class="x"&gt;{&lt;/span&gt;
+&lt;span class="x"&gt;  echo $e-&amp;gt;getMessage();&lt;/span&gt;
+&lt;span class="x"&gt;}&lt;/span&gt;
+
+&lt;span class="x"&gt;echo &amp;#39;&amp;quot;recid&amp;quot;,&amp;quot;domain&amp;quot;,&amp;quot;name&amp;quot;,&amp;quot;type&amp;quot;,&amp;quot;target&amp;quot;&amp;#39;.&amp;quot;\n&amp;quot;;&lt;/span&gt;
+&lt;span class="x"&gt;foreach($domains as $id =&amp;gt; $name)&lt;/span&gt;
+&lt;span class="x"&gt;{&lt;/span&gt;
+&lt;span class="x"&gt;  foreach($records[$id] as $recid =&amp;gt; $arr)&lt;/span&gt;
+&lt;span class="x"&gt;    {&lt;/span&gt;
+&lt;span class="x"&gt;      echo &amp;#39;&amp;quot;&amp;#39;.$recid.&amp;#39;&amp;quot;,&amp;quot;&amp;#39;.$name.&amp;#39;&amp;quot;,&amp;quot;&amp;#39;.$arr[&amp;#39;name&amp;#39;].&amp;#39;&amp;quot;,&amp;quot;&amp;#39;.$arr[&amp;#39;type&amp;#39;].&amp;#39;&amp;quot;,&amp;quot;&amp;#39;.$arr[&amp;#39;target&amp;#39;].&amp;quot;\&amp;quot;\n&amp;quot;;&lt;/span&gt;
+&lt;span class="x"&gt;    }&lt;/span&gt;
+&lt;span class="x"&gt;}&lt;/span&gt;
+
+
+&lt;span class="x"&gt;?&amp;gt;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;That will print out a list containing the Linode &lt;span class="caps"&gt;DNS&lt;/span&gt; record id (recid),
+domain, record name, type and&amp;nbsp;target:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&amp;quot;recid&amp;quot;,&amp;quot;domain&amp;quot;,&amp;quot;name&amp;quot;,&amp;quot;type&amp;quot;,&amp;quot;target&amp;quot;
+&amp;quot;137423&amp;quot;,&amp;quot;jasonantman.com&amp;quot;,&amp;quot;&amp;quot;,&amp;quot;TXT&amp;quot;,&amp;quot;v=spf1 mx:jasonantman.com -all&amp;quot;
+&amp;quot;3597859&amp;quot;,&amp;quot;jasonantman.com&amp;quot;,&amp;quot;&amp;quot;,&amp;quot;MX&amp;quot;,&amp;quot;linode1.jasonantman.com&amp;quot;
+&amp;quot;3488952&amp;quot;,&amp;quot;jasonantman.com&amp;quot;,&amp;quot;&amp;quot;,&amp;quot;mx&amp;quot;,&amp;quot;linode2.jasonantman.com&amp;quot;
+&amp;quot;3472952&amp;quot;,&amp;quot;jasonantman.com&amp;quot;,&amp;quot;blog&amp;quot;,&amp;quot;CNAME&amp;quot;,&amp;quot;linode1.jasonantman.com&amp;quot;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;If you want to, say, search for only records that include host
+&amp;#8220;example&amp;#8221;, you could use grep and awk&amp;nbsp;like:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;php linodeDnsToCsv.php | grep linode1 | grep -v &lt;span class="s1"&gt;&amp;#39;&amp;quot;linode1&amp;quot;,&amp;quot;a&amp;quot;&amp;#39;&lt;/span&gt; | awk -F , &lt;span class="s1"&gt;&amp;#39;{printf &amp;quot;%-27s %-20s %-7s %s\n&amp;quot;, $2, $3, $4, $5}&amp;#39;&lt;/span&gt; | sed &lt;span class="s1"&gt;&amp;#39;s/&amp;quot;//g&amp;#39;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;I hope this helps someone else out, and saves them a few minutes of&amp;nbsp;coding&amp;#8230;&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Fri, 20 Jan 2012 22:49:00 -0500</pubDate><guid>tag:newblog.jasonantman.com,2012-01-20:2012/01/php-script-to-query-linode-dns-manager-api/</guid><category>api</category><category>dns</category><category>linode</category><category>PHP</category><category>sysadmin</category></item><item><title>Quick and Simple Timestamping of Debug Logs</title><link>http://newblog.jasonantman.com/2011/09/quick-and-simple-timestamping-of-debug-logs/</link><description>&lt;p&gt;I&amp;#8217;ve been having some issues that may be
+&lt;a href="http://puppetlabs.com/"&gt;Puppet&lt;/a&gt;-related. Unfortunately, Puppet (at
+least the old 0.25.4 client that I&amp;#8217;m running) doesn&amp;#8217;t timestamp the
+debug logs sent to stdout. I know it&amp;#8217;s hanging somewhere, but I need
+concrete numbers to look at. Here&amp;#8217;s a wonderfully simple bash script
+that timestamps everything sent to it on stdin, and echoes it back to&amp;nbsp;stdout:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="c"&gt;#!/bin/bash&lt;/span&gt;
+
+&lt;span class="nv"&gt;&lt;span class="caps"&gt;DATECMD&lt;/span&gt;&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;date +%H:%M:%S&amp;#39;&lt;/span&gt;
+
+&lt;span class="k"&gt;while &lt;/span&gt;&lt;span class="nb"&gt;read &lt;/span&gt;line; &lt;span class="k"&gt;do&lt;/span&gt;
+&lt;span class="k"&gt;    &lt;/span&gt;&lt;span class="nb"&gt;echo&lt;/span&gt; -e &lt;span class="s2"&gt;&amp;quot;$($&lt;span class="caps"&gt;DATECMD&lt;/span&gt;) $line&amp;quot;&lt;/span&gt;
+&lt;span class="k"&gt;done&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Call it as simply as: &lt;code&gt;command | ~/bin/ts&lt;/code&gt;, or maybe like
+&lt;code&gt;command 2&amp;gt;&amp;amp;1 | ~/bin/ts | tee foo.log&lt;/code&gt;. Dead simple, but very helpful
+when the developers didn&amp;#8217;t think to timestamp debug log&amp;nbsp;output.&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Thu, 08 Sep 2011 07:06:00 -0400</pubDate><guid>tag:newblog.jasonantman.com,2011-09-08:2011/09/quick-and-simple-timestamping-of-debug-logs/</guid><category>debugging</category><category>logs</category><category>puppet</category><category>sysadmin</category><category>timestamp</category></item><item><title>Using wireshark to capture packets from a remote host</title><link>http://newblog.jasonantman.com/2011/04/using-wireshark-to-capture-packets-from-a-remote-host/</link><description>&lt;p&gt;I spend a fair amount of my time debugging network and service problems
+on a few racks of Linux servers. Of course, they&amp;#8217;re located in a data
+center (yes, just downstairs, but still not quite as comfortable as my
+office), and they&amp;#8217;re all command-line only - no sense in using up &lt;span class="caps"&gt;RAM&lt;/span&gt;
+and &lt;span class="caps"&gt;CPU&lt;/span&gt; to run a graphical &lt;span class="caps"&gt;UI&lt;/span&gt; on a box that should just be serving
+remote clients. I used to go through the arduous task of running a
+command line &lt;a href="http://www.tcpdump.org/"&gt;&lt;code&gt;tcpdump&lt;/code&gt;&lt;/a&gt; session on the server
+until I thought I had enough packets, then SCPing it over to my
+workstation and opening the file in
+&lt;a href="http://www.wireshark.org/"&gt;wireshark&lt;/a&gt; (formerly Ethereal). Fortunately,
+thanks to a
+&lt;a href="http://linuxexplore.wordpress.com/2010/05/30/remote-packet-capture-using-wireshark-tcpdump/"&gt;post&lt;/a&gt;
+on Rahul Panwar&amp;#8217;s &lt;a href="http://linuxexplore.wordpress.com/"&gt;Linux Explore
+blog&lt;/a&gt; (which seems to be sadly
+neglected), I found a much easier way to do it. I&amp;#8217;ve summarized that
+post here, added a little explanation, and also made some useful
+comments for people working on Red Hat/CentOS and&amp;nbsp;OpenSuSE.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;What you&amp;nbsp;need:&lt;/strong&gt;&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Source system (the server you want to capture packets on) that you
+    have &lt;span class="caps"&gt;SSH&lt;/span&gt; access to, with tcpdump installed, and available to your
+    user (either directly, or via sudo without&amp;nbsp;password).&lt;/li&gt;
+&lt;li&gt;Destination system (where you run graphical Wireshark) with
+    wireshark installed and working, and &lt;code&gt;mkfifo&lt;/code&gt; available.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&lt;strong&gt;Procedure:&lt;/strong&gt;&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;On the destination system, if you haven&amp;#8217;t already done&amp;nbsp;so,&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;mkfifo /tmp/packet_capture
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;This creates a &lt;a href="http://en.wikipedia.org/wiki/Named_pipe"&gt;named pipe&lt;/a&gt;
+where the source packet data (via ssh) will be written and Wireshark
+will read it from. You can use any name or location you want, but
+&lt;code&gt;/tmp/packet_capture&lt;/code&gt; is pretty&amp;nbsp;logical.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;On your destination system, open up Wireshark (we do this now, since
+    on many systems it required the root password to start). In the
+    &amp;#8220;Capture&amp;#8221; menu, select &amp;#8220;Options&amp;#8221;. In the &amp;#8220;Interface&amp;#8221; box, type in
+    the path to the &lt;span class="caps"&gt;FIFO&lt;/span&gt; you created (&lt;code&gt;/tmp/packet_capture&lt;/code&gt;). You should
+    press the Start button before running the next command - I recommend
+    typing the command in a terminal window, pressing start, then
+    hitting enter in the terminal to run the&amp;nbsp;command.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;On the destination system,&amp;nbsp;run&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;ssh user@source-hostname &lt;span class="s2"&gt;&amp;quot;sudo /usr/sbin/tcpdump -s 0 -U -n -w - -i eth0 not port 22&amp;quot;&lt;/span&gt; &amp;gt; /tmp/packet_capture
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;This will &lt;span class="caps"&gt;SSH&lt;/span&gt; to the source system (&lt;code&gt;source-hostname&lt;/code&gt;, either by
+hostname or &lt;span class="caps"&gt;IP&lt;/span&gt;) as the specified user (&lt;code&gt;user&lt;/code&gt;) and execute
+&lt;code&gt;sudo /usr/sbin/tcpdump&lt;/code&gt;. Omit the &amp;#8220;sudo&amp;#8221; if you don&amp;#8217;t need it,
+though if you do, you&amp;#8217;ll need passwordless access. Options passed to
+tcpdump are: &amp;#8220;-s 0&amp;#8221; snarf entire packets, no length limit; &amp;#8220;-U&amp;#8221;
+packet-buffered output - write each complete packet to output once
+it&amp;#8217;s captured, rather than waiting for a buffer to fill up; &amp;#8220;-n&amp;#8221;
+don&amp;#8217;t convert addresses to hostnames; &amp;#8220;-w -&amp;#8221; write raw packets to
+&lt;span class="caps"&gt;STDOUT&lt;/span&gt; (which will be passed through the &lt;span class="caps"&gt;SSH&lt;/span&gt; tunnel and become
+&lt;span class="caps"&gt;STDOUT&lt;/span&gt; of the &amp;#8220;ssh&amp;#8221; command on the destination machine); &amp;#8220;-i eth0&amp;#8221;
+capture on interface eth0; &amp;#8220;not port 22&amp;#8221; a tcpdump filter expression
+to prevent capturing our own &lt;span class="caps"&gt;SSH&lt;/span&gt; packets (more on this below). The
+final &amp;#8220;&gt; /tmp/packet_capture&amp;#8221; redirects the &lt;span class="caps"&gt;STDOUT&lt;/span&gt; of the ssh
+program (the raw packets from tcpdump on the source machine) to the
+&lt;code&gt;/tmp/packet_capture&lt;/code&gt; &lt;span class="caps"&gt;FIFO&lt;/span&gt;.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;When you&amp;#8217;re ready to stop the capture, just Ctrl+C the &lt;span class="caps"&gt;SSH&lt;/span&gt; command
+    in the terminal window. Wireshark will automatically stop capturing,
+    and you can save the capture file or play around with it. To capture
+    again, you&amp;#8217;ll need to restart the capture in Wireshark and then run
+    the ssh command&amp;nbsp;again.&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&lt;strong&gt;A note on network usage and tcpdump&amp;nbsp;filters&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;This is a relatively bandwidth intensive procedure. If you use the &amp;#8220;not
+port 22&amp;#8221; tcpdump filter (shown above) on the source machine, all traffic
+over eth0 (other than &lt;span class="caps"&gt;SSH&lt;/span&gt;) on that machine will be duplicated within an
+&lt;span class="caps"&gt;SSH&lt;/span&gt; tunnel. So you have double the traffic, plus the overhead of
+tunneling all that within &lt;span class="caps"&gt;SSH&lt;/span&gt; to the destination machine. If you&amp;#8217;re
+capturing data from a busy machine this way, you could easily saturate
+the uplink and wreak all sorts of havoc. As a result, I&amp;#8217;d recommend
+making the tcpdump filter as specific as you can while still retaining
+the data you need. If you can replace it with a filter for specific
+ports (i.e. &lt;code&gt;'(port 67 or port 68)'&lt;/code&gt; for &lt;span class="caps"&gt;DHCP&lt;/span&gt;) or specific hosts, that
+should cut down on the amount of data you actually have to pass through
+the&amp;nbsp;tunnel.&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Tue, 26 Apr 2011 10:50:00 -0400</pubDate><guid>tag:newblog.jasonantman.com,2011-04-26:2011/04/using-wireshark-to-capture-packets-from-a-remote-host/</guid><category>ethereal</category><category>linux</category><category>sysadmin</category><category>tcpdump</category><category>troubleshooting</category><category>wireshark</category></item><item><title>Getting Sun iLOM information within Linux</title><link>http://newblog.jasonantman.com/2010/09/getting-sun-ilom-information-within-linux/</link><description>&lt;p&gt;At work, I&amp;#8217;m starting to implement &lt;a href="http://www.ocsinventory-ng.org/"&gt;&lt;span class="caps"&gt;OCS&lt;/span&gt; Inventory
+&lt;span class="caps"&gt;NG&lt;/span&gt;&lt;/a&gt; on our Linux boxes to keep track of
+hardware. Part of the plan is also that we have a
+&lt;a href="http://www.mediawiki.org"&gt;MediaWiki&lt;/a&gt; installation for internal
+documentation, and articles for every host (named as the hostname). I&amp;#8217;m
+going to pull data from &lt;span class="caps"&gt;OCS&lt;/span&gt; into the articles based on hostname (via a
+&lt;span class="caps"&gt;PHP&lt;/span&gt; include) so the documentation will automatically include up-to-date
+information on&amp;nbsp;hardware.&lt;/p&gt;
+&lt;p&gt;Since we&amp;#8217;re moving to MySQL-backed &lt;span class="caps"&gt;DHCP&lt;/span&gt;, I decided that it would also be
+nice to include &lt;span class="caps"&gt;DHCP&lt;/span&gt; information and links to our web tool to edit the
+host (like setting &lt;span class="caps"&gt;PXE&lt;/span&gt; boot information). This is pretty easy for the
+ethX interfaces, as &lt;span class="caps"&gt;OCS&lt;/span&gt; collects &lt;span class="caps"&gt;MAC&lt;/span&gt; addresses and I can search our &lt;span class="caps"&gt;DHCP&lt;/span&gt;
+database for them. However, it isn&amp;#8217;t as simple for the iLOM interface,
+which (obviously) &lt;span class="caps"&gt;OCS&lt;/span&gt; knows nothing about - though it&amp;#8217;s arguably one of
+the most-forgotten things on our&amp;nbsp;machines.&lt;/p&gt;
+&lt;p&gt;I know that &lt;span class="caps"&gt;HP&lt;/span&gt; Proliant servers have the nice little &lt;span class="caps"&gt;HP&lt;/span&gt; &lt;span class="caps"&gt;PSP&lt;/span&gt; (Proliant
+Support Pack) that includes tools such as &lt;code&gt;hpasmcli&lt;/code&gt;, but Sun doesn&amp;#8217;t
+have anything like that. (We just have one &lt;span class="caps"&gt;HP&lt;/span&gt; box in production right
+now, but I&amp;#8217;ll probably be adding support for it&amp;nbsp;soon).&lt;/p&gt;
+&lt;p&gt;Enter &lt;a href="http://openipmi.sourceforge.net/"&gt;OpenIPMI&lt;/a&gt;. The iLOM has an &lt;span class="caps"&gt;IPMI&lt;/span&gt;
+interface, and the standard OpenIPMI-tools package in CentOS
+repositories has the ipmitool required to get the relevant information.
+A call is pretty simple: &lt;code&gt;ipmitool -l open lan print 1&lt;/code&gt; yields something&amp;nbsp;like:  &lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;Set in Progress         : Set Complete
+Auth Type Support       : NONE MD2 MD5 PASSWORD
+Auth Type Enable        : Callback : MD2 MD5 PASSWORD
+                        : User     : MD2 MD5 PASSWORD
+                        : Operator : MD2 MD5 PASSWORD
+                        : Admin    : MD2 MD5 PASSWORD
+                        : OEM      :
+IP Address Source       : DHCP Address
+IP Address              : 172.16.xxx.xxx
+Subnet Mask             : 255.255.255.224
+MAC Address             : 00:14:4f:xx:xx:xx
+SNMP Community String   : xxxxxx
+IP Header               : TTL=0x00 Flags=0x00 Precedence=0x00 TOS=0x00
+BMC ARP Control         : ARP Responses Disabled, Gratuitous ARP Disabled
+Gratituous ARP Intrvl   : 5.0 seconds
+Default Gateway IP      : 172.16.xx.xx
+Default Gateway MAC     : 00:00:00:00:00:00
+Backup Gateway IP       : 0.0.0.0
+Backup Gateway MAC      : 00:00:00:00:00:00
+802.1q VLAN ID          : Disabled
+802.1q VLAN Priority    : 0
+RMCP+ Cipher Suites     : 2,3,0
+Cipher Suite Priv Max   : XXXXXXXXXXXXXXX
+                        :     X=Cipher Suite Unused
+                        :     c=CALLBACK
+                        :     u=USER
+                        :     o=OPERATOR
+                        :     a=ADMIN
+                        :     O=OEM
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Now it&amp;#8217;s just a matter of integrating this into ocsinventory-agent,
+having it run the command if present (and Sun hardware), and parsing the
+results. Once I have some actual code done, I&amp;#8217;ll pass it&amp;nbsp;along.&lt;/p&gt;
+&lt;p&gt;Many thanks to &lt;code&gt;pseud0&lt;/code&gt; on the Sun forums for answering my
+&lt;a href="http://forums.sun.com/thread.jspa?messageID=11049794#11049794"&gt;question&lt;/a&gt;
+about&amp;nbsp;this.&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Thu, 16 Sep 2010 10:28:00 -0400</pubDate><guid>tag:newblog.jasonantman.com,2010-09-16:2010/09/getting-sun-ilom-information-within-linux/</guid><category>inventory</category><category>ipmi</category><category>ipmitool</category><category>ocs-inventory</category><category>sun</category><category>sunfire</category><category>sysadmin</category></item><item><title>Putting the Why in Documentation</title><link>http://newblog.jasonantman.com/2010/08/putting-the-why-in-documentation/</link><description>&lt;p&gt;I work as a Linux Sysadmin (among many other non-official titles) in a
+small group that mainly provides services. We run wireless and student
+computing labs across a whole campus, but other than that (and most of
+that) is just back-end systems - web servers, &lt;span class="caps"&gt;RADIUS&lt;/span&gt;, &lt;span class="caps"&gt;DHCP&lt;/span&gt;, etc. As a
+result, I write no end-user documentation. I generally think of this as
+a blessing, since the people who read my documentation are people who
+think (more or less) like&amp;nbsp;me.&lt;/p&gt;
+&lt;p&gt;However, I&amp;#8217;ve just started writing the wiki page for a rather large
+system I developed. And in writing the docs, and thinking about what was
+missing from the (practically non-existent) documentation on the system
+I was replacing, it got me thinking a lot about the documentation
+writing process. Most of us have heard that there are two general types
+of documentation - end-user docs and developer (and I&amp;#8217;m rolling SysAdmin
+in here) documentation. End-user docs tell someone how to use what we
+built. Developer docs tell people how to troubleshoot, fix, modify, and
+extend it.&amp;nbsp;Usually.&lt;/p&gt;
+&lt;p&gt;But there&amp;#8217;s one very important piece that&amp;#8217;s missing from most
+developer-level documentation I&amp;#8217;ve read: why it&amp;#8217;s built the way it is.
+Sure, this isn&amp;#8217;t applicable in all instances. This is obviously ignored
+by closed-source software developers when writing documentation for
+release. And I&amp;#8217;m sure it&amp;#8217;s ignored in some larger shops just out of fear
+that the interns will explain why they need to iterate a database result
+set. But for those of us who are designing and building systems, I&amp;#8217;d
+argue that documenting the reasons behind our decisions is much more
+important than how-to-fix-it or how-to-rebuild-it documentation. Sure,
+it&amp;#8217;s atrocious practice, but that can all be gleaned from examining a
+live system or backups. But when it comes time for the next person (or
+you or I, five years down the road) to re-design or drastically modify
+our creations, some documentation of the decisions we made - and the
+reasoning behind them - will be extremely&amp;nbsp;useful.&lt;/p&gt;
+&lt;p&gt;Case in point: My latest project started as performance analysis of a
+large &lt;span class="caps"&gt;DHCP&lt;/span&gt; server using the &lt;a href="http://personal.cfw.com/~masneyb/"&gt;Masney &lt;span class="caps"&gt;LDAP&lt;/span&gt;
+patch&lt;/a&gt; to &lt;a href="http://www.isc.org/software/dhcp"&gt;&lt;span class="caps"&gt;ISC&lt;/span&gt;
+DHCPd&lt;/a&gt;. After over a week of
+performance testing and trying different configurations and theories
+(all of which I &amp;#8220;documented&amp;#8221; in my text file lab notebook), we ended up
+deciding to totally remove &lt;span class="caps"&gt;LDAP&lt;/span&gt; from the system, move to configuration
+files generated from MySQL, and keep everything (including the logs) in
+ramdisk. We found performance bottlenecks in both the &lt;span class="caps"&gt;LDAP&lt;/span&gt; communication
+and disk &lt;span class="caps"&gt;IO&lt;/span&gt;. We have the performance test output to prove it. We have
+the results of dozens of tests with different configurations, as well as
+a number of problems we identified with the &lt;span class="caps"&gt;LDAP&lt;/span&gt; patch. And from
+testing, we have a handful of issues identified and fixed in the new
+system, whose fixes aren&amp;#8217;t exactly&amp;nbsp;intuitive.&lt;/p&gt;
+&lt;p&gt;The previous system had pretty poor documentation, but even worse, it
+was only functional documentation - what the system does, and how it
+does it. There was no discussion of why the parsing script disregarded
+lines with a certain string in them, why the daemon is restarted every
+night, why &lt;span class="caps"&gt;LDAP&lt;/span&gt; was chosen in the first place, or any performance
+metrics (so we had no original as-intended baseline to compare&amp;nbsp;against).&lt;/p&gt;
+&lt;p&gt;So for those of you designing systems and documenting them (you *do*
+document them, &lt;em&gt;right&lt;/em&gt;?), please include &lt;strong&gt;why&lt;/strong&gt; in your documentation.
+The next time someone needs to fix or tweak or re-engineer the system,
+they&amp;#8217;ll be able to figure out what happens on line 123 of the init
+script themselves. But it might take them hours to figure out &lt;em&gt;why&lt;/em&gt; it&amp;#8217;s
+done, or &lt;em&gt;why&lt;/em&gt; it&amp;#8217;s done &lt;em&gt;that way&lt;/em&gt;.&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Fri, 06 Aug 2010 14:51:00 -0400</pubDate><guid>tag:newblog.jasonantman.com,2010-08-06:2010/08/putting-the-why-in-documentation/</guid><category>documentation</category><category>sysadmin</category></item><item><title>What is System Administration?</title><link>http://newblog.jasonantman.com/2010/04/what-is-system-administration/</link><description>&lt;p&gt;I was recently reading an interesting article, &amp;#8220;from tasks to
+assurances: redefining system administration&amp;#8221;, by &lt;a href="http://www.cs.tufts.edu/~couch/"&gt;Alva L.
+Couch&lt;/a&gt;, in the April 2010 issue of
+&lt;a href="http://www.usenix.org/publications/login/"&gt;;&lt;span class="caps"&gt;LOGIN&lt;/span&gt;:&lt;/a&gt;. He makes a lot of
+good points, mainly that system administration has been defined by
+tasks, but should really be defined by assurances (a much more abstract
+concept). This does make a lot more sense, and perhaps will aid me in
+finally coming up with a succinct (but complete) answer for when people
+ask me what I&amp;nbsp;do.&lt;/p&gt;
+&lt;p&gt;It bears mention that my role as an &lt;span class="caps"&gt;SA&lt;/span&gt; probably isn&amp;#8217;t the same as many
+others. Working at a University has its perks - and one is definitely
+the inclination towards research, tinkering, and trying new things.
+Another is the extremely tight budget - I&amp;#8217;d estimate that only about 25%
+of what my group supports (software-wise) actually has a vendor behind
+it. Most of those services have primary admins assigned to&amp;nbsp;them.&lt;/p&gt;
+&lt;p&gt;The group I work in is composed of 9 people (including myself). We&amp;#8217;re
+responsible for the architecture (specifically authentication,
+network-side stuff) for residential/dorm networking (ResNet), all of the
+student computing labs (\~1,000 user stations) as well as printing
+therein, the University-wide wireless network (from physical
+installation through support), and a few other services. That doesn&amp;#8217;t
+include all of the usual ancillary stuff - mail, &lt;span class="caps"&gt;DHCP&lt;/span&gt;, web apps,
+storage, etc. It would probably surprise most corporate &lt;span class="caps"&gt;IT&lt;/span&gt; types that we
+more or less function as an independent unit - we share certain
+services, like Nagios monitoring, with other groups, but do most of our
+work as a single standalone&amp;nbsp;unit.&lt;/p&gt;
+&lt;p&gt;My own job (since I&amp;#8217;m currently the only part-time person in our group)
+is probably &lt;em&gt;very&lt;/em&gt; different from most SAs. I&amp;#8217;m the primary admin for
+only one user-visible service, which is in the process of being phased
+out (and is very lightly used currently). For the most part, I&amp;#8217;d
+describe myself as a &amp;#8220;floating&amp;#8221; admin - I&amp;#8217;m usually assigned whatever
+problems come up that are in my knowledge area (or more than the primary
+admin can cram into a work week), and also do quite a bit of research
+(mainly suitability analysis of new technologies). I&amp;#8217;m also the &lt;span class="caps"&gt;DR&lt;/span&gt; guy,
+and am in the process of implementing across the board an automated
+installation, configuration, recovery and backup system for all of our
+Linux/Unix boxes. As ironic as this may seem, while I&amp;#8217;m not the primary
+admin for any of our major services, if one of the boxes than run them
+falls over, it&amp;#8217;s more or less my responsibility to get it back up and
+running. Or at least have the plans and procedures for that laid&amp;nbsp;out.&lt;/p&gt;
+&lt;p&gt;Something that is also quite different from many enterprise shops is our
+software budget - which is almost non-existent. Except for a few
+services - some of the stuff used to administer the Windows and Mac lab
+machines, the printing systems, and the wireless stuff, we&amp;#8217;re pretty
+much exclusively open source. As a result, there&amp;#8217;s rarely a vendor to
+fall back on, and &amp;#8220;fixing a problem&amp;#8221; can often involve hours of reading&amp;nbsp;source.&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;As an aside, I once had a phone screen where the interviewer asked me
+about a difficult problem I recently solved, and what my methodology
+was. I ran through about 20 steps. When I finished the list, the
+interviewer asked me, &amp;#8220;at what point would you call the vendor for
+support?&amp;#8221; My response: &amp;#8220;vendor? what&amp;nbsp;vendor?&amp;#8221;&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;So I&amp;#8217;m trying to think up a good answer to what I do, and what the other
+SAs in my group do. There&amp;#8217;s the work in progress so&amp;nbsp;far:&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;We provide many different services to our users (all University
+faculty, staff, students, etc.). It&amp;#8217;s my job to ensure that those
+services are as reliable as possible, function correctly, are secure,
+and work as well as possible. When something does fail, no matter what
+it is, it&amp;#8217;s my job to get it back to normal. And when a new technology
+emerges that may increase the quality, reliability or security of a
+service we offer, it&amp;#8217;s my job to evaluate it and, if it is found to be
+worthy, implement&amp;nbsp;it.&lt;/p&gt;
+&lt;/blockquote&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Sat, 24 Apr 2010 09:08:00 -0400</pubDate><guid>tag:newblog.jasonantman.com,2010-04-24:2010/04/what-is-system-administration/</guid><category>sysadmin</category><category>system administration</category></item><item><title>A Cartoon about Me</title><link>http://newblog.jasonantman.com/2010/02/a-cartoon-about-me/</link><description>&lt;p&gt;Just found this today on one of my all-time favorite sites,
+&lt;a href="http://xkcd.com"&gt;&lt;span class="caps"&gt;XKCD&lt;/span&gt;&lt;/a&gt;. I swear it&amp;#8217;s about&amp;nbsp;me:&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://www.xkcd.com/705/"&gt;&lt;img alt="XKCD number
+705" src="http://imgs.xkcd.com/comics/devotion_to_duty.png" /&gt;&lt;/a&gt;&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Mon, 22 Feb 2010 14:33:00 -0500</pubDate><guid>tag:newblog.jasonantman.com,2010-02-22:2010/02/a-cartoon-about-me/</guid><category>humor</category><category>sysadmin</category><category>XKCD</category></item><item><title>Using nmap to quickly ping all hosts in an address range</title><link>http://newblog.jasonantman.com/2010/02/using-nmap-to-quickly-ping-all-hosts-in-an-address-range/</link><description>&lt;p&gt;At $&lt;span class="caps"&gt;WORK&lt;/span&gt;, the subnet we use for some of our workstations and test boxes
+was only recently setup with &lt;span class="caps"&gt;DHCP&lt;/span&gt;. Previously, we&amp;#8217;d used
+&lt;span class="caps"&gt;IP&lt;/span&gt;-by-Whiteboard in the office. As a result, most of the recent machines
+use &lt;span class="caps"&gt;DHCP&lt;/span&gt;, but there are a few older ones still around using static
+addresses. I recently had to add a new machine, so I had to go through
+the process of finding out which IPs are in use and which aren&amp;#8217;t (since
+some aren&amp;#8217;t in&amp;nbsp;&lt;span class="caps"&gt;DHCP&lt;/span&gt;).&lt;/p&gt;
+&lt;p&gt;I decided to be good and update &lt;span class="caps"&gt;DHCP&lt;/span&gt; with records for all machines in
+the subnet, whether they&amp;#8217;re actually using &lt;span class="caps"&gt;DHCP&lt;/span&gt; or not. There&amp;#8217;s a quick
+way to do this with &lt;code&gt;nmap&lt;/code&gt; using the options for ping scan (&lt;code&gt;-sP&lt;/code&gt;) and
+always resolve &lt;span class="caps"&gt;DNS&lt;/span&gt; (&lt;code&gt;-R&lt;/code&gt;):&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="gp"&gt;#&lt;/span&gt; nmap -sP -R 172.16.43.129-159
+&lt;span class="go"&gt;Host ar01-hill-hill.example.com (172.16.43.129) appears to be up.&lt;/span&gt;
+&lt;span class="go"&gt;&lt;span class="caps"&gt;MAC&lt;/span&gt; Address: 00:11:&lt;span class="caps"&gt;BC&lt;/span&gt;:7D:28:0A (Cisco Systems)&lt;/span&gt;
+&lt;span class="go"&gt;Host ccf-hill019-1.example.com (172.16.43.130) appears to be up.&lt;/span&gt;
+&lt;span class="go"&gt;&lt;span class="caps"&gt;MAC&lt;/span&gt; Address: 00:00:&lt;span class="caps"&gt;AA&lt;/span&gt;:63:54:&lt;span class="caps"&gt;BB&lt;/span&gt; (Xerox)&lt;/span&gt;
+&lt;span class="go"&gt;Host ccf-hill019-2.example.com (172.16.43.131) appears to be down.&lt;/span&gt;
+&lt;span class="go"&gt;Host ccf-hill019-3.example.com (172.16.43.132) appears to be down.&lt;/span&gt;
+&lt;span class="go"&gt;Host ccf-hill019-4.example.com (172.16.43.133) appears to be down.&lt;/span&gt;
+&lt;span class="go"&gt;Host ccf-hill019-5.example.com (172.16.43.134) appears to be down.&lt;/span&gt;
+&lt;span class="go"&gt;Host ccf-hill019-6.example.com (172.16.43.135) appears to be down.&lt;/span&gt;
+&lt;span class="go"&gt;Host ccf-hill019-7.example.com (172.16.43.136) appears to be up.&lt;/span&gt;
+&lt;span class="go"&gt;Host speakeasy.example.com (172.16.43.137) appears to be up.&lt;/span&gt;
+&lt;span class="go"&gt;&lt;span class="caps"&gt;MAC&lt;/span&gt; Address: 00:17:A4:13:&lt;span class="caps"&gt;EB&lt;/span&gt;:57 (Global Data Services)&lt;/span&gt;
+&lt;span class="go"&gt;Host ccf-hill019-9.example.com (172.16.43.138) appears to be up.&lt;/span&gt;
+&lt;span class="go"&gt;&lt;span class="caps"&gt;MAC&lt;/span&gt; Address: 00:17:A4:13:E8:17 (Global Data Services)&lt;/span&gt;
+&lt;span class="go"&gt;Host ccf-hill019-10.example.com (172.16.43.139) appears to be down.&lt;/span&gt;
+&lt;span class="go"&gt;Host testmac01.example.com (172.16.43.140) appears to be down.&lt;/span&gt;
+&lt;span class="go"&gt;Host ccf-hill019-12.example.com (172.16.43.141) appears to be down.&lt;/span&gt;
+&lt;span class="go"&gt;Host ccf-hill019-13.example.com (172.16.43.142) appears to be up.&lt;/span&gt;
+&lt;span class="go"&gt;&lt;span class="caps"&gt;MAC&lt;/span&gt; Address: 00:0D:29:59:58:00 (Cisco)&lt;/span&gt;
+&lt;span class="go"&gt;Host ccf-hill019-14.example.com (172.16.43.143) appears to be down.&lt;/span&gt;
+&lt;span class="go"&gt;Host ccf-hill019-15.example.com (172.16.43.144) appears to be down.&lt;/span&gt;
+&lt;span class="go"&gt;Host ccf-hill019-16.example.com (172.16.43.145) appears to be down.&lt;/span&gt;
+&lt;span class="go"&gt;Host ccf-hill019-17.example.com (172.16.43.146) appears to be down.&lt;/span&gt;
+&lt;span class="go"&gt;Host ccf-hill019-18.example.com (172.16.43.147) appears to be up.&lt;/span&gt;
+&lt;span class="go"&gt;&lt;span class="caps"&gt;MAC&lt;/span&gt; Address: 00:1E:C2:0D:C1:98 (Unknown)&lt;/span&gt;
+&lt;span class="go"&gt;Host ccf-hill019-19.example.com (172.16.43.148) appears to be down.&lt;/span&gt;
+&lt;span class="go"&gt;Host ccf-hill019-20.example.com (172.16.43.149) appears to be down.&lt;/span&gt;
+&lt;span class="go"&gt;Host ccf-hill019-21.example.com (172.16.43.150) appears to be down.&lt;/span&gt;
+&lt;span class="go"&gt;Host lordkris.example.com (172.16.43.151) appears to be down.&lt;/span&gt;
+&lt;span class="go"&gt;Host ccf-hill019-23.example.com (172.16.43.152) appears to be down.&lt;/span&gt;
+&lt;span class="go"&gt;Host ccf-hill019-24.example.com (172.16.43.153) appears to be down.&lt;/span&gt;
+&lt;span class="go"&gt;Host ccf-hill019-25.example.com (172.16.43.154) appears to be down.&lt;/span&gt;
+&lt;span class="go"&gt;Host ccf-hill019-26.example.com (172.16.43.155) appears to be down.&lt;/span&gt;
+&lt;span class="go"&gt;Host ccf-hill019-27.example.com (172.16.43.156) appears to be down.&lt;/span&gt;
+&lt;span class="go"&gt;Host ccf-hill019-28.example.com (172.16.43.157) appears to be down.&lt;/span&gt;
+&lt;span class="go"&gt;Host ccf-hill019-29.example.com (172.16.43.158) appears to be down.&lt;/span&gt;
+&lt;span class="go"&gt;Host ccf-hill019-30.example.com (172.16.43.159) appears to be down.&lt;/span&gt;
+&lt;span class="go"&gt;Nmap finished: 31 &lt;span class="caps"&gt;IP&lt;/span&gt; addresses (7 hosts up) scanned in 0.892 seconds&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;As you can see, the results also (very usefully) include &lt;span class="caps"&gt;MAC&lt;/span&gt; addresses,
+so it&amp;#8217;s pretty easy to update &lt;span class="caps"&gt;DHCP&lt;/span&gt; as&amp;nbsp;needed.&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Mon, 08 Feb 2010 09:10:00 -0500</pubDate><guid>tag:newblog.jasonantman.com,2010-02-08:2010/02/using-nmap-to-quickly-ping-all-hosts-in-an-address-range/</guid><category>dhcp</category><category>nmap</category><category>ping</category><category>sysadmin</category></item><item><title>Project Announcement - PHPsa</title><link>http://newblog.jasonantman.com/2009/09/project-announcement-phpsa/</link><description>&lt;p&gt;So, here&amp;#8217;s the &amp;#8220;official&amp;#8221; scoop on the new project that I&amp;#8217;m
+planning/starting to work on. I&amp;#8217;m calling it PHPsa for now, and it&amp;#8217;s
+going to (hopefully) be an integrated dashboard/portal for SysAdmins.
+While there are a number of tools that fit into this general category
+(perhaps with &lt;a href="http://www.alienvault.com/home.php?section=News"&gt;&lt;span class="caps"&gt;OSSIM&lt;/span&gt;&lt;/a&gt;
+being the closest, though it&amp;#8217;s security-minded), I feel that there&amp;#8217;s a
+real gap in terms of tool integration. My daily workflow, which includes
+multiple trips to and correlation among Nagios, Cacti, &lt;span class="caps"&gt;DNS&lt;/span&gt;, &lt;span class="caps"&gt;DHCP&lt;/span&gt;,
+Puppet, logs, and other tools really leaves something to be desired. So,
+I&amp;#8217;m setting out to create a modular SysAdmin dashboard that unifies many
+of the common SysAdmin-related tools into a modular&amp;nbsp;dashboard.&lt;/p&gt;
+&lt;p&gt;The first overall design goals that I&amp;#8217;ve set&amp;nbsp;are:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;A modular, plugin-based architecture that allows admins to select
+    which features/tools they want, and allows easy development of new&amp;nbsp;modules.&lt;/li&gt;
+&lt;li&gt;Design with legacy tools in mind - easy ways to tie in to tools that
+    weren&amp;#8217;t written with PHPsa in mind, both in terms of linking to
+    information and gathering/unifying&amp;nbsp;information.&lt;/li&gt;
+&lt;li&gt;&lt;span class="caps"&gt;RBAC&lt;/span&gt;, including per-module rules and the possibility for a limited
+    read-only view (client/user&amp;nbsp;mode).&lt;/li&gt;
+&lt;li&gt;Use of data sources, specifically web-based/&lt;span class="caps"&gt;REST&lt;/span&gt; APIs where
+    available, and databases otherwise, from existing tools with as
+    little modification as&amp;nbsp;possible.&lt;/li&gt;
+&lt;li&gt;Support for database abstraction, though I&amp;#8217;ll be using&amp;nbsp;MySQL.&lt;/li&gt;
+&lt;li&gt;Eventually, implement &lt;span class="caps"&gt;RSS&lt;/span&gt; feeds of pertinent&amp;nbsp;information.&lt;/li&gt;
+&lt;li&gt;Balance Ajax/&lt;span class="caps"&gt;DHTML&lt;/span&gt; with the desire for important things to have
+    canonical, static, bookmark-able&amp;nbsp;URLs.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;So, here are some of the things that I&amp;#8217;m planning on integrating, with
+obvious bias towards getting my own projects done before I integrate
+pre-existing&amp;nbsp;tools:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href="http://multibindadmin.jasonantman.com"&gt;MultiBindAdmin&lt;/a&gt;, my &lt;span class="caps"&gt;DNS&lt;/span&gt; and
+    &lt;span class="caps"&gt;DHCP&lt;/span&gt; administration tool (specifically geared towards split-view &lt;span class="caps"&gt;DNS&lt;/span&gt;
+    with the inside view behind&amp;nbsp;&lt;span class="caps"&gt;NAT&lt;/span&gt;).&lt;/li&gt;
+&lt;li&gt;&lt;a href="http://rackman.jasonantman.com/"&gt;RackMan&lt;/a&gt;, my tool for mapping
+    devices&amp;#8217; physical locations in racks (and tacking&amp;nbsp;patching).&lt;/li&gt;
+&lt;li&gt;My simple config tool for
+    &lt;a href="http://www.puppetlabs.com"&gt;Puppet&lt;/a&gt;.&lt;/li&gt;
+&lt;li&gt;&lt;a href="http://nagios.org/"&gt;Nagios&lt;/a&gt;.&lt;/li&gt;
+&lt;li&gt;&lt;a href="http://www.cacti.net/"&gt;Cacti&lt;/a&gt;.&lt;/li&gt;
+&lt;li&gt;Nathan Hubbard&amp;#8217;s &lt;a href="http://www.machdb.org/"&gt;MachDB&lt;/a&gt;.&lt;/li&gt;
+&lt;li&gt;&lt;a href="http://www.bacula.org/en/"&gt;Bacula&lt;/a&gt; (monitoring/status&amp;nbsp;only).&lt;/li&gt;
+&lt;li&gt;Syslog via &lt;a href="http://www.rsyslog.com/"&gt;rsyslog&lt;/a&gt; (or any other
+    syslog-to-&lt;span class="caps"&gt;SQL&lt;/span&gt;&amp;nbsp;solution).&lt;/li&gt;
+&lt;li&gt;Possibly a front-end to &lt;a href="http://www.google.com/analytics/"&gt;Google
+    Analytics&lt;/a&gt;.&lt;/li&gt;
+&lt;li&gt;Some of my custom scripts for graphing SpamAssassin, &lt;span class="caps"&gt;DNS&lt;/span&gt; queries,&amp;nbsp;etc.&lt;/li&gt;
+&lt;li&gt;Some sort of Apache log analysis, like
+    &lt;a href="http://www.mrunix.net/webalizer/"&gt;Webalizer&lt;/a&gt;.&lt;/li&gt;
+&lt;li&gt;Mail log analysis, possibly
+    &lt;a href="http://awstats.sourceforge.net/"&gt;AWstats&lt;/a&gt;.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;So, the first big issues that I&amp;#8217;m going to&amp;nbsp;tackle:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;General layout. Specifically, how to handle a more-or-less
+    consistent layout while integrating tools that weren&amp;#8217;t designed for
+    PHPsa. I&amp;#8217;ll probably end up using iFrames (or even a frameset) for
+    tools that don&amp;#8217;t integrate&amp;nbsp;well.&lt;/li&gt;
+&lt;li&gt;How to correlate data/objects between different tools (i.e. how to
+    display information from Nagios, Cacti, MultiBindAdmin and MachDB
+    for a given&amp;nbsp;host?).&lt;/li&gt;
+&lt;li&gt;Do I want to use a templating engine like
+    &lt;a href="http://www.smarty.net/"&gt;Smarty&lt;/a&gt; or hand-code all of the&amp;nbsp;&lt;span class="caps"&gt;HTML&lt;/span&gt;?&lt;/li&gt;
+&lt;li&gt;How will I handle&amp;nbsp;plugins?&lt;/li&gt;
+&lt;li&gt;How much code do I want to re-write and how much can I use as-is
+    from other tools? And, on a related note, how much existing data can
+    I access easily from other tools, vs having to use grabber scripts
+    that dump data in&amp;nbsp;MySQL?&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&lt;strong&gt;Update 2010-02-03&lt;/strong&gt;: I think this may become a semi-official project
+for me at $work, which means that I&amp;#8217;ll be able to dedicate quite a bit
+more time to it. Unfortunately, it also means that I will, most likely,
+have to give up Nathan Hubbard&amp;#8217;s &lt;a href="http://www.machdb.org/"&gt;MachDB&lt;/a&gt; in
+favor of &lt;a href="http://www.ocsinventory-ng.org/"&gt;&lt;span class="caps"&gt;OCS&lt;/span&gt; Inventory &lt;span class="caps"&gt;NG&lt;/span&gt;&lt;/a&gt;, a more
+mature project that already includes inventory support for Linux,
+Windows and&amp;nbsp;Mac.&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Tue, 29 Sep 2009 15:36:00 -0400</pubDate><guid>tag:newblog.jasonantman.com,2009-09-29:2009/09/project-announcement-phpsa/</guid><category>bind</category><category>cacti</category><category>dns</category><category>Nagios</category><category>PHPsa</category><category>Projects</category><category>puppet</category><category>rsyslog</category><category>sysadmin</category><category>syslog</category></item><item><title>Dealing with unplanned downtime - productively</title><link>http://newblog.jasonantman.com/2009/09/dealing-with-unplanned-downtime-productively/</link><description>&lt;p&gt;While I&amp;#8217;ve read and really appreciate &lt;a href="http://whatexit.org/tal/"&gt;Tom
+Limoncelli&lt;/a&gt;&amp;#8216;s &lt;a href="http://www.amazon.com/o/ASIN/0596007833/tomontime-20"&gt;Time Management for System
+Administrators&lt;/a&gt;,
+the current state of my life (mainly that it&amp;#8217;s split between work,
+personal projects, a freelance client, administering the systems of a
+the &lt;a href="http://www.midlandparkambulance.com"&gt;ambulance corps&lt;/a&gt; and real
+people, and that my &amp;#8220;work day&amp;#8221; is whenever I&amp;#8217;m awake) has prevented me
+from really implementing most of the advice. However, I do try to be as
+productive as I&amp;nbsp;can.&lt;/p&gt;
+&lt;p&gt;Without getting into details, a few weeks ago, $&lt;span class="caps"&gt;WORK&lt;/span&gt; suffered a major
+electrical failure that required everything in the data center to be
+powered down. This happened around 10:30 &lt;span class="caps"&gt;AM&lt;/span&gt;, and the majority of groups
+simply powered down their machines and left, planning to return around 2
+&lt;span class="caps"&gt;AM&lt;/span&gt; (the estimated power restoration time). After getting our machines
+down and stopping for pizza, I remembered how much of a pain it was to
+work in the racks bringing everything down. While my group only has two
+racks, we&amp;#8217;ve had a lot of changeover lately, and the cabling had gotten
+quote messy. Noting this, I mentioned it to my two higher-ups,
+remembering that we had a stock of assorted length patch cables. We were
+able to make an &amp;#8220;emergency&amp;#8221; run to our cable vendor and pick up a box of
+1- 2- and 3-foot power&amp;nbsp;cables.&lt;/p&gt;
+&lt;p&gt;While everyone else was home or in their offices dodging the pieces of
+falling sky (everything was down including VoIP and mail), we were the
+only group getting real productive work done in the data center. The
+power failure, rather than a catastrophic event, was a great opportunity
+- the only time we could pull &lt;em&gt;every&lt;/em&gt; cable in a production rack and
+re-do all power and&amp;nbsp;patches.&lt;/p&gt;
+&lt;p&gt;So, here&amp;#8217;s my &lt;span class="caps"&gt;SA&lt;/span&gt; tip for the day - everyone has some big projects that
+they&amp;#8217;d like to do, require downtime, but aren&amp;#8217;t critical enough to
+schedule something. So, keep a list of these and have the parts on hand.
+Whether it&amp;#8217;s a &amp;#8220;just in case&amp;#8221; hardware swap-out, re-patching, or
+anything else, eventually you (depending on the environment that you
+work in) might have one of those times when the solution to the problem
+is out of your hands and there&amp;#8217;s nothing else to do. Use this time&amp;nbsp;productively.&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Thu, 17 Sep 2009 12:50:00 -0400</pubDate><guid>tag:newblog.jasonantman.com,2009-09-17:2009/09/dealing-with-unplanned-downtime-productively/</guid><category>sysadmin</category><category>time management</category></item></channel></rss>

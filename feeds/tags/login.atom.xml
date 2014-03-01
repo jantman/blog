@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Jason Antman's Blog</title><link href="http://newblog.jasonantman.com/" rel="alternate"></link><link href="http://newblog.jasonantman.com/feeds/tags/login.atom.xml" rel="self"></link><id>http://newblog.jasonantman.com/</id><updated>2011-01-05T11:48:00-05:00</updated><entry><title>How to get actual login username when using sudo su</title><link href="http://newblog.jasonantman.com/2011/01/how-to-get-actual-login-username-when-using-sudo-su/" rel="alternate"></link><updated>2011-01-05T11:48:00-05:00</updated><author><name>admin</name></author><id>tag:newblog.jasonantman.com,2011-01-05:2011/01/how-to-get-actual-login-username-when-using-sudo-su/</id><summary type="html">&lt;p&gt;I&amp;#8217;ve had the need to find out the actual username of someone logged in
+and working as root (via &lt;code&gt;sudo su -&lt;/code&gt;) to &lt;a href="/2011/01/client-side-subversion-commit-message-hooks/"&gt;put it into a subversion
+commit message&lt;/a&gt;.
+This quick little bash script does the trick, and just echos the&amp;nbsp;username.&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="c"&gt;#!/bin/bash&lt;/span&gt;
+
+&lt;span class="nv"&gt;&lt;span class="caps"&gt;PID&lt;/span&gt;&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nv"&gt;$$&lt;/span&gt; &lt;span class="c"&gt;# get &lt;span class="caps"&gt;PID&lt;/span&gt; of current process&lt;/span&gt;
+&lt;span class="nv"&gt;LogUID&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="sb"&gt;`&lt;/span&gt;cat /proc/&lt;span class="s2"&gt;&amp;quot;$&lt;span class="caps"&gt;PID&lt;/span&gt;&amp;quot;&lt;/span&gt;/loginuid&lt;span class="sb"&gt;`&lt;/span&gt; &lt;span class="c"&gt;# get loginuid of current process&lt;/span&gt;
+&lt;span class="nv"&gt;username&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="sb"&gt;`&lt;/span&gt;getent passwd &lt;span class="s2"&gt;&amp;quot;$LogUID&amp;quot;&lt;/span&gt; | awk -F &lt;span class="s2"&gt;&amp;quot;:&amp;quot;&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;{print $1}&amp;#39;&lt;/span&gt;&lt;span class="sb"&gt;`&lt;/span&gt; &lt;span class="c"&gt;# translate loginuid to username&lt;/span&gt;
+&lt;span class="nb"&gt;echo&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;$username&amp;quot;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;</summary><category term="linux"></category><category term="login"></category><category term="sudo"></category><category term="username"></category></entry></feed>

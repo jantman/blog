@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Jason Antman's Blog</title><link href="http://newblog.jasonantman.com/" rel="alternate"></link><link href="http://newblog.jasonantman.com/feeds/tags/cobbler.atom.xml" rel="self"></link><id>http://newblog.jasonantman.com/</id><updated>2009-02-03T15:51:00-05:00</updated><entry><title>How To Wipe a Bunch of Machines Quickly</title><link href="http://newblog.jasonantman.com/2009/02/how-to-wipe-a-bunch-of-machines-quickly/" rel="alternate"></link><updated>2009-02-03T15:51:00-05:00</updated><author><name>admin</name></author><id>tag:newblog.jasonantman.com,2009-02-03:2009/02/how-to-wipe-a-bunch-of-machines-quickly/</id><summary type="html">&lt;p&gt;&lt;strong&gt;Updated 2009-03-05, see&amp;nbsp;bottom.&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;At work the other week, we decommissioned 24 old desktops - Dell &lt;span class="caps"&gt;GX280&lt;/span&gt;&amp;#8217;s
+that were used in the student labs as print release stations. They
+didn&amp;#8217;t have anything sensitive on them, just Windows &lt;span class="caps"&gt;XP&lt;/span&gt;, but with
+licensing and all we have to wipe Windows off of them before surplussing
+them. Since there were 24 of them, it wasn&amp;#8217;t exactly going to be the
+quickest task. Moreover, the &lt;span class="caps"&gt;GX280&lt;/span&gt;&amp;#8217;s we used don&amp;#8217;t have &lt;em&gt;any&lt;/em&gt; removable
+media&amp;nbsp;drives.&lt;/p&gt;
+&lt;p&gt;A few people mentioned &lt;a href="http://www.dban.org/"&gt;Darik&amp;#8217;s Boot And Nuke&lt;/a&gt;
+(&lt;span class="caps"&gt;DBAN&lt;/span&gt;), which is a bootable Linux distro (&lt;span class="caps"&gt;CD&lt;/span&gt; or floppy) aimed at wiping
+all of the fixed disks attached to a machine. While they do offer an
+&amp;#8220;Enterprise&amp;#8221; version that supports network booting (and logging wipe
+verifications to a central machine), the pricing isn&amp;#8217;t exactly favorable
+for a small project (or something that just needs Windows to go away,
+not a DoD-grade 7-pass overwrite with random data). Between the lack of
+a &lt;span class="caps"&gt;CD&lt;/span&gt; drive and the apparent need to select wiping options at boot, this
+didn&amp;#8217;t seem to be the best method for&amp;nbsp;me.&lt;/p&gt;
+&lt;p&gt;Luckily, with a little googling, I came by the
+&lt;a href="https://fedorahosted.org/cobbler/"&gt;Cobbler&lt;/a&gt; project, a ready-to-run
+install server aimed at automating network-based &lt;span class="caps"&gt;OS&lt;/span&gt; installation. It
+turns out that Cobbler has a wiki article on &lt;a href="https://fedorahosted.org/cobbler/wiki/SystemRetirement"&gt;system
+retirement&lt;/a&gt; that
+deals with using Cobbler to automate a network boot of &lt;span class="caps"&gt;DBAN&lt;/span&gt;. Cobbler
+takes control of &lt;span class="caps"&gt;DHCP&lt;/span&gt; and &lt;span class="caps"&gt;TFTP&lt;/span&gt;, boots the machine(s) to a &lt;span class="caps"&gt;PXE&lt;/span&gt; boot menu,
+and allows selection of one of the cobbler&amp;nbsp;&amp;#8220;profiles&amp;#8221;.&lt;/p&gt;
+&lt;p&gt;The general procedure is something along these&amp;nbsp;lines:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Get the &lt;span class="caps"&gt;DBAN&lt;/span&gt; iso and grab the .ima image off of it. Loopback mount&amp;nbsp;it.&lt;/li&gt;
+&lt;li&gt;Copy the &lt;code&gt;initrd&lt;/code&gt; and kernel into &lt;code&gt;/opt/cobbler/dban&lt;/code&gt; as
+    &lt;code&gt;initrd.img&lt;/code&gt; and &lt;code&gt;vmlinuz&lt;/code&gt;,&amp;nbsp;respectively.&lt;/li&gt;
+&lt;li&gt;Assuming you have cobblerd running (cobbler check), add a Distro for
+    &lt;span class="caps"&gt;DBAN&lt;/span&gt;:
+    &lt;code&gt;cobbler distro add --name=DBAN-1.0.7-i386 --kernel=/opt/cobbler/dban/vmlinuz --initrd=/opt/cobbler/dban/initrd.img --kopts="root=/dev/ram0 init=/rc nuke=dwipe floppy=0,16,cmos"&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;Add a Profile for it:
+    &lt;code&gt;cobbler profile add --name=DBAN-1.0.7-i386 --distro=DBAN-1.0.7-i386&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;cobbler sync&lt;/code&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Assuming all went well, when we &lt;span class="caps"&gt;PXE&lt;/span&gt; boot a machine on the same &lt;span class="caps"&gt;LAN&lt;/span&gt; as
+the Cobbler system, we&amp;#8217;ll get &lt;span class="caps"&gt;DHCP&lt;/span&gt; and a &lt;span class="caps"&gt;PXE&lt;/span&gt; boot menu which will list
+&lt;code&gt;DBAN-1.0.7.i386&lt;/code&gt; as one of the options. On some of the &lt;span class="caps"&gt;GX280&lt;/span&gt;&amp;#8217;s that I
+did, I had to go into the &lt;span class="caps"&gt;BIOS&lt;/span&gt; and enable &lt;span class="caps"&gt;PXE&lt;/span&gt; boot (or select &lt;span class="caps"&gt;PXE&lt;/span&gt; from
+the &lt;span class="caps"&gt;BIOS&lt;/span&gt; boot menu). Now, when &lt;span class="caps"&gt;DBAN&lt;/span&gt; boots, we&amp;#8217;ll get the standard dmesg
+output and then a selection screen allowing us to pick a wipe type (I
+used the single pass all zeros for just getting rid of the old &lt;span class="caps"&gt;OS&lt;/span&gt;) and
+select which disks to wipe. If you use the default wipe, just press
+&amp;#8220;space&amp;#8221; to select all disks and then &amp;#8220;F10&amp;#8221; to begin the&amp;nbsp;wipe.&lt;/p&gt;
+&lt;p&gt;This process allowed me to wipe 7 machines at once (8 port &lt;span class="caps"&gt;KVM&lt;/span&gt;, 1 port
+for the server). With a better &lt;span class="caps"&gt;KVM&lt;/span&gt; or (even better yet) a totally
+automatic system as described below, it would essentially be limited to
+whatever the server and network hardware will&amp;nbsp;handle.&lt;/p&gt;
+&lt;p&gt;To add a little more automation, we can run
+&lt;code&gt;cobbler system add --name=default --profile=DBAN-1.0.7-i386&lt;/code&gt; which adds
+a default profile to Cobbler, saying that any machines with MACs not
+specifically assigned to a profile should boot the &lt;span class="caps"&gt;DBAN&lt;/span&gt; profile, and
+bypassing the &lt;span class="caps"&gt;PXE&lt;/span&gt; boot&amp;nbsp;menu.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;&lt;span class="caps"&gt;WARNING&lt;/span&gt;:&lt;/strong&gt; what follows will setup Cobbler and &lt;span class="caps"&gt;DBAN&lt;/span&gt; to automatically
+wipe all &lt;span class="caps"&gt;PXE&lt;/span&gt;-booting devices without &lt;span class="caps"&gt;ANY&lt;/span&gt; human intervention. Use at your
+own risk and, for God&amp;#8217;s sake, don&amp;#8217;t plug your server into a production
+network (I recommend this only in a lab environment with a dedicated
+switch, all machines in one physical area, and no possibility of getting
+on the same &amp;#8216;net as production&amp;nbsp;machines).&lt;/p&gt;
+&lt;p&gt;It&amp;#8217;s theoretically possible to totally automate this setup. According to
+the &lt;span class="caps"&gt;DBAN&lt;/span&gt; docs, it will also accept kernel options (kopts) that effect
+how dnuke works - specifically, &lt;code&gt;--autonuke&lt;/code&gt; to tell it to wipe without
+human intervention and a method option such as &lt;code&gt;--method=zero&lt;/code&gt; to select
+the wipe method. This means that if we &lt;span class="caps"&gt;PXE&lt;/span&gt; boot with kernel options set
+to &lt;code&gt;nuke="dwipe --autonuke --method=zero"&lt;/code&gt; we should go straight to the
+dwipe utility (the heart of &lt;span class="caps"&gt;DBAN&lt;/span&gt;) and automatically wipe all disks by
+writing zeros once - without operator intervention. Unfortunately,
+there&amp;#8217;s a &lt;a href="https://fedorahosted.org/cobbler/ticket/148"&gt;bug&lt;/a&gt; in the
+current (1.4.0) Cobbler which prevents quote-encapsulated strings in
+kopts, meaning that we can&amp;#8217;t set one kernel option to a string with
+whitespace as needed here. If this bug is fixed, it should allow this
+process to work without any operator intervention, assuming the clients
+will &lt;span class="caps"&gt;PXE&lt;/span&gt;&amp;nbsp;boot.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Updated 2009-03-05&lt;/strong&gt; I haven&amp;#8217;t tested it yet, but apparently the
+Cobbler bug preventing complex kernel options has &lt;a href="https://fedorahosted.org/pipermail/cobbler/2009-February/002874.html"&gt;been
+fixed&lt;/a&gt;.
+The fix should be included in the 1.4.3 release and is currently in the
+development&amp;nbsp;tree.&lt;/p&gt;</summary><category term="automation"></category><category term="cobbler"></category><category term="dban"></category><category term="pxe"></category><category term="retirement"></category><category term="security"></category><category term="wiping"></category></entry></feed>

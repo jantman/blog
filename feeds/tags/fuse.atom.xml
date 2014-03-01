@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Jason Antman's Blog</title><link href="http://newblog.jasonantman.com/" rel="alternate"></link><link href="http://newblog.jasonantman.com/feeds/tags/fuse.atom.xml" rel="self"></link><id>http://newblog.jasonantman.com/</id><updated>2008-04-21T17:28:00-04:00</updated><entry><title>Centralized Storage via SFTP</title><link href="http://newblog.jasonantman.com/2008/04/centralized-storage-via-sftp/" rel="alternate"></link><updated>2008-04-21T17:28:00-04:00</updated><author><name>admin</name></author><id>tag:newblog.jasonantman.com,2008-04-21:2008/04/centralized-storage-via-sftp/</id><summary type="html">&lt;p&gt;For quite a while, I&amp;#8217;ve been planning on centralizing a lot of my
+personal storage (documents, miscellaneous stuff) on one machine at
+home. The biggest problem that I have is that, while a &lt;span class="caps"&gt;VPN&lt;/span&gt; would be a
+good solution for my apartment (if I could get
+&lt;a href="http://www.ipcop.org/"&gt;IPcop&lt;/a&gt;to do &lt;span class="caps"&gt;VPN&lt;/span&gt; between two dynamic IPs), it
+doesn&amp;#8217;t really work for my mobile life. My laptop is often connected to
+untrusted wireless, and unknown firewall configurations, so &lt;span class="caps"&gt;VPN&lt;/span&gt; isn&amp;#8217;t
+always the best (and definitely not the easiest) option. Given road
+warrior use, &lt;span class="caps"&gt;NFS&lt;/span&gt; is obviously out of the&amp;nbsp;question.&lt;/p&gt;
+&lt;p&gt;After a little searching, I found the
+&lt;a href="http://fuse.sourceforge.net/sshfs.html"&gt;&lt;span class="caps"&gt;SSHFS&lt;/span&gt;&lt;/a&gt; module for
+&lt;a href="http://fuse.sourceforge.net/"&gt;&lt;span class="caps"&gt;FUSE&lt;/span&gt;&lt;/a&gt;, which allows userspace mounting of
+a &lt;span class="caps"&gt;SFTP&lt;/span&gt; filesystem. Despite some initial hiccups, I managed to get it
+setup on two machines - my laptop and a desktop in the apartment. This
+week I&amp;#8217;ll finish working on the rest of the machines - and eventually
+replace my aging &lt;a href="http://www.jasonantman.com/wiki/index.php/SSH_Gateway_Box"&gt;&lt;span class="caps"&gt;SSH&lt;/span&gt;
+gateway&lt;/a&gt;
+machine (currently a 10-year-old Gateway mini tower) with a
+&lt;a href="http://www.soekris.com/"&gt;Soekris&lt;/a&gt;&amp;nbsp;box.&lt;/p&gt;
+&lt;p&gt;The setup was pretty&amp;nbsp;easy:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Make sure you have public key authentication setup for ssh between
+    the machines, using &lt;span class="caps"&gt;RSA&lt;/span&gt;&amp;nbsp;keys.&lt;/li&gt;
+&lt;li&gt;Make sure fuse, libfuse, and the related packages are&amp;nbsp;installed.&lt;/li&gt;
+&lt;li&gt;Install the sshfs&amp;nbsp;package.&lt;/li&gt;
+&lt;li&gt;Make sure your user is added to the &amp;#8220;trusted&amp;#8221; group (for&amp;nbsp;OpenSuSE).&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;After that, just give it a spin, as the user that you want to mount the
+filesystem&amp;nbsp;as:&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;sshfs hostname:/path/to/mount /path/to/local/mountpoint&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;Once that worked pefectly, I added the following to my &lt;code&gt;.bash_profile&lt;/code&gt;:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="c"&gt;# this handles &lt;span class="caps"&gt;SSHFS&lt;/span&gt; mount of the central-home dir&lt;/span&gt;
+&lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="o"&gt;[&lt;/span&gt; -a /path/to/local/mountpoint &lt;span class="o"&gt;]&lt;/span&gt;; &lt;span class="k"&gt;then&lt;/span&gt;
+&lt;span class="k"&gt;    &lt;/span&gt;&lt;span class="nb"&gt;echo&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;&lt;span class="caps"&gt;HOSTNAME&lt;/span&gt; home is mounted at /path/to/local/mountpoint&amp;quot;&lt;/span&gt;
+&lt;span class="k"&gt;else&lt;/span&gt;
+&lt;span class="k"&gt;    &lt;/span&gt;&lt;span class="nb"&gt;echo&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;Mounting &lt;span class="caps"&gt;HOSTNAME&lt;/span&gt; home at /path/to/local/mountpoint...&amp;quot;&lt;/span&gt;
+    hostname:/path/to/mount /path/to/local/mountpoint&lt;span class="sb"&gt;`&lt;/span&gt;  
+&lt;span class="k"&gt;fi&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;</summary><category term="fuse"></category><category term="sftp"></category><category term="ssh"></category><category term="sshfs"></category><category term="storage"></category></entry></feed>

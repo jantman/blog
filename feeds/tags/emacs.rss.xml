@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Jason Antman's Blog</title><link>http://newblog.jasonantman.com/</link><description></description><atom:link href="http://newblog.jasonantman.com/feeds/tags/emacs.rss.xml" rel="self"></atom:link><lastBuildDate>Wed, 15 Aug 2012 08:00:00 -0400</lastBuildDate><item><title>Setting emacs zone-mode based on path</title><link>http://newblog.jasonantman.com/2012/08/setting-emacs-zone-mode-based-on-path/</link><description>&lt;p&gt;At work, we do a fair amount of &lt;span class="caps"&gt;DNS&lt;/span&gt; updates. Our zone files are stored
+in subversion, and are named according to the domain (with no .zone
+extension). It&amp;#8217;s a real pain when updating a few (or a few dozen) zones
+in Emacs, since I have to remember to &amp;#8220;M-x zone-mode&amp;#8221; so the serial gets
+automatically updated. Here&amp;#8217;s a lisp snippet to put in your &lt;code&gt;.emacs&lt;/code&gt;
+file that will set zone-mode for all files in any path matching the
+regex &lt;code&gt;svn/named/zones-internal&lt;/code&gt;. I deliberately made it a relative path
+(or, really, any path containing that) so it would work for all of my
+team&amp;#8217;s workstations, no matter where we have the svn repo checked&amp;nbsp;out:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;add-to-list&lt;/span&gt; &lt;span class="ss"&gt;&amp;#39;auto-mode-alist&lt;/span&gt; &lt;span class="o"&gt;&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;svn/named/zones-internal/&amp;quot;&lt;/span&gt; &lt;span class="o"&gt;.&lt;/span&gt; &lt;span class="nv"&gt;zone-mode&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Many thanks to &lt;code&gt;taylanub&lt;/code&gt; on #emacs on irc.freenode.net for helping
+with&amp;nbsp;this.&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Wed, 15 Aug 2012 08:00:00 -0400</pubDate><guid>tag:newblog.jasonantman.com,2012-08-15:2012/08/setting-emacs-zone-mode-based-on-path/</guid><category>bind</category><category>emacs</category><category>lisp</category><category>named</category><category>zone-mode</category></item><item><title>Emacs Mode Variable for HTML</title><link>http://newblog.jasonantman.com/2012/06/emacs-mode-variable-for-html/</link><description>&lt;p&gt;Unfortunately, I often find myself editing files that are mixed &lt;span class="caps"&gt;PHP&lt;/span&gt; and
+&lt;span class="caps"&gt;HTML&lt;/span&gt;, and ending with a &amp;#8220;.php&amp;#8221; extension. For most smaller
+projects/tasks, I use &lt;a href="http://www.gnu.org/software/emacs/"&gt;emacs&lt;/a&gt; at the
+command line (nox) and my .emacs settings for
+&lt;a href="http://php-mode.sourceforge.net/"&gt;php-mode&lt;/a&gt; will latch onto the &amp;#8220;.php&amp;#8221;
+extension and open it with &lt;span class="caps"&gt;PHP&lt;/span&gt; mode. Unfortunately, &lt;span class="caps"&gt;PHP&lt;/span&gt; mode really
+doesn&amp;#8217;t like embedded &lt;span class="caps"&gt;HTML&lt;/span&gt; (let alone mostly &lt;span class="caps"&gt;HTML&lt;/span&gt; with some inline &lt;span class="caps"&gt;PHP&lt;/span&gt;),
+and the indentation gets very messy, among other&amp;nbsp;problems.&lt;/p&gt;
+&lt;p&gt;The simple solution is to add the following (&lt;span class="caps"&gt;XHTML&lt;/span&gt; 1.0
+Transitional-compliant) comment to the first line of the file, which
+tells emacs to load&amp;nbsp;html-mode:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="c"&gt;&amp;lt;!-- -*- mode: html; -*- --&amp;gt;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;You can also get emacs to do this for you, as per the &lt;a href="http://www.gnu.org/software/emacs/manual/html_node/emacs/Specifying-File-Variables.html"&gt;Specifying File
+Variables&lt;/a&gt;
+documentation page. Once in html-mode, simply &lt;code&gt;M-x
+add-file-local-variable-prop-line&lt;/code&gt;, enter &amp;#8220;mode&amp;#8221; for the variable
+name and use the default of the current&amp;nbsp;mode.&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Tue, 26 Jun 2012 08:43:00 -0400</pubDate><guid>tag:newblog.jasonantman.com,2012-06-26:2012/06/emacs-mode-variable-for-html/</guid><category>emacs</category><category>html. php</category></item></channel></rss>

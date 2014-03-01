@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Jason Antman's Blog</title><link>http://newblog.jasonantman.com/</link><description></description><atom:link href="http://newblog.jasonantman.com/feeds/tags/hl2170w.rss.xml" rel="self"></atom:link><lastBuildDate>Sat, 11 Apr 2009 11:53:00 -0400</lastBuildDate><item><title>Brother HL2170W DHCP Problems</title><link>http://newblog.jasonantman.com/2009/04/brother-hl2170w-dhcp-problems/</link><description>&lt;p&gt;Two weeks ago, I &lt;a href="/2009/03/brother-hl-2170w-great-features-from-a-personal-laser-printer/"&gt;wrote about the Brother
+&lt;span class="caps"&gt;HL&lt;/span&gt;-2170W&lt;/a&gt;
+that I got for my mother. It seemed absolutely wonderful. Until the
+night of March 31st, just before Conficker was supposed to strike. Being
+that mom&amp;#8217;s computer is the only one at home running Windows, I finished
+up a long-standing project - and moved her desktop, printer, and AppleTV
+over to a separate &lt;span class="caps"&gt;VLAN&lt;/span&gt; that&amp;#8217;s not routable to anything else internal
+(i.e. anything important, or anything of mine). I&amp;#8217;d already had the
+&amp;#8220;client&amp;#8221; &lt;span class="caps"&gt;VLAN&lt;/span&gt; setup for a while, so it was just a matter of tweaking the
+firewall rules and moving the static &lt;span class="caps"&gt;DHCP&lt;/span&gt; assignments from one subnet to
+the&amp;nbsp;other.&lt;/p&gt;
+&lt;p&gt;Well, that&amp;#8217;s where the problems started. While her Windows &lt;span class="caps"&gt;XP&lt;/span&gt; desktop
+and AppleTV coped nicely, and got their new addresses in &lt;span class="caps"&gt;DHCP&lt;/span&gt; as they
+should, the &lt;span class="caps"&gt;HL2170W&lt;/span&gt; did not, As a matter of fact, after two hours, I
+hadn&amp;#8217;t seen a single &lt;span class="caps"&gt;DHCP&lt;/span&gt; request, even though I had the lease time set
+to 10 minutes for both subnets. So, I tried administratively downing the
+switch port a few times, to no avail. After a day of waiting, I came
+back to the problem - and &lt;em&gt;still&lt;/em&gt; found nothing in the &lt;span class="caps"&gt;DHCP&lt;/span&gt; logs from
+that printer. I emailed mom and asked her to power-cycle it a few
+times&amp;#8230; still nothing! It wasn&amp;#8217;t even requesting &lt;span class="caps"&gt;DHCP&lt;/span&gt; when rolled, let
+alone at a regular&amp;nbsp;interval!&lt;/p&gt;
+&lt;p&gt;Fast forward a week or so, to today. I&amp;#8217;m ready to call Brother Support,
+as my mother hasn&amp;#8217;t had use of her new printer in a week and a half. I&amp;#8217;m
+infuriated - I&amp;#8217;ve rolled the printer dozens of times, and not a single
+event in the &lt;span class="caps"&gt;DHCP&lt;/span&gt; log. I know it&amp;#8217;s sending traffic from the port - I&amp;#8217;ve
+reset the counters and they&amp;#8217;re changing. I tried moving it back to the
+original &lt;span class="caps"&gt;VLAN&lt;/span&gt; and confirmed that it still has its&amp;#8217; original &lt;span class="caps"&gt;IP&lt;/span&gt;. I could
+get into the web interface via &lt;a href="http://lynx.isc.org/"&gt;lynx&lt;/a&gt; and *tell
+it* to refresh &lt;span class="caps"&gt;DHCP&lt;/span&gt;, but this seemed quite pointless - there&amp;#8217;s no way
+it&amp;#8217;s physically possible to send the web request and then switch the
+port to the new &lt;span class="caps"&gt;VLAN&lt;/span&gt; before it gets&amp;nbsp;&lt;span class="caps"&gt;DHCP&lt;/span&gt;.&lt;/p&gt;
+&lt;p&gt;So, I&amp;#8217;m ready to call Brother Support. I then notice that the printer is
+turned off at the moment. From the switch log, it looks as though it&amp;#8217;s
+been powered off for six days. So, I turn it on. And then go about
+starting my prep for the Brother call, first opening up a tail on the
+&lt;span class="caps"&gt;DHCP&lt;/span&gt; server log, grepped for the proper interface. And, wouldn&amp;#8217;t you
+know, as I get up to let the dog out, the printer starts spitting out&amp;nbsp;pages!&lt;/p&gt;
+&lt;p&gt;As far as I can tell, there&amp;#8217;s something &lt;em&gt;seriously wrong&lt;/em&gt; with the
+Brother &lt;span class="caps"&gt;HL&lt;/span&gt;-2170W &lt;span class="caps"&gt;DHCP&lt;/span&gt; implementation. Specifically, it didn&amp;#8217;t get an
+address on the new &lt;span class="caps"&gt;VLAN&lt;/span&gt; until it was powered off for a *long* time.
+Even reboots wouldn&amp;#8217;t trigger a request, until the box had been powered
+off for &lt;em&gt;days&lt;/em&gt;. More importantly, though, it seems that it only gets
+&lt;span class="caps"&gt;DHCP&lt;/span&gt; &lt;strong&gt;&lt;em&gt;once&lt;/em&gt;&lt;/strong&gt; when it boots, and totally disregards the lease&amp;nbsp;time!&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Sat, 11 Apr 2009 11:53:00 -0400</pubDate><guid>tag:newblog.jasonantman.com,2009-04-11:2009/04/brother-hl2170w-dhcp-problems/</guid><category>dhcp</category><category>hl2170w</category><category>printer</category><category>vlan</category></item></channel></rss>

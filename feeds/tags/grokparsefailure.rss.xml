@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Jason Antman's Blog</title><link>http://newblog.jasonantman.com/</link><description></description><atom:link href="http://newblog.jasonantman.com/feeds/tags/grokparsefailure.rss.xml" rel="self"></atom:link><lastBuildDate>Mon, 03 Sep 2012 08:37:00 -0400</lastBuildDate><item><title>RVM and Ruby 1.9 to test logstash grok patterns on Fedora/CentOS</title><link>http://newblog.jasonantman.com/2012/09/rvm-and-ruby-1-9-to-test-logstash-grok-patterns-on-fedoracentos/</link><description>&lt;p&gt;I&amp;#8217;ve been working on a personal project with
+&lt;a href="http://logstash.net/"&gt;Logstash&lt;/a&gt; lately, and it relies relatively
+heavily on &lt;a href="https://github.com/jordansissel/grok"&gt;grok&lt;/a&gt; filters for
+matching text and extracting matched parts. Today, I&amp;#8217;ve been parsing
+syslog from &lt;a href="http://puppetlabs.com/puppet/puppet-open-source/"&gt;Puppet&lt;/a&gt;
+to extract various metrics and timings, which will then be passed on
+from Logstash to &lt;a href="https://github.com/etsy/statsd"&gt;Etsy&amp;#8217;s statsd&lt;/a&gt; and
+then to &lt;a href="http://graphite.wikidot.com/"&gt;graphite&lt;/a&gt; for display.
+Unfortunately, a few of my patterns are showing the &amp;#8220;_grokparsefailure&amp;#8221;
+tag and I just can&amp;#8217;t seem to find the&amp;nbsp;problem.&lt;/p&gt;
+&lt;p&gt;The logstash wiki provides a page on &lt;a href="https://github.com/logstash/logstash/wiki/Testing-your-Grok-patterns-(--logstash-1.1.0-and-above-)"&gt;Testing your Grok
+patterns&lt;/a&gt;,
+as does Sean Laurent on his blog: &lt;a href="http://blog.bealetech.com/content/testing-logstash-grok-filters"&gt;Testing Logstash grok
+filters&lt;/a&gt;.
+Unfortunately, I work in a CentOS/&lt;span class="caps"&gt;RHEL&lt;/span&gt; shop, and we&amp;#8217;re decidedly &lt;em&gt;not&lt;/em&gt; a
+Ruby shop. Our Logstash install is using the monolithic/standalone Java
+&lt;span class="caps"&gt;JAR&lt;/span&gt;. We run Puppet, which is currently under ruby 1.8.7, and the
+&lt;a href="http://rubygems.org/gems/jls-grok"&gt;jls-grok rubygem&lt;/a&gt; requires ruby 1.9.
+There&amp;#8217;s no way I&amp;#8217;d feel safe installing 1.9 on any of our machines, as
+they all run (and require) Puppet. So, I found out about
+&lt;a href="https://rvm.io/"&gt;&lt;span class="caps"&gt;RVM&lt;/span&gt;&lt;/a&gt;, the Ruby Version Manager, which allows you to
+run and switch between multiple ruby versions, and all of it is
+installed on a per-user basis. So, I created a new user on my Fedora 16
+desktop called &amp;#8220;rvmtest&amp;#8221; and went about the process of setting up what&amp;#8217;s
+needed to test grok patterns in the user&amp;#8217;s local environment. I imagine
+this would work similarly under CentOS or &lt;span class="caps"&gt;RHEL&lt;/span&gt;, but the following is
+only tested on Fedora 16. If you have any issues, you should probably
+refer back to the &lt;span class="caps"&gt;RVM&lt;/span&gt;&amp;nbsp;documentation.&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Create the isolated user, just to be extra careful. Login as that&amp;nbsp;user.&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;As per &lt;a href="https://rvm.io/rvm/install/"&gt;Installing &lt;span class="caps"&gt;RVM&lt;/span&gt;&lt;/a&gt;:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;curl https://raw.github.com/wayneeseguin/rvm/master/binscripts/rvm-installer | bash -s stable
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;edit your &lt;code&gt;~/.bashrc&lt;/code&gt; and&amp;nbsp;add:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="o"&gt;[[&lt;/span&gt; -s &lt;span class="s2"&gt;&amp;quot;$&lt;span class="caps"&gt;HOME&lt;/span&gt;/.rvm/scripts/rvm&amp;quot;&lt;/span&gt; &lt;span class="o"&gt;]]&lt;/span&gt; &lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt; . &lt;span class="s2"&gt;&amp;quot;$&lt;span class="caps"&gt;HOME&lt;/span&gt;/.rvm/scripts/rvm&amp;quot;&lt;/span&gt;
+&lt;span class="o"&gt;[[&lt;/span&gt; -r &lt;span class="nv"&gt;$rvm_path&lt;/span&gt;/scripts/completion &lt;span class="o"&gt;]]&lt;/span&gt; &lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt; . &lt;span class="nv"&gt;$rvm_path&lt;/span&gt;/scripts/completion
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;The first line sets up &lt;span class="caps"&gt;RVM&lt;/span&gt; for your sessions, and the second sources
+in tab-completion for the &lt;code&gt;rvm&lt;/code&gt; command.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;code&gt;source .bashrc&lt;/code&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;If you&amp;#8217;re interested, you can see a list of all known rubies with:
+    &lt;code&gt;rvm list known&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;Install Ruby (&lt;span class="caps"&gt;MRI&lt;/span&gt;) 1.9.2: &lt;code&gt;rvm install 1.9.2&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;span class="dquo"&gt;&amp;#8220;&lt;/span&gt;switch&amp;#8221; to that ruby: &lt;code&gt;rvm use 1.9.2&lt;/code&gt; and confirm it by running
+    &lt;code&gt;ruby -v&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;Make it the default ruby for us: &lt;code&gt;rvm use 1.9.2 --default&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;Create a &amp;#8220;gemset&amp;#8221; (set of rubygems for our environment):
+    &lt;code&gt;rvm gemset create groktest&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;Use it, and set it as default: &lt;code&gt;rvm use 1.9.2@groktest --default&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;for grok testing, &lt;code&gt;gem install jls-grok&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;check that it&amp;#8217;s there: &lt;code&gt;gem list&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;Download Logstash&amp;#8217;s default grok patterns &lt;a href="https://raw.github.com/logstash/logstash/master/patterns/grok-patterns"&gt;from&amp;nbsp;github&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;You should now be ready to test some grok&amp;nbsp;patterns.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;While the two howto&amp;#8217;s linked above use &lt;code&gt;irb&lt;/code&gt; to interactively test the
+patterns, I prefer something easier to move to production, more
+reliable, and more repeatable. The following quick little ruby script
+takes test to match against on &lt;span class="caps"&gt;STDIN&lt;/span&gt; (log files, messages, etc.) and
+prints the matches to &lt;span class="caps"&gt;STDOUT&lt;/span&gt;. The script is based on
+&lt;a href="https://github.com/jordansissel/ruby-grok/blob/master/examples/test.rb"&gt;test.rb&lt;/a&gt;
+from &lt;a href="https://github.com/jordansissel/ruby-grok"&gt;jordansissel&amp;#8217;s
+ruby-grok&lt;/a&gt;. Note one
+important thing here, I couldn&amp;#8217;t get the shebang (&lt;code&gt;#!&lt;/code&gt;) to work with
+anything other than the explicit path to my &lt;span class="caps"&gt;RVM&lt;/span&gt; ruby install
+(&lt;code&gt;which ruby&lt;/code&gt;) so you&amp;#8217;ll need to manually update this&amp;nbsp;yourself.&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="c1"&gt;#!.rvm/rubies/ruby-1.9.2-320bin/ruby&lt;/span&gt;
+
+&lt;span class="nb"&gt;require&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;rubygems&amp;#39;&lt;/span&gt;
+&lt;span class="nb"&gt;require&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;grok-pure&amp;#39;&lt;/span&gt;
+&lt;span class="nb"&gt;require&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;pp&amp;#39;&lt;/span&gt;
+
+&lt;span class="n"&gt;grok&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="no"&gt;Grok&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;new&lt;/span&gt;
+&lt;span class="n"&gt;grok&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;add_patterns_from_file&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;grok-patterns&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+&lt;span class="n"&gt;pattern&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;your_grok_pattern_here&amp;#39;&lt;/span&gt;
+&lt;span class="n"&gt;grok&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;compile&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;pattern&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="nb"&gt;puts&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;&lt;span class="caps"&gt;PATTERN&lt;/span&gt;: &lt;/span&gt;&lt;span class="si"&gt;#{&lt;/span&gt;&lt;span class="n"&gt;pattern&lt;/span&gt;&lt;span class="si"&gt;}&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;
+
+&lt;span class="k"&gt;while&lt;/span&gt; &lt;span class="n"&gt;a&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nb"&gt;gets&lt;/span&gt;
+  &lt;span class="nb"&gt;puts&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;&lt;span class="caps"&gt;IN&lt;/span&gt;: &lt;/span&gt;&lt;span class="si"&gt;#{&lt;/span&gt;&lt;span class="n"&gt;a&lt;/span&gt;&lt;span class="si"&gt;}&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;
+  &lt;span class="n"&gt;match&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;grok&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;match&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;a&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+  &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="n"&gt;match&lt;/span&gt;
+    &lt;span class="nb"&gt;puts&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;&lt;span class="caps"&gt;MATCH&lt;/span&gt;:&amp;quot;&lt;/span&gt;
+    &lt;span class="n"&gt;pp&lt;/span&gt; &lt;span class="n"&gt;match&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;captures&lt;/span&gt;
+  &lt;span class="k"&gt;else&lt;/span&gt;
+    &lt;span class="nb"&gt;puts&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;No Match.&amp;quot;&lt;/span&gt;
+  &lt;span class="k"&gt;end&lt;/span&gt;
+&lt;span class="k"&gt;end&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Here&amp;#8217;s an example using a pattern to capture information from custom
+syslog messages triggered by updating puppet configs. Here&amp;#8217;s some sample&amp;nbsp;messages:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="go"&gt;[rvmtest@jantmanwork ~]$ cat puppet.log&lt;/span&gt;
+&lt;span class="go"&gt;Updated 2 files in puppet svn (environment prod) to revision 754&lt;/span&gt;
+&lt;span class="go"&gt;Updated 3 files in puppet svn (environment prod) to revision 756&lt;/span&gt;
+&lt;span class="go"&gt;Updated 1 files in puppet svn (environment prod) to revision 757&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;And the pattern that I&amp;nbsp;use:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;Updated%{SPACE}%{NUMBER:puppet_svn_num_files}%{SPACE}files%{SPACE}in%{SPACE}puppet%{SPACE}svn%{SPACE}\(environment%{SPACE}%{WORD:puppet_svn_env}\)%{SPACE}to%{SPACE}revision%{SPACE}%{NUMBER:puppet_svn_revision}
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;And the output of the&amp;nbsp;script:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="go"&gt;[rvmtest@jantmanwork ~]$ cat puppet.log | ./puppet-update-test.rb &lt;/span&gt;
+&lt;span class="go"&gt;&lt;span class="caps"&gt;PATTERN&lt;/span&gt;: Updated%{&lt;span class="caps"&gt;SPACE&lt;/span&gt;}%{&lt;span class="caps"&gt;NUMBER&lt;/span&gt;:puppet_svn_num_files}%{&lt;span class="caps"&gt;SPACE&lt;/span&gt;}files%{&lt;span class="caps"&gt;SPACE&lt;/span&gt;}in%{&lt;span class="caps"&gt;SPACE&lt;/span&gt;}puppet%{&lt;span class="caps"&gt;SPACE&lt;/span&gt;}svn%{&lt;span class="caps"&gt;SPACE&lt;/span&gt;}\(environment%{&lt;span class="caps"&gt;SPACE&lt;/span&gt;}%{&lt;span class="caps"&gt;WORD&lt;/span&gt;:puppet_svn_env}\)%{&lt;span class="caps"&gt;SPACE&lt;/span&gt;}to%{&lt;span class="caps"&gt;SPACE&lt;/span&gt;}revision%{&lt;span class="caps"&gt;SPACE&lt;/span&gt;}%{&lt;span class="caps"&gt;NUMBER&lt;/span&gt;:puppet_svn_revision}&lt;/span&gt;
+&lt;span class="go"&gt;&lt;span class="caps"&gt;IN&lt;/span&gt;: Updated 2 files in puppet svn (environment prod) to revision 754&lt;/span&gt;
+&lt;span class="go"&gt;&lt;span class="caps"&gt;MATCH&lt;/span&gt;:&lt;/span&gt;
+&lt;span class="go"&gt;{&amp;quot;&lt;span class="caps"&gt;SPACE&lt;/span&gt;&amp;quot;=&amp;gt;[&amp;quot; &amp;quot;, &amp;quot; &amp;quot;, &amp;quot; &amp;quot;, &amp;quot; &amp;quot;, &amp;quot; &amp;quot;, &amp;quot; &amp;quot;, &amp;quot; &amp;quot;, &amp;quot; &amp;quot;, &amp;quot; &amp;quot;, &amp;quot; &amp;quot;],&lt;/span&gt;
+&lt;span class="go"&gt; &amp;quot;&lt;span class="caps"&gt;NUMBER&lt;/span&gt;:puppet_svn_num_files&amp;quot;=&amp;gt;[&amp;quot;2&amp;quot;],&lt;/span&gt;
+&lt;span class="go"&gt; &amp;quot;&lt;span class="caps"&gt;BASE10NUM&lt;/span&gt;&amp;quot;=&amp;gt;[&amp;quot;2&amp;quot;, &amp;quot;754&amp;quot;],&lt;/span&gt;
+&lt;span class="go"&gt; &amp;quot;&lt;span class="caps"&gt;WORD&lt;/span&gt;:puppet_svn_env&amp;quot;=&amp;gt;[&amp;quot;prod&amp;quot;],&lt;/span&gt;
+&lt;span class="go"&gt; &amp;quot;&lt;span class="caps"&gt;NUMBER&lt;/span&gt;:puppet_svn_revision&amp;quot;=&amp;gt;[&amp;quot;754&amp;quot;]}&lt;/span&gt;
+&lt;span class="go"&gt;&lt;span class="caps"&gt;IN&lt;/span&gt;: Updated 3 files in puppet svn (environment prod) to revision 756&lt;/span&gt;
+&lt;span class="go"&gt;&lt;span class="caps"&gt;MATCH&lt;/span&gt;:&lt;/span&gt;
+&lt;span class="go"&gt;{&amp;quot;&lt;span class="caps"&gt;SPACE&lt;/span&gt;&amp;quot;=&amp;gt;[&amp;quot; &amp;quot;, &amp;quot; &amp;quot;, &amp;quot; &amp;quot;, &amp;quot; &amp;quot;, &amp;quot; &amp;quot;, &amp;quot; &amp;quot;, &amp;quot; &amp;quot;, &amp;quot; &amp;quot;, &amp;quot; &amp;quot;, &amp;quot; &amp;quot;],&lt;/span&gt;
+&lt;span class="go"&gt; &amp;quot;&lt;span class="caps"&gt;NUMBER&lt;/span&gt;:puppet_svn_num_files&amp;quot;=&amp;gt;[&amp;quot;3&amp;quot;],&lt;/span&gt;
+&lt;span class="go"&gt; &amp;quot;&lt;span class="caps"&gt;BASE10NUM&lt;/span&gt;&amp;quot;=&amp;gt;[&amp;quot;3&amp;quot;, &amp;quot;756&amp;quot;],&lt;/span&gt;
+&lt;span class="go"&gt; &amp;quot;&lt;span class="caps"&gt;WORD&lt;/span&gt;:puppet_svn_env&amp;quot;=&amp;gt;[&amp;quot;prod&amp;quot;],&lt;/span&gt;
+&lt;span class="go"&gt; &amp;quot;&lt;span class="caps"&gt;NUMBER&lt;/span&gt;:puppet_svn_revision&amp;quot;=&amp;gt;[&amp;quot;756&amp;quot;]}&lt;/span&gt;
+&lt;span class="go"&gt;&lt;span class="caps"&gt;IN&lt;/span&gt;: Updated 1 files in puppet svn (environment prod) to revision 757&lt;/span&gt;
+&lt;span class="go"&gt;&lt;span class="caps"&gt;MATCH&lt;/span&gt;:&lt;/span&gt;
+&lt;span class="go"&gt;{&amp;quot;&lt;span class="caps"&gt;SPACE&lt;/span&gt;&amp;quot;=&amp;gt;[&amp;quot; &amp;quot;, &amp;quot; &amp;quot;, &amp;quot; &amp;quot;, &amp;quot; &amp;quot;, &amp;quot; &amp;quot;, &amp;quot; &amp;quot;, &amp;quot; &amp;quot;, &amp;quot; &amp;quot;, &amp;quot; &amp;quot;, &amp;quot; &amp;quot;],&lt;/span&gt;
+&lt;span class="go"&gt; &amp;quot;&lt;span class="caps"&gt;NUMBER&lt;/span&gt;:puppet_svn_num_files&amp;quot;=&amp;gt;[&amp;quot;1&amp;quot;],&lt;/span&gt;
+&lt;span class="go"&gt; &amp;quot;&lt;span class="caps"&gt;BASE10NUM&lt;/span&gt;&amp;quot;=&amp;gt;[&amp;quot;1&amp;quot;, &amp;quot;757&amp;quot;],&lt;/span&gt;
+&lt;span class="go"&gt; &amp;quot;&lt;span class="caps"&gt;WORD&lt;/span&gt;:puppet_svn_env&amp;quot;=&amp;gt;[&amp;quot;prod&amp;quot;],&lt;/span&gt;
+&lt;span class="go"&gt; &amp;quot;&lt;span class="caps"&gt;NUMBER&lt;/span&gt;:puppet_svn_revision&amp;quot;=&amp;gt;[&amp;quot;757&amp;quot;]}&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Hopefully this will make the process a bit simpler for someone&amp;nbsp;else&amp;#8230;&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Mon, 03 Sep 2012 08:37:00 -0400</pubDate><guid>tag:newblog.jasonantman.com,2012-09-03:2012/09/rvm-and-ruby-1-9-to-test-logstash-grok-patterns-on-fedoracentos/</guid><category>grok</category><category>grokparsefailure</category><category>jruby</category><category>kibana</category><category>logstash</category><category>ruby</category><category>rvm</category></item></channel></rss>

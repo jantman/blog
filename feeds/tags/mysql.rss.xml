@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Jason Antman's Blog</title><link>http://newblog.jasonantman.com/</link><description></description><atom:link href="http://newblog.jasonantman.com/feeds/tags/mysql.rss.xml" rel="self"></atom:link><lastBuildDate>Wed, 04 May 2011 08:47:00 -0400</lastBuildDate><item><title>Simple Diagrams of MySQL Schema</title><link>http://newblog.jasonantman.com/2011/05/simple-diagrams-of-mysql-schema/</link><description>&lt;p&gt;Jess Robinson&amp;#8217;s
+&lt;a href="http://search.cpan.org/~jrobinson/SQL-Translator/"&gt;&lt;span class="caps"&gt;SQL&lt;/span&gt;-Translator&lt;/a&gt; &lt;span class="caps"&gt;CPAN&lt;/span&gt;
+module translates and parses &lt;span class="caps"&gt;SQL&lt;/span&gt; statements. The
+&lt;a href="http://sqlfairy.sourceforge.net/"&gt;SQLfairy&lt;/a&gt; project has some nice
+binaries that, among other things, use GraphViz or &lt;span class="caps"&gt;GD&lt;/span&gt; to draw pseudo-&lt;span class="caps"&gt;ER&lt;/span&gt;
+diagrams from &lt;span class="caps"&gt;SQL&lt;/span&gt; &lt;span class="caps"&gt;CREATE&lt;/span&gt; statements. Drawing a diagram of an &lt;span class="caps"&gt;SQL&lt;/span&gt; schema
+is as easy as
+&lt;code&gt;sqlt-diagram --db=MySQL -o schema.png -i png -t "title" --color --gutter 100 -c 2 schema-erd.sql&lt;/code&gt;.
+There are a few minor issues - the program seems to choke on the &lt;span class="caps"&gt;LOCK&lt;/span&gt;
+&lt;span class="caps"&gt;TABLES&lt;/span&gt; statements in &lt;code&gt;mysqldump&lt;/code&gt; output. But overall, the results are
+quite nice. The script can take (as easy as putting it in a Makefile)
+mysqldump output and generate a diagram like the one below, including
+foreign key constraints. I also found a simple intro and example in a
+post on &lt;a href="http://nsaunders.wordpress.com/2009/01/11/easy-visualisation-of-database-schemas-using-sqlfairy/"&gt;Neil
+Saunders&lt;/a&gt;&amp;#8216;&amp;nbsp;blog.&lt;/p&gt;
+&lt;p&gt;&lt;img alt="sqlfairy output" src="/GFX/sqlfairy.png" /&gt;&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Wed, 04 May 2011 08:47:00 -0400</pubDate><guid>tag:newblog.jasonantman.com,2011-05-04:2011/05/simple-diagrams-of-mysql-schema/</guid><category>database</category><category>db</category><category>diagram</category><category>mysql</category><category>sql</category></item><item><title>MySQL General Query Log and Awk Trimming Columns</title><link>http://newblog.jasonantman.com/2010/12/mysql-general-query-log-and-awk-trimming-columns/</link><description>&lt;p&gt;So today I started to implement a number of complex regex-based rules
+and templates to get &lt;a href="http://www.rsyslog.com"&gt;rsyslog&lt;/a&gt; to parse &lt;span class="caps"&gt;ISC&lt;/span&gt;
+DHCPd logs in realtime. Unfortunately one of my templates must have been
+wrong, because I started seeing some errors about a field that cannot be
+blank in &lt;code&gt;/var/log/messages&lt;/code&gt;. Unfortunately, rsyslog doesn&amp;#8217;t log the
+query that raised the error, or the name of the template, or anything
+else useful - just that there was a database error. With over a dozen
+new templates, this didn&amp;#8217;t help much. But the following technique&amp;nbsp;did:&lt;/p&gt;
+&lt;p&gt;MySQLd has a &lt;a href="http://dev.mysql.com/doc/refman/5.1/en/query-log.html"&gt;General Query
+Log&lt;/a&gt; that can be
+activated by addling a line&amp;nbsp;like:  &lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;log=/tmp/query.log`
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;to &lt;code&gt;/etc/my.cnf&lt;/code&gt; under the &lt;code&gt;[mysqld]&lt;/code&gt; section. This will log *all*
+queries to the specified log file, even if they resulted in an error or
+did not manipulate&amp;nbsp;data.&lt;/p&gt;
+&lt;p&gt;I couldn&amp;#8217;t find documentation on the log file format, but I observed
+that each line appeared to begin with some whitespace, then a number
+(perhaps a connection or section number, or maybe some sort of query
+ordering number), then the word &amp;#8220;Query&amp;#8221;, then the query. The following
+awk expression prints everything from the third column on, dropping the
+first two columns (the number and&amp;nbsp;&amp;#8220;Query&amp;#8221;):  &lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;awk &lt;span class="s1"&gt;&amp;#39;{ for (i=2; i&amp;lt;=&lt;span class="caps"&gt;NF&lt;/span&gt;; i++) printf &amp;quot;%s &amp;quot;, $i; printf &amp;quot;\n&amp;quot;; }&amp;#39;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;For easy analysis, the output of that can be piped into &lt;code&gt;sort&lt;/code&gt; and then
+&lt;code&gt;uniq&lt;/code&gt;.&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Tue, 21 Dec 2010 11:45:00 -0500</pubDate><guid>tag:newblog.jasonantman.com,2010-12-21:2010/12/mysql-general-query-log-and-awk-trimming-columns/</guid><category>awk</category><category>database</category><category>logging</category><category>mysql</category></item><item><title>Update, Eventum/MySQLTicketing Integration</title><link>http://newblog.jasonantman.com/2008/02/update-eventummysqlticketing-integration/</link><description>&lt;p&gt;Well I know I haven&amp;#8217;t updated in a while. I have a whole bunch of links
+that I&amp;#8217;d like to comment on, but things have been horribly busy. You can
+find the links in my &lt;a href="http://del.icio.us/jantman/1-toblog"&gt;&amp;#8220;1-toblog&amp;#8221; folder on
+del.icio.us&lt;/a&gt; (prefixed with &amp;#8220;1-&amp;#8221; so
+it shows up at the beginning of my bookmark&amp;nbsp;menu).&lt;/p&gt;
+&lt;p&gt;In monitoring land, I&amp;#8217;ve paused my &lt;a href="http://www.hyperic.com/products/hq_oss.html"&gt;Hyperic
+&lt;span class="caps"&gt;HQ&lt;/span&gt;&lt;/a&gt; &lt;span class="caps"&gt;VM&lt;/span&gt; as I wasn&amp;#8217;t too
+pleased with how the features panned out. I was invited to beta test
+&lt;a href="http://www.groundworkopensource.com/"&gt;Groundwork Open Source&lt;/a&gt; 5.2b, but
+I&amp;#8217;m not crazy about the open-ness of a non-public Beta, and am honestly
+not that intrigued by the small feature set (though, admittedly, they do
+need more documentation on the F/&lt;span class="caps"&gt;OSS&lt;/span&gt; version). I&amp;#8217;d still like to try
+them all, especially &lt;a href="http://www.zenoss.com/product/core"&gt;Zenoss Core&lt;/a&gt;,
+but I&amp;#8217;m pretty busy with class, and things are heating up at work and
+with a few consulting&amp;nbsp;projects.&lt;/p&gt;
+&lt;p&gt;In my &amp;#8220;spare time&amp;#8221; (read: staying up until 5 &lt;span class="caps"&gt;AM&lt;/span&gt; and somehow still
+getting up for work at 9) I&amp;#8217;ve been working on something that&amp;#8217;s been
+bugging me for a while - getting &lt;a href="http://www.nagios.org/"&gt;Nagios&lt;/a&gt; to
+automatically open and update tickets in
+&lt;a href="http://eventum.mysql.org"&gt;Eventum&lt;/a&gt;, the ticketing system that I (and
+MySQL) use. The general idea is to use a &amp;#8220;glue&amp;#8221; script, written in &lt;span class="caps"&gt;PHP&lt;/span&gt;
+(Eventum&amp;#8217;s native language). It will (hopefully) keep track of which
+hosts/services it has opened tickets for (and what the ticket &lt;span class="caps"&gt;ID&lt;/span&gt; is),
+and decide from that whether to open a new ticket or, if one already
+exists for that host/service, update it. It should also handle changes
+to assigned user/group, update categories, priorities, etc. This will
+all be based on a &lt;span class="caps"&gt;DB&lt;/span&gt; table that maps problem severities and
+hosts/services to the users, groups, categories, and priorities that
+they should be&amp;nbsp;assigned.&lt;/p&gt;
+&lt;p&gt;The biggest problem is that I&amp;#8217;m not a whiz at object-oriented &lt;span class="caps"&gt;PHP&lt;/span&gt;, and
+like any good &lt;span class="caps"&gt;OO&lt;/span&gt; program, Eventum is broken down into dozens of objects,
+classes, and files. With the help of the &lt;a href="http://xdebug.org/"&gt;Xdebug debugging extension for
+&lt;span class="caps"&gt;PHP&lt;/span&gt;&lt;/a&gt;, which prints full debugging output including
+stack and function call traces, I&amp;#8217;ve been able to *finally* - after
+about four hours of work - write a simple little 15-line script that
+uses &lt;span class="caps"&gt;ONLY&lt;/span&gt; existing Eventum classes, unmodified (except for a separate
+init.php with some stuff commented out), which gets a list of users
+assigned to an issue. From here, it shouldn&amp;#8217;t be difficult to get full
+issue information and then, hopefully, add and update&amp;nbsp;issues.&lt;/p&gt;
+&lt;p&gt;I have a &lt;a href="http://www.jasonantman.com/wiki/index.php/Monitoring_Ticketing"&gt;basic description of the project on my
+wiki&lt;/a&gt;,
+and the current (development, so could be broken) source code in &lt;span class="caps"&gt;CVS&lt;/span&gt;,
+which can be &lt;a href="http://cvs.jasonantman.com/cvs/Eventum-Nagios/"&gt;seen through ViewVC on my
+site&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;Stay&amp;nbsp;Tuned!&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Thu, 21 Feb 2008 14:53:00 -0500</pubDate><guid>tag:newblog.jasonantman.com,2008-02-21:2008/02/update-eventummysqlticketing-integration/</guid><category>eventum</category><category>monitoring</category><category>mysql</category><category>programming</category><category>ticketing</category></item><item><title>Sun and MySQL</title><link>http://newblog.jasonantman.com/2008/01/sun-and-mysql/</link><description>&lt;p&gt;I&amp;#8217;ve got a lot to update about in the next few days. I&amp;#8217;m back in my
+apartment for the new semester of school, I&amp;#8217;ve got a lot of
+infrastructure work to do here (most importantly getting net-to-net &lt;span class="caps"&gt;VPN&lt;/span&gt;
+with &lt;a href="http://www.dyndns.org"&gt;DynDNS&lt;/a&gt; at both ends working from here to
+home, even if it means bypassing &lt;a href="http://www.ipcop.org/"&gt;IPcop&lt;/a&gt;
+totally), and I also did some freelance administration over winter
+break, including some work with &lt;span class="caps"&gt;SCO&lt;/span&gt; OpenServer and some work with &lt;span class="caps"&gt;DF&lt;/span&gt;
+generation - I also set up my own &lt;span class="caps"&gt;PDF&lt;/span&gt; form filling system, which I&amp;#8217;ll be
+posting in &lt;a href="http://cvs.jasonantman.com"&gt;&lt;span class="caps"&gt;CVS&lt;/span&gt;&lt;/a&gt; once it&amp;#8217;s done. Most
+importantly, the new mailserver has been up and running for 22 days
+without any problems. And, by far the most exciting, I&amp;#8217;m typing this up
+on my beautiful new &lt;a href="http://eeepc.asus.com/us/product.htm"&gt;Asus eeePC
+4G&lt;/a&gt; (which I upgraded to 1 &lt;span class="caps"&gt;GB&lt;/span&gt; &lt;span class="caps"&gt;RAM&lt;/span&gt;)
+running &lt;a href="http://www.opensuse.org"&gt;OpenSuSE&lt;/a&gt; 10.3 from a 4 &lt;span class="caps"&gt;GB&lt;/span&gt; &lt;span class="caps"&gt;SDHC&lt;/span&gt; card -
+A &lt;span class="caps"&gt;HOWTO&lt;/span&gt; will be coming soon. I&amp;#8217;m also going to be doing some work with
+sitemaps on this site - specifically Google sitemaps - and building one
+map for the blog, Mediawiki, and static content. I&amp;#8217;m also testing
+&lt;a href="http://www.google.com/analytics/"&gt;Google Analytics&lt;/a&gt; on my
+&lt;a href="http://www.jasonantman.com"&gt;wiki&lt;/a&gt; to augment
+&lt;a href="http://www.mrunix.net/webalizer/"&gt;Webalizer&lt;/a&gt;. I&amp;#8217;ll be updating the blog
+in the next few days with a lot of&amp;nbsp;content.&lt;/p&gt;
+&lt;p&gt;I&amp;#8217;m also catching up on all of my &lt;span class="caps"&gt;RSS&lt;/span&gt; feeds in &lt;a href="http://www.google.com/reader/"&gt;Google
+Reader&lt;/a&gt; (yes, I use Google everything -
+but not mail or Docs) which I mostly ignored over break. I started
+yesterday with 780 items, and I&amp;#8217;m down to 500. I&amp;#8217;m also going to attempt
+to start quick little &amp;#8220;links of the day&amp;#8221; entries, as it seems that it&amp;#8217;s
+taking me too much time to fully blog on the interesting news of the
+day, and my&lt;a href="http://del.icio.us/jantman/1-toblog"&gt;list of things to blog
+on&lt;/a&gt; is getting way too long. (Just
+as a side note, the only reason I really use
+&lt;a href="http://del.icio.us"&gt;del.icio.us&lt;/a&gt; is so I can have the &lt;a href="http://del.icio.us/help/firefox/extensionnew"&gt;firefox
+plugin&lt;/a&gt; sync my bookmarks
+between the many machines I&amp;nbsp;use.)&lt;/p&gt;
+&lt;p&gt;Anyway, on to the hottest bit of news today - &lt;a href="http://www.sun.com"&gt;Sun
+Microsystems&lt;/a&gt; has acqured &lt;a href="http://www.mysql.com/"&gt;MySQL
+&lt;span class="caps"&gt;AB&lt;/span&gt;&lt;/a&gt;. Now, I must say that I&amp;#8217;m an intern at Sun -
+the Campus Ambassador to Rutgers University. Essentially, my job is
+talking to students, professors, and staff and telling them that &amp;#8220;Yes,
+Sun does open source, and they have a few things that should interest
+you&amp;#8221; - in addition to giving tech demos, handing out CDs, and raffling
+off t-shirts - and even a &lt;a href="http://www.sunspotworld.com/"&gt;SunSPOT&lt;/a&gt;. I
+must emphasize that what I say here is my own opinion and nothing more.
+Heck, I&amp;#8217;m an intern, it&amp;#8217;s not like I know any more about what&amp;#8217;s going on
+at Sun than anyone else who reads&amp;nbsp;Digg.&lt;/p&gt;
+&lt;p&gt;Anyway, lots of people are talking about the MySQL acquisition. I&amp;#8217;ve
+heard every possible opinion, but it seems like lots of them are
+worrying about something along the lines of Sun pushing a
+Solaris/Apache/MySQL/Java stack on &lt;span class="caps"&gt;SPARC&lt;/span&gt; hardware. Now, I&amp;#8217;ve been
+watching Sun *very* closely for the past year or so. And I&amp;#8217;ve been
+following &lt;a href="http://www.sun.com/aboutsun/executives/schwartz/bio.jsp"&gt;Jonathan
+Schwartz&lt;/a&gt;
+pretty closely too, especially &lt;a href="http://blogs.sun.com/jonathan/entry/in_a_vortex"&gt;his blog post about the MySQL
+acquisition&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;I can&amp;#8217;t say anything as a Sun employee (I don&amp;#8217;t have anything more to
+say than anyone else who follows the news) but, personally, I think a
+lot of people who are worried are just missing the point. Sun used to be
+a closed, proprietary company pushing Solaris on &lt;span class="caps"&gt;SPARC&lt;/span&gt;. But it seems to
+me, lately, Sun is all about options. Java&amp;#8217;s Free software now. Solaris
+&lt;a href="http://www.opensolaris.org"&gt;has been opened&lt;/a&gt; as well. I don&amp;#8217;t get the
+feeling that acquiring MySQL is about pushing Solaris instead of Linux,
+or that it will cause Sun to ignore
+&lt;a href="http://www.postgresql.org/"&gt;PostgreSQL&lt;/a&gt; or Oracle/Solaris products.
+It&amp;#8217;s about options. Just look at Sun in the news lately - more and more
+Intel-based commodity hardware, Solaris, Linux, or even Windows on Sun
+Hardware, Java,&amp;nbsp;OpenSolaris&amp;#8230;&lt;/p&gt;
+&lt;p&gt;I very much get the feeling that Sun/MySQL is not about Sun trying to
+force &lt;span class="caps"&gt;LAMP&lt;/span&gt; out of the marketplace or, as some have conjectured, to turn
+MySQL into a mostly proprietary product with minimal free version. It
+seems to be about options. About diversity. Whatever you want, Sun can
+help. Everything from million-dollar Enterprise servers running &lt;a href="http://www.sun.com/software/solaris/trustedsolaris/"&gt;Trusted
+Solaris&lt;/a&gt; and giant
+Oracle databases to Intel-based 1U or 2U &lt;span class="caps"&gt;LAMP&lt;/span&gt; servers - or even, now,
+&lt;span class="caps"&gt;LAMP&lt;/span&gt; servers on non-Sun hardware. (Though why anyone with the money to
+do so wouldn&amp;#8217;t buy Sun hardware, I have no&amp;nbsp;idea).&lt;/p&gt;
+&lt;p&gt;Stay tuned for&amp;nbsp;more.&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Sun, 20 Jan 2008 02:00:00 -0500</pubDate><guid>tag:newblog.jasonantman.com,2008-01-20:2008/01/sun-and-mysql/</guid><category>mysql</category><category>sun</category></item></channel></rss>

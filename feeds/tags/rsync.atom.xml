@@ -1,0 +1,543 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Jason Antman's Blog</title><link href="http://newblog.jasonantman.com/" rel="alternate"></link><link href="http://newblog.jasonantman.com/feeds/tags/rsync.atom.xml" rel="self"></link><id>http://newblog.jasonantman.com/</id><updated>2012-07-07T06:34:00-04:00</updated><entry><title>Nagios Check Plugin for Rsnapshot Backups</title><link href="http://newblog.jasonantman.com/2012/07/nagios-check-plugin-for-rsnapshot-backups/" rel="alternate"></link><updated>2012-07-07T06:34:00-04:00</updated><author><name>admin</name></author><id>tag:newblog.jasonantman.com,2012-07-07:2012/07/nagios-check-plugin-for-rsnapshot-backups/</id><summary type="html">&lt;p&gt;In a previous post, I described how I do &lt;a href="/2012/01/secure-rsnapshot-backups-over-the-wan-via-ssh/"&gt;Secure rsnapshot backups over
+the &lt;span class="caps"&gt;WAN&lt;/span&gt; via
+&lt;span class="caps"&gt;SSH&lt;/span&gt;&lt;/a&gt;. While my
+layout of rsnapshot configuration files, data, and log files is a bit
+esoteric, I monitor all this with a Nagios check plugin that runs on my
+backup host. It Assumes that the output of
+&lt;a href="http://rsnapshot.org/"&gt;rsnapshot&lt;/a&gt; is written to a text log file, one
+file per host, at a path that matches
+&lt;code&gt;/path_to_log_directory/log_HOSTNAME_YYYYMMDD-HHMMSS.log&lt;/code&gt; where
+&lt;code&gt;HOSTNAME&lt;/code&gt; is the name of the host, and &lt;code&gt;YYYYMMDD-HHMMSS&lt;/code&gt; is a datestamp
+(actually, the script just finds the newest file matching
+&lt;code&gt;log_HOSTNAME_*.log&lt;/code&gt; in that directory). In order to obtain correct
+timing of the runs, which rsnapshot doesn&amp;#8217;t offer, it assumes that you
+trigger rsnapshot through a wrapper script, which runs it once per host
+(inside a loop?) with per-host log files and some logging information
+added,&amp;nbsp;like:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="k"&gt;for &lt;/span&gt;h in 
+&lt;span class="k"&gt;do&lt;/span&gt;
+&lt;span class="k"&gt;    &lt;/span&gt;&lt;span class="nv"&gt;&lt;span class="caps"&gt;LOGFILE&lt;/span&gt;&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;/mnt/backup/rsnapshot/logs/log_${h}_`date +%Y%m%d-%H%M%S`.txt&amp;quot;&lt;/span&gt;
+    &lt;span class="nb"&gt;echo&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;# Starting backup at `date` (`date +%s`)&amp;quot;&lt;/span&gt; &amp;gt;&amp;gt; &lt;span class="s2"&gt;&amp;quot;$&lt;span class="caps"&gt;LOGFILE&lt;/span&gt;&amp;quot;&lt;/span&gt;
+    /usr/bin/rsnapshot -c /etc/rsnapshot-&lt;span class="nv"&gt;$h&lt;/span&gt;.conf daily &amp;amp;&amp;gt;&amp;gt; &lt;span class="s2"&gt;&amp;quot;$&lt;span class="caps"&gt;LOGFILE&lt;/span&gt;&amp;quot;&lt;/span&gt;
+    &lt;span class="nb"&gt;echo&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;# Finished backup at `date` (`date +%s`)&amp;quot;&lt;/span&gt; &amp;gt;&amp;gt; &lt;span class="s2"&gt;&amp;quot;$&lt;span class="caps"&gt;LOGFILE&lt;/span&gt;&amp;quot;&lt;/span&gt;
+&lt;span class="k"&gt;done&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;The &lt;code&gt;check_rsnapshot.pl&lt;/code&gt; plugin uses &lt;code&gt;utils.pm&lt;/code&gt; from Nagios, as well as
+&lt;a href="http://search.cpan.org/~jv/Getopt-Long-2.38/lib/Getopt/Long.pm"&gt;Getopt::Long&lt;/a&gt;,
+&lt;a href="http://search.cpan.org/~makoto/File-Stat-0.01/Stat.pm"&gt;File::stat&lt;/a&gt;,
+&lt;a href="http://search.cpan.org/~flora/perl-5.14.2/lib/File/Basename.pm"&gt;File::Basename&lt;/a&gt;,
+&lt;a href="http://search.cpan.org/~smueller/PathTools-3.33/lib/File/Spec.pm"&gt;File::Spec&lt;/a&gt;
+and
+&lt;a href="http://search.cpan.org/~ferreira/Number-Bytes-Human-0.07/Human.pm"&gt;Number::Bytes::Human&lt;/a&gt;.
+This was one of my first Perl plugins, but seems to be rather
+acceptable. It makes the following checks based on the rsnapshot&amp;nbsp;log:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Backup run in the last X seconds (warning and crit&amp;nbsp;thresholds)&lt;/li&gt;
+&lt;li&gt;Maximum time from start to finish (warning and crit&amp;nbsp;thresholds)&lt;/li&gt;
+&lt;li&gt;Minimum size of backup (warning and crit&amp;nbsp;thresholds)&lt;/li&gt;
+&lt;li&gt;Minimum number of files in backup (warning and crit&amp;nbsp;thresholds)&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;In addition to &lt;code&gt;check_file_age&lt;/code&gt; checks on a number of files that are
+included in backups and I know are modified before each backup run, this
+seems to handle monitoring quite well for me. I certainly preferred
+running &lt;a href="http://www.bacula.org/"&gt;Bacula&lt;/a&gt; and using my MySQL-based
+&lt;a href="https://github.com/jantman/nagios-scripts/blob/master/check_bacula_job.php"&gt;check_bacula_job.php&lt;/a&gt;,
+but as I&amp;#8217;m now backing up 4 machines to my desktop, I no longer have a
+need for Bacula (or&amp;nbsp;tapes).&lt;/p&gt;
+&lt;p&gt;The script itself can be found at
+&lt;a href="https://github.com/jantman/nagios-scripts/blob/master/check_rsnapshot.pl"&gt;github&lt;/a&gt;.&lt;/p&gt;</summary><category term="backups"></category><category term="monitoring"></category><category term="Nagios"></category><category term="rsnapshot"></category><category term="rsync"></category></entry><entry><title>Rsync on an Android phone</title><link href="http://newblog.jasonantman.com/2012/04/rsync-on-an-android-phone/" rel="alternate"></link><updated>2012-04-04T20:40:00-04:00</updated><author><name>admin</name></author><id>tag:newblog.jasonantman.com,2012-04-04:2012/04/rsync-on-an-android-phone/</id><summary type="html">&lt;p&gt;Every once in a while, there are some files that I want kept in sync
+between my Android-based phone and one of my Linux (or Mac, or any Unix,
+or maybe Windows too, but I use Linux&amp;#8230;) boxes. Yeah, I can copy them
+over manually via &lt;span class="caps"&gt;USB&lt;/span&gt; or even something a bit simpler like
+&lt;a href="https://market.android.com/details?id=lysesoft.andftp"&gt;AndFTP&lt;/a&gt;
+(assuming you can &lt;span class="caps"&gt;SCP&lt;/span&gt; to the target machine). But that&amp;#8217;s a real pain for
+anything like my &lt;a href="http://keepass.info/"&gt;KeePass&lt;/a&gt; (well, actually
+&lt;a href="http://www.keepassx.org/"&gt;KeePassX&lt;/a&gt; and
+&lt;a href="https://market.android.com/details?id=com.android.keepass"&gt;KeePassDroid&lt;/a&gt;)
+password database, that I might add something to at any time and forget
+to sync. I also try to occasionally (waiting in line?) backup &lt;span class="caps"&gt;SMS&lt;/span&gt;, call
+logs, etc. on my phone, and like to have those synced back to the
+desktop&amp;nbsp;automatically.&lt;/p&gt;
+&lt;p&gt;Enter the solution: &lt;a href="https://market.android.com/details?id=eu.kowalczuk.rsync4android"&gt;rsync backup for
+Android&lt;/a&gt;,
+a &lt;a href="http://rsync.samba.org/"&gt;rsync&lt;/a&gt; client for Android that includes
+Tasker plugins (there are a few things about the app that I don&amp;#8217;t like,
+but it seems to be the only option at the moment), and
+&lt;a href="https://market.android.com/details?id=net.dinglisch.android.taskerm"&gt;Tasker&lt;/a&gt;,
+an automation framework for Android.Tasker is one of the few Android
+apps that I&amp;#8217;ve actually bought (i.e. not free/no-cost), and is currently
+selling for $6.49. It&amp;#8217;s an incredibly capable task automator, very much
+akin to &lt;a href="http://www.twofortyfouram.com/"&gt;Locale&lt;/a&gt; on steroids. On the
+down side, Tasker can eat up battery life if you don&amp;#8217;t configure it
+intelligently, and it&amp;#8217;s not &lt;em&gt;always&lt;/em&gt; 100% reliable when interacting with
+the system. On the positive side, Tasker can identify practically any
+combination of states in the android system (from hardware and software
+events to &lt;span class="caps"&gt;GPS&lt;/span&gt; location, time, signal status, etc.) and perform almost
+any task on the system based on this information. Sure, this specific
+problem could be solved with a cron replacement (which Android lacks, of
+course), but Tasker can do things like play specific audio files when
+you get an &lt;span class="caps"&gt;SMS&lt;/span&gt; from a specific number, mute audio at certain &lt;span class="caps"&gt;GPS&lt;/span&gt;
+locations, or turn WiFi on when I get home and off when I leave the
+house. It also has a plugin architecture, and rsync backup for Android
+happens to have a plugin that works with&amp;nbsp;it.&lt;/p&gt;
+&lt;p&gt;So, our goal is to have a daily, bi-directional, newest-file-wins sync
+between a directory on our Android phone and a directory on a computer.
+I&amp;#8217;m not going to go into a lot of the computer-side stuff, mainly
+because that varies quite a bit between operating systems, and also
+because my personal setup is a bit paranoid in terms of security. For
+the computer side, we&amp;#8217;ll need a machine that can be SSHed to from the
+Internet (either a static &lt;span class="caps"&gt;IP&lt;/span&gt; or a known hostname/dynamic &lt;span class="caps"&gt;DNS&lt;/span&gt;), a user
+that can run rsync over &lt;span class="caps"&gt;SSH&lt;/span&gt;, and a directory that&amp;#8217;s writable&amp;nbsp;(obviously).&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Setup:&lt;/strong&gt;&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Buy and install the
+    &lt;a href="https://play.google.com/store/apps/details?id=net.dinglisch.android.taskerm"&gt;Tasker&lt;/a&gt;&amp;nbsp;app.&lt;/li&gt;
+&lt;li&gt;Install the &lt;a href="https://play.google.com/store/apps/details?id=eu.kowalczuk.rsync4android"&gt;rsync backup for
+    Android&lt;/a&gt;&amp;nbsp;app.&lt;/li&gt;
+&lt;li&gt;Configure the rsync stuff on the computer. In the simplest form,
+    we&amp;#8217;ll just need a user that can login and run rsync, and a directory
+    to sync from/to &lt;em&gt;(note: this should be a directory used only for
+    syncing the&amp;nbsp;phone&amp;#8230;).&lt;/em&gt;&lt;/li&gt;
+&lt;li&gt;Open the rsync backup for Android app. Use Menu -&gt; Generate Keys to
+    generate a new pair of &lt;span class="caps"&gt;SSH&lt;/span&gt; keys, and then get the public key setup
+    on the target computer. See &lt;a href="http://android.kowalczuk.eu/rsync4android/"&gt;the developer&amp;#8217;s web
+    site&lt;/a&gt; for&amp;nbsp;instructions.&lt;/li&gt;
+&lt;li&gt;Once keys are setup, create a new profile called &amp;#8220;&lt;span class="caps"&gt;PC&lt;/span&gt;-droid&amp;#8221;. Set the
+    local directory to a new empty directory (I used &lt;code&gt;/sdcard/sync&lt;/code&gt;),
+    enter the remote host address, port, username, and remote directory,
+    and select the private &lt;span class="caps"&gt;SSH&lt;/span&gt; key that you created. Check off &amp;#8220;rsync on
+    reverse direction&amp;#8221;. As this program is just a &lt;span class="caps"&gt;GUI&lt;/span&gt; wrapper around
+    normal rsync binaries, you can specify additional options to the
+    rsync command; my string ended up being
+    &lt;code&gt;-vHrltDuO --chmod=Du+rwx,go-rwx,Fu+rw,go-rw --no-perms&lt;/code&gt;. If it
+    helps, at the bottom of the screen you can see the actual rsync
+    command line that will be run. Save when&amp;nbsp;done.&lt;/li&gt;
+&lt;li&gt;Save the profile, then long-press it and select &amp;#8220;Duplicate&amp;#8221;. Change
+    the name to &amp;#8220;droid-&lt;span class="caps"&gt;PC&lt;/span&gt;&amp;#8221;, uncheck &amp;#8220;rsync in reverse direction&amp;#8221;, and
+    change your additional options as needed (mine became
+    &lt;code&gt;-vHrltDu --chmod=Dug+rwx,o-rwx,Fug+rw,o-rw --no-perms&lt;/code&gt;). Save when&amp;nbsp;done.&lt;/li&gt;
+&lt;li&gt;Create a test file in the sync directory on the &lt;span class="caps"&gt;PC&lt;/span&gt;, and a different
+    one in the sync directory on the&amp;nbsp;droid.&lt;/li&gt;
+&lt;li&gt;One at a time, in the rsync backup app, tap on the profile names. If
+    all goes well, the syncs should run, and both files will now be in
+    both places. If there are any problems, the output should help; the
+    most likely issues are probably permissions, rsync command options,
+    or &lt;span class="caps"&gt;SSH&lt;/span&gt;&amp;nbsp;keys.&lt;/li&gt;
+&lt;li&gt;Long-press each profile, select &amp;#8220;Edit&amp;#8221;, and check off &amp;#8220;Close log
+    window after job is done&amp;#8221;. Save&amp;nbsp;profile.&lt;/li&gt;
+&lt;li&gt;Now fire up Tasker. Click the &amp;#8220;+&amp;#8221; at the bottom of the screen to
+    create a new profile, call it &amp;#8220;sync&amp;#8221;, and click the check&amp;nbsp;mark.&lt;/li&gt;
+&lt;li&gt;On the First Context panel, tap Time, and select when you want the
+    jobs to run; I chose 03:01. Tap the check&amp;nbsp;mark.&lt;/li&gt;
+&lt;li&gt;On the Task Selection panel, tap New Task. Give it a name, like&amp;nbsp;&amp;#8220;sync2&amp;#8221;.&lt;/li&gt;
+&lt;li&gt;On the Task Edit panel, tap the &amp;#8220;+&amp;#8221; button at the bottom left, tap
+    Plugin, tap &amp;#8220;rsync backup for Android&amp;#8221;, click the &amp;#8220;Edit&amp;#8221; button on
+    the Configuration line, and select the &lt;span class="caps"&gt;PC&lt;/span&gt;-droid rsync profile. Tap
+    the check mark in the lower left to&amp;nbsp;save.&lt;/li&gt;
+&lt;li&gt;Repeat the last step for the droid-&lt;span class="caps"&gt;PC&lt;/span&gt; rsync&amp;nbsp;profile.&lt;/li&gt;
+&lt;li&gt;Tap the check box in the lower left. This saves the&amp;nbsp;profile.&lt;/li&gt;
+&lt;li&gt;In the main Tasker screen, make sure there&amp;#8217;s a green check to the
+    right of the profile you just added, and that the button at the
+    bottom right of the screen is set to&amp;nbsp;&amp;#8220;On&amp;#8221;.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Assuming this all went well, the next time the time you specified rolls
+around, your sync should run. If you gave the task a name in step 12,
+you can setup additional profiles to run it at other times (or use the
+repeat logic&amp;nbsp;builtin).&lt;/p&gt;</summary><category term="android"></category><category term="rsync"></category><category term="tasker"></category></entry><entry><title>Secure rsnapshot backups over the WAN via SSH</title><link href="http://newblog.jasonantman.com/2012/01/secure-rsnapshot-backups-over-the-wan-via-ssh/" rel="alternate"></link><updated>2012-01-15T17:26:00-05:00</updated><author><name>admin</name></author><id>tag:newblog.jasonantman.com,2012-01-15:2012/01/secure-rsnapshot-backups-over-the-wan-via-ssh/</id><summary type="html">&lt;p&gt;Since I moved all of my &lt;span class="caps"&gt;WAN&lt;/span&gt;-facing stuff (mail, web, this blog, svn
+etc.) to a virtual server with &lt;a href="http://www.linode.com"&gt;Linode&lt;/a&gt;, and just
+have a desktop at home, it&amp;#8217;s no longer practical to use
+&lt;a href="http://www.bacula.org/"&gt;Bacula&lt;/a&gt; for backups. Linode manages daily and
+weekly backups through their backup service, but they&amp;#8217;ll only restore a
+full filesystem at a time. I wanted something that would keep daily and
+weekly incremental backups long enough that I could find a file changed
+(or accidentally deleted) a few days or weeks ago. Since I&amp;#8217;d be backing
+up to my desktop at home (which is on a residential dynamic &lt;span class="caps"&gt;IP&lt;/span&gt;
+connection), the logical solution was something using
+&lt;a href="http://rsync.samba.org/"&gt;rsync&lt;/a&gt;. Even better than that is the
+&lt;a href="http://rsnapshot.org/"&gt;rsnapshot&lt;/a&gt; tool, which builds upon rsync and
+hard links to manage incremental backups with as little disk usage as
+possible (though I&amp;#8217;d certainly recommend excluding log&amp;nbsp;files).&lt;/p&gt;
+&lt;p&gt;I&amp;#8217;m pretty strict about security. Since my home connection has a dynamic
+&lt;span class="caps"&gt;IP&lt;/span&gt;, things are a bit more complicated - I can&amp;#8217;t push from the server, I
+can&amp;#8217;t &lt;span class="caps"&gt;ACL&lt;/span&gt; or firewall the server to just my home &lt;span class="caps"&gt;IP&lt;/span&gt;, and an IPsec &lt;span class="caps"&gt;VPN&lt;/span&gt;
+would be difficult to accomplish (not to mention add a lot of overhead
+to big file transfers). So, I opted for a solution that uses &lt;span class="caps"&gt;SSH&lt;/span&gt;
+key-based authentication, forced comands, and a C&amp;nbsp;wrapper.&lt;/p&gt;
+&lt;p&gt;The configuration of rsync and rsnapshot is mostly out of the scope of
+this post. There are plenty of good resources for that, so I&amp;#8217;ll just
+cover the things that won&amp;#8217;t be found in most tutorials. Also, I&amp;#8217;ll be
+referring to the remote machine to be backed up as the &amp;#8220;remote host&amp;#8221; and
+the local machine which triggers the backup and stores the data as the
+&amp;#8220;local&amp;nbsp;host&amp;#8221;.&lt;/p&gt;
+&lt;h2 id="local-host-setup-part-i"&gt;Local Host Setup - Part&amp;nbsp;I&lt;/h2&gt;
+&lt;ol&gt;
+&lt;li&gt;Choose and create a directory to store your backups in. I have a &lt;span class="caps"&gt;1TB&lt;/span&gt;
+    external disk mounted at &lt;code&gt;/mnt/backup/&lt;/code&gt;, so I chose
+    &lt;code&gt;/mnt/backup/rsnapshot/&lt;/code&gt;.&lt;/li&gt;
+&lt;li&gt;Generate two sets of password-less &lt;span class="caps"&gt;SSH&lt;/span&gt; keys using the &lt;code&gt;ssh-keygen&lt;/code&gt;
+    program. One will be used to run the rsync command on the remote
+    host, the other will be used to trigger your pre- and post-backup
+    scripts. Name them accordingly (i.e.
+    &amp;#8220;remoteHostname_remoteBackupUsername_cmd&amp;#8221; and
+    &amp;#8220;remoteHostname_remoteBackupUsername_rsync&amp;#8221;). Now, get (scp) the
+    public key for each pair to the remote&amp;nbsp;host.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id="remote-host-setup"&gt;Remote Host&amp;nbsp;Setup&lt;/h2&gt;
+&lt;ol&gt;
+&lt;li&gt;Ensure that rsync is installed on the&amp;nbsp;host.&lt;/li&gt;
+&lt;li&gt;Create a user to run the backups. I called this user &amp;#8220;rsyncuser&amp;#8221;.
+    Create a home directory, and a group for the user. Do not set a
+    password (you don&amp;#8217;t want password&amp;nbsp;logins).&lt;/li&gt;
+&lt;li&gt;Copy the public key files you created above to the user&amp;#8217;s &lt;code&gt;~/.ssh/&lt;/code&gt;
+    directory.&lt;/li&gt;
+&lt;li&gt;Cat the &amp;#8220;remoteHostname_remoteBackupUsername_cmd&amp;#8221; public key into
+    the user&amp;#8217;s &lt;code&gt;~/.ssh/authorized_keys&lt;/code&gt; file.&lt;/li&gt;
+&lt;li&gt;Now comes the first fun part. Let&amp;#8217;s assume that your pre- and
+    post-backup scripts are &lt;code&gt;/root/bin/rsnapshot-pre.sh&lt;/code&gt; and
+    &lt;code&gt;/root/bin/rsnapshot-post.sh&lt;/code&gt;, respectively. As root, grab a copy of
+    cmd-wrapper.c (from
+    &lt;a href="https://github.com/jantman/misc-scripts/blob/master/cmd-wrapper.c"&gt;GitHub&lt;/a&gt;
+    or at the bottom of this post). Modify for your use - the only thing
+    likely to change is line 38, which ensures it will only run for a
+    member of &lt;span class="caps"&gt;GID&lt;/span&gt; 502. Change this to rsyncuser&amp;#8217;s &lt;span class="caps"&gt;GID&lt;/span&gt;. Compile the
+    wrapper with &lt;code&gt;gcc -o cmd-wrapper cmd-wrapper.c&lt;/code&gt;. Copy it to
+    rsyncuser&amp;#8217;s home directory (/home/rsyncuser), &lt;code&gt;chown root:rsyncuser&lt;/code&gt;
+    and &lt;code&gt;chmod 4750&lt;/code&gt;. Yes, this sets the &lt;span class="caps"&gt;SUID&lt;/span&gt; bit. The program will now
+    be owned by root, and runnable &lt;em&gt;as root&lt;/em&gt; by rsyncuser (or, more
+    specifically, any member of the rsyncuser&amp;nbsp;group).&lt;/li&gt;
+&lt;li&gt;Open rsyncuser&amp;#8217;s &lt;code&gt;.ssh/authorized_keys&lt;/code&gt; file in a text editor. At
+    the beginning of the &amp;#8220;remoteHostname_remoteBackupUsername_cmd&amp;#8221; key
+    line, prepend &lt;code&gt;command="/home/rsyncuser/cmd-wrapper"&lt;/code&gt;. This sets up
+    &lt;span class="caps"&gt;SSH&lt;/span&gt; forced command (there&amp;#8217;s a good overview in &lt;a href="http://oreilly.com/catalog/sshtdg/chapter/ch08.html"&gt;O&amp;#8217;Reilly&amp;#8217;s &lt;span class="caps"&gt;SSH&lt;/span&gt;: The
+    Definitive
+    Guide&lt;/a&gt;) so that
+    when this key is used to login, it will directly execute
+    &lt;code&gt;/home/rsyncuser/cmd-wrapper&lt;/code&gt; and then exit, without allowing access
+    to anything&amp;nbsp;else.&lt;/li&gt;
+&lt;li&gt;Add rsyncuser to &lt;code&gt;AllowUsers&lt;/code&gt; in &lt;code&gt;/etc/ssh/sshd_config&lt;/code&gt; (you &lt;em&gt;do&lt;/em&gt;
+    limit user access via &lt;span class="caps"&gt;SSH&lt;/span&gt;, right?) and then reload&amp;nbsp;sshd.&lt;/li&gt;
+&lt;li&gt;Now, if you &lt;span class="caps"&gt;SSH&lt;/span&gt; to rsyncuser@remoteHost from the local host, using
+    the &amp;#8220;_cmd&amp;#8221; ssh key and a command of &amp;#8220;pre&amp;#8221; (i.e.
+    &lt;code&gt;ssh -i /path/to/remoteHostname_remoteBackupUsername_cmd rsyncuser@remoteHost pre&lt;/code&gt;),
+    it should execute &lt;code&gt;/root/bin/rsnapshot-pre.sh&lt;/code&gt; ad root, and you
+    should see the output&amp;nbsp;locally.&lt;/li&gt;
+&lt;li&gt;Repeat the above step for the post-backup script (replacing &amp;#8220;pre&amp;#8221;
+    above with &amp;#8220;post&amp;#8221;). You should now have your pre- and post-backup
+    scripts working, and triggered remotely. &lt;em&gt;(Note: these steps, and
+    some of the other setup here, is a bit more complex so that it will
+    work better with rsnapshot backups of multiple remote&amp;nbsp;hosts.)&lt;/em&gt;&lt;/li&gt;
+&lt;li&gt;Cat the &amp;#8220;remoteHostname_remoteBackupUsername_rsync&amp;#8221; public key
+    into the backup user&amp;#8217;s &lt;code&gt;~/.ssh/authorized_keys&lt;/code&gt; file.&lt;/li&gt;
+&lt;li&gt;As root, grab a copy of rsync-wrapper.c (from
+    &lt;a href="https://github.com/jantman/misc-scripts/blob/master/rsync-wrapper.c"&gt;GitHub&lt;/a&gt;
+    or at the bottom of this post). Modify for your use - the only thing
+    likely to change is line 38, which ensures it will only run for a
+    member of &lt;span class="caps"&gt;GID&lt;/span&gt; 502 (change this to rsyncuser&amp;#8217;s &lt;span class="caps"&gt;GID&lt;/span&gt;), and perhaps the
+    path of or arguments passed to rsync (the wrapper will call
+    &lt;code&gt;/usr/bin/rsync --server --sender -vlogDtprRe.iLsf --numeric-ids . /&lt;/code&gt;).
+    Compile the wrapper with &lt;code&gt;gcc -o rsync-wrapper rsync-wrapper.c&lt;/code&gt;.
+    Copy it to rsyncuser&amp;#8217;s home directory (/home/rsyncuser),
+    &lt;code&gt;chown root:rsyncuser&lt;/code&gt; and &lt;code&gt;chmod 4750&lt;/code&gt;.&lt;/li&gt;
+&lt;li&gt;Open rsyncuser&amp;#8217;s &lt;code&gt;.ssh/authorized_keys&lt;/code&gt; file in a text editor. At
+    the beginning of the &amp;#8220;remoteHostname_remoteBackupUsername_rsync&amp;#8221;
+    key line, prepend &lt;code&gt;command="/home/rsyncuser/rsync-wrapper"&lt;/code&gt;. This
+    will run rsync with the arguments specified in rsync-wrapper.c every
+    time this key is used to&amp;nbsp;login.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id="local-host-setup-part-ii"&gt;Local Host Setup - Part&amp;nbsp;&lt;span class="caps"&gt;II&lt;/span&gt;&lt;/h2&gt;
+&lt;p&gt;I use totally separate configs for each host that I backup, to keep
+things clean and to let me enable, disable, or tweak one remote backup
+without affecting the&amp;nbsp;others.&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;Create host-specific pre- and post-backup scripts. I put them in
+    &lt;code&gt;/etc/rsnapshot.d/&lt;/code&gt;.
+    &lt;code&gt;/etc/rsnapshot.d/pre-remoteHostName.sh&lt;/code&gt;:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="c"&gt;#!/bin/bash&lt;/span&gt;
+
+&lt;span class="c"&gt;# do anything else needed on the local system before a backup&lt;/span&gt;
+ssh -i /path/to/remoteHostname_remoteBackupUsername_cmd rsyncuser@remoteHost pre
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;&lt;code&gt;/etc/rsnapshot.d/post-remoteHostName.sh&lt;/code&gt;:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="c"&gt;#!/bin/bash&lt;/span&gt;
+
+&lt;span class="c"&gt;# do anything else needed on the local system after a backup&lt;/span&gt;
+ssh -i /path/to/remoteHostname_remoteBackupUsername_cmd rsyncuser@remoteHost post
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Setup a set of rsync include and exclude files (see &lt;code&gt;man rsync(1)&lt;/code&gt;,
+    &lt;code&gt;--include-from=&lt;/code&gt; and &lt;code&gt;--exclude-from=&lt;/code&gt;). I put mine at
+    &lt;code&gt;/etc/rsnapshot.d/rsync-include-remoteHostName.txt&lt;/code&gt; and
+    &lt;code&gt;/etc/rsnapshot.d/rsync-exclude-remoteHostName.txt&lt;/code&gt;, respectively.
+    (Examples included at the bottom of this&amp;nbsp;post).&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Configure rsnapshot. I use a separate config file for each remote
+    host. Copy the default &lt;code&gt;/etc/rsnapshot.conf&lt;/code&gt; to
+    &lt;code&gt;/etc/rsnapshot-remoteHostName.conf&lt;/code&gt;. The important items are
+    &lt;code&gt;rsync_short_args&lt;/code&gt;, &lt;code&gt;rsync_long_args&lt;/code&gt;, &lt;code&gt;ssh_args&lt;/code&gt;, &lt;code&gt;cmd_preexec&lt;/code&gt;,
+    &lt;code&gt;cmd_postexec&lt;/code&gt; and &lt;code&gt;backup&lt;/code&gt;. Here&amp;#8217;s an example of my config file,
+    with comments and blank lines&amp;nbsp;removed:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;config_version  1.2
+snapshot_root   /mnt/backup/rsnapshot/
+cmd_cp          /bin/cp
+cmd_rm          /bin/rm
+cmd_rsync       /usr/bin/rsync
+cmd_ssh         /usr/bin/ssh
+cmd_logger      /bin/logger
+cmd_du          /usr/bin/du
+cmd_rsnapshot_diff      /usr/bin/rsnapshot-diff
+interval        daily   14 # save 14 daily backups
+interval        weekly  6 # save 6 weekly backups
+verbose         2
+loglevel        3
+logfile /var/log/rsnapshot-remoteHostName.log
+lockfile        /var/run/rsnapshot-remoteHostName.pid
+rsync_short_args        -a
+rsync_long_args --delete --numeric-ids --relative --delete-excluded
+ssh_args        -i /path/to/remoteHostname_remoteBackupUsername_rsync
+exclude_file    /etc/rsnapshot.d/rsync-exclude-remoteHostName.txt
+include_file    /etc/rsnapshot.d/rsync-include-remoteHostName.txt
+link_dest       1
+use_lazy_deletes        1
+cmd_preexec     /etc/rsnapshot.d/pre-remoteHostName.sh
+cmd_postexec    /etc/rsnapshot.d/post-remoteHostName.sh
+backup  rsyncuser@remoteHostName:/      remoteHostName/
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;The &lt;code&gt;backup&lt;/code&gt; line is what tells rsync what to back up (&lt;code&gt;/&lt;/code&gt; on
+remoteHostName, logging in as rsyncuser), and where to back up to&amp;nbsp;(snapshot_root/remoteHostName/).&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Create two scripts that will actually trigger the backups, which
+    I&amp;#8217;ll call &lt;code&gt;/root/bin/rsnapshot-daily.sh&lt;/code&gt; and &lt;code&gt;/root/bin/rsnapshot-weekly.sh&lt;/code&gt;:&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;/root/bin/rsnapshot-daily.sh&lt;/code&gt;:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="c"&gt;#!/bin/bash&lt;/span&gt;
+
+/usr/bin/rsnapshot -c /etc/rsnapshot-remoteHostName.conf daily
+&lt;span class="c"&gt;# add other hosts here; note, they&amp;#39;ll run in series&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;&lt;code&gt;/root/bin/rsnapshot-weekly.sh&lt;/code&gt;:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="c"&gt;#!/bin/bash&lt;/span&gt;
+
+/usr/bin/rsnapshot -c /etc/rsnapshot-remoteHostName.conf weekly
+&lt;span class="c"&gt;# add other hosts here; note, they&amp;#39;ll run in series&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Add two entries to root&amp;#8217;s croontab to run the rsnapshot backups.
+    Adjust the following days and times to your&amp;nbsp;liking:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;0 1 * * Mon /root/bin/rsnapshot-weekly.sh # run the weekly backups every Monday at 01:00
+30 2 * * * /root/bin/rsnapshot-daily.sh # run the daily backups every day at 02:30, which *should* be after the weekly finished on Monday morning
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Check, after the next scheduled runs, that everything appears to
+    have run correctly. If you want, you can manually trigger the daily
+    script and watch what happens. If you do this more than once, you
+    should delete the directories it creates, or else rotation will be
+    messed up. If you have issues with rsync, aside from the usual
+    troubleshooting, check that rsync-wrapper.c is calling rsync with
+    the same arguments that rsnapshot is sending. It may be useful to
+    use my
+    &lt;a href="https://github.com/jantman/misc-scripts/blob/master/print-cmd.sh"&gt;print-cmd.sh&lt;/a&gt;
+    script in place of the &amp;#8220;rsync-wrapper&amp;#8221; forced command. This script
+    will simply log the command rsnapshot calls via&amp;nbsp;&lt;span class="caps"&gt;SSH&lt;/span&gt;.&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Assuming all of this worked, you should now have a fairly secure
+&lt;span class="caps"&gt;SSH&lt;/span&gt;-based remotely-triggered backup system. In a follow-up post I
+provide my &lt;a href="/2012/02/nagios-check-plugin-for-rsnapshot-backups/"&gt;Nagios Check Plugin for Rsnapshot
+Backups&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;The referenced scripts, config files, etc. are&amp;nbsp;below:&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;cmd-wrapper.c&lt;/code&gt;:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="cp"&gt;#include &lt;/span&gt;
+&lt;span class="cp"&gt;#include &lt;/span&gt;
+&lt;span class="cp"&gt;#include &lt;/span&gt;
+&lt;span class="cp"&gt;#include &lt;/span&gt;
+&lt;span class="cp"&gt;#include &lt;/span&gt;
+&lt;span class="cp"&gt;#include &lt;/span&gt;
+
+&lt;span class="cm"&gt;/********************************************&lt;/span&gt;
+&lt;span class="cm"&gt; * Wrapper - Secure Yourself                &lt;/span&gt;
+&lt;span class="cm"&gt; *                                          &lt;/span&gt;
+&lt;span class="cm"&gt; * 2007 - Mike Golvach - eggi@comcast.net   &lt;/span&gt;
+&lt;span class="cm"&gt; * Modified 2012 by Jason Antman  &lt;/span&gt;
+&lt;span class="cm"&gt; *  - configured for use as pre- and post-backup script wrapper&lt;/span&gt;
+&lt;span class="cm"&gt; *                                          &lt;/span&gt;
+&lt;span class="cm"&gt; * &lt;span class="caps"&gt;USAGE&lt;/span&gt;: cmd-wrapper [pre|post]&lt;/span&gt;
+&lt;span class="cm"&gt; *&lt;/span&gt;
+&lt;span class="cm"&gt; * $HeadURL: http://svn.jasonantman.com/misc-scripts/cmd-wrapper.c $&lt;/span&gt;
+&lt;span class="cm"&gt; * $LastChangedRevision: 26 $&lt;/span&gt;
+&lt;span class="cm"&gt; *                                          &lt;/span&gt;
+&lt;span class="cm"&gt; ********************************************/&lt;/span&gt;
+
+&lt;span class="cm"&gt;/* Creative Commons Attribution-Noncommercial-Share Alike 3.0 United States License */&lt;/span&gt;
+
+&lt;span class="cm"&gt;/* Define global variables */&lt;/span&gt;
+
+&lt;span class="kt"&gt;int&lt;/span&gt; &lt;span class="n"&gt;gid&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+
+&lt;span class="cm"&gt;/* main(int argc, char **argv) - main process loop */&lt;/span&gt;
+
+&lt;span class="kt"&gt;int&lt;/span&gt; &lt;span class="nf"&gt;main&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kt"&gt;int&lt;/span&gt; &lt;span class="n"&gt;argc&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="kt"&gt;char&lt;/span&gt; &lt;span class="o"&gt;**&lt;/span&gt;&lt;span class="n"&gt;argv&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="kt"&gt;char&lt;/span&gt; &lt;span class="o"&gt;**&lt;/span&gt;&lt;span class="n"&gt;envp&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="p"&gt;{&lt;/span&gt;
+  &lt;span class="kt"&gt;char&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="n"&gt;origcmd&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+
+  &lt;span class="n"&gt;origcmd&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;getenv&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;SSH_ORIGINAL_COMMAND&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+
+  &lt;span class="cm"&gt;/* printf (&amp;quot;Original Command:%s\n&amp;quot;, origcmd); */&lt;/span&gt;
+
+  &lt;span class="cm"&gt;/* Set euid and egid to actual user */&lt;/span&gt;
+
+  &lt;span class="n"&gt;gid&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;getgid&lt;/span&gt;&lt;span class="p"&gt;();&lt;/span&gt;
+  &lt;span class="n"&gt;setegid&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;getgid&lt;/span&gt;&lt;span class="p"&gt;());&lt;/span&gt;
+  &lt;span class="n"&gt;seteuid&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;getuid&lt;/span&gt;&lt;span class="p"&gt;());&lt;/span&gt;
+
+  &lt;span class="cm"&gt;/* Confirm user is in &lt;span class="caps"&gt;GROUP&lt;/span&gt;(502) group */&lt;/span&gt;
+
+  &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt; &lt;span class="n"&gt;gid&lt;/span&gt; &lt;span class="o"&gt;!=&lt;/span&gt; &lt;span class="mi"&gt;502&lt;/span&gt; &lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="n"&gt;printf&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;User Not Authorized! Exiting...&lt;/span&gt;&lt;span class="se"&gt;\n&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+    &lt;span class="n"&gt;exit&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+  &lt;span class="p"&gt;}&lt;/span&gt;
+
+  &lt;span class="cm"&gt;/* Check argc count only at this point */&lt;/span&gt;
+
+  &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt; &lt;span class="n"&gt;argc&lt;/span&gt; &lt;span class="o"&gt;!=&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt; &lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="n"&gt;printf&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;Usage: cmd-wrapper [pre|post]&lt;/span&gt;&lt;span class="se"&gt;\n&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+    &lt;span class="n"&gt;exit&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+  &lt;span class="p"&gt;}&lt;/span&gt;
+
+  &lt;span class="cm"&gt;/* Set uid, gid, euid and egid to root */&lt;/span&gt;
+
+  &lt;span class="n"&gt;setegid&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+  &lt;span class="n"&gt;seteuid&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+  &lt;span class="n"&gt;setgid&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+  &lt;span class="n"&gt;setuid&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+
+  &lt;span class="cm"&gt;/* Check argv for proper arguments and run&lt;/span&gt;
+&lt;span class="cm"&gt;   * the corresponding script, if invoked.&lt;/span&gt;
+&lt;span class="cm"&gt;   */&lt;/span&gt;
+
+  &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt; &lt;span class="n"&gt;strncmp&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;origcmd&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;pre&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mi"&gt;3&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt; &lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;execl&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;/root/bin/rsnapshot-pre.sh&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;rsnapshot-pre.sh&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nb"&gt;&lt;span class="caps"&gt;NULL&lt;/span&gt;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+      &lt;span class="n"&gt;perror&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;Execl:&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+    &lt;span class="p"&gt;}&lt;/span&gt;
+  &lt;span class="p"&gt;}&lt;/span&gt; &lt;span class="k"&gt;else&lt;/span&gt; &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt; &lt;span class="n"&gt;strncmp&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;origcmd&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;post&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mi"&gt;4&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt; &lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;execl&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;/root/bin/rsnapshot-post.sh&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;rsnapshot-post.sh&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nb"&gt;&lt;span class="caps"&gt;NULL&lt;/span&gt;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+      &lt;span class="n"&gt;perror&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;Execl:&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+    &lt;span class="p"&gt;}&lt;/span&gt;
+  &lt;span class="p"&gt;}&lt;/span&gt; &lt;span class="k"&gt;else&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="n"&gt;printf&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;&lt;span class="caps"&gt;ERROR&lt;/span&gt;: Invalid command: %s&lt;/span&gt;&lt;span class="se"&gt;\n&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;origcmd&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+    &lt;span class="n"&gt;printf&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;Usage: &lt;span class="caps"&gt;COMMAND&lt;/span&gt; [pre|post]&lt;/span&gt;&lt;span class="se"&gt;\n&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+    &lt;span class="n"&gt;exit&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+  &lt;span class="p"&gt;}&lt;/span&gt;
+  &lt;span class="n"&gt;exit&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;&lt;code&gt;rsync-wrapper.c&lt;/code&gt;:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="cp"&gt;#include &lt;/span&gt;
+&lt;span class="cp"&gt;#include &lt;/span&gt;
+&lt;span class="cp"&gt;#include &lt;/span&gt;
+&lt;span class="cp"&gt;#include &lt;/span&gt;
+&lt;span class="cp"&gt;#include &lt;/span&gt;
+
+&lt;span class="cm"&gt;/********************************************&lt;/span&gt;
+&lt;span class="cm"&gt; * Wrapper - Secure Yourself                &lt;/span&gt;
+&lt;span class="cm"&gt; *                                          &lt;/span&gt;
+&lt;span class="cm"&gt; * 2007 - Mike Golvach - eggi@comcast.net   &lt;/span&gt;
+&lt;span class="cm"&gt; * Modified 2012 by Jason Antman  &lt;/span&gt;
+&lt;span class="cm"&gt; *  - configured for use as rsync wrapper&lt;/span&gt;
+&lt;span class="cm"&gt; *                                          &lt;/span&gt;
+&lt;span class="cm"&gt; * $HeadURL: http://svn.jasonantman.com/misc-scripts/rsync-wrapper.c $&lt;/span&gt;
+&lt;span class="cm"&gt; * $LastChangedRevision: 26 $&lt;/span&gt;
+&lt;span class="cm"&gt; *                                          &lt;/span&gt;
+&lt;span class="cm"&gt; ********************************************/&lt;/span&gt;
+
+&lt;span class="cm"&gt;/* Creative Commons Attribution-Noncommercial-Share Alike 3.0 United States License */&lt;/span&gt;
+
+&lt;span class="cm"&gt;/* Define global variables */&lt;/span&gt;
+
+&lt;span class="kt"&gt;int&lt;/span&gt; &lt;span class="n"&gt;gid&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+
+&lt;span class="cm"&gt;/* main(int argc, char **argv) - main process loop */&lt;/span&gt;
+
+&lt;span class="kt"&gt;int&lt;/span&gt; &lt;span class="nf"&gt;main&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kt"&gt;int&lt;/span&gt; &lt;span class="n"&gt;argc&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="kt"&gt;char&lt;/span&gt; &lt;span class="o"&gt;**&lt;/span&gt;&lt;span class="n"&gt;argv&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="p"&gt;{&lt;/span&gt;
+
+  &lt;span class="cm"&gt;/* Set euid and egid to actual user */&lt;/span&gt;
+
+  &lt;span class="n"&gt;gid&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;getgid&lt;/span&gt;&lt;span class="p"&gt;();&lt;/span&gt;
+  &lt;span class="n"&gt;setegid&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;getgid&lt;/span&gt;&lt;span class="p"&gt;());&lt;/span&gt;
+  &lt;span class="n"&gt;seteuid&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;getuid&lt;/span&gt;&lt;span class="p"&gt;());&lt;/span&gt;
+
+  &lt;span class="cm"&gt;/* Confirm user is in &lt;span class="caps"&gt;GROUP&lt;/span&gt;(502) group */&lt;/span&gt;
+
+  &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt; &lt;span class="n"&gt;gid&lt;/span&gt; &lt;span class="o"&gt;!=&lt;/span&gt; &lt;span class="mi"&gt;502&lt;/span&gt; &lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="n"&gt;printf&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;User Not Authorized! Exiting...&lt;/span&gt;&lt;span class="se"&gt;\n&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+    &lt;span class="n"&gt;exit&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+  &lt;span class="p"&gt;}&lt;/span&gt;
+
+  &lt;span class="cm"&gt;/* Check argc count only at this point */&lt;/span&gt;
+
+  &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt; &lt;span class="n"&gt;argc&lt;/span&gt; &lt;span class="o"&gt;!=&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt; &lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="n"&gt;printf&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;Usage: rsync-wrapper&lt;/span&gt;&lt;span class="se"&gt;\n&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+    &lt;span class="n"&gt;exit&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+  &lt;span class="p"&gt;}&lt;/span&gt;
+
+  &lt;span class="cm"&gt;/* Set uid, gid, euid and egid to root */&lt;/span&gt;
+
+  &lt;span class="n"&gt;setegid&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+  &lt;span class="n"&gt;seteuid&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+  &lt;span class="n"&gt;setgid&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+  &lt;span class="n"&gt;setuid&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+
+  &lt;span class="cm"&gt;/* Check argv for proper arguments and run&lt;/span&gt;
+&lt;span class="cm"&gt;   * the corresponding script, if invoked.&lt;/span&gt;
+&lt;span class="cm"&gt;   */&lt;/span&gt;
+  &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;execl&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;/usr/bin/rsync&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;rsync&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;--server&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;--sender&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;-vlogDtprRe.iLsf&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;--numeric-ids&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;.&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;/&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nb"&gt;&lt;span class="caps"&gt;NULL&lt;/span&gt;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="n"&gt;perror&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;Execl:&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+  &lt;span class="p"&gt;}&lt;/span&gt;
+  &lt;span class="n"&gt;exit&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;&lt;code&gt;/etc/rsnapshot.d/rsync-include-remoteHostName.txt&lt;/code&gt;:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;# Include
++ /dev/console
++ /dev/initctl
++ /dev/null
++ /dev/zero
++ /usr/local/*
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;&lt;code&gt;/etc/rsnapshot.d/rsync-exclude-remoteHostName.txt&lt;/code&gt;:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;# Exclude
+- /cgroup/*
+- /dev/*
+- /lib/*
+- lost+found/
+- /proc/*
+- /sys/
+- /tmp/
+- /var/log/*
+&lt;/pre&gt;&lt;/div&gt;</summary><category term="backups"></category><category term="linode"></category><category term="rsnapshot"></category><category term="rsync"></category><category term="security"></category><category term="ssh"></category><category term="wrapper"></category></entry></feed>

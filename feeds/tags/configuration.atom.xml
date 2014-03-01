@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Jason Antman's Blog</title><link href="http://newblog.jasonantman.com/" rel="alternate"></link><link href="http://newblog.jasonantman.com/feeds/tags/configuration.atom.xml" rel="self"></link><id>http://newblog.jasonantman.com/</id><updated>2010-02-11T09:48:00-05:00</updated><entry><title>Apache2 - list Name-Based Virtual Hosts</title><link href="http://newblog.jasonantman.com/2010/02/apache2-list-name-based-virtual-hosts/" rel="alternate"></link><updated>2010-02-11T09:48:00-05:00</updated><author><name>admin</name></author><id>tag:newblog.jasonantman.com,2010-02-11:2010/02/apache2-list-name-based-virtual-hosts/</id><summary type="html">&lt;p&gt;Here&amp;#8217;s a little tidbit that I never knew until I had an
+&lt;a href="http://httpd.apache.org/"&gt;Apache2&lt;/a&gt; name-based virtual host problem:
+&lt;code&gt;httpd -S&lt;/code&gt; lists the vhosts that are being served by Apache, and how
+they were parsed from the config&amp;nbsp;files.&lt;/p&gt;
+&lt;p&gt;The output on one of my servers looks something&amp;nbsp;like:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="go"&gt;[root@web2 vhosts.d]# httpd -S&lt;/span&gt;
+&lt;span class="go"&gt;VirtualHost configuration:&lt;/span&gt;
+&lt;span class="go"&gt;wildcard NameVirtualHosts and _default_ servers:&lt;/span&gt;
+&lt;span class="go"&gt;_default_:443          web2.jasonantman.com (/etc/httpd/vhosts.d/ssl-host.conf:7)&lt;/span&gt;
+&lt;span class="go"&gt;*:80                   is a NameVirtualHost&lt;/span&gt;
+&lt;span class="go"&gt;         default server www.jasonantman.com (/etc/httpd/vhosts.d/000-default.conf:1)&lt;/span&gt;
+&lt;span class="go"&gt;         port 80 namevhost www.jasonantman.com (/etc/httpd/vhosts.d/000-default.conf:1)&lt;/span&gt;
+&lt;span class="go"&gt;         port 80 namevhost rackman.jasonantman.com (/etc/httpd/vhosts.d/rackman.jasonantman.com.conf:1)&lt;/span&gt;
+&lt;span class="go"&gt;         port 80 namevhost whatismyip.jasonantman.com (/etc/httpd/vhosts.d/whatismyip.jasonantman.com.conf:1)&lt;/span&gt;
+&lt;span class="go"&gt;Syntax &lt;span class="caps"&gt;OK&lt;/span&gt;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;This is quite useful in debugging vhost problems, especially those pesky
+times when a request that should go to a specific vhost is being served
+by the default (in my case at this time, I had two ServerName directives
+instead of a ServerName and a&amp;nbsp;ServerAlias).&lt;/p&gt;</summary><category term="apache"></category><category term="configuration"></category><category term="linux"></category></entry><entry><title>Building a Rebuild-able Site</title><link href="http://newblog.jasonantman.com/2009/05/building-a-rebuild-able-site/" rel="alternate"></link><updated>2009-05-06T08:42:00-04:00</updated><author><name>admin</name></author><id>tag:newblog.jasonantman.com,2009-05-06:2009/05/building-a-rebuild-able-site/</id><summary type="html">&lt;p&gt;At $&lt;span class="caps"&gt;WORK&lt;/span&gt;, my group runs about two dozen servers that provide services
+for over 60,000 users. They&amp;#8217;re a mix of Windows and Linux, with some old
+Solaris stuff thrown in there. The one thing they have in common is
+they&amp;#8217;re all hand-built, hand-configured, and old. They&amp;#8217;ve been around
+for a while. At the moment, we don&amp;#8217;t even have an adequate backup&amp;nbsp;system.&lt;/p&gt;
+&lt;p&gt;So, being the closest thing to a SysAdmin we have (my official title is
+still Student Systems Programmer), it&amp;#8217;s my job to build a new
+installation, configuration and backup infrastructure. We&amp;#8217;ve already
+standardized on &lt;a href="http://www.centos.org"&gt;CentOS&lt;/a&gt; as a University-wide
+distro, and have a local full mirror, so I don&amp;#8217;t need to choose a
+distro. I do, however, have to plan the installation and backup
+architecture. The main requirements&amp;nbsp;are:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Lowest overall time for bare-metal recovery to a working&amp;nbsp;system.&lt;/li&gt;
+&lt;li&gt;Ease of use, as people other than myself will need to administer it
+    (so they should be able to do so from a cheat sheet in the&amp;nbsp;wiki).&lt;/li&gt;
+&lt;li&gt;Repeatability - it should be easy and intuitive to make an
+    almost-exact-copy of a&amp;nbsp;machine.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;I started a thread a few days ago on the &lt;span class="caps"&gt;SAGE&lt;/span&gt; mailing list, which you
+can find
+&lt;a href="http://mailman.sage.org/pipermail/sage-members/2009/msg00447.html"&gt;here&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;At the moment, it looks like the general idea that I&amp;#8217;m going with is to
+use &lt;a href="http://fedoraproject.org/wiki/Anaconda/Kickstart"&gt;Kickstart&lt;/a&gt; to
+install the systems, using a basic and minimal Kickstart file. Basic
+package selection (minimalist) with just what&amp;#8217;s needed to configure the
+system with a hostname and network settings for the management &lt;span class="caps"&gt;VLAN&lt;/span&gt;.
+I&amp;#8217;ll then have Kickstart install and configure a configuration
+management package - I&amp;#8217;m leaning towards
+&lt;a href="http://reductivelabs.com/products/puppet/"&gt;Puppet&lt;/a&gt; over
+&lt;a href="http://www.cfengine.org/"&gt;Cfengine&lt;/a&gt; and am starting testing. The config
+management software will handle all of the customization for the system
+(everything different from the base generic Kickstart install) so it&amp;#8217;s
+all kept under the control of config management from step&amp;nbsp;1.&lt;/p&gt;
+&lt;p&gt;The final part is a backup system, mainly for whatever eventually -
+whether out of human error or simple laziness - ends up out of the
+config management system&amp;#8217;s control. Our previous &lt;span class="caps"&gt;SA&lt;/span&gt; had settled on
+&lt;a href="http://www.zmanda.com/"&gt;Zmanda&lt;/a&gt;, the paid version of
+&lt;a href="http://www.amanda.org/"&gt;Amanda&lt;/a&gt;, which comes with specific plugins for
+MySQL and &lt;span class="caps"&gt;MSSQL&lt;/span&gt;. I&amp;#8217;m also looking at &lt;a href="http://www.bacula.org"&gt;Bacula&lt;/a&gt;,
+mainly because of its&amp;#8217; advanced features, scheduling (especially the new
+scheduling in Bacula 3) and&amp;nbsp;scalability.&lt;/p&gt;
+&lt;p&gt;The beauty that I see in having Kickstart do something minimal and then
+letting Puppet handle the rest is that (especially since we&amp;#8217;ve
+standardized on SunFire X4100&amp;#8217;s with identical configurations) I can
+kickstart and rack up a few spare machines, and to get them up and
+running all I need to do is power them up (iLOM) and tell Puppet what to
+make&amp;nbsp;them.&lt;/p&gt;
+&lt;p&gt;I&amp;#8217;m currently starting testing of both Puppet itself and getting
+Kickstart to start the puppet install and daemon (instructions from
+&lt;a href="http://watzmann.net/blog/index.php?cat=21"&gt;David Lutterkort&amp;#8217;s blog (Red Hat software
+engineer)&lt;/a&gt;). We&amp;#8217;ll see how
+everything&amp;nbsp;goes&amp;#8230;&lt;/p&gt;</summary><category term="backup"></category><category term="configuration"></category><category term="kickstart"></category><category term="linux"></category><category term="puppet"></category><category term="recovery"></category><category term="work"></category></entry><entry><title>My Dream Network</title><link href="http://newblog.jasonantman.com/2009/02/my-dream-network/" rel="alternate"></link><updated>2009-02-07T01:15:00-05:00</updated><author><name>admin</name></author><id>tag:newblog.jasonantman.com,2009-02-07:2009/02/my-dream-network/</id><summary type="html">&lt;p&gt;On the same thread as the &lt;a href="/2009/02/community-datacenter/"&gt;last
+post&lt;/a&gt;, some
+thoughts on my ideal network, or the hosts on that&amp;nbsp;network:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;One &amp;#8220;gold master&amp;#8221; installation/kickstart file of a single chosen
+    distro, with a base set of packages, including site-specific
+    packages. (or something like this implemented in a configuration
+    management&amp;nbsp;system)&lt;/li&gt;
+&lt;li&gt;All new installations performed over the network in an automated
+    fashion, and from a local&amp;nbsp;repository.&lt;/li&gt;
+&lt;li&gt;Software updates are automated (either through a configuration
+    management tool or something like the behemoth I talked about
+    &lt;a href="/2008/10/my-biggest-problem-with-linux/"&gt;here&lt;/a&gt;)
+    and pulled from a local repository (perhaps one which mirrors the
+    mainline repos, but only downloads a package the first time it&amp;#8217;s&amp;nbsp;requested?).&lt;/li&gt;
+&lt;li&gt;&lt;a href="http://reductivelabs.com/trac/puppet"&gt;Puppet&lt;/a&gt; or
+    &lt;a href="http://www.cfengine.org/"&gt;CFengine&lt;/a&gt; on each machine. Better than
+    just having them is having each machine automatically added when
+    it&amp;#8217;s created. Even better yet would be to have Puppet or CFengine
+    combined with something like
+    &lt;a href="https://fedorahosted.org/cobbler/"&gt;Cobbler&lt;/a&gt;, so I can define a new
+    machine in {puppet|cfengine}, list its&amp;#8217; &lt;span class="caps"&gt;MAC&lt;/span&gt; address, then netboot
+    the box and come back in a few hours to have an &lt;span class="caps"&gt;OS&lt;/span&gt; installed,
+    packages installed and the machine configured, monitored in Nagios,
+    monitored for security and backed&amp;nbsp;up.&lt;/li&gt;
+&lt;li&gt;&lt;a href="http://www.tripwire.com/"&gt;Tripwire&lt;/a&gt; or some other sort of security
+    software, as well as centralized logging and auditing, on every&amp;nbsp;box.&lt;/li&gt;
+&lt;li&gt;A small number of additional &amp;#8220;package groups&amp;#8221; to add to the &amp;#8220;gold
+    master&amp;#8221; via config management - something like &amp;#8220;web server&amp;#8221;
+    (Apache2, &lt;span class="caps"&gt;PHP&lt;/span&gt;, MySQL, log analysis for them, etc.), &amp;#8220;development
+    server&amp;#8221; (&lt;span class="caps"&gt;CVS&lt;/span&gt;, debuggers, etc.). These would also update the backup
+    system to include appropriate directories, update Nagios configs,&amp;nbsp;etc.&lt;/li&gt;
+&lt;li&gt;A good way - if even a human making notes in a per-machine text file&lt;ul&gt;
+&lt;li&gt;of tracking the &amp;#8220;little stuff&amp;#8221; like that one cron script that
+makes everything work right, the location of that hacked-together
+Python script, etc. A way to easily remember the things needed to
+recreate a box which aren&amp;#8217;t found in &lt;code&gt;rpm -qa&lt;/code&gt; or any obvious&amp;nbsp;overviews.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;a href="http://www.bacula.org"&gt;Bacula&lt;/a&gt; or &lt;a href="http://www.amanda.org/"&gt;&lt;span class="caps"&gt;AMANDA&lt;/span&gt;&lt;/a&gt;
+    setup to backup every box, perhaps with some sort of template system
+    for server types - every machine gets &lt;code&gt;/root&lt;/code&gt; and &lt;code&gt;/etc&lt;/code&gt; backed up,
+    but web servers get &lt;code&gt;/srv/www&lt;/code&gt; and mail servers get &lt;code&gt;/var/mail&lt;/code&gt;.&lt;/li&gt;
+&lt;li&gt;Nagios setup to monitor everything logical on every box. Perhaps
+    this would use a configuration management engine to handle Nagios
+    configs, so that for example if any Proliant hardware is used,
+    {config management program} will figure this out, install the &lt;span class="caps"&gt;HPASM&lt;/span&gt;
+    packages, put the appropriate check scripts on the box, and update
+    the Nagios configs. Likewise, adding Apache to a machine should
+    cause it to be monitored in the Nagios&amp;nbsp;configs.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Unfortunately, as I&amp;#8217;m not independently wealthy, I don&amp;#8217;t have the time
+to quit my job, wipe every machine I own, and start from scratch. But it
+sure would be nice to be able to, one day, start a server farm from
+scratch and be able to implement some of these cool&amp;nbsp;things&amp;#8230;&lt;/p&gt;</summary><category term="configuration"></category><category term="dream network"></category><category term="ideal network"></category><category term="management"></category></entry><entry><title>Hardware Inventory System</title><link href="http://newblog.jasonantman.com/2008/09/hardware-inventory-system/" rel="alternate"></link><updated>2008-09-12T13:01:00-04:00</updated><author><name>admin</name></author><id>tag:newblog.jasonantman.com,2008-09-12:2008/09/hardware-inventory-system/</id><summary type="html">&lt;p&gt;After a few crazy weeks at work, the pay check is finally here, and I&amp;#8217;ve
+decided to allocate some of the money to hardware upgrades of my
+personal machines. While &lt;a href="http://www.nagios.org"&gt;Nagios&lt;/a&gt; gives me a good
+idea of where performance is a problem, I&amp;#8217;m still running a large amount
+of &amp;#8220;legacy&amp;#8221; hardware (my home router/firewall is a 350MHz P-&lt;span class="caps"&gt;II&lt;/span&gt; desktop)
+and hardware age is a significant factor in my upgrade&amp;nbsp;plans.&lt;/p&gt;
+&lt;p&gt;So, I set out looking for a program (most likely some backend scripts
+that dump data to MySQL, and then a &lt;span class="caps"&gt;PHP&lt;/span&gt; front-end) to perform a hardware
+inventory - essentially, run a script on each box, find out the system
+details, and dump it in a &lt;span class="caps"&gt;DB&lt;/span&gt;. Now that my pool of upgrade candidates is
+above a dozen machines, at multiple locations, some of which are
+single-use boxes often neglected/forgotten, doing this in my head isn&amp;#8217;t
+the&amp;nbsp;easiest.&lt;/p&gt;
+&lt;p&gt;So, while I&amp;#8217;ve been googling and searching some mailing list archives,
+I&amp;#8217;m also developing a set of&amp;nbsp;requirements.&lt;/p&gt;
+&lt;p&gt;The chief&amp;nbsp;requirements:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Ability to run a script on a remote machine and have the results
+    returned in a meaningful format. Most likely, a single script, run
+    as root (&lt;span class="caps"&gt;SUID&lt;/span&gt; or sudo) that returns nice, formatted, &lt;span class="caps"&gt;SQL&lt;/span&gt;-ready
+    results (so the parsing of platform-specific command output will
+    happen on the client, with every client returning a normalized data&amp;nbsp;set).&lt;/li&gt;
+&lt;li&gt;Ability to track hardware changes - i.e. disks swapped from one box
+    to another, &lt;span class="caps"&gt;NIC&lt;/span&gt; replacement, processor upgrade,&amp;nbsp;etc.&lt;/li&gt;
+&lt;li&gt;Each piece of hardware tracked individually, allowing future support
+    of fully tracking components, spares,&amp;nbsp;etc.&lt;/li&gt;
+&lt;li&gt;Support for future barcoding of components and physically-performed&amp;nbsp;inventory.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Some of the data that I&amp;#8217;d like&amp;nbsp;collected:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Data on a machine stored by chassis vendor name and serial
+    numer/service&amp;nbsp;tag.&lt;/li&gt;
+&lt;li&gt;Hostname associated with each&amp;nbsp;box.&lt;/li&gt;
+&lt;li&gt;Architecture, number of CPUs/cores and type, model, speed, socket
+    (for upgrade&amp;nbsp;planning/ordering).&lt;/li&gt;
+&lt;li&gt;Motherboard model/manufacturer, serial number, &lt;span class="caps"&gt;HW&lt;/span&gt; and &lt;span class="caps"&gt;SW&lt;/span&gt;/&lt;span class="caps"&gt;FW&lt;/span&gt;
+    revisions, manufacture&amp;nbsp;date.&lt;/li&gt;
+&lt;li&gt;Storage (internal &lt;span class="amp"&gt;&amp;amp;&lt;/span&gt; directly connected external) - type, interface,
+    capacity, specifications/manufacturer and&amp;nbsp;model.&lt;/li&gt;
+&lt;li&gt;Amount fo &lt;span class="caps"&gt;RAM&lt;/span&gt;, type of &lt;span class="caps"&gt;RAM&lt;/span&gt;, and configuration of cards (number of
+    empty&amp;nbsp;slots).&lt;/li&gt;
+&lt;li&gt;&lt;span class="caps"&gt;PCI&lt;/span&gt; card configuration - number and type/mfr/model of cards, as well
+    as number of empty&amp;nbsp;slots&lt;/li&gt;
+&lt;li&gt;For all NICs - &lt;span class="caps"&gt;MAC&lt;/span&gt; addresses, current IPs, as well as link
+    type/speed and connected&amp;nbsp;switch/port.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;I&amp;#8217;d also like some level of software inventory, especially for those
+machines that may be running &amp;#8220;forgotten&amp;#8221;&amp;nbsp;services:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href="http://nmap.org/"&gt;nmap&lt;/a&gt; scan&amp;nbsp;results.&lt;/li&gt;
+&lt;li&gt;&lt;span class="caps"&gt;OS&lt;/span&gt;-generated list of running services, with &lt;span class="caps"&gt;GUI&lt;/span&gt; including a
+    blacklist of &amp;#8220;default&amp;#8221; services not to be displayed, and possibly
+    also cross-links to Nagios&amp;nbsp;status.&lt;/li&gt;
+&lt;li&gt;Possibly a parsed output from ps, using a blacklist as shown&amp;nbsp;above.&lt;/li&gt;
+&lt;li&gt;If a firewall is running on the system, a list of all open&amp;nbsp;ports.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;I&amp;#8217;ll be checking out some options today. Unfortunately, I have a feeling
+that there&amp;#8217;s most likely nothing that supports my requirements, and I&amp;#8217;ll
+probably end up implementing a lot of this&amp;nbsp;myself.&lt;/p&gt;</summary><category term="configuration"></category><category term="inventory"></category></entry></feed>

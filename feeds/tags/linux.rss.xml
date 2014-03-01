@@ -1,0 +1,1749 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Jason Antman's Blog</title><link>http://newblog.jasonantman.com/</link><description></description><atom:link href="http://newblog.jasonantman.com/feeds/tags/linux.rss.xml" rel="self"></atom:link><lastBuildDate>Mon, 13 May 2013 05:00:00 -0400</lastBuildDate><item><title>Search for a small-scale but automated RPM build system</title><link>http://newblog.jasonantman.com/2013/05/search-for-a-small-scale-but-automated-rpm-build-system/</link><description>&lt;p&gt;&lt;strong&gt;This post is part of a series of older draft posts from a few months
+ago that I&amp;#8217;m just getting around to publishing. Unfortunately, I have
+yet to find a build system that meets my requirements (see the last&amp;nbsp;paragraph).&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;At work, we have a handful - currently a really small number - of &lt;span class="caps"&gt;RPM&lt;/span&gt;
+packages that we need to build and deploy internally for our CentOS
+server infrastructure. A number of them are just pulled down from
+specific third-party repositories and rebuilt to have the vendor set as
+us, and some are internally patched or developed software. We run
+websites, and on the product side, we&amp;#8217;re a
+Python/&lt;a href="https://www.djangoproject.com/"&gt;Django&lt;/a&gt; shop (in fact, probably
+one of the largest Django apps out there). We don&amp;#8217;t deploy our Django
+apps via &lt;span class="caps"&gt;RPM&lt;/span&gt;, so building and distributing RPMs is definitely not one of
+our core competencies. In fact, we really only want to do it when we&amp;#8217;re
+testing/deploying a new distro, or when an upstream package is&amp;nbsp;updated.&lt;/p&gt;
+&lt;p&gt;Last week I pulled a ticket to deploy &lt;a href="http://nodejs.org/"&gt;node.js&lt;/a&gt; to
+one of our build hosts, and we&amp;#8217;ve got a few things in the pipeline that
+also rely on it. I found the
+&lt;a href="https://github.com/puppetlabs/puppetlabs-nodejs"&gt;puppetlabs-nodejs&lt;/a&gt;
+module on Github that&amp;#8217;s supposed to install it on &lt;span class="caps"&gt;RHEL&lt;/span&gt;/CentOS, but it
+pulls packages from
+&lt;a href="http://patches.fedorapeople.org/oldnode/stable/"&gt;http://patches.fedorapeople.org/oldnode/stable/&lt;/a&gt;,
+and the newest version of nodejs there is 0.6.18, which is quite old. I
+can&amp;#8217;t find any actively maintained sources of newer nodejs packages for
+&lt;span class="caps"&gt;RHEL&lt;/span&gt;/CentOS (yeah, I know, that&amp;#8217;s one down side to the
+distributions&amp;#8230;). However, I did find that nodejs 0.9.5 is being &lt;a href="http://koji.fedoraproject.org/koji/packageinfo?packageID=15154"&gt;built
+for Fedora 18/19 in the Fedora build
+system&lt;/a&gt;,
+is already in the Fedora 18 Testing and Fedora Rawhide repos, but is
+failing its &lt;span class="caps"&gt;EL6&lt;/span&gt; builds in their system. The decision I&amp;#8217;ve come to is to
+use the puppetlabs-nodejs module to install it, but try and rebuild the
+Fedora 18 RPMs under CentOS 5 and&amp;nbsp;6.&lt;/p&gt;
+&lt;p&gt;So that&amp;#8217;s the background. Now, my current task: to search for an &lt;span class="caps"&gt;RPM&lt;/span&gt;
+build system for my current job. My core requirements, in no specific
+order,&amp;nbsp;are:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Be relatively easy and quick to use for people who have a specfile
+    or &lt;span class="caps"&gt;SRPM&lt;/span&gt; and want to be able to &amp;#8220;ensure =&gt; present&amp;#8221; the finished &lt;span class="caps"&gt;RPM&lt;/span&gt;
+    on a system. i.e., require as little per-package configuration as&amp;nbsp;possible.&lt;/li&gt;
+&lt;li&gt;Be able to handle rebuilding &amp;#8220;all&amp;#8221; of our RPMs when we roll out a
+    new distro version. Doesn&amp;#8217;t necessarily need to be automatic, but
+    should be relatively&amp;nbsp;simple.&lt;/li&gt;
+&lt;li&gt;Ideally, not need to be running constantly - i.e. something that
+    will cope well with build hosts being VMs that are shut down when
+    they&amp;#8217;re not&amp;nbsp;needed.&lt;/li&gt;
+&lt;li&gt;Handle automatically putting successfully built packages into a
+    repository, ideally with some sort of (manual) promotion process
+    from staging to&amp;nbsp;stable.&lt;/li&gt;
+&lt;li&gt;Have minimal external (infrastructure) dependencies that we can&amp;#8217;t
+    satisfy with existing&amp;nbsp;systems.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;So, the first step was to research existing &lt;span class="caps"&gt;RPM&lt;/span&gt; build systems and how
+others do this. Here&amp;#8217;s a list of what I could find online, though most
+of these are from distributions and software vendors/projects, not
+end-user companies that are only building for internal&amp;nbsp;use.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href="https://fedorahosted.org/koji/wiki"&gt;Koji&lt;/a&gt; is the build system used
+    by &lt;a href="http://fedoraproject.org/wiki/Koji"&gt;Fedora&lt;/a&gt; and RedHat. It&amp;#8217;s
+    about as full-featured as any can be, and I&amp;#8217;m familiar with it from
+    my time at &lt;a href="http://koji.rutgers.edu/koji/"&gt;Rutgers University&lt;/a&gt;, as
+    it&amp;#8217;s used to maintain their CentOS/&lt;span class="caps"&gt;RHEL&lt;/span&gt; packages. It&amp;#8217;s based largely
+    on Mock. However, &lt;a href="http://fedoraproject.org/wiki/Koji/ServerHowTo"&gt;setting up the build
+    server&lt;/a&gt; is no
+    trivial task; there are few installations outside of Fedora/RedHat,
+    and it relies on either Kerberos or an &lt;span class="caps"&gt;SSL&lt;/span&gt; &lt;span class="caps"&gt;CA&lt;/span&gt; infrastructure to
+    authenticate machines and clients. So, it&amp;#8217;s designed for too large a
+    scale and too much infrastructure for&amp;nbsp;me.&lt;/li&gt;
+&lt;li&gt;&lt;span class="caps"&gt;PLD&lt;/span&gt; Linux has a &lt;a href="https://www.pld-linux.org/developingpld/builderscript"&gt;builder
+    script&lt;/a&gt; that
+    seems to automate &lt;code&gt;rpmbuild&lt;/code&gt; as well as fetching sources and
+    resolving/building dependencies. I haven&amp;#8217;t looked at the script yet,
+    but apparently it&amp;#8217;s in &lt;span class="caps"&gt;PLD&lt;/span&gt;&amp;#8217;s &amp;#8220;rpm-build-tools&amp;#8221;&amp;nbsp;package.&lt;/li&gt;
+&lt;li&gt;&lt;span class="caps"&gt;PLD&lt;/span&gt; Linux also has a &lt;span class="caps"&gt;CVS&lt;/span&gt; repository for something called
+    &lt;a href="http://cvs.pld-linux.org/cgi-bin/cvsweb/pld-builder.new"&gt;pld-builder.new&lt;/a&gt;.
+    The
+    &lt;a href="http://cvs.pld-linux.org/cgi-bin/cvsweb/pld-builder.new/doc/README?rev=1.5"&gt;&lt;span class="caps"&gt;README&lt;/span&gt;&lt;/a&gt;
+    and
+    &lt;a href="http://cvs.pld-linux.org/cgi-bin/cvsweb/pld-builder.new/doc/ARCHITECTURE?rev=1.6"&gt;&lt;span class="caps"&gt;ARCHITECTURE&lt;/span&gt;&lt;/a&gt;
+    files make it sound like a relatively simple mainly-Python system
+    that builds &lt;span class="caps"&gt;SRPMS&lt;/span&gt; and binary packages when requested, and most
+    importantly, seems like a simple system that uses little more than
+    shared filesystem access for communication and&amp;nbsp;coordination.&lt;/li&gt;
+&lt;li&gt;&lt;span class="caps"&gt;ALT&lt;/span&gt; Linux has &lt;a href="http://en.altlinux.org/Sisyphus"&gt;Sisyphus&lt;/a&gt;, which
+    combines repository management and web interface tools, package
+    building and testing tools, and&amp;nbsp;more.&lt;/li&gt;
+&lt;li&gt;The Dries &lt;span class="caps"&gt;RPM&lt;/span&gt; repository uses (or at least used&amp;#8230; my reference is
+    quite old) &lt;a href="http://dries.ulyssis.org/rpm/pydar2/index.html"&gt;pydar2&lt;/a&gt;,
+    &amp;#8220;a distributed client/server program which allows you to build
+    multiple spec files on multiple distribution/architecture
+    combinations automatically.&amp;#8221; That sounds like it could be what I
+    need, but the last update says that it isn&amp;#8217;t finished yet, and that
+    was in &lt;strong&gt;2005&lt;/strong&gt;.&lt;/li&gt;
+&lt;li&gt;Mandriva Linux has pretty extensive information on their build
+    system &lt;a href="http://wiki.mandriva.com/en/Category:Build_System"&gt;on their
+    wiki&lt;/a&gt; and a
+    &lt;a href="http://wiki.mandriva.com/en/Development/Packaging/BuildSystem/Theory"&gt;build system theory
+    page&lt;/a&gt;,
+    but it seems to be largely a hodgepodge of shell scripts and
+    cronjobs, and is likely not a candidate for use by anyone other than
+    its&amp;nbsp;designers.&lt;/li&gt;
+&lt;li&gt;Argeo provides the &lt;a href="https://www.argeo.org/wiki/SLC"&gt;&lt;span class="caps"&gt;SLC&lt;/span&gt; framework&lt;/a&gt;
+    which has a &amp;#8220;&lt;span class="caps"&gt;RPM&lt;/span&gt; Factory&amp;#8221; component, but I can&amp;#8217;t seem to find much
+    more than a wiki page, and can&amp;#8217;t tell if it&amp;#8217;s a build automation
+    system or just handles mocking packages and putting them in a repo
+    on a single&amp;nbsp;host.&lt;/li&gt;
+&lt;li&gt;Dag Wieers&amp;#8217; repositories use (or used) a set of python scripts
+    called &lt;a href="http://dag.wieers.com/home-made/dar/"&gt;&lt;span class="caps"&gt;DAR&lt;/span&gt;, &amp;#8220;Dynamic Apt Repository
+    builder&amp;#8221;&lt;/a&gt;. They&amp;#8217;re on
+    &lt;a href="https://github.com/dagwieers/dar"&gt;github&lt;/a&gt; but are listed as &amp;#8220;old&amp;#8221;
+    and haven&amp;#8217;t been updated in at least 2 years. The features sound
+    quite interesting, and though it&amp;#8217;s based on the Apt repo format, it
+    might provide some good ideas for implementing a similar&amp;nbsp;system.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;Update four months later:&lt;/strong&gt; I&amp;#8217;ve yet to find a build system that meets
+my requirements above. For the moment I&amp;#8217;m only managing \~20 packages,
+so my &amp;#8220;build system&amp;#8221; is a single shell script that reads in some
+environment variables and runs through using
+&lt;a href="http://fedoraproject.org/wiki/Projects/Mock"&gt;mock&lt;/a&gt; to build them in the
+correct order (including pushing the finished RPMs back into the local
+repository that mock reads from) and then pushing the finished packages
+to our internal repository. Maybe when I have some spare time, I&amp;#8217;ll
+consider a project to either make a slightly better (but simple) &lt;span class="caps"&gt;RPM&lt;/span&gt;
+build system based on Python, or get our
+&lt;a href="http://jenkins-ci.org/"&gt;Jenkins&lt;/a&gt; install to handle this for&amp;nbsp;me.&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Mon, 13 May 2013 05:00:00 -0400</pubDate><guid>tag:newblog.jasonantman.com,2013-05-13:2013/05/search-for-a-small-scale-but-automated-rpm-build-system/</guid><category>build</category><category>linux</category><category>nodejs</category><category>package</category><category>packaging</category><category>repository</category><category>rpm</category><category>rpmbuild</category><category>software</category><category>sysadmin</category><category>yum</category></item><item><title>CentOS/Fedora Install on SuperMicro Servers via IPMI Card KVM Over IP</title><link>http://newblog.jasonantman.com/2012/04/centosfedora-install-on-supermicro-servers-via-ipmi-card-kvm-over-ip/</link><description>&lt;p&gt;I recently had to setup Fedora 16 to test something on a &lt;a href="http://www.supermicro.com/products/system/1U/6015/SYS-6015T-T.cfm"&gt;SuperMicro
+6015T-&lt;span class="caps"&gt;TV&lt;/span&gt;&lt;/a&gt;
+1U &amp;#8220;dual&amp;#8221; server. This is a 1U enclosure with two separate servers in it
+- based on the &lt;a href="http://www.supermicro.com/products/motherboard/Xeon1333/5000P/X7DBT.cfm"&gt;SuperMicro
+&lt;span class="caps"&gt;X7DBT&lt;/span&gt;&lt;/a&gt;
+motherboards - each with an
+&lt;a href="http://www.supermicro.com/products/accessories/addon/SIM.cfm"&gt;&lt;span class="caps"&gt;AOC&lt;/span&gt;-&lt;span class="caps"&gt;SIMSO&lt;/span&gt;+&lt;/a&gt;
+&lt;span class="caps"&gt;IPMI&lt;/span&gt; and &lt;span class="caps"&gt;KVM&lt;/span&gt;-over-&lt;span class="caps"&gt;IP&lt;/span&gt; management card. Every time I tried different
+options for the kernel parameters (I was using Cobbler), I could get the
+&lt;span class="caps"&gt;OS&lt;/span&gt; to boot, but once Anaconda started, I&amp;#8217;d lose image (&amp;#8220;No Signal&amp;#8221;) on
+the &lt;span class="caps"&gt;IP&lt;/span&gt; &lt;span class="caps"&gt;KVM&lt;/span&gt;, and the serial console would go quiet. It took me about a
+dozen tries before I found a mailing list reference to the &amp;#8220;nomodeset&amp;#8221;
+option. This did the trick perfectly, and kept Anaconda&amp;nbsp;working.&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Fri, 13 Apr 2012 15:19:00 -0400</pubDate><guid>tag:newblog.jasonantman.com,2012-04-13:2012/04/centosfedora-install-on-supermicro-servers-via-ipmi-card-kvm-over-ip/</guid><category>anaconda</category><category>centos</category><category>fedora</category><category>ipmi</category><category>kvm</category><category>linux</category><category>raritan</category><category>supermicro</category></item><item><title>Linux Memory Usage and Disk Caching</title><link>http://newblog.jasonantman.com/2011/08/linux-memory-usage-and-disk-caching/</link><description>&lt;p&gt;I recently added some &lt;a href="http://www.cacti.net"&gt;Cacti&lt;/a&gt;-based graphing to a
+number of Linux-based servers prior to rolling out a new service. When I
+was looking over the performance graphs of the initial testing, I
+noticed that memory usage on our &lt;a href="http://www.rsyslog.com"&gt;rsyslog&lt;/a&gt;
+server was near 98%. Looking at &lt;code&gt;top(1)&lt;/code&gt;, I saw numbers that agreed,
+though processor usage was around 99% idle, and no process appeared to
+be using more than 1% of memory. It took me a minute or two to open my
+eyes and see past the panic of memory usage, and finally look at the
+complete output from &lt;code&gt;free(1)&lt;/code&gt;:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;             total       used       free     shared    buffers     cached
+Mem:       8171508    8032632     138876          0     162084    7253716
+-/+ buffers/cache:     616832    7554676
+Swap:      4192956        152    4192804
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;The pertinent part is the last column: &amp;#8220;cached&amp;#8221;. It slipped my mind that
+while rsyslog is writing vast amounts of data to disk, which may or may
+not ever be read back, the kernel is using free memory to cache as much
+of that as it reliably can. Hence the difference between what the kernel
+and userland tools call &amp;#8220;free&amp;#8221;, and what most human beings (or at least
+sysadmins) would consider &amp;#8220;free&amp;#8221; - or, more correctly, &amp;#8220;available for&amp;nbsp;use&amp;#8221;.&lt;/p&gt;
+&lt;p&gt;When I get a chance, maybe I&amp;#8217;ll submit patches to the Cacti Memory Usage
+Percent (&lt;span class="caps"&gt;SNMP&lt;/span&gt;) template to either graph cache separately, or remove it
+from the&amp;nbsp;total.&lt;/p&gt;
+&lt;p&gt;Interestingly, I also found a somewhat cute page entitled &amp;#8220;Help! Linux
+ate my &lt;span class="caps"&gt;RAM&lt;/span&gt;!&amp;#8221; at
+&lt;a href="http://www.linuxatemyram.com/"&gt;http://www.linuxatemyram.com/&lt;/a&gt;.&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Tue, 23 Aug 2011 08:17:00 -0400</pubDate><guid>tag:newblog.jasonantman.com,2011-08-23:2011/08/linux-memory-usage-and-disk-caching/</guid><category>linux</category><category>memory</category><category>rsyslog</category><category>syslog</category></item><item><title>Article on theInquirer.net</title><link>http://newblog.jasonantman.com/2011/07/article-on-theinquirer-net/</link><description>&lt;p&gt;I guess it&amp;#8217;s pretty strange that I just found out about it now, three
+years later, but there&amp;#8217;s an &lt;a href="http://www.theinquirer.net/inquirer/news/1026958/citibank-infuriating-customers-linux-hostile-site"&gt;article on
+TheInquirer.net&lt;/a&gt;
+about Citibank&amp;#8217;s website not allowing Linux, that heavily quotes &lt;a href="/2008/08/linux-choice-updates-citibank-issues/"&gt;a blog
+post of mine&lt;/a&gt; about the
+issue.&amp;nbsp;Cool.&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Mon, 11 Jul 2011 15:55:00 -0400</pubDate><guid>tag:newblog.jasonantman.com,2011-07-11:2011/07/article-on-theinquirer-net/</guid><category>citibank</category><category>linux</category><category>me</category></item><item><title>Netgear ReadyNAS 1100 Bug causes NFS Failure after reboot - workaround</title><link>http://newblog.jasonantman.com/2011/06/netgear-readynas-1100-bug-causes-nfs-failure-after-reboot-workaround/</link><description>&lt;p&gt;At work, we have a &lt;a href="http://www.readynas.com/?cat=23"&gt;Netgear ReadyNAS
+1100&lt;/a&gt;. It&amp;#8217;s a &lt;span class="caps"&gt;4TB&lt;/span&gt; &lt;span class="caps"&gt;NAS&lt;/span&gt; appliance, a cute
+little 1U half-depth Linux box with 4 &lt;span class="caps"&gt;SATA&lt;/span&gt; disks, a &lt;span class="caps"&gt;RAID&lt;/span&gt; controller, and
+some firmware to do a whole bunch of fancy stuff (mainly geared towards
+consumers and very small shops - all configuration is point-and-click
+web &lt;span class="caps"&gt;UI&lt;/span&gt;). We&amp;#8217;ve been using it for storing archived log data and
+low-priority backups. At the beginning of this problem, it was running
+RAIDiator 4.1.6 firmware since December of last year (over 6 months),
+and hadn&amp;#8217;t had any configuration changes in at least 4&amp;nbsp;months.&lt;/p&gt;
+&lt;p&gt;Last week, I had to power off the unit and remove the power cables for
+some rack maintenance. I went through the usual full shutdown procedure
+in the web &lt;span class="caps"&gt;UI&lt;/span&gt;, and also told it to `fsck` the volumes, as that hadn&amp;#8217;t
+been done in quite some time. Unfortunately, when the unit came back up,
+even after I could log into the web &lt;span class="caps"&gt;UI&lt;/span&gt;, I couldn&amp;#8217;t mount the &lt;span class="caps"&gt;NFS&lt;/span&gt; shares
+on my backup server. I kept getting messages&amp;nbsp;like:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="go"&gt;[root@backup-server ~]# mount -a&lt;/span&gt;
+&lt;span class="go"&gt;mount: mount to &lt;span class="caps"&gt;NFS&lt;/span&gt; server &amp;#39;css-readynas&amp;#39; failed: &lt;span class="caps"&gt;RPC&lt;/span&gt; Error: Program not registered.&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;so my next step was to check &lt;span class="caps"&gt;RPC&lt;/span&gt; status of the readynas, from the
+client. That was also a bit of a&amp;nbsp;surprise:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="go"&gt;[root@backup-server ~]# rpcinfo -p css-readynas                        &lt;/span&gt;
+&lt;span class="go"&gt;   program vers proto   port                                              &lt;/span&gt;
+&lt;span class="go"&gt;    100000    2   tcp    111  portmapper                                  &lt;/span&gt;
+&lt;span class="go"&gt;    100000    2   udp    111  portmapper                                  &lt;/span&gt;
+&lt;span class="go"&gt;    100011    1   udp    620  rquotad                                     &lt;/span&gt;
+&lt;span class="go"&gt;    100011    2   udp    620  rquotad                                     &lt;/span&gt;
+&lt;span class="go"&gt;    100011    1   tcp    623  rquotad                                     &lt;/span&gt;
+&lt;span class="go"&gt;    100011    2   tcp    623  rquotad                                     &lt;/span&gt;
+&lt;span class="go"&gt;    100024    1   udp  32765  status                                      &lt;/span&gt;
+&lt;span class="go"&gt;    100024    1   tcp  32765  status                                      &lt;/span&gt;
+&lt;span class="go"&gt;    100005    1   udp   2051  mountd                                      &lt;/span&gt;
+&lt;span class="go"&gt;    100005    1   tcp   3006  mountd                                      &lt;/span&gt;
+&lt;span class="go"&gt;    100005    2   udp   2051  mountd                                      &lt;/span&gt;
+&lt;span class="go"&gt;    100005    2   tcp   3006  mountd                                      &lt;/span&gt;
+&lt;span class="go"&gt;    100005    3   udp   2051  mountd                                      &lt;/span&gt;
+&lt;span class="go"&gt;    100005    3   tcp   3006  mountd &lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Somewhere in that list is supposed to be nfsd, listening on port 2049.
+Next, I did an nmap (port scan) of the&amp;nbsp;readynas:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="go"&gt;[root@backup-server ~]# nmap -sU -p2047-2050 css-readynas             &lt;/span&gt;
+
+&lt;span class="go"&gt;Starting Nmap 4.11 ( http://www.insecure.org/nmap/ ) at 2011-06-23 15:21 &lt;span class="caps"&gt;EDT&lt;/span&gt;&lt;/span&gt;
+&lt;span class="go"&gt;Interesting ports on css-readynas.rutgers.edu (172.16.25.108):              &lt;/span&gt;
+&lt;span class="go"&gt;&lt;span class="caps"&gt;PORT&lt;/span&gt;     &lt;span class="caps"&gt;STATE&lt;/span&gt;         &lt;span class="caps"&gt;SERVICE&lt;/span&gt;                                              &lt;/span&gt;
+&lt;span class="go"&gt;2047/udp closed        dls                                                  &lt;/span&gt;
+&lt;span class="go"&gt;2048/udp closed        dls-monitor                                          &lt;/span&gt;
+&lt;span class="go"&gt;2049/udp open|filtered nfs                                                  &lt;/span&gt;
+&lt;span class="go"&gt;2050/udp closed        unknown  &lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Interesting. The port scan shows that &lt;em&gt;something&lt;/em&gt; is listening on port
+2049. But rpcinfo doesn&amp;#8217;t seem to recognize it as a &lt;span class="caps"&gt;NFS&lt;/span&gt;&amp;nbsp;server.&lt;/p&gt;
+&lt;p&gt;At this point, through FrontView (the web &lt;span class="caps"&gt;UI&lt;/span&gt;) I backed up the
+configuration and went through a few reboot cycles, with no change. I
+then started tweaking everything I could that I thought would restart
+the &lt;span class="caps"&gt;NFS&lt;/span&gt; server - I added and removed allowed hosts for the &lt;span class="caps"&gt;NFS&lt;/span&gt; share,
+enabled and disabled sync mode, etc. I started searching the &lt;a href="http://www.readynas.com/forum/"&gt;ReadyNAS
+Forum&lt;/a&gt; and found a post that reported a
+very similar problem - &lt;a href="http://www.readynas.com/forum/viewtopic.php?f=20&amp;amp;t=23139"&gt;upnpd grabbing nfsd
+port&lt;/a&gt;. The
+user reported that he was getting the same &amp;#8220;&lt;span class="caps"&gt;RPC&lt;/span&gt; Error: Program not
+registered&amp;#8221; message, and in &lt;code&gt;daemon.log&lt;/code&gt; on the ReadyNAS, found a line
+including &amp;#8220;storage nfsd[1087]: nfssvc: Address already in use&amp;#8221;. I
+remembered that I&amp;#8217;d setup the ReadyNAS to forward all logs to our
+central syslog server and, sure enough, found an identical message that
+something had already bound to &lt;span class="caps"&gt;UDP&lt;/span&gt; port 2049 when &lt;span class="caps"&gt;NFS&lt;/span&gt; was starting. I
+tried confirming that upnpd was disabled and rebooting, but that didn&amp;#8217;t
+help. Grepping my logs for &amp;#8220;nfs&amp;#8221;&amp;nbsp;returned:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;daemon.log:Jun 23 12:43:43 css-readynas nfsd[2331]: nfssvc: Address already in use
+daemon.log:Jun 23 15:26:33 css-readynas nfsd[2724]: nfssvc: Address already in use
+kern.log:Jun 23 11:35:29 css-readynas kernel: Installing knfsd (copyright (C) 1996 okir@monad.swb.de).
+kern.log:Jun 23 12:43:43 css-readynas kernel: NFSD: Using /var/lib/nfs/v4recovery as the NFSv4 state recovery directory
+kern.log:Jun 23 12:43:43 css-readynas kernel: NFSD: starting 90-second grace period
+kern.log:Jun 23 14:56:20 css-readynas kernel: Installing knfsd (copyright (C) 1996 okir@monad.swb.de).
+kern.log:Jun 23 15:12:41 css-readynas kernel: NFSD: starting 90-second grace period
+kern.log:Jun 23 15:26:33 css-readynas kernel: NFSD: Using /var/lib/nfs/v4recovery as the NFSv4 state recovery directory
+kern.log:Jun 23 15:26:33 css-readynas kernel: NFSD: starting 90-second grace period
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;My next step was a few more reboots, with no change. I then upgraded the
+RAIDiator firmware to the latest, 4.1.7. Still no luck. I installed the
+&lt;a href="http://www.readynas.com/?p=4203"&gt;Enable root &lt;span class="caps"&gt;SSH&lt;/span&gt;&lt;/a&gt; addon, and that&amp;#8217;s
+when things became very&amp;nbsp;clear:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="gp"&gt;css-readynas:/var/log#&lt;/span&gt; netstat -unlp
+&lt;span class="go"&gt;Active Internet connections (only servers)&lt;/span&gt;
+&lt;span class="go"&gt;Proto Recv-Q Send-Q Local Address           Foreign Address         State       &lt;span class="caps"&gt;PID&lt;/span&gt;/Program name   &lt;/span&gt;
+&lt;span class="go"&gt;udp        0      0 0.0.0.0:2049            0.0.0.0:*                           794/snmpd           &lt;/span&gt;
+&lt;span class="go"&gt;udp        0      0 0.0.0.0:514             0.0.0.0:*                           673/syslogd         &lt;/span&gt;
+&lt;span class="go"&gt;udp        0      0 172.16.25.108:137       0.0.0.0:*                           1672/nmbd           &lt;/span&gt;
+&lt;span class="go"&gt;udp        0      0 0.0.0.0:137             0.0.0.0:*                           1672/nmbd           &lt;/span&gt;
+&lt;span class="go"&gt;udp        0      0 172.16.25.108:138       0.0.0.0:*                           1672/nmbd           &lt;/span&gt;
+&lt;span class="go"&gt;udp        0      0 0.0.0.0:138             0.0.0.0:*                           1672/nmbd           &lt;/span&gt;
+&lt;span class="go"&gt;udp        0      0 0.0.0.0:161             0.0.0.0:*                           794/snmpd           &lt;/span&gt;
+&lt;span class="go"&gt;udp        0      0 0.0.0.0:162             0.0.0.0:*                           802/snmptrapd       &lt;/span&gt;
+&lt;span class="go"&gt;udp        0      0 0.0.0.0:2086            0.0.0.0:*                           1565/rpc.mountd     &lt;/span&gt;
+&lt;span class="go"&gt;udp        0      0 127.0.0.1:22081         0.0.0.0:*                           1599/raidard        &lt;/span&gt;
+&lt;span class="go"&gt;udp        0      0 172.16.25.108:22081     0.0.0.0:*                           1599/raidard        &lt;/span&gt;
+&lt;span class="go"&gt;udp        0      0 0.0.0.0:22081           0.0.0.0:*                           1599/raidard        &lt;/span&gt;
+&lt;span class="go"&gt;udp        0      0 0.0.0.0:988             0.0.0.0:*                           819/rpc.rquotad     &lt;/span&gt;
+&lt;span class="go"&gt;udp        0      0 0.0.0.0:5353            0.0.0.0:*                           729/avahi-daemon: r &lt;/span&gt;
+&lt;span class="go"&gt;udp        0      0 0.0.0.0:111             0.0.0.0:*                           666/portmap         &lt;/span&gt;
+&lt;span class="go"&gt;udp        0      0 0.0.0.0:881             0.0.0.0:*                           1553/rpc.statd      &lt;/span&gt;
+&lt;span class="go"&gt;udp        0      0 0.0.0.0:32765           0.0.0.0:*                           1553/rpc.statd     &lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;For some &lt;strong&gt;&lt;em&gt;very&lt;/em&gt;&lt;/strong&gt; strange reason, snmpd had bound to port 2049 (the
+nfs port) instead of 161. That left no port for nfs to bind&amp;nbsp;to.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Solution:&lt;/strong&gt;&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="gp"&gt;css-readynas:/var/log#&lt;/span&gt; /etc/init.d/snmpd stop                                                       
+&lt;span class="go"&gt;Stopping network management services: snmpd snmptrapd readynas-agent.                               &lt;/span&gt;
+&lt;span class="gp"&gt;css-readynas:/var/log#&lt;/span&gt; /etc/init.d/nfs-kernel-server start
+&lt;span class="go"&gt;Exporting directories for &lt;span class="caps"&gt;NFS&lt;/span&gt; kernel daemon...done.&lt;/span&gt;
+&lt;span class="go"&gt;Starting &lt;span class="caps"&gt;NFS&lt;/span&gt; kernel daemon:mount: nfsd already mounted or /proc/fs/nfsd/ busy&lt;/span&gt;
+&lt;span class="go"&gt;mount: according to mtab, nfsd is mounted on /proc/fs/nfsd&lt;/span&gt;
+&lt;span class="go"&gt; statd nfsd mountd.&lt;/span&gt;
+&lt;span class="gp"&gt;css-readynas:/var/log#&lt;/span&gt; /etc/init.d/snmpd start
+&lt;span class="go"&gt;Starting network management services: snmpd snmptrapd readynas-agent.&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Stop snmpd, restart nfs-kernel-server so that it grabs port 2049 like it
+should, and then start snmpd back up. If all went well, nfsd should now
+be listening on &lt;span class="caps"&gt;UDP&lt;/span&gt; 2049, and snmpd should be listening on &lt;span class="caps"&gt;UDP&lt;/span&gt; 161 like
+it should. To&amp;nbsp;confirm:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="gp"&gt;css-readynas:/var/log#&lt;/span&gt; netstat -unlp
+&lt;span class="go"&gt;Active Internet connections (only servers)&lt;/span&gt;
+&lt;span class="go"&gt;Proto Recv-Q Send-Q Local Address           Foreign Address         State       &lt;span class="caps"&gt;PID&lt;/span&gt;/Program name&lt;/span&gt;
+&lt;span class="go"&gt;udp        0      0 0.0.0.0:2049            0.0.0.0:*                           -&lt;/span&gt;
+&lt;span class="go"&gt;udp        0      0 0.0.0.0:514             0.0.0.0:*                           673/syslogd&lt;/span&gt;
+&lt;span class="go"&gt;udp        0      0 172.16.25.108:137       0.0.0.0:*                           1672/nmbd&lt;/span&gt;
+&lt;span class="go"&gt;udp        0      0 0.0.0.0:137             0.0.0.0:*                           1672/nmbd&lt;/span&gt;
+&lt;span class="go"&gt;udp        0      0 172.16.25.108:138       0.0.0.0:*                           1672/nmbd&lt;/span&gt;
+&lt;span class="go"&gt;udp        0      0 0.0.0.0:138             0.0.0.0:*                           1672/nmbd&lt;/span&gt;
+&lt;span class="go"&gt;udp        0      0 0.0.0.0:161             0.0.0.0:*                           26161/snmpd&lt;/span&gt;
+&lt;span class="go"&gt;udp        0      0 0.0.0.0:162             0.0.0.0:*                           26163/snmptrapd&lt;/span&gt;
+&lt;span class="go"&gt;udp        0      0 0.0.0.0:2086            0.0.0.0:*                           1565/rpc.mountd&lt;/span&gt;
+&lt;span class="go"&gt;udp        0      0 127.0.0.1:22081         0.0.0.0:*                           1599/raidard&lt;/span&gt;
+&lt;span class="go"&gt;udp        0      0 172.16.25.108:22081     0.0.0.0:*                           1599/raidard&lt;/span&gt;
+&lt;span class="go"&gt;udp        0      0 0.0.0.0:22081           0.0.0.0:*                           1599/raidard&lt;/span&gt;
+&lt;span class="go"&gt;udp        0      0 0.0.0.0:988             0.0.0.0:*                           819/rpc.rquotad&lt;/span&gt;
+&lt;span class="go"&gt;udp        0      0 0.0.0.0:5353            0.0.0.0:*                           729/avahi-daemon: r&lt;/span&gt;
+&lt;span class="go"&gt;udp        0      0 0.0.0.0:2158            0.0.0.0:*                           -&lt;/span&gt;
+&lt;span class="go"&gt;udp        0      0 0.0.0.0:111             0.0.0.0:*                           666/portmap&lt;/span&gt;
+&lt;span class="go"&gt;udp        0      0 0.0.0.0:2160            0.0.0.0:*                           26161/snmpd&lt;/span&gt;
+&lt;span class="go"&gt;udp        0      0 0.0.0.0:881             0.0.0.0:*                           1553/rpc.statd&lt;/span&gt;
+&lt;span class="go"&gt;udp        0      0 0.0.0.0:32765           0.0.0.0:*                           1553/rpc.statd&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;All is well. Now to confirm this from the client&amp;nbsp;machine:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="go"&gt;[root@backup-server ~]# rpcinfo -p css-readynas&lt;/span&gt;
+&lt;span class="go"&gt;   program vers proto   port&lt;/span&gt;
+&lt;span class="go"&gt;    100000    2   tcp    111  portmapper&lt;/span&gt;
+&lt;span class="go"&gt;    100000    2   udp    111  portmapper&lt;/span&gt;
+&lt;span class="go"&gt;    100011    1   udp    988  rquotad&lt;/span&gt;
+&lt;span class="go"&gt;    100011    2   udp    988  rquotad&lt;/span&gt;
+&lt;span class="go"&gt;    100011    1   tcp    991  rquotad&lt;/span&gt;
+&lt;span class="go"&gt;    100011    2   tcp    991  rquotad&lt;/span&gt;
+&lt;span class="go"&gt;    100024    1   udp  32765  status&lt;/span&gt;
+&lt;span class="go"&gt;    100024    1   tcp  32765  status&lt;/span&gt;
+&lt;span class="go"&gt;    100005    1   udp   2086  mountd&lt;/span&gt;
+&lt;span class="go"&gt;    100005    1   tcp   3131  mountd&lt;/span&gt;
+&lt;span class="go"&gt;    100005    2   udp   2086  mountd&lt;/span&gt;
+&lt;span class="go"&gt;    100005    2   tcp   3131  mountd&lt;/span&gt;
+&lt;span class="go"&gt;    100005    3   udp   2086  mountd&lt;/span&gt;
+&lt;span class="go"&gt;    100005    3   tcp   3131  mountd&lt;/span&gt;
+&lt;span class="go"&gt;    100003    2   udp   2049  nfs&lt;/span&gt;
+&lt;span class="go"&gt;    100003    3   udp   2049  nfs&lt;/span&gt;
+&lt;span class="go"&gt;    100003    4   udp   2049  nfs&lt;/span&gt;
+&lt;span class="go"&gt;    100003    2   tcp   2049  nfs&lt;/span&gt;
+&lt;span class="go"&gt;    100003    3   tcp   2049  nfs&lt;/span&gt;
+&lt;span class="go"&gt;    100003    4   tcp   2049  nfs&lt;/span&gt;
+&lt;span class="go"&gt;    100021    1   udp   2158  nlockmgr&lt;/span&gt;
+&lt;span class="go"&gt;    100021    3   udp   2158  nlockmgr&lt;/span&gt;
+&lt;span class="go"&gt;    100021    4   udp   2158  nlockmgr&lt;/span&gt;
+&lt;span class="go"&gt;    100021    1   tcp   4189  nlockmgr&lt;/span&gt;
+&lt;span class="go"&gt;    100021    3   tcp   4189  nlockmgr&lt;/span&gt;
+&lt;span class="go"&gt;    100021    4   tcp   4189  nlockmgr&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Ok, &lt;span class="caps"&gt;NFS&lt;/span&gt; is now there. It all looks good, and re-running &lt;code&gt;mount -a&lt;/code&gt; on
+the client successfully mounts the &lt;span class="caps"&gt;NFS&lt;/span&gt;&amp;nbsp;share.&lt;/p&gt;
+&lt;p&gt;We&amp;#8217;ll see what happens next time I have to reboot the ReadyNAS. In the
+mean time, I&amp;#8217;m going to try to bring this to the attention of Netgear
+support and hope they do something about&amp;nbsp;it.&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Tue, 28 Jun 2011 08:40:00 -0400</pubDate><guid>tag:newblog.jasonantman.com,2011-06-28:2011/06/netgear-readynas-1100-bug-causes-nfs-failure-after-reboot-workaround/</guid><category>appliance</category><category>embedded</category><category>linux</category><category>nas</category><category>netgear</category><category>nfs</category><category>readynas</category></item><item><title>Using wireshark to capture packets from a remote host</title><link>http://newblog.jasonantman.com/2011/04/using-wireshark-to-capture-packets-from-a-remote-host/</link><description>&lt;p&gt;I spend a fair amount of my time debugging network and service problems
+on a few racks of Linux servers. Of course, they&amp;#8217;re located in a data
+center (yes, just downstairs, but still not quite as comfortable as my
+office), and they&amp;#8217;re all command-line only - no sense in using up &lt;span class="caps"&gt;RAM&lt;/span&gt;
+and &lt;span class="caps"&gt;CPU&lt;/span&gt; to run a graphical &lt;span class="caps"&gt;UI&lt;/span&gt; on a box that should just be serving
+remote clients. I used to go through the arduous task of running a
+command line &lt;a href="http://www.tcpdump.org/"&gt;&lt;code&gt;tcpdump&lt;/code&gt;&lt;/a&gt; session on the server
+until I thought I had enough packets, then SCPing it over to my
+workstation and opening the file in
+&lt;a href="http://www.wireshark.org/"&gt;wireshark&lt;/a&gt; (formerly Ethereal). Fortunately,
+thanks to a
+&lt;a href="http://linuxexplore.wordpress.com/2010/05/30/remote-packet-capture-using-wireshark-tcpdump/"&gt;post&lt;/a&gt;
+on Rahul Panwar&amp;#8217;s &lt;a href="http://linuxexplore.wordpress.com/"&gt;Linux Explore
+blog&lt;/a&gt; (which seems to be sadly
+neglected), I found a much easier way to do it. I&amp;#8217;ve summarized that
+post here, added a little explanation, and also made some useful
+comments for people working on Red Hat/CentOS and&amp;nbsp;OpenSuSE.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;What you&amp;nbsp;need:&lt;/strong&gt;&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Source system (the server you want to capture packets on) that you
+    have &lt;span class="caps"&gt;SSH&lt;/span&gt; access to, with tcpdump installed, and available to your
+    user (either directly, or via sudo without&amp;nbsp;password).&lt;/li&gt;
+&lt;li&gt;Destination system (where you run graphical Wireshark) with
+    wireshark installed and working, and &lt;code&gt;mkfifo&lt;/code&gt; available.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&lt;strong&gt;Procedure:&lt;/strong&gt;&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;On the destination system, if you haven&amp;#8217;t already done&amp;nbsp;so,&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;mkfifo /tmp/packet_capture
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;This creates a &lt;a href="http://en.wikipedia.org/wiki/Named_pipe"&gt;named pipe&lt;/a&gt;
+where the source packet data (via ssh) will be written and Wireshark
+will read it from. You can use any name or location you want, but
+&lt;code&gt;/tmp/packet_capture&lt;/code&gt; is pretty&amp;nbsp;logical.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;On your destination system, open up Wireshark (we do this now, since
+    on many systems it required the root password to start). In the
+    &amp;#8220;Capture&amp;#8221; menu, select &amp;#8220;Options&amp;#8221;. In the &amp;#8220;Interface&amp;#8221; box, type in
+    the path to the &lt;span class="caps"&gt;FIFO&lt;/span&gt; you created (&lt;code&gt;/tmp/packet_capture&lt;/code&gt;). You should
+    press the Start button before running the next command - I recommend
+    typing the command in a terminal window, pressing start, then
+    hitting enter in the terminal to run the&amp;nbsp;command.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;On the destination system,&amp;nbsp;run&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;ssh user@source-hostname &lt;span class="s2"&gt;&amp;quot;sudo /usr/sbin/tcpdump -s 0 -U -n -w - -i eth0 not port 22&amp;quot;&lt;/span&gt; &amp;gt; /tmp/packet_capture
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;This will &lt;span class="caps"&gt;SSH&lt;/span&gt; to the source system (&lt;code&gt;source-hostname&lt;/code&gt;, either by
+hostname or &lt;span class="caps"&gt;IP&lt;/span&gt;) as the specified user (&lt;code&gt;user&lt;/code&gt;) and execute
+&lt;code&gt;sudo /usr/sbin/tcpdump&lt;/code&gt;. Omit the &amp;#8220;sudo&amp;#8221; if you don&amp;#8217;t need it,
+though if you do, you&amp;#8217;ll need passwordless access. Options passed to
+tcpdump are: &amp;#8220;-s 0&amp;#8221; snarf entire packets, no length limit; &amp;#8220;-U&amp;#8221;
+packet-buffered output - write each complete packet to output once
+it&amp;#8217;s captured, rather than waiting for a buffer to fill up; &amp;#8220;-n&amp;#8221;
+don&amp;#8217;t convert addresses to hostnames; &amp;#8220;-w -&amp;#8221; write raw packets to
+&lt;span class="caps"&gt;STDOUT&lt;/span&gt; (which will be passed through the &lt;span class="caps"&gt;SSH&lt;/span&gt; tunnel and become
+&lt;span class="caps"&gt;STDOUT&lt;/span&gt; of the &amp;#8220;ssh&amp;#8221; command on the destination machine); &amp;#8220;-i eth0&amp;#8221;
+capture on interface eth0; &amp;#8220;not port 22&amp;#8221; a tcpdump filter expression
+to prevent capturing our own &lt;span class="caps"&gt;SSH&lt;/span&gt; packets (more on this below). The
+final &amp;#8220;&gt; /tmp/packet_capture&amp;#8221; redirects the &lt;span class="caps"&gt;STDOUT&lt;/span&gt; of the ssh
+program (the raw packets from tcpdump on the source machine) to the
+&lt;code&gt;/tmp/packet_capture&lt;/code&gt; &lt;span class="caps"&gt;FIFO&lt;/span&gt;.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;When you&amp;#8217;re ready to stop the capture, just Ctrl+C the &lt;span class="caps"&gt;SSH&lt;/span&gt; command
+    in the terminal window. Wireshark will automatically stop capturing,
+    and you can save the capture file or play around with it. To capture
+    again, you&amp;#8217;ll need to restart the capture in Wireshark and then run
+    the ssh command&amp;nbsp;again.&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&lt;strong&gt;A note on network usage and tcpdump&amp;nbsp;filters&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;This is a relatively bandwidth intensive procedure. If you use the &amp;#8220;not
+port 22&amp;#8221; tcpdump filter (shown above) on the source machine, all traffic
+over eth0 (other than &lt;span class="caps"&gt;SSH&lt;/span&gt;) on that machine will be duplicated within an
+&lt;span class="caps"&gt;SSH&lt;/span&gt; tunnel. So you have double the traffic, plus the overhead of
+tunneling all that within &lt;span class="caps"&gt;SSH&lt;/span&gt; to the destination machine. If you&amp;#8217;re
+capturing data from a busy machine this way, you could easily saturate
+the uplink and wreak all sorts of havoc. As a result, I&amp;#8217;d recommend
+making the tcpdump filter as specific as you can while still retaining
+the data you need. If you can replace it with a filter for specific
+ports (i.e. &lt;code&gt;'(port 67 or port 68)'&lt;/code&gt; for &lt;span class="caps"&gt;DHCP&lt;/span&gt;) or specific hosts, that
+should cut down on the amount of data you actually have to pass through
+the&amp;nbsp;tunnel.&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Tue, 26 Apr 2011 10:50:00 -0400</pubDate><guid>tag:newblog.jasonantman.com,2011-04-26:2011/04/using-wireshark-to-capture-packets-from-a-remote-host/</guid><category>ethereal</category><category>linux</category><category>sysadmin</category><category>tcpdump</category><category>troubleshooting</category><category>wireshark</category></item><item><title>How to get actual login username when using sudo su</title><link>http://newblog.jasonantman.com/2011/01/how-to-get-actual-login-username-when-using-sudo-su/</link><description>&lt;p&gt;I&amp;#8217;ve had the need to find out the actual username of someone logged in
+and working as root (via &lt;code&gt;sudo su -&lt;/code&gt;) to &lt;a href="/2011/01/client-side-subversion-commit-message-hooks/"&gt;put it into a subversion
+commit message&lt;/a&gt;.
+This quick little bash script does the trick, and just echos the&amp;nbsp;username.&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="c"&gt;#!/bin/bash&lt;/span&gt;
+
+&lt;span class="nv"&gt;&lt;span class="caps"&gt;PID&lt;/span&gt;&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nv"&gt;$$&lt;/span&gt; &lt;span class="c"&gt;# get &lt;span class="caps"&gt;PID&lt;/span&gt; of current process&lt;/span&gt;
+&lt;span class="nv"&gt;LogUID&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="sb"&gt;`&lt;/span&gt;cat /proc/&lt;span class="s2"&gt;&amp;quot;$&lt;span class="caps"&gt;PID&lt;/span&gt;&amp;quot;&lt;/span&gt;/loginuid&lt;span class="sb"&gt;`&lt;/span&gt; &lt;span class="c"&gt;# get loginuid of current process&lt;/span&gt;
+&lt;span class="nv"&gt;username&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="sb"&gt;`&lt;/span&gt;getent passwd &lt;span class="s2"&gt;&amp;quot;$LogUID&amp;quot;&lt;/span&gt; | awk -F &lt;span class="s2"&gt;&amp;quot;:&amp;quot;&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;{print $1}&amp;#39;&lt;/span&gt;&lt;span class="sb"&gt;`&lt;/span&gt; &lt;span class="c"&gt;# translate loginuid to username&lt;/span&gt;
+&lt;span class="nb"&gt;echo&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;$username&amp;quot;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Wed, 05 Jan 2011 11:48:00 -0500</pubDate><guid>tag:newblog.jasonantman.com,2011-01-05:2011/01/how-to-get-actual-login-username-when-using-sudo-su/</guid><category>linux</category><category>login</category><category>sudo</category><category>username</category></item><item><title>Client-side subversion commit message hooks</title><link>http://newblog.jasonantman.com/2011/01/client-side-subversion-commit-message-hooks/</link><description>&lt;p&gt;While I know this isn&amp;#8217;t best practice, since we use &lt;span class="caps"&gt;LDAP&lt;/span&gt;-based auth for
+our Linux boxes (including a sudoers file based on &lt;span class="caps"&gt;LDAP&lt;/span&gt; group
+membership), we usually do work on some boxes as root (&lt;code&gt;sudo su -&lt;/code&gt;).
+This includes our &lt;a href="http://www.puppetlabs.com/"&gt;puppetmaster&lt;/a&gt;, where
+configs are kept in subversion and edited as root. The one problem with
+this is how to get the username of the actual committer, not root, in
+subversion&amp;nbsp;messages.&lt;/p&gt;
+&lt;p&gt;The theory that I came up with is a &lt;a href="/2011/01/how-to-get-actual-login-username-when-using-sudo-su/"&gt;shell script that finds out who the
+actual user
+is&lt;/a&gt;, and
+then tacking this onto the beginning of the subversion commit message
+(since there&amp;#8217;s no real way to do client-side hooks in subversion). While
+I struggled with subversion&amp;#8217;s lack of good client hooks, I came up with
+a theory based on a script that preloads svn-commit.tmp and then calls
+the text editor. It&amp;#8217;s actually quite&amp;nbsp;simple.&lt;/p&gt;
+&lt;p&gt;First, in your .bashrc or wherever you setup environment variables,
+&lt;code&gt;export SVN_EDITOR=/usr/local/bin/svnPreCommitClientHook.sh&lt;/code&gt;. This way,
+every time you run &lt;code&gt;svn commit&lt;/code&gt;, instead of calling your text editor
+with &lt;code&gt;svn-commit.tmp&lt;/code&gt; as an argument, the bash script will do what it
+needs to (commit message preloading) with svn-commit.tmp and &lt;em&gt;then&lt;/em&gt; call
+your editor to finish the&amp;nbsp;message.&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;/usr/local/bin/svnPreCommitClientHook.sh&lt;/code&gt;:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="c"&gt;#!/bin/bash&lt;/span&gt;
+&lt;span class="nv"&gt;&lt;span class="caps"&gt;LOGNAME&lt;/span&gt;&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="sb"&gt;`&lt;/span&gt;/usr/local/bin/getLogname.py&lt;span class="sb"&gt;`&lt;/span&gt; &lt;span class="c"&gt;# script to get user&amp;#39;s actual login name, even if using sudo su&lt;/span&gt;
+&lt;span class="nb"&gt;echo&lt;/span&gt; -e &lt;span class="s2"&gt;&amp;quot;\nBY: $&lt;span class="caps"&gt;LOGNAME&lt;/span&gt;&amp;quot;&lt;/span&gt; &amp;gt; svn-commit.foo
+cat svn-commit.tmp &amp;gt;&amp;gt; svn-commit.foo
+mv svn-commit.foo svn-commit.tmp
+&lt;span class="s2"&gt;&amp;quot;$&lt;span class="caps"&gt;EDITOR&lt;/span&gt;&amp;quot;&lt;/span&gt; svn-commit.tmp
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Using this method, running &lt;code&gt;svn commit&lt;/code&gt; will pull up your text editor
+with &amp;#8220;&lt;span class="caps"&gt;BY&lt;/span&gt;: username&amp;#8221; already inserted in the commit&amp;nbsp;message.&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Wed, 05 Jan 2011 11:23:00 -0500</pubDate><guid>tag:newblog.jasonantman.com,2011-01-05:2011/01/client-side-subversion-commit-message-hooks/</guid><category>linux</category><category>puppet</category><category>subversion</category><category>svn</category></item><item><title>Ignoring SVN directories and save files with grep</title><link>http://newblog.jasonantman.com/2010/10/ignoring-svn-directories-and-save-files-with-grep/</link><description>&lt;p&gt;Yes, I know I haven&amp;#8217;t posted anything useful in a while. I&amp;#8217;ve been quite
+busy at work, and hopefully I&amp;#8217;ll post some of my &lt;span class="caps"&gt;DHCP&lt;/span&gt; stuff. In the&amp;nbsp;meantime&amp;#8230;&lt;/p&gt;
+&lt;p&gt;I&amp;#8217;m starting a project for the &lt;a href="http://www.midlandparkambulance.com/"&gt;ambulance
+corps&lt;/a&gt; migrating two Linux boxes
+to a single new server. One of them has been in production for about
+five years, and (partially due to the &amp;#8220;we need it yesterday&amp;#8221; nature of
+emergency services) has quite a bit of cruft laying around. Since almost
+everything is web-based (well, browser-based, restricted to the &lt;span class="caps"&gt;LAN&lt;/span&gt;
+only), there are a lot of web apps and &lt;span class="caps"&gt;PHP&lt;/span&gt; scripts that need to be
+migrated. This is made even more complicated by the switch from SuSE
+10.1 (yes, ancient) to CentOS 5.4, and therefore from &lt;code&gt;/srv/www/htdocs&lt;/code&gt;
+to &lt;code&gt;/var/www/html&lt;/code&gt;. I could be lazy and symlink it, but I think it&amp;#8217;s
+time to search down and destroy any absolute&amp;nbsp;includes.&lt;/p&gt;
+&lt;p&gt;The problem with doing this is that, with any scripts in &lt;span class="caps"&gt;SVN&lt;/span&gt;, grepping
+for a string could potentially return three hits for a file - the actual
+file, the emacs save file (&lt;code&gt;filename~&lt;/code&gt;) and the text file in the &lt;code&gt;.svn&lt;/code&gt;
+directory.&lt;/p&gt;
+&lt;p&gt;The solution is actually pretty easy. To get rid of the .svn
+directories, we add &lt;code&gt;--exclude=\*.svn\*&lt;/code&gt; to our grep command line (yes,
+I know, it excludes everything with &amp;#8220;.svn&amp;#8221; in the path, but that&amp;#8217;s
+acceptably imprecise for my purposes). To get rid of the tilde (save)
+files, all we need is &lt;code&gt;--exclude=\*~&lt;/code&gt;. It&amp;#8217;s no problem to string them
+together as &lt;code&gt;grep --exclude=\*~ --exclude=\*.svn\* -rin "foo bar" *&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;To make this even easier, just add to your &lt;code&gt;.bashrc&lt;/code&gt;:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="nb"&gt;export &lt;/span&gt;&lt;span class="nv"&gt;GREP_OPTIONS&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;--exclude=\*~ --exclude=\*.svn\*&amp;quot;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Fri, 15 Oct 2010 07:27:00 -0400</pubDate><guid>tag:newblog.jasonantman.com,2010-10-15:2010/10/ignoring-svn-directories-and-save-files-with-grep/</guid><category>grep</category><category>linux</category></item><item><title>How to make software distribution secure</title><link>http://newblog.jasonantman.com/2010/09/how-to-make-software-distribution-secure/</link><description>&lt;p&gt;We were seeing some strange behavior with Mac client machines on the
+network lately, specifically with &lt;span class="caps"&gt;DNS&lt;/span&gt; queries (I&amp;#8217;d guess that a lot of
+it has to do with
+&lt;a href="http://en.wikipedia.org/wiki/Bonjour_(software)"&gt;Bonjour&lt;/a&gt;), but the
+discussion touched on the &lt;a href="http://isc.sans.edu/diary.html?storyid=3595"&gt;&lt;span class="caps"&gt;DNS&lt;/span&gt;
+Changer&lt;/a&gt;
+&lt;a href="http://www.dnschanger.com/"&gt;trojan&lt;/a&gt; for Mac. I&amp;#8217;d really never heard
+about it before, and after some basic reading, it really got me thinking
+about the state of software packaging, updates, and distribution.
+Granted, some of my observations would require sweeping changes to how
+packaging is handled (even on the *nixes), and would require buy-in
+from more than just the vendor and distributor (well, I guess &lt;span class="caps"&gt;MS&lt;/span&gt; can
+probably pressure ISVs to do whatever they want), but seems to be the
+only way to keep appliancization from becoming the solution to security
+issues. I&amp;#8217;ve written about this
+&lt;a href="/2009/12/book-comments-the-future-of-the-internet-and-how-to-stop-it-by-jonathan-zittrain/"&gt;before&lt;/a&gt;,
+and a while ago in respect to
+&lt;a href="/2008/10/my-biggest-problem-with-linux/"&gt;Linux&lt;/a&gt;, but here&amp;#8217;s my current
+take on what needs to be done to software packaging to allow our
+machines to stay secure, no matter what &lt;span class="caps"&gt;OS&lt;/span&gt; they&amp;nbsp;run.&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;Allow packages to be installed as a user.&lt;/strong&gt; This is a mammoth task
+    under Windows or Mac, but still an issue under Linux. The &lt;span class="caps"&gt;DNS&lt;/span&gt;
+    Changer trojan is a case in point - there&amp;#8217;s no reason a &amp;#8220;video
+    codec&amp;#8221; would need to be installed system-wide, and if that were
+    simply installed user-specific, the malicious installer would never
+    have the privileges to change system-wide &lt;span class="caps"&gt;DNS&lt;/span&gt; settings. This is also
+    a big issue under Linux. Yum, apt, rpm, etc. should (if run as a
+    non-root user) install packages in a user-local path under &lt;code&gt;/home&lt;/code&gt;
+    by default. Of course, this would mean many things would need to
+    change in order to cope - perhaps even a change to the
+    &lt;a href="http://www.linuxfoundation.org/collaborate/workgroups/lsb"&gt;&lt;span class="caps"&gt;LSB&lt;/span&gt;&lt;/a&gt;&amp;nbsp;spec.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Warn about inconsistencies on package installation.&lt;/strong&gt; The package
+    installation program should warn a user (whether installing packages
+    system-wide or local to a user) if the package is going to modify
+    system-wide files, i.e. files not specifically placed by that
+    package and that package&amp;nbsp;only.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Real package management for Windows and Mac&lt;/strong&gt; It&amp;#8217;s about time that
+    Apple and Microsoft admit that people without billions in funding
+    can come up with good ideas. Get rid of these Installer programs
+    (the many many different ones). Each &lt;span class="caps"&gt;OS&lt;/span&gt; should pick a package
+    format, develop a yum-like (or, even better, zypper-like) package
+    management program that understands repositories. I don&amp;#8217;t know how
+    they&amp;#8217;d cope with the pervasive license keys and &lt;span class="caps"&gt;DRM&lt;/span&gt; in the non-nix
+    world, but I&amp;#8217;m sure they could figure out a way that still allowed
+    sane package management. The idea here is that vendors run
+    repositories and are responsible for their &lt;span class="caps"&gt;GPG&lt;/span&gt; keys, so trojans
+    claiming to be an update to a given vendor&amp;#8217;s software would be
+    rejected. Also, isn&amp;#8217;t it about time that you can update all your
+    software on Windows or Mac through one&amp;nbsp;tool?&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Filesystem-based &lt;span class="caps"&gt;IDS&lt;/span&gt; for Windows and Mac&lt;/strong&gt; Assuming it will take a
+    while to get everyone onboard with the packaging idea, and noting
+    that users of these OSes like installing applications from arbitrary
+    sources, there should be an &lt;span class="caps"&gt;OS&lt;/span&gt;-level feature to audit all filesystem
+    changes made by untrusted/unsigned applications, and a way to alert
+    the user to these changes if they appear suspisious (essentially
+    what &lt;a href="http://www.safer-networking.org"&gt;Spybot Search &lt;span class="amp"&gt;&amp;amp;&lt;/span&gt; Destroy /
+    TeaTimer&lt;/a&gt; do, but builtin to the&amp;nbsp;&lt;span class="caps"&gt;OS&lt;/span&gt;).&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Vendor support of packaging/repositories&lt;/strong&gt; - Along with the idea
+    of repositories, vendors should have a trust or signing system for
+    ISVs signing keys. If users are installing arbitrary software,
+    making them trust an arbitrary key won&amp;#8217;t do anything to improve
+    security. Microsoft and Apple need to run a &lt;span class="caps"&gt;CA&lt;/span&gt; that signs the
+    package signing keys of their ISVs. The also - and here&amp;#8217;s the big
+    one - need to have a parallel framework for &amp;#8220;independent
+    developers&amp;#8221;. I.e. something that doesn&amp;#8217;t cost any money for the
+    packagers, and allows them to at least give a &amp;#8220;this person is who
+    they say they are&amp;#8221;&amp;nbsp;message.&lt;/li&gt;
+&lt;li&gt;Finally, &lt;strong&gt;Make package management pervasive&lt;/strong&gt; - Have a real push to
+    apply the packaging and signing keys standard to all software for
+    the&amp;nbsp;&lt;span class="caps"&gt;OS&lt;/span&gt;.&lt;/li&gt;
+&lt;li&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;On a final note, applicable to both the current state of Linux packaging
+and my ideas about Mac and Windows&amp;#8230; &lt;span class="caps"&gt;DNS&lt;/span&gt; is the ideal method of key
+distribution (granted, yes, this just means that the security of the
+packager&amp;#8217;s &lt;span class="caps"&gt;DNS&lt;/span&gt; records, and their servers and signing key, is just more
+of an issue). But even with Yum and Zypper, it seems to me to be logical
+that the packager&amp;#8217;s public key should be stored in a &lt;span class="caps"&gt;DNS&lt;/span&gt; record (or at a
+&lt;span class="caps"&gt;URL&lt;/span&gt; stored in a &lt;span class="caps"&gt;DNS&lt;/span&gt; &lt;span class="caps"&gt;TXT&lt;/span&gt; record). That way, it wouldn&amp;#8217;t be up to an end
+user to import and trust a key, they&amp;#8217;d just have to trust the repository
+(i.e. software.adobe.com) and the package manager would pull down the
+key and verify that package X in software.adobe.com is, in fact, signed
+by the software.adobe.com&amp;nbsp;key.&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Fri, 17 Sep 2010 12:42:00 -0400</pubDate><guid>tag:newblog.jasonantman.com,2010-09-17:2010/09/how-to-make-software-distribution-secure/</guid><category>linux</category><category>mac</category><category>packaging</category><category>security</category><category>software</category><category>windows</category></item><item><title>New MacBook Pro; Dual boot with Linux</title><link>http://newblog.jasonantman.com/2010/06/new-macbook-pro-dual-boot-with-linux/</link><description>&lt;p&gt;So in the first bit of good news lately, after four years as a
+part-timer, this Monday I start my full-time position at Rutgers as a
+Linux SysAdmin. Not really anything different - same office, same work,
+just another day a week and a pay bump (plus benefits and all that). My
+only real change on the first day will be a 3-hour &lt;span class="caps"&gt;HR&lt;/span&gt; orientation and
+moving my workstation to public address space. But, on the positive
+side, my new laptop just came in - a shiny new 13&amp;#8221; MacBook Pro, 2.4GHz
+Core2 Duo, &lt;span class="caps"&gt;4GB&lt;/span&gt; &lt;span class="caps"&gt;RAM&lt;/span&gt;, &lt;span class="caps"&gt;250GB&lt;/span&gt; &lt;span class="caps"&gt;HDD&lt;/span&gt;. Every time I see Mac packaging, I
+remember why they cost so much - the box must be half the&amp;nbsp;price!&lt;/p&gt;
+&lt;p&gt;&lt;img alt="MacBook Pro" src="/GFX/newMacBookPro.jpg" /&gt;&lt;/p&gt;
+&lt;p&gt;If all goes well, I&amp;#8217;ll have the machine setup to dual-boot &lt;span class="caps"&gt;OSX&lt;/span&gt; and Linux
+(specifically &lt;a href="http://www.opensuse.org"&gt;OpenSuSE&lt;/a&gt; 11.2. I&amp;#8217;ll post notes
+when I have it&amp;nbsp;done.&lt;/p&gt;
+&lt;p&gt;The list of things I have to figure out beyond just getting both OSes&amp;nbsp;running:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Do I want to use Mac for more than a select few apps that require it
+    (i.e. possibly as another day-to-day &lt;span class="caps"&gt;OS&lt;/span&gt;)? If so, I need to figure
+    out file sharing between the OSes, what I want unified from my
+    profiles/homedirs, Firefox profile sharing,&amp;nbsp;etc.&lt;/li&gt;
+&lt;li&gt;How to do a simple shared&amp;nbsp;partition?&lt;/li&gt;
+&lt;li&gt;&lt;span class="caps"&gt;FUSE&lt;/span&gt;/&lt;span class="caps"&gt;SSHFS&lt;/span&gt; on the Mac&amp;nbsp;side.&lt;/li&gt;
+&lt;li&gt;Is there a way to select the boot &lt;span class="caps"&gt;OS&lt;/span&gt; (rEFIt) from&amp;nbsp;Linux?&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Stay&amp;nbsp;tuned&amp;#8230;&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Tue, 22 Jun 2010 15:17:00 -0400</pubDate><guid>tag:newblog.jasonantman.com,2010-06-22:2010/06/new-macbook-pro-dual-boot-with-linux/</guid><category>apple</category><category>dual boot</category><category>laptop</category><category>linux</category><category>mac</category><category>macbook</category><category>opensuse</category></item><item><title>The Newest Generation of Hackers</title><link>http://newblog.jasonantman.com/2010/03/the-newest-generation-of-hackers/</link><description>&lt;p&gt;&lt;em&gt;Note for non-technical readers (not that I expect there to be many).
+The title of this post includes the word &amp;#8220;hacker&amp;#8221;. If you think that has
+anything to do with illegal acts or unethical behavior, you&amp;#8217;ve fallen
+victim to what happens when the mainstream media latches on to a term
+they don&amp;#8217;t understand. The
+&lt;a href="http://www.catb.org/jargon/html/H/hacker.html"&gt;definition&lt;/a&gt; of
+this word is far from negative. Within the geek community, the title
+&amp;#8220;hacker&amp;#8221; is the utmost compliment - something like Grand Master in the
+martial arts, or perhaps whatever title is given to an eminent artist.
+It both describes someone who is an expert in their field. Or, more
+generally, someone who enjoys seeking knowledge simply for the sake of
+knowledge - figuring out how things work, how to make them, and how to
+make them better. If you&amp;#8217;re looking for a term that describes a
+criminal, &amp;#8220;attacker&amp;#8221;, &amp;#8220;malicious user&amp;#8221; or &amp;#8220;computer criminal&amp;#8221; work fine.
+While I wouldn&amp;#8217;t by any extent consider myself a hacker in the
+super-genius-wizard sense of the term, I do definitely subscribe to the
+hacker ethic - the burning need to figure out how things work and make
+them&amp;nbsp;better.&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;Thanks to the snow at the end of last week, and a long weekend, I
+actually got to do some reading that didn&amp;#8217;t involve man pages or books
+strictly about software. I finally finished &lt;a href="http://www.amazon.com/Daemon-Gnu-Penguin-Peter-Salus/dp/097903423X"&gt;The Daemon, the Gnu, and
+the
+Penguin&lt;/a&gt;
+by Peter H. Salus, a wonderful book (with a great foreword by maddog
+Hall). I also &lt;em&gt;finally&lt;/em&gt; got a chance to start reading &lt;a href="http://www.amazon.com/Cathedral-Bazaar-Musings-Accidental-Revolutionary/dp/0596001088/"&gt;The Cathedral &lt;span class="amp"&gt;&amp;amp;&lt;/span&gt;
+the Bazaar: Musings on Linux and Open Source by an Accidental
+Revolutionary&lt;/a&gt;
+by Eric S. Raymond (&lt;span class="caps"&gt;ESR&lt;/span&gt;). I&amp;#8217;m only up to page 50 or so, but it&amp;#8217;s an
+equally good book, and I&amp;#8217;ve been looking forward to reading it for&amp;nbsp;years.&lt;/p&gt;
+&lt;p&gt;I&amp;#8217;ve always been very interested in history (heck, I have a minor in
+it), and specifically the history of my other interests. When
+photography took up most of my time, I read every photo history book I
+could get my hands on (including many primary sources on now-archaic
+techniques). In the past few years, I&amp;#8217;ve been amassing books on
+computing history (specifically &lt;span class="caps"&gt;ARPANET&lt;/span&gt;/the Internet and Unix/Linux/Free
+software) at a near-alarming&amp;nbsp;rate.&lt;/p&gt;
+&lt;p&gt;Through all of my reading, two main things have struck me: the utterly
+amazing feats accomplished by previous generations, and how my own
+generation takes them for granted. I was born in 1987 which, I feel,
+makes me part of a very small group who were lucky enough to grow up
+during the real rise of the Internet. I remember playing simple games on
+my grandmother&amp;#8217;s (business) &lt;span class="caps"&gt;386DX&lt;/span&gt; long before I could read most of the
+words on the screen. But I also remember my father dialing in to an &lt;span class="caps"&gt;ISP&lt;/span&gt;
+(I honestly don&amp;#8217;t remember which one) on a 9600 baud serial modem, and
+how unique that was at the time (at least among kids my age). By 13 or
+so, I had a 10BaseT network in my house, sharing a 56k dial-up
+connection between two computers. I feel that I&amp;#8217;m part of a short
+historical period of kids who &amp;#8220;grew up&amp;#8221; with computers, used them in
+middle school, are perfectly at home with them, but still remember
+dial-up, the launch of Windows 98, and ordering Linux on CDs because you
+just couldn&amp;#8217;t get it any other way (too young to have access to the
+resources of a college, only&amp;nbsp;dial-up).&lt;/p&gt;
+&lt;p&gt;Anyway, on to my&amp;nbsp;point&amp;#8230;&lt;/p&gt;
+&lt;p&gt;As I read about those who stepped before me (and my generation), those
+who thought up such amazing ideas as Unix, the Internet, networking and
+most of the software and protocols we have today, I realize how big
+their shoes are, and how difficult it will be for the next generation to
+fill them. Sure, we have Facebook, &lt;span class="caps"&gt;RSS&lt;/span&gt; feeds, Web 2.0 and smartphones,
+but will we be able to innovate on the level that those who came before
+us did? And then it strikes me how much we young aspiring hackers take
+for granted. How many aspects of technology today would be seemed
+impossible 20 years ago, but we use without a second&amp;nbsp;thought.&lt;/p&gt;
+&lt;p&gt;The last generation of hackers and programmers were raised on software
+distribution tapes. Their idea of &amp;#8220;open&amp;#8221; was formed by what they were
+used to - a Cathedral development model, with regular releases
+(production, perhaps beta, perhaps even less) and accompanying source
+code. However, in the pre-Internet days, they were still bound by
+physical media. They were still bound to the Cathedral development
+model, to a small and tight-knit group of sages determining when the
+world was ready to see the fruits of their&amp;nbsp;labor.&lt;/p&gt;
+&lt;p&gt;The current generation - those of us just out of college or grad school,
+or even younger - think of Linux as the quintessential open source
+project. For those of us who came into computing when Linux was already
+around (I first ran Linux in 2001 when, at 14, I bought the
+newly-released &lt;span class="caps"&gt;CD&lt;/span&gt; set of SuSE 7.3), Linux sets the bar. It&amp;#8217;s what we
+were raised on (at least in terms of open source). Fixed releases - even
+with source - seem antiquated, pre-Internet, our fathers&amp;#8217; open source.
+To us, open means nightly builds, world-readable ticket/bug trackers,
+anonymous Git or &lt;span class="caps"&gt;SVN&lt;/span&gt; access, and &lt;span class="caps"&gt;RSS&lt;/span&gt; feeds of every commit. It means
+being able to see every line of code at every moment in time, even if
+we&amp;#8217;ve never e-mailed one of the&amp;nbsp;developers.&lt;/p&gt;
+&lt;p&gt;Even just a few years ago, the word &amp;#8220;open&amp;#8221; was used by vendors to mean
+almost anything - everything from software based on Linux, to software
+that included source (regardless of the license) to software that just
+used (patent encumbered) documented protocols or formats. For the next
+generation, even the generation entering the workforce now, open means
+much more. It means transparency in development, in code, in
+documentation, in&amp;nbsp;management.&lt;/p&gt;
+&lt;p&gt;Many times, I&amp;#8217;ve found an &amp;#8220;open&amp;#8221; software project, and searched their
+web site endlessly looking for links to Git or &lt;span class="caps"&gt;SVN&lt;/span&gt; or &lt;span class="caps"&gt;CVS&lt;/span&gt;. Or looked
+endlessly for the (internal) bug tracker. Every time, I had to remind
+myself that the world, even many of the open source projects, are still
+far behind my expectations. Even Google&amp;#8217;s Android Open Source project
+only has code merged in periodically from the production (closed) tree,
+and maintains a separate bug tracker. Far from my expectation of just
+having some parts of the tree unavailable on the Internet, and some
+classes of bugs filtered out from public&amp;nbsp;view.&lt;/p&gt;
+&lt;p&gt;Nobody - not even Microsoft - can deny that the world is moving more and
+more to open source. It&amp;#8217;s already the de-facto standard on the Internet,
+but it&amp;#8217;s moving more and more to the desktop every day. And, as this
+happens, the expectations of what open means (increasingly more
+transparent than just &amp;#8220;open&amp;#8221;) are also increasing. The software world -
+both proprietary and open source - will have to keep up. And, hopefully,
+as the generation raised on the Internet begins to fill the ranks of
+geeks in the workforce, we&amp;#8217;ll see more and more open source&amp;nbsp;usage.&lt;/p&gt;
+&lt;p&gt;As a side note, I&amp;#8217;d be very interested to see how open source use
+compares to demographics. I know that Linux use (on student-owned
+computers) at most colleges is way above the global average, and the
+same goes for&amp;nbsp;Firefox.&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Tue, 02 Mar 2010 21:45:00 -0500</pubDate><guid>tag:newblog.jasonantman.com,2010-03-02:2010/03/the-newest-generation-of-hackers/</guid><category>free</category><category>hacker</category><category>linux</category><category>open source</category><category>svn</category></item><item><title>Apache2 - list Name-Based Virtual Hosts</title><link>http://newblog.jasonantman.com/2010/02/apache2-list-name-based-virtual-hosts/</link><description>&lt;p&gt;Here&amp;#8217;s a little tidbit that I never knew until I had an
+&lt;a href="http://httpd.apache.org/"&gt;Apache2&lt;/a&gt; name-based virtual host problem:
+&lt;code&gt;httpd -S&lt;/code&gt; lists the vhosts that are being served by Apache, and how
+they were parsed from the config&amp;nbsp;files.&lt;/p&gt;
+&lt;p&gt;The output on one of my servers looks something&amp;nbsp;like:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="go"&gt;[root@web2 vhosts.d]# httpd -S&lt;/span&gt;
+&lt;span class="go"&gt;VirtualHost configuration:&lt;/span&gt;
+&lt;span class="go"&gt;wildcard NameVirtualHosts and _default_ servers:&lt;/span&gt;
+&lt;span class="go"&gt;_default_:443          web2.jasonantman.com (/etc/httpd/vhosts.d/ssl-host.conf:7)&lt;/span&gt;
+&lt;span class="go"&gt;*:80                   is a NameVirtualHost&lt;/span&gt;
+&lt;span class="go"&gt;         default server www.jasonantman.com (/etc/httpd/vhosts.d/000-default.conf:1)&lt;/span&gt;
+&lt;span class="go"&gt;         port 80 namevhost www.jasonantman.com (/etc/httpd/vhosts.d/000-default.conf:1)&lt;/span&gt;
+&lt;span class="go"&gt;         port 80 namevhost rackman.jasonantman.com (/etc/httpd/vhosts.d/rackman.jasonantman.com.conf:1)&lt;/span&gt;
+&lt;span class="go"&gt;         port 80 namevhost whatismyip.jasonantman.com (/etc/httpd/vhosts.d/whatismyip.jasonantman.com.conf:1)&lt;/span&gt;
+&lt;span class="go"&gt;Syntax &lt;span class="caps"&gt;OK&lt;/span&gt;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;This is quite useful in debugging vhost problems, especially those pesky
+times when a request that should go to a specific vhost is being served
+by the default (in my case at this time, I had two ServerName directives
+instead of a ServerName and a&amp;nbsp;ServerAlias).&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Thu, 11 Feb 2010 09:48:00 -0500</pubDate><guid>tag:newblog.jasonantman.com,2010-02-11:2010/02/apache2-list-name-based-virtual-hosts/</guid><category>apache</category><category>configuration</category><category>linux</category></item><item><title>Running a script on USB drive insertion</title><link>http://newblog.jasonantman.com/2009/11/running-a-script-on-usb-drive-insertion/</link><description>&lt;p&gt;Before I even get into how to do this, &lt;strong&gt;be warned:&lt;/strong&gt; this is a &lt;em&gt;really&lt;/em&gt;
+bad idea unless you can ensure total physical access control to the
+machine. About the only place I&amp;#8217;d ever use it is in a non-networked
+embedded system in a secure location. Its original intent is to handle
+loading of pictures onto a Linux-based digital photo&amp;nbsp;frame.&lt;/p&gt;
+&lt;p&gt;So, you want to run a specific script on insertion of a &lt;span class="caps"&gt;USB&lt;/span&gt; drive.
+Here&amp;#8217;s how to use udev to do&amp;nbsp;it:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;Create &lt;code&gt;/etc/udev/rules.d/99-usbhook.rules&lt;/code&gt;:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;ACTION==&amp;quot;add&amp;quot;,KERNEL==&amp;quot;sd*&amp;quot;, SUBSYSTEMS==&amp;quot;usb&amp;quot;, ATTRS{product}==&amp;quot;Mass Storage&amp;quot;, RUN+=&amp;quot;/root/bin/usbhook %k&amp;quot;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;This will run &amp;#8220;/root/bin/usbook&amp;#8221;, passing it the device name as an
+argument, every time a &lt;span class="caps"&gt;USB&lt;/span&gt; Mass Storage device is plugged&amp;nbsp;in.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;run &lt;code&gt;udevcontrol reload_rules&lt;/code&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;Create your usbhook&amp;nbsp;script.&lt;/li&gt;
+&lt;li&gt;Enjoy&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Here is my usbhook script to copy all files from a &lt;span class="caps"&gt;USB&lt;/span&gt; mass storage disk
+to a specific location. It includes quite a bit of debugging, and also
+checks for the presence of a file called &amp;#8220;foobarbaz.txt&amp;#8221; on the device
+before copying the files&amp;nbsp;over.&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="c"&gt;#!/bin/bash&lt;/span&gt;
+
+&lt;span class="c"&gt;# script to move over all files from a &lt;span class="caps"&gt;USB&lt;/span&gt; key&lt;/span&gt;
+&lt;span class="c"&gt;# when it is inserted into the system.&lt;/span&gt;
+
+&lt;span class="c"&gt;# should be called from a udev rule like:&lt;/span&gt;
+&lt;span class="c"&gt;#&lt;span class="caps"&gt;ACTION&lt;/span&gt;==&amp;quot;add&amp;quot;,&lt;span class="caps"&gt;KERNEL&lt;/span&gt;==&amp;quot;sd*&amp;quot;, &lt;span class="caps"&gt;SUBSYSTEMS&lt;/span&gt;==&amp;quot;usb&amp;quot;, &lt;span class="caps"&gt;ATTRS&lt;/span&gt;{product}==&amp;quot;Mass Storage&amp;quot;, &lt;span class="caps"&gt;RUN&lt;/span&gt;+=&amp;quot;/root/bin/usbhook %k&amp;quot;&lt;/span&gt;
+
+&lt;span class="c"&gt;# Copyright 2009 Jason Antman.  &lt;/span&gt;
+&lt;span class="c"&gt;# &lt;/span&gt;
+
+&lt;span class="c"&gt;# &lt;span class="caps"&gt;CONFIGURATION&lt;/span&gt;&lt;/span&gt;
+&lt;span class="nv"&gt;&lt;span class="caps"&gt;DEBUG&lt;/span&gt;&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;1 &lt;span class="c"&gt;# set to 1 for debugging output&lt;/span&gt;
+&lt;span class="nv"&gt;&lt;span class="caps"&gt;DEST&lt;/span&gt;&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;/home/foo/&amp;quot;&lt;/span&gt; &lt;span class="c"&gt;# destination for files&lt;/span&gt;
+
+
+&lt;span class="nv"&gt;&lt;span class="caps"&gt;DEVICE&lt;/span&gt;&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;$1&amp;quot;&lt;/span&gt; &lt;span class="c"&gt;# the device name&lt;/span&gt;
+&lt;span class="nv"&gt;&lt;span class="caps"&gt;LOGFACILITY&lt;/span&gt;&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;kernel.info&amp;quot;&lt;/span&gt; &lt;span class="c"&gt;# for debugging output&lt;/span&gt;
+
+
+&lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="o"&gt;[&lt;/span&gt; &lt;span class="k"&gt;${&lt;/span&gt;&lt;span class="nv"&gt;&lt;span class="caps"&gt;DEBUG&lt;/span&gt;&lt;/span&gt;&lt;span class="p"&gt;:=0&lt;/span&gt;&lt;span class="k"&gt;}&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; 1 &lt;span class="o"&gt;]&lt;/span&gt;; &lt;span class="k"&gt;then &lt;/span&gt;logger &lt;span class="s2"&gt;&amp;quot;$&lt;span class="caps"&gt;LOGFACILITY&lt;/span&gt;&amp;quot;&lt;/span&gt; usbhook called with arguments: &lt;span class="s2"&gt;&amp;quot;$&lt;span class="caps"&gt;DEVICE&lt;/span&gt;&amp;quot;&lt;/span&gt;; &lt;span class="k"&gt;fi&lt;/span&gt;
+
+sleep 5 &lt;span class="c"&gt;# delay 5 seconds to wait for mount&lt;/span&gt;
+
+mount | grep &lt;span class="s2"&gt;&amp;quot;$&lt;span class="caps"&gt;DEVICE&lt;/span&gt;&amp;quot;&lt;/span&gt;
+&lt;span class="nv"&gt;&lt;span class="caps"&gt;FOO&lt;/span&gt;&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;$?&amp;quot;&lt;/span&gt;
+
+&lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="o"&gt;[&lt;/span&gt; &lt;span class="nv"&gt;$&lt;span class="caps"&gt;FOO&lt;/span&gt;&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; 0 &lt;span class="o"&gt;]&lt;/span&gt;;
+&lt;span class="k"&gt;then&lt;/span&gt;
+&lt;span class="k"&gt;    if&lt;/span&gt; &lt;span class="o"&gt;[&lt;/span&gt; &lt;span class="k"&gt;${&lt;/span&gt;&lt;span class="nv"&gt;&lt;span class="caps"&gt;DEBUG&lt;/span&gt;&lt;/span&gt;&lt;span class="p"&gt;:=0&lt;/span&gt;&lt;span class="k"&gt;}&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; 1 &lt;span class="o"&gt;]&lt;/span&gt;; &lt;span class="k"&gt;then &lt;/span&gt;logger &lt;span class="s2"&gt;&amp;quot;$&lt;span class="caps"&gt;LOGFACILITY&lt;/span&gt;&amp;quot;&lt;/span&gt; usbhook device mounted: &lt;span class="s2"&gt;&amp;quot;$&lt;span class="caps"&gt;DEVICE&lt;/span&gt;&amp;quot;&lt;/span&gt;; &lt;span class="k"&gt;fi&lt;/span&gt;
+&lt;span class="k"&gt;else&lt;/span&gt;
+&lt;span class="k"&gt;    if&lt;/span&gt; &lt;span class="o"&gt;[&lt;/span&gt; &lt;span class="k"&gt;${&lt;/span&gt;&lt;span class="nv"&gt;&lt;span class="caps"&gt;DEBUG&lt;/span&gt;&lt;/span&gt;&lt;span class="p"&gt;:=0&lt;/span&gt;&lt;span class="k"&gt;}&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; 1 &lt;span class="o"&gt;]&lt;/span&gt;; &lt;span class="k"&gt;then &lt;/span&gt;logger &lt;span class="s2"&gt;&amp;quot;$&lt;span class="caps"&gt;LOGFACILITY&lt;/span&gt;&amp;quot;&lt;/span&gt; usbhook device &lt;span class="caps"&gt;NOT&lt;/span&gt; mounted: &lt;span class="s2"&gt;&amp;quot;$&lt;span class="caps"&gt;DEVICE&lt;/span&gt;&amp;quot;&lt;/span&gt; - exiting; &lt;span class="k"&gt;fi&lt;/span&gt;
+&lt;span class="k"&gt;    &lt;/span&gt;&lt;span class="nb"&gt;exit &lt;/span&gt;0
+&lt;span class="k"&gt;fi&lt;/span&gt;
+
+&lt;span class="nv"&gt;&lt;span class="caps"&gt;BAR&lt;/span&gt;&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="sb"&gt;`&lt;/span&gt;mount | grep &lt;span class="s2"&gt;&amp;quot;$&lt;span class="caps"&gt;DEVICE&lt;/span&gt;&amp;quot;&lt;/span&gt; | awk &lt;span class="s1"&gt;&amp;#39;{ print $3 }&amp;#39;&lt;/span&gt;&lt;span class="sb"&gt;`&lt;/span&gt;
+
+&lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="o"&gt;[&lt;/span&gt; -e &lt;span class="s2"&gt;&amp;quot;$&lt;span class="caps"&gt;BAR&lt;/span&gt;/foobarbaz.txt&amp;quot;&lt;/span&gt; &lt;span class="o"&gt;]&lt;/span&gt;
+&lt;span class="k"&gt;then&lt;/span&gt;
+&lt;span class="k"&gt;    if&lt;/span&gt; &lt;span class="o"&gt;[&lt;/span&gt; &lt;span class="k"&gt;${&lt;/span&gt;&lt;span class="nv"&gt;&lt;span class="caps"&gt;DEBUG&lt;/span&gt;&lt;/span&gt;&lt;span class="p"&gt;:=0&lt;/span&gt;&lt;span class="k"&gt;}&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; 1 &lt;span class="o"&gt;]&lt;/span&gt;; &lt;span class="k"&gt;then &lt;/span&gt;logger &lt;span class="s2"&gt;&amp;quot;$&lt;span class="caps"&gt;LOGFACILITY&lt;/span&gt;&amp;quot;&lt;/span&gt; usbhook &lt;span class="s2"&gt;&amp;quot;$&lt;span class="caps"&gt;BAR&lt;/span&gt;&amp;quot;&lt;/span&gt;/foobarbaz.txt found; &lt;span class="k"&gt;fi&lt;/span&gt;
+&lt;span class="k"&gt;else&lt;/span&gt;
+&lt;span class="k"&gt;    if&lt;/span&gt; &lt;span class="o"&gt;[&lt;/span&gt; &lt;span class="k"&gt;${&lt;/span&gt;&lt;span class="nv"&gt;&lt;span class="caps"&gt;DEBUG&lt;/span&gt;&lt;/span&gt;&lt;span class="p"&gt;:=0&lt;/span&gt;&lt;span class="k"&gt;}&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; 1 &lt;span class="o"&gt;]&lt;/span&gt;; &lt;span class="k"&gt;then &lt;/span&gt;logger &lt;span class="s2"&gt;&amp;quot;$&lt;span class="caps"&gt;LOGFACILITY&lt;/span&gt;&amp;quot;&lt;/span&gt; usbhook &lt;span class="s2"&gt;&amp;quot;$&lt;span class="caps"&gt;BAR&lt;/span&gt;&amp;quot;&lt;/span&gt;/foobarbaz.txt &lt;span class="caps"&gt;NOT&lt;/span&gt; found - exiting; &lt;span class="k"&gt;fi&lt;/span&gt;
+&lt;span class="k"&gt;    &lt;/span&gt;&lt;span class="nb"&gt;exit &lt;/span&gt;0
+&lt;span class="k"&gt;fi&lt;/span&gt;
+
+cp -R &lt;span class="s2"&gt;&amp;quot;$&lt;span class="caps"&gt;DEVICE&lt;/span&gt;&amp;quot;&lt;/span&gt;/* &lt;span class="s2"&gt;&amp;quot;$&lt;span class="caps"&gt;DEST&lt;/span&gt;&amp;quot;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;This was tested on &lt;a href="http://www.opensuse.org"&gt;OpenSuSE&lt;/a&gt;&amp;nbsp;10.3.&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Wed, 11 Nov 2009 11:47:00 -0500</pubDate><guid>tag:newblog.jasonantman.com,2009-11-11:2009/11/running-a-script-on-usb-drive-insertion/</guid><category>linux</category><category>script</category><category>udev</category><category>usb</category></item><item><title>Microsoft submits driver code for Linux kernel</title><link>http://newblog.jasonantman.com/2009/07/microsoft-submits-driver-code-for-linux-kernel/</link><description>&lt;p&gt;I read a very interesting &lt;a href="http://www.linux-mag.com/cache/7439/1.html"&gt;article on
+Linux-Mag.com&lt;/a&gt; today. The
+gist of it is that Microsoft (as happily announced in a &lt;a href="http://www.microsoft.com/presspass/features/2009/Jul09/07-20LinuxQA.mspx"&gt;press
+release&lt;/a&gt;)
+has submitted 20,000 lines of code for inclusion into the kernel.
+Specifically, the code is comprised of a number of drivers that will
+enable Linux to run better under Microsoft&amp;nbsp;Hyper-V.&lt;/p&gt;
+&lt;p&gt;Yes, that&amp;#8217;s right, Microsoft released code under GPLv2 and is asking for
+it to be put in Linux. They released it under the license that they call
+&amp;#8220;cancer&amp;#8221;. And the entire purpose is, essentially, saying &amp;#8220;we want your
+project to run well as a guest under our&amp;nbsp;hypervisor.&lt;/p&gt;
+&lt;p&gt;The Linux Mag article did touch on some recent news, such as Microsoft&amp;#8217;s
+&lt;a href="http://www.linux-mag.com/id/7325"&gt;lawsuit against TomTom&lt;/a&gt; (&lt;a href="http://arstechnica.com/microsoft/news/2009/03/microsoft-and-tomtom-settle-patent-dispute.ars"&gt;settled in
+late
+March&lt;/a&gt;)
+claiming that the Linux kernel infringes their &lt;span class="caps"&gt;VFAT&lt;/span&gt; patents and the 2004
+&lt;a href="http://ec.europa.eu/comm/competition/antitrust/cases/decisions/37792/en.pdf"&gt;&lt;span class="caps"&gt;EU&lt;/span&gt; antitrust case
+(&lt;span class="caps"&gt;PDF&lt;/span&gt;)&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;A number of things are immediately apparent to&amp;nbsp;me:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;The only reason for this is so Linux will virtualize well under&amp;nbsp;Windows/Hyper-V.&lt;/li&gt;
+&lt;li&gt;Microsoft doesn&amp;#8217;t seem to be making any similar effort to allow
+    Windows to virtualize well under Xen (and it seems to me that many
+    more people would want Windows on a reliable Linux host than the
+    other way&amp;nbsp;around).&lt;/li&gt;
+&lt;li&gt;Microsoft reached a settlement with TomTom, but never did anything
+    to indemnify the Linux community at&amp;nbsp;large.&lt;/li&gt;
+&lt;li&gt;This is &lt;strong&gt;not&lt;/strong&gt; a Microsoft endorsement (or even recognition) of the&amp;nbsp;&lt;span class="caps"&gt;GPL&lt;/span&gt;.&lt;/li&gt;
+&lt;li&gt;Microsoft &lt;a href="http://www.linux-watch.com/news/NS6670466370.html"&gt;made
+    threats&lt;/a&gt; about
+    Linux violating &amp;#8220;over 228&amp;#8221; of its patents in&amp;nbsp;2007.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;There&amp;#8217;s a
+&lt;a href="http://www.kroah.com/log/linux/microsoft-linux-hyper-v-drivers.html"&gt;post&lt;/a&gt;
+on &lt;a href="http://www.kroah.com/log/"&gt;Greg Kroah-Hartman&amp;#8217;s blog&lt;/a&gt; (he&amp;#8217;s the
+kernel maintainer who will - or will not - eventually be in charge of
+the inclusion of the code). It should be noted that &lt;strong&gt;this all started&lt;/strong&gt;
+due to a guy who I really admire, &lt;a href="http://linux-network-plumber.blogspot.com/"&gt;Stephen
+Hemminger&lt;/a&gt;, the principal
+engineer at Vyatta (whose router product I absolutely love, and their
+mock advertisements are just as wonderful). Steve has a &lt;a href="http://linux-network-plumber.blogspot.com/2009/07/congratulations-microsoft.html"&gt;post on his
+blog&lt;/a&gt;
+giving the&amp;nbsp;background.&lt;/p&gt;
+&lt;p&gt;So what do &lt;em&gt;I&lt;/em&gt; think should be done? Include the code. But first&amp;#8230; (I
+know Microsoft doing all of this at once would be a dream, but maybe one
+or two of them would be&amp;nbsp;nice)&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;If they haven&amp;#8217;t already done so, Microsoft should publicly recognize
+    the &lt;span class="caps"&gt;GPL&lt;/span&gt; and all of its terms as being a legally binding&amp;nbsp;license.&lt;/li&gt;
+&lt;li&gt;Prior to having any Microsoft code included in the Linux kernel,
+    Microsoft publicly states that the Linux kernel, as of the time they
+    submitted their code, does not infringe on any Microsoft
+    intellectual&amp;nbsp;property.&lt;/li&gt;
+&lt;li&gt;It would be nice of Microsoft would agree to some level of
+    cooperation with the Linux&amp;nbsp;community.&lt;/li&gt;
+&lt;li&gt;Microsoft pledges to allow, support, and actively develop for
+    Windows as a guest under Xen and&amp;nbsp;&lt;span class="caps"&gt;KVM&lt;/span&gt;.&lt;/li&gt;
+&lt;/ol&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Thu, 23 Jul 2009 09:32:00 -0400</pubDate><guid>tag:newblog.jasonantman.com,2009-07-23:2009/07/microsoft-submits-driver-code-for-linux-kernel/</guid><category>gpl</category><category>kernel</category><category>linux</category><category>microsoft</category></item><item><title>Building a Rebuild-able Site</title><link>http://newblog.jasonantman.com/2009/05/building-a-rebuild-able-site/</link><description>&lt;p&gt;At $&lt;span class="caps"&gt;WORK&lt;/span&gt;, my group runs about two dozen servers that provide services
+for over 60,000 users. They&amp;#8217;re a mix of Windows and Linux, with some old
+Solaris stuff thrown in there. The one thing they have in common is
+they&amp;#8217;re all hand-built, hand-configured, and old. They&amp;#8217;ve been around
+for a while. At the moment, we don&amp;#8217;t even have an adequate backup&amp;nbsp;system.&lt;/p&gt;
+&lt;p&gt;So, being the closest thing to a SysAdmin we have (my official title is
+still Student Systems Programmer), it&amp;#8217;s my job to build a new
+installation, configuration and backup infrastructure. We&amp;#8217;ve already
+standardized on &lt;a href="http://www.centos.org"&gt;CentOS&lt;/a&gt; as a University-wide
+distro, and have a local full mirror, so I don&amp;#8217;t need to choose a
+distro. I do, however, have to plan the installation and backup
+architecture. The main requirements&amp;nbsp;are:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Lowest overall time for bare-metal recovery to a working&amp;nbsp;system.&lt;/li&gt;
+&lt;li&gt;Ease of use, as people other than myself will need to administer it
+    (so they should be able to do so from a cheat sheet in the&amp;nbsp;wiki).&lt;/li&gt;
+&lt;li&gt;Repeatability - it should be easy and intuitive to make an
+    almost-exact-copy of a&amp;nbsp;machine.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;I started a thread a few days ago on the &lt;span class="caps"&gt;SAGE&lt;/span&gt; mailing list, which you
+can find
+&lt;a href="http://mailman.sage.org/pipermail/sage-members/2009/msg00447.html"&gt;here&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;At the moment, it looks like the general idea that I&amp;#8217;m going with is to
+use &lt;a href="http://fedoraproject.org/wiki/Anaconda/Kickstart"&gt;Kickstart&lt;/a&gt; to
+install the systems, using a basic and minimal Kickstart file. Basic
+package selection (minimalist) with just what&amp;#8217;s needed to configure the
+system with a hostname and network settings for the management &lt;span class="caps"&gt;VLAN&lt;/span&gt;.
+I&amp;#8217;ll then have Kickstart install and configure a configuration
+management package - I&amp;#8217;m leaning towards
+&lt;a href="http://reductivelabs.com/products/puppet/"&gt;Puppet&lt;/a&gt; over
+&lt;a href="http://www.cfengine.org/"&gt;Cfengine&lt;/a&gt; and am starting testing. The config
+management software will handle all of the customization for the system
+(everything different from the base generic Kickstart install) so it&amp;#8217;s
+all kept under the control of config management from step&amp;nbsp;1.&lt;/p&gt;
+&lt;p&gt;The final part is a backup system, mainly for whatever eventually -
+whether out of human error or simple laziness - ends up out of the
+config management system&amp;#8217;s control. Our previous &lt;span class="caps"&gt;SA&lt;/span&gt; had settled on
+&lt;a href="http://www.zmanda.com/"&gt;Zmanda&lt;/a&gt;, the paid version of
+&lt;a href="http://www.amanda.org/"&gt;Amanda&lt;/a&gt;, which comes with specific plugins for
+MySQL and &lt;span class="caps"&gt;MSSQL&lt;/span&gt;. I&amp;#8217;m also looking at &lt;a href="http://www.bacula.org"&gt;Bacula&lt;/a&gt;,
+mainly because of its&amp;#8217; advanced features, scheduling (especially the new
+scheduling in Bacula 3) and&amp;nbsp;scalability.&lt;/p&gt;
+&lt;p&gt;The beauty that I see in having Kickstart do something minimal and then
+letting Puppet handle the rest is that (especially since we&amp;#8217;ve
+standardized on SunFire X4100&amp;#8217;s with identical configurations) I can
+kickstart and rack up a few spare machines, and to get them up and
+running all I need to do is power them up (iLOM) and tell Puppet what to
+make&amp;nbsp;them.&lt;/p&gt;
+&lt;p&gt;I&amp;#8217;m currently starting testing of both Puppet itself and getting
+Kickstart to start the puppet install and daemon (instructions from
+&lt;a href="http://watzmann.net/blog/index.php?cat=21"&gt;David Lutterkort&amp;#8217;s blog (Red Hat software
+engineer)&lt;/a&gt;). We&amp;#8217;ll see how
+everything&amp;nbsp;goes&amp;#8230;&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Wed, 06 May 2009 08:42:00 -0400</pubDate><guid>tag:newblog.jasonantman.com,2009-05-06:2009/05/building-a-rebuild-able-site/</guid><category>backup</category><category>configuration</category><category>kickstart</category><category>linux</category><category>puppet</category><category>recovery</category><category>work</category></item><item><title>My biggest problem with Linux</title><link>http://newblog.jasonantman.com/2008/10/my-biggest-problem-with-linux/</link><description>&lt;p&gt;For one of my wonderful classes, Internet Security, I&amp;#8217;m doing a
+presentation on &amp;#8220;patch management&amp;#8221;. While I&amp;#8217;m obligated to cover Windows
+- and, of course, will talk about MacOS - I&amp;#8217;ll obviously be spending a
+good deal of time on the Unix/Linux side of things. This has gotten me
+thinking about one of my biggest problems with Linux (and specifically
+&lt;a href="http://www.opensuse.org"&gt;OpenSuSE&lt;/a&gt;, my usual default distro. Patch
+management is utterly&amp;nbsp;awful.&lt;/p&gt;
+&lt;p&gt;Here&amp;#8217;s the problem: I have about a dozen machines under my control. I
+need to keep them all up-to-date. Currently, I manually do patches and
+upgrades via YaST or zypper. I thought about scripting this through
+zypper, but that doesn&amp;#8217;t make any sense - the packages on the machines
+are far from homogenous, so there&amp;#8217;s no clear way to make one script that
+updates them all. I considered using Puppet or CFengine or something of
+that sort, but that&amp;#8217;s too heavy-weight for me - for only a dozen
+machines, many of which are personal or development only, that&amp;#8217;s a lot
+to keep track of by hand, and a lot of work defining which patches
+should be applied, and which machines shouldn&amp;#8217;t be&amp;nbsp;changed.&lt;/p&gt;
+&lt;p&gt;My other peeve is distribution upgrades. About three of my machines are
+still running OpenSuSE 10.0 or 10.1, both of which are unsupported, and
+no longer even have downloads available. Why? Becuase I&amp;#8217;ve done major
+OpenSuSE upgrades before, broken a &lt;span class="caps"&gt;LOT&lt;/span&gt; of stuff, and I simply can&amp;#8217;t risk
+that on machines that can&amp;#8217;t stand extended downtime. This process
+*needs* to be made easier. Bottom line - it should be made no more
+difficult or unreliable than a kernel upgrade. &lt;span class="caps"&gt;IMHO&lt;/span&gt;, the biggest selling
+point for Solaris is its&amp;#8217; ability to do a total upgrade to a second
+partition, and switch-over at runtime. Why doesn&amp;#8217;t Linux (or SuSE) have
+this&amp;nbsp;yet?&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;What&amp;#8217;s my ideal solution?&lt;/em&gt; A curses application that uses text-file
+backends (curses so I can run it over &lt;span class="caps"&gt;SSH&lt;/span&gt; even if I have a slow link or
+high latency, like from a &lt;span class="caps"&gt;SSH&lt;/span&gt; session on my cell phone, if need be). The
+app would allow me to list all of the machines I want managed. It would
+connect to the machines over standard &lt;span class="caps"&gt;SSH&lt;/span&gt;, and would leave an extensive
+audit trail of what&amp;#8217;s done, both on the management console and on the
+machines (as well as running as a dedicated user). The application would
+maintain an inventory of all of the packages on every machine. It would
+check daily for new patches/updates to any of those packages, and e-mail
+me a daily summary of what&amp;#8217;s new, including all dependency changes, and
+which machines need the update. It would also allow me to define, on a
+per-machine (or per-group-of-machines) basis, rules for packages that
+must stay at their current version - i.e. I have a bunch of &lt;span class="caps"&gt;PHP4&lt;/span&gt; apps,
+so machine X needs to stay at &lt;span class="caps"&gt;PHP4&lt;/span&gt;. The e-mail summary would include any
+packages that aren&amp;#8217;t going to be updated for a specific machine because
+of dependency/version rules, as well as warnings about any new packages
+that have a dependency that has a rule set. I could then run the main
+curses app on my admin machine and, starting from &lt;span class="caps"&gt;NO&lt;/span&gt; selections, select
+which updates I want to apply and whether I want to ignore or create new
+rules to keep something at its current version, on a per-machine or
+per-group basis. This curses app would generate a file (&lt;span class="caps"&gt;XML&lt;/span&gt;?) of what to
+do (which would also be generated or edited by hand, easily). The &lt;span class="caps"&gt;XML&lt;/span&gt;
+file would then be fed into a script that downloads all of the needed
+packages to a central (local) mirror (or, optionally, for remote
+machines, has them download locally on the machine), checksums them, and
+then installs them (running commands over &lt;span class="caps"&gt;SSH&lt;/span&gt;) on all applicable
+machines. It would then keep a log of all changes, both on each machine
+changed (in a master changelog file) and on the central administrative
+machine. &lt;strong&gt;Most importantly&lt;/strong&gt;, the curses interface would have a simple,
+quick way to back out any specific update or group of updates for all
+machines, a group of machines, or one machine. All data needed to back
+out a change would be kept on each machine (say, cleaned up at the next
+update of that package and all of its&amp;#8217; dependencies) with
+machine-readable instructions kept in a central file, allowing local
+rollbacks - i.e. a machine goes down, I realize that it was because of
+an update to package X, and on the local machine I can check the
+changelog, see an entry like &amp;#8220;Package X updated 1.0.0 to 1.0.1 on
+yyyy-mm-dd, Change &lt;span class="caps"&gt;ID&lt;/span&gt; 1234&amp;#8221; and then, to rollback, simply issue a
+command like &amp;#8220;patchmgt rollback 1234&amp;#8221; on the effected&amp;nbsp;machine.&lt;/p&gt;
+&lt;p&gt;Just some ideas, and a little&amp;nbsp;rant.&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Mon, 27 Oct 2008 15:27:00 -0400</pubDate><guid>tag:newblog.jasonantman.com,2008-10-27:2008/10/my-biggest-problem-with-linux/</guid><category>linux</category><category>patch management</category><category>solaris</category><category>updates</category><category>upgrades</category></item><item><title>eeePC stronger than ever</title><link>http://newblog.jasonantman.com/2008/09/eeepc-stronger-than-ever/</link><description>&lt;p&gt;It seems like every time I open up my &lt;a href="http://reader.google.com"&gt;Google
+Reader&lt;/a&gt; account, there&amp;#8217;s news about another
+company that released a knock-off of my beloved &lt;a href="http://eeepc.asus.com/global/700.htm"&gt;Asus eeePC 4G Surf
+(701)&lt;/a&gt; (interestingly, it looks
+like eeepc.asus.com is down at the moment of writing). Even Asus has
+released numerous (I think the product like is now up to about 10
+variations) follow-ups to the 7&amp;#8221; beauty, now up to 10&amp;#8221; in size (though,
+admittedly, I&amp;#8217;m less-than-enthused about their Windows&amp;nbsp;models).&lt;/p&gt;
+&lt;p&gt;With the new semester here, I am (unfortunately) back in class. And I&amp;#8217;m
+very happy to report that I&amp;#8217;m starting to see eeePCs in more and more
+hands. Granted, my classes are in the &lt;span class="caps"&gt;IT&lt;/span&gt; program, but I was quite
+surprised last night to be sitting in my Internet Security class and
+notice no less than four eeePCs in a class of about 25 people. While
+I&amp;#8217;ve just relegated my own 4G to my server room bag, replacing it with a
+(used, surplus from work) &lt;span class="caps"&gt;IBM&lt;/span&gt; ThinkPad T41 (14.1&amp;#8221; display, 1.4GHz
+Pentium, &lt;span class="caps"&gt;768MB&lt;/span&gt; &lt;span class="caps"&gt;RAM&lt;/span&gt;, and a &lt;span class="caps"&gt;DVD&lt;/span&gt; drive). Though my heart sank when I found
+that half of the eeePCs were running Windows, it seems that in my
+travels around campus, I&amp;#8217;m seeing more and more eeePCs, and more laptops
+running&amp;nbsp;Linux.&lt;/p&gt;
+&lt;p&gt;While the academic world has surely embraced new technologies, and
+non-mainstream technologies, quicker than other sectors (specifically
+considering Linux and the apparent popularity of the eeePC), it&amp;#8217;s
+definitely a good omen. Seeing non-geek, and perhaps even non-&lt;span class="caps"&gt;CS&lt;/span&gt; and
+non-Engineering, students using Linux speaks quite well for the
+expansion of the Linux user base when these students graduate and enter
+the &amp;#8220;real&amp;nbsp;world&amp;#8221;&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Wed, 10 Sep 2008 23:55:00 -0400</pubDate><guid>tag:newblog.jasonantman.com,2008-09-10:2008/09/eeepc-stronger-than-ever/</guid><category>asus</category><category>eeepc</category><category>linux</category></item><item><title>LIRC and Hauppauge PVR-150 on OpenSuSE 11.0</title><link>http://newblog.jasonantman.com/2008/09/lirc-and-hauppauge-pvr-150-on-opensuse-110/</link><description>&lt;p&gt;Well, despite what&amp;#8217;s been said elsewhere, it &lt;em&gt;&lt;span class="caps"&gt;IS&lt;/span&gt;&lt;/em&gt; possible! It&amp;#8217;s a bit
+error-ridden at first, but here is the procedure that I used to compile
+and install the &lt;span class="caps"&gt;PVR&lt;/span&gt;-150 patched &lt;span class="caps"&gt;LIRC&lt;/span&gt;&amp;nbsp;0.8.3-&lt;span class="caps"&gt;CVS&lt;/span&gt;.&lt;/p&gt;
+&lt;p&gt;First, Download the tarball mentioned in the &lt;a href="http://www.blushingpenguin.com/mark/blog/?p=24"&gt;Version 3 blog
+post&lt;/a&gt; at &lt;a href="http://www.blushingpenguin.com/mark/blog/"&gt;Marks
+Braindump&lt;/a&gt;. You can pretty
+much follow his instructions on the installation in the blog post, with
+some changes that are specific to getting it to compile on OpenSuSE&amp;nbsp;11.&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;First, remove all traces of the OpenSuSE &lt;span class="caps"&gt;LIRC&lt;/span&gt; from you system.
+    Uninstall the &lt;span class="caps"&gt;RPMS&lt;/span&gt; and everything else that goes with them. Then
+    unload all of the kernel modules, especially lirc_i2c (if you have
+    it&amp;nbsp;loaded).&lt;/li&gt;
+&lt;li&gt;In your kernel source directory, run
+    &lt;code&gt;make oldconfig &amp;amp;&amp;amp; make prepare.&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;In your kernel source directory, run &lt;code&gt;make prepare scripts&lt;/code&gt; which,
+    among other things, compiles the required &lt;code&gt;genksyms&lt;/code&gt; scurript.&lt;/li&gt;
+&lt;li&gt;I was getting a compile error like &amp;#8220;&lt;span class="caps"&gt;WARNING&lt;/span&gt;: Symbol version dump
+    /usr/src/`uname -r`/Module.symvers is missing&amp;#8221;. Find out which
+    kernel you&amp;#8217;re running (&lt;code&gt;uname -r&lt;/code&gt;). In yout kernel source directory,
+    copy your Module.symvers file from /usr/src/linux-obj. I was running
+    i386 architecture with the &amp;#8220;default&amp;#8221; kernel, so mine was located at
+    &lt;code&gt;/usr/src/linux-obj/i386/debug/Module.symvers&lt;/code&gt;. Copy that into
+    &lt;code&gt;/usr/src/linux&lt;/code&gt;.&lt;/li&gt;
+&lt;li&gt;In the lirc (patched) directory, run &lt;code&gt;setup.sh&lt;/code&gt; as instructed. &lt;span class="caps"&gt;DO&lt;/span&gt;
+    &lt;span class="caps"&gt;NOT&lt;/span&gt; tell it to run configure - just save settings and&amp;nbsp;exit.&lt;/li&gt;
+&lt;li&gt;Edit the generated &lt;code&gt;configure.sh&lt;/code&gt; file, adding a
+    &lt;code&gt;--with-kerneldir=/usr/src/KERNELDIR&lt;/code&gt;, replacing &lt;span class="caps"&gt;KERNELDIR&lt;/span&gt; with the
+    actual path to your kernel soruce (i.e. /usr/src/`uname&amp;nbsp;-r`).&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;make&lt;/code&gt;. If no errors, &lt;code&gt;make install&lt;/code&gt;.&lt;/li&gt;
+&lt;li&gt;I decided to reboot at this point, and when I did, everything worked&amp;nbsp;perfectly.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Also, I found that I needed to explicitly specify &lt;code&gt;--device=/dev/lirc0&lt;/code&gt;
+when starting &lt;span class="caps"&gt;LIRC&lt;/span&gt;, as well as not specifying a driver. I just took the
+&lt;code&gt;/etc/init.d/lirc&lt;/code&gt; from the official OpenSuSE 11.0 package, commented
+out line 108 in &lt;code&gt;makeargs()&lt;/code&gt; that adds the &lt;code&gt;-H $LIRC_DRIVER&lt;/code&gt; to the
+args, and added &lt;code&gt;LIRC_DEVICE="/dev/lirc0"&lt;/code&gt; to the top after the &lt;span class="caps"&gt;INIT&lt;/span&gt;&amp;nbsp;info.&lt;/p&gt;
+&lt;p&gt;Unfortunately, figuring out this process took me a long time. I&amp;#8217;ve
+reconstructed these instructions from various post-it notes, the
+whiteboard next to my desk, and some bash history files and terminal
+dumps. If this doesn&amp;#8217;t seem to work for you, please drop an email to
+jason &lt;span class="caps"&gt;AT&lt;/span&gt; jason antman &lt;span class="caps"&gt;DOT&lt;/span&gt; com, with as much information as you have, and
+I&amp;#8217;ll figure it out and update the&amp;nbsp;instructions.&lt;/p&gt;
+&lt;p&gt;Now, finally, an up-to-date system &lt;span class="caps"&gt;AND&lt;/span&gt; &lt;a href="http://www.mythtv.org"&gt;MythTV&lt;/a&gt;.&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Mon, 01 Sep 2008 10:37:00 -0400</pubDate><guid>tag:newblog.jasonantman.com,2008-09-01:2008/09/lirc-and-hauppauge-pvr-150-on-opensuse-110/</guid><category>hauppauge</category><category>linux</category><category>lirc</category><category>mythtv</category><category>opensuse</category><category>pvr-150</category><category>suse</category></item><item><title>Linux, Choice, Updates, CitiBank issues</title><link>http://newblog.jasonantman.com/2008/08/linux-choice-updates-citibank-issues/</link><description>&lt;p&gt;&lt;strong&gt;Update July 11, 2011&lt;/strong&gt; - I &lt;a href="/2011/07/article-on-theinquirer-net/"&gt;just found
+out&lt;/a&gt; that this post is heavily
+quote in &lt;a href="http://www.theinquirer.net/inquirer/news/1026958/citibank-infuriating-customers-linux-hostile-site"&gt;an article on
+theinquirer.net&lt;/a&gt;
+about this issue. Luckily (I don&amp;#8217;t know whether I made a difference or
+not, certainly CitiBank never contacted me back), citicards.com now
+works with Firefox on Linux. I have no idea if it was a change made by
+Citi, or a change with Firefox or Flash&amp;nbsp;Player.&lt;/p&gt;
+&lt;p&gt;I know this blog has been less-than-active lately. Life has been pretty
+busy, between a massive network upgrade at the &lt;a href="http://www.midlandparkambulance.com"&gt;ambulance
+corps&lt;/a&gt; that I volunteer with, the
+impending doom of a new semester at work, scheduling courses, and a few
+personal projects. I do, however, have a long list of things to post,
+including some notes on my upgrade to &lt;a href="http://www.nagios.org"&gt;Nagios 3&lt;/a&gt;,
+my recent experience with the &lt;a href="http://www.pcengines.ch/alix.htm"&gt;&lt;span class="caps"&gt;PC&lt;/span&gt; Engines
+&lt;span class="caps"&gt;ALIX&lt;/span&gt;&lt;/a&gt; board, some changes to
+&lt;a href="http://tuxostat.jasonantman.com"&gt;tuxOstat&lt;/a&gt;, and my plans to upgrade to
+Optimum Business cable with 5 static IPs - finally a real home for
+&lt;a href="http://www.jasonantman.com"&gt;JasonAntman.com&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;CitiCards Problems -&lt;/strong&gt; I had a somewhat unnerving experience this
+morning. Having just gotten a Citibank credit card, and made my first
+few purchases on it, I browsed to
+&lt;a href="https://www.citicards.com"&gt;CitiCards.com&lt;/a&gt; to check my account summary.
+I happened to be using a just-purchased &lt;span class="caps"&gt;IBM&lt;/span&gt; T41 laptop, running
+&lt;a href="http://www.opensuse.org"&gt;OpenSuSE 11.0&lt;/a&gt; and
+&lt;a href="http://www.getfirefox.com"&gt;FireFox3&lt;/a&gt;, so when I saw the page display
+and then go completely blank, I suspected a problem with my Flash
+plugin. Little did I know, but I tried the same page on 3 other
+Linux/Firefox machines, with the same result. I put in a call to the
+tech support line, and was gruffly informed by the representative that
+Firefox was not supported, they were unable to support it, and, to
+paraphrase, I should get another browser or f*** off. She was &lt;em&gt;very
+well-aware&lt;/em&gt; of the issue, and stated that Citi would not fix it. At this
+point, I stated that I thought I would cancel my card, and she told me
+to have a nice day and hung&amp;nbsp;up.&lt;/p&gt;
+&lt;p&gt;I decided to go to step 2 of the Generic Problem Solving
+Method,
+and found &lt;a href="http://www.google.com/search?hl=en&amp;amp;q=citicards.com+linux&amp;amp;btnG=Google+Search"&gt;hundreds of references to a problem with CitiCards.com on
+Linux&lt;/a&gt;.
+I read through a lot of conspiracy theory, but decided to test one of
+the theories (and fixes). Sure enough, when I right-clicked on the blank
+white screen, I got a Flash context menu. Clicking &amp;#8220;Play&amp;#8221; showed the ad,
+and I was able to click the little &amp;#8220;X&amp;#8221; in the top right and bypass it,
+gaining access to the normal main page. Never to be one to ignore a
+conspiracy (or anti-Linux) theory, I pulled up the same page on a Mac.
+Sure enough, that particular ad (set not to play and with an opaque
+full-screen background) didn&amp;#8217;t show up. Hmm&amp;#8230; maybe there&amp;#8217;s something
+to the theory put forth by the &lt;a href="http://stealcode.blogspot.com/2008/07/citibank-doesnt-like-linuxubuntu_27.html"&gt;guy who said CitiBank is blocking Linux
+users&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;I decided to call back, and this time spoke with Susan at CitiCards tech
+support. She was very understanding, and apologized for both the
+inconvenience and the previous representative&amp;#8217;s attitude. She said that
+she was aware of some issues with Firefox and Linux, but stated that
+they are only unsupported so far as Tech Support won&amp;#8217;t walk a customer
+using Linux or FireFox through any issue resolution, but that both the
+browser and architecture should, theoretically, work. She didn&amp;#8217;t know
+anything about a policy against Linux, or intentional blocking/sabotage.
+She did say, however, that they are &amp;#8220;working on it&amp;#8221;. I did inform her
+that the problem could probably be resolved by simply editing the Flash
+ad to be properly transparent, or suppressing it for Linux
+architectures, though I doubt that the information will make its&amp;#8217; way up
+the food chain. Unfortunately, I can&amp;#8217;t seem to find a contact email for
+anything site-related on&amp;nbsp;CitiCards.com.&lt;/p&gt;
+&lt;p&gt;If this is really a case of intentional blocking, it would be quite
+infuriating - I filled out the application for the card on
+FireFox3/Linux&amp;#8230; but then they block account&amp;nbsp;access?&lt;/p&gt;
+&lt;p&gt;Hopefully more of an update&amp;nbsp;tonight&amp;#8230;&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Mon, 25 Aug 2008 12:37:00 -0400</pubDate><guid>tag:newblog.jasonantman.com,2008-08-25:2008/08/linux-choice-updates-citibank-issues/</guid><category>citibank</category><category>citicards</category><category>firefox</category><category>flash</category><category>linux</category></item><item><title>Practical PHP and MySQL</title><link>http://newblog.jasonantman.com/2008/06/practical-php-and-mysql/</link><description>&lt;p&gt;I&amp;#8217;m taking a summer course in Building Data Driven Websites - not that I
+thought I&amp;#8217;d learn much in such a course at
+&lt;a href="http://scils.rutgers.edu"&gt;&lt;span class="caps"&gt;SCILS&lt;/span&gt;&lt;/a&gt;, but I&amp;#8217;d like to graduate on time, and
+need the credits, and Bill Crosbie is just the type of rare teacher that
+can keep even me awake and interested. Our book is &lt;a href="http://www.informit.com/store/product.aspx?isbn=0132239973"&gt;Practical &lt;span class="caps"&gt;PHP&lt;/span&gt; and
+MySQL: Building Eight Dynamic Web
+Applications&lt;/a&gt;
+(&lt;a href="http://www.amazon.com/Practical-PHP-MySQL-Building-Applications/dp/0132239973"&gt;Amazon&lt;/a&gt;)
+by &lt;a href="http://www.jonobacon.org/"&gt;Jono Bacon&lt;/a&gt;. Now, I know it&amp;#8217;s not a
+&lt;em&gt;real&lt;/em&gt; book like, say, &lt;a href="http://oreilly.com/catalog/9780596003432/"&gt;&lt;span class="caps"&gt;ESA3&lt;/span&gt; by
+Frisch&lt;/a&gt;, which has a healthy
+&lt;a href="http://www.aeleen.com/home.htm"&gt;web presense&lt;/a&gt;. But this thing is all
+code and doesn&amp;#8217;t even have a web site, let alone easy code&amp;nbsp;downloads!&lt;/p&gt;
+&lt;p&gt;The book does come with a heavily customized Ubuntu LiveCD. However,
+when I popped it in my &lt;a href="http://www.opensuse.org"&gt;OpenSuSE workstation&lt;/a&gt;,
+I couldn&amp;#8217;t really make much out of the &lt;span class="caps"&gt;CD&lt;/span&gt; - there was certainly no
+easy-to-find &amp;#8220;this is the code&amp;#8221; directory. Well, after some exploring, I
+mounted the &lt;a href="http://squashfs.sourceforge.net/"&gt;SquashFS&lt;/a&gt; filesystem and
+poked around a bit. Strange&amp;#8230; seems to only have one real user (root)
+and, though they claim this is a fully-functional &lt;span class="caps"&gt;LAMP&lt;/span&gt; server, no Apache
+or MySQL. Really weird. Well, after poking for a few minutes, I found
+the holy grail - &lt;code&gt;/root/.bash_history&lt;/code&gt; was intact! Just a quick look
+through it with &lt;code&gt;less&lt;/code&gt; and I found what I was looking for: &lt;code&gt;/opt/lampp&lt;/code&gt;.
+It appears that the install is actually ApacheFriends&amp;#8217;
+&lt;a href="http://www.apachefriends.org/en/xampp-linux.html"&gt;&lt;span class="caps"&gt;LAMPP&lt;/span&gt;&lt;/a&gt;, or &lt;span class="caps"&gt;XAMPP&lt;/span&gt; for
+Linux (gotta wonder if the guy writing this book doesn&amp;#8217;t even know how
+to install Apache&amp;#8230; I&amp;#8217;m sure &lt;span class="caps"&gt;XAMPP&lt;/span&gt; for Linux is more bloated than a
+customized build of Apache/MySQL/&lt;span class="caps"&gt;PHP&lt;/span&gt; from source, especially since it&amp;#8217;s
+only being used to host 8 sample projects, so a lot could be left&amp;nbsp;out).&lt;/p&gt;
+&lt;p&gt;Anyway, it appears that &lt;span class="caps"&gt;LAMPP&lt;/span&gt; is running in a chroot&amp;#8217;ed environment. The
+actual sample code is rooted at &lt;code&gt;/opt/lampp/htdocs/sites&lt;/code&gt;. It seems that
+&lt;em&gt;all&lt;/em&gt; of the &lt;span class="caps"&gt;PHP&lt;/span&gt; files are also owned by root and chmod&amp;#8217;ed 777! And
+the top-level &lt;code&gt;index.php&lt;/code&gt; file makes use of absolute links, so obviously
+he never thought that someone may want to copy the sample code and use
+it on a &lt;em&gt;real&lt;/em&gt;&amp;nbsp;box.&lt;/p&gt;
+&lt;p&gt;I just can&amp;#8217;t imagine someone who&amp;#8217;s a beginner with Linux, let alone a
+Windows person, trying to get this source code onto a machine where they
+can actually play with it. And&amp;#8230; to make the situation worse&amp;#8230; the
+LiveCD has vi and vim, but no Emacs!!!!&amp;nbsp;Eeeek!!&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Thu, 26 Jun 2008 14:29:00 -0400</pubDate><guid>tag:newblog.jasonantman.com,2008-06-26:2008/06/practical-php-and-mysql/</guid><category>books</category><category>linux</category><category>PHP</category><category>programming</category><category>rutgers</category></item><item><title>Update</title><link>http://newblog.jasonantman.com/2008/06/update-2/</link><description>&lt;p&gt;I&amp;#8217;ve been incredibly busy lately. But I have 2 quick&amp;nbsp;updates-&lt;/p&gt;
+&lt;p&gt;tuxOstat, my thermostat project, isn&amp;#8217;t totally finished, but is up
+and running. There&amp;#8217;s still some work to do, but the code is largely
+complete. There&amp;#8217;s
+also a web interface with temperature
+graphs, system status, and a (horrible) webcam view of the &lt;span class="caps"&gt;LCD&lt;/span&gt; control
+panel. I&amp;#8217;ll probably be finishing up a first version this week,
+finishing the documentation next week, and releasing what I have&amp;nbsp;soon.&lt;/p&gt;
+&lt;p&gt;I got an e-mail today about one of my older projects, &lt;a href="http://www.php-ems-tools.com"&gt;&lt;span class="caps"&gt;PHP&lt;/span&gt; &lt;span class="caps"&gt;EMS&lt;/span&gt;
+Tools&lt;/a&gt;, a &lt;span class="caps"&gt;PHP&lt;/span&gt;/MySQL based application for
+fire/&lt;span class="caps"&gt;EMS&lt;/span&gt; agencies to handle scheduling, membership rosters, equipment
+checks, etc. The potential user was asking about running the software on
+Windows - which, of course, I have no experience with. I&amp;#8217;m pretty sure
+there aren&amp;#8217;t many, if any, Unix-specific calls hidden in the code, and
+advised him to try &lt;span class="caps"&gt;XAMPP&lt;/span&gt; (Apache/MySQL on Windows). But I did take a
+moment to comment on why I chose Linux. My pilot installation of &lt;span class="caps"&gt;PHP&lt;/span&gt; &lt;span class="caps"&gt;EMS&lt;/span&gt;
+Tools, at the Midland Park Volunteer Ambulance Corps, where I&amp;#8217;ve been a
+member since 2005, has been handling our scheduling, roster, and
+equipment checks since June 2006. It&amp;#8217;s running on a generation 1 Compaq
+Proliant &lt;span class="caps"&gt;DL380&lt;/span&gt;, running dual Pentium &lt;span class="caps"&gt;III&lt;/span&gt; 733MHz processors and &lt;span class="caps"&gt;1GB&lt;/span&gt;
+memory - and even with a number of other programs on it, including
+ieilogd which is reading from the
+serial port 24x7 - the load average has never passed 1.2 and the memory
+usage is well under 50%. More importantly, the system has been up for
+442 days without a&amp;nbsp;hiccup!&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Sun, 15 Jun 2008 11:03:00 -0400</pubDate><guid>tag:newblog.jasonantman.com,2008-06-15:2008/06/update-2/</guid><category>ieilogd</category><category>linux</category><category>php ems tools</category><category>tuxostat</category></item><item><title>New Project</title><link>http://newblog.jasonantman.com/2008/06/new-project/</link><description>&lt;p&gt;Well, TuxTruck has been temporarily put on the back burner. I priced out
+the hardware, and it looks like a minimum of $1000, more like $1000 if I
+get what I had originally wanted. This is complicated by the fact that
+my roommates and I were just hit with a $220 electric bill. Mostly,
+that&amp;#8217;s due to the central air conditioning in our apartment, and the
+horrible inefficiencies with&amp;nbsp;it.&lt;/p&gt;
+&lt;p&gt;Inefficient? Yes. At the moment, I&amp;#8217;m the only person in the apartment.
+I&amp;#8217;m home for the weekend from 18:00 Friday through about 15:00 Monday. I
+have class Monday-Thursday night 18:00-21:45. I work Tuesday-Friday
+0900-1700. Even though the thermostat we have is &amp;#8220;programmable&amp;#8221;, it can
+only be set for 4 time periods per day, weekdays and weekends. So, I
+figured that a little added efficiency in calculating when the A/C
+should run would go a long way towards energy&amp;nbsp;savings.&lt;/p&gt;
+&lt;p&gt;My idea - tuxOstat - is to have a Linux box that has temperature sensors
+placed around the apartment, and a bank of relays to control the
+heating/cooling systems. So, even though I only got the idea last
+Thursday, version 1 should be up and running next&amp;nbsp;week.&lt;/p&gt;
+&lt;p&gt;In terms of&amp;nbsp;hardware:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Originally I had planned on using a &lt;a href="http://www.soekris.com/net4526.htm"&gt;Soekris
+    net4526&lt;/a&gt; that I had lying
+    around. However, the added cost of a MiniPCI &lt;span class="caps"&gt;USB&lt;/span&gt; card seemed
+    prohibitive for a one-off project. Instead, I&amp;#8217;m using an old &lt;span class="caps"&gt;HP&lt;/span&gt;
+    OmniBook laptop that was already lying behind my servers. It&amp;#8217;s
+    running Debian&amp;nbsp;4.0.&lt;/li&gt;
+&lt;li&gt;I&amp;#8217;ve ordered (just 15 minutes ago) a &lt;a href="http://www.phidgets.com/products.php?product_id=1014"&gt;Phidgets InterfaceKit
+    0/0/4&lt;/a&gt;, which
+    connects via &lt;span class="caps"&gt;USB&lt;/span&gt; and provides 4 relays. One will control the fan,
+    one for the A/C compressor, one for the heat, and one unused (for&amp;nbsp;now).&lt;/li&gt;
+&lt;li&gt;I already had a
+    &lt;a href="http://www.hobby-boards.com/catalog/product_info.php?cPath=23&amp;amp;products_id=1503"&gt;&lt;span class="caps"&gt;DS9490&lt;/span&gt;&lt;/a&gt;
+    Dallas 1-wire &lt;span class="caps"&gt;USB&lt;/span&gt; adapter from
+    &lt;a href="http://www.hobby-boards.com/"&gt;Hobby-Boards.com&lt;/a&gt; along with five
+    &lt;a href="http://www.hobby-boards.com/catalog/product_info.php?products_id=93"&gt;&lt;span class="caps"&gt;DS18S20P&lt;/span&gt;&lt;/a&gt;
+    1-wire parasite power temperature sensors. I&amp;#8217;ve wired those up with
+    one in the living room near the existing thermostat, one in my
+    bedroom, and one stuck about five feet up one of the A/C conduits,
+    to sense when the system is actually putting out cold air. I&amp;#8217;ve had
+    them logging to MySQL since 0200&amp;nbsp;today.&lt;/li&gt;
+&lt;li&gt;I decided to bite the bullet and order a beautiful &lt;a href="http://www.crystalfontz.com/products/635xes/index.html"&gt;CrystalFontz
+    &lt;span class="caps"&gt;XES635BK&lt;/span&gt;-&lt;span class="caps"&gt;TMF&lt;/span&gt;-&lt;span class="caps"&gt;KU&lt;/span&gt;&lt;/a&gt;
+    for the physical interface. It&amp;#8217;s a little backlit &lt;span class="caps"&gt;LCD&lt;/span&gt; display, in a
+    surface-mount box, along with four bi-color LEDs and a 6-button
+    keypad. That should handle the interface for anyone who doesn&amp;#8217;t want
+    to grab a&amp;nbsp;console.&lt;/li&gt;
+&lt;li&gt;I&amp;#8217;ll be looking for a eight-pin header so that the relays will plug
+    right in to the screw-terminal block that the thermostat uses, to
+    make for easy switching to the original thermostat if needed (or
+    when moving out in a&amp;nbsp;year).&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Now, in terms of&amp;nbsp;software:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;A Python text-based configuration/administration program. Will be
+    accessed via &lt;span class="caps"&gt;SSH&lt;/span&gt; or &lt;span class="caps"&gt;KVM&lt;/span&gt; for the actual&amp;nbsp;machine.&lt;/li&gt;
+&lt;li&gt;Lots of state data stored in files under&amp;nbsp;/var.&lt;/li&gt;
+&lt;li&gt;A python script, run via cron every 2 minutes, that checks
+    temperatures from the 1-wire bus, logs them to MySQL (on a remote
+    host) and updates the temperature files in&amp;nbsp;/var.&lt;/li&gt;
+&lt;li&gt;A master control script, run via cron every minute, that looks at
+    the temperatures, the current system state, any manual overrides
+    that exist, and decides what relays should be on or&amp;nbsp;off.&lt;/li&gt;
+&lt;li&gt;A daemon to handle relay&amp;nbsp;control.&lt;/li&gt;
+&lt;li&gt;A daemon to handle the &lt;span class="caps"&gt;LCD&lt;/span&gt; display output and keypad input
+    (including immediate manual&amp;nbsp;overrides).&lt;/li&gt;
+&lt;li&gt;A method of providing overrides of the programmed schedule on a
+    single-instance basis, i.e. &amp;#8220;system completely off from 2008-06-06
+    18:00 to 2008-06-08&amp;nbsp;15:00&amp;#8221;.&lt;/li&gt;
+&lt;/ol&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Wed, 04 Jun 2008 10:34:00 -0400</pubDate><guid>tag:newblog.jasonantman.com,2008-06-04:2008/06/new-project/</guid><category>1wire</category><category>automation</category><category>home control</category><category>linux</category><category>thermostat</category></item><item><title>Getting SunSPOTs working under OpenSuSE 10.1</title><link>http://newblog.jasonantman.com/2008/05/getting-sunspots-working-under-opensuse-101/</link><description>&lt;p&gt;So I&amp;#8217;ve been playing around with&lt;a href="http://www.sunspotworld.com"&gt;SunSPOT&lt;/a&gt;s
+lately. Or trying to. My only x86 (32-bit) machines are an old desktop
+running OpenSuSE 10.1 and my eeePC. It looks like I just killed my new
+install on the &lt;span class="caps"&gt;8GB&lt;/span&gt; &lt;span class="caps"&gt;SDHC&lt;/span&gt; card, so I gave the desktop a try. I&amp;#8217;d already
+tried once with the install of Orange from the &lt;span class="caps"&gt;CD&lt;/span&gt; that came with them,
+and had NetBeans 6 installed, so I had to do some recovery. The
+procedure was as&amp;nbsp;follows:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Install all of the Java6 java-sun packages (specifically the base as&amp;nbsp;devel).&lt;/li&gt;
+&lt;li&gt;Download the Java 6 &lt;span class="caps"&gt;JDK&lt;/span&gt; from Sun, and install all of the&amp;nbsp;RPMs.&lt;/li&gt;
+&lt;li&gt;Screw with /usr/lib/jvm and get it sane - specifically, replace all
+    of the symlinks that point to /etc/alternatives with new ones
+    pointing to the Java6 install in&amp;nbsp;/usr/lib/jvm/java-1.6.0-sun-1.6.0&lt;/li&gt;
+&lt;li&gt;Delete your entire .netbeans directory (I was having serious issues
+    with&amp;nbsp;NetBeans).&lt;/li&gt;
+&lt;li&gt;Start NetBeans from the command line with an explicitly set jdkhome:
+    &amp;#8220;netbeans &amp;#8212;jdkhome&amp;nbsp;/usr/lib/jvm/java-1.6.0-sun-1.6.0&lt;/li&gt;
+&lt;li&gt;Download the &lt;span class="caps"&gt;SPOT&lt;/span&gt; plugin for NetBeans, following the instructions on
+    &lt;a href="http://weblogs.java.net/blog/brunogh/archive/2008/04/starting_with_s.html"&gt;Bruno Ghisi&amp;#8217;s
+    blog&lt;/a&gt;.&lt;/li&gt;
+&lt;li&gt;Once installed, you should have a little &lt;span class="caps"&gt;SPOT&lt;/span&gt;-looking icon on the
+    toolbar below &amp;#8220;Navigate&amp;#8221;. Click on it, and launch SPOTManager from
+    the link in the right panel (&amp;#8220;Sun SPOTs Info&amp;#8221;, the link is an icon
+    not text). Go through whatever configuration is&amp;nbsp;needed.&lt;/li&gt;
+&lt;li&gt;Upgrade local &lt;span class="caps"&gt;SDK&lt;/span&gt; to Purple (Click the &lt;span class="caps"&gt;SDK&lt;/span&gt; tab, select &amp;#8220;v3.0 Purple&amp;#8221;
+    from the right panel, click the Upgrade button near the&amp;nbsp;bottom).&lt;/li&gt;
+&lt;li&gt;Upgrade your demos following davidgs&amp;#8217;s &lt;a href="http://blogs.sun.com/davidgs/entry/beta_follow_up"&gt;blog
+    posting&lt;/a&gt;.&lt;/li&gt;
+&lt;li&gt;Upgrade all of the SPOTs to Purple (plug them in one at a time, on
+    the SPOTManager SunSPOTs tab, click&amp;nbsp;&amp;#8220;Upgrade&amp;#8221;).&lt;/li&gt;
+&lt;li&gt;I&amp;#8217;m still having some minor issues here. I&amp;#8217;ll update when I have
+    everything figured&amp;nbsp;out&amp;#8230;&lt;/li&gt;
+&lt;/ol&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Tue, 13 May 2008 13:09:00 -0400</pubDate><guid>tag:newblog.jasonantman.com,2008-05-13:2008/05/getting-sunspots-working-under-opensuse-101/</guid><category>java</category><category>linux</category><category>netbeans</category><category>sun</category><category>sunspot</category></item><item><title>SunSPOT; CarPC; MediaWiki Logging</title><link>http://newblog.jasonantman.com/2008/05/sunspot-carpc-mediawiki-logging/</link><description>&lt;p&gt;Well, finals season is upon me. That&amp;#8217;s probably why I haven&amp;#8217;t been
+posting much lately (I haven&amp;#8217;t even been checking &lt;a href="http://reader.google.com/"&gt;Google
+Reader&lt;/a&gt; - I&amp;#8217;ll have to delete a few thousand
+entries when I get back into the swing of things). I&amp;#8217;ve been pretty
+busy, between studying, projects, and work. I&amp;#8217;ll be working 4 days a
+week through June 20th, as well as taking night classes 4 nigths a week
+(unfortunately not the same 4 days) through July 3, in an effort to
+graduate Rutgers on time (after transferring in and also switching
+majors). Work after June 20th is up in the air - who knows how hard the
+budget cuts will&amp;nbsp;hit.&lt;/p&gt;
+&lt;p&gt;My internship as the Sun Microsystems Campus Ambassador to Rutgers is
+over on May 12th. I got a chance to do the Rutgers &lt;span class="caps"&gt;IT&lt;/span&gt; Vendor Fair with
+Sun, and met a few cool people - especially including Matt McGrath of
+&lt;a href="http://www.conres.com/"&gt;Continental Resources&lt;/a&gt;, a Sun Strategic iForce
+Partner, who&amp;#8217;s doing some wonderful things with the &lt;a href="http://www.sun.com/solutions/landing/industry/education/edu_essentials.jsp"&gt;Sun Education
+Essentials Matching Grant
+Program&lt;/a&gt;,
+and &lt;a href="http://opsamericas.com/"&gt;Skip Paul&lt;/a&gt;, a Linux Systems Engineer for
+Novell&amp;#8217;s Open Platform Solutions group. I also finally cracked open my
+demo set of &lt;a href="http://www.sunspotworld.com/"&gt;SunSPOT&lt;/a&gt;s. Wonderful little
+devices, radio, run Java on the bare metal, and have temperature
+sensors, accelerometers, and liberal I/O. My first development exereice
+will probably be making a temperature and acceleration data logger for
+my truck, but there&amp;#8217;s surely more to come. They&amp;#8217;re&amp;nbsp;great!&lt;/p&gt;
+&lt;p&gt;My newest project - which I&amp;#8217;m hoping to spend nearly the whole summer on
+- is the &lt;a href="http://www.jasonantman.com/tuxtruck/"&gt;TuxTruck&lt;/a&gt;. I&amp;#8217;ve been
+frustrated with the lack of &amp;#8220;smartness&amp;#8221; in my truck (an 06 Ford F-250),
+not to mention having to remember my &lt;span class="caps"&gt;MP3&lt;/span&gt; player so I can listen to
+podcasts on the way to work, and having so many gadgets in my truck. So,
+the solution is obvious: a Linux-based
+&lt;a href="http://en.wikipedia.org/wiki/Carpc"&gt;CarPC&lt;/a&gt;. A nice little Mini-&lt;span class="caps"&gt;ATX&lt;/span&gt; box
+under a seat, with a 7&amp;#8221; pull-out touchscreen in the dash (replacing the
+factory radio). It&amp;#8217;s a big, complicated, and expensive project - but I
+want one, and I could use some experience with smaller systems.&lt;br /&gt;
+The major features I have&amp;nbsp;planned:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Realtime &lt;span class="caps"&gt;GPS&lt;/span&gt;&amp;nbsp;navigation&lt;/li&gt;
+&lt;li&gt;Hands-free bluetooth calls from my cell, with address book, routing
+    to contact address, possibly voice&amp;nbsp;dialing.&lt;/li&gt;
+&lt;li&gt;Realtime&amp;nbsp;weather&lt;/li&gt;
+&lt;li&gt;&lt;span class="caps"&gt;OBD&lt;/span&gt;-&lt;span class="caps"&gt;II&lt;/span&gt; interface, for vehicle diagnostics and fuel
+    efficiency/performance&amp;nbsp;profiling&lt;/li&gt;
+&lt;li&gt;Audio - at a minimum searching and playing MP3s, and automatically
+    downloading podcasts and throwing them in a playlist. Perhaps also
+    an &lt;span class="caps"&gt;AM&lt;/span&gt;/&lt;span class="caps"&gt;FM&lt;/span&gt;&amp;nbsp;tuner&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;It&amp;#8217;s not an easy project. So far, the major challenges seem to&amp;nbsp;be:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;No full-featured &lt;span class="caps"&gt;GPS&lt;/span&gt; navigation package available. The ones that are
+    available don&amp;#8217;t seem to be too easy to integrate into my planned
+    &lt;span class="caps"&gt;GUI&lt;/span&gt;, which will allot them 800x420 pixels (on an 800x480 screen) and
+    requre the bottom toolbar to be always&amp;nbsp;available.&lt;/li&gt;
+&lt;li&gt;How to handle processing of multiple data streams that require
+    near-real-time processing - specifically, &lt;span class="caps"&gt;GPS&lt;/span&gt; with text-to-speech,
+    turn-by-turn directions, plus playing audio, plus responding to an
+    incoming phone call in a timely manner, pausing the audio, and
+    stopping &lt;span class="caps"&gt;GPS&lt;/span&gt; audio but continuing&amp;nbsp;navigation.&lt;/li&gt;
+&lt;li&gt;Whether to install a smaller stereo and use aux input for audio, or
+    totally rip out the stereo, use an amp with the computer as its only
+    input, and then how to control&amp;nbsp;volume?&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;There will be more to come in the future. For now, take a look at &lt;a href="https://github.com/jantman/tuxtruck"&gt;the
+TuxTruck github&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Update Saturday, March 2, 2013&lt;/strong&gt; - I&amp;#8217;m in the process of migrating my
+legacy &lt;span class="caps"&gt;CVS&lt;/span&gt; and Subversion repositories to
+&lt;a href="http://github.com/jantman/"&gt;github.com&lt;/a&gt;. The forgotten &lt;span class="caps"&gt;SVN&lt;/span&gt; repository
+for TuxTruck has been migrated there, and the &lt;span class="caps"&gt;CVS&lt;/span&gt; repository will soon
+be moved there as well. Tuxtruck.org has been permanently taken offline
+and redirected to the GitHub&amp;nbsp;repository.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Mediawiki Logging&lt;/strong&gt; - I recently
+had a situation where I had to confirm how much work someone had done on
+a MediaWiki-based project. The Recent Changes page only goes back 30
+days, and walking through the History of each page is a pain. After
+looking around in the database a bit, I found a few tables of&amp;nbsp;interest:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;Table &amp;#8220;users&amp;#8221; includes fields &amp;#8220;user_touched&amp;#8221; (last time the user
+    was updated) and &amp;#8220;user_editcount&amp;#8221; (a really simple count of the
+    users&amp;#8217; number of&amp;nbsp;edits).&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Table &amp;#8220;recentchanges&amp;#8221; holds a lot of data&amp;#8230; seemingly the entire
+    life of the&amp;nbsp;wiki&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Wed, 07 May 2008 10:03:00 -0400</pubDate><guid>tag:newblog.jasonantman.com,2008-05-07:2008/05/sunspot-carpc-mediawiki-logging/</guid><category>bluetooth</category><category>car</category><category>carpc</category><category>conres</category><category>gps</category><category>linux</category><category>mediawiki</category><category>novell</category><category>obd</category><category>rutgers</category><category>sun</category><category>sunspot</category><category>suse</category><category>tuxtruck</category></item><item><title>Asus eeePC Update</title><link>http://newblog.jasonantman.com/2008/02/asus-eeepc-update/</link><description>&lt;p&gt;More to come sometime this week, when I have enough sanity and time to&amp;nbsp;write.&lt;/p&gt;
+&lt;p&gt;In the mean&amp;nbsp;time&amp;#8230;&lt;/p&gt;
+&lt;p&gt;So it&amp;#8217;s been two weeks since classes started again, and that means two
+weeks using my now-beloved eeePC 4G Surf (details in a &lt;a href="/2008/01/eeepc-solaris-other-updates.html"&gt;previous
+post&lt;/a&gt;).
+Granted, I have my &amp;#8220;desktop replacement&amp;#8221; laptop (&lt;a href="http://www.linuxcertified.com/linux-laptop-lc2464.html"&gt;a Linux Certified
+&lt;span class="caps"&gt;LC2464&lt;/span&gt;&lt;/a&gt;) to use
+at my desk at home or at my apartment - though the &amp;#8220;desktop replacement&amp;#8221;
+really means that it&amp;#8217;s easy to move from one desk to&amp;nbsp;another.&lt;/p&gt;
+&lt;p&gt;So far, I really love it, but I have a few&amp;nbsp;issues:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;I should have bought an &lt;span class="caps"&gt;8GB&lt;/span&gt; &lt;span class="caps"&gt;SDHC&lt;/span&gt; card instead of the &lt;span class="caps"&gt;4GB&lt;/span&gt; that I got&lt;ul&gt;
+&lt;li&gt;especially with a full install of OpenSuSE with Sun&amp;#8217;s &lt;span class="caps"&gt;JDK&lt;/span&gt; and
+OpenOffice, the &lt;span class="caps"&gt;2GB&lt;/span&gt; root partition is 99%&amp;nbsp;full!&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;After using a desktop for hours, it takes a few lines of text for my
+    fingers to re-adjust to the small keyboard. Hopefully it&amp;#8217;ll get
+    easier with&amp;nbsp;time.&lt;/li&gt;
+&lt;li&gt;Unfortunately, I don&amp;#8217;t have space for kernel headers or source, so I
+    can&amp;#8217;t compile the customized version of asus_acpi. I can&amp;#8217;t find any
+    binary packges, or binary kernel modules for my kernel version. That
+    prevents me from using sleep/hibernate/suspend, and also means I
+    don&amp;#8217;t get accurate battery calculations. I&amp;#8217;ve found from usage that
+    the battery lasts 2-3 hours with wireless on and minimal screen
+    brightness. Also, unfortunately, (maybe because of the &lt;span class="caps"&gt;ACPI&lt;/span&gt; issue?)
+    if I dim the screen and then the screensaver comes on, when I log
+    back in it resets to full&amp;nbsp;brightness.&lt;/li&gt;
+&lt;li&gt;As of this week, there&amp;#8217;s still no MadWifi driver for the Atheros
+    card in the 4G. I have to run it under Ndiswrapper. As a result, I
+    can&amp;#8217;t get monitor mode, so the eee is effectively useless for
+    wireless site surveys and security work. There&amp;#8217;s talk of a
+    forthcoming MadWifi, but if nothing shows up, I may have to go with
+    a &lt;span class="caps"&gt;USB&lt;/span&gt; adapter (I don&amp;#8217;t want to void the warranty by swapping out the
+    internal Mini-&lt;span class="caps"&gt;PCI&lt;/span&gt;&amp;nbsp;adapter).&lt;/li&gt;
+&lt;li&gt;Not a problem with the eeePC, but it seems like quite a few web
+    sites that I&amp;#8217;ve visited are horribly coded - with static screen
+    sizes assumed. On the small screen on the eee, the biggest issue is
+    when the first few characters of every line on some sites are cut
+    off, thereby rendering the content illegible. This is an issue out
+    of Asus&amp;#8217; control, but can be a hindrance to full use. I have,
+    however, found that for many sites, switching &lt;span class="caps"&gt;FF&lt;/span&gt; to &amp;#8220;full screen&amp;#8221;
+    mode (F11)&amp;nbsp;helps.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Stay tuned for more, and some new scripts to automate wireless surveys,
+rogue &lt;span class="caps"&gt;AP&lt;/span&gt; detection, etc. And maybe even some work with autonomics and or
+configuration&amp;nbsp;tools.&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Mon, 04 Feb 2008 19:12:00 -0500</pubDate><guid>tag:newblog.jasonantman.com,2008-02-04:2008/02/asus-eeepc-update/</guid><category>eeepc</category><category>linux</category></item><item><title>*nix</title><link>http://newblog.jasonantman.com/2007/09/nix/</link><description>&lt;p&gt;First off, my Sun blog should be coming sometime this weekend/early next
+week. If I post anything interesting there, I&amp;#8217;ll be sure to cross-post&amp;nbsp;it.&lt;/p&gt;
+&lt;p&gt;This morning at work, while reading &lt;a href="http://digg.com"&gt;Digg&lt;/a&gt;, I came by
+two interesting links that got me thinking:
+&lt;a href="http://www.foogazi.com/2007/09/27/5-reasons-your-parents-should-use-linux/"&gt;5 Reasons Your Parents Should Use
+Linux&lt;/a&gt;
+and &lt;a href="http://warpedvisions.org/2006/12/30/ten-things-linux-distros-get-right-that-ms-doesnt/"&gt;Ten Things Linux Distros Get Right (That &lt;span class="caps"&gt;MS&lt;/span&gt;
+Doesn&amp;#8217;t)&lt;/a&gt;.
+Now, I&amp;#8217;ll admit, my *nix experience is pretty much limited to Linux.
+I&amp;#8217;ve used &lt;span class="caps"&gt;BSD&lt;/span&gt; a few times, but only as pre-built images for embedded
+systems like my &lt;a href="http://www.soekris.com"&gt;Soekris&lt;/a&gt; boxen. I&amp;#8217;ve used
+Solaris mainly just as a user/web developer in &lt;span class="caps"&gt;SSH&lt;/span&gt; at work. And while I
+now have a work computer running Solaris 10 and a &lt;span class="caps"&gt;SXDE&lt;/span&gt; image on my
+laptop, I&amp;#8217;m still relatively new - and, given that I&amp;#8217;m now doing
+hardware support and wireless work, I don&amp;#8217;t even know what I need
+another machine in the office&amp;nbsp;for.&lt;/p&gt;
+&lt;p&gt;That being said, the second link got me thinking. Specifically, about
+something I read in &lt;a href="http://www.catb.org/~esr/writings/taoup/"&gt;The Art of Unix
+Programming&lt;/a&gt; [Wikipedia] by
+Eric S. Raymond (available online
+&lt;a href="http://www.catb.org/~esr/writings/taoup/html/"&gt;here&lt;/a&gt;) with regards to
+interface design. One quote that I was able to find in the online
+version, comes from Chapter 11, under the subtitle &amp;#8220;Tradeoffs between
+&lt;span class="caps"&gt;CLI&lt;/span&gt; and Visual Interfaces&amp;#8221;, &amp;#8220;Resistance to &lt;span class="caps"&gt;CLI&lt;/span&gt; interfaces tends to
+decrease as users become more expert. In many problem domains, users
+(especially frequent
+users) reach a crossover point at which the concision and expressiveness
+of &lt;span class="caps"&gt;CLI&lt;/span&gt; becomes more valuable than avoiding its mnemonic load. Thus, for
+example, computing novices prefer the ease of &lt;span class="caps"&gt;GUI&lt;/span&gt; desktops, but
+experienced users often gradually discover that they prefer typing
+commands to a&amp;nbsp;shell.&amp;#8221;&lt;/p&gt;
+&lt;p&gt;There is another similar
+quote in the book, mentioning how resistance to the &lt;span class="caps"&gt;CLI&lt;/span&gt; drops as
+&lt;em&gt;typing speed&lt;/em&gt;&amp;nbsp;increases.&lt;/p&gt;
+&lt;p&gt;Unfortunately, in some areas I&amp;#8217;m still bound to Windows. Though my only
+personal use for it is to control an ancient Umax Mirage IIse &lt;span class="caps"&gt;SCSI&lt;/span&gt;
+scanner (with only Windows and Mac drivers), I ultimately need to touch
+it now and then - whether on my mother&amp;#8217;s box (she claims she has to have
+Windows and &lt;span class="caps"&gt;MS&lt;/span&gt; Office because &amp;#8220;that&amp;#8217;s what businesses use&amp;#8221;) or as admin
+of the four boxes at the &lt;a href="http://www.midlandparkambulance.com"&gt;Ambulance
+Corps&lt;/a&gt; where I&amp;nbsp;volunteer.&lt;/p&gt;
+&lt;p&gt;However, whenever I am (unfortunately) pushed into the task of working
+on a Windows box, I always feel something lacking. To be blunt, I don&amp;#8217;t
+see how experienced users can deal with it. And this isn&amp;#8217;t just an issue
+of multiple desktops, or reliability (I expect my desktop to have months
+of uptime, and my servers to have years). This isn&amp;#8217;t just pro-Linux,
+it&amp;#8217;s anti-Windows. Linux is great. Solaris seems wonderful, and I can&amp;#8217;t
+want to move my servers over. And, believe it or not, due to playing
+around with the Solaris Management Console, for the first time in 5
+years, I plan on running X on my servers.
+What this is, is a talk about total workflow. Years ago, I reached the
+point where I am more comfortable at the command line, or in an
+Ncurses-style &lt;span class="caps"&gt;GUI&lt;/span&gt;, than in&amp;nbsp;X.&lt;/p&gt;
+&lt;p&gt;I an attribute this to two factors - verbosity and speed. The &lt;span class="caps"&gt;CLI&lt;/span&gt; is as
+verbose as anything can get. I remember setting a static &lt;span class="caps"&gt;IP&lt;/span&gt; on a Windows
+box. I had to navigate the Start menu, open up the control panel, the
+network thingy, click on the network card, and work through a series of
+dialogs. In Linux, I clicked on the terminal icon, typed &amp;#8220;sudo ifconfig
+eth0 up 192.168.0.211&amp;#8221; and then a password. Done. Likewise, refreshing a
+&lt;span class="caps"&gt;DHCP&lt;/span&gt; lease on Windows requires a whole bunch of &amp;#8220;repair connection&amp;#8221;
+nonsense, whereas in Linux all it requires is &amp;#8220;dhclient eth0&amp;#8221;. The
+bottom line I know what I&amp;#8217;m doing. Windows should have an option to let
+me quickly do&amp;nbsp;it.&lt;/p&gt;
+&lt;p&gt;Speed is a related issue. Click, click-click, drag, click, click&amp;#8230;.
+what about just typing? Even for people who aren&amp;#8217;t &lt;span class="caps"&gt;CLI&lt;/span&gt;-friendly, there&amp;#8217;s
+Ncurses. YaST2, the SuSE/openSuSE administration tool, has both &lt;span class="caps"&gt;GUI&lt;/span&gt; and
+Ncurses interfaces. I always use the Ncurses interface. Why? Because
+I&amp;#8217;ve been using it for years. I know that if I want to add a user
+through YaST, I hit the down arrow 7 times, tab once, down 5, enter. Tab
+once more to bring up the add user dialog. I can do this in well under a
+second. What&amp;#8217;s the bottom line? Well, first of all, my hands are already
+on the keyboard. That&amp;#8217;s where they like to stay. That&amp;#8217;s where they&amp;#8217;re
+comfortable. My fingers need to move a *lot* less to navigate with the
+arrow keys, tab, and enter than they do to use a mouse. If you know what
+you&amp;#8217;re doing, if you already know what you&amp;#8217;re looking for, then a mouse
+is slower than the speed of thought (or&amp;nbsp;reaction).&lt;/p&gt;
+&lt;p&gt;So where&amp;#8217;s the Windows bashing? Simple. How do people at Microsoft deal
+with this? How does the guy who *wrote* that network settings dialog
+deal with navigating the &lt;span class="caps"&gt;GUI&lt;/span&gt; every time, even though he already knows
+exactly what he wants to do - and probably the system calls to do&amp;nbsp;it?&lt;/p&gt;
+&lt;p&gt;The bottom line is that every time I sit down at a Windows machine, I
+wonder how the most popular &lt;span class="caps"&gt;OS&lt;/span&gt; is one that doesn&amp;#8217;t give any thought to
+advanced users. I know that I can type faster than I can move a mouse,
+why don&amp;#8217;t you let me use that? More importantly, why didn&amp;#8217;t Microsoft
+ever think that people would use computers on a network? When I
+installed Solaris, I wanted to edit a config file. I hadn&amp;#8217;t customized
+&lt;em&gt;anything&lt;/em&gt; yet, hadn&amp;#8217;t installed any other software, nothing. Yet, I
+was able to open up a terminal and grab my .emacs file from my laptop in
+one line&amp;nbsp;(scp).&lt;/p&gt;
+&lt;p&gt;To be totally honest, the question running through my mind is something
+like &amp;#8220;everything is so much quicker on Linux. How do experts deal with&amp;nbsp;Windows?&amp;#8221;&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Fri, 28 Sep 2007 13:22:00 -0400</pubDate><guid>tag:newblog.jasonantman.com,2007-09-28:2007/09/nix/</guid><category>Digg</category><category>Eric S Raymond</category><category>linux</category><category>solaris</category><category>sun</category><category>Unix</category></item><item><title>Update</title><link>http://newblog.jasonantman.com/2007/07/update/</link><description>&lt;p&gt;I haven&amp;#8217;t been too active on here lately, mainly due to spending my
+summer as a paid transport &lt;span class="caps"&gt;EMT&lt;/span&gt;, working 50 hours a week or so, and still
+trying to keep up on&amp;nbsp;&amp;#8220;life&amp;#8221;.&lt;/p&gt;
+&lt;p&gt;I have a few things planned for the next month or so of summer, so stay
+tuned. Some of them&amp;nbsp;include:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Redesign of my site including lots of information that&amp;#8217;s been stored
+    away in text files, and a new wiki for technical&amp;nbsp;information.&lt;/li&gt;
+&lt;li&gt;Some embedded development work, and notes on&amp;nbsp;that.&lt;/li&gt;
+&lt;li&gt;Converting some sort of low-cost handheld computer, tablet, or eBook
+    reader for use as a Linux-based &lt;span class="caps"&gt;RSS&lt;/span&gt; reader (updated over &lt;span class="caps"&gt;LAN&lt;/span&gt; nightly
+    and cached locally), hopefully including an image of my software as
+    well as some conduit to an &lt;span class="caps"&gt;RSS&lt;/span&gt; reader program, and ability to email
+    a list of &amp;#8220;flagged&amp;#8221; articles on sync (&lt;span class="caps"&gt;RSS&lt;/span&gt; update over&amp;nbsp;network).&lt;/li&gt;
+&lt;li&gt;A vast update of my &lt;a href="http://repo.jasonantman.com"&gt;Code Repo&lt;/a&gt; with
+    most of my home-grown F/&lt;span class="caps"&gt;OSS&lt;/span&gt; programs, including my (very basic)
+    web-based budget/finance&amp;nbsp;program.&lt;/li&gt;
+&lt;li&gt;An update to &lt;a href="http://php-ems-tools.com"&gt;&lt;span class="caps"&gt;PHP&lt;/span&gt; &lt;span class="caps"&gt;EMS&lt;/span&gt;&amp;nbsp;Tools&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;Notes on my experience with MythTV, an integrating it with &lt;span class="caps"&gt;IR&lt;/span&gt;
+    controls, Cablevision &lt;span class="caps"&gt;SA&lt;/span&gt; set-top box, and ultimately a &amp;#8220;smart&amp;nbsp;room&amp;#8221;.&lt;/li&gt;
+&lt;li&gt;My never-ending quest to find a way to interface a &lt;span class="caps"&gt;CDMA&lt;/span&gt; handset to a
+    computer for purposes of sending &lt;span class="caps"&gt;SMS&lt;/span&gt; from the command line (Nagios
+    out-of-band alerts on a&amp;nbsp;budget).&lt;/li&gt;
+&lt;li&gt;A trial run of Asterisk and VoIP from the house to the&amp;nbsp;dorm.&lt;/li&gt;
+&lt;li&gt;Some more projects including:&lt;ul&gt;
+&lt;li&gt;Finding and implementing a hardware/software trouble- and
+    change-tracking system, which will also integrate with my&amp;nbsp;Wiki.&lt;/li&gt;
+&lt;li&gt;Choosing bug tracking software for my internal&amp;nbsp;projects.&lt;/li&gt;
+&lt;li&gt;Choosing and implementing a network-wide backup system to handle
+    *nix, Windows, and my remote *nix&amp;nbsp;machines.&lt;/li&gt;
+&lt;li&gt;OpenSolaris.&lt;/li&gt;
+&lt;li&gt;Figuring out a system to handle automated nightly/weekly tasks
+    on my diverse machines including log analysis, backups, software
+    updates, and the usual stuff (SpamAssassin updates and training
+    and other routine&amp;nbsp;tasks).&lt;/li&gt;
+&lt;li&gt;A status tracker/to-do list of my numerous&amp;nbsp;projects.&lt;/li&gt;
+&lt;li&gt;Releasing most of my web-based kludges under &lt;span class="caps"&gt;GPL&lt;/span&gt; for anyone who
+    may be&amp;nbsp;interested.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Sat, 14 Jul 2007 01:14:00 -0400</pubDate><guid>tag:newblog.jasonantman.com,2007-07-14:2007/07/update/</guid><category>emergency medical</category><category>linux</category><category>mythtv</category><category>php ems tools</category><category>tablet</category><category>update</category></item><item><title>Managing G1 Proliant Servers with modern Linux</title><link>http://newblog.jasonantman.com/2007/03/managing-g1-proliant-servers-with-modern-linux/</link><description>&lt;p&gt;Not much of an &amp;#8220;upgrade&amp;#8221; for anyone who&amp;#8217;s in &lt;span class="caps"&gt;IT&lt;/span&gt;, but jasonantman.com is
+currently being upgraded from old desktops used as servers to a pile of
+generation-1 (G1) &lt;span class="caps"&gt;HP&lt;/span&gt;/Compaq Proliants. I know that there are utilities
+for Linux to manage the servers, specifically control fan speed and
+monitor hardware-level health for Linux. However, the most recent
+download on &lt;span class="caps"&gt;HP&lt;/span&gt;&amp;#8217;s site is for &lt;span class="caps"&gt;SLES9&lt;/span&gt;. All of my boxes will be running
+openSuSE 10.2, and the &lt;span class="caps"&gt;SLES9&lt;/span&gt; version wouldn&amp;#8217;t install on&amp;nbsp;them.&lt;/p&gt;
+&lt;p&gt;After an hour long phone call to &lt;span class="caps"&gt;HP&lt;/span&gt; support, I ended up speaking with
+Paulo, the third support person I was transferred to. #1 read off the
+web site, #2 knew what Linux was, but Paulo (#3) actually told me that
+he was experimenting with installing &lt;span class="caps"&gt;HPASM&lt;/span&gt; (&lt;span class="caps"&gt;HP&lt;/span&gt;&amp;#8217;s server
+administration/management utility) on an older Proliant as well. He
+spent about half an hour walking me through it. Here&amp;#8217;s what I&amp;nbsp;found:&lt;/p&gt;
+&lt;p&gt;The most compatible version of &lt;span class="caps"&gt;HPASM&lt;/span&gt; (I guess it&amp;#8217;s some hidden feature
+for people who know it) is the version for the &lt;span class="caps"&gt;DL380&lt;/span&gt; G4. Paulo
+instructed me to download this &lt;span class="caps"&gt;RPM&lt;/span&gt; from their site. I did, choosing the
+&lt;span class="caps"&gt;SLES10&lt;/span&gt; (x86) download (hpasm-7.7.0-115.sles10.i586.rpm). This installed
+fine. Running &lt;code&gt;hpasm status&lt;/code&gt; from the command line asks us to activate
+it first. Do the activation. Now, running &lt;code&gt;hpasm status&lt;/code&gt; still asks us
+to activate. Paulo confirmed this as happening on his machine too. Try
+&lt;code&gt;/etc/init.d/hpasm status&lt;/code&gt; and you should see that all of the modules
+are&amp;nbsp;working.&lt;/p&gt;
+&lt;p&gt;Now, the install is complete. I&amp;#8217;m not sure if the &lt;span class="caps"&gt;SNMP&lt;/span&gt; works, but it
+should as long as your snmpd is running. The &lt;code&gt;hpasm activate&lt;/code&gt; command
+modifies snmpd.conf appropriately. and you will be queried for the
+currect configuration&amp;nbsp;information.&lt;/p&gt;
+&lt;p&gt;To give it a test, run &lt;code&gt;hplog -f&lt;/code&gt; or &lt;code&gt;hplog -p&lt;/code&gt; and you should see fan
+and power status,&amp;nbsp;respectively.&lt;/p&gt;
+&lt;p&gt;Paulo also told me that I could download the hpadu package (also &lt;span class="caps"&gt;DL380&lt;/span&gt;
+G4 / &lt;span class="caps"&gt;SLES10&lt;/span&gt;) to get array diagnostics, He warned me that some of the
+install scripts in &lt;span class="caps"&gt;HPADU&lt;/span&gt; look for the web management homepage, which we
+haven&amp;#8217;t installed. To get around this, install the &lt;span class="caps"&gt;HPADU&lt;/span&gt; &lt;span class="caps"&gt;RPM&lt;/span&gt; file
+(hpadu-7.70-12.linux.rpm)
+&lt;code&gt;rpm -ivh --force --nodeps --noscripts hpadu-7.70-12.linux.rpm&lt;/code&gt;. Be
+aware, though, that this package is supposed to be web-based. It
+installs to&amp;nbsp;/opt/hp/hpadu.&lt;/p&gt;
+&lt;p&gt;The web interface, luckily for me, is written in &lt;span class="caps"&gt;PHP&lt;/span&gt;. It is pretty
+complex so it might take me a while to figure out the workings, but when
+I do, I&amp;#8217;ll post as much info as I can on how to make a &lt;span class="caps"&gt;CLI&lt;/span&gt; interface, or
+where one exists if I can find&amp;nbsp;it.&lt;/p&gt;
+&lt;p&gt;Also, I&amp;#8217;ll most likely develop a Python check script to use with
+&lt;a href="http://www.nagios.org"&gt;Nagios&lt;/a&gt; to monitor most of the hpasm-enabled&amp;nbsp;components.&lt;/p&gt;
+&lt;p&gt;For the use of anyone else, here are some of the links that &lt;span class="caps"&gt;HP&lt;/span&gt; Support
+sent me after the&amp;nbsp;call:&lt;/p&gt;
+&lt;p&gt;Link for users guide for Proliant Support Pack, which includes
+documentation on &lt;span class="caps"&gt;HPASM&lt;/span&gt; from the&amp;nbsp;&lt;span class="caps"&gt;CLI&lt;/span&gt;:&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://h18000.www1.hp.com/support/files/server/us/WebDoc/720/psp-users-guide.pdf"&gt;http://h18000.www1.hp.com/support/files/server/us/WebDoc/720/psp-users-guide.pdf&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;Product&amp;nbsp;manuals:&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://h20180.www2.hp.com/apps/Nav?h_pagetype=s-003&amp;amp;h_lang=en&amp;amp;h_cc=us&amp;amp;h_product=241435&amp;amp;h_page=hpcom&amp;amp;h_client=z-a-r1002-3&amp;amp;cc=us〈=en"&gt;http://h20180.www2.hp.com/apps/Nav?h_pagetype=s-003&amp;amp;h_lang=en&amp;amp;h_cc=us&amp;amp;h_product=241435&amp;amp;h_page=hpcom&amp;amp;h_client=z-a-r1002-3&amp;amp;cc=us〈=en&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;span class="caps"&gt;ML370&lt;/span&gt;&amp;nbsp;G1&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://h20000.www2.hp.com/bc/docs/support/UCR/SupportManual/TPM_143091-004/TPM_143091-004.pdf"&gt;http://h20000.www2.hp.com/bc/docs/support/&lt;span class="caps"&gt;UCR&lt;/span&gt;/SupportManual/TPM_143091-004/TPM_143091-004.pdf&lt;/a&gt;&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Thu, 01 Mar 2007 16:27:00 -0500</pubDate><guid>tag:newblog.jasonantman.com,2007-03-01:2007/03/managing-g1-proliant-servers-with-modern-linux/</guid><category>compaq</category><category>hp</category><category>hpadu</category><category>hpasm</category><category>linux</category><category>management</category><category>proliant</category><category>psp</category></item><item><title>Why hasn’t Linux caught up to Windows?</title><link>http://newblog.jasonantman.com/2007/02/why-hasnt-linux-caught-up-to-windows/</link><description>&lt;p&gt;Those of us who are involved in the Linux community are often frustrated
+by the lack of widespread acceptance of Linux. Granted, I haven&amp;#8217;t used
+all of the newest &amp;#8220;desktop&amp;#8221; distributions (&amp;#8216;distros&amp;#8217;), but I know that
+my choice - openSuSE - is far from being ready to compete with Windows
+for the novice user market. From the first few screens of the
+installation, it&amp;#8217;s clear that this isn&amp;#8217;t something for the uninitiated.
+However, to get off on a short tangent, openSuSE has also severely
+hampered access to the command-line-only, text-mode installation, which
+I need in order to install on many of my&amp;nbsp;servers.&lt;/p&gt;
+&lt;p&gt;Granted, it will take a lot of work to get Linux to retain its&amp;#8217; strong
+points, and still be user-friendly for the non-technical user. However,
+there are three main points that I see as being the biggest problems for
+new users. All of which, coincidentally, are ones which some people
+would bill as strong points of Linux. And they all have to do directly
+with some of the founding principles of Linux - interoperability and&amp;nbsp;choice.&lt;/p&gt;
+&lt;h2 id="packaging"&gt;Packaging.&lt;/h2&gt;
+&lt;p&gt;Searching for a package for a linux system goes something like this:
+figure out what package format your distro uses, figure out the distro
+version and architecture, and then start checking the online
+repositories. If it&amp;#8217;s something simple, you may be able to use a you
+distro-specific maintenance program to automatically upgrade it. If not,
+you can sift through the myriad online repositories for packages that
+fit your package manager (&lt;span class="caps"&gt;RPM&lt;/span&gt;, Apt, etc.) and your distro/architecture.
+If you have no luck there, find the package&amp;#8217;s homepage, and hope someone
+has contributed packages for your distro and architecture - usually a
+hit-or-miss situation. Last but not least, when all else has failed, you
+choose either to compile from source yourself, or give up. Compiling
+from source not only requires some knowledge of your system, Linux, and
+the compilation sequence used by the software - hopefully the generic
+&lt;span class="caps"&gt;GNU&lt;/span&gt;-style ./configure, make, make install and not some more esoteric
+scheme. Furthermore, compilation requires a whole slew of tools to be
+installed on your system - make, gcc, autoconf, and may others,
+depending on package. While it&amp;#8217;s not practical for people with limited
+resources, homogenous environments, or novice users, I operate in a
+largely heterogeneous environment - i586/compatible systems running SuSE
+9.3-10.2 - and therefore maintain a dedicated system for compilation, if&amp;nbsp;merited.&lt;/p&gt;
+&lt;p&gt;All of this complexity just enforces the novice&amp;#8217;s idea that there is not
+much software available for Linux, as many novices are limited (due to
+technical knowledge) to the packages that come with their&amp;nbsp;&lt;span class="caps"&gt;OS&lt;/span&gt;.&lt;/p&gt;
+&lt;p&gt;While there are a few schemes to standardize all of this, the real
+solution is quite complex, and would be based on a single package system
+to be adopted by all distros (beginning with the main ones). Such a
+system should have the following&amp;nbsp;features:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Ability to work easily with all&amp;nbsp;distros&lt;/li&gt;
+&lt;li&gt;I main configuration file which can define which directories to use -
+i.e. /etc, /bin,&amp;nbsp;etc.&lt;/li&gt;
+&lt;li&gt;Support for both simple, novice-oriented interfaces and expert-level&amp;nbsp;configuration&lt;/li&gt;
+&lt;li&gt;Multiple interfaces, including command-line, text/ncurses, &lt;span class="caps"&gt;GTK&lt;/span&gt;, and
+other graphical&amp;nbsp;subsystems&lt;/li&gt;
+&lt;li&gt;A generalized package format that is&amp;nbsp;non-distro-specific&lt;/li&gt;
+&lt;li&gt;Integration with an online master-list of&amp;nbsp;repositories&lt;/li&gt;
+&lt;li&gt;Ability to search, download, and install packages from these&amp;nbsp;repositories&lt;/li&gt;
+&lt;li&gt;Automatic update&amp;nbsp;ability&lt;/li&gt;
+&lt;li&gt;Ability to mine the repositories for updates, and display a list on
+screen or emailed to a user&amp;nbsp;account&lt;/li&gt;
+&lt;li&gt;Very good tools for easy compilation from&amp;nbsp;source.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Some of these ideas would be incorporated in the tool itself, and some
+as add-on&amp;nbsp;modules.&lt;/p&gt;
+&lt;p&gt;The features that I, as administrator of a largely heterogeneous network
+of about 10 machines, would most like to see&amp;nbsp;are:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Truly automatic updates via list - select which packages can be
+automatically updated, and run a cron job nightly to check for any
+updates for those packages and automatically get and install&amp;nbsp;them.&lt;/li&gt;
+&lt;li&gt;&lt;span class="caps"&gt;LAN&lt;/span&gt;-based updating - A single server on the &lt;span class="caps"&gt;LAN&lt;/span&gt; maintains a list
+(perhaps gathered via an automatic tool) of &lt;span class="caps"&gt;ALL&lt;/span&gt; packages installed on
+&lt;span class="caps"&gt;ALL&lt;/span&gt; &lt;span class="caps"&gt;LAN&lt;/span&gt; machines. Each night the configured clients will update this
+list over the network, and then the master server will download all
+available updates for all packages. Once this is complete, it will send
+a message to all &lt;span class="caps"&gt;LAN&lt;/span&gt; machines, which will then update their software
+from the central repository on the &lt;span class="caps"&gt;LAN&lt;/span&gt;. This would, in effect,
+automatically keep all &lt;span class="caps"&gt;LAN&lt;/span&gt; machines on the same version of each
+package and totally&amp;nbsp;up-to-date.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Kernel updates would be done manually, but should have an option for the
+administrator to push the update to all&amp;nbsp;machines.&lt;/p&gt;
+&lt;h2 id="distro-specific-tools-filesystem-layout-etc"&gt;Distro-specific tools, filesystem layout,&amp;nbsp;etc.&lt;/h2&gt;
+&lt;p&gt;This is not only a barrier for novice users, but experienced users as
+well. If you do a search online for Linux training, you will surely come
+by a nubmer of certifications - &lt;span class="caps"&gt;NCLE&lt;/span&gt;, &lt;span class="caps"&gt;RHCE&lt;/span&gt;, etc. The many distinct
+certifications - offered by each Linux vendor and independent training
+companies - underscore the inherent differences in Linux distributions.
+While I&amp;#8217;m perfectly comfortable working with SuSE Linux (by Novell), if
+I was to sit down in front of a Gentoo system, I would probably be
+totally&amp;nbsp;lost.&lt;/p&gt;
+&lt;p&gt;While the &lt;span class="caps"&gt;LSB&lt;/span&gt; project (http://www.linux-foundation.org/en/&lt;span class="caps"&gt;LSB&lt;/span&gt;) has aimed
+to provide compatibility between distros, there are three main points
+which must still be&amp;nbsp;addressed:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;The organization of filesystems on different distros, specifically
+the directory tree and default locations for certain components, still
+differs. In the interest of usability, the Linux directory tree should
+be standardized, so that locations of programs, files, etc. will be
+identical across&amp;nbsp;distributions.&lt;/li&gt;
+&lt;li&gt;An effort needs to be made to make administration as similar as
+possible across all distros. This means that program names,
+functionality, location, etc. should be standardized as much as&amp;nbsp;possible.&lt;/li&gt;
+&lt;li&gt;It seems that each distro has its&amp;#8217; own administration tool - YaST for
+SuSE, and others for other distros. An effort needs to be made to
+develop a tool encompassing all of the features in one, distro-neutral
+form. Webmin (www.webmin.com) has done this wonderfully in a web-based
+interface, but attention should be focused on a text-mode console
+version as&amp;nbsp;well.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id="gui"&gt;&lt;span class="caps"&gt;GUI&lt;/span&gt;&lt;/h2&gt;
+&lt;p&gt;Perhaps the biggest hurdle for novices using Linux, and the biggest
+development challenge, is general ease of use. While the above two
+points may fall into this category, I am specifically referring to the
+general, day-to-day use of the operating&amp;nbsp;system.&lt;/p&gt;
+&lt;p&gt;While I will not begin to suggest solutions, the main problems that I
+see are as&amp;nbsp;follows:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;The stability and security of Linux must be kept intact, unlike
+distros such as&amp;nbsp;Lindows.&lt;/li&gt;
+&lt;li&gt;There must remain a way for advanced users to perform advanced&amp;nbsp;tasks.&lt;/li&gt;
+&lt;li&gt;As much of the inner workings should be hidden from the end-user as
+possible, unless specifically&amp;nbsp;requested.&lt;/li&gt;
+&lt;li&gt;I good system would have a field added to a users&amp;#8217; &lt;span class="caps"&gt;GECOS&lt;/span&gt; data
+specifying their level of &amp;#8220;novice-ness&amp;#8221; - i.e. allowing a dumbed-down
+interface for users while retaining a full interface with Expert
+features for those who want&amp;nbsp;it.&lt;/li&gt;
+&lt;li&gt;&lt;span class="dquo"&gt;&amp;#8220;&lt;/span&gt;Mysterious&amp;#8221; things such as file permissions should be hidden from
+novice-level users when not absolutely&amp;nbsp;needed.&lt;/li&gt;
+&lt;li&gt;There must be a strong integration with &amp;#8220;anti-mistake&amp;#8221; tools and &lt;span class="caps"&gt;DWIM&lt;/span&gt;
+technology. The system itself should manage file permissions in a way
+that grants only the minimum needed&amp;nbsp;access.&lt;/li&gt;
+&lt;li&gt;There should be good, strong mistake detection, specifically in terms
+of catching a user&amp;#8217;s inadvertent changing of file permissions, deleting
+required files,&amp;nbsp;etc.&lt;/li&gt;
+&lt;li&gt;Tools should be built so that the novice user is never required to
+login as root or run a root&amp;nbsp;shell.&lt;/li&gt;
+&lt;li&gt;Perhaps, and I&amp;#8217;m sure this is controversial, the root account should
+be given either &lt;span class="caps"&gt;CLI&lt;/span&gt;-only access, or should not have X running by
+default, so as to discourage novice users from running day-to-day tasks
+as&amp;nbsp;root.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;I&amp;#8217;m sure I&amp;#8217;ve missed a lot, and have also probably mentioned a number of
+things that are already in place. However, the bottom line is that Linux
+has to be able to achieve the easy of use and interoperability (between
+distros) that Windows currently has, while retaining the extensibility,
+advanced features, security, and stability that make Linux what it&amp;nbsp;is.&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Mon, 19 Feb 2007 17:20:00 -0500</pubDate><guid>tag:newblog.jasonantman.com,2007-02-19:2007/02/why-hasnt-linux-caught-up-to-windows/</guid><category>compatibility</category><category>development</category><category>distribution</category><category>linux</category><category>novice</category><category>windows</category></item></channel></rss>

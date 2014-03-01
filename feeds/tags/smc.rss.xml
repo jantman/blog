@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Jason Antman's Blog</title><link>http://newblog.jasonantman.com/</link><description></description><atom:link href="http://newblog.jasonantman.com/feeds/tags/smc.rss.xml" rel="self"></atom:link><lastBuildDate>Fri, 14 Dec 2007 02:44:00 -0500</lastBuildDate><item><title>Sun Blade 150 working!</title><link>http://newblog.jasonantman.com/2007/12/sun-blade-150-working/</link><description>&lt;p&gt;Yes, it&amp;#8217;s 3 &lt;span class="caps"&gt;AM&lt;/span&gt; here, and I&amp;#8217;ve been working since about 6 &lt;span class="caps"&gt;PM&lt;/span&gt; on this. But
+I finally got one of my two surplus (and fully locked down in &lt;span class="caps"&gt;NVRAM&lt;/span&gt;) Sun
+Blade 150 workstations up and running. I encountered a few problems
+along the way, but managed to solve them - more or&amp;nbsp;less.&lt;/p&gt;
+&lt;h2 id="problem-1-nvram-password-set-impossible-to-install-an-os"&gt;Problem 1 - &lt;span class="caps"&gt;NVRAM&lt;/span&gt; password set, impossible to install an&amp;nbsp;&lt;span class="caps"&gt;OS&lt;/span&gt;.&lt;/h2&gt;
+&lt;p&gt;I did a &lt;em&gt;lot&lt;/em&gt; of googling, and asking for advice. Eventually, I came
+by a forum post expressing success with a procedure of pulling out and
+then re-inserting the &lt;span class="caps"&gt;NVRAM&lt;/span&gt; *while* the system is powered on. This
+left my system un-bootable. I pulled the chip again, and found two pins
+bent. I straightened them, re-inserted, and rebooted using the Stop+N
+Equivalent Functionality (after powering on the system, once you hear
+the &lt;span class="caps"&gt;POST&lt;/span&gt; beep, click the power button twice quickly). This temporarily
+resets the &lt;span class="caps"&gt;NVRAM&lt;/span&gt; to default settings. I found that the password was
+gone, and was able to issue the &amp;#8220;set-defaults&amp;#8221; command at the &amp;#8220;ok&gt;&amp;#8221;
+prompt. I then popped in the Solaris 10 install &lt;span class="caps"&gt;CD&lt;/span&gt;, issued the
+&amp;#8220;reset-all&amp;#8221; command to reboot, and used Stop+A at boot to bring up a
+boot menu, and told it to boot from &lt;span class="caps"&gt;CDROM&lt;/span&gt; (&amp;#8220;boot cdrom&amp;#8221;). Installation
+then&amp;nbsp;started.&lt;/p&gt;
+&lt;h2 id="problem-2-invalid-nvram"&gt;Problem 2 - Invalid&amp;nbsp;&lt;span class="caps"&gt;NVRAM&lt;/span&gt;&lt;/h2&gt;
+&lt;p&gt;After the above procedure, when booting, I got a message following the
+Sun banner stating that there was a problem with the IDprom checksum.
+When the install &lt;span class="caps"&gt;CD&lt;/span&gt; booted, I also got messages stating &amp;#8220;Invalid format
+code in IDprom&amp;#8221;, &amp;#8220;Warning: IDprom checksum error&amp;#8221;, and &amp;#8220;os-io Invalid
+format code in IDprom&amp;#8221;. After another five hours of work, I found that
+it&amp;#8217;s essentially something I have to live with. While OpenBoot previous
+to version 4 allowed use of the &amp;#8220;mkp&amp;#8221; and &amp;#8220;mkpl&amp;#8221; commands to directly
+write the IDprom, version 4 and above allows no access to this. The
+IDprom was reporting an ethernet (mac) address of all zeros.
+Unfortunately, there seems to be no way to correct this as far as I&amp;#8217;ve
+found. However, it didn&amp;#8217;t effect my &lt;span class="caps"&gt;OS&lt;/span&gt; installation&amp;#8230;&amp;nbsp;much.&lt;/p&gt;
+&lt;p&gt;*There may be a way to access the IDprom through OpenBoot 4.x, but I
+couldn&amp;#8217;t find any reference to it online, and couldn&amp;#8217;t figure out the
+&lt;span class="caps"&gt;FORTH&lt;/span&gt; commands from the reference&amp;nbsp;docs.&lt;/p&gt;
+&lt;p&gt;Some helpful links for the above problems include the OpenBoot 4.x
+Command Reference Manual, currently found
+&lt;a href="http://dlc.sun.com/pdf/816-1177-10/816-1177-10.pdf"&gt;here&lt;/a&gt;, as well as
+the Sun Blade 150 Service Manual (from
+&lt;a href="http://docs.sun.com/"&gt;docs.sun.com&lt;/a&gt;), document 816-4379-10, currently
+indexed with the Sun Blade 150 docs
+&lt;a href="http://docs.sun.com/app/docs/coll/sb150"&gt;here&lt;/a&gt;. It was also
+interesting, in my search for help, to look at the OpenBoot 3.x Command
+Manual, and see how easy it was to re-write the IDprom on older Sun
+Blade&amp;nbsp;workstations.&lt;/p&gt;
+&lt;p&gt;Pleaese note that the advice given in the &lt;a href="http://040.digital-bless.com/texts/Unofficial_Sun_Blade_100_FAQ.htm"&gt;Unofficial SunBlade 100
+&lt;span class="caps"&gt;FAQ&lt;/span&gt;&lt;/a&gt;
+and the &lt;a href="http://www.squirrel.com/sun-nvram-hostid.faq.html"&gt;squirrel.com Sun &lt;span class="caps"&gt;NVRAM&lt;/span&gt;
+&lt;span class="caps"&gt;FAQ&lt;/span&gt;&lt;/a&gt; doesn&amp;#8217;t seem to
+work on the 150 with OpenBoot 4.x. From what I can tell, all of that
+advice applies only to OpenBoot&amp;nbsp;3.x!&lt;/p&gt;
+&lt;p&gt;Some other helpful links included an ITworld.com article on &lt;a href="http://open.itworld.com/5040/nlsunixfirmware070111/page_1.html"&gt;Sun &lt;span class="caps"&gt;NVRAM&lt;/span&gt;
+passwords&lt;/a&gt;,
+&lt;a href="http://forum.java.sun.com/thread.jspa?threadID=5093819&amp;amp;messageID=9329080"&gt;this&lt;/a&gt;
+Sun Developer Forum post, and
+&lt;a href="http://forum.java.sun.com/thread.jspa?threadID=5093819&amp;amp;messageID=9329080"&gt;this&lt;/a&gt;
+post on password&amp;nbsp;recovery.&lt;/p&gt;
+&lt;h2 id="problem-3-mac-ethernet-address-is-000000000000"&gt;Problem 3 - &lt;span class="caps"&gt;MAC&lt;/span&gt; / Ethernet address is&amp;nbsp;00:00:00:00:00:00&lt;/h2&gt;
+&lt;p&gt;When booting Solaris, I found that I couldn&amp;#8217;t get &lt;span class="caps"&gt;DHCP&lt;/span&gt;. When I finally
+got the &lt;span class="caps"&gt;OS&lt;/span&gt; running and logged in as root, I realized something
+interesting - I couldn&amp;#8217;t access or ping anything past the one switch I
+was connected to. But everything on that switch was fine, pinging both
+from and to the Solaris box. I ping&amp;#8217;ed from my laptop, and then thought
+to run &amp;#8220;arp -a&amp;#8221;. It showed a &lt;span class="caps"&gt;MAC&lt;/span&gt; address of 00:00:00:00:00:00! Running
+&amp;#8220;ifconfig -a&amp;#8221; on the Solaris box confirmed this. Luckily, the first time
+I booted this box, I wrote down the ethernet address and hostID as shown
+on the banner. I ran a quick ifconfig to setup the correct &lt;span class="caps"&gt;MAC&lt;/span&gt;, like
+&amp;#8220;ifconfig eri0 ether xx:xx:xx:xx:xx:xx&amp;#8221;. Networking now worked
+perfectly, and I could get to everything on the &lt;span class="caps"&gt;LAN&lt;/span&gt; as well as browse
+the web. It would be good to somehow reset this in &lt;span class="caps"&gt;NVRAM&lt;/span&gt;, but for now
+I&amp;#8217;m just going to add it to the startup scripts somewhere. One forum
+post that I found suggested adding the previous ifconfig command to the
+top of /etc/rc.c/init.d/network, which I&amp;#8217;ve done and will see how it
+works at the next&amp;nbsp;boot.&lt;/p&gt;
+&lt;h2 id="problem-4-cant-login-to-smc-solaris-management-console"&gt;Problem 4 - Can&amp;#8217;t login to &lt;span class="caps"&gt;SMC&lt;/span&gt; (Solaris Management&amp;nbsp;Console)&lt;/h2&gt;
+&lt;p&gt;My next task after getting the system up and running, and getting
+networking working, as to give myself a user account. I was logged in
+using the Java Desktop System, so I opened a terminal and ran &amp;#8220;smc &amp;amp;&amp;#8221;.
+After the usual initialization wait, I loaded the toolboxes for the
+local machine, and connected. When I clicked on the &amp;#8220;users&amp;#8221; module and
+entered my root password, I got an invalid password / login failed
+message. I tried again and again, even checking against the post-it that
+I wrote the password on until I memorize it. Nothing. Searching the
+forums, I came by this
+&lt;a href="http://forum.java.sun.com/thread.jspa?threadID=5104081&amp;amp;messageID=9354742"&gt;post&lt;/a&gt;,
+but the value in /etc/security/policy.conf was correctly set to &amp;#8221;
+CRYPT_DEFAULT=__unix__&amp;#8221;. So, on a wild hunch, I used &amp;#8220;passwd&amp;#8221; to
+reset my password to a shorter one, which I use on a few other
+(unimportant) workstations.&amp;nbsp;Magic!&lt;/p&gt;
+&lt;p&gt;I now have, after two days of work, a working Solaris box. Now that I
+have a good &lt;span class="caps"&gt;OS&lt;/span&gt; install, in order to get the other box working, I
+*should* just be able to swap HDDs, boot, login as root, and use the
+&amp;#8220;eeprom&amp;#8221; command to set &amp;#8220;security-mode&amp;#8221; to &amp;#8220;none&amp;#8221;, bypassing all of this&amp;nbsp;bull****.&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Fri, 14 Dec 2007 02:44:00 -0500</pubDate><guid>tag:newblog.jasonantman.com,2007-12-14:2007/12/sun-blade-150-working/</guid><category>nvram</category><category>openboot</category><category>password</category><category>smc</category><category>solaris</category><category>sun</category><category>sunblade</category></item></channel></rss>

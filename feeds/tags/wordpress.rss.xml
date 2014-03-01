@@ -1,0 +1,702 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Jason Antman's Blog</title><link>http://newblog.jasonantman.com/</link><description></description><atom:link href="http://newblog.jasonantman.com/feeds/tags/wordpress.rss.xml" rel="self"></atom:link><lastBuildDate>Wed, 01 Jan 2014 15:15:00 -0500</lastBuildDate><item><title>Planning Migration from WordPress to Static Site</title><link>http://newblog.jasonantman.com/2014/01/planning-migration-from-wordpress-to-static-site/</link><description>&lt;p&gt;Right now, this blog, my email, and a whole bunch of other services are
+hosted on a &lt;a href="http://linode.com"&gt;Linode&lt;/a&gt; Xen &lt;span class="caps"&gt;VM&lt;/span&gt;. I don&amp;#8217;t really keep up
+to date with administration and upgrades the way I used to, and
+honestly, I&amp;#8217;d rather spend my time working on other things (like
+actually writing all of the blog posts that I&amp;#8217;ve been planning to. The
+first thing I&amp;#8217;ve identified for migration is this blog itself. It&amp;#8217;s
+currently on WordPress and, frankly, I don&amp;#8217;t either need nor like it.
+But there are some features I like. I&amp;#8217;d like to end up with a static
+site generator, hosted from either S3 or GitHub Pages. I know that means
+I&amp;#8217;ll lost comments (unless I move to a third-party, &lt;span class="caps"&gt;JS&lt;/span&gt;-based comment
+system like &lt;a href="http://disqus.com/"&gt;Disqus&lt;/a&gt;, which means I&amp;#8217;ll lose
+&lt;em&gt;control&lt;/em&gt; over my comments) but I suppose I can live with that. What I
+really want is something simple, static, cheap or free (that I&amp;#8217;ll likely
+put behind a small ec2 instance running nginx for&amp;nbsp;redirects/rewrites).&lt;/p&gt;
+&lt;p&gt;I&amp;#8217;m still in the planning phase, and trying to come up with a
+feature-by-feature comparison of my options. I&amp;#8217;ll likely post that when
+I finally have it done (at the moment it&amp;#8217;s in a very rough &lt;a href="https://docs.google.com/spreadsheet/ccc?key=0AnHh-ye5DNiNdF9DWkJrT2kzSkNsNVp6cjMzLXJ6VEE&amp;amp;usp=sharing"&gt;Google Docs
+spreadsheet&lt;/a&gt;).
+I&amp;#8217;m trying to round up my static site generator options and see which
+ones will do most, if not all, of what I want (though I still haven&amp;#8217;t
+discounted using hosted wordpress if it comes down to it). Here are the
+features I currently &amp;#8220;use&amp;#8221; (have) on my WordPress&amp;nbsp;blog:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;User-defined permalinks to&amp;nbsp;posts&lt;/li&gt;
+&lt;li&gt;Overall &lt;span class="caps"&gt;RSS&lt;/span&gt; feed of blog (currently powered by FeedBurner) and of&amp;nbsp;comments)&lt;/li&gt;
+&lt;li&gt;Categories (a post can be in multiple&amp;nbsp;categories)&lt;/li&gt;
+&lt;li&gt;Tags&lt;/li&gt;
+&lt;li&gt;Category and Tag&amp;nbsp;pages&lt;/li&gt;
+&lt;li&gt;per-Category and per-Tag feeds&amp;nbsp;(&lt;span class="caps"&gt;RSS&lt;/span&gt;)&lt;/li&gt;
+&lt;li&gt;Tag cloud &amp;#8220;widget&amp;#8221; in&amp;nbsp;sidebar&lt;/li&gt;
+&lt;li&gt;Themes. I actually like my current &lt;span class="caps"&gt;WP&lt;/span&gt;&amp;nbsp;theme&amp;#8230;&lt;/li&gt;
+&lt;li&gt;Visitor statistics (currently self-hosted
+    &lt;a href="http://piwik.org/"&gt;Piwik&lt;/a&gt;, formerly Google&amp;nbsp;Analytics)&lt;/li&gt;
+&lt;li&gt;Post publishing via cron&amp;#8217;ed script (&lt;em&gt;see below&lt;/em&gt;)&lt;/li&gt;
+&lt;li&gt;Draft/Pending status (i.e. let me save a partial post, and let me
+    save a complete post but mark it &amp;#8220;pending&amp;#8221; so I can just publish it&amp;nbsp;later)&lt;/li&gt;
+&lt;li&gt;Commenting (this will probably be the big sticking&amp;nbsp;point)&lt;/li&gt;
+&lt;li&gt;Syntax&amp;nbsp;hilighting&lt;/li&gt;
+&lt;li&gt;As &amp;#8220;weird&amp;#8221; as this is, I write all my posts in raw &lt;span class="caps"&gt;HTML&lt;/span&gt;, and am
+    perfectly happy doing&amp;nbsp;that.&lt;/li&gt;
+&lt;li&gt;&lt;span class="dquo"&gt;&amp;#8220;&lt;/span&gt;Subscribe via Email&amp;#8221; FeedBurner&amp;nbsp;widget&lt;/li&gt;
+&lt;li&gt;&lt;span class="caps"&gt;XML&lt;/span&gt;&amp;nbsp;Sitemap&lt;/li&gt;
+&lt;li&gt;Twitter&amp;nbsp;box/widget&lt;/li&gt;
+&lt;li&gt;Pingbacks (not that these are really useful for anything other than
+    spam these&amp;nbsp;days)&lt;/li&gt;
+&lt;li&gt;Automatic or manual post excerpts for feeds,&amp;nbsp;etc.&lt;/li&gt;
+&lt;li&gt;Remote publishing via &lt;span class="caps"&gt;XML&lt;/span&gt;-&lt;span class="caps"&gt;RPC&lt;/span&gt;/Android app (not that I&amp;#8217;ve used it
+    more than once or&amp;nbsp;twice)&lt;/li&gt;
+&lt;li&gt;Advertising - I currently use Google AdSense on my blog. The revenue
+    from my tiny hit count isn&amp;#8217;t enough to offset the cost of a Linode,
+    but if I moved to a much less expensive hosting service, it might be
+    worth considering (you can&amp;#8217;t run ads on the free hosted WordPress,
+    and I doubt you can on GitHub Pages&amp;nbsp;either).&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;I should be updating this post when I do some more research and have a
+comparison of the&amp;nbsp;options.&lt;/p&gt;
+&lt;p&gt;Note on &amp;#8220;Post publishing via cron&amp;#8217;ed script&amp;#8221; - sometimes I sit down and
+write half a dozen or so blog posts at a time. But I don&amp;#8217;t want them all
+to show up immediately, and spam the few people who still use &lt;span class="caps"&gt;RSS&lt;/span&gt;
+readers after the death of Google Reader. So I set the posts to
+&amp;#8220;Pending&amp;#8221; status, and I have a cron&amp;#8217;ed script that runs every weekday
+morning and publishes the one oldest &amp;#8220;pending&amp;#8221; post. Who knows if this
+actually does any good or&amp;nbsp;not&amp;#8230;&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Wed, 01 Jan 2014 15:15:00 -0500</pubDate><guid>tag:newblog.jasonantman.com,2014-01-01:2014/01/planning-migration-from-wordpress-to-static-site/</guid><category>blog</category><category>jekyll</category><category>pelican</category><category>python</category><category>static site</category><category>wordpress</category></item><item><title>Wordpress - Automatically publish a pending post each weekday morning from a PHP script</title><link>http://newblog.jasonantman.com/2012/09/wordpress-automatically-publish-a-pending-post-each-weekday-morning-from-a-php-script/</link><description>&lt;p&gt;In an earlier post, &lt;a href="/2012/08/piwik-web-analytics-and-some-unfortunate-stats-about-my-blog/"&gt;Piwik Web Analytics, and some unfortunate stats
+about my
+blog&lt;/a&gt;,
+I mentioned that the &lt;a href="http://feedburner.google.com/"&gt;Feedburner&lt;/a&gt; stats
+for this blog show a relatively high subscribe/unsubscribe rate for this
+blog. I think a large part of that is my tendency to blog in spurts, and
+even worse, my tendency to write drafts and not publish them. In an
+effort to combat this, I&amp;#8217;ve been trying to finish blog posts and then
+set them to &amp;#8220;Pending&amp;#8221; status, and go back and publish one every day
+(well, every day that I have some still sitting unpublished). Of course,
+that counts on me logging in to Wordpress every day, which isn&amp;#8217;t
+something I do. The following script is, at least for now, the answer
+for&amp;nbsp;me.&lt;/p&gt;
+&lt;p&gt;This script (a standalone &lt;span class="caps"&gt;PHP&lt;/span&gt; script) uses
+&lt;a href="http://core.trac.wordpress.org/browser/trunk/wp-load.php"&gt;&lt;code&gt;wp-load.php&lt;/code&gt;&lt;/a&gt;
+to load the wordpress environment, and then finds the oldest post with a
+given status (&amp;#8220;pending&amp;#8221; in my case) and attempts to publish it. It only
+does this if there has not been another post published in the last 24
+hours. The following script can be found in Git at
+&lt;a href="https://github.com/jantman/misc-scripts/blob/master/wordpress_daily_post.php"&gt;https://github.com/jantman/misc-scripts/blob/master/wordpress_daily_post.php&lt;/a&gt;&lt;/p&gt;
+&lt;!---
+sourceinclude
+---&gt;
+
+&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="x"&gt;#!/usr/bin/php&lt;/span&gt;
+&lt;span class="cp"&gt;&amp;lt;?php&lt;/span&gt;
+&lt;span class="sd"&gt;/**&lt;/span&gt;
+&lt;span class="sd"&gt; * wordpress_daily_post.php&lt;/span&gt;
+&lt;span class="sd"&gt; * Script to publish the oldest post with a given status, if no&lt;/span&gt;
+&lt;span class="sd"&gt; * other post has been published in 24 hours. Intended to be run&lt;/span&gt;
+&lt;span class="sd"&gt; * via cron on weekdays.&lt;/span&gt;
+&lt;span class="sd"&gt; *&lt;/span&gt;
+&lt;span class="sd"&gt; * Copyright 2012 Jason Antman &lt;/span&gt;
+&lt;span class="sd"&gt; *&lt;/span&gt;
+&lt;span class="sd"&gt; * Licensed under the Apache License, Version 2.0 &lt;/span&gt;
+&lt;span class="sd"&gt; *&lt;/span&gt;
+&lt;span class="sd"&gt; * use it anywhere you want, however you want, provided that this header is left intact,&lt;/span&gt;
+&lt;span class="sd"&gt; * and that if redistributed, credit is given to me.&lt;/span&gt;
+&lt;span class="sd"&gt; *&lt;/span&gt;
+&lt;span class="sd"&gt; * It is strongly requested, but not technically required, that any changes/improvements&lt;/span&gt;
+&lt;span class="sd"&gt; * be emailed to the above address.&lt;/span&gt;
+&lt;span class="sd"&gt; *&lt;/span&gt;
+&lt;span class="sd"&gt; * The latest version of this script will always be available at:&lt;/span&gt;
+&lt;span class="sd"&gt; * $HeadURL: http://svn.jasonantman.com/misc-scripts/wordpress_daily_post.php $&lt;/span&gt;
+&lt;span class="sd"&gt; * $LastChangedRevision: 40 $&lt;/span&gt;
+&lt;span class="sd"&gt; *&lt;/span&gt;
+&lt;span class="sd"&gt; * Changelog:&lt;/span&gt;
+&lt;span class="sd"&gt; * 2012-09-03 Jason Antman  - 1.0&lt;/span&gt;
+&lt;span class="sd"&gt; *  - first version&lt;/span&gt;
+&lt;span class="sd"&gt; */&lt;/span&gt;
+
+&lt;span class="c1"&gt;# &lt;span class="caps"&gt;BEGIN&lt;/span&gt; &lt;span class="caps"&gt;CONFIGURATION&lt;/span&gt;&lt;/span&gt;
+&lt;span class="nb"&gt;define&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;WP_LOAD_LOC&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;/var/www/vhosts/blog.jasonantman.com/wp-load.php&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt; &lt;span class="c1"&gt;// Configure this to the full path of your Wordpress wp-load.php&lt;/span&gt;
+&lt;span class="nb"&gt;define&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;SOURCE_POST_STATUS&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;pending&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt; &lt;span class="c1"&gt;// post status to publish&lt;/span&gt;
+&lt;span class="c1"&gt;# &lt;span class="caps"&gt;END&lt;/span&gt; &lt;span class="caps"&gt;CONFIGURATION&lt;/span&gt;&lt;/span&gt;
+
+&lt;span class="nv"&gt;$&lt;span class="caps"&gt;VERBOSE&lt;/span&gt;&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="k"&gt;false&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="nv"&gt;$DRY_RUN&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="k"&gt;false&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="nb"&gt;array_shift&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;$argv&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;span class="k"&gt;while&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;count&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;$argv&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;&amp;gt;&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+  &lt;span class="k"&gt;if&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;isset&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;$argv&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;])&lt;/span&gt; &lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class="nv"&gt;$argv&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;-d&amp;quot;&lt;/span&gt; &lt;span class="o"&gt;||&lt;/span&gt; &lt;span class="nv"&gt;$argv&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;--dry-run&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;){&lt;/span&gt;
+    &lt;span class="nv"&gt;$DRY_RUN&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="k"&gt;true&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+    &lt;span class="nb"&gt;fwrite&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;&lt;span class="caps"&gt;STDERR&lt;/span&gt;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;&lt;span class="caps"&gt;DRY&lt;/span&gt; &lt;span class="caps"&gt;RUN&lt;/span&gt; &lt;span class="caps"&gt;ONLY&lt;/span&gt; - &lt;span class="caps"&gt;NOT&lt;/span&gt; &lt;span class="caps"&gt;ACTUALLY&lt;/span&gt; &lt;span class="caps"&gt;PUBLISHING&lt;/span&gt;.&lt;/span&gt;&lt;span class="se"&gt;\n&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+  &lt;span class="p"&gt;}&lt;/span&gt;
+  &lt;span class="k"&gt;if&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;isset&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;$argv&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;])&lt;/span&gt; &lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class="nv"&gt;$argv&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;-v&amp;quot;&lt;/span&gt; &lt;span class="o"&gt;||&lt;/span&gt; &lt;span class="nv"&gt;$argv&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;--verbose&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;){&lt;/span&gt;
+    &lt;span class="nv"&gt;$&lt;span class="caps"&gt;VERBOSE&lt;/span&gt;&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="k"&gt;true&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+    &lt;span class="nb"&gt;fwrite&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;&lt;span class="caps"&gt;STDERR&lt;/span&gt;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;WP_LOAD_LOC=&amp;quot;&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;WP_LOAD_LOC&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="se"&gt;\n&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+    &lt;span class="nb"&gt;fwrite&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;&lt;span class="caps"&gt;STDERR&lt;/span&gt;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;SOURCE_POST_STATUS=&amp;quot;&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;SOURCE_POST_STATUS&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="se"&gt;\n&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+  &lt;span class="p"&gt;}&lt;/span&gt;
+  &lt;span class="nb"&gt;array_shift&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;$argv&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+
+&lt;span class="nv"&gt;$_SERVER&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;HTTP_HOST&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;localhost&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="c1"&gt;// needed for wp-includes/ms-settings.php:100&lt;/span&gt;
+&lt;span class="k"&gt;require_once&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;WP_LOAD_LOC&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+
+&lt;span class="c1"&gt;# check that we&amp;#39;re running on a weekday&lt;/span&gt;
+&lt;span class="k"&gt;if&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;date&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;N&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;&amp;gt;=&lt;/span&gt; &lt;span class="mi"&gt;6&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+&lt;span class="c1"&gt;#  if($&lt;span class="caps"&gt;VERBOSE&lt;/span&gt;){ fwrite(&lt;span class="caps"&gt;STDERR&lt;/span&gt;, &amp;quot;today is a saturday or sunday, dieing.\n&amp;quot;); }&lt;/span&gt;
+&lt;span class="c1"&gt;#  exit(1);&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+
+&lt;span class="c1"&gt;# find the publish date/time of the last published post&lt;/span&gt;
+&lt;span class="nv"&gt;$published&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nx"&gt;get_posts&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="k"&gt;array&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;numberposts&amp;#39;&lt;/span&gt; &lt;span class="o"&gt;=&amp;gt;&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;orderby&amp;#39;&lt;/span&gt; &lt;span class="o"&gt;=&amp;gt;&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;post_date&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;order&amp;#39;&lt;/span&gt; &lt;span class="o"&gt;=&amp;gt;&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;&lt;span class="caps"&gt;DESC&lt;/span&gt;&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;post_status&amp;#39;&lt;/span&gt; &lt;span class="o"&gt;=&amp;gt;&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;publish&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;));&lt;/span&gt;
+&lt;span class="nv"&gt;$post&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nv"&gt;$published&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;];&lt;/span&gt;
+&lt;span class="nv"&gt;$pub_date&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nv"&gt;$post&lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="na"&gt;post_date&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="nv"&gt;$pub_id&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nv"&gt;$post&lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="na"&gt;&lt;span class="caps"&gt;ID&lt;/span&gt;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+
+&lt;span class="k"&gt;if&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;strtotime&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;$pub_date&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;&amp;gt;=&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;time&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt; &lt;span class="mi"&gt;86400&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+  &lt;span class="k"&gt;if&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;$&lt;span class="caps"&gt;VERBOSE&lt;/span&gt;&lt;/span&gt;&lt;span class="p"&gt;){&lt;/span&gt; &lt;span class="nb"&gt;fwrite&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;&lt;span class="caps"&gt;STDERR&lt;/span&gt;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;last post (&lt;span class="caps"&gt;ID&lt;/span&gt; &lt;/span&gt;&lt;span class="si"&gt;$pub_id&lt;/span&gt;&lt;span class="s2"&gt;) within last day (&lt;/span&gt;&lt;span class="si"&gt;$pub_date&lt;/span&gt;&lt;span class="s2"&gt;). Nothing to do. Exiting.&lt;/span&gt;&lt;span class="se"&gt;\n&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt; &lt;span class="p"&gt;}&lt;/span&gt;
+  &lt;span class="k"&gt;exit&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt; &lt;span class="k"&gt;else&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+  &lt;span class="k"&gt;if&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;$&lt;span class="caps"&gt;VERBOSE&lt;/span&gt;&lt;/span&gt;&lt;span class="p"&gt;){&lt;/span&gt; &lt;span class="nb"&gt;fwrite&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;&lt;span class="caps"&gt;STDERR&lt;/span&gt;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;Found last post (&lt;span class="caps"&gt;ID&lt;/span&gt; &lt;/span&gt;&lt;span class="si"&gt;$pub_id&lt;/span&gt;&lt;span class="s2"&gt;) with post date &lt;/span&gt;&lt;span class="si"&gt;$pub_date&lt;/span&gt;&lt;span class="s2"&gt;.&lt;/span&gt;&lt;span class="se"&gt;\n&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt; &lt;span class="p"&gt;}&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+
+
+&lt;span class="c1"&gt;# find the earliest post of status SOURCE_POST_STATUS, if there is one.&lt;/span&gt;
+&lt;span class="nv"&gt;$to_post&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nx"&gt;get_posts&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="k"&gt;array&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;numberposts&amp;#39;&lt;/span&gt; &lt;span class="o"&gt;=&amp;gt;&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;orderby&amp;#39;&lt;/span&gt; &lt;span class="o"&gt;=&amp;gt;&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;post_date&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;order&amp;#39;&lt;/span&gt; &lt;span class="o"&gt;=&amp;gt;&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;&lt;span class="caps"&gt;ASC&lt;/span&gt;&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;post_status&amp;#39;&lt;/span&gt; &lt;span class="o"&gt;=&amp;gt;&lt;/span&gt; &lt;span class="nx"&gt;SOURCE_POST_STATUS&lt;/span&gt;&lt;span class="p"&gt;));&lt;/span&gt;
+&lt;span class="k"&gt;if&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;count&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;$to_post&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="nx"&gt;&lt;span class="caps"&gt;ID&lt;/span&gt;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="nv"&gt;$to_pub_date&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nv"&gt;$post&lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="na"&gt;post_date&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="nv"&gt;$to_pub_title&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nv"&gt;$post&lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="na"&gt;post_title&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="nv"&gt;$now&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nb"&gt;time&lt;/span&gt;&lt;span class="p"&gt;();&lt;/span&gt;
+&lt;span class="nv"&gt;$new_date&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nb"&gt;date&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;Y-m-d H:i:s&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nv"&gt;$now&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;span class="nv"&gt;$new_date_gmt&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nb"&gt;gmdate&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;Y-m-d H:i:s&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nv"&gt;$now&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+
+&lt;span class="k"&gt;if&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;$&lt;span class="caps"&gt;VERBOSE&lt;/span&gt;&lt;/span&gt;&lt;span class="p"&gt;){&lt;/span&gt; &lt;span class="nb"&gt;fwrite&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;&lt;span class="caps"&gt;STDERR&lt;/span&gt;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;Post to publish: &lt;span class="caps"&gt;ID&lt;/span&gt;=&lt;/span&gt;&lt;span class="si"&gt;$to_pub_id&lt;/span&gt;&lt;span class="s2"&gt; &lt;span class="caps"&gt;DATE&lt;/span&gt;=&lt;/span&gt;&lt;span class="si"&gt;$to_pub_date&lt;/span&gt;&lt;span class="s2"&gt; NEW_DATE=&lt;/span&gt;&lt;span class="si"&gt;$new_date&lt;/span&gt;&lt;span class="s2"&gt; &lt;span class="caps"&gt;TITLE&lt;/span&gt;=&lt;/span&gt;&lt;span class="si"&gt;$to_pub_title&lt;/span&gt;&lt;span class="se"&gt;\n&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt; &lt;span class="p"&gt;}&lt;/span&gt;
+
+&lt;span class="c1"&gt;# actually publish it&lt;/span&gt;
+&lt;span class="k"&gt;if&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="o"&gt;!&lt;/span&gt; &lt;span class="nv"&gt;$DRY_RUN&lt;/span&gt;&lt;span class="p"&gt;){&lt;/span&gt;
+  &lt;span class="nv"&gt;$arr&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="k"&gt;array&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;&lt;span class="caps"&gt;ID&lt;/span&gt;&amp;#39;&lt;/span&gt; &lt;span class="o"&gt;=&amp;gt;&lt;/span&gt; &lt;span class="nv"&gt;$to_pub_id&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;post_status&amp;#39;&lt;/span&gt; &lt;span class="o"&gt;=&amp;gt;&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;publish&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;post_date&amp;#39;&lt;/span&gt; &lt;span class="o"&gt;=&amp;gt;&lt;/span&gt; &lt;span class="nv"&gt;$new_date&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;post_date_gmt&amp;#39;&lt;/span&gt; &lt;span class="o"&gt;=&amp;gt;&lt;/span&gt; &lt;span class="nv"&gt;$new_date_gmt&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+  &lt;span class="nv"&gt;$ret&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nx"&gt;wp_update_post&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;$arr&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt; &lt;span class="c1"&gt;// publish the post&lt;/span&gt;
+  &lt;span class="k"&gt;if&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;$ret&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="nb"&gt;fwrite&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;&lt;span class="caps"&gt;STDERR&lt;/span&gt;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;&lt;span class="caps"&gt;ERROR&lt;/span&gt;: Post &lt;/span&gt;&lt;span class="si"&gt;$to_pub_id&lt;/span&gt;&lt;span class="s2"&gt; was not successfully published.&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+    &lt;span class="k"&gt;exit&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+  &lt;span class="p"&gt;}&lt;/span&gt;
+  &lt;span class="k"&gt;if&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;$&lt;span class="caps"&gt;VERBOSE&lt;/span&gt;&lt;/span&gt;&lt;span class="p"&gt;){&lt;/span&gt; &lt;span class="nb"&gt;fwrite&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;&lt;span class="caps"&gt;STDERR&lt;/span&gt;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;Published post. New &lt;span class="caps"&gt;ID&lt;/span&gt;: &lt;/span&gt;&lt;span class="si"&gt;$ret&lt;/span&gt;&lt;span class="se"&gt;\n&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt; &lt;span class="p"&gt;}&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;span class="k"&gt;else&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+  &lt;span class="nb"&gt;fwrite&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;&lt;span class="caps"&gt;STDERR&lt;/span&gt;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;Dry run only, not publishing post.&lt;/span&gt;&lt;span class="se"&gt;\n&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+
+&lt;span class="c1"&gt;# check that the post really was published&lt;/span&gt;
+&lt;span class="nv"&gt;$published&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nx"&gt;get_posts&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="k"&gt;array&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;numberposts&amp;#39;&lt;/span&gt; &lt;span class="o"&gt;=&amp;gt;&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;orderby&amp;#39;&lt;/span&gt; &lt;span class="o"&gt;=&amp;gt;&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;post_date&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;order&amp;#39;&lt;/span&gt; &lt;span class="o"&gt;=&amp;gt;&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;&lt;span class="caps"&gt;DESC&lt;/span&gt;&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;post_status&amp;#39;&lt;/span&gt; &lt;span class="o"&gt;=&amp;gt;&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;publish&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;));&lt;/span&gt;
+&lt;span class="nv"&gt;$post&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nv"&gt;$published&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;];&lt;/span&gt;
+&lt;span class="nv"&gt;$pub_date&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nv"&gt;$post&lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="na"&gt;post_date&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="nv"&gt;$pub_id&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nv"&gt;$post&lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="na"&gt;&lt;span class="caps"&gt;ID&lt;/span&gt;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="nv"&gt;$pub_title&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nv"&gt;$post&lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="na"&gt;post_title&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="nv"&gt;$pub_guid&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nv"&gt;$post&lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="na"&gt;guid&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+
+&lt;span class="k"&gt;if&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;$pub_title&lt;/span&gt; &lt;span class="o"&gt;!=&lt;/span&gt; &lt;span class="nv"&gt;$to_pub_title&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+  &lt;span class="nb"&gt;fwrite&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;&lt;span class="caps"&gt;STDERR&lt;/span&gt;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;&lt;span class="caps"&gt;ERROR&lt;/span&gt;: title of most recent post does not match title of what we wanted to post.&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+  &lt;span class="k"&gt;exit&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+
+&lt;span class="nb"&gt;fwrite&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;&lt;span class="caps"&gt;STDOUT&lt;/span&gt;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;Published post &lt;/span&gt;&lt;span class="si"&gt;$pub_id&lt;/span&gt;&lt;span class="s2"&gt; at &lt;/span&gt;&lt;span class="si"&gt;$pub_date&lt;/span&gt;&lt;span class="se"&gt;\n&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;span class="nb"&gt;fwrite&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;&lt;span class="caps"&gt;STDOUT&lt;/span&gt;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;Title: &lt;/span&gt;&lt;span class="si"&gt;$pub_title&lt;/span&gt;&lt;span class="se"&gt;\n&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;span class="nb"&gt;fwrite&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;&lt;span class="caps"&gt;STDOUT&lt;/span&gt;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="se"&gt;\n\n\n&lt;/span&gt;&lt;span class="s2"&gt; &lt;span class="caps"&gt;GUID&lt;/span&gt;/Link: &lt;/span&gt;&lt;span class="si"&gt;$pub_guid&lt;/span&gt;&lt;span class="se"&gt;\n&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;span class="nb"&gt;fwrite&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;&lt;span class="caps"&gt;STDOUT&lt;/span&gt;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="se"&gt;\n\n&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="k"&gt;__FILE__&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot; on &amp;quot;&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;trim&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;shell_exec&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;hostname --fqdn&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot; running as &amp;quot;&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="nb"&gt;get_current_user&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="se"&gt;\n&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+
+&lt;span class="cp"&gt;?&amp;gt;&lt;/span&gt;&lt;span class="x"&gt;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;You&amp;#8217;ll need to set &lt;code&gt;WP_LOAD_LOC&lt;/code&gt; (line 29) to the full path of your
+Wordpress installation&amp;#8217;s &lt;code&gt;wp-load.php&lt;/code&gt; (it should be in the top-level
+directory of your Wordpress installation. I run this script from cron&amp;nbsp;like:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;0 6 * * 1-5 /home/jantman/bin/wordpress_daily_post.php --verbose # publish WP pending posts daily
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;so that it runs at &lt;span class="caps"&gt;6AM&lt;/span&gt; (local time) each weekday. Assuming you have cron
+setup to send you mail, you&amp;#8217;ll get a daily message saying what was (or
+wasn&amp;#8217;t)&amp;nbsp;done.&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Tue, 04 Sep 2012 05:00:00 -0400</pubDate><guid>tag:newblog.jasonantman.com,2012-09-04:2012/09/wordpress-automatically-publish-a-pending-post-each-weekday-morning-from-a-php-script/</guid><category>cron</category><category>PHP</category><category>wordpress</category></item><item><title>New Blog Theme</title><link>http://newblog.jasonantman.com/2012/03/new-blog-theme/</link><description>&lt;p&gt;In a follow-up to my &lt;a href="/2012/03/some-thoughts-on-choosing-a-new-wordpress-theme/"&gt;Some Thoughts on Choosing a New Wordpress
+Theme&lt;/a&gt; post
+from a few days ago, I decided on the
+&lt;a href="http://wordpress.org/extend/themes/admired"&gt;Admired&lt;/a&gt;
+&lt;a href="http://wp-ultra.com/themes/admired/"&gt;theme&lt;/a&gt; by &lt;a href="https://plus.google.com/103391260195864203534/posts"&gt;Brad
+Thomas&lt;/a&gt;. It&amp;#8217;s
+amazingly full-featured and has a good set of options. I had to manually
+change a few things in the &lt;span class="caps"&gt;CSS&lt;/span&gt; (I wanted to tweak the top bar colors a
+bit in a way that&amp;#8217;s not supported in the options), but overall it was a
+very simple transition. While it&amp;#8217;s unfortunately very far from valid
+&lt;a href="http://validator.w3.org/check?verbose=1&amp;amp;uri=http://blog.jasonantman.com/"&gt;&lt;span class="caps"&gt;HTML&lt;/span&gt;&lt;/a&gt;
+or
+&lt;a href="http://jigsaw.w3.org/css-validator/validator?profile=css3&amp;amp;warning=0&amp;amp;uri=http://blog.jasonantman.com/"&gt;&lt;span class="caps"&gt;CSS&lt;/span&gt;&lt;/a&gt;,
+it seems quite&amp;nbsp;nice.&lt;/p&gt;
+&lt;p&gt;If you happen to read this post and see anything wrong with the theme,
+or it doesn&amp;#8217;t display properly for you, please leave a comment below
+(with browser version and &lt;span class="caps"&gt;OS&lt;/span&gt;, if you&amp;nbsp;please).&lt;/p&gt;
+&lt;p&gt;My next project, continuing on from my &lt;a href="/2012/03/inaccuracies-in-google-analytics-for-website-stats/"&gt;Inaccuracies in Google Analytics
+for Website
+Stats&lt;/a&gt;
+post, is to compare the two self-hosted JavaScript-based open source
+Google Analytics alternatives I&amp;#8217;ve identified
+(&lt;a href="http://piwik.org/"&gt;Piwik&lt;/a&gt; and &lt;a href="http://www.openwebanalytics.com/"&gt;Open Web
+Analytics&lt;/a&gt;) and try one out on my site
+(keeping in mind that my server is pretty heavily loaded, and I don&amp;#8217;t
+want to push it over the edge). Once I come to some sort of conclusion
+on that, I&amp;#8217;ll get back to some useful&amp;nbsp;posts.&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Tue, 20 Mar 2012 19:25:00 -0400</pubDate><guid>tag:newblog.jasonantman.com,2012-03-20:2012/03/new-blog-theme/</guid><category>blog</category><category>theme</category><category>wordpress</category></item><item><title>Some Thoughts on Choosing a New Wordpress Theme</title><link>http://newblog.jasonantman.com/2012/03/some-thoughts-on-choosing-a-new-wordpress-theme/</link><description>&lt;p&gt;I think I&amp;#8217;m going to choose a new theme for my blog. The current theme
+is &lt;a href="http://wordpress.org/extend/themes/inove"&gt;iNove&lt;/a&gt; (albeit an older
+version with some custom modifications), and I feel like it looks a bit
+messy and has gotten a bit cluttered, so it&amp;#8217;s time to find something
+new. I like the 2-column layout, and have a few other things I&amp;#8217;m looking
+for - specifically, aside from something with advanced features like
+lots of widget support and hooks, something that has good visual
+separation between different posts and widgets. I also really want
+something, if possible, with relative column widths. My current home and
+work desktops both have dual monitors, and the minimum resolution I have
+on one screen is 1920x1080. When I look at my blog in a maximized
+window, about half the screen width is wasted with empty space. So,
+ideally, I&amp;#8217;d like a theme that&amp;#8217;s based on relative widths, probably with
+a &amp;#8220;min-width&amp;#8221; property so it wouldn&amp;#8217;t get compressed to an absurdly
+narrow width on small&amp;nbsp;screens.&lt;/p&gt;
+&lt;p&gt;I use &lt;a href="http://www.google.com/analytics/"&gt;Google Analytics&lt;/a&gt; (as noted in
+the &lt;a href="/privacy-policy/"&gt;privacy policy&lt;/a&gt;) for visitor statistics on this
+blog (more about that in a moment). So, I took a peek at the breakdown
+of visitors by screen resolution, and saw that for the past year, 94% of
+the 27,500 visits had a screen width of 1024px or more (and the majority
+of the others looked like mobile device resolutions, so they&amp;#8217;d probably
+zoom the page correctly). So, my first gut reaction was to assume that I
+could use a theme approximately 1000px wide. Unfortunately, there&amp;#8217;s two
+main problems with that: first, as mentioned by &lt;a href="http://css-tricks.com/screen-resolution-notequalto-browser-window/"&gt;Chris Coyier on
+&lt;span class="caps"&gt;CSS&lt;/span&gt;-Tricks.com&lt;/a&gt;,
+just because someone has a given screen resolution doesn&amp;#8217;t mean their
+browser window (let alone the viewport) is that size. As a matter of
+fact, I usually have my main browser window set at about 80% of the
+width of one of my monitors, with my instant messaging client
+&lt;a href="http://pidgin.im/"&gt;Pidgin&lt;/a&gt; taking up the rest of the space. So there&amp;#8217;s
+one inaccuracy. There&amp;#8217;s a potentially much greater inaccuracy in my
+stats as well, which I&amp;#8217;m going to discuss in a &lt;a href="/2012/03/inaccuracies-in-google-analytics-for-website-stats/"&gt;separate
+post&lt;/a&gt;.&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Sat, 17 Mar 2012 11:48:00 -0400</pubDate><guid>tag:newblog.jasonantman.com,2012-03-17:2012/03/some-thoughts-on-choosing-a-new-wordpress-theme/</guid><category>analysis</category><category>analytics</category><category>blog</category><category>google</category><category>logging</category><category>stats</category><category>theme</category><category>wordpress</category></item><item><title>Nagios / Icinga Configuration Highlighting with GeSHi</title><link>http://newblog.jasonantman.com/2012/02/nagios-icinga-configuration-highlighting-with-geshi/</link><description>&lt;p&gt;As you may know from former posts, this blog
+(&lt;a href="http://wordpress.org"&gt;WordPress&lt;/a&gt;-powered) and a few
+&lt;a href="http://www.mediawiki.org"&gt;MediaWiki&lt;/a&gt; sites that I have use the
+excellent &lt;span class="caps"&gt;PHP&lt;/span&gt;-based &lt;a href="http://qbnz.com/highlighter/"&gt;GeSHi&lt;/a&gt; syntax
+highlighter. Today I was writing &lt;a href="/2012/02/sending-aim-messages-from-a-perl-script/"&gt;a
+post&lt;/a&gt; that includes
+some Icinga (Nagios) configuration snippets. After a quick search, I
+found a &lt;a href="https://github.com/adepertat/geshi-nagios"&gt;Nagios language file for
+GeSHi&lt;/a&gt; on GitHub. Thanks very
+much to &lt;a href="https://github.com/adepertat"&gt;Albéric de Pertat (adepertat)&lt;/a&gt;
+for writing this and providing it to the&amp;nbsp;public.&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Tue, 28 Feb 2012 18:42:00 -0500</pubDate><guid>tag:newblog.jasonantman.com,2012-02-28:2012/02/nagios-icinga-configuration-highlighting-with-geshi/</guid><category>GeSHi</category><category>icinga</category><category>mediawiki</category><category>Nagios</category><category>PHP</category><category>wordpress</category></item><item><title>WP-Syntax Plugin GeSHi Path Fix</title><link>http://newblog.jasonantman.com/2012/01/wp-syntax-plugin-geshi-path-fix/</link><description>&lt;p&gt;The &lt;a href="http://wordpress.org/extend/plugins/wp-syntax/"&gt;Wp-Syntax&lt;/a&gt; plugin
+for &lt;a href="http://wordpress.org"&gt;WordPress&lt;/a&gt; provides syntax highlighting for
+WordPress blogs via the &lt;a href="http://qbnz.com/highlighter"&gt;GeSHi&lt;/a&gt; &lt;span class="caps"&gt;PHP&lt;/span&gt; syntax
+highlighter. Unfortunately, the plugin includes a builtin version of
+GeSHi (currently 1.0.8.9) in &lt;code&gt;geshi/&lt;/code&gt;. As a result, not only are users
+of the plugin not instructed to use the latest version of GeSHi, but it
+won&amp;#8217;t use a host-wide GeSHi installation that&amp;#8217;s already in the &lt;span class="caps"&gt;PHP&lt;/span&gt;
+include path (i.e. &lt;code&gt;/usr/share/php/&lt;/code&gt;), like the the many &lt;a href="http://pkgs.org/search/?keyword=php-geshi&amp;amp;search_on=name&amp;amp;distro=0&amp;amp;arch=32-bit"&gt;php-geshi
+packages&lt;/a&gt;
+offered by repositories including
+&lt;a href="http://fedoraproject.org/wiki/EPEL"&gt;&lt;span class="caps"&gt;EPEL&lt;/span&gt;&lt;/a&gt; (for Fedora, CentOS and&amp;nbsp;&lt;span class="caps"&gt;RHEL&lt;/span&gt;).&lt;/p&gt;
+&lt;p&gt;The fix is quite simple. Just open &lt;code&gt;wp-syntax.php&lt;/code&gt; in the &lt;code&gt;wp-syntax/&lt;/code&gt;
+plugin directory in your favorite text editor and change the GeSHi
+include line (for &lt;span class="caps"&gt;WP&lt;/span&gt;-Syntax 0.9.12, this is line 53)&amp;nbsp;from:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="x"&gt;include_once(&amp;quot;geshi/geshi.php&amp;quot;);&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;to:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="x"&gt;include_once(&amp;quot;geshi.php&amp;quot;);&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;If you already have GeSHi installed in the &lt;span class="caps"&gt;PHP&lt;/span&gt; include path, just remove
+the &lt;code&gt;geshi&lt;/code&gt; directory in your &lt;code&gt;wp-syntax/&lt;/code&gt; plugin directory, flush the
+WordPress caches (if any), and load a page which uses GeSHi - it should
+now use the host-wide version. If you want to still use a local version
+for wp-syntax, you can move things around to where they &lt;em&gt;should&lt;/em&gt; be in
+the &lt;code&gt;wp-syntax/&lt;/code&gt; plugin&amp;nbsp;directory:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;mv geshi/geshi.php . &lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt; mv geshi/geshi/* geshi/ &lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt; rmdir geshi/geshi
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Note - if you&amp;#8217;re in a shared hosting environment, or are otherwise not
+able to upgrade the php-geshi package on your server yourself, you might
+not want to do&amp;nbsp;this.&lt;/p&gt;
+&lt;p&gt;I also &lt;a href="http://wordpress.org/support/topic/wp-syntax-move-geshi-include-path-to-allow-use-with-host-wide-geshi?replies=1#post-2556903"&gt;posted about this in the WordPress support
+forums&lt;/a&gt;.
+Hopefully the &lt;span class="caps"&gt;WP&lt;/span&gt;-Syntax devs will include this change in the next&amp;nbsp;version&amp;#8230;&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Thu, 12 Jan 2012 19:09:00 -0500</pubDate><guid>tag:newblog.jasonantman.com,2012-01-12:2012/01/wp-syntax-plugin-geshi-path-fix/</guid><category>GeSHi</category><category>PHP</category><category>syntax highlighting</category><category>wordpress</category></item><item><title>Puppet Syntax Highlighting with GeSHi</title><link>http://newblog.jasonantman.com/2012/01/puppet-syntax-highlighting-with-geshi/</link><description>&lt;p&gt;This blog is run on wordpress, and I also do quite a bit in &lt;span class="caps"&gt;PHP&lt;/span&gt;, so I&amp;#8217;m
+familiar with the &lt;a href="http://qbnz.com/highlighter/"&gt;GeSHi&lt;/a&gt; syntax
+highlighter. It&amp;#8217;s &lt;span class="caps"&gt;PHP&lt;/span&gt;-based, and can run both as a Wordpress plugin
+(&lt;a href="http://wordpress.org/extend/plugins/wp-syntax/"&gt;&lt;span class="caps"&gt;WP&lt;/span&gt;-Syntax&lt;/a&gt;) and as a
+&lt;span class="caps"&gt;PHP&lt;/span&gt; module. It also works quite well with the MediaWiki &lt;a href="http://www.mediawiki.org/wiki/Extension:SyntaxHighlight_GeSHi"&gt;SyntaxHighlight
+GeSHi&lt;/a&gt;&amp;nbsp;extension.&lt;/p&gt;
+&lt;p&gt;Today I was documenting some &lt;a href="http://www.puppet.org"&gt;Puppet&lt;/a&gt; code in a
+wiki, and realized that I didn&amp;#8217;t have syntax highlighting. Well, fellow
+Linux sysadmin and puppetmaster Jason Hancock was nice enough to post on
+his blog (&lt;a href="http://geek.jasonhancock.com/2011/10/14/puppet-syntax-highlighting-geshi/"&gt;Puppet Syntax Highlighting with
+GeSHi&lt;/a&gt;)
+that he&amp;#8217;s developed a GeSHi language file for Puppet, available from
+&lt;a href="https://github.com/jasonhancock/geshi-language-files"&gt;GitHub&lt;/a&gt;. Many&amp;nbsp;thanks!&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Wed, 11 Jan 2012 12:32:00 -0500</pubDate><guid>tag:newblog.jasonantman.com,2012-01-11:2012/01/puppet-syntax-highlighting-with-geshi/</guid><category>GeSHi</category><category>mediawiki</category><category>PHP</category><category>puppet</category><category>wordpress</category></item><item><title>New web server, WP optimization</title><link>http://newblog.jasonantman.com/2010/02/new-web-server-wp-optimization/</link><description>&lt;p&gt;Tonight, more or less on a whim, I moved my blog from my older (dual
+1GHz Pentium &lt;span class="caps"&gt;III&lt;/span&gt; Coppermine, &lt;span class="caps"&gt;1GB&lt;/span&gt; &lt;span class="caps"&gt;RAM&lt;/span&gt;, 10k &lt;span class="caps"&gt;RPM&lt;/span&gt; &lt;span class="caps"&gt;SCSI&lt;/span&gt; disks, Compaq
+Proliant &lt;span class="caps"&gt;DL360&lt;/span&gt; G1, OpenSuSE 10.2 32-bit) web server to my newer one
+(dual 1.4GHz Pentium &lt;span class="caps"&gt;III&lt;/span&gt;, &lt;span class="caps"&gt;2GB&lt;/span&gt; &lt;span class="caps"&gt;RAM&lt;/span&gt;, 10k &lt;span class="caps"&gt;RPM&lt;/span&gt; &lt;span class="caps"&gt;SCSI&lt;/span&gt; disks, &lt;span class="caps"&gt;HP&lt;/span&gt; Proliant &lt;span class="caps"&gt;DL360&lt;/span&gt;
+G2, CentOS 5.3 32-bit). I did some profiling with
+&lt;a href="http://httpd.apache.org/docs/2.0/programs/ab.html"&gt;ab&lt;/a&gt; (ApacheBench),
+and just moving from one server to the other got some serious
+performance gains (I was profiling with runs of 1000 requests total, 10
+concurrent requests). I also added the &lt;a href="http://wordpress.org/extend/plugins/w3-total-cache/"&gt;W3 Total
+Cache&lt;/a&gt; Wordpress
+plugin, which got the numbers to look even&amp;nbsp;better!&lt;/p&gt;
+&lt;p&gt;As a side note, this was all done pretty quickly (moving the database
+and tarball for the vhost, installing the plugin, changing &lt;span class="caps"&gt;DNS&lt;/span&gt;), so
+please give me a heads-up if you experience any&amp;nbsp;problems.&lt;/p&gt;
+&lt;p&gt;The numbers are rather&amp;nbsp;impressive:&lt;/p&gt;
+&lt;table border="1"&gt;
+&lt;tr&gt;
+&lt;td&gt;
+&lt;/td&gt;
+&lt;th&gt;
+Total Time(s)
+
+&lt;/th&gt;
+&lt;th&gt;
+&lt;span class="caps"&gt;RPS&lt;/span&gt;
+
+&lt;/th&gt;
+&lt;th&gt;
+Avg. Connection Time (ms)
+
+&lt;/th&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;th&gt;
+Old Server
+
+&lt;/th&gt;
+&lt;td&gt;
+1192.252
+
+&lt;/td&gt;
+&lt;td&gt;
+838.75
+
+&lt;/td&gt;
+&lt;td&gt;
+11,893
+
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;th&gt;
+New Server
+
+&lt;/th&gt;
+&lt;td&gt;
+569.121
+
+&lt;/td&gt;
+&lt;td&gt;
+1757.09
+
+&lt;/td&gt;
+&lt;td&gt;
+5,667
+
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;th&gt;
+Default W3tc Config
+
+&lt;/th&gt;
+&lt;td&gt;
+23.754
+
+&lt;/td&gt;
+&lt;td&gt;
+42,098.44
+
+&lt;/td&gt;
+&lt;td&gt;
+237
+
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;th&gt;
+Tuned W3tc
+
+&lt;/th&gt;
+&lt;td&gt;
+12.281
+
+&lt;/td&gt;
+&lt;td&gt;
+81,428.76
+
+&lt;/td&gt;
+&lt;td&gt;
+122
+
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/table&gt;
+
+&lt;p&gt;All tests were performed on my workstation, a Dell Precision 470, two
+dual-core Xeons at 2.8 GHz, &lt;span class="caps"&gt;2GB&lt;/span&gt; &lt;span class="caps"&gt;RAM&lt;/span&gt;, &lt;span class="caps"&gt;16GB&lt;/span&gt; swap, OpenSuSE 11.1 64-bit.
+This was on the same &lt;span class="caps"&gt;LAN&lt;/span&gt; and subnet as the servers, with the workstation
+connected via a 1Gbps copper Ethernet link and the web-serving
+interfaces of the servers connected via 100Mbps (There&amp;#8217;s a trunk in
+between, from the gigabit aggregation switch to the 100Mbps distribution&amp;nbsp;switch).&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Sun, 28 Feb 2010 23:19:00 -0500</pubDate><guid>tag:newblog.jasonantman.com,2010-02-28:2010/02/new-web-server-wp-optimization/</guid><category>apache</category><category>optimization</category><category>performance</category><category>wordpress</category></item><item><title>Wordpress Installation, Finished</title><link>http://newblog.jasonantman.com/2009/02/wordpress-installation-finished/</link><description>&lt;p&gt;Found this from a month and a half ago, waiting as a&amp;nbsp;draft:&lt;/p&gt;
+&lt;p&gt;So, I mostly finished the WordPress installation. I got everything for
+WordPress up and running, tested my Blogger &lt;span class="caps"&gt;URL&lt;/span&gt; redirection script and
+then switched over my subdomain&amp;nbsp;redirection.&lt;/p&gt;
+&lt;p&gt;The blogger redirection takes two parts, but is in fact quite simple.
+First, I went into the directory where the Blogger content had lived -
+&lt;code&gt;/srv/www/htdocs/blog&lt;/code&gt; and moved everything in there into another
+directory, out of the way. I then created a .htaccess in the directory&amp;nbsp;like:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="nt"&gt;&amp;lt;IfModule&lt;/span&gt; &lt;span class="s"&gt;mod_rewrite.c&lt;/span&gt;&lt;span class="nt"&gt;&amp;gt;&lt;/span&gt;
+&lt;span class="nb"&gt;RewriteEngine&lt;/span&gt; &lt;span class="k"&gt;On&lt;/span&gt;
+&lt;span class="nb"&gt;RewriteBase&lt;/span&gt; &lt;span class="sx"&gt;/blog/&lt;/span&gt;
+&lt;span class="nb"&gt;RewriteCond&lt;/span&gt; %{REQUEST_FILENAME} !-f
+&lt;span class="nb"&gt;RewriteCond&lt;/span&gt; %{REQUEST_FILENAME} !-d
+&lt;span class="nb"&gt;RewriteRule&lt;/span&gt; .* index.php [L]
+&lt;span class="nt"&gt;&amp;lt;/IfModule&amp;gt;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;All this does is used mod_rewrite to serve blog/index.php up for every
+page request. In index.php, I handle the important &lt;span class="caps"&gt;URL&lt;/span&gt; forms for Blogger
+- archives, tags, feeds, and posts - and redirect to the appropriate
+place. For archives, I just parse out the year and month from the
+Blogger &lt;span class="caps"&gt;URL&lt;/span&gt; and redirect to the proper page for &lt;span class="caps"&gt;WP&lt;/span&gt;. The feed is straight
+redirection. The tags (&amp;#8220;labels&amp;#8221; in Blogger parlance) are pulled out of
+the &lt;span class="caps"&gt;URL&lt;/span&gt;, have spaces (after &lt;code&gt;urldecode()&lt;/code&gt;) replaced with dashes and are
+redirected to the right tag for&amp;nbsp;&lt;span class="caps"&gt;WP&lt;/span&gt;.&lt;/p&gt;
+&lt;p&gt;The posts, on the other hand, were a bit more difficult. My solution
+ended up being parsing the post name out of the &lt;span class="caps"&gt;URL&lt;/span&gt;. When I used the
+import tool, &lt;span class="caps"&gt;WP&lt;/span&gt; kept the original Blogger URLs in the &lt;code&gt;wp_postmeta&lt;/code&gt;
+table with a &lt;code&gt;meta_key&lt;/code&gt; of &amp;#8220;blogger_permalink&amp;#8221;. I just looked for a
+Blogger permalink matching the title from the Blogger &lt;span class="caps"&gt;URL&lt;/span&gt;, found the
+corresponding post &lt;span class="caps"&gt;ID&lt;/span&gt; and redirected to the proper new &lt;span class="caps"&gt;WP&lt;/span&gt;&amp;nbsp;&lt;span class="caps"&gt;URL&lt;/span&gt;.&lt;/p&gt;
+&lt;p&gt;The code for index.php, for me, looks something&amp;nbsp;like:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="cp"&gt;&amp;lt;?php&lt;/span&gt;
+&lt;span class="c1"&gt;// redirect old Blogger URLs in /blog to new WordPress in /wp&lt;/span&gt;
+&lt;span class="nv"&gt;$request&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nb"&gt;mysql_real_escape_string&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;str_replace&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;/blog&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nv"&gt;$_SERVER&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;REQUEST_URI&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;]));&lt;/span&gt;
+
+&lt;span class="c1"&gt;// handle constant stuff like feeds and top-level pages&lt;/span&gt;
+&lt;span class="c1"&gt;// &lt;span class="caps"&gt;TODO&lt;/span&gt;&lt;/span&gt;
+&lt;span class="k"&gt;if&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;strpos&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;$request&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;_archive.html&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+&lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="c1"&gt;// redirect to an archive&lt;/span&gt;
+    &lt;span class="nv"&gt;$request&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nx"&gt;substr&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;$request&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nb"&gt;strpos&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;$request&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;/&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="o"&gt;+&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+    &lt;span class="nv"&gt;$ary&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nb"&gt;explode&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;_&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nv"&gt;$request&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+    &lt;span class="nv"&gt;$redirect_to&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;http://blog.jasonantman.com/&amp;quot;&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="nv"&gt;$ary&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;/&amp;quot;&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="nv"&gt;$ary&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;/&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+    &lt;span class="nx"&gt;header&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;Location: &amp;quot;&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="nv"&gt;$redirect_to&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+    &lt;span class="k"&gt;die&lt;/span&gt;&lt;span class="p"&gt;();&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;span class="k"&gt;elseif&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;strpos&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;$request&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;labels/&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+&lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="c1"&gt;// redirect to a tag page&lt;/span&gt;
+    &lt;span class="nv"&gt;$redirect_to&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nx"&gt;substr&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;$request&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nb"&gt;strpos&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;$request&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;labels/&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="o"&gt;+&lt;/span&gt;&lt;span class="mi"&gt;7&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+    &lt;span class="nv"&gt;$redirect_to&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nb"&gt;str_replace&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;.html&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nv"&gt;$redirect_to&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+    &lt;span class="nv"&gt;$redirect_to&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nb"&gt;urldecode&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;$redirect_to&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+    &lt;span class="nv"&gt;$redirect_to&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nb"&gt;str_replace&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot; &amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;-&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nv"&gt;$redirect_to&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+    &lt;span class="nv"&gt;$redirect_to&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;http://blog.jasonantman.com/tags/&amp;quot;&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;strtolower&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;$redirect_to&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;/&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+    &lt;span class="nx"&gt;header&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;Location: &amp;quot;&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="nv"&gt;$redirect_to&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+    &lt;span class="k"&gt;die&lt;/span&gt;&lt;span class="p"&gt;();&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;span class="k"&gt;elseif&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;strpos&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;$request&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;/blogger.html&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+&lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="c1"&gt;// redirect to main blog&lt;/span&gt;
+    &lt;span class="nx"&gt;header&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;Location: http://blog.jasonantman.com/&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+    &lt;span class="k"&gt;die&lt;/span&gt;&lt;span class="p"&gt;();&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;span class="k"&gt;elseif&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;strpos&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;$request&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;/atom.xml&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+&lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="c1"&gt;// redirect to new feed&lt;/span&gt;
+    &lt;span class="nx"&gt;header&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;Location: http://blog.jasonantman.com/feed/&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+    &lt;span class="k"&gt;die&lt;/span&gt;&lt;span class="p"&gt;();&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+
+&lt;span class="c1"&gt;// handle the posts, months, tags, etc.&lt;/span&gt;
+&lt;span class="nv"&gt;$fail&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="k"&gt;false&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="nv"&gt;$redirect_to&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="nv"&gt;$conn&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nb"&gt;mysql_connect&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;   &lt;span class="k"&gt;or&lt;/span&gt; &lt;span class="k"&gt;die&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;Error. MySQL connection failed at mysql_connect&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;span class="k"&gt;if&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="o"&gt;!&lt;/span&gt; &lt;span class="nv"&gt;$conn&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="nb"&gt;error_log&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;span class="caps"&gt;SCRIPT&lt;/span&gt; &amp;quot;&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="nv"&gt;$_SERVER&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;PHP_SELF&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;: &amp;quot;&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;Unable to connect to MySQL.&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+    &lt;span class="nv"&gt;$fail&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="k"&gt;true&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;span class="nv"&gt;$select&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nb"&gt;mysql_select_db&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;wordpress&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;span class="k"&gt;if&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="o"&gt;!&lt;/span&gt; &lt;span class="nv"&gt;$select&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="nb"&gt;error_log&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;span class="caps"&gt;SCRIPT&lt;/span&gt; &amp;quot;&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="nv"&gt;$_SERVER&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;PHP_SELF&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;: &amp;quot;&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;Unable to select &lt;span class="caps"&gt;DB&lt;/span&gt; wordpress.&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+    &lt;span class="nv"&gt;$fail&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="k"&gt;true&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;span class="nv"&gt;$query&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;&lt;span class="caps"&gt;SELECT&lt;/span&gt; m.meta_key,m.meta_value,p.post_name,p.post_date &lt;span class="caps"&gt;FROM&lt;/span&gt; wp_postmeta &lt;span class="caps"&gt;AS&lt;/span&gt; m &lt;span class="caps"&gt;LEFT&lt;/span&gt; &lt;span class="caps"&gt;JOIN&lt;/span&gt; wp_posts &lt;span class="caps"&gt;AS&lt;/span&gt; p &lt;span class="caps"&gt;ON&lt;/span&gt; m.post_id=p.&lt;span class="caps"&gt;ID&lt;/span&gt; &lt;span class="caps"&gt;WHERE&lt;/span&gt; m.meta_key=&amp;#39;blogger_permalink&amp;#39; &lt;span class="caps"&gt;AND&lt;/span&gt; m.meta_value=&amp;#39;&amp;quot;&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="nv"&gt;$request&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&amp;#39;;&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="nv"&gt;$result&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nb"&gt;mysql_query&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;$query&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;span class="k"&gt;if&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="o"&gt;!&lt;/span&gt; &lt;span class="nv"&gt;$result&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="nb"&gt;error_log&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;span class="caps"&gt;SCRIPT&lt;/span&gt; &amp;quot;&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="nv"&gt;$_SERVER&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;PHP_SELF&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;: &amp;quot;&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;Error in query: &amp;quot;&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="nv"&gt;$query&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot; &lt;span class="caps"&gt;ERROR&lt;/span&gt;: &amp;quot;&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="nb"&gt;mysql_error&lt;/span&gt;&lt;span class="p"&gt;());&lt;/span&gt;
+    &lt;span class="nv"&gt;$fail&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="k"&gt;true&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;span class="k"&gt;if&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;mysql_num_rows&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;$result&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="c1"&gt;// couldn&amp;#39;t find an appropriate page&lt;/span&gt;
+    &lt;span class="c1"&gt;// &lt;span class="caps"&gt;TODO&lt;/span&gt;: find a better way... for now just redirect to the month page&lt;/span&gt;
+    &lt;span class="nv"&gt;$ary&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nb"&gt;explode&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;/&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nv"&gt;$request&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+    &lt;span class="k"&gt;if&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;count&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;$ary&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;&amp;gt;&lt;/span&gt; &lt;span class="mi"&gt;3&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+    &lt;span class="p"&gt;{&lt;/span&gt;
+        &lt;span class="nv"&gt;$redirect_to&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;http://blog.jasonantman.com/&amp;quot;&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="nv"&gt;$ary&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;/&amp;quot;&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="nv"&gt;$ary&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;/&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+    &lt;span class="p"&gt;}&lt;/span&gt;
+    &lt;span class="k"&gt;else&lt;/span&gt;
+    &lt;span class="p"&gt;{&lt;/span&gt;
+        &lt;span class="nv"&gt;$redirect_to&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;http://blog.jasonantman.com/&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+    &lt;span class="p"&gt;}&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;span class="k"&gt;else&lt;/span&gt;
+&lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="nv"&gt;$row&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nb"&gt;mysql_fetch_assoc&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;$result&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+    &lt;span class="nv"&gt;$redirect_to&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;http://blog.jasonantman.com/&amp;quot;&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="nb"&gt;date&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;Y&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nb"&gt;strtotime&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;$row&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;post_date&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;]))&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;/&amp;quot;&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="nb"&gt;date&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;m&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nb"&gt;strtotime&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;$row&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;post_date&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;]))&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;/&amp;quot;&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="nv"&gt;$row&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;post_name&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;];&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+
+&lt;span class="k"&gt;if&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;$fail&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="c1"&gt;// redirect to main page with 302&lt;/span&gt;
+    &lt;span class="nx"&gt;Header&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;Location: http://blog.jasonantman.com/&amp;quot;&lt;/span&gt; &lt;span class="p"&gt;);&lt;/span&gt; &lt;span class="c1"&gt;// implicit 302&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;span class="k"&gt;else&lt;/span&gt;
+&lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="c1"&gt;// redirect to the post or month&lt;/span&gt;
+    &lt;span class="nx"&gt;Header&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;&lt;span class="caps"&gt;HTTP&lt;/span&gt;/1.1 301 Moved Permanently&amp;quot;&lt;/span&gt; &lt;span class="p"&gt;);&lt;/span&gt;
+    &lt;span class="nx"&gt;Header&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;Location: &amp;quot;&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="nv"&gt;$redirect_to&lt;/span&gt; &lt;span class="p"&gt;);&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+
+&lt;span class="cp"&gt;?&amp;gt;&lt;/span&gt;&lt;span class="x"&gt;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;So, it now looks like I&amp;#8217;m pretty much done with setup, and even get to
+keep my links. The one interesting problem that will crop up is due to
+the fact that, at the moment, I&amp;#8217;m hosting off of a dynamically IPed
+residential internet connection, so I&amp;#8217;m at
+&lt;code&gt;http://jantman.dyndns.org:10011&lt;/code&gt;. The problem lies in the fact that
+Blogger used this for its&amp;#8217; URIs and Permalinks, and it seems that
+(though &lt;code&gt;http://blog.jasonantman.com&lt;/code&gt; uses a 302 not a 301 to redirect)
+Google, Technorati, etc. have indexed my site with this hostname and
+port, instead of the redirecting subdomain. Normally this wouldn&amp;#8217;t be a
+problem, but I plan on soon moving to a business hosting account with 5
+static IPs and port 80 open. Which means that soon the subdomain will
+become &amp;#8220;real&amp;#8221;&amp;#8230; and all of those pesky dyndns.org:10011 links will be
+obsolete. The only way I can think of fixing this is, once I make the
+switch to static &lt;span class="caps"&gt;IP&lt;/span&gt; and port 80 (which will also include moving all of
+my subdomains to name-based virtual hosts) I&amp;#8217;ll have to craft
+RewriteRules or redirect rules to replace
+&lt;code&gt;http://jantman.dyndns.org:10011/wp/&lt;/code&gt; with
+&lt;code&gt;http://blog.jasonantman.com/&lt;/code&gt;, update DynDNS with my new static &lt;span class="caps"&gt;IP&lt;/span&gt;, and
+keep a default vhost listening on 10011 to provide rule-based
+redirection to the new subdomain.&amp;nbsp;Eek.&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Tue, 03 Feb 2009 10:13:00 -0500</pubDate><guid>tag:newblog.jasonantman.com,2009-02-03:2009/02/wordpress-installation-finished/</guid><category>apache</category><category>blogger</category><category>dynamic IP</category><category>wordpress</category></item><item><title>WordPress… Finally!</title><link>http://newblog.jasonantman.com/2008/12/wordpress-finally/</link><description>&lt;p&gt;Well, I finally bit the bullet. I woke up this morning, got in to work
+(slow day) and said to myself, &amp;#8220;My blog&amp;#8217;s finally moving to WordPress.
+Today.&amp;#8221; So, I read through the docs (really psyched about the Blogger
+import feature), downloaded 2.7 (latest), setup the &lt;span class="caps"&gt;DB&lt;/span&gt; and installed
+away. Once I did the preliminary things like changing the admin password
+and setting up some categories, I set about importing from&amp;nbsp;Blogger.&lt;/p&gt;
+&lt;p&gt;Here was the first of the major issues. Though WordPress has really
+hyped their Blogger importer, they failed to mention that it is totally
+useless if you are self-hosting Blogger and publishing via &lt;span class="caps"&gt;FTP&lt;/span&gt; or &lt;span class="caps"&gt;SFTP&lt;/span&gt;,
+as I was. So, after a lengthy consultation with the great oracle of
+Google, I dedided I had two options - switch Blogger to publish to
+BlogSpot.com and use the &lt;span class="caps"&gt;WP&lt;/span&gt; import tool, or custom hack a script. I must
+admit, it felt a bit pointless&amp;#8230; all of my old posts were in a directry
+at the same level as &lt;span class="caps"&gt;WP&lt;/span&gt;, it seemed quite stupid to have to jump through
+hoops to get that data. Though I&amp;#8217;m not quite sure whether the GData &lt;span class="caps"&gt;API&lt;/span&gt;
+really doesn&amp;#8217;t give access to posts if&amp;nbsp;self-hosted.&lt;/p&gt;
+&lt;p&gt;I migrated publishing of Blogger to BlogSpot.com
+(&lt;a href="http://www.jasonantman.com/jargon/entry.php?id=metasyntactic-variable"&gt;foobarthudgrunt&lt;/a&gt;.blogspot.com),
+despite worries about confusing Google or messing up the little bit of
+ranking I&amp;#8217;ve been able to gain. It successfully imported all 128 of my
+entries, and the few comments. But, as I navigated to the &amp;#8220;Edit&amp;#8221; page to
+have a look, an even bigger problem was apparent. All of the tags from
+Blogger had ended up as categories in &lt;span class="caps"&gt;WP&lt;/span&gt;. So I had no tags for any of my
+posts, and a gazillion categories with only one post in them. Luckily,
+the &lt;span class="caps"&gt;DB&lt;/span&gt; schema is pretty sane, and I qickly figured out that both
+categories and tags are stored in the &lt;code&gt;wp_term_taxonomy&lt;/code&gt; table, and the
+difference between a category and a tag is simply that the &lt;code&gt;taxonomy&lt;/code&gt;
+field is either &amp;#8220;category&amp;#8221; or &amp;#8220;post_tag&amp;#8221;, respectively. So, since I
+hadn&amp;#8217;t added any posts in &lt;span class="caps"&gt;WP&lt;/span&gt; yet, I just changed &lt;code&gt;taxonomy&lt;/code&gt; to
+&amp;#8220;post_tag&amp;#8221; for anything with an &lt;span class="caps"&gt;ID&lt;/span&gt; past the categories I&amp;#8217;d added. And
+it seems to have worked&amp;nbsp;beautifully.&lt;/p&gt;
+&lt;p&gt;Up next, however, was the hard part: sitting down with my list of
+categories and sifting through 128 posts to categorize them. The biggest
+pain is the default edit posts table in the admin interface lists 15
+posts per page, and with a cursory glance at the source I couldn&amp;#8217;t for
+the life of me figure out where that limit is&amp;nbsp;set.&lt;/p&gt;
+&lt;p&gt;Next up, I spent some time looking over the configuration options in &lt;span class="caps"&gt;WP&lt;/span&gt;,
+updating my About page, and listing things to do in the future (more
+static pages, blogroll and links,&amp;nbsp;etc.).&lt;/p&gt;
+&lt;p&gt;I was finally ready to setup pretty URLs. And&amp;#8230; sure enough&amp;#8230; I
+clicked &amp;#8220;submit&amp;#8221; to apply some changes to the default blog &lt;span class="caps"&gt;URL&lt;/span&gt; (my real
+domain, as opposed to the DynDNS domain) and subtitle, and I got kicked
+out of the admin interface. Try as I might, I had no luck logging in. I
+then found that WordPress doesn&amp;#8217;t log anything anywhere - no MySQL log
+and no error messages in the Apache error log. Wondeful. I spent about
+an hour looking through the source, figuring out how the auth method
+works, and trying to set an &lt;span class="caps"&gt;MD5&lt;/span&gt; password. It was obviously apparent that
+the password in the &lt;span class="caps"&gt;DB&lt;/span&gt; for my one user (administrative user) was
+generated by PHPass, not &lt;span class="caps"&gt;MD5&lt;/span&gt;, but the auth function was evaluating
+anything &gt;= 32 characters as PHPass, and the &lt;span class="caps"&gt;MD5&lt;/span&gt; of my password was 32
+characters, so that wouldn&amp;#8217;t work. I tried the &amp;#8220;forgot password&amp;#8221; link
+with both username and email, but no mail was being sent. When I reached
+the 2-1/2 hour mark, I started instrumenting the login code with some
+&lt;code&gt;error_log()&lt;/code&gt; lines to see what was up. I narrowed the problem down to
+the block of code starting at lin 48 in &lt;code&gt;wp-include/user.php&lt;/code&gt; -
+specifically, according to the comments, no credentials were being
+passed but the cookie wasn&amp;#8217;t set. And it&amp;#8217;s silent in that case. So, at
+this point, I&amp;#8217;m totally lost. I decided to clear all of my browser&amp;#8217;s
+cookies and auth info, and try again. No dice. After nearly 3 hours, I
+decided to do a packet capture, and found the horribly simple reason.
+Somewhere in the code, &lt;span class="caps"&gt;WP&lt;/span&gt; is evaluating the &amp;#8220;siteurl&amp;#8221; or &amp;#8220;home&amp;#8221; values
+from wp_options, and using them instead of just doing relative links.
+As a result, when the form submits, Apache keeps returning a 302, and
+the form submission never makes it there. Hopefully this won&amp;#8217;t create a
+problem when I transition from DynDNS to a real static &lt;span class="caps"&gt;IP&lt;/span&gt; and domain&amp;nbsp;name.&lt;/p&gt;
+&lt;p&gt;Next I enabled pretty permalinks, enabled mod_rewrite in the vhost, and
+selected a new template for my blog (though I&amp;#8217;m planning on doing some
+heavy customization). I didn&amp;#8217;t want to leave the default template up for
+too long, in case Google&amp;#8217;s heavy crawling of my site picked up all of
+the new content somehow&amp;#8230; I ended up narrowing it down to three themes,
+coincidentally all designed by
+&lt;a href="http://wordpress.org/extend/themes/profile/mg12"&gt;mg12&lt;/a&gt;:
+&lt;a href="http://wordpress.org/extend/themes/blocks2"&gt;Blocks2&lt;/a&gt;,
+&lt;a href="http://wordpress.org/extend/themes/inove#post-668"&gt;iNove&lt;/a&gt; or
+&lt;a href="http://wordpress.org/extend/themes/elegant-box"&gt;ElegantBox&lt;/a&gt;. I
+installed them all on my box and looked at iNove first, and it was love
+at first&amp;nbsp;sight.&lt;/p&gt;
+&lt;p&gt;So, that&amp;#8217;s where it stands right now. I finally have my blog on
+WordPress and running, and have a theme. The action plan for tonight&amp;nbsp;includes:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Using RewriteRule and a &lt;span class="caps"&gt;PHP&lt;/span&gt; script to point all of the old Blogger
+    URLs to the new WordPress&amp;nbsp;installation.&lt;/li&gt;
+&lt;li&gt;Adding some new static content, and top-bar links to my other&amp;nbsp;sites.&lt;/li&gt;
+&lt;li&gt;Refining the theme a bit,&amp;nbsp;possibly?&lt;/li&gt;
+&lt;li&gt;Adding links to my sites, and to the&amp;nbsp;blogroll.&lt;/li&gt;
+&lt;li&gt;Adding the buttons/plugins for del.icio.us, Digg, Slashdot, reddit,&amp;nbsp;etc.&lt;/li&gt;
+&lt;li&gt;Redirecting my main blog page to&amp;nbsp;WordPress.&lt;/li&gt;
+&lt;li&gt;Redirecting or linking my old feed locations to&amp;nbsp;WordPress.&lt;/li&gt;
+&lt;/ul&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Wed, 17 Dec 2008 15:58:00 -0500</pubDate><guid>tag:newblog.jasonantman.com,2008-12-17:2008/12/wordpress-finally/</guid><category>blogger</category><category>blogging</category><category>PHP</category><category>wordpress</category></item><item><title>New Project - Blog Migration to WordPress</title><link>http://newblog.jasonantman.com/2008/09/new-project-blog-migration-to-wordpress/</link><description>&lt;p&gt;For quite some time, I&amp;#8217;ve been frustrated with Blogger. First of all,
+its&amp;#8217; publishing system is horribly inefficient. As everything is static
+&lt;span class="caps"&gt;HTML&lt;/span&gt;, at this point, writing this blog entry alone will require it to
+re-publish approximately &lt;strong&gt;6 &lt;span class="caps"&gt;MB&lt;/span&gt;&lt;/strong&gt; to my server. Seems sort&amp;#8217;a pointless.
+Not to mention, it doesn&amp;#8217;t allow any of the stuff that I really want,
+such as multiple categories with per-category &lt;span class="caps"&gt;RSS&lt;/span&gt;, or good searching. It
+also means that, though this blog is hosted on my own server, I&amp;#8217;m
+dependent on Blogger to add&amp;nbsp;posts.&lt;/p&gt;
+&lt;p&gt;I&amp;#8217;m still horribly busy dealing with insurance companies and the police
+in relation to my stolen truck, as well as looking around and trying to
+figure out what my next vehicle will be, and how much I can spend on&amp;nbsp;it.&lt;/p&gt;
+&lt;p&gt;Anyway, I&amp;#8217;ve decided that at some point in the future, I&amp;#8217;ll be migrating
+to &lt;a href="http://www.wordpress.org"&gt;WordPress&lt;/a&gt; for the blog. It will, of
+course, be hosted on my own machine, and will hopefully also include a
+migration of everything from this Blogger account. And, somehow, will
+include some sort of redirection from old posts to the relevant new
+ones. Most importantly, though, I plan on deferring the project until I
+get my multiple static &lt;span class="caps"&gt;IP&lt;/span&gt; service from &lt;a href="http://www.optimum.com"&gt;Optimum
+Online&lt;/a&gt;, as the new blog (and the rest of my
+subdomains) will be moved from GoDaddy forwarding to their own
+subdomains setup as Apache name-based&amp;nbsp;VHosts.&lt;/p&gt;
+&lt;p&gt;Stay tuned for progress&amp;nbsp;updates&amp;#8230;&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Thu, 18 Sep 2008 12:49:00 -0400</pubDate><guid>tag:newblog.jasonantman.com,2008-09-18:2008/09/new-project-blog-migration-to-wordpress/</guid><category>blog</category><category>wordpress</category></item></channel></rss>

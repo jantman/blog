@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Jason Antman's Blog</title><link>http://newblog.jasonantman.com/</link><description></description><atom:link href="http://newblog.jasonantman.com/feeds/tags/grep.rss.xml" rel="self"></atom:link><lastBuildDate>Thu, 09 Dec 2010 09:08:00 -0500</lastBuildDate><item><title>Highlighting matches with grep and less</title><link>http://newblog.jasonantman.com/2010/12/highlighting-matches-with-grep-and-less/</link><description>&lt;p&gt;Yes, I haven&amp;#8217;t posted much lately. Just a quick little tip, since it
+came in handy&amp;nbsp;today.&lt;/p&gt;
+&lt;p&gt;Grep accepts a &lt;code&gt;--color&lt;/code&gt; argument which highlights matches in color
+(assuming your terminal supports it). Passing grep &lt;code&gt;--color=always&lt;/code&gt; and
+piping the output into &lt;code&gt;less -R&lt;/code&gt; will allow you to scroll through the
+colorized output with less. Very handy if you&amp;#8217;re grepping through source
+code with long lines or &lt;span class="caps"&gt;SQL&lt;/span&gt;&amp;nbsp;statements.&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Thu, 09 Dec 2010 09:08:00 -0500</pubDate><guid>tag:newblog.jasonantman.com,2010-12-09:2010/12/highlighting-matches-with-grep-and-less/</guid><category>color</category><category>grep</category><category>less</category><category>terminal</category></item><item><title>Ignoring SVN directories and save files with grep</title><link>http://newblog.jasonantman.com/2010/10/ignoring-svn-directories-and-save-files-with-grep/</link><description>&lt;p&gt;Yes, I know I haven&amp;#8217;t posted anything useful in a while. I&amp;#8217;ve been quite
+busy at work, and hopefully I&amp;#8217;ll post some of my &lt;span class="caps"&gt;DHCP&lt;/span&gt; stuff. In the&amp;nbsp;meantime&amp;#8230;&lt;/p&gt;
+&lt;p&gt;I&amp;#8217;m starting a project for the &lt;a href="http://www.midlandparkambulance.com/"&gt;ambulance
+corps&lt;/a&gt; migrating two Linux boxes
+to a single new server. One of them has been in production for about
+five years, and (partially due to the &amp;#8220;we need it yesterday&amp;#8221; nature of
+emergency services) has quite a bit of cruft laying around. Since almost
+everything is web-based (well, browser-based, restricted to the &lt;span class="caps"&gt;LAN&lt;/span&gt;
+only), there are a lot of web apps and &lt;span class="caps"&gt;PHP&lt;/span&gt; scripts that need to be
+migrated. This is made even more complicated by the switch from SuSE
+10.1 (yes, ancient) to CentOS 5.4, and therefore from &lt;code&gt;/srv/www/htdocs&lt;/code&gt;
+to &lt;code&gt;/var/www/html&lt;/code&gt;. I could be lazy and symlink it, but I think it&amp;#8217;s
+time to search down and destroy any absolute&amp;nbsp;includes.&lt;/p&gt;
+&lt;p&gt;The problem with doing this is that, with any scripts in &lt;span class="caps"&gt;SVN&lt;/span&gt;, grepping
+for a string could potentially return three hits for a file - the actual
+file, the emacs save file (&lt;code&gt;filename~&lt;/code&gt;) and the text file in the &lt;code&gt;.svn&lt;/code&gt;
+directory.&lt;/p&gt;
+&lt;p&gt;The solution is actually pretty easy. To get rid of the .svn
+directories, we add &lt;code&gt;--exclude=\*.svn\*&lt;/code&gt; to our grep command line (yes,
+I know, it excludes everything with &amp;#8220;.svn&amp;#8221; in the path, but that&amp;#8217;s
+acceptably imprecise for my purposes). To get rid of the tilde (save)
+files, all we need is &lt;code&gt;--exclude=\*~&lt;/code&gt;. It&amp;#8217;s no problem to string them
+together as &lt;code&gt;grep --exclude=\*~ --exclude=\*.svn\* -rin "foo bar" *&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;To make this even easier, just add to your &lt;code&gt;.bashrc&lt;/code&gt;:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="nb"&gt;export &lt;/span&gt;&lt;span class="nv"&gt;GREP_OPTIONS&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;--exclude=\*~ --exclude=\*.svn\*&amp;quot;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Fri, 15 Oct 2010 07:27:00 -0400</pubDate><guid>tag:newblog.jasonantman.com,2010-10-15:2010/10/ignoring-svn-directories-and-save-files-with-grep/</guid><category>grep</category><category>linux</category></item></channel></rss>

@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Jason Antman's Blog</title><link>http://newblog.jasonantman.com/</link><description></description><atom:link href="http://newblog.jasonantman.com/feeds/tags/ieib.rss.xml" rel="self"></atom:link><lastBuildDate>Mon, 31 Mar 2008 12:43:00 -0400</lastBuildDate><item><title>IEI HubMax Access Control and Linux</title><link>http://newblog.jasonantman.com/2008/03/iei-access-control-and-linux/</link><description>&lt;p&gt;At the &lt;a href="http://www.midlandparkambulance.com/"&gt;Midland Park Ambulance
+Corps&lt;/a&gt;, where I&amp;#8217;ve been
+volunteering my time as an &lt;span class="caps"&gt;EMT&lt;/span&gt; and all-around tech guru for three years,
+we have an &lt;a href="http://www.ieib.com/product-details.html?id=49"&gt;&lt;span class="caps"&gt;IEI&lt;/span&gt; HubMax2 access control
+system&lt;/a&gt;. Maybe overkill
+for us (only 78 users in it, including old codes), it&amp;#8217;s pretty simple -
+a box with some microcontrollers sits in a wiring closet, and is hooked
+up to keypads at each door, and relays to electromechanical strikes.
+Type in the right code, and the door opens. Obviously, it also logs all
+entries as well as unknown codes (but doesn&amp;#8217;t log the actual code if
+unknown, so instead of removing old users, I set their codes to an
+invalid timezone so the doors don&amp;#8217;t open, but accountability is still
+intact). Well, the old box died - fried by a surge from a blown computer
+that was hooked up to its&amp;#8217; serial port. New one was installed this
+weekend - an 8 hour&amp;nbsp;ordeal.&lt;/p&gt;
+&lt;p&gt;The problem with the system is that to program it, I have to grab the
+laptop out of one of the ambulances, have &lt;span class="caps"&gt;IEI&lt;/span&gt;&amp;#8217;s proprietary
+Windows-based programming software (which programs it via sending and
+receiving full binary memory maps of the controllers over 1200 baud
+serial), and spend half an hour in the utility closet (next to the
+furnace) where the box is waiting for memory maps to transfer over the
+slow direct connection. Well, there&amp;#8217;s a proliant server running
+&lt;a href="http://www.opensuse.org/"&gt;OpenSuSE&lt;/a&gt; seven feet away&amp;#8230; why not use&amp;nbsp;that?&lt;/p&gt;
+&lt;p&gt;While &lt;span class="caps"&gt;IEI&lt;/span&gt; offers their
+&lt;a href="http://www.ieib.com/products-browser-managed.html"&gt;eMerge&lt;/a&gt; systems -
+appliance servers that manage their access control units via a web
+interface - for $6000, which run RedHat, they won&amp;#8217;t even respond to my
+emails inquiring whether they have Linux-based programming software for
+their HubMax line. We don&amp;#8217;t get that many new members per year, so I
+figured just programming in a few spare codes will handle it. Removing
+people can wait, as people usually leave on good terms. However, every
+once in a while something&amp;#8217;s amiss at the building (usually a door left
+ajar, or food left out), and I&amp;#8217;m called upon to pull the logs. It&amp;#8217;s a
+pain in the @$$. I have to hunker down in that utility closet with a
+laptop, waiting for the whole memory map to download over 1200 baud just
+to see who came and went. Porting the software to Linux wouldn&amp;#8217;t be a
+quick project. This is even worse during the school year when I&amp;#8217;m living
+in my apartment an hour away, taking classes full time, and still
+working 25 hours a&amp;nbsp;week.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;The Solution&lt;/strong&gt;: At the end of my
+eight-hour install, everything was programmed and setup, but the logs
+were still bothering me. Then I hit on an idea. Remembering how archaic
+the real-world interfacing of these things seemed to me (how can you use
+binary memory maps? What about a serial terminal with an &lt;span class="caps"&gt;ASCII&lt;/span&gt; command
+set, or even Ethernet and &lt;span class="caps"&gt;SNMP&lt;/span&gt; or Telnet? I really want to build one of
+these things running real-time Linux&amp;#8230;), I started to flip through the
+manual and, sure enough, found a command (entered on a 12-key keypad on
+the main board) to dump logs in realtime to a serial line&amp;nbsp;printer.&lt;/p&gt;
+&lt;p&gt;I ran a cable to the Linux-based server not 10 feet away, fired up
+Kermit, issued the Enable Log Print code, and tried a code entry on the
+keypad by the front door.&amp;nbsp;Bingo!&lt;/p&gt;
+&lt;p&gt;In the two days since, I have a little daemon coded in &lt;span class="caps"&gt;PHP&lt;/span&gt; (yes, &lt;span class="caps"&gt;PHP&lt;/span&gt;)
+that reads the serial line and dumps all log data (entries, exits, door
+ajar, unknown code, access denied) to both a text file (for debugging
+and redundancy) and into a MySQL database. Another hour of coding and I
+have a simple web &lt;span class="caps"&gt;GUI&lt;/span&gt;, available on any of the computers on the &lt;span class="caps"&gt;LAN&lt;/span&gt;, for
+officers to check who&amp;#8217;s come, and who tried to get in but&amp;nbsp;couldn&amp;#8217;t.&lt;/p&gt;
+&lt;p&gt;I&amp;#8217;ve never written a daemon before, so I still have a bit more research
+to do - mainly in terms of error handling and how to keep it constantly
+running. However, I have a first version&amp;nbsp;working.&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Mon, 31 Mar 2008 12:43:00 -0400</pubDate><guid>tag:newblog.jasonantman.com,2008-03-31:2008/03/iei-access-control-and-linux/</guid><category>access control</category><category>door lock</category><category>hubmax</category><category>iei</category><category>ieib</category></item></channel></rss>

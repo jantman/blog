@@ -1,0 +1,363 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Jason Antman's Blog</title><link href="http://newblog.jasonantman.com/" rel="alternate"></link><link href="http://newblog.jasonantman.com/feeds/tags/fedora.atom.xml" rel="self"></link><id>http://newblog.jasonantman.com/</id><updated>2013-01-21T12:13:00-05:00</updated><entry><title>Fedora Linux and OSX Dual Boot on Mid-2010 (6,2) 15” MacBook Pro Laptop</title><link href="http://newblog.jasonantman.com/2013/01/fedora-linux-and-osx-dual-boot-on-mid-2010-62-15-macbook-pro-laptop/" rel="alternate"></link><updated>2013-01-21T12:13:00-05:00</updated><author><name>admin</name></author><id>tag:newblog.jasonantman.com,2013-01-21:2013/01/fedora-linux-and-osx-dual-boot-on-mid-2010-62-15-macbook-pro-laptop/</id><summary type="html">&lt;p&gt;As part of the transition from a contractor to a full-time employee of
+&lt;a href="http://www.cmgdigital.com"&gt;Cox Media Group Digital &lt;span class="amp"&gt;&amp;amp;&lt;/span&gt; Strategy&lt;/a&gt; (check
+out our &lt;a href="https://github.com/cmgdigital"&gt;github&lt;/a&gt;), I&amp;#8217;ve been issued a
+&lt;a href="http://support.apple.com/kb/SP582"&gt;Mid-2010 (6,2)&lt;/a&gt; 15&amp;#8221; &lt;a href="http://en.wikipedia.org/wiki/Macbook_pro#Technical_specifications_2"&gt;MacBook
+Pro&lt;/a&gt;
+laptop, to replace my current &lt;a href="http://support.apple.com/kb/SP11"&gt;Early-2008
+(3,1)&lt;/a&gt; MacPro desktop. The desktop is
+currently running &lt;a href="http://fedoraproject.org/"&gt;Fedora&lt;/a&gt; 17, dual-boot with
+with Mac &lt;span class="caps"&gt;OS&lt;/span&gt; X (left in place for firmware updates and emergencies) using
+the &lt;a href="http://www.rodsbooks.com/refind/index.html"&gt;rEFInd boot manager&lt;/a&gt; to
+choose between the two OSes. It took me two days to get this working
+right on my desktop, but it had been my plan to duplicate this setup on
+my laptop. I found a lot of conflicting information online, but I
+decided to give it a&amp;nbsp;try.&lt;/p&gt;
+&lt;p&gt;Well, I have Fedora 18 and &lt;span class="caps"&gt;OS&lt;/span&gt; X 10.8 dual-booting on the laptop, but not
+as planned. After a day and a half of research, troubleshooting and
+re-installs, here&amp;#8217;s what I found to actually work, in the hope that
+nobody else will go through the ordeal I went through. Following that
+are some notes about the new Fedora 18 installer (Anaconda 18),
+especially important for anyone who&amp;#8217;s used Linux for a while. To those
+who are new to Linux, don&amp;#8217;t be dissuaded by the above. Most of the
+frustration I experienced is because I&amp;#8217;ve been using Linux for a
+relatively long time (about 10 years), had my own ideas about exactly
+how I wanted things setup (which are decidedly &lt;em&gt;not&lt;/em&gt; supported by
+Fedora), and had some assumptions about the installation process based
+on earlier&amp;nbsp;versions.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;How to get it&amp;nbsp;working:&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;Forget about rEFInd. This had been the original advice from &lt;a href="http://mjg59.dreamwidth.org/"&gt;Matthew
+Garrett&lt;/a&gt;,
+&lt;a href="https://twitter.com/mjg59"&gt;@mjg59&lt;/a&gt;, kernel coder, contributor to the
+Anaconda project, and all-around authority on booting Linux on &lt;span class="caps"&gt;EFI&lt;/span&gt;/&lt;span class="caps"&gt;UEFI&lt;/span&gt;
+hardware. My advice, and the method that worked for&amp;nbsp;me:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Shrink your Mac partitions and leave as much free space as you want
+    for Fedora. using the Disk Utility tool in &lt;span class="caps"&gt;OS&lt;/span&gt; X (I also created an
+    &lt;span class="caps"&gt;8GB&lt;/span&gt; &lt;span class="caps"&gt;VFAT&lt;/span&gt; partition that both OSes can read/write&amp;nbsp;to).&lt;/li&gt;
+&lt;li&gt;&lt;a href="http://fedoraproject.org/en/get-fedora"&gt;Download Fedora 18&lt;/a&gt; 64-bit
+    &lt;span class="caps"&gt;DVD&lt;/span&gt; image, I chose the &lt;span class="caps"&gt;KDE&lt;/span&gt; version. Verify the sha256 sum if you
+    want (they don&amp;#8217;t have a readily visible link to the checksum file.
+    Copy the download link, paste it into your address bar and remove
+    the filename. You should get a directory index that includes a
+    &lt;code&gt;-CHECKSUM&lt;/code&gt; file.&lt;/li&gt;
+&lt;li&gt;Per the Installation Guide&amp;#8217;s &lt;a href="http://docs.fedoraproject.org/en-US/Fedora/18/html/Installation_Guide/Making_USB_Media-UNIX_Linux.html"&gt;Making Fedora &lt;span class="caps"&gt;USB&lt;/span&gt; Media
+    page&lt;/a&gt;,
+    use &lt;code&gt;liveusb-creator&lt;/code&gt; to setup the installation image on the &lt;span class="caps"&gt;USB&lt;/span&gt;
+    flash drive (I needed to start it with the &lt;code&gt;--reset-mbr&lt;/code&gt; option).
+    You can also use other tools (dd if you&amp;#8217;re not on a Fedora-based
+    distro), or a &lt;span class="caps"&gt;DVD&lt;/span&gt;, but this is the method I&amp;nbsp;chose.&lt;/li&gt;
+&lt;li&gt;Due to a &lt;a href="https://fedorahosted.org/liveusb-creator/ticket/810"&gt;bug in
+    liveusb-creator&lt;/a&gt;,
+    you may need to manually edit &lt;code&gt;/EFI/boot/grub.cfg&lt;/code&gt; on the created
+    &lt;span class="caps"&gt;USB&lt;/span&gt; stick if grub gives you a file not found error. If that happens,
+    please see my bug report above for the action to take (in short, you
+    need to mount the &lt;span class="caps"&gt;USB&lt;/span&gt; stick, &lt;code&gt;chmod u+w /EFI/boot/grub.cfg&lt;/code&gt; then
+    edit that file and replace every occurrence of &amp;#8220;isolinux&amp;#8221; with
+    &amp;#8220;syslinux&amp;#8221; and every occurrence of
+    &amp;#8220;root=live:&lt;span class="caps"&gt;LABEL&lt;/span&gt;=Fedora-18-x86_64-Live-&lt;span class="caps"&gt;KDE&lt;/span&gt;.iso&amp;#8221; with&amp;nbsp;&amp;#8220;root=live:&lt;span class="caps"&gt;LABEL&lt;/span&gt;=&lt;span class="caps"&gt;LIVE&lt;/span&gt;&amp;#8221;).&lt;/li&gt;
+&lt;li&gt;Boot the &lt;span class="caps"&gt;USB&lt;/span&gt; drive (use the alt key when you turn on the laptop to
+    select the &lt;span class="caps"&gt;USB&lt;/span&gt; drive) and just install Fedora normally, letting it
+    do its thing. Select a boot disk and let it put &lt;span class="caps"&gt;GRUB2&lt;/span&gt; on the &lt;span class="caps"&gt;EFI&lt;/span&gt;&amp;nbsp;partition.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;When you boot, it will boot to &lt;span class="caps"&gt;GRUB&lt;/span&gt;. There will be some options for Mac
+&lt;span class="caps"&gt;OS&lt;/span&gt; there, but they don&amp;#8217;t work (more on that below). If you want to boot
+Mac, hold down the alt/option key when you power on the laptop, which
+will bring you to the boot disk selector and you can pick the Mac disk.
+I know it&amp;#8217;s not pretty or ideal, but it&amp;#8217;s the best option right&amp;nbsp;now.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Making it&amp;nbsp;Better:&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;&lt;span class="caps"&gt;GRUB2&lt;/span&gt; tries to automatically detect other OSes and configure them in the
+boot loader (this is done through &lt;code&gt;/etc/grub.d/30_os-prober&lt;/code&gt;, commonly
+just referred to as &lt;code&gt;os-prober&lt;/code&gt;). It tries to boot Mac directly through
+the xnu_kernel64 module, which not only isn&amp;#8217;t installed on the boot
+partition by default, but just doesn&amp;#8217;t work with at least Mountain Lion
+(10.8). So getting &lt;span class="caps"&gt;GRUB&lt;/span&gt; to boot Mac means either having the bugs in the
+xnu module fixed, or figuring out how to setup a chainloader to boot
+from &lt;span class="caps"&gt;GRUB&lt;/span&gt; to Mac. The latter is probably the method I&amp;#8217;ll investigate,
+but for now, since I rarely use Mac, I&amp;#8217;m happy having to use the alt key
+at boot to get there. To remove the annoying, broken Mac &lt;span class="caps"&gt;OS&lt;/span&gt; options from
+the grub screen, run the following commands as root (they assume you
+have your &lt;span class="caps"&gt;EFI&lt;/span&gt; partition mounted at &lt;code&gt;/boot/efi&lt;/code&gt; which I believe Fedora
+should do by&amp;nbsp;default:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;cp /boot/efi/EFI/fedora/grub.cfg /boot/efi/EFI/fedora/grub.cfg.bak
+&lt;span class="nb"&gt;echo&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;GRUB_DISABLE_OS_PROBER=&amp;quot;true&amp;quot;&amp;#39;&lt;/span&gt; &amp;gt;&amp;gt; /etc/default/grub
+grub2-mkconfig &amp;gt; /boot/efi/&lt;span class="caps"&gt;EFI&lt;/span&gt;/fedora/grub.cfg
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;&lt;strong&gt;Thoughts on the Fedora 18 Anaconda&amp;nbsp;Installer&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;I found a couple of issues with the new Anaconda 18 installer that were
+either unweildy or confusing for someone who&amp;#8217;s been installing Linux for
+a long time. Overall, the new installer is very nice. It has a clean,
+even elegant &lt;span class="caps"&gt;UI&lt;/span&gt;, a relatively nice flow from start to completion, and is
+certainly beginner-friendly. It has fewer options than any Linux
+installer I&amp;#8217;ve ever used before - not even options for package
+selection, firewall or SELinux configuration, etc. - but I guess this is
+in line with the goal of making Fedora a desktop &lt;span class="caps"&gt;OS&lt;/span&gt; for the masses. I
+would have appreciated an &amp;#8220;advanced mode&amp;#8221; installer that was more like
+Fedora 17 (or even much older versions), but I guess I&amp;#8217;m an edge case,
+at least in the Fedora community. However, I did find two things
+especially difficult, both related to the fact that my laptop has two
+main drives (a &lt;span class="caps"&gt;500GB&lt;/span&gt; hard drive and a &lt;span class="caps"&gt;120GB&lt;/span&gt;&amp;nbsp;&lt;span class="caps"&gt;SSD&lt;/span&gt;):&lt;/p&gt;
+&lt;p&gt;First, the installer prompted me to select a &amp;#8220;boot disk&amp;#8221;. I guess I
+should have read the installation guide, but I assumed that nomenclature
+translated to either &amp;#8220;which disk should the automatic partitiioning put
+yout &lt;code&gt;/boot&lt;/code&gt; partition on&amp;#8221; or &amp;#8220;which disk should I set the bootable flag
+on in the partition table&amp;#8221;. In fact, it means &amp;#8220;which disk should I put
+&lt;span class="caps"&gt;GRUB&lt;/span&gt; on the &lt;span class="caps"&gt;EFI&lt;/span&gt; partition of&amp;#8221;. I installed, rebooted, and was shocked -
+and somewhat distressed - to boot directly to &lt;span class="caps"&gt;GRUB2&lt;/span&gt; instead of the
+rEFInd installation I had setup. The installer didn&amp;#8217;t have any of the
+previously-customary &amp;#8220;warning: this will overwrite your &lt;span class="caps"&gt;MBR&lt;/span&gt;/&lt;span class="caps"&gt;EFI&lt;/span&gt; boot
+partition&amp;#8221; notices, so I felt safe letting it continue. It turned out
+that this was the way I ended up going, and it also turns out that
+there&amp;#8217;s a bug in Anaconda that makes it fail installation if you tell it
+not to write a bootloader to disk (though it&amp;#8217;s patched by one line of
+Python code). But I was deeply distressed that - contrary to the
+experience of every, admittedly more complicated, Linux installer I&amp;#8217;d
+used before - the Fedora 18 installer overwrote my &lt;span class="caps"&gt;EFI&lt;/span&gt; bootloader
+(analogous to overwriting the &lt;span class="caps"&gt;MBR&lt;/span&gt; on a &lt;span class="caps"&gt;BIOS&lt;/span&gt; boot machine) without ever
+warning me or asking for a&amp;nbsp;confirmation.&lt;/p&gt;
+&lt;p&gt;Secondly, the partitioning tool is clearly designed for only one
+destination disk. The overview screen lists configured partitions by
+label and mount point, but not by physical device, so figuring out which
+partitions are on which physical disks takes a click on each and every
+partition to view that information in the detail panel. When you create
+a new partition, it&amp;#8217;s automatically put in a &lt;span class="caps"&gt;LVM&lt;/span&gt; volume group spanning
+all disks. Changing the target of the automatically created volume group
+requires a few clicks, as does changing the physical disks backing any
+new volume groups. To assign a newly created partition to a specific
+disk, you have to click on an unlabeled &amp;#8220;tool&amp;#8221; icon under the list of
+partitions, far away from the information on the partition in question.
+It&amp;#8217;s a nice interface for someone who clicks the &amp;#8220;partition
+automatically&amp;#8221; button, or who just knows they want to add &amp;#8220;an extra
+partition&amp;#8221;, but for anyone who has a specific layout in mind (like
+having &lt;code&gt;/&lt;/code&gt;, &lt;code&gt;/boot&lt;/code&gt; and &lt;code&gt;/var&lt;/code&gt;, specifically sized, on the &lt;span class="caps"&gt;SSD&lt;/span&gt; and
+&lt;code&gt;/home&lt;/code&gt; on the rotating disk) it takes about 4-5 more clicks and dialogs
+to add a partition than the last Fedora installer did. Mainly, it&amp;#8217;s
+lacking any sort of Advanced Mode for partitioning that allows the user
+to quickly and accurately layout a more complex partitioning&amp;nbsp;scheme.&lt;/p&gt;
+&lt;p&gt;Below are some screenshots from the Fedora 17 and Fedora 18 Installation
+Guides, which contrast both the overview of all partitions and the
+individual partition&amp;nbsp;settings:&lt;/p&gt;
+&lt;p&gt;Fedora 18 Overview, from &lt;a href="http://docs.fedoraproject.org/en-US/Fedora/18/html/Installation_Guide/s1-diskpartitioning-x86.html"&gt;9.13. Creating a Custom Partition
+Layout&lt;/a&gt;:  &lt;/p&gt;
+&lt;p&gt;&lt;img alt="image" src="http://www.dedoimedo.com/images/computers_years/2013_1/fedora-18-installer-configure-partitions.jpg" /&gt;  &lt;/p&gt;
+&lt;p&gt;Fedora 17 Overview, from &lt;a href="http://docs.fedoraproject.org/en-US/Fedora/17/html/Installation_Guide/s1-diskpartitioning-x86.html"&gt;9.14. Creating a Custom Layout or Modifying
+the Default
+Layout&lt;/a&gt;:  &lt;/p&gt;
+&lt;p&gt;&lt;img alt="image" src="http://docs.fedoraproject.org/en-US/Fedora/17/html/Installation_Guide/images/diskpartitioning/ddmain.png" /&gt;  &lt;/p&gt;
+&lt;p&gt;Fedora 18 Partition Creation/Editing, from &lt;a href="http://docs.fedoraproject.org/en-US/Fedora/18/html/Installation_Guide/Create_LVM-x86.html"&gt;9.13.3. Create &lt;span class="caps"&gt;LVM&lt;/span&gt; Logical
+Volume&lt;/a&gt;:  &lt;/p&gt;
+&lt;p&gt;&lt;img alt="image" src="http://docs.fedoraproject.org/en-US/Fedora/18/html/Installation_Guide/images/diskpartitioning/lvm-pv.png" /&gt;  &lt;/p&gt;
+&lt;p&gt;Fedora 17 Partition Creation/Editing, from &lt;a href="http://docs.fedoraproject.org/en-US/Fedora/17/html/Installation_Guide/Adding_Partitions-x86.html"&gt;9.14.2. Adding
+Partitions&lt;/a&gt;:  &lt;/p&gt;
+&lt;p&gt;&lt;img alt="image" src="http://docs.fedoraproject.org/en-US/Fedora/17/html/Installation_Guide/images/diskpartitioning/part-add.png" /&gt;&lt;/p&gt;</summary><category term="bootloader"></category><category term="efi"></category><category term="fedora"></category><category term="gpt"></category><category term="grub"></category><category term="installation"></category><category term="laptop"></category><category term="mac"></category><category term="macbook"></category><category term="os x"></category></entry><entry><title>Fedora Init Script Specification Summary</title><link href="http://newblog.jasonantman.com/2013/01/fedora-init-script-specification-summary/" rel="alternate"></link><updated>2013-01-03T11:30:00-05:00</updated><author><name>admin</name></author><id>tag:newblog.jasonantman.com,2013-01-03:2013/01/fedora-init-script-specification-summary/</id><summary type="html">&lt;p&gt;I&amp;#8217;ve been deploying some new software lately (specifically
+&lt;a href="https://github.com/marisaseal/selenesse"&gt;selenesse&lt;/a&gt;, which combines
+&lt;a href="http://seleniumhq.org/"&gt;Selenium&lt;/a&gt; and &lt;a href="http://fitnesse.org/"&gt;fitnesse&lt;/a&gt;,
+&lt;a href="http://en.wikipedia.org/wiki/Xvfb"&gt;xvfb&lt;/a&gt;). None of these seem to come
+with init scripts to run as daemons, and the quality of the few
+Fedora/RedHat/CentOS init scripts I was able to find was quite poor. The
+Fedora project has a &lt;a href="http://fedoraproject.org/wiki/Packaging:SysVInitScript"&gt;Specification for SysV-style Init Scripts in their
+Packaging wiki&lt;/a&gt;,
+which specifies what a Fedora/RedHat/CentOS init script should look
+like, in excruciating detail. What follows is an overview of the more
+important points, which I&amp;#8217;m using to develop or modify the scripts I&amp;#8217;m
+currently working&amp;nbsp;on.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Scripts must be put in &lt;code&gt;/etc/rc.d/init.d&lt;/code&gt;, not in the &lt;code&gt;/etc/init.d&lt;/code&gt;
+    symlink. They should have 0755&amp;nbsp;permissions.&lt;/li&gt;
+&lt;li&gt;Scripts must have a Fedora-style &lt;a href="http://fedoraproject.org/wiki/Packaging:SysVInitScript#Chkconfig_Header"&gt;chkconfig
+    header&lt;/a&gt;
+    (&amp;#8220;chkconfig:&amp;#8221;, &amp;#8220;description:&amp;#8221; lines), and may have an &lt;a href="http://fedoraproject.org/wiki/Packaging:SysVInitScript#LSB_Header"&gt;&lt;span class="caps"&gt;LSB&lt;/span&gt;-style
+    header&lt;/a&gt;
+    (&lt;span class="caps"&gt;BEGIN&lt;/span&gt; &lt;span class="caps"&gt;INIT&lt;/span&gt; &lt;span class="caps"&gt;INFO&lt;/span&gt;/&lt;span class="caps"&gt;END&lt;/span&gt; &lt;span class="caps"&gt;INIT&lt;/span&gt; &lt;span class="caps"&gt;INFO&lt;/span&gt;). See &lt;a href="http://fedoraproject.org/wiki/Packaging:SysVInitScript#Initscript_template"&gt;Initscript
+    template&lt;/a&gt;.&lt;/li&gt;
+&lt;li&gt;Scripts &lt;strong&gt;must&lt;/strong&gt; make use of a lockfile in &lt;code&gt;/var/lock/subsys/&lt;/code&gt;, and
+    the name of the lockfile must be the same as the name of the init
+    script. (There is a technical reason for this relating to how sysv
+    init terminates daemons at shutdown). The lockfile should be touched
+    when the daemon successfully starts, and removed when it
+    successfully&amp;nbsp;stops.&lt;/li&gt;
+&lt;li&gt;Init scripts should not depend on any environment variables set
+    outside the script. They should operate gracefully with an
+    empty/uninitialized environment (or only &lt;span class="caps"&gt;LANG&lt;/span&gt; and &lt;span class="caps"&gt;TERM&lt;/span&gt; set and a &lt;span class="caps"&gt;CWD&lt;/span&gt;
+    of &lt;code&gt;/&lt;/code&gt;, as enforced by &lt;code&gt;service(8)&lt;/code&gt;, or with a full environment if
+    they are called directly by a&amp;nbsp;user.&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;a href="http://fedoraproject.org/wiki/Packaging:SysVInitScript#Required_Actions"&gt;Required&amp;nbsp;actions&lt;/a&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;all of the following actions are required, and have specific&amp;nbsp;definitions:&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;start&lt;/strong&gt;: starts the&amp;nbsp;service&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;stop&lt;/strong&gt;: stops the&amp;nbsp;service&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;restart&lt;/strong&gt;: stop and restart the service if the service is
+    already running, otherwise just start the&amp;nbsp;service&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;condrestart (and try-restart)&lt;/strong&gt;: restart the service if the
+    service is already running, if not, do&amp;nbsp;nothing&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;reload&lt;/strong&gt;: reload the configuration of the service without
+    actually stopping and restarting the service (if the service
+    does not support this, do&amp;nbsp;nothing)&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;force-reload&lt;/strong&gt;: reload the configuration of the service and
+    restart it so that it takes&amp;nbsp;effect&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;status&lt;/strong&gt;: print the current status of the&amp;nbsp;service&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;usage&lt;/strong&gt;: by default, if the initscript is run without any
+    action, it should list a &amp;#8220;usage message&amp;#8221; that has all actions
+    (intended for&amp;nbsp;use)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;There are specified exit codes for &lt;a href="http://fedoraproject.org/wiki/Packaging:SysVInitScript#Exit_Codes_for_the_Status_Action"&gt;status
+    actions&lt;/a&gt;
+    and &lt;a href="http://fedoraproject.org/wiki/Packaging:SysVInitScript#Exit_Codes_for_non-Status_Actions"&gt;non-status
+    actions&lt;/a&gt;.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;They must &amp;#8220;behave sensibly&amp;#8221;. I&amp;#8217;ve found this to be one of the
+    biggest problems with homegrown init scripts. If &lt;code&gt;servicename start&lt;/code&gt;
+    is called while the service is already running, it should simply
+    exit 0. Likewise if the service is already stopped. Init scripts
+    &lt;strong&gt;must not kill unrelated processes&lt;/strong&gt;. I don&amp;#8217;t know how many times
+    I&amp;#8217;ve seen scripts that kill every java or python process on a&amp;nbsp;machine.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;I intend to use this as a quick checklist when developing or evaluating
+init scripts for RedHat/Fedora based systems. In my experience, the
+biggest problems with most init scripts revolve around poor handling of
+&lt;span class="caps"&gt;PID&lt;/span&gt; files and lockfiles,&amp;nbsp;mainly:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Killing processes other than the one that the script started (i.e.
+    killing all java or python processes), usually because the &lt;span class="caps"&gt;PID&lt;/span&gt; isn&amp;#8217;t
+    tracked at&amp;nbsp;start&lt;/li&gt;
+&lt;li&gt;Starting a second instance of the subsystem because lockfiles aren&amp;#8217;t
+    used, or the status function is&amp;nbsp;broken.&lt;/li&gt;
+&lt;li&gt;improper exit&amp;nbsp;codes&lt;/li&gt;
+&lt;li&gt;either explicitly relying on environment variables (and therefore
+    breaking when called through &lt;code&gt;service(8)&lt;/code&gt;), or conversely, not
+    cleaning/resetting environment variables that are used by dependent
+    code or&amp;nbsp;processes.&lt;/li&gt;
+&lt;/ul&gt;</summary><category term="centos"></category><category term="fedora"></category><category term="init"></category><category term="redhat"></category><category term="startup"></category></entry><entry><title>Nagstamon on Fedora 17</title><link href="http://newblog.jasonantman.com/2012/10/nagstamon-on-fedora-17/" rel="alternate"></link><updated>2012-10-05T07:37:00-04:00</updated><author><name>admin</name></author><id>tag:newblog.jasonantman.com,2012-10-05:2012/10/nagstamon-on-fedora-17/</id><summary type="html">&lt;p&gt;Since I started my last job, I&amp;#8217;ve been using
+&lt;a href="http://nagstamon.ifw-dresden.de/"&gt;Nagstamon&lt;/a&gt; on my workstation; it&amp;#8217;s a
+really handy little system tray application that monitors a
+Nagios/Icinga instance and shows status updates/summary in a handy
+fashion, including flashing and (optionally) a sound alert when
+something changes. Unfortunately, there doesn&amp;#8217;t seem to be a Fedora 17
+package for it, though there is an entry on the &lt;a href="http://fedoraproject.org/wiki/Package_maintainers_wishlist#N-O"&gt;Fedora package
+maintainers
+wishlist&lt;/a&gt;.
+The closest I was able to find is a
+&lt;a href="http://pkgs.org/centos-6-rhel-6/repoforge-i386/nagstamon-0.9.7.1-2.el6.rf.noarch.rpm.html"&gt;repoforge/RPMforge&lt;/a&gt;
+package of Nagstamon 0.9.7.1, along with a &lt;a href="http://apt.sw.be/source/nagstamon-0.9.7.1-2.rf.src.rpm"&gt;source
+&lt;span class="caps"&gt;RPM&lt;/span&gt;&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;Here are the steps to build that package on&amp;nbsp;F17:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Download and install
+    &lt;a href="http://apt.sw.be/source/rpm-macros-rpmforge-0-6.rf.src.rpm"&gt;rpm-macros-rpmforge&lt;/a&gt;.&lt;/li&gt;
+&lt;li&gt;As root, edit &lt;code&gt;/etc/rpm/macros.rpmforge&lt;/code&gt; and comment out the &lt;code&gt;%dist&lt;/code&gt;
+    macro, so we&amp;#8217;ll still have the default &amp;#8220;fc17&amp;#8221; dist&amp;nbsp;tag.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;wget http://apt.sw.be/source/nagstamon-0.9.7.1-2.rf.src.rpm&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;rpmbuild &amp;#8212;rebuild&amp;nbsp;nagstamon-0.9.7.1-2.rf.src.rpm&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Hopefully this will help someone else as well. At the moment, Nagstamon
+is actually up to version 0.9.9, so hopefully I&amp;#8217;ll build a newer package
+sometime&amp;nbsp;soon.&lt;/p&gt;</summary><category term="fedora"></category><category term="nagios. icinga"></category><category term="nagstamon"></category><category term="package"></category><category term="rpm"></category></entry><entry><title>Getting oVirt up and running</title><link href="http://newblog.jasonantman.com/2012/09/getting-ovirt-up-and-running/" rel="alternate"></link><updated>2012-09-07T05:00:00-04:00</updated><author><name>admin</name></author><id>tag:newblog.jasonantman.com,2012-09-07:2012/09/getting-ovirt-up-and-running/</id><summary type="html">&lt;p&gt;The bulk of this post was written way back in April 2012. If you&amp;#8217;re just
+coming here, and looking to setup oVirt, you should probably &lt;a href="#postscript"&gt;skip down
+to the postscript&lt;/a&gt; for an update, and ignore most of the
+content here (as it&amp;#8217;s applicable to an older oVirt&amp;nbsp;version).&lt;/p&gt;
+&lt;p&gt;I recently started setting up &lt;a href="http://www.ovirt.org"&gt;oVirt&lt;/a&gt;, the
+community version of Red Hat Enterprise Virtualization, at work for some
+testing (mainly a &amp;#8220;sandbox&amp;#8221; &lt;span class="caps"&gt;VM&lt;/span&gt; environment, and because
+&lt;a href="http://theforeman.org/"&gt;Foreman&lt;/a&gt;
+&lt;a href="http://blog.theforeman.org/2012/03/vnc-support-built-in-foreman.html"&gt;supports&lt;/a&gt;
+it). To start with, I had two nodes, each with two dual-core Xeon
+processors (&lt;span class="caps"&gt;VT&lt;/span&gt;-x capable) with &lt;span class="caps"&gt;20GB&lt;/span&gt; &lt;span class="caps"&gt;RAM&lt;/span&gt;, one with &lt;span class="caps"&gt;600GB&lt;/span&gt; internal storage
+and one with &lt;span class="caps"&gt;140GB&lt;/span&gt; internal. While oVirt&amp;#8217;s documentation isn&amp;#8217;t exactly
+wonderful, I found a blgo post by Jason Brooks, &lt;a href="http://blog.jebpages.com/archives/how-to-get-up-and-running-with-ovirt/"&gt;How to Get Up and
+Running with
+oVirt&lt;/a&gt;,
+which gives a great walkthrough of getting the oVirt Engine setup on a
+machine, and also setting up that same machine as a &lt;span class="caps"&gt;VM&lt;/span&gt; host. As oVirt is
+still fairly young, this is all done on Fedora. I performed my
+installation via Cobbler, though I&amp;#8217;m afraid to admit it was an entirely
+manual, interactive&amp;nbsp;install.&lt;/p&gt;
+&lt;p&gt;I did run into a few bumps during Jason&amp;#8217;s tutorial. In step 15, adding
+the data &lt;span class="caps"&gt;NFS&lt;/span&gt; export as a Storage Domain, I was unable to add the &lt;span class="caps"&gt;NFS&lt;/span&gt;
+export. I found the &lt;a href="http://www.ovirt.org/wiki/Troubleshooting_NFS_Storage_Issues"&gt;Troubleshooting &lt;span class="caps"&gt;NFS&lt;/span&gt; Storage Issues page on the
+oVirt
+wiki&lt;/a&gt;,
+ensured that SELinux was disabled and that the export had the correct
+permissions, confirmed that &lt;code&gt;/etc/nfsmount.conf&lt;/code&gt; specified &lt;code&gt;Nfsvers=3&lt;/code&gt;,
+rebooted, and then ran the &lt;code&gt;nfs-check.py&lt;/code&gt; script. At this point, I was
+able to add the other storage domains in steps 15 and&amp;nbsp;16.&lt;/p&gt;
+&lt;p&gt;My second issue was that even on Fedora 16, I simply can&amp;#8217;t get the spice
+client (through the &lt;code&gt;spice-xpi&lt;/code&gt; browser plugin) to work. As far as I can
+tell from the logs, it looks like &lt;code&gt;spicec&lt;/code&gt; is being sent a value of
+&amp;#8220;None&amp;#8221; for the secured port parameter, instead of the correct port
+number. I assume this is a bug in oVirt, but I&amp;#8217;ll revisit this problem
+when I have time. In the mean time, I changed my test &lt;span class="caps"&gt;VM&lt;/span&gt; to use &lt;span class="caps"&gt;VNC&lt;/span&gt;,
+which is launched by installing the &lt;code&gt;ovirt-engine-cli&lt;/code&gt; package (see
+below) on your client computer, connecting to the oVirt &lt;span class="caps"&gt;API&lt;/span&gt; with&amp;nbsp;ovirt-shell:  &lt;/p&gt;
+&lt;p&gt;&lt;code&gt;ovirt-shell --connect --url=https://ovirt-engine.example.com:8443/api --user=admin@internal --password adminpassword&lt;/code&gt;&lt;br /&gt;
+and then running &lt;code&gt;console vm_name&lt;/code&gt;. This launches the &lt;code&gt;vncviewer&lt;/code&gt;
+binary, which is in the &amp;#8220;tigervnc&amp;#8221; package on&amp;nbsp;Fedora.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Installing&amp;nbsp;ovirt-engine-cli&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;To run &lt;code&gt;ovirt-shell&lt;/code&gt; on your workstation (Fedora 16, of course&amp;#8230;)
+you&amp;#8217;ll need the ovirt-engine-cli and ovirt-engine-sdk packages. I
+manually downloaded them from
+&lt;a href="http://www.ovirt.org/releases/nightly/fedora/16/"&gt;http://www.ovirt.org/releases/nightly/fedora/16/&lt;/a&gt;,
+versions 2.1.3 and 1.6.2, respecitively. The &lt;span class="caps"&gt;SDK&lt;/span&gt; and &lt;span class="caps"&gt;CLI&lt;/span&gt; are python
+based, so there are a few Python dependencies, all of which were
+automatically solved by yum. I know there are &lt;span class="caps"&gt;SDK&lt;/span&gt; and &lt;span class="caps"&gt;CLI&lt;/span&gt; packages out
+there for other distros, but haven&amp;#8217;t tried them&amp;nbsp;yet.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Installing Linux&amp;nbsp;Guests&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;Installing a CentOS 6.2 x86_64 guest was relatively straightforward,
+and my usual kickstart infrastructure worked fine. The only catch was
+the VirtIO storage interface, which shows up as &lt;code&gt;/dev/vdx&lt;/code&gt; instead of
+&lt;code&gt;/dev/sdx&lt;/code&gt;; I just added another kickstart metadata option in Cobbler
+that allows me to use &lt;code&gt;sdx&lt;/code&gt; by specifying &amp;#8220;virtual=yes&amp;#8221; (for our VMWare
+hosts), or &lt;code&gt;vdx&lt;/code&gt; by specifying&amp;nbsp;&amp;#8220;virtual=ovirt&amp;#8221;.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Setting up&amp;nbsp;Authentication&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;As installed, oVirt only has one user, &amp;#8220;admin@internal&amp;#8221;; it requires an
+external directory service for user authentication. Currently, it
+supports &lt;span class="caps"&gt;IPA&lt;/span&gt;, Red Hat&amp;#8217;s Enterprise Identity Management tool (combines
+&lt;span class="caps"&gt;RHEL&lt;/span&gt;, oVirt Directory Server, Kerberos and &lt;span class="caps"&gt;NTP&lt;/span&gt;; perhaps
+&lt;a href="http://freeipa.org"&gt;FreeIPA&lt;/a&gt; would work as well?) and Microsoft Active
+Directory. As much as I&amp;#8217;d like to give &lt;span class="caps"&gt;IPA&lt;/span&gt; or FreeIPA a try, my company
+already has an &lt;span class="caps"&gt;AD&lt;/span&gt; infrastructure, so I opted to go that route.
+Documentation is given in the &lt;a href="http://www.ovirt.org/wiki/File:OVirt-3.0-Installation_Guide-en-US.pdf"&gt;oVirt 3.0 Installation
+Guide&lt;/a&gt;,
+starting on page 96. Unfortunately, I was never about to get &lt;span class="caps"&gt;AD&lt;/span&gt; auth
+working correctly, so I just worked with the one admin&amp;nbsp;user.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Adding a&amp;nbsp;Node&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;The biggest issue I had was adding the second node to oVirt. I attempted
+to use the &lt;span class="caps"&gt;DVD&lt;/span&gt; Import feature of Cobbler on the &lt;a href="http://www.ovirt.org/get-ovirt/"&gt;oVirt Node Image
+&lt;span class="caps"&gt;ISO&lt;/span&gt;&lt;/a&gt;, but that failed. I then found the
+image&amp;#8217;s &lt;code&gt;LiveOS/livecd-iso-to-pxeboot&lt;/code&gt; script and used that to make a
+kernerl and initrd, and kernel parameters, for Cobbler. &lt;span class="caps"&gt;PXE&lt;/span&gt; works&amp;nbsp;fine.&lt;/p&gt;
+&lt;p&gt;&lt;a name="postscript"&gt;&lt;/a&gt;&lt;strong&gt;Postscript:&lt;/strong&gt; I ended up blowing away my
+oVirt installation in favor of testing other things. At some point, the
+engine install got corrupted in a way that I just couldn&amp;#8217;t fix; even
+though I spent all day one Saturday working on it, it took more time
+than I could allocate to a personal project. So this post is really
+semi-complete at best. However, there is some good news. Jason Brooks&amp;#8217;
+original post, &lt;a href="http://blog.jebpages.com/archives/how-to-get-up-and-running-with-ovirt/"&gt;How to Get Up and Running with
+oVirt&lt;/a&gt;,
+was written for oVirt 3.0, as was this post. Since then, there has been
+a new release, &lt;a href="http://wiki.ovirt.org/wiki/OVirt_3.1_release_notes"&gt;oVirt
+3.1&lt;/a&gt;, which
+apparently has a better &lt;span class="caps"&gt;UI&lt;/span&gt; and a better installer. Jason Brooks has a
+new post, &lt;a href="http://blog.jebpages.com/archives/up-and-running-with-ovirt-3-1-edition/"&gt;Up and Running with oVirt, 3.1
+Edition&lt;/a&gt;,
+which covers installation and configuration of both an all-in-one
+machine and a separate node. If you&amp;#8217;re looking to try oVirt, I&amp;#8217;d
+recommend you give that a shot. Unfortunately (and strangely, given that
+this is supposed to be the &amp;#8220;upstream&amp;#8221; of RedHat&amp;#8217;s proprietary &lt;span class="caps"&gt;RHEV&lt;/span&gt;) it&amp;#8217;s
+still all based on&amp;nbsp;Fedora.&lt;/p&gt;</summary><category term="fedora"></category><category term="kvm"></category><category term="ovirt"></category><category term="qemu"></category><category term="redhat"></category><category term="rhev"></category><category term="spice"></category><category term="virtualization"></category></entry><entry><title>CentOS/Fedora Install on SuperMicro Servers via IPMI Card KVM Over IP</title><link href="http://newblog.jasonantman.com/2012/04/centosfedora-install-on-supermicro-servers-via-ipmi-card-kvm-over-ip/" rel="alternate"></link><updated>2012-04-13T15:19:00-04:00</updated><author><name>admin</name></author><id>tag:newblog.jasonantman.com,2012-04-13:2012/04/centosfedora-install-on-supermicro-servers-via-ipmi-card-kvm-over-ip/</id><summary type="html">&lt;p&gt;I recently had to setup Fedora 16 to test something on a &lt;a href="http://www.supermicro.com/products/system/1U/6015/SYS-6015T-T.cfm"&gt;SuperMicro
+6015T-&lt;span class="caps"&gt;TV&lt;/span&gt;&lt;/a&gt;
+1U &amp;#8220;dual&amp;#8221; server. This is a 1U enclosure with two separate servers in it
+- based on the &lt;a href="http://www.supermicro.com/products/motherboard/Xeon1333/5000P/X7DBT.cfm"&gt;SuperMicro
+&lt;span class="caps"&gt;X7DBT&lt;/span&gt;&lt;/a&gt;
+motherboards - each with an
+&lt;a href="http://www.supermicro.com/products/accessories/addon/SIM.cfm"&gt;&lt;span class="caps"&gt;AOC&lt;/span&gt;-&lt;span class="caps"&gt;SIMSO&lt;/span&gt;+&lt;/a&gt;
+&lt;span class="caps"&gt;IPMI&lt;/span&gt; and &lt;span class="caps"&gt;KVM&lt;/span&gt;-over-&lt;span class="caps"&gt;IP&lt;/span&gt; management card. Every time I tried different
+options for the kernel parameters (I was using Cobbler), I could get the
+&lt;span class="caps"&gt;OS&lt;/span&gt; to boot, but once Anaconda started, I&amp;#8217;d lose image (&amp;#8220;No Signal&amp;#8221;) on
+the &lt;span class="caps"&gt;IP&lt;/span&gt; &lt;span class="caps"&gt;KVM&lt;/span&gt;, and the serial console would go quiet. It took me about a
+dozen tries before I found a mailing list reference to the &amp;#8220;nomodeset&amp;#8221;
+option. This did the trick perfectly, and kept Anaconda&amp;nbsp;working.&lt;/p&gt;</summary><category term="anaconda"></category><category term="centos"></category><category term="fedora"></category><category term="ipmi"></category><category term="kvm"></category><category term="linux"></category><category term="raritan"></category><category term="supermicro"></category></entry></feed>

@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Jason Antman's Blog</title><link>http://newblog.jasonantman.com/</link><description></description><atom:link href="http://newblog.jasonantman.com/feeds/tags/pcengines.rss.xml" rel="self"></atom:link><lastBuildDate>Fri, 30 Sep 2011 14:16:00 -0400</lastBuildDate><item><title>Vyatta NetworkOS router/firewall on Alix board / Compact Flash</title><link>http://newblog.jasonantman.com/2011/09/vyatta-networkos-routerfirewall-on-alix-board-compact-flash/</link><description>&lt;p&gt;With the impending move to an apartment in Georgia and the migration of
+my rack full of servers to a hosting provider, there&amp;#8217;s no longer a need
+for me to run my &lt;a href="http://www.vyatta.org/"&gt;Vyatta &lt;span class="caps"&gt;VC&lt;/span&gt;&lt;/a&gt; router on a beefy
+dual-&lt;span class="caps"&gt;CPU&lt;/span&gt; RAIDed &lt;a href="http://h18000.www1.hp.com/products/quickspecs/11504_na/11504_na.HTML"&gt;&lt;span class="caps"&gt;DL360&lt;/span&gt;
+G3&lt;/a&gt;
+&lt;span class="caps"&gt;HP&lt;/span&gt; Proliant server chassis. I found an older PCEngines &lt;a href="http://pcengines.ch/alix2c1.htm"&gt;Alix
+2c1&lt;/a&gt; single board computer (433 MHz &lt;span class="caps"&gt;AMD&lt;/span&gt;
+Geode &lt;span class="caps"&gt;LX700&lt;/span&gt; , &lt;span class="caps"&gt;128MB&lt;/span&gt; &lt;span class="caps"&gt;DDR&lt;/span&gt; &lt;span class="caps"&gt;DRAM&lt;/span&gt;, CompactFlash (&lt;span class="caps"&gt;CF&lt;/span&gt;) card socket, MiniPCI, 3x
+10/100 ethernet) lying around, and decided to turn that into the new
+router. But I&amp;#8217;ve been so spoiled by Vyatta&amp;#8217;s good performance (well, at
+least on an x86 server) and the &lt;em&gt;real&lt;/em&gt; &lt;span class="caps"&gt;CLI&lt;/span&gt;, so I don&amp;#8217;t think I can go
+back to something like &lt;a href="http://m0n0.ch/wall/"&gt;m0n0wall&lt;/a&gt; or
+&lt;a href="http://www.pfsense.org/"&gt;pfSense&lt;/a&gt;, and since it&amp;#8217;s going to be my only
+network services box (also doing &lt;span class="caps"&gt;DNS&lt;/span&gt;, &lt;span class="caps"&gt;DHCP&lt;/span&gt;, firewalling, &lt;span class="caps"&gt;NAT&lt;/span&gt;, and maybe
+IPsec &lt;span class="caps"&gt;VPN&lt;/span&gt;) it&amp;#8217;s not viable to use the type of older Cisco or Juniper
+hardware that I can&amp;nbsp;afford.&lt;/p&gt;
+&lt;p&gt;The down side is that Vyatta isn&amp;#8217;t really designed or tuned for small
+systems, let alone &lt;span class="caps"&gt;CF&lt;/span&gt; media that doesn&amp;#8217;t take too well to lots of
+writes. So, I&amp;#8217;m going to begin experimentation with doing a &lt;span class="caps"&gt;CF&lt;/span&gt; install
+of the current Vyatta Core 6.3, and we&amp;#8217;ll see how it goes and what
+tuning I do over&amp;nbsp;time.&lt;/p&gt;
+&lt;p&gt;I found two relatively good references; a &lt;a href="http://www.vyatta.org/forum/viewtopic.php?t=502"&gt;post on the vyatta.org
+forum&lt;/a&gt; from 2008,
+relating to Vyatta version 4 (also on the author&amp;#8217;s
+&lt;a href="http://dataflip.blogspot.com/2008/06/optimizing-vyatta-for-compact-flash.html"&gt;blog&lt;/a&gt;),
+and a &lt;a href="http://peytongroup.wordpress.com/2010/02/16/vyatta-community-on-a-compact-flash/"&gt;blog
+post&lt;/a&gt;
+detailing a more complex
+&lt;a href="http://squashfs.sourceforge.net/"&gt;SquashFS&lt;/a&gt;/&lt;a href="http://en.wikipedia.org/wiki/Tmpfs"&gt;tmpfs&lt;/a&gt;/&lt;a href="http://unionfs.filesystems.org/"&gt;UnionFS&lt;/a&gt;
+read-only Vyatta install. Given my relatively short timeframe and little
+free time, I decided to try the former approach for now, and plan to
+make a more customized and tuned &lt;span class="caps"&gt;CF&lt;/span&gt; version of Vyatta in the&amp;nbsp;future.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Creating the actual disk&amp;nbsp;image:&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;My development platform at the moment is an intel-based MacBook Pro,
+running MacOS X 10.6.4 and VirtualBox 4.0.12. As much of a Linux fan as
+I am, my work laptop runs Mac (like everyone else in the office) and
+lately I can&amp;#8217;t guarantee that I&amp;#8217;ll be at my desktop long enough to
+finish anything. The target is an Alix2c1 with a &lt;span class="caps"&gt;2GB&lt;/span&gt; SanDisk Ultra &lt;span class="caps"&gt;CF&lt;/span&gt;
+card (yes, I know an industrial card would be better, but I couldn&amp;#8217;t get
+my hands on one). For starters, I created a new VirtualBox &lt;span class="caps"&gt;VM&lt;/span&gt; with the
+following&amp;nbsp;settings:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;span class="caps"&gt;OS&lt;/span&gt; Type: Linux&amp;nbsp;2.6&lt;/li&gt;
+&lt;li&gt;Base Memory:&amp;nbsp;&lt;span class="caps"&gt;128MB&lt;/span&gt;&lt;/li&gt;
+&lt;li&gt;Boot Order: Floppy, &lt;span class="caps"&gt;CD&lt;/span&gt;-&lt;span class="caps"&gt;ROM&lt;/span&gt;, Hard&amp;nbsp;Disk&lt;/li&gt;
+&lt;li&gt;&lt;span class="caps"&gt;IDE&lt;/span&gt; Controller Primary: mounted vyatta-livecd_VC6.3 &lt;span class="caps"&gt;ISO&lt;/span&gt;&amp;nbsp;image&lt;/li&gt;
+&lt;li&gt;&lt;span class="caps"&gt;IDE&lt;/span&gt; Controller Secondary: &lt;span class="caps"&gt;RAW&lt;/span&gt; &lt;span class="caps"&gt;VMDK&lt;/span&gt; image (created&amp;nbsp;below)&lt;/li&gt;
+&lt;li&gt;Audio:&amp;nbsp;None&lt;/li&gt;
+&lt;li&gt;Network: Disabled &lt;em&gt;(this is important, as Vyatta saves the
+    interfaces by hardware address, and it would require some config
+    editing and reboots to change&amp;nbsp;them)&lt;/em&gt;&lt;/li&gt;
+&lt;li&gt;Serial Port: disconnected (but&amp;nbsp;present)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;One difficulty I ran into on Mac is mounting the raw &lt;span class="caps"&gt;CF&lt;/span&gt; card in the
+VirtualBox guest. I plugged it in via a &lt;span class="caps"&gt;USB&lt;/span&gt; reader, and of course it
+automatically mounted in MacOS. I ejected it and the &lt;code&gt;/dev/disk1&lt;/code&gt; device
+disappeared. It turns out that the full procedure (as far as I could
+tell) for Mac&amp;nbsp;is:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Plug in the &lt;span class="caps"&gt;CF&lt;/span&gt; card and&amp;nbsp;reader.&lt;/li&gt;
+&lt;li&gt;It should automount. Run &lt;code&gt;mount&lt;/code&gt; to see what the actual device is -
+    in my case, the &lt;code&gt;/dev/disk1s1&lt;/code&gt; partition was mounted, so the disk is
+    &lt;code&gt;/dev/disk1&lt;/code&gt;.&lt;/li&gt;
+&lt;li&gt;Run &lt;code&gt;sudo umount -f /dev/disk1&lt;/code&gt;. It seems that the MacOS automounter
+    has a god complex, so you may need to re-run this command quite a
+    few times throughout the process if you get device or resource busy&amp;nbsp;errors.&lt;/li&gt;
+&lt;li&gt;In an appropriate directory, create the raw &lt;span class="caps"&gt;VMDK&lt;/span&gt; image with:
+    &lt;code&gt;VBoxManage internalcommands createrawvmdk -filename rawdisk.vmdk -rawdisk /dev/disk1&lt;/code&gt;.&lt;/li&gt;
+&lt;li&gt;When creating your &lt;span class="caps"&gt;VM&lt;/span&gt;, you&amp;#8217;ll have an option to select Use an
+    Existing Virtual Disk. Use that option, and select the file created
+    in the last&amp;nbsp;step.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Once that&amp;#8217;s done, and you&amp;#8217;ve setup the &lt;span class="caps"&gt;VM&lt;/span&gt; with the raw disk, boot the &lt;span class="caps"&gt;VM&lt;/span&gt;
+(should boot to the Vyatta LiveCD), login as usual for an install
+(vyatta:vyatta), and the the fun&amp;nbsp;begins:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;At the prompt after logging in, &lt;code&gt;sudo su -&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;Edit &lt;code&gt;/opt/vyatta/sbin/install-system&lt;/code&gt; (hint: Vyatta has nano and vi
+    installed. &lt;code&gt;nano -c filename&lt;/code&gt; shows line numbers) and change the
+    &lt;code&gt;ROOT_FSTYPE&lt;/code&gt; variable (line 78 in &lt;span class="caps"&gt;VC6&lt;/span&gt;.3) from &amp;#8220;ext4&amp;#8221; to&amp;nbsp;&amp;#8220;ext2&amp;#8221;.&lt;/li&gt;
+&lt;li&gt;Run &lt;code&gt;install-system&lt;/code&gt;. I used all default options (including one
+    partition) and it seemed to work fine. It took a minute or two to
+    create the ext2 filesystem on my &lt;span class="caps"&gt;2GB&lt;/span&gt; &lt;span class="caps"&gt;CF&lt;/span&gt;&amp;nbsp;card.&lt;/li&gt;
+&lt;li&gt;The file copy took even longer&amp;#8230; so be patient, or have a book&amp;nbsp;handy.&lt;/li&gt;
+&lt;li&gt;When system-install finishes and you get the root prompt back,
+    before rebooting, continue with some minor&amp;nbsp;tweaks:&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;mkdir /mnt/temp&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;mount /dev/sda1 /mnt/temp&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;cd /mnt/temp&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;Edit &lt;code&gt;boot/grub/grub.cfg&lt;/code&gt; and change all occurrences of
+    &amp;#8220;root=&lt;span class="caps"&gt;UUID&lt;/span&gt;=&amp;#8230;&amp;#8221; entries for the &amp;#8220;linux&amp;#8221; lines (lines 13, 18, 23, 28
+    in my grub.cfg) to &amp;#8220;root=/dev/sda1&amp;#8221;. My only real reason for this
+    change is so that I can move my altered config files (config.boot,
+    fstab and grub.cfg) with minimal changes when I upgrade or make a
+    different vyatta &lt;span class="caps"&gt;CF&lt;/span&gt; card, without having to update the &lt;span class="caps"&gt;UUID&lt;/span&gt; for the
+    new&amp;nbsp;partition.&lt;/li&gt;
+&lt;li&gt;Edit &lt;code&gt;etc/fstab&lt;/code&gt; and change the &amp;#8220;&lt;span class="caps"&gt;UUID&lt;/span&gt;=&amp;#8230;&amp;#8221; device to&amp;nbsp;&amp;#8221;/dev/sda1&amp;#8221;.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;shutdown&lt;/code&gt;. Once the &lt;span class="caps"&gt;VM&lt;/span&gt; is stopped, you can remove the &lt;span class="caps"&gt;CF&lt;/span&gt;&amp;nbsp;card.&lt;/li&gt;
+&lt;li&gt;The PCEngines Alix.2 boards use a default serial console speed of
+    38400 baud. Pretty much every network device, plus Linux and Vyatta,
+    use a default speed of 9600 baud. Once I got the &lt;span class="caps"&gt;CF&lt;/span&gt; card installed
+    in the Alix board and hooked it up to my laptop (null modem cable to
+    a &lt;span class="caps"&gt;PL&lt;/span&gt;-2303 based &lt;span class="caps"&gt;USB&lt;/span&gt; to serial adapter, minicom for terminal
+    emulation), I set my terminal emulator to 38400 8N1, powered the
+    board, and then pressed &amp;#8216;s&amp;#8217; during &lt;span class="caps"&gt;POST&lt;/span&gt; to get into &lt;span class="caps"&gt;BIOS&lt;/span&gt; settings.
+    Option &amp;#8216;9&amp;#8217; sets the Alix to 9600 baud, &amp;#8216;Q&amp;#8217; to quit, and &amp;#8216;Y&amp;#8217; to save
+    changes permanently. The board will reboot, and once the terminal
+    emulator is set back to 9600 baud, serial console should work fine
+    both in &lt;span class="caps"&gt;BIOS&lt;/span&gt; and in the&amp;nbsp;&lt;span class="caps"&gt;OS&lt;/span&gt;.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;If all worked well, you should be able to boot into Vyatta and login as
+the default &amp;#8220;vyatta&amp;#8221; user (which you set a password for during the
+install). Assuming you know your way around Vyatta, it&amp;#8217;s pretty standard
+from here, though there are a few things you may want to check or
+configure right&amp;nbsp;away:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;In configuration mode (&lt;code&gt;configure&lt;/code&gt;) run &lt;code&gt;show interfaces&lt;/code&gt;. All of
+    your physical ethernet interfaces should appear, along with their
+    &lt;span class="caps"&gt;MAC&lt;/span&gt;&amp;nbsp;addresses.&lt;/li&gt;
+&lt;li&gt;Some changes to reduce the number of log writes to the &lt;span class="caps"&gt;CF&lt;/span&gt; card:
+    &lt;code&gt;set system syslog console facility all level notice&lt;/code&gt; and
+    &lt;code&gt;set system syslog global facility protocols level notice&lt;/code&gt;.&lt;/li&gt;
+&lt;li&gt;Configure interfaces. with firewalls, &lt;span class="caps"&gt;IP&lt;/span&gt; addresses or &lt;span class="caps"&gt;DHCP&lt;/span&gt;,&amp;nbsp;etc.&lt;/li&gt;
+&lt;li&gt;Do whatever other configuration you need for a minimal system -
+    dhcp, dns, nat,&amp;nbsp;etc.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;And that&amp;#8217;s it - this should give you a working Vyatta system on &lt;span class="caps"&gt;CF&lt;/span&gt; on an
+Alix board. Stay tuned, hopefully in a month or so I&amp;#8217;ll get around to
+customizing it a bit more, based on the second blog entry linked&amp;nbsp;above.&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Fri, 30 Sep 2011 14:16:00 -0400</pubDate><guid>tag:newblog.jasonantman.com,2011-09-30:2011/09/vyatta-networkos-routerfirewall-on-alix-board-compact-flash/</guid><category>alix</category><category>embedded</category><category>network</category><category>pcengines</category><category>router</category><category>vyatta</category></item></channel></rss>

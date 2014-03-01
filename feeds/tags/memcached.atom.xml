@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Jason Antman's Blog</title><link href="http://newblog.jasonantman.com/" rel="alternate"></link><link href="http://newblog.jasonantman.com/feeds/tags/memcached.atom.xml" rel="self"></link><id>http://newblog.jasonantman.com/</id><updated>2012-06-26T13:46:00-04:00</updated><entry><title>Tools for watching apache httpd and memcached</title><link href="http://newblog.jasonantman.com/2012/06/tools-for-watching-apache-httpd-and-memcached/" rel="alternate"></link><updated>2012-06-26T13:46:00-04:00</updated><author><name>admin</name></author><id>tag:newblog.jasonantman.com,2012-06-26:2012/06/tools-for-watching-apache-httpd-and-memcached/</id><summary type="html">&lt;p&gt;Recently I was working on a code release on a site running &lt;span class="caps"&gt;PHP&lt;/span&gt; on
+&lt;a href="http://httpd.apache.org/"&gt;Apache httpd&lt;/a&gt;, and using
+&lt;a href="http://memcached.org/"&gt;memcached&lt;/a&gt;. Without getting into specifics, we
+had a number of issues that were both Apache and memcached problems, and
+little visibility into them as it was running on an older server without
+much monitoring in place. I started looking around for simple tools that
+could provide a bit more insight, without many dependencies (as the
+machine is a relatively minimalist install). Here are some of the
+options I&amp;nbsp;found:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;a href="http://code.google.com/p/memcache-top/"&gt;memcache-top&lt;/a&gt; - A top-like
+    script that pulls stats from memcached instances and can show both
+    per-instance, total and average usage %, hit rate, number of
+    connections, time to run the stats query, evictions, gets, sets, and
+    read and write amounts. Best of all, it&amp;#8217;s a very small perl script
+    that requires only &lt;span class="caps"&gt;IO&lt;/span&gt;::Socket and Time::HiRes. Here&amp;#8217;s a small
+    example of the&amp;nbsp;output:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;memcache-top v0.6       (default port: 11211, color: on, refresh: 3 seconds)
+
+INSTANCE                USAGE   HIT %   CONN    TIME    EVICT   GETS    SETS    READ    WRITE
+127.0.0.1:11211         86.6%   99.4%   115     0.6ms   0.0     4114    1669    1.3M    24.2M
+127.0.0.1:11212         85.5%   59.9%   2       0.4ms   0.0     0       0       90      8055
+
+AVERAGE:                86.0%   79.6%   58      0.5ms   0.0     2057    834     682.4K  12.1M
+
+TOTAL:          0.9GB/  1.0GB           117     1.0ms   0.0     4114    1669    1.3M    24.2M
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;a href="https://github.com/dormando/damemtop"&gt;damemtop&lt;/a&gt; is also a nice
+    top-like memcached tool. On the positive side, you can specify any
+    column from &amp;#8220;stats&amp;#8221;, &amp;#8220;stats items&amp;#8221; or &amp;#8220;stats slabs&amp;#8221; in the
+    configuration file, and can choose between average or one-second
+    snapshots for each column. On the down side, it requires the &lt;span class="caps"&gt;YAML&lt;/span&gt;
+    and AnyEvent Perl modules, so it has some uncommon&amp;nbsp;dependencies.&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;damemtop: Tue Jun 26 14:02:24 2012 [sort: hostname asc] [delay: 3s]
+hostname           all_version  all_fill_rate  hit_rate  evictions  curr_items  curr_connections   cmd_get  cmd_set  bytes_written  bytes_read  get_hits  get_misses  
+TOTAL:             
+NA                 NA           NA             NA        NA         NA          NA                 87       32       491,735        30,894      86        1           
+AVERAGE:           
+NA                 NA           86.00%         99.00%    NA         NA          NA                 43       16       122,933        7,723       43        1           
+10.200.1.78:11211  1.2.6        86.63%         98.04%    0          0           -1.00204024880524  51       19       386,492        21,613      50        1           
+10.200.1.78:11212  1.2.6        85.46%         NA        0          0           0                  0        0        11,373         31          0         0           
+10.200.1.79:11211  1.2.6        87.31%         100.00%   0          0           -1.00204024880524  36       13       82,479         9,219       36        0           
+10.200.1.79:11212  1.2.6        85.08%         NA        0          0           0                  0        0        11,389         31          0         0           
+loop took: 0.305617094039917
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;I&amp;#8217;m still looking around for something for apache that uses mod_status
+and isn&amp;#8217;t too verbose; ideally I&amp;#8217;d like to be able to watch memcached,
+apache response codes/times, and apache mod_status all in the same
+terminal&amp;nbsp;window.&lt;/p&gt;</summary><category term="apache"></category><category term="memcached"></category><category term="perl"></category><category term="top"></category><category term="troubleshooting"></category></entry></feed>

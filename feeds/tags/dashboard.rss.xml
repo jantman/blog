@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Jason Antman's Blog</title><link>http://newblog.jasonantman.com/</link><description></description><atom:link href="http://newblog.jasonantman.com/feeds/tags/dashboard.rss.xml" rel="self"></atom:link><lastBuildDate>Sat, 11 Aug 2012 10:34:00 -0400</lastBuildDate><item><title>Patch to Puppet Dashboard 1.2.10 to show arbitrary facts in the main node table</title><link>http://newblog.jasonantman.com/2012/08/patch-to-puppet-dashboard-1-2-10-to-show-arbitrary-facts-in-the-main-node-table/</link><description>&lt;p&gt;We use &lt;a href="http://puppetlabs.com/puppet/related-projects/dashboard/"&gt;Puppet
+Dashboard&lt;/a&gt; at
+work to view the status of our puppet nodes. While it&amp;#8217;s very handy,
+there&amp;#8217;s one feature I really wanted: the ability to show the value of
+arbitrary puppet facts in the main node table on the home page.
+Specifically, the facts we use for environment (we have eng/dev, qa,
+prod, and test puppet environments), zone (physical location) and last
+applied configuration version. I&amp;#8217;m not terribly experience with Ruby,
+but I managed to muddle my way through a working patch to do this, along
+with options in the settings file to enable it and configure the facts.
+You&amp;#8217;ll need to restart dashboard (or your web server) to change the
+facts, of course. The commit is currently &lt;a href="https://github.com/jantman/puppet-dashboard/commit/5364e2b0188d18ae62c355279e58c7ce6d7db654"&gt;available on
+github&lt;/a&gt;,
+but it doesn&amp;#8217;t strictly follow the &lt;a href="https://github.com/puppetlabs/puppet-dashboard/blob/master/CONTRIBUTING.md"&gt;puppet-dashboard contributing
+checklist&lt;/a&gt;
+so I may have to redo&amp;nbsp;it.&lt;/p&gt;
+&lt;p&gt;Here&amp;#8217;s a&amp;nbsp;screenshot:&lt;/p&gt;
+&lt;p&gt;&lt;a href="/GFX/dashboard_after_patch.png"&gt;&lt;img alt="Dashboard screenshot after
+patch" src="/GFX/dashboard_after_patch_sm.png" /&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;And here&amp;#8217;s that the configuration section added to settings.yml looks&amp;nbsp;like:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="c1"&gt;# Enables display of arbitrary node facts in &amp;quot;home&amp;quot; page node table, between node name and latest report time&lt;/span&gt;
+&lt;span class="l-Scalar-Plain"&gt;enable_home_facts&lt;/span&gt;&lt;span class="p-Indicator"&gt;:&lt;/span&gt; &lt;span class="l-Scalar-Plain"&gt;true&lt;/span&gt;
+
+&lt;span class="c1"&gt;# If enable_home_facts is true, the fact names and column headings to display. Simply repeat the following two line pairs&lt;/span&gt;
+&lt;span class="c1"&gt;# as needed:&lt;/span&gt;
+&lt;span class="c1"&gt;#- name: &amp;#39;factname&amp;#39;&lt;/span&gt;
+&lt;span class="c1"&gt;#  heading: &amp;#39;heading text&amp;#39;&lt;/span&gt;
+&lt;span class="l-Scalar-Plain"&gt;home_facts&lt;/span&gt;&lt;span class="p-Indicator"&gt;:&lt;/span&gt; 
+&lt;span class="p-Indicator"&gt;-&lt;/span&gt; &lt;span class="l-Scalar-Plain"&gt;name&lt;/span&gt;&lt;span class="p-Indicator"&gt;:&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;environment&amp;#39;&lt;/span&gt;
+  &lt;span class="l-Scalar-Plain"&gt;heading&lt;/span&gt;&lt;span class="p-Indicator"&gt;:&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;Env&amp;#39;&lt;/span&gt;
+&lt;span class="p-Indicator"&gt;-&lt;/span&gt; &lt;span class="l-Scalar-Plain"&gt;name&lt;/span&gt;&lt;span class="p-Indicator"&gt;:&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;zone&amp;#39;&lt;/span&gt;
+  &lt;span class="l-Scalar-Plain"&gt;heading&lt;/span&gt;&lt;span class="p-Indicator"&gt;:&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;Zone&amp;#39;&lt;/span&gt;
+&lt;span class="p-Indicator"&gt;-&lt;/span&gt; &lt;span class="l-Scalar-Plain"&gt;name&lt;/span&gt;&lt;span class="p-Indicator"&gt;:&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;catalog_config_version&amp;#39;&lt;/span&gt;
+  &lt;span class="l-Scalar-Plain"&gt;heading&lt;/span&gt;&lt;span class="p-Indicator"&gt;:&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;Cfg&lt;/span&gt;&lt;span class="nv"&gt; &lt;/span&gt;&lt;span class="s"&gt;Ver&amp;#39;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;If I feel really adventurous, I&amp;#8217;d like to implement my other big wish,
+some sort of pop-up list of links, based on arbitrary facts (mainly
+hostname and fqdn) for each node - something where I can mouse over the
+node name/table cell, and see links (static URLs with node
+name/fqdn/other facts plugged in) to things like Nagios/Icinga, our
+backup system,&amp;nbsp;etc.&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Sat, 11 Aug 2012 10:34:00 -0400</pubDate><guid>tag:newblog.jasonantman.com,2012-08-11:2012/08/patch-to-puppet-dashboard-1-2-10-to-show-arbitrary-facts-in-the-main-node-table/</guid><category>dashboard</category><category>facts</category><category>puppet</category><category>ruby</category><category>sysadmin</category></item><item><title>The state of Puppet External Node Classifiers</title><link>http://newblog.jasonantman.com/2012/02/the-state-of-puppet-external-node-classifiers/</link><description>&lt;p&gt;&lt;strong&gt;Update November 2013&lt;/strong&gt;: This post has brought an amazing amount of
+traffic to my blog, probably because it still seems to be one of the
+only &lt;span class="caps"&gt;ENC&lt;/span&gt; comparisons out there. Both Dashboard (and Puppet Enterprise
+Console) and The Foreman have changed quite a bit since I wrote this.
+Foreman has certainly been developed at warp speed. I&amp;#8217;ll try to write an
+update to this sometime soon, but be advised that the information here
+is somewhat&amp;nbsp;dated.&lt;/p&gt;
+&lt;p&gt;At work, we&amp;#8217;re in the process of rolling out
+&lt;a href="http://projects.puppetlabs.com/projects/puppet"&gt;puppet&lt;/a&gt; for
+configuration management of our servers. It will be an integral part of
+the provisioning process of all new physical and virtual hosts, and will
+also be phased in on existing hosts as possible. Right now, we have an
+initial puppet install that was &amp;#8220;development&amp;#8221;, but we&amp;#8217;re about to move
+to &amp;#8220;production&amp;#8221; (new puppetmaster in our production infrastructure,
+production MySQL, etc.). We&amp;#8217;ve been using
+&lt;a href="http://puppetlabs.com/puppet/related-projects/dashboard/"&gt;Dashboard&lt;/a&gt;,
+but just as a report viewer. Up until now, we&amp;#8217;ve been using nodes.pp and
+per-node flat-file manifests. I&amp;#8217;ve got a few issues with this, but the
+biggest is that all of our node definitions (and their classes and
+parameters) live in the same &lt;span class="caps"&gt;SVN&lt;/span&gt; repository as our modules and other
+puppet configuration. Not only does this mean a checkout and commit just
+to change a node parameter or add a module/class to a node, but it also
+means that for my team members who don&amp;#8217;t have previous puppet
+experience, it greatly blurs the line between administering puppet
+(developing and maintaining modules) and using puppet (building a node,
+changing node params or modules/classes), since both tasks are
+accomplished in the same &lt;span class="caps"&gt;SVN&lt;/span&gt;&amp;nbsp;repository.&lt;/p&gt;
+&lt;p&gt;So, I&amp;#8217;ve been pushing an &lt;a href="http://docs.puppetlabs.com/guides/external_nodes.html"&gt;External Node Classifier
+(&lt;span class="caps"&gt;ENC&lt;/span&gt;)&lt;/a&gt; with a web
+interface as one of the biggest feature enhancements we need for our
+puppet install. The complicating factor is that I&amp;#8217;ve been given a time
+frame of approximately 1 week to get the &amp;#8220;production&amp;#8221; puppetmaster
+running on our production infrastructure and marked as &amp;#8220;done&amp;#8221;. That
+includes the &lt;span class="caps"&gt;ENC&lt;/span&gt;. At my last gig, at Rutgers University, I wrote our &lt;span class="caps"&gt;ENC&lt;/span&gt;
+in &lt;span class="caps"&gt;PHP&lt;/span&gt; (actually I wrote it for my half-dozen or so boxes at home, and
+brought it to Rutgers gratis), and it also handled kickstart file
+distribution and &lt;span class="caps"&gt;PXE&lt;/span&gt; configuration, and was extended to also set &lt;span class="caps"&gt;DHCP&lt;/span&gt;
+and &lt;span class="caps"&gt;DNS&lt;/span&gt; for the hosts - a one-stop solution. Unfortunately the code is
+very organization-specific, not terribly solid, and the &lt;span class="caps"&gt;UI&lt;/span&gt; looks awful,
+so it&amp;#8217;s not a fit for the current employer. So I have to find something
+else that fits the bill. I have a list of initial (&amp;#8220;phase 1&amp;#8221;)
+requirements that are a mix of functionality that we require and
+management&amp;nbsp;requirements:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Must support environments, since we make use of&amp;nbsp;them.&lt;/li&gt;
+&lt;li&gt;Must support default values for parameters based on environment,
+    &amp;#8220;zone&amp;#8221; (a custom fact and variable we define), or a combination of&amp;nbsp;both.&lt;/li&gt;
+&lt;li&gt;For accountability and legal reasons, must have full auditing of all
+    changes by all users (and, obviously, support&amp;nbsp;authentication).&lt;/li&gt;
+&lt;li&gt;Display node last run time and&amp;nbsp;status.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;As well as at least the ability to implement some of our phase 2&amp;nbsp;requirements:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Ability to show modules and classes applied to a node, including
+    those required/included through other&amp;nbsp;modules/classes/roles.&lt;/li&gt;
+&lt;li&gt;Should support at least some level of puppet report&amp;nbsp;display.&lt;/li&gt;
+&lt;li&gt;Ability to trigger a node run (kick) from the&amp;nbsp;&lt;span class="caps"&gt;UI&lt;/span&gt;.&lt;/li&gt;
+&lt;li&gt;Some level of permission separation, &lt;span class="caps"&gt;ACL&lt;/span&gt; or &lt;span class="caps"&gt;RBAC&lt;/span&gt; so that we could
+    potentially delegate control of a certain module or parameter, on a
+    certain group of nodes, to the development&amp;nbsp;team.&lt;/li&gt;
+&lt;li&gt;Per-node links to other tools such as Icinga/Nagios or our&amp;nbsp;wiki.&lt;/li&gt;
+&lt;li&gt;Some way of detecting valid classes and modules (and our &amp;#8220;role&amp;#8221;
+    module) per-environment (i.e. available modules/classes/roles should
+    be pulled from the configs, not manually&amp;nbsp;entered).&lt;/li&gt;
+&lt;li&gt;Ability to display puppet docs from&amp;nbsp;modules/classes&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Our current situation makes this even more difficult: we&amp;#8217;re an
+operations team of five (hiring at the moment to fill the position of
+the sixth), and I believe I&amp;#8217;m the only member of the team with any real
+software development experience. And none of us have experience with
+Ruby (which Puppet and most of its universe is written in). This means
+that any in-house solution runs the risk of being unmaintainable should
+I get hit by a bus (some of our team have various levels of experience
+with Perl and other scripting languages, but not really from an app
+development perspective). Because of these reasons, there&amp;#8217;s a management
+aversion to anything that we code ourselves (well, these reasons, and
+the fact that with a shorthanded team we don&amp;#8217;t have much time for
+projects without an immediate&amp;nbsp;impact).&lt;/p&gt;
+&lt;p&gt;So, I spent hours looking around online trying to find existing
+web-based &lt;span class="caps"&gt;ENC&lt;/span&gt; projects, and came up with a pretty small&amp;nbsp;list:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href="http://puppetlabs.com/puppet/related-projects/dashboard/"&gt;Dashboard&lt;/a&gt;,
+    the Puppet Labs web &lt;span class="caps"&gt;UI&lt;/span&gt;. It&amp;#8217;s the most common web-based puppet &lt;span class="caps"&gt;ENC&lt;/span&gt; as
+    far as I know, and since it&amp;#8217;s an official Puppet Labs project (and
+    the basis for their Puppet Enterprise &lt;span class="caps"&gt;UI&lt;/span&gt;), its future is pretty
+    secure. But it&amp;#8217;s still very basic (let alone enterprise features),
+    and has a plugin system that is very&amp;nbsp;young.&lt;/li&gt;
+&lt;li&gt;&lt;a href="http://theforeman.org/projects/foreman"&gt;The Foreman&lt;/a&gt; is probably
+    the second-most-common puppet &lt;span class="caps"&gt;ENC&lt;/span&gt;, and has also been around about as
+    long as Dashboard. Its features are nice, and it includes support
+    for Kickstart (management of &lt;span class="caps"&gt;TFTP&lt;/span&gt; and &lt;span class="caps"&gt;DHCP&lt;/span&gt;) and &lt;span class="caps"&gt;DNS&lt;/span&gt;, as well as some
+    virtual machine management. Unfortunately, we already have &lt;span class="caps"&gt;DHCP&lt;/span&gt; and
+    &lt;span class="caps"&gt;DNS&lt;/span&gt; infrastructure so I&amp;#8217;m sure it would be quite a bit of effort to
+    integrate it with our environment, and for a non-Ruby shop, it has
+    the same problem with maintainability of custom&amp;nbsp;code.&lt;/li&gt;
+&lt;li&gt;&lt;a href="http://www.ingent.net/projects/initr/wiki"&gt;initr&lt;/a&gt;, a
+    &lt;a href="http://www.redmine.org/"&gt;Redmine&lt;/a&gt; plugin that functions as an &lt;span class="caps"&gt;ENC&lt;/span&gt;
+    and manages modules. It includes &lt;span class="caps"&gt;RBAC&lt;/span&gt; and leverages Redmine. But
+    since we don&amp;#8217;t use Redmine, it&amp;#8217;s not much of an&amp;nbsp;advantage.&lt;/li&gt;
+&lt;li&gt;&lt;a href="http://www.gitorious.org/opennms-puppet-node-pusher"&gt;OpenNMS Puppet Node
+    Pusher&lt;/a&gt;An &lt;span class="caps"&gt;ENC&lt;/span&gt;
+    script for &lt;a href="http://www.opennms.org/"&gt;OpenNMS&lt;/a&gt;, which we also don&amp;#8217;t&amp;nbsp;use.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;I was pretty amazed to see that nobody had written a puppet web &lt;span class="caps"&gt;UI&lt;/span&gt;/&lt;span class="caps"&gt;ENC&lt;/span&gt;
+in &lt;span class="caps"&gt;PHP&lt;/span&gt; (or Perl or Python), especially since Puppet is now quite&amp;nbsp;popular.&lt;/p&gt;
+&lt;p&gt;So, I&amp;#8217;m essentially left with the following&amp;nbsp;options:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Start from scratch and write my own in &lt;span class="caps"&gt;PHP&lt;/span&gt;. By far the worst option,
+    since we don&amp;#8217;t have anyone on our team who&amp;#8217;s likely to maintain it,
+    and the Puppet community is&amp;nbsp;Ruby-focused.&lt;/li&gt;
+&lt;li&gt;Use Foreman, since it&amp;#8217;s the only one that appears to offer audit
+    logging, have a bunch of features that don&amp;#8217;t work for us, and
+    hopefully deal with&amp;nbsp;it.&lt;/li&gt;
+&lt;li&gt;Learn Ruby, write plugins for Dashboard, and hope that Puppet Labs
+    or someone else will pick them up and maintain them if I&amp;nbsp;can&amp;#8217;t.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;At the moment, I&amp;#8217;ve decided to investigate Foreman and initr in a bit
+more depth, and also play around with the Dashboard code and try to pick
+up some Ruby (as they&amp;#8217;re all written in Ruby anyway). I&amp;#8217;ll also discuss
+these options with the team and see how opinions go (keeping in mind
+that the higher the likelihood of the community picking up/merging my
+changes, the&amp;nbsp;better).&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Sun, 26 Feb 2012 12:45:00 -0500</pubDate><guid>tag:newblog.jasonantman.com,2012-02-26:2012/02/the-state-of-puppet-external-node-classifiers/</guid><category>dashboard</category><category>foreman</category><category>node classifier</category><category>puppet</category></item></channel></rss>

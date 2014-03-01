@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Jason Antman's Blog</title><link href="http://newblog.jasonantman.com/" rel="alternate"></link><link href="http://newblog.jasonantman.com/feeds/tags/startup.atom.xml" rel="self"></link><id>http://newblog.jasonantman.com/</id><updated>2013-01-03T11:30:00-05:00</updated><entry><title>Fedora Init Script Specification Summary</title><link href="http://newblog.jasonantman.com/2013/01/fedora-init-script-specification-summary/" rel="alternate"></link><updated>2013-01-03T11:30:00-05:00</updated><author><name>admin</name></author><id>tag:newblog.jasonantman.com,2013-01-03:2013/01/fedora-init-script-specification-summary/</id><summary type="html">&lt;p&gt;I&amp;#8217;ve been deploying some new software lately (specifically
+&lt;a href="https://github.com/marisaseal/selenesse"&gt;selenesse&lt;/a&gt;, which combines
+&lt;a href="http://seleniumhq.org/"&gt;Selenium&lt;/a&gt; and &lt;a href="http://fitnesse.org/"&gt;fitnesse&lt;/a&gt;,
+&lt;a href="http://en.wikipedia.org/wiki/Xvfb"&gt;xvfb&lt;/a&gt;). None of these seem to come
+with init scripts to run as daemons, and the quality of the few
+Fedora/RedHat/CentOS init scripts I was able to find was quite poor. The
+Fedora project has a &lt;a href="http://fedoraproject.org/wiki/Packaging:SysVInitScript"&gt;Specification for SysV-style Init Scripts in their
+Packaging wiki&lt;/a&gt;,
+which specifies what a Fedora/RedHat/CentOS init script should look
+like, in excruciating detail. What follows is an overview of the more
+important points, which I&amp;#8217;m using to develop or modify the scripts I&amp;#8217;m
+currently working&amp;nbsp;on.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Scripts must be put in &lt;code&gt;/etc/rc.d/init.d&lt;/code&gt;, not in the &lt;code&gt;/etc/init.d&lt;/code&gt;
+    symlink. They should have 0755&amp;nbsp;permissions.&lt;/li&gt;
+&lt;li&gt;Scripts must have a Fedora-style &lt;a href="http://fedoraproject.org/wiki/Packaging:SysVInitScript#Chkconfig_Header"&gt;chkconfig
+    header&lt;/a&gt;
+    (&amp;#8220;chkconfig:&amp;#8221;, &amp;#8220;description:&amp;#8221; lines), and may have an &lt;a href="http://fedoraproject.org/wiki/Packaging:SysVInitScript#LSB_Header"&gt;&lt;span class="caps"&gt;LSB&lt;/span&gt;-style
+    header&lt;/a&gt;
+    (&lt;span class="caps"&gt;BEGIN&lt;/span&gt; &lt;span class="caps"&gt;INIT&lt;/span&gt; &lt;span class="caps"&gt;INFO&lt;/span&gt;/&lt;span class="caps"&gt;END&lt;/span&gt; &lt;span class="caps"&gt;INIT&lt;/span&gt; &lt;span class="caps"&gt;INFO&lt;/span&gt;). See &lt;a href="http://fedoraproject.org/wiki/Packaging:SysVInitScript#Initscript_template"&gt;Initscript
+    template&lt;/a&gt;.&lt;/li&gt;
+&lt;li&gt;Scripts &lt;strong&gt;must&lt;/strong&gt; make use of a lockfile in &lt;code&gt;/var/lock/subsys/&lt;/code&gt;, and
+    the name of the lockfile must be the same as the name of the init
+    script. (There is a technical reason for this relating to how sysv
+    init terminates daemons at shutdown). The lockfile should be touched
+    when the daemon successfully starts, and removed when it
+    successfully&amp;nbsp;stops.&lt;/li&gt;
+&lt;li&gt;Init scripts should not depend on any environment variables set
+    outside the script. They should operate gracefully with an
+    empty/uninitialized environment (or only &lt;span class="caps"&gt;LANG&lt;/span&gt; and &lt;span class="caps"&gt;TERM&lt;/span&gt; set and a &lt;span class="caps"&gt;CWD&lt;/span&gt;
+    of &lt;code&gt;/&lt;/code&gt;, as enforced by &lt;code&gt;service(8)&lt;/code&gt;, or with a full environment if
+    they are called directly by a&amp;nbsp;user.&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;a href="http://fedoraproject.org/wiki/Packaging:SysVInitScript#Required_Actions"&gt;Required&amp;nbsp;actions&lt;/a&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;all of the following actions are required, and have specific&amp;nbsp;definitions:&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;start&lt;/strong&gt;: starts the&amp;nbsp;service&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;stop&lt;/strong&gt;: stops the&amp;nbsp;service&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;restart&lt;/strong&gt;: stop and restart the service if the service is
+    already running, otherwise just start the&amp;nbsp;service&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;condrestart (and try-restart)&lt;/strong&gt;: restart the service if the
+    service is already running, if not, do&amp;nbsp;nothing&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;reload&lt;/strong&gt;: reload the configuration of the service without
+    actually stopping and restarting the service (if the service
+    does not support this, do&amp;nbsp;nothing)&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;force-reload&lt;/strong&gt;: reload the configuration of the service and
+    restart it so that it takes&amp;nbsp;effect&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;status&lt;/strong&gt;: print the current status of the&amp;nbsp;service&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;usage&lt;/strong&gt;: by default, if the initscript is run without any
+    action, it should list a &amp;#8220;usage message&amp;#8221; that has all actions
+    (intended for&amp;nbsp;use)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;There are specified exit codes for &lt;a href="http://fedoraproject.org/wiki/Packaging:SysVInitScript#Exit_Codes_for_the_Status_Action"&gt;status
+    actions&lt;/a&gt;
+    and &lt;a href="http://fedoraproject.org/wiki/Packaging:SysVInitScript#Exit_Codes_for_non-Status_Actions"&gt;non-status
+    actions&lt;/a&gt;.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;They must &amp;#8220;behave sensibly&amp;#8221;. I&amp;#8217;ve found this to be one of the
+    biggest problems with homegrown init scripts. If &lt;code&gt;servicename start&lt;/code&gt;
+    is called while the service is already running, it should simply
+    exit 0. Likewise if the service is already stopped. Init scripts
+    &lt;strong&gt;must not kill unrelated processes&lt;/strong&gt;. I don&amp;#8217;t know how many times
+    I&amp;#8217;ve seen scripts that kill every java or python process on a&amp;nbsp;machine.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;I intend to use this as a quick checklist when developing or evaluating
+init scripts for RedHat/Fedora based systems. In my experience, the
+biggest problems with most init scripts revolve around poor handling of
+&lt;span class="caps"&gt;PID&lt;/span&gt; files and lockfiles,&amp;nbsp;mainly:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Killing processes other than the one that the script started (i.e.
+    killing all java or python processes), usually because the &lt;span class="caps"&gt;PID&lt;/span&gt; isn&amp;#8217;t
+    tracked at&amp;nbsp;start&lt;/li&gt;
+&lt;li&gt;Starting a second instance of the subsystem because lockfiles aren&amp;#8217;t
+    used, or the status function is&amp;nbsp;broken.&lt;/li&gt;
+&lt;li&gt;improper exit&amp;nbsp;codes&lt;/li&gt;
+&lt;li&gt;either explicitly relying on environment variables (and therefore
+    breaking when called through &lt;code&gt;service(8)&lt;/code&gt;), or conversely, not
+    cleaning/resetting environment variables that are used by dependent
+    code or&amp;nbsp;processes.&lt;/li&gt;
+&lt;/ul&gt;</summary><category term="centos"></category><category term="fedora"></category><category term="init"></category><category term="redhat"></category><category term="startup"></category></entry></feed>

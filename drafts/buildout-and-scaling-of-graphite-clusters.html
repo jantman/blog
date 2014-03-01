@@ -1,25 +1,48 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml"
->
+      xmlns:og="http://ogp.me/ns#"
+      xmlns:fb="https://www.facebook.com/2008/fbml">
 <head>
     <title>Buildout and Scaling of Graphite Clusters</title>
     <!-- Using the latest rendering mode for IE -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <!-- Open Graph tags -->
+
     <!-- Bootstrap -->
-        <link rel="stylesheet" href="http://jantman.github.io/blog/theme/css/bootstrap.flatly.min.css" type="text/css"/>
-    <link href="http://jantman.github.io/blog/theme/css/font-awesome.min.css" rel="stylesheet">
-    <link href="http://jantman.github.io/blog/theme/css/pygments.css" rel="stylesheet">
-        <link href="http://jantman.github.io/blog/theme/css/typogrify.css" rel="stylesheet">
-    <link rel="stylesheet" href="http://jantman.github.io/blog/theme/css/style.css" type="text/css"/>
+        <link rel="stylesheet" href="http://newblog.jasonantman.com/theme/css/bootstrap.flatly.min.css" type="text/css"/>
+    <link href="http://newblog.jasonantman.com/theme/css/font-awesome.min.css" rel="stylesheet">
+    <link href="http://newblog.jasonantman.com/theme/css/pygments.css" rel="stylesheet">
+        <link href="http://newblog.jasonantman.com/theme/css/typogrify.css" rel="stylesheet">
+    <link rel="stylesheet" href="http://newblog.jasonantman.com/theme/css/style.css" type="text/css"/>
     <!-- JavaScript plugins (requires jQuery) -->
     <script src="http://code.jquery.com/jquery.js"></script>
 
-    <link rel="stylesheet" href="http://jantman.github.io/blog/theme/css/forkongithub.min.css" type="text/css" />
+    <link rel="stylesheet" href="http://newblog.jasonantman.com/theme/css/forkongithub.min.css" type="text/css" />
 
+        <link href="http://newblog.jasonantman.com/feeds/all.atom.xml" type="application/atom+xml" rel="alternate"
+              title="Jason Antman's Blog ATOM Feed"/>
+        <link href="http://newblog.jasonantman.com/feeds/all.rss.xml" type="application/atom+xml" rel="alternate"
+              title="Jason Antman's Blog RSS Feed"/>
 
+    <script type="text/javascript">
+
+        var _gaq = _gaq || [];
+        _gaq.push(['_setAccount', 'UA-2718127-2']);
+        _gaq.push(['_trackPageview']);
+
+        (function () {
+            var ga = document.createElement('script');
+            ga.type = 'text/javascript';
+            ga.async = true;
+            ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(ga, s);
+        })();
+
+    </script>
 </head>
 <body>
 <span id="forkongithub"><a href="https://github.com/jantman/blog">Fork me on GitHub</a></span><nav class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -31,37 +54,37 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-            <a href="http://jantman.github.io/blog" class="navbar-brand">Jason Antman's Blog</a>
+            <a href="http://newblog.jasonantman.com" class="navbar-brand">Jason Antman's Blog</a>
         </div>
         <div class="collapse navbar-collapse navbar-ex1-collapse">
             <ul class="nav navbar-nav">
-                         <li><a href="http://jantman.github.io/blog/pages/about.html">
+                         <li><a href="http://newblog.jasonantman.com/pages/about.html">
                              About
                           </a></li>
                         <li >
-                            <a href="http://jantman.github.io/blog/category/ideas-and-rants.html">Ideas and rants</a>
+                            <a href="http://newblog.jasonantman.com/categories/ideas-and-rants/index.html">Ideas and rants</a>
                         </li>
                         <li >
-                            <a href="http://jantman.github.io/blog/category/miscellaneous.html">Miscellaneous</a>
+                            <a href="http://newblog.jasonantman.com/categories/miscellaneous/index.html">Miscellaneous</a>
                         </li>
                         <li >
-                            <a href="http://jantman.github.io/blog/category/monitoring.html">Monitoring</a>
+                            <a href="http://newblog.jasonantman.com/categories/monitoring/index.html">Monitoring</a>
                         </li>
                         <li >
-                            <a href="http://jantman.github.io/blog/category/projects.html">Projects</a>
+                            <a href="http://newblog.jasonantman.com/categories/projects/index.html">Projects</a>
                         </li>
                         <li >
-                            <a href="http://jantman.github.io/blog/category/puppet.html">Puppet</a>
+                            <a href="http://newblog.jasonantman.com/categories/puppet/index.html">Puppet</a>
                         </li>
                         <li >
-                            <a href="http://jantman.github.io/blog/category/sysadmin.html">Sysadmin</a>
+                            <a href="http://newblog.jasonantman.com/categories/sysadmin/index.html">Sysadmin</a>
                         </li>
                         <li >
-                            <a href="http://jantman.github.io/blog/category/tech-howtos.html">Tech howtos</a>
+                            <a href="http://newblog.jasonantman.com/categories/tech-howtos/index.html">Tech howtos</a>
                         </li>
             </ul>
             <ul class="nav navbar-nav navbar-right">
-                <li><a href="http://jantman.github.io/blog/archives.html"><i class="icon-th-list"></i>Archives</a></li>
+                <li><a href="http://newblog.jasonantman.com/archives.html"><i class="icon-th-list"></i>Archives</a></li>
             </ul>
         </div>
         <!-- /.navbar-collapse -->
@@ -75,7 +98,7 @@
         <article>
             <header class="page-header">
                 <h1>
-                    <a href="http://jantman.github.io/blog/2013/09/buildout-and-scaling-of-graphite-clusters/"
+                    <a href="http://newblog.jasonantman.com/2013/09/buildout-and-scaling-of-graphite-clusters/"
                        rel="bookmark"
                        title="Permalink to Buildout and Scaling of Graphite Clusters">
                         Buildout and Scaling of Graphite&nbsp;Clusters
@@ -158,64 +181,49 @@ they show (click the images for larger versions). Keep in mind that in
 most of these graphs, they&#8217;re including three physical hosts, each with
 one carbon-relay and two carbon-caches, plus a master carbon-relay on
 one of the&nbsp;hosts.</p>
-<p><a href="creates_vs_io_read_await_large.png">&lt; img src=&#8221;/<span class="caps">GFX</span>/creates_vs_io_read_await.png&#8221; width=&#8221;800&#8221;
-height=&#8221;480&#8221; alt=&#8221;graph of iostat read_await vs carbon-cache creates.
+<p><a href="/GFX/creates_vs_io_read_await_large.png"><img alt="graph of iostat read_await vs carbon-cache creates.
 When creates reach approx. 500/minute across the cluster, await begins
-to show spikes.&#8221; /></a></p>
-<p><a href="creates_vs_io_read_ms_large.png">&lt; img src=&#8221;/<span class="caps">GFX</span>/creates_vs_io_read_ms.png&#8221; width=&#8221;800&#8221; height=&#8221;480&#8221;
-alt=&#8221;graph of iostat milliseconds reading vs carbon-cache creates. When
+to show spikes" src="/GFX/creates_vs_io_read_await.png" /></a></p>
+<p><a href="/GFX/creates_vs_io_read_ms_large.png"><img alt="graph of iostat milliseconds reading vs carbon-cache creates. When
 creates reach approx. 1000/minute, read time increases from near-zero to
-over 50% of clock time.&#8221; /></a></p>
-<p><a href="metricsReceived_vs_carbon-cache_memUsage_large.png">&lt; img src=&#8221;/<span class="caps">GFX</span>/metricsReceived_vs_carbon-cache_memUsage.png&#8221;
-width=&#8221;800&#8221; height=&#8221;480&#8221; alt=&#8221;graph of carbon-relay metrics received vs
+over 50% of clock time" src="/GFX/creates_vs_io_read_ms.png" /></a></p>
+<p><a href="/GFX/metricsReceived_vs_carbon-cache_memUsage_large.png"><img alt="graph of carbon-relay metrics received vs
 carbon-cache memory usage. Memory usage climbs unevenly but in a
 generally similar fashion to metrics received, but does not decrease.
-The second spike in metrics received simply increases memory use.&#8221;
-/></a></p>
-<p><a href="metricsReceived_vs_carbon-relay-master_memUsage_large.png">&lt; img src=&#8221;/<span class="caps">GFX</span>/metricsReceived_vs_carbon-relay-master_memUsage.png&#8221;
-width=&#8221;800&#8221; height=&#8221;480&#8221; alt=&#8221;graph of carbon-relay metrics received vs
+The second spike in metrics received simply increases memory use." src="/GFX/metricsReceived_vs_carbon-cache_memUsage.png" /></a></p>
+<p><a href="metricsReceived_vs_carbon-relay-master_memUsage_large.png"><img alt="graph of carbon-relay metrics received vs
 carbon-relay master memory usage. This graph is a signigicant departure
 from the other, close-to-linear relationships. Master carbon-relay
 memory usage stays largely steady from 95k metrics/minute to
 approximately 300k metrics/minute, then almost doubles within one sample
-period (from approx. 16 <span class="caps">MB</span> to approx. 28 <span class="caps">MB</span>) and maintains that level to
-the peak of 750k metrics/minute.&#8221;
-/></a></p>
-<p><a href="metrics_recvd_vs_flush_time_large.png">&lt; img src=&#8221;/<span class="caps">GFX</span>/metrics_recvd_vs_flush_time.png&#8221; width=&#8221;800&#8221;
-height=&#8221;480&#8221; alt=&#8221;graph of carbon-relay metrics received vs statsd time
+period (from approx. 16 MB to approx. 28 MB) and maintains that level to
+the peak of 750k metrics/minute." src="/GFX/metricsReceived_vs_carbon-relay-master_memUsage.png" /></a></p>
+<p><a href="/GFX/metrics_recvd_vs_flush_time_large.png"><img alt="graph of carbon-relay metrics received vs statsd time
 flushing graphite stats. the best-fit line of the two graphs would
-almost match.&#8221; /></a></p>
-<p><a href="metrics_recvd_vs_iops_large.png">&lt; img src=&#8221;/<span class="caps">GFX</span>/metrics_recvd_vs_iops.png&#8221; width=&#8221;800&#8221; height=&#8221;480&#8221;
-alt=&#8221;graph of carbon-relay metrics received vs <span class="caps">IOPS</span>. It&#8217;s clear that we
-were near our <span class="caps">IOPS</span> ceiling prior to this event when handling about 300k
-metrics per minute, and at 75k metrics per minute we&#8217;re using about half
-of our available <span class="caps">IO</span>.&#8221; /></a></p>
-<p><a href="metrics_recvd_vs_iostat_queue_length_large.png">&lt; img src=&#8221;/<span class="caps">GFX</span>/metrics_recvd_vs_iostat_queue_length.png&#8221;
-width=&#8221;800&#8221; height=&#8221;480&#8221; alt=&#8221;graph of carbon-relay metrics received vs
-<span class="caps">IO</span> queue length. Shows that we were already at maximum disk queue at
+almost match" src="/GFX/metrics_recvd_vs_flush_time.png" /></a></p>
+<p><a href="/GFX/metrics_recvd_vs_iops_large.png"><img alt="graph of carbon-relay metrics received vs IOPS. It's clear that we
+were near our IOPS ceiling prior to this event when handling about 300k
+metrics per minute, and at 75k metrics per minute we're using about half
+of our available IO" src="/GFX/metrics_recvd_vs_iops.png" /></a></p>
+<p><a href="metrics_recvd_vs_iostat_queue_length_large.png"><img alt="graph of carbon-relay metrics received vs
+IO queue length. Shows that we were already at maximum disk queue at
 300k metrics/minute before the event, but after limiting metrics down to
-75k per minute <span class="caps">IO</span> queues dropped to about 25% of capacity.&#8221;
-/></a></p>
-<p><a href="metrics_recvd_vs_iostat_wps_large.png">&lt; img src=&#8221;/<span class="caps">GFX</span>/metrics_recvd_vs_iostat_wps.png&#8221; width=&#8221;800&#8221;
-height=&#8221;480&#8221; alt=&#8221;graph of carbon-relay metrics received vs <span class="caps">IO</span> writes
+75k per minute IO queues dropped to about 25% of capacity." src="/GFX/metrics_recvd_vs_iostat_queue_length.png" /></a></p>
+<p><a href="metrics_recvd_vs_iostat_wps_large.png"><img alt="graph of carbon-relay metrics received vs IO writes
 per second. Writes per second increase roughly linearly with
 metricsReceived from 95k metrics/minute to about 175k metrics/minute,
-and then level off when <span class="caps">IO</span> is saturated.&#8221;
-/></a></p>
-<p><a href="metrics_recvd_vs_iostat_write_bytes_large.png">&lt; img src=&#8221;/<span class="caps">GFX</span>/metrics_recvd_vs_iostat_write_bytes.png&#8221;
-width=&#8221;800&#8221; height=&#8221;480&#8221; alt=&#8221;graph of carbon-relay metrics received vs
-<span class="caps">IO</span> bytes written. This is an even better indication than the previous
+and then level off when IO is saturated." src="/GFX/metrics_recvd_vs_iostat_wps.png" /></a></p>
+<p><a href="metrics_recvd_vs_iostat_write_bytes_large.png"><img alt="graph of carbon-relay metrics received vs
+IO bytes written. This is an even better indication than the previous
 graph that writes to disk continue acceptably up to about 175k
-metrics/minute and then level off, indicating <span class="caps">IO</span> saturation and metric
-create queueing in carbon-cache.&#8221;
-/></a></p>
-<p><a href="metrics_vs_relay-master_cpuUsage_large.png">&lt; img src=&#8221;/<span class="caps">GFX</span>/metrics_vs_relay-master_cpuUsage.png&#8221; width=&#8221;800&#8221;
-height=&#8221;480&#8221; alt=&#8221;graph of carbon-relay master metrics received vs
-carbon-relay master <span class="caps">CPU</span> usage. Through the entire event up to 750k
-metrics/minute, master carbon-relay <span class="caps">CPU</span> usage stayed almost perfectly in
+metrics/minute and then level off, indicating IO saturation and metric
+create queueing in carbon-cache." src="/GFX/metrics_recvd_vs_iostat_write_bytes.png" /></a></p>
+<p><a href="/GFX/metrics_vs_relay-master_cpuUsage_large.png"><img alt="graph of carbon-relay master metrics received vs
+carbon-relay master CPU usage. Through the entire event up to 750k
+metrics/minute, master carbon-relay CPU usage stayed almost perfectly in
 step with the number of metrics. Aside from some spikes and dips, the
-<span class="caps">CPU</span> usage line almost perfectly mirrors the slope of the metrics
-received line.&#8221; /></a></p>
+CPU usage line almost perfectly mirrors the slope of the metrics
+received line." src="/GFX/metrics_vs_relay-master_cpuUsage.png" /></a></p>
 <ul>
 <li>what the various internal stats&nbsp;mean  </li>
 <li>how to interpret&nbsp;them  </li>
@@ -249,6 +257,30 @@ than <span class="caps">IO</span> can handle, and need to fix the problem&nbsp;i
 </ul>
             </div>
             <!-- /.entry-content -->
+    <hr />
+    <section class="comments" id="comments">
+        <h2>Comments</h2>
+        <div id="disqus_thread"></div>
+        <script type="text/javascript">
+            /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+            var disqus_shortname = 'jasonantman'; // required: replace example with your forum shortname
+            var disqus_identifier = 'buildout-and-scaling-of-graphite-clusters';
+            var disqus_url = 'http://newblog.jasonantman.com/2013/09/buildout-and-scaling-of-graphite-clusters/';
+
+            /* * * DON'T EDIT BELOW THIS LINE * * */
+            (function () {
+                var dsq = document.createElement('script');
+                dsq.type = 'text/javascript';
+                dsq.async = true;
+                dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+                (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+            })();
+        </script>
+        <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by
+            Disqus.</a></noscript>
+        <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+
+    </section>
         </article>
     </section>
 
@@ -261,132 +293,132 @@ than <span class="caps">IO</span> can handle, and need to fix the problem&nbsp;i
 
                 <li class="list-group-item"><h4><i class="icon-home icon-large"></i>Recent Posts</h4></li>
                         <li class="list-group-item">
-                            <a href="http://jantman.github.io/blog/2014/01/planning-migration-from-wordpress-to-static-site/">
+                            <a href="http://newblog.jasonantman.com/2014/01/planning-migration-from-wordpress-to-static-site/">
                                 Planning Migration from WordPress to Static&nbsp;Site
                             </a>
                         </li>
                         <li class="list-group-item">
-                            <a href="http://jantman.github.io/blog/2013/08/testing-gpg-key-passphrases/">
+                            <a href="http://newblog.jasonantman.com/2013/08/testing-gpg-key-passphrases/">
                                 Testing <span class="caps">GPG</span> Key&nbsp;Passphrases
                             </a>
                         </li>
                         <li class="list-group-item">
-                            <a href="http://jantman.github.io/blog/2013/06/quick-tip-timestamping-bash-history/">
+                            <a href="http://newblog.jasonantman.com/2013/06/quick-tip-timestamping-bash-history/">
                                 Quick Tip: Timestamping bash&nbsp;history
                             </a>
                         </li>
                         <li class="list-group-item">
-                            <a href="http://jantman.github.io/blog/2013/06/python-script-to-check-a-list-of-urls-for-return-code-and-final-return-code-if-redirected/">
+                            <a href="http://newblog.jasonantman.com/2013/06/python-script-to-check-a-list-of-urls-for-return-code-and-final-return-code-if-redirected/">
                                 Python script to check a list of URLs for return code, and final return code if&nbsp;redirected
                             </a>
                         </li>
                         <li class="list-group-item">
-                            <a href="http://jantman.github.io/blog/2013/06/modern-0-10-x-nodejs-rpms-on-centosrehl-5-and-6/">
+                            <a href="http://newblog.jasonantman.com/2013/06/modern-0-10-x-nodejs-rpms-on-centosrehl-5-and-6/">
                                 Modern (0.10.x+) NodeJS RPMs on CentOS/<span class="caps">REHL</span> 5 and&nbsp;6
                             </a>
                         </li>
 
 
-                <li class="list-group-item"><a href="http://jantman.github.io/blog/tags.html"><h4><i class="icon-tags icon-large"></i>Tags</h4></a></li>
+                <li class="list-group-item"><a href="http://newblog.jasonantman.com/tags.html"><h4><i class="icon-tags icon-large"></i>Tags</h4></a></li>
                 <li class="list-group-item">
-                        <span class="tag-0">
-                            <a href="http://jantman.github.io/blog/tag/linux.html">
-                                linux
+                        <span class="tag-1">
+                            <a href="http://newblog.jasonantman.com/tags/android/index.html">
+                                android
                             </a>
                         </span>
                         <span class="tag-1">
-                            <a href="http://jantman.github.io/blog/tag/microsoft.html">
-                                microsoft
-                            </a>
-                        </span>
-                        <span class="tag-1">
-                            <a href="http://jantman.github.io/blog/tag/monitoring.html">
-                                monitoring
-                            </a>
-                        </span>
-                        <span class="tag-1">
-                            <a href="http://jantman.github.io/blog/tag/sun.html">
-                                sun
-                            </a>
-                        </span>
-                        <span class="tag-1">
-                            <a href="http://jantman.github.io/blog/tag/php.html">
-                                PHP
-                            </a>
-                        </span>
-                        <span class="tag-1">
-                            <a href="http://jantman.github.io/blog/tag/wordpress.html">
-                                wordpress
-                            </a>
-                        </span>
-                        <span class="tag-1">
-                            <a href="http://jantman.github.io/blog/tag/sysadmin.html">
-                                sysadmin
-                            </a>
-                        </span>
-                        <span class="tag-1">
-                            <a href="http://jantman.github.io/blog/tag/puppet.html">
-                                puppet
-                            </a>
-                        </span>
-                        <span class="tag-1">
-                            <a href="http://jantman.github.io/blog/tag/nagios.html">
-                                Nagios
-                            </a>
-                        </span>
-                        <span class="tag-1">
-                            <a href="http://jantman.github.io/blog/tag/google.html">
+                            <a href="http://newblog.jasonantman.com/tags/google/index.html">
                                 google
                             </a>
                         </span>
                         <span class="tag-1">
-                            <a href="http://jantman.github.io/blog/tag/android.html">
-                                android
+                            <a href="http://newblog.jasonantman.com/tags/sun/index.html">
+                                sun
+                            </a>
+                        </span>
+                        <span class="tag-1">
+                            <a href="http://newblog.jasonantman.com/tags/sysadmin/index.html">
+                                sysadmin
+                            </a>
+                        </span>
+                        <span class="tag-1">
+                            <a href="http://newblog.jasonantman.com/tags/monitoring/index.html">
+                                monitoring
+                            </a>
+                        </span>
+                        <span class="tag-1">
+                            <a href="http://newblog.jasonantman.com/tags/puppet/index.html">
+                                puppet
+                            </a>
+                        </span>
+                        <span class="tag-1">
+                            <a href="http://newblog.jasonantman.com/tags/nagios/index.html">
+                                Nagios
+                            </a>
+                        </span>
+                        <span class="tag-1">
+                            <a href="http://newblog.jasonantman.com/tags/php/index.html">
+                                PHP
+                            </a>
+                        </span>
+                        <span class="tag-1">
+                            <a href="http://newblog.jasonantman.com/tags/linux/index.html">
+                                linux
+                            </a>
+                        </span>
+                        <span class="tag-1">
+                            <a href="http://newblog.jasonantman.com/tags/wordpress/index.html">
+                                wordpress
+                            </a>
+                        </span>
+                        <span class="tag-1">
+                            <a href="http://newblog.jasonantman.com/tags/microsoft/index.html">
+                                microsoft
                             </a>
                         </span>
                         <span class="tag-2">
-                            <a href="http://jantman.github.io/blog/tag/security.html">
-                                security
-                            </a>
-                        </span>
-                        <span class="tag-2">
-                            <a href="http://jantman.github.io/blog/tag/mediawiki.html">
-                                mediawiki
-                            </a>
-                        </span>
-                        <span class="tag-2">
-                            <a href="http://jantman.github.io/blog/tag/droid.html">
-                                droid
-                            </a>
-                        </span>
-                        <span class="tag-2">
-                            <a href="http://jantman.github.io/blog/tag/logging.html">
-                                logging
-                            </a>
-                        </span>
-                        <span class="tag-2">
-                            <a href="http://jantman.github.io/blog/tag/syslog.html">
-                                syslog
-                            </a>
-                        </span>
-                        <span class="tag-2">
-                            <a href="http://jantman.github.io/blog/tag/rpm.html">
-                                rpm
-                            </a>
-                        </span>
-                        <span class="tag-2">
-                            <a href="http://jantman.github.io/blog/tag/apache.html">
-                                apache
-                            </a>
-                        </span>
-                        <span class="tag-2">
-                            <a href="http://jantman.github.io/blog/tag/firefox.html">
+                            <a href="http://newblog.jasonantman.com/tags/firefox/index.html">
                                 firefox
                             </a>
                         </span>
                         <span class="tag-2">
-                            <a href="http://jantman.github.io/blog/tag/dns.html">
+                            <a href="http://newblog.jasonantman.com/tags/mediawiki/index.html">
+                                mediawiki
+                            </a>
+                        </span>
+                        <span class="tag-2">
+                            <a href="http://newblog.jasonantman.com/tags/dns/index.html">
                                 dns
+                            </a>
+                        </span>
+                        <span class="tag-2">
+                            <a href="http://newblog.jasonantman.com/tags/security/index.html">
+                                security
+                            </a>
+                        </span>
+                        <span class="tag-2">
+                            <a href="http://newblog.jasonantman.com/tags/apache/index.html">
+                                apache
+                            </a>
+                        </span>
+                        <span class="tag-2">
+                            <a href="http://newblog.jasonantman.com/tags/droid/index.html">
+                                droid
+                            </a>
+                        </span>
+                        <span class="tag-2">
+                            <a href="http://newblog.jasonantman.com/tags/syslog/index.html">
+                                syslog
+                            </a>
+                        </span>
+                        <span class="tag-2">
+                            <a href="http://newblog.jasonantman.com/tags/ems/index.html">
+                                EMS
+                            </a>
+                        </span>
+                        <span class="tag-2">
+                            <a href="http://newblog.jasonantman.com/tags/logging/index.html">
+                                logging
                             </a>
                         </span>
                 </li>
@@ -411,17 +443,17 @@ than <span class="caps">IO</span> can handle, and need to fix the problem&nbsp;i
     <section>
     <ul class="list-group list-group-flush">
     <li class="list-group-item"><h4><i class="icon-github icon-large"></i>GitHub Repos</h4></li>
-    <li class="list-group-item">
         <div id="gh_repos">
             <p class="list-group-item">Status updating...</p>
         </div>
             <a href="https://github.com/jantman">@jantman</a> on GitHub
+    </ul>
         <script type="text/javascript">
             $(document).ready(function () {
                 if (!window.jXHR) {
                     var jxhr = document.createElement('script');
                     jxhr.type = 'text/javascript';
-                    jxhr.src = 'http://jantman.github.io/blog/theme/js/jXHR.js';
+                    jxhr.src = 'http://newblog.jasonantman.com/theme/js/jXHR.js';
                     var s = document.getElementsByTagName('script')[0];
                     s.parentNode.insertBefore(jxhr, s);
                 }
@@ -434,9 +466,7 @@ than <span class="caps">IO</span> can handle, and need to fix the problem&nbsp;i
                 });
             });
         </script>
-        <script src="http://jantman.github.io/blog/theme/js/github.js" type="text/javascript"></script>
-    </li>
-    </ul>
+        <script src="http://newblog.jasonantman.com/theme/js/github.js" type="text/javascript"></script>
     </section>
 </aside>        </div>
     </div>
@@ -453,10 +483,23 @@ than <span class="caps">IO</span> can handle, and need to fix the problem&nbsp;i
     </div>
 </footer>
 <!-- Include all compiled plugins (below), or include individual files as needed -->
-<script src="http://jantman.github.io/blog/theme/js/bootstrap.min.js"></script>
+<script src="http://newblog.jasonantman.com/theme/js/bootstrap.min.js"></script>
 
 <!-- Enable responsive features in IE8 with Respond.js (https://github.com/scottjehl/Respond) -->
-<script src="http://jantman.github.io/blog/theme/js/respond.min.js"></script>
+<script src="http://newblog.jasonantman.com/theme/js/respond.min.js"></script>
+    <script type="text/javascript">
+        /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+        var disqus_shortname = 'jasonantman'; // required: replace example with your forum shortname
+
+        /* * * DON'T EDIT BELOW THIS LINE * * */
+        (function () {
+            var s = document.createElement('script');
+            s.async = true;
+            s.type = 'text/javascript';
+            s.src = '//' + disqus_shortname + '.disqus.com/count.js';
+            (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+        }());
+    </script>
 
 
 </body>

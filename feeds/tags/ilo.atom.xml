@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Jason Antman's Blog</title><link href="http://newblog.jasonantman.com/" rel="alternate"></link><link href="http://newblog.jasonantman.com/feeds/tags/ilo.atom.xml" rel="self"></link><id>http://newblog.jasonantman.com/</id><updated>2009-06-11T23:52:00-04:00</updated><entry><title>HP Prolaint iLO SSH Problems</title><link href="http://newblog.jasonantman.com/2009/06/hp-prolaint-ilo-ssh-problems/" rel="alternate"></link><updated>2009-06-11T23:52:00-04:00</updated><author><name>admin</name></author><id>tag:newblog.jasonantman.com,2009-06-11:2009/06/hp-prolaint-ilo-ssh-problems/</id><summary type="html">&lt;p&gt;There&amp;#8217;s a known issue with the &lt;span class="caps"&gt;SSH&lt;/span&gt; implementation in the iLO firmware
+for &lt;span class="caps"&gt;HP&lt;/span&gt; Proliant servers (specifically G2 and G3) and OpenSSH 5.1p1.
+There was a
+&lt;a href="http://marc.info/?l=openssh-unix-dev&amp;amp;m=122095298729858&amp;amp;w=2"&gt;thread&lt;/a&gt; on
+the OpenSSH developers list that referenced this problem and suggested a
+solution, but it doesn&amp;#8217;t seem to be a sure&amp;nbsp;fix.&lt;/p&gt;
+&lt;p&gt;This problem is present on my &lt;span class="caps"&gt;DL360&lt;/span&gt; G2&amp;#8217;s which are running the 1.84
+2006-05-05 version of the iLO firmware (iLO 1.84 pass9) with the P26
+2004.05.01 version of the system firmware. I also see the issue on a
+&lt;span class="caps"&gt;DL380G3&lt;/span&gt; running iLO 1.92 2008.04.24 and system firmware P29 2004.09.15.
+The only way that I can reliably get into the iLO is by SSHing from a
+box with an older version of &lt;span class="caps"&gt;SSH&lt;/span&gt;, such as&amp;nbsp;4.2p1.&lt;/p&gt;
+&lt;p&gt;Most of the things that I could find online referenced unsetting the
+&lt;span class="caps"&gt;LANG&lt;/span&gt; environment variable (&lt;code&gt;unset LANG&lt;/code&gt;) and then SSHing with agent forwarding disabled (&lt;code&gt;ssh -a hostname-ilo&lt;/code&gt;).&lt;/p&gt;
+&lt;p&gt;Unfortunately this combination doesn&amp;#8217;t seem to do it for&amp;nbsp;me.&lt;/p&gt;
+&lt;p&gt;I happened to stumble by &lt;a href="http://www.mail-archive.com/debian-ssh@lists.debian.org/msg00904.html"&gt;this
+post&lt;/a&gt;
+to the debian-ssh mailing list, which suggested that shortening the new
+OpenSSH version string fixed the&amp;nbsp;problem.&lt;/p&gt;
+&lt;p&gt;I was able to confirm that the version string is, in fact, the sole
+problem. I downloaded the source of OpenSSH 5.2p1 and, with the
+following small patch to version.h, managed to get &lt;span class="caps"&gt;SSH&lt;/span&gt; working to the
+iLO&amp;nbsp;perfectly:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="gd"&gt;--- openssh-patched/version.h   2009-06-12 00:35:48.000000000 -0400&lt;/span&gt;
+&lt;span class="gi"&gt;+++ openssh-5.2p1/version.h     2009-02-22 19:09:26.000000000 -0500&lt;/span&gt;
+&lt;span class="gu"&gt;@@ -1,6 +1,6 @@&lt;/span&gt;
+ /* $OpenBSD: version.h,v 1.55 2009/02/23 00:06:15 djm Exp $ */
+
+&lt;span class="gd"&gt;-#define SSH_VERSION    &amp;quot;OpenSSH&amp;quot;&lt;/span&gt;
+&lt;span class="gi"&gt;+#define SSH_VERSION    &amp;quot;OpenSSH_5.2&amp;quot;&lt;/span&gt;
+
+&lt;span class="gd"&gt;-#define SSH_PORTABLE   &amp;quot;&amp;quot;&lt;/span&gt;
+&lt;span class="gi"&gt;+#define SSH_PORTABLE   &amp;quot;p1&amp;quot;&lt;/span&gt;
+ #define SSH_RELEASE    SSH_VERSION SSH_PORTABLE
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;I patched version.h, ran &lt;code&gt;./configure&lt;/code&gt;, &lt;code&gt;make&lt;/code&gt;, and then copied the
+compiled ssh binary to /usr/bin/ilossh, so that my original ssh binary
+would be intact, and the ilossh binary would be left alone by &lt;span class="caps"&gt;RPM&lt;/span&gt;&amp;nbsp;upgrades.&lt;/p&gt;</summary><category term="ilo"></category><category term="openssh"></category><category term="proliant"></category><category term="ssh"></category></entry></feed>

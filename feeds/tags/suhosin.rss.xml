@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Jason Antman's Blog</title><link>http://newblog.jasonantman.com/</link><description></description><atom:link href="http://newblog.jasonantman.com/feeds/tags/suhosin.rss.xml" rel="self"></atom:link><lastBuildDate>Fri, 21 Oct 2011 10:24:00 -0400</lastBuildDate><item><title>php-suhosin syslog issues</title><link>http://newblog.jasonantman.com/2011/10/php-suhosin-syslog-issues/</link><description>&lt;p&gt;I just installed php-&lt;a href="http://www.hardened-php.net/suhosin/"&gt;suhosin&lt;/a&gt;
+0.9.29 from &lt;span class="caps"&gt;EPEL&lt;/span&gt; on a CentOS 5.6 box. I&amp;#8217;m running a whole bunch of
+name-based vhosts in Apache, and have a bunch of web apps, so I opted to
+run suhosin in simulation mode (don&amp;#8217;t actually block anything, but log
+errors) and have it log via syslog to a single file. Unfortunately, when
+I configured this, the syslog messages started showing up in the wrong
+place, apparently with the wrong facility &lt;em&gt;and&lt;/em&gt; priority. After some
+roundabout debugging (at first assuming syslogd to be the problem), I
+determined that, for whatever really strange reason (perhaps an
+incorrect syslog.h on the &lt;span class="caps"&gt;EPEL&lt;/span&gt; box that built the suhosin package?) the
+LOG_* constants were incorrect. I looked up the correct integer values
+in &lt;code&gt;/usr/include/sys/syslog.h&lt;/code&gt; and the following configuration
+directives accomplished the task&amp;nbsp;correctly:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="na"&gt;suhosin.log.syslog.facility&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;128&lt;/span&gt;
+&lt;span class="c1"&gt;; 128 = LOG_LOCAL0&lt;/span&gt;
+
+&lt;span class="na"&gt;suhosin.log.syslog.priority&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;5&lt;/span&gt;
+&lt;span class="c1"&gt;; 5 = LOG_NOTICE&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;This one line puts suhosin into simulation mode, where it only logs
+errors instead of enforcing on&amp;nbsp;them:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="na"&gt;suhosin.simulation&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;On&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Fri, 21 Oct 2011 10:24:00 -0400</pubDate><guid>tag:newblog.jasonantman.com,2011-10-21:2011/10/php-suhosin-syslog-issues/</guid><category>centos</category><category>logging</category><category>PHP</category><category>security</category><category>suhosin</category><category>syslog</category></item></channel></rss>

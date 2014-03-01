@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Jason Antman's Blog</title><link>http://newblog.jasonantman.com/</link><description></description><atom:link href="http://newblog.jasonantman.com/feeds/tags/usb.rss.xml" rel="self"></atom:link><lastBuildDate>Wed, 11 Nov 2009 11:47:00 -0500</lastBuildDate><item><title>Running a script on USB drive insertion</title><link>http://newblog.jasonantman.com/2009/11/running-a-script-on-usb-drive-insertion/</link><description>&lt;p&gt;Before I even get into how to do this, &lt;strong&gt;be warned:&lt;/strong&gt; this is a &lt;em&gt;really&lt;/em&gt;
+bad idea unless you can ensure total physical access control to the
+machine. About the only place I&amp;#8217;d ever use it is in a non-networked
+embedded system in a secure location. Its original intent is to handle
+loading of pictures onto a Linux-based digital photo&amp;nbsp;frame.&lt;/p&gt;
+&lt;p&gt;So, you want to run a specific script on insertion of a &lt;span class="caps"&gt;USB&lt;/span&gt; drive.
+Here&amp;#8217;s how to use udev to do&amp;nbsp;it:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;Create &lt;code&gt;/etc/udev/rules.d/99-usbhook.rules&lt;/code&gt;:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;ACTION==&amp;quot;add&amp;quot;,KERNEL==&amp;quot;sd*&amp;quot;, SUBSYSTEMS==&amp;quot;usb&amp;quot;, ATTRS{product}==&amp;quot;Mass Storage&amp;quot;, RUN+=&amp;quot;/root/bin/usbhook %k&amp;quot;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;This will run &amp;#8220;/root/bin/usbook&amp;#8221;, passing it the device name as an
+argument, every time a &lt;span class="caps"&gt;USB&lt;/span&gt; Mass Storage device is plugged&amp;nbsp;in.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;run &lt;code&gt;udevcontrol reload_rules&lt;/code&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;Create your usbhook&amp;nbsp;script.&lt;/li&gt;
+&lt;li&gt;Enjoy&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Here is my usbhook script to copy all files from a &lt;span class="caps"&gt;USB&lt;/span&gt; mass storage disk
+to a specific location. It includes quite a bit of debugging, and also
+checks for the presence of a file called &amp;#8220;foobarbaz.txt&amp;#8221; on the device
+before copying the files&amp;nbsp;over.&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="c"&gt;#!/bin/bash&lt;/span&gt;
+
+&lt;span class="c"&gt;# script to move over all files from a &lt;span class="caps"&gt;USB&lt;/span&gt; key&lt;/span&gt;
+&lt;span class="c"&gt;# when it is inserted into the system.&lt;/span&gt;
+
+&lt;span class="c"&gt;# should be called from a udev rule like:&lt;/span&gt;
+&lt;span class="c"&gt;#&lt;span class="caps"&gt;ACTION&lt;/span&gt;==&amp;quot;add&amp;quot;,&lt;span class="caps"&gt;KERNEL&lt;/span&gt;==&amp;quot;sd*&amp;quot;, &lt;span class="caps"&gt;SUBSYSTEMS&lt;/span&gt;==&amp;quot;usb&amp;quot;, &lt;span class="caps"&gt;ATTRS&lt;/span&gt;{product}==&amp;quot;Mass Storage&amp;quot;, &lt;span class="caps"&gt;RUN&lt;/span&gt;+=&amp;quot;/root/bin/usbhook %k&amp;quot;&lt;/span&gt;
+
+&lt;span class="c"&gt;# Copyright 2009 Jason Antman.  &lt;/span&gt;
+&lt;span class="c"&gt;# &lt;/span&gt;
+
+&lt;span class="c"&gt;# &lt;span class="caps"&gt;CONFIGURATION&lt;/span&gt;&lt;/span&gt;
+&lt;span class="nv"&gt;&lt;span class="caps"&gt;DEBUG&lt;/span&gt;&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;1 &lt;span class="c"&gt;# set to 1 for debugging output&lt;/span&gt;
+&lt;span class="nv"&gt;&lt;span class="caps"&gt;DEST&lt;/span&gt;&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;/home/foo/&amp;quot;&lt;/span&gt; &lt;span class="c"&gt;# destination for files&lt;/span&gt;
+
+
+&lt;span class="nv"&gt;&lt;span class="caps"&gt;DEVICE&lt;/span&gt;&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;$1&amp;quot;&lt;/span&gt; &lt;span class="c"&gt;# the device name&lt;/span&gt;
+&lt;span class="nv"&gt;&lt;span class="caps"&gt;LOGFACILITY&lt;/span&gt;&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;kernel.info&amp;quot;&lt;/span&gt; &lt;span class="c"&gt;# for debugging output&lt;/span&gt;
+
+
+&lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="o"&gt;[&lt;/span&gt; &lt;span class="k"&gt;${&lt;/span&gt;&lt;span class="nv"&gt;&lt;span class="caps"&gt;DEBUG&lt;/span&gt;&lt;/span&gt;&lt;span class="p"&gt;:=0&lt;/span&gt;&lt;span class="k"&gt;}&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; 1 &lt;span class="o"&gt;]&lt;/span&gt;; &lt;span class="k"&gt;then &lt;/span&gt;logger &lt;span class="s2"&gt;&amp;quot;$&lt;span class="caps"&gt;LOGFACILITY&lt;/span&gt;&amp;quot;&lt;/span&gt; usbhook called with arguments: &lt;span class="s2"&gt;&amp;quot;$&lt;span class="caps"&gt;DEVICE&lt;/span&gt;&amp;quot;&lt;/span&gt;; &lt;span class="k"&gt;fi&lt;/span&gt;
+
+sleep 5 &lt;span class="c"&gt;# delay 5 seconds to wait for mount&lt;/span&gt;
+
+mount | grep &lt;span class="s2"&gt;&amp;quot;$&lt;span class="caps"&gt;DEVICE&lt;/span&gt;&amp;quot;&lt;/span&gt;
+&lt;span class="nv"&gt;&lt;span class="caps"&gt;FOO&lt;/span&gt;&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;$?&amp;quot;&lt;/span&gt;
+
+&lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="o"&gt;[&lt;/span&gt; &lt;span class="nv"&gt;$&lt;span class="caps"&gt;FOO&lt;/span&gt;&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; 0 &lt;span class="o"&gt;]&lt;/span&gt;;
+&lt;span class="k"&gt;then&lt;/span&gt;
+&lt;span class="k"&gt;    if&lt;/span&gt; &lt;span class="o"&gt;[&lt;/span&gt; &lt;span class="k"&gt;${&lt;/span&gt;&lt;span class="nv"&gt;&lt;span class="caps"&gt;DEBUG&lt;/span&gt;&lt;/span&gt;&lt;span class="p"&gt;:=0&lt;/span&gt;&lt;span class="k"&gt;}&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; 1 &lt;span class="o"&gt;]&lt;/span&gt;; &lt;span class="k"&gt;then &lt;/span&gt;logger &lt;span class="s2"&gt;&amp;quot;$&lt;span class="caps"&gt;LOGFACILITY&lt;/span&gt;&amp;quot;&lt;/span&gt; usbhook device mounted: &lt;span class="s2"&gt;&amp;quot;$&lt;span class="caps"&gt;DEVICE&lt;/span&gt;&amp;quot;&lt;/span&gt;; &lt;span class="k"&gt;fi&lt;/span&gt;
+&lt;span class="k"&gt;else&lt;/span&gt;
+&lt;span class="k"&gt;    if&lt;/span&gt; &lt;span class="o"&gt;[&lt;/span&gt; &lt;span class="k"&gt;${&lt;/span&gt;&lt;span class="nv"&gt;&lt;span class="caps"&gt;DEBUG&lt;/span&gt;&lt;/span&gt;&lt;span class="p"&gt;:=0&lt;/span&gt;&lt;span class="k"&gt;}&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; 1 &lt;span class="o"&gt;]&lt;/span&gt;; &lt;span class="k"&gt;then &lt;/span&gt;logger &lt;span class="s2"&gt;&amp;quot;$&lt;span class="caps"&gt;LOGFACILITY&lt;/span&gt;&amp;quot;&lt;/span&gt; usbhook device &lt;span class="caps"&gt;NOT&lt;/span&gt; mounted: &lt;span class="s2"&gt;&amp;quot;$&lt;span class="caps"&gt;DEVICE&lt;/span&gt;&amp;quot;&lt;/span&gt; - exiting; &lt;span class="k"&gt;fi&lt;/span&gt;
+&lt;span class="k"&gt;    &lt;/span&gt;&lt;span class="nb"&gt;exit &lt;/span&gt;0
+&lt;span class="k"&gt;fi&lt;/span&gt;
+
+&lt;span class="nv"&gt;&lt;span class="caps"&gt;BAR&lt;/span&gt;&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="sb"&gt;`&lt;/span&gt;mount | grep &lt;span class="s2"&gt;&amp;quot;$&lt;span class="caps"&gt;DEVICE&lt;/span&gt;&amp;quot;&lt;/span&gt; | awk &lt;span class="s1"&gt;&amp;#39;{ print $3 }&amp;#39;&lt;/span&gt;&lt;span class="sb"&gt;`&lt;/span&gt;
+
+&lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="o"&gt;[&lt;/span&gt; -e &lt;span class="s2"&gt;&amp;quot;$&lt;span class="caps"&gt;BAR&lt;/span&gt;/foobarbaz.txt&amp;quot;&lt;/span&gt; &lt;span class="o"&gt;]&lt;/span&gt;
+&lt;span class="k"&gt;then&lt;/span&gt;
+&lt;span class="k"&gt;    if&lt;/span&gt; &lt;span class="o"&gt;[&lt;/span&gt; &lt;span class="k"&gt;${&lt;/span&gt;&lt;span class="nv"&gt;&lt;span class="caps"&gt;DEBUG&lt;/span&gt;&lt;/span&gt;&lt;span class="p"&gt;:=0&lt;/span&gt;&lt;span class="k"&gt;}&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; 1 &lt;span class="o"&gt;]&lt;/span&gt;; &lt;span class="k"&gt;then &lt;/span&gt;logger &lt;span class="s2"&gt;&amp;quot;$&lt;span class="caps"&gt;LOGFACILITY&lt;/span&gt;&amp;quot;&lt;/span&gt; usbhook &lt;span class="s2"&gt;&amp;quot;$&lt;span class="caps"&gt;BAR&lt;/span&gt;&amp;quot;&lt;/span&gt;/foobarbaz.txt found; &lt;span class="k"&gt;fi&lt;/span&gt;
+&lt;span class="k"&gt;else&lt;/span&gt;
+&lt;span class="k"&gt;    if&lt;/span&gt; &lt;span class="o"&gt;[&lt;/span&gt; &lt;span class="k"&gt;${&lt;/span&gt;&lt;span class="nv"&gt;&lt;span class="caps"&gt;DEBUG&lt;/span&gt;&lt;/span&gt;&lt;span class="p"&gt;:=0&lt;/span&gt;&lt;span class="k"&gt;}&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; 1 &lt;span class="o"&gt;]&lt;/span&gt;; &lt;span class="k"&gt;then &lt;/span&gt;logger &lt;span class="s2"&gt;&amp;quot;$&lt;span class="caps"&gt;LOGFACILITY&lt;/span&gt;&amp;quot;&lt;/span&gt; usbhook &lt;span class="s2"&gt;&amp;quot;$&lt;span class="caps"&gt;BAR&lt;/span&gt;&amp;quot;&lt;/span&gt;/foobarbaz.txt &lt;span class="caps"&gt;NOT&lt;/span&gt; found - exiting; &lt;span class="k"&gt;fi&lt;/span&gt;
+&lt;span class="k"&gt;    &lt;/span&gt;&lt;span class="nb"&gt;exit &lt;/span&gt;0
+&lt;span class="k"&gt;fi&lt;/span&gt;
+
+cp -R &lt;span class="s2"&gt;&amp;quot;$&lt;span class="caps"&gt;DEVICE&lt;/span&gt;&amp;quot;&lt;/span&gt;/* &lt;span class="s2"&gt;&amp;quot;$&lt;span class="caps"&gt;DEST&lt;/span&gt;&amp;quot;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;This was tested on &lt;a href="http://www.opensuse.org"&gt;OpenSuSE&lt;/a&gt;&amp;nbsp;10.3.&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Wed, 11 Nov 2009 11:47:00 -0500</pubDate><guid>tag:newblog.jasonantman.com,2009-11-11:2009/11/running-a-script-on-usb-drive-insertion/</guid><category>linux</category><category>script</category><category>udev</category><category>usb</category></item></channel></rss>

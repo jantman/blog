@@ -1,0 +1,428 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Jason Antman's Blog</title><link href="http://newblog.jasonantman.com/" rel="alternate"></link><link href="http://newblog.jasonantman.com/feeds/tags/firefox.atom.xml" rel="self"></link><id>http://newblog.jasonantman.com/</id><updated>2012-01-10T23:06:00-05:00</updated><entry><title>Firefox QR Code Generator</title><link href="http://newblog.jasonantman.com/2012/01/firefox-qr-code-generator/" rel="alternate"></link><updated>2012-01-10T23:06:00-05:00</updated><author><name>admin</name></author><id>tag:newblog.jasonantman.com,2012-01-10:2012/01/firefox-qr-code-generator/</id><summary type="html">&lt;p&gt;Just a quick little tip, I happened by the &lt;a href="https://addons.mozilla.org/en-US/firefox/addon/mobile-barcoder/"&gt;Mobile
+Barcoder&lt;/a&gt;
+Firefox add-on the other day. It&amp;#8217;s a Firefox add-on that generates &lt;a href="http://en.wikipedia.org/wiki/Qr_code"&gt;&lt;span class="caps"&gt;QR&lt;/span&gt;
+Code&lt;/a&gt; barcodes for text or links,
+right in your browser. While my Droid3 has a full keyboard, sometimes I
+still want to quickly send links from my desktop browser session to my
+phone. Firefox Sync helps a lot but is a bit slow on the phone (since I
+usually have 100+ tabs open between all of my desktop Firefox sessions),
+and email is an option but a bit&amp;nbsp;slower.&lt;/p&gt;
+&lt;p&gt;There are two caveats about this add-on&amp;nbsp;though:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;The feature to generate a &lt;span class="caps"&gt;QR&lt;/span&gt; code for the &lt;span class="caps"&gt;URL&lt;/span&gt; of the current page
+    shows up in the status bar, which isn&amp;#8217;t shown in modern versions of
+    Firefox. You&amp;#8217;ll need to enable the &lt;a href="https://support.mozilla.org/en-US/kb/what-add-bar"&gt;Add-on
+    bar&lt;/a&gt;.&lt;/li&gt;
+&lt;li&gt;It uses the
+    &lt;a href="http://mobilecodes.nokia.com/"&gt;http://mobilecodes.nokia.com/&lt;/a&gt;
+    server to generate barcodes, so it&amp;#8217;s dependent on connectivity and
+    that&amp;nbsp;service.&lt;/li&gt;
+&lt;/ol&gt;</summary><category term="barcode"></category><category term="firefox"></category><category term="mobile"></category><category term="Mozilla"></category><category term="qr code"></category></entry><entry><title>Handling mailto links on another computer</title><link href="http://newblog.jasonantman.com/2010/11/handling-mailto-links-on-another-computer/" rel="alternate"></link><updated>2010-11-16T11:34:00-05:00</updated><author><name>admin</name></author><id>tag:newblog.jasonantman.com,2010-11-16:2010/11/handling-mailto-links-on-another-computer/</id><summary type="html">&lt;p&gt;At work, I use &lt;a href="http://synergy-foss.org/"&gt;synergy&lt;/a&gt; to control two
+computers with the same mouse and keyboard. My main desktop (skynet) has
+two monitors - generally one for Firefox and one for my terminals - and
+my secondary machine (mithrandir), a third monitor on my desk, handles
+email and &lt;span class="caps"&gt;IM&lt;/span&gt;. The only real problem I&amp;#8217;ve had with this is mailto: links,
+which obviously don&amp;#8217;t work since my browser and mail client are on
+different&amp;nbsp;computers.&lt;/p&gt;
+&lt;p&gt;Getting cross-machine mailto links to work isn&amp;#8217;t all that difficult, at
+least with thunderbird which accepts a &amp;#8220;-compose&amp;#8221; command line argument.
+First, get passwordless pubkey &lt;span class="caps"&gt;SSH&lt;/span&gt; authentication setup from the web
+browser machine to the mail client machine. Then set your mailto
+handler/mail client to a shell script in your path. Finally, fill the
+script in with something&amp;nbsp;like:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="c"&gt;#!/bin/bash&lt;/span&gt;
+ssh mithrandir &lt;span class="s2"&gt;&amp;quot;export &lt;span class="caps"&gt;DISPLAY&lt;/span&gt;=:0.0 &amp;amp;&amp;amp; thunderbird -compose &amp;#39;$@&amp;#39;&amp;quot;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;This first sets the &lt;span class="caps"&gt;DISPLAY&lt;/span&gt; environment variable so thunderbird can open
+a window in the already-running X session, then invokes thunderbird
+passing it the mailto: link as an argument to -compose. Note the single
+quotes which prevent spaces in the link from breaking&amp;nbsp;things.&lt;/p&gt;</summary><category term="firefox"></category><category term="Thunderbird"></category></entry><entry><title>PHP Script to Dump Firefox Session</title><link href="http://newblog.jasonantman.com/2010/08/php-script-to-dump-firefox-session/" rel="alternate"></link><updated>2010-08-17T21:17:00-04:00</updated><author><name>admin</name></author><id>tag:newblog.jasonantman.com,2010-08-17:2010/08/php-script-to-dump-firefox-session/</id><summary type="html">&lt;p&gt;If you&amp;#8217;re anything like me, you often find yourself working on multiple
+computers. Today I left a few tabs open in Firefox on my work laptop,
+and wanted to continue reading from my desktop. Normally I&amp;#8217;d just grab
+the laptop, or &lt;span class="caps"&gt;RDP&lt;/span&gt; into it if it was my work desktop that had the open
+tabs, but at the moment my girlfriend is neck-deep in WoW on the
+MacBook. Having had this problem before (getting tabs back remotely, not
+a laptop occupied with WoW), I started thinking about a&amp;nbsp;solution.&lt;/p&gt;
+&lt;p&gt;I &lt;em&gt;could&lt;/em&gt; have closed my local firefox session, moved the
+sessionstore.js somewhere else, copied the one from the laptop over,
+re-opened firefox, &amp;#8230; well, you get the&amp;nbsp;idea.&lt;/p&gt;
+&lt;p&gt;But that sounds like a really sub-optimal solution. So I started looking
+around a bit. It seems that sessionstore.js is &lt;em&gt;almost&lt;/em&gt; &lt;span class="caps"&gt;JSON&lt;/span&gt;, but as per
+&lt;a href="https://bugzilla.mozilla.org/show_bug.cgi?id=407110#c2"&gt;Mozilla bug
+407110&lt;/a&gt;, it&amp;#8217;s
+not quite standards-compliant. Luckily, it seems that &lt;span class="caps"&gt;PHP&lt;/span&gt;&amp;#8217;s &lt;span class="caps"&gt;JSON&lt;/span&gt; module
+is quite tolerant, so once I stripped off the leading and trailing
+parens from the file contents, it parsed quite&amp;nbsp;nicely.&lt;/p&gt;
+&lt;p&gt;I&amp;#8217;ve written a small &lt;code&gt;dumpFirefoxSession.php&lt;/code&gt; script that reads the
+sessionstore.js file (in cwd or a specified path), unserializes the &lt;span class="caps"&gt;JSON&lt;/span&gt;
+as an array, and then dumps the tabs. It dumps as either plain text or
+&lt;span class="caps"&gt;HTML&lt;/span&gt; (currently just elements inside the body, not a full &lt;span class="caps"&gt;HTML&lt;/span&gt; file).
+The &lt;span class="caps"&gt;HTML&lt;/span&gt; will include &lt;code&gt;ol&lt;/code&gt;s for each window listing the tabs, links to
+the current content (sessionstore.js also holds history for each tab,
+but I don&amp;#8217;t need this), and it shows which tab is currently&amp;nbsp;selected.&lt;/p&gt;
+&lt;p&gt;You can grab the script from github at:
+&lt;a href="https://github.com/jantman/misc-scripts/blob/master/nmap-xml-to-table.php"&gt;https://github.com/jantman/misc-scripts/blob/master/nmap-xml-to-table.php&lt;/a&gt;.
+The current version is 3. You&amp;#8217;ll need &lt;span class="caps"&gt;PHP&lt;/span&gt; (probably 5) with &lt;span class="caps"&gt;JSON&lt;/span&gt;&amp;nbsp;support.&lt;/p&gt;</summary><category term="firefox"></category><category term="PHP"></category></entry><entry><title>Linux, Choice, Updates, CitiBank issues</title><link href="http://newblog.jasonantman.com/2008/08/linux-choice-updates-citibank-issues/" rel="alternate"></link><updated>2008-08-25T12:37:00-04:00</updated><author><name>admin</name></author><id>tag:newblog.jasonantman.com,2008-08-25:2008/08/linux-choice-updates-citibank-issues/</id><summary type="html">&lt;p&gt;&lt;strong&gt;Update July 11, 2011&lt;/strong&gt; - I &lt;a href="/2011/07/article-on-theinquirer-net/"&gt;just found
+out&lt;/a&gt; that this post is heavily
+quote in &lt;a href="http://www.theinquirer.net/inquirer/news/1026958/citibank-infuriating-customers-linux-hostile-site"&gt;an article on
+theinquirer.net&lt;/a&gt;
+about this issue. Luckily (I don&amp;#8217;t know whether I made a difference or
+not, certainly CitiBank never contacted me back), citicards.com now
+works with Firefox on Linux. I have no idea if it was a change made by
+Citi, or a change with Firefox or Flash&amp;nbsp;Player.&lt;/p&gt;
+&lt;p&gt;I know this blog has been less-than-active lately. Life has been pretty
+busy, between a massive network upgrade at the &lt;a href="http://www.midlandparkambulance.com"&gt;ambulance
+corps&lt;/a&gt; that I volunteer with, the
+impending doom of a new semester at work, scheduling courses, and a few
+personal projects. I do, however, have a long list of things to post,
+including some notes on my upgrade to &lt;a href="http://www.nagios.org"&gt;Nagios 3&lt;/a&gt;,
+my recent experience with the &lt;a href="http://www.pcengines.ch/alix.htm"&gt;&lt;span class="caps"&gt;PC&lt;/span&gt; Engines
+&lt;span class="caps"&gt;ALIX&lt;/span&gt;&lt;/a&gt; board, some changes to
+&lt;a href="http://tuxostat.jasonantman.com"&gt;tuxOstat&lt;/a&gt;, and my plans to upgrade to
+Optimum Business cable with 5 static IPs - finally a real home for
+&lt;a href="http://www.jasonantman.com"&gt;JasonAntman.com&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;CitiCards Problems -&lt;/strong&gt; I had a somewhat unnerving experience this
+morning. Having just gotten a Citibank credit card, and made my first
+few purchases on it, I browsed to
+&lt;a href="https://www.citicards.com"&gt;CitiCards.com&lt;/a&gt; to check my account summary.
+I happened to be using a just-purchased &lt;span class="caps"&gt;IBM&lt;/span&gt; T41 laptop, running
+&lt;a href="http://www.opensuse.org"&gt;OpenSuSE 11.0&lt;/a&gt; and
+&lt;a href="http://www.getfirefox.com"&gt;FireFox3&lt;/a&gt;, so when I saw the page display
+and then go completely blank, I suspected a problem with my Flash
+plugin. Little did I know, but I tried the same page on 3 other
+Linux/Firefox machines, with the same result. I put in a call to the
+tech support line, and was gruffly informed by the representative that
+Firefox was not supported, they were unable to support it, and, to
+paraphrase, I should get another browser or f*** off. She was &lt;em&gt;very
+well-aware&lt;/em&gt; of the issue, and stated that Citi would not fix it. At this
+point, I stated that I thought I would cancel my card, and she told me
+to have a nice day and hung&amp;nbsp;up.&lt;/p&gt;
+&lt;p&gt;I decided to go to step 2 of the Generic Problem Solving
+Method,
+and found &lt;a href="http://www.google.com/search?hl=en&amp;amp;q=citicards.com+linux&amp;amp;btnG=Google+Search"&gt;hundreds of references to a problem with CitiCards.com on
+Linux&lt;/a&gt;.
+I read through a lot of conspiracy theory, but decided to test one of
+the theories (and fixes). Sure enough, when I right-clicked on the blank
+white screen, I got a Flash context menu. Clicking &amp;#8220;Play&amp;#8221; showed the ad,
+and I was able to click the little &amp;#8220;X&amp;#8221; in the top right and bypass it,
+gaining access to the normal main page. Never to be one to ignore a
+conspiracy (or anti-Linux) theory, I pulled up the same page on a Mac.
+Sure enough, that particular ad (set not to play and with an opaque
+full-screen background) didn&amp;#8217;t show up. Hmm&amp;#8230; maybe there&amp;#8217;s something
+to the theory put forth by the &lt;a href="http://stealcode.blogspot.com/2008/07/citibank-doesnt-like-linuxubuntu_27.html"&gt;guy who said CitiBank is blocking Linux
+users&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;I decided to call back, and this time spoke with Susan at CitiCards tech
+support. She was very understanding, and apologized for both the
+inconvenience and the previous representative&amp;#8217;s attitude. She said that
+she was aware of some issues with Firefox and Linux, but stated that
+they are only unsupported so far as Tech Support won&amp;#8217;t walk a customer
+using Linux or FireFox through any issue resolution, but that both the
+browser and architecture should, theoretically, work. She didn&amp;#8217;t know
+anything about a policy against Linux, or intentional blocking/sabotage.
+She did say, however, that they are &amp;#8220;working on it&amp;#8221;. I did inform her
+that the problem could probably be resolved by simply editing the Flash
+ad to be properly transparent, or suppressing it for Linux
+architectures, though I doubt that the information will make its&amp;#8217; way up
+the food chain. Unfortunately, I can&amp;#8217;t seem to find a contact email for
+anything site-related on&amp;nbsp;CitiCards.com.&lt;/p&gt;
+&lt;p&gt;If this is really a case of intentional blocking, it would be quite
+infuriating - I filled out the application for the card on
+FireFox3/Linux&amp;#8230; but then they block account&amp;nbsp;access?&lt;/p&gt;
+&lt;p&gt;Hopefully more of an update&amp;nbsp;tonight&amp;#8230;&lt;/p&gt;</summary><category term="citibank"></category><category term="citicards"></category><category term="firefox"></category><category term="flash"></category><category term="linux"></category></entry><entry><title>Custom MediaWiki Sidebar; New Blog?</title><link href="http://newblog.jasonantman.com/2008/06/custom-mediawiki-sidebar-new-blog/" rel="alternate"></link><updated>2008-06-18T22:26:00-04:00</updated><author><name>admin</name></author><id>tag:newblog.jasonantman.com,2008-06-18:2008/06/custom-mediawiki-sidebar-new-blog/</id><summary type="html">&lt;p&gt;As you may have noticed, some &lt;a href="http://www.spreadfirefox.com/node&amp;amp;id=238326&amp;amp;t=305"&gt;Firefox
+3&lt;/a&gt;
+&lt;a href="http://www.spreadfirefox.com/?q=affiliates/homepage"&gt;buttons&lt;/a&gt; have
+popped up not only here on my blog, but also on my
+&lt;a href="http://www.jasonantman.com/"&gt;wiki&lt;/a&gt;. While adding the buttons to
+&lt;a href="http://www.blogger.com/"&gt;Blogger&lt;/a&gt; was a simple addition to the
+template, getting them in the sidebar of MediaWiki wasn&amp;#8217;t exactly as
+easy (yeah, I&amp;#8217;m considering the arduous project of moving my whole 102+
+page wiki to &lt;a href="http://drupal.org/"&gt;Drupal&lt;/a&gt; or another good F/&lt;span class="caps"&gt;OSS&lt;/span&gt;&amp;nbsp;&lt;span class="caps"&gt;CMS&lt;/span&gt;).&lt;/p&gt;
+&lt;p&gt;After some serious grepping through the source, and adding &lt;span class="caps"&gt;HTML&lt;/span&gt; comments
+to see where they appeared, I finally found a solution to add the button
+to the MediaWiki sidebar - though I&amp;#8217;d really like it to appear below the
+search box (I guess that&amp;#8217;s something for my to-do list). I&amp;#8217;m using the
+MonoBook skin (though somewhat modified). I&amp;#8217;m using &amp;#8220;MonoBook nouveau&amp;#8221;,
+and it should be the version that shipped with &lt;span class="caps"&gt;MW&lt;/span&gt; 1.10.1. In this
+version, I added the code around line 166. Specifically, this was added
+before the &lt;code&gt;&amp;lt;div id="p-search" class="portlet"&amp;gt;&lt;/code&gt; line, and after the end
+of the &lt;code&gt;foreach ($this-&amp;gt;data['sidebar'] as $bar =&amp;gt; $cont)&lt;/code&gt; loop. This
+threw the button in a box directly above the search box, and below all
+of my sidebar&amp;nbsp;links.&lt;/p&gt;
+&lt;p&gt;The code looked something&amp;nbsp;like:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="cp"&gt;&amp;lt;?php } ?&amp;gt;&lt;/span&gt;
+&lt;span class="c"&gt;&amp;lt;!-- firefox link added to MonoBook.php by jantman 2008-06-18 --&amp;gt;&lt;/span&gt;
+&lt;span class="nt"&gt;&amp;lt;div&lt;/span&gt; &lt;span class="na"&gt;class=&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;portlet&amp;#39;&lt;/span&gt; &lt;span class="na"&gt;id=&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;p-logos&amp;#39;&lt;/span&gt;&lt;span class="nt"&gt;&amp;gt;&lt;/span&gt;
+&lt;span class="nt"&gt;&amp;lt;h5&amp;gt;&lt;/span&gt;Cool Stuff&lt;span class="nt"&gt;&amp;lt;/h5&amp;gt;&lt;/span&gt;
+&lt;span class="nt"&gt;&amp;lt;div&lt;/span&gt; &lt;span class="na"&gt;class=&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;pBody&amp;#39;&lt;/span&gt;&lt;span class="nt"&gt;&amp;gt;&lt;/span&gt;
+&lt;span class="nt"&gt;&amp;lt;ul&amp;gt;&lt;/span&gt;
+&lt;span class="nt"&gt;&amp;lt;li&amp;gt;&amp;lt;a&lt;/span&gt; &lt;span class="na"&gt;href=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;http://www.spreadfirefox.com/node&amp;amp;id=238326&amp;amp;t=305&amp;quot;&lt;/span&gt; &lt;span class="na"&gt;target=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;_blank&amp;quot;&lt;/span&gt;&lt;span class="nt"&gt;&amp;gt;&lt;/span&gt;
+&lt;span class="nt"&gt;&amp;lt;img&lt;/span&gt; &lt;span class="na"&gt;border=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;0&amp;quot;&lt;/span&gt; &lt;span class="na"&gt;alt=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;Firefox 3&amp;quot;&lt;/span&gt; &lt;span class="na"&gt;title=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;Firefox 3&amp;quot;&lt;/span&gt; &lt;span class="na"&gt;src=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;http://sfx-images.mozilla.org/affiliates/Buttons/firefox3/110x32_best-yet.png&amp;quot;&lt;/span&gt;&lt;span class="nt"&gt;/&amp;gt;&lt;/span&gt;
+&lt;span class="nt"&gt;&amp;lt;/a&amp;gt;&lt;/span&gt;
+&lt;span class="nt"&gt;&amp;lt;/li&amp;gt;&lt;/span&gt;
+&lt;span class="nt"&gt;&amp;lt;/ul&amp;gt;&lt;/span&gt;
+&lt;span class="nt"&gt;&amp;lt;/div&amp;gt;&lt;/span&gt;
+&lt;span class="nt"&gt;&amp;lt;/div&amp;gt;&lt;/span&gt;
+&lt;span class="c"&gt;&amp;lt;!-- end firefox link --&amp;gt;&lt;/span&gt;
+&lt;span class="nt"&gt;&amp;lt;div&lt;/span&gt; &lt;span class="na"&gt;id=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;p-search&amp;quot;&lt;/span&gt; &lt;span class="na"&gt;class=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;portlet&amp;quot;&lt;/span&gt;&lt;span class="nt"&gt;&amp;gt;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;In other news, I&amp;#8217;m taking a Data Driven Websites class this summer
+(&lt;span class="caps"&gt;PHP&lt;/span&gt;/MySQL, but for some reason they switched to a Windows server&amp;#8230;
+endless problems, and I can&amp;#8217;t even edit with Nano on the server, let
+alone emacs). Our first project was to build a blog engine, which I&amp;#8217;m
+working on right now. Anyway, it got me thinking&amp;#8230; the one thing that
+Blogger is missing is the ability to post to a given category, and allow
+users to view or subscribe to a specific category (or everything). So I
+think I may look into writing something like that myself, if I can&amp;#8217;t
+find a good alternative that&amp;#8217;s already done and is F/&lt;span class="caps"&gt;OSS&lt;/span&gt;. Regardless,
+I&amp;#8217;ll probably be keeping the Blogger template as well as (ugh) moving
+over all of my current posts, which Blogger chose to store in raw &lt;span class="caps"&gt;HTML&lt;/span&gt;.
+So there&amp;#8217;s going to be a lot of parsing on my&amp;nbsp;future&amp;#8230;&lt;/p&gt;
+&lt;p&gt;&lt;span class="caps"&gt;PS&lt;/span&gt; - When I get a new blog engine, I&amp;#8217;m also going to go for a slightly
+modified template that uses relative widths and placement - so that
+code, like the snippet here, fits the screen&amp;nbsp;correctly.&lt;/p&gt;</summary><category term="blog"></category><category term="firefox"></category><category term="mediawiki"></category><category term="PHP"></category></entry><entry><title>Firefox 3!!!!</title><link href="http://newblog.jasonantman.com/2008/06/firefox-3/" rel="alternate"></link><updated>2008-06-18T20:37:00-04:00</updated><author><name>admin</name></author><id>tag:newblog.jasonantman.com,2008-06-18:2008/06/firefox-3/</id><summary type="html">&lt;p&gt;Well, Firefox 3 is here. And it&amp;#8217;s wonderful. I&amp;#8217;ve had it running all
+day, and absolutely love it. I just got &lt;span class="caps"&gt;FFX&lt;/span&gt; 3 running on my laptop (my
+primary workstation). The memory management does appear to be better -
+nowhere near as much of a strain on the laptop (a mere &lt;span class="caps"&gt;1GB&lt;/span&gt; &lt;span class="caps"&gt;RAM&lt;/span&gt;), and
+better page load time. I&amp;#8217;m not sure how I feel about the &lt;span class="caps"&gt;UI&lt;/span&gt; changes, but
+those can be dealt&amp;nbsp;with&amp;#8230;&lt;/p&gt;
+&lt;p&gt;For everyone who downloaded Firefox 3 today - good job! Over
+&lt;strong&gt;8 Million&lt;/strong&gt; downloads in 24 hours,
+and inching up to 580 Million total downloads of&amp;nbsp;Firefox!!!&lt;/p&gt;
+&lt;p&gt;Want to hear a figure even more amazing, from Mozilla&amp;#8217;s &lt;a href="http://blog.mozilla.com/metrics/"&gt;Blog of
+Metrics&lt;/a&gt;? It&amp;#8217;s only been
+&lt;em&gt;a little over twenty four hours since
+the launch&lt;/em&gt;, and &amp;#8220;According the &lt;a href="http://marketshare.hitslink.com/report.aspx?qprid=31"&gt;live
+tracking&lt;/a&gt; from Net
+Applications, Fx3 has been hovering around 4% worldwide market&amp;nbsp;share.&amp;#8221;&lt;/p&gt;</summary><category term="firefox"></category></entry><entry><title>Links for 2008-02-23</title><link href="http://newblog.jasonantman.com/2008/02/links-for-2008-02-23/" rel="alternate"></link><updated>2008-02-25T11:20:00-05:00</updated><author><name>admin</name></author><id>tag:newblog.jasonantman.com,2008-02-25:2008/02/links-for-2008-02-23/</id><summary type="html">&lt;p&gt;Some links for&amp;nbsp;today:&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://arstechnica.com/news.ars/post/20080221-microsoft-launches-new-open-standards-interoperability-push.html"&gt;Microsoft&amp;#8217;s new promised on interoperability, open standards.
+etc.&lt;/a&gt;
+- somewhat ironic given the Office Open &lt;span class="caps"&gt;XML&lt;/span&gt; debacle on &amp;#8220;standards&amp;#8221;. &lt;a href="http://arstechnica.com/journals/linux.ars/2008/02/21/red-hat-not-impressed-with-microsofts-interoperability-plans"&gt;And
+Red Hat&amp;#8217;s worries about
+it&lt;/a&gt;.
+(Ars&amp;nbsp;Technica)&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://www.groklaw.net/article.php?story=20080221184924826"&gt;Groklaw&amp;#8217;s lengthy analysis of the
+promises&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://blogs.zdnet.com/threatchaos/"&gt;Pakistan removed from the Internet, causes global YouTube
+outage&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://www.guardian.co.uk/theguardian/2008/feb/23/internet.usa"&gt;A Guardian article on the WikiLeaks
+debacle&lt;/a&gt;
+- perhaps the biggest affront to the First Amendment this&amp;nbsp;year.&lt;/p&gt;
+&lt;p&gt;An&lt;a href="http://www.informationweek.com/story/showArticle.jhtml?articleID=206800800&amp;amp;cid=RSSfeed_IWK_All"&gt;InformationWeek article about some guys from BlackHat &lt;span class="caps"&gt;D.C.&lt;/span&gt; who said
+that they will be able to crack &lt;span class="caps"&gt;GSM&lt;/span&gt; encryption in under 30 minutes with
+$1,000 of technology or 30 seconds with
+$100,000&lt;/a&gt;
+(FPGAs - Maybe a cluster of&amp;nbsp;&lt;span class="caps"&gt;PS3&lt;/span&gt;&amp;#8217;s?)&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://citp.princeton.edu/memory/"&gt;A Princeton Unviersity blog about cold boots possibly able to crack the
+Windows BitLocker system&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://blog.mozilla.com/blog/2008/02/21/500-million-firefox-downloads-complete-500-million-grains-in-progress/"&gt;Yay! Firefox has hit its&amp;#8217; 500 Millionth
+download!!!&lt;/a&gt;
+And there was much&amp;nbsp;rejoicing&amp;#8230;&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://arstechnica.com/news.ars/post/20080219-opera-browser-market-isnt-functioning-thanks-to-microsoft.html"&gt;An ArsTechnica article on Internet Explorer, what should be done to fix
+it, and how there can still be a non-standards-compliant
+browser&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://jeremy.linuxquestions.org/"&gt;Jeremy&amp;#8217;s Blog&lt;/a&gt; - the mind behind
+&lt;a href="http://www.linuxquestions.org/"&gt;LinuxQuestions.org&lt;/a&gt; - &lt;a href="http://jeremy.linuxquestions.org/2008/02/21/2007-linuxquestionsorg-members-choice-award-winners/"&gt;provides a recap
+of the 2007 &lt;span class="caps"&gt;LQ&lt;/span&gt; Members&amp;#8217; Choice
+awards&lt;/a&gt;.
+Some interesting winners were VirtualBox for virtualization package,
+Debain for server distro, Knoppix for Live Distro, Eclipse for &lt;span class="caps"&gt;IDE&lt;/span&gt;/Web
+Development Environment, Python for language of the year, and - much to
+my chagrin - vi/vim for&amp;nbsp;editor.&lt;/p&gt;
+&lt;p&gt;A &lt;a href="http://www.linuxjournal.com/content/whats-next-open-source-and-public-media"&gt;LinuxJournal article on What&amp;#8217;s Next for Open Source and Public
+Meida&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://www.linuxinsider.com/rsstory/61803.html"&gt;LinuxInsider - &lt;span class="caps"&gt;EU&lt;/span&gt; taking Microsoft&amp;#8217;s promises with a grain of
+salt&lt;/a&gt;, noting that &lt;span class="caps"&gt;MS&lt;/span&gt;
+has made &amp;#8220;at least four similar statements&amp;#8221; in the&amp;nbsp;past.&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://utcc.utoronto.ca/~cks/space/blog/"&gt;Chris Siebenmann&lt;/a&gt; - &lt;a href="http://utcc.utoronto.ca/~cks/space/blog/tech/SharingRisk"&gt;Where
+the risk is with virtualization (and
+iSCSI)&lt;/a&gt; and
+&lt;a href="http://utcc.utoronto.ca/~cks/space/blog/sysadmin/WirelessMachineRoom"&gt;Wireless, machine rooms, and the Asus
+eeePC&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://www.ibm.com/developerworks/library/x-ooxmlstandard.html?ca=dgr-lnxw06OOXMLBigDeal&amp;amp;S_TACT=105AGX59&amp;amp;S_CMP=GR"&gt;&lt;span class="caps"&gt;IBM&lt;/span&gt; DeveloperWorks - &lt;span class="caps"&gt;OOXML&lt;/span&gt;: What&amp;#8217;s the big
+deal?&lt;/a&gt;
+- outlining the technical objections to &lt;span class="caps"&gt;OOXML&lt;/span&gt; as a standard. Linked from
+a &lt;a href="http://rootprompt.org/article.php3?article=11548"&gt;rootprompt.org&lt;/a&gt;
+article mentioning that &amp;#8220;&lt;span class="caps"&gt;OOXML&lt;/span&gt; is essentially a complete replication of
+every chunk of data that a Microsoft Office application might possibly
+save in a&amp;nbsp;file&amp;#8221;.&lt;/p&gt;
+&lt;p&gt;Slashdot &lt;span class="caps"&gt;YRO&lt;/span&gt; - &lt;a href="http://yro.slashdot.org/article.pl?sid=08/02/25/0159250&amp;amp;from=rss"&gt;a guy who got hist stock photos stolen, entered into a
+long legal battle, and
+won&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;Microsoft&amp;#8217;s &lt;a href="http://seattlepi.nwsource.com/business/352442_vista23.html"&gt;Windows Vista Capable lawsuit granted class-action
+status&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;A &lt;a href="http://www.washingtonpost.com/wp-dyn/content/article/2008/02/23/AR2008022300693.html"&gt;Washington Post article on Hans Reiser&amp;#8217;s Geek Defense
+strategy&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;A &lt;a href="http://apple.slashdot.org/article.pl?sid=08/02/23/1915254&amp;amp;from=rss"&gt;Slashdot post linking to news that Apple sent a cease-and-decist
+order to the Hymn
+Project&lt;/a&gt;,
+which produces software to remove &lt;span class="caps"&gt;DRM&lt;/span&gt; from iTunes songs. Apple had their
+&lt;span class="caps"&gt;ISP&lt;/span&gt; remove all download links. (I guess the only solution is for us all
+to buy bandwidth right from a&amp;nbsp;&lt;span class="caps"&gt;NSP&lt;/span&gt;&amp;#8230;)&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://news.yahoo.com/s/ap/20080222/ap_on_hi_te/yahoo_shareholder_lawsuit"&gt;Yahoo&amp;#8217;s shareholders are suing it for not gobbling up the Microsoft
+deal&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://arstechnica.com/news.ars/post/20080220-disgruntled-customer-sues-comcast-over-p2p-throttling.html"&gt;Comcast getting sued &lt;span class="caps"&gt;AGAIN&lt;/span&gt; for &lt;span class="caps"&gt;P2P&lt;/span&gt;
+filtering&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://blog.wired.com/music/2008/02/riaa-training-v.html"&gt;A leaked &lt;span class="caps"&gt;RIAA&lt;/span&gt; training video for
+prosecutors&lt;/a&gt;,
+going so far as to say that &lt;span class="caps"&gt;IP&lt;/span&gt; piracy can lead to arrests for drugs,
+weapons, or terrorism. It also includes instructions on how to get a
+&lt;span class="caps"&gt;RIAA&lt;/span&gt; investigator certified as a court&amp;nbsp;expert.&lt;/p&gt;
+&lt;p&gt;A &lt;a href="http://www.nytimes.com/2008/02/21/fashion/21webgirls.html?_r=2&amp;amp;oref=slogin&amp;amp;oref=slogin"&gt;New York Times article on - gasp - women using the
+Internet&lt;/a&gt;.
+Linked from &lt;a href="http://yesthattom.livejournal.com"&gt;Tom Limoncelli&amp;#8217;s blog&lt;/a&gt;.&lt;/p&gt;</summary><category term="apple"></category><category term="bitlocker"></category><category term="cellphone"></category><category term="EU"></category><category term="firefox"></category><category term="gsm"></category><category term="microsoft"></category><category term="ooxml"></category><category term="pakistan"></category><category term="riaa"></category><category term="virtualization"></category><category term="wikileaks"></category><category term="windows"></category><category term="youtube"></category></entry><entry><title>Blacklists, Network Performance, New Project, XKCD</title><link href="http://newblog.jasonantman.com/2007/10/blacklists-network-performance-new-project-xkcd/" rel="alternate"></link><updated>2007-10-10T14:03:00-04:00</updated><author><name>admin</name></author><id>tag:newblog.jasonantman.com,2007-10-10:2007/10/blacklists-network-performance-new-project-xkcd/</id><summary type="html">&lt;p&gt;Part 2 of today&amp;#8217;s&amp;nbsp;thoughts&amp;#8230;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Blacklists, Blocking, Reverse-Validation&lt;/strong&gt; - Yes, they have some uses.
+I use Daemon Synchronization in
+&lt;a href="http://www.jasonantman.com/wiki/index.php/DenyHosts"&gt;DenyHosts&lt;/a&gt; and
+plug-ins like Pyzor in SpamAssassin. However, I&amp;#8217;ve also been the victim
+of blacklists, and the new Internet order, many times. There&amp;#8217;s a
+conspiracy between ISPs - simply put, big ISPs want everyone else to use
+big ISPs. I understand the logic behind reverse-validation. However, I
+have a residential internet connection. I also run Linux. When I got
+Verizon, I configured Postfix to deliver mail directly. Big mistake.
+Most big email providers (&lt;span class="caps"&gt;AOL&lt;/span&gt;, &lt;span class="caps"&gt;MSN&lt;/span&gt;, probably Gmail too) will bounce back
+e-mail that comes from a domain that doesn&amp;#8217;t reverse-validate. And since
+Verizon owns my &lt;span class="caps"&gt;IP&lt;/span&gt;, despite the substantial sums of money they&amp;#8217;ve been
+getting from me, my &lt;span class="caps"&gt;IP&lt;/span&gt; doesn&amp;#8217;t reverse-validate to my domain name. To
+top it off, Verizon blocks the usual &lt;span class="caps"&gt;SMTP&lt;/span&gt; ports on residential
+connections, so I can&amp;#8217;t have people send me e-mail either. Everything
+needs to be relayed through Verizon. To add to the frustration, Verizon
+blocks port 80 on my connection, so I&amp;#8217;m forced to serve my whole site on
+an unused (and un-blocked) high-numbered port. And use
+&lt;a href="http://www.dyndns.org"&gt;DynDNS.org&lt;/a&gt; to redirect to my dynamic &lt;span class="caps"&gt;IP&lt;/span&gt;. This
+wouldn&amp;#8217;t be so much of an issue if I didn&amp;#8217;t know that some large
+companies have firewalls configured to block &lt;span class="caps"&gt;HTTP&lt;/span&gt; requests *&lt;span class="caps"&gt;OUT&lt;/span&gt;* to
+any non-default port. As a result, my own father can&amp;#8217;t view my web site
+or blog from work. What ever happened to the little&amp;nbsp;guy?&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Network Performance&lt;/strong&gt; - I know I have old computers and an old switch.
+But there&amp;#8217;s something wrong when network file transfers crawl by at \~3
+Mbps. I setup &lt;a href="http://sd.wareonearth.com/~phil/net/ttcp/"&gt;nttcp&lt;/a&gt; on two
+of my machines to measure throughput, and was greeted with numbers in
+the realm of 93-96 Mbps - what I&amp;#8217;d expect on a 100 Mpbs network.
+However, a file transfer between these two machines barely scratched 8
+Mpbs. Maybe GigE is the answer, but I&amp;#8217;ll be looking into the theory
+behind this in the next few days - admittedly, I don&amp;#8217;t know much about
+network performance, but I&amp;#8217;m willing to&amp;nbsp;learn&amp;#8230;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;New Project&lt;/strong&gt; - I&amp;#8217;ve started planning on a new project,
+&lt;a href="http://www.openepcr.org"&gt;openEPCR&lt;/a&gt;. My &lt;a href="http://www.php-ems-tools.com"&gt;&lt;span class="caps"&gt;PHP&lt;/span&gt; &lt;span class="caps"&gt;EMS&lt;/span&gt;
+Tools&lt;/a&gt; package for &lt;span class="caps"&gt;EMS&lt;/span&gt; and fire agencies
+seems to be generating a lot of downloads (yet little community
+interest), and I&amp;#8217;m now seriously thinking about the lack of a free,
+open-source Electronic Patient Care Report package for the pre-hospital
+care industry. A lot of these organizations are volunteer and operating
+on limited budgets. Stay tuned&amp;#8230; all I&amp;#8217;ll say is that what I&amp;#8217;ve planned
+is something that you&amp;#8217;d expect from me - open-source,
+platform-independent, and geared towards limited hardware resources.
+I&amp;#8217;ll probably be looking towards Java as a development platform, though
+the interest generated in &lt;a href="http://gears.google.com/"&gt;Google Gears&lt;/a&gt; may
+also pay off. Of course, there&amp;#8217;s no way I can do such an ambitious
+project myself, so I&amp;#8217;m looking for developers to help&amp;nbsp;out.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Comic&lt;/strong&gt; - pretty much the only non-serious content in my Google Reader
+account is &lt;a href="http://xkcd.com"&gt;&lt;span class="caps"&gt;XKCD&lt;/span&gt;.com&lt;/a&gt;. It&amp;#8217;s a great comic with
+wonderful technical and geek humor. Today&amp;#8217;s
+&lt;a href="http://xkcd.com/327/"&gt;comic&lt;/a&gt; was so good that I just had to include&amp;nbsp;it&amp;#8230;&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://xkcd.com/327/"&gt;&lt;img alt="image" src="http://imgs.xkcd.com/comics/exploits_of_a_mom.png" /&gt;&lt;/a&gt;&lt;/p&gt;</summary><category term="bandwidth"></category><category term="blacklist"></category><category term="comic"></category><category term="epcr"></category><category term="firefox"></category><category term="java"></category><category term="openepcr"></category><category term="patient care report"></category><category term="pcr"></category><category term="php ems tools"></category><category term="reverse-validation"></category><category term="XKCD"></category></entry><entry><title>PCpro UK: Boycott ad-blocking Firefox, urges furious web designer</title><link href="http://newblog.jasonantman.com/2007/09/pcpro-uk-boycott-ad-blocking-firefox-urges-furious-web-designer/" rel="alternate"></link><updated>2007-09-17T14:04:00-04:00</updated><author><name>admin</name></author><id>tag:newblog.jasonantman.com,2007-09-17:2007/09/pcpro-uk-boycott-ad-blocking-firefox-urges-furious-web-designer/</id><summary type="html">&lt;p&gt;When browsing through &lt;a href="http://digg.com/"&gt;Digg&lt;/a&gt; this morning, I came by a
+story at PCpro &lt;span class="caps"&gt;UK&lt;/span&gt; entitled &amp;#8220;&lt;a href="http://www.pcpro.co.uk/news/news/124719/"&gt;Boycott ad-blocking Firefox, urges furious
+web designer&lt;/a&gt;&amp;#8220;. This gentleman
+stated that, &amp;#8220;Software that
+blocks all advertisement is an infringement of the rights of website
+owners and&amp;nbsp;developers.&amp;#8221;&lt;/p&gt;
+&lt;p&gt;While I don&amp;#8217;t like giving press to such a story, I found it alarming on
+many&amp;nbsp;levels.&lt;/p&gt;
+&lt;p&gt;Firstly, I&amp;#8217;ve never heard of rights of website owners and developers.
+Being a &amp;#8220;website owner and developer&amp;#8221; myself, I understand that the web
+is a dynamic medium. Moreover, I think of &lt;span class="caps"&gt;HTML&lt;/span&gt; as what it is - a markup
+language. It just tells a program (browser) how to display something in
+a user-friendly style. I test my pages with Lynx, and expect them to
+conform to &lt;span class="caps"&gt;HTML&lt;/span&gt;/1.1. In other words, I believe that the Internet is an
+information distribution tool. I expect, I &lt;em&gt;want&lt;/em&gt;, my content to be
+viewable by as many people as possible. I try to use simple markup and
+make use of &lt;span class="caps"&gt;ALT&lt;/span&gt; tags so that as many people as possible will be able to
+view the content. I want it to make sense on as many platforms as
+possible. I want people who need accessibility aids to be able to
+understand it. In short, I want my content to reach as many people as&amp;nbsp;possible.&lt;/p&gt;
+&lt;p&gt;Not only is this developer trying to do something which is ignorant and
+a case of being a flat-out bad citizen of the &amp;#8216;net, but he is trying to
+fight against the progress which has so painstakingly been made in the
+field of web standardization. I well remember when, not long ago at all,
+I was handicapped by my choice of using Firefox. I still come by the odd
+site which chose to use a component which is tied to Internet Explorer,
+thereby alienating 35% of web&amp;nbsp;users.&lt;/p&gt;
+&lt;p&gt;I will admit that I am by no means the typical Internet user. The fact
+that all of my some dozen or so machines (excepting one which I need to
+use a legacy &lt;span class="caps"&gt;SCSI&lt;/span&gt; flatbed scanner) run 100% Free/Open Source software. I
+use Linux. OpenSolaris. &lt;span class="caps"&gt;BSD&lt;/span&gt;. I believe that I have a right to examine
+and modify the source code of the programs that I use. When choosing a
+bug tracking system, I spent hours customizing an open-source
+alternative because I was unwilling to use the closed-source option
+which seemed to fit best. Therefore, I guess it is easy to understand
+that I refuse to buy from, or even visit, a web site that doesn&amp;#8217;t
+support&amp;nbsp;Firefox.&lt;/p&gt;
+&lt;p&gt;This is not a browser war. This is not me simply deciding to flame
+someone who isn&amp;#8217;t a F/&lt;span class="caps"&gt;OSS&lt;/span&gt; zealot. This boils down to a deeper issue that
+can be seen all around us - including in the recent news surrounding the
+&lt;span class="caps"&gt;US&lt;/span&gt; &lt;span class="caps"&gt;FCC&lt;/span&gt;&amp;#8217;s auction of a portion of the 700MHz spectrum. The issue at hand
+is the complacency of technology users, and the feeling by technology
+providers that they can push anything they want on users. The concept
+that providers are sending data to me, and that I can use that data
+however I want (within the extent of the law) is getting&amp;nbsp;lost.&lt;/p&gt;
+&lt;p&gt;When I watch &lt;span class="caps"&gt;TV&lt;/span&gt;, I used to leave the room or pick up a book when a
+commercial comes on. Now that I have a &lt;span class="caps"&gt;PVR&lt;/span&gt; (specifically, MythTV), I can
+record the shows I want, and then have commercials flagged for automatic
+skipping before I watch them. When I decide to watch them, I have no
+commercials. When I use the web, I select the content that I want. If I
+don&amp;#8217;t want it, I don&amp;#8217;t get&amp;nbsp;it.&lt;/p&gt;
+&lt;p&gt;Moreover, another large issue at hand is the simple nature of digital
+media. This applies to &lt;span class="caps"&gt;TV&lt;/span&gt; recording, music and movie sharing, software
+piracy, etc. Digital media is not the same as analog media. An &lt;span class="caps"&gt;MP3&lt;/span&gt; (or,
+for that matter, a &lt;span class="caps"&gt;CD&lt;/span&gt;) is not the same as a tape. In product litigation,
+there is a term known as &amp;#8220;perceived use&amp;#8221;. If you make a glass coffee
+table that is exactly at knee height, it is perceived that eventually,
+someone will try to sit on it. That&amp;#8217;s common sense. If it shatters and
+kills them, it was your responsibility to foresee such an obvious
+eventuality. It&amp;#8217;s only common sense that if something is flat and at
+normal sitting level, someone will try to sit on&amp;nbsp;it.&lt;/p&gt;
+&lt;p&gt;Likewise, I would argue that when any content is distributed digitally,
+you must foresee that it will be copied or altered. It is simply the
+nature of the medium. If the recording industry didn&amp;#8217;t want people
+ripping music from CDs, they should have kept releasing things on tape.
+Even more so with DVDs - I&amp;#8217;m sure we all remember the push. Five years
+ago, I was hard pressed to find a &lt;span class="caps"&gt;DVD&lt;/span&gt; in a local rental store. Today, I
+haven&amp;#8217;t seen a &lt;span class="caps"&gt;VHS&lt;/span&gt; tape in years. The industry *pushed* the format on
+us, and is now complaining when we use it in a brutally obvious way. If
+I had to liken it to any legal phenomenon, I would pick entrapment. It&amp;#8217;s
+not a far stretch to compare the recording industry&amp;#8217;s actions to those
+of a police officer who leaves a car running, with the keys in the
+ignition, and a sign on the windshield that says &amp;#8220;Take me for a spin
+around the parking lot&amp;#8221; and then arrests someone for auto theft when
+they leave the lot. If they industry is worried about piracy, it should
+have been their obligation to look into exactly how easy piracy would
+be, before they chose a distribution&amp;nbsp;medium.&lt;/p&gt;
+&lt;p&gt;In closing my rant, I will ask a few simple&amp;nbsp;questions:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;Why is it that the law, being as biased to corporate interests (and
+against the individual) as it is, doesn&amp;#8217;t recognize the rights of the
+individual to use what they legally purchased in a way that they see
+fit? (i.e. if I buy a &lt;span class="caps"&gt;DVD&lt;/span&gt;, I should be able to make a backup copy on my
+computer - even the &lt;em&gt;copyright law&lt;/em&gt; states&amp;nbsp;that).&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;How long will it be before someone turns up an internal &lt;span class="caps"&gt;RIAA&lt;/span&gt; memo
+from ten years ago stating that the industry could increase its&amp;#8217; profits
+by releasing music on a medium (&lt;span class="caps"&gt;CD&lt;/span&gt;) that is prone to piracy, and then
+fining the people who exploit that common&amp;nbsp;sense?&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;When they came out with &lt;span class="caps"&gt;VHS&lt;/span&gt; recorders, the industry was up in arms
+about piracy. So, they got together and added a small amount on the
+price of every blank tape, intended to reimburse the
+labels/artists/networks for the copy that it would be used to make. Why
+can&amp;#8217;t they just tack $3 onto every blank &lt;span class="caps"&gt;DVD&lt;/span&gt; and &lt;span class="caps"&gt;CD&lt;/span&gt;, $20 on every blank
+hard drive, and stop suing college&amp;nbsp;kids?&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;</summary><category term="ad blocker"></category><category term="firefox"></category><category term="internet"></category><category term="standards"></category></entry></feed>

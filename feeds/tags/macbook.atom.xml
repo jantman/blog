@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Jason Antman's Blog</title><link href="http://newblog.jasonantman.com/" rel="alternate"></link><link href="http://newblog.jasonantman.com/feeds/tags/macbook.atom.xml" rel="self"></link><id>http://newblog.jasonantman.com/</id><updated>2013-01-21T12:13:00-05:00</updated><entry><title>Fedora Linux and OSX Dual Boot on Mid-2010 (6,2) 15” MacBook Pro Laptop</title><link href="http://newblog.jasonantman.com/2013/01/fedora-linux-and-osx-dual-boot-on-mid-2010-62-15-macbook-pro-laptop/" rel="alternate"></link><updated>2013-01-21T12:13:00-05:00</updated><author><name>admin</name></author><id>tag:newblog.jasonantman.com,2013-01-21:2013/01/fedora-linux-and-osx-dual-boot-on-mid-2010-62-15-macbook-pro-laptop/</id><summary type="html">&lt;p&gt;As part of the transition from a contractor to a full-time employee of
+&lt;a href="http://www.cmgdigital.com"&gt;Cox Media Group Digital &lt;span class="amp"&gt;&amp;amp;&lt;/span&gt; Strategy&lt;/a&gt; (check
+out our &lt;a href="https://github.com/cmgdigital"&gt;github&lt;/a&gt;), I&amp;#8217;ve been issued a
+&lt;a href="http://support.apple.com/kb/SP582"&gt;Mid-2010 (6,2)&lt;/a&gt; 15&amp;#8221; &lt;a href="http://en.wikipedia.org/wiki/Macbook_pro#Technical_specifications_2"&gt;MacBook
+Pro&lt;/a&gt;
+laptop, to replace my current &lt;a href="http://support.apple.com/kb/SP11"&gt;Early-2008
+(3,1)&lt;/a&gt; MacPro desktop. The desktop is
+currently running &lt;a href="http://fedoraproject.org/"&gt;Fedora&lt;/a&gt; 17, dual-boot with
+with Mac &lt;span class="caps"&gt;OS&lt;/span&gt; X (left in place for firmware updates and emergencies) using
+the &lt;a href="http://www.rodsbooks.com/refind/index.html"&gt;rEFInd boot manager&lt;/a&gt; to
+choose between the two OSes. It took me two days to get this working
+right on my desktop, but it had been my plan to duplicate this setup on
+my laptop. I found a lot of conflicting information online, but I
+decided to give it a&amp;nbsp;try.&lt;/p&gt;
+&lt;p&gt;Well, I have Fedora 18 and &lt;span class="caps"&gt;OS&lt;/span&gt; X 10.8 dual-booting on the laptop, but not
+as planned. After a day and a half of research, troubleshooting and
+re-installs, here&amp;#8217;s what I found to actually work, in the hope that
+nobody else will go through the ordeal I went through. Following that
+are some notes about the new Fedora 18 installer (Anaconda 18),
+especially important for anyone who&amp;#8217;s used Linux for a while. To those
+who are new to Linux, don&amp;#8217;t be dissuaded by the above. Most of the
+frustration I experienced is because I&amp;#8217;ve been using Linux for a
+relatively long time (about 10 years), had my own ideas about exactly
+how I wanted things setup (which are decidedly &lt;em&gt;not&lt;/em&gt; supported by
+Fedora), and had some assumptions about the installation process based
+on earlier&amp;nbsp;versions.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;How to get it&amp;nbsp;working:&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;Forget about rEFInd. This had been the original advice from &lt;a href="http://mjg59.dreamwidth.org/"&gt;Matthew
+Garrett&lt;/a&gt;,
+&lt;a href="https://twitter.com/mjg59"&gt;@mjg59&lt;/a&gt;, kernel coder, contributor to the
+Anaconda project, and all-around authority on booting Linux on &lt;span class="caps"&gt;EFI&lt;/span&gt;/&lt;span class="caps"&gt;UEFI&lt;/span&gt;
+hardware. My advice, and the method that worked for&amp;nbsp;me:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Shrink your Mac partitions and leave as much free space as you want
+    for Fedora. using the Disk Utility tool in &lt;span class="caps"&gt;OS&lt;/span&gt; X (I also created an
+    &lt;span class="caps"&gt;8GB&lt;/span&gt; &lt;span class="caps"&gt;VFAT&lt;/span&gt; partition that both OSes can read/write&amp;nbsp;to).&lt;/li&gt;
+&lt;li&gt;&lt;a href="http://fedoraproject.org/en/get-fedora"&gt;Download Fedora 18&lt;/a&gt; 64-bit
+    &lt;span class="caps"&gt;DVD&lt;/span&gt; image, I chose the &lt;span class="caps"&gt;KDE&lt;/span&gt; version. Verify the sha256 sum if you
+    want (they don&amp;#8217;t have a readily visible link to the checksum file.
+    Copy the download link, paste it into your address bar and remove
+    the filename. You should get a directory index that includes a
+    &lt;code&gt;-CHECKSUM&lt;/code&gt; file.&lt;/li&gt;
+&lt;li&gt;Per the Installation Guide&amp;#8217;s &lt;a href="http://docs.fedoraproject.org/en-US/Fedora/18/html/Installation_Guide/Making_USB_Media-UNIX_Linux.html"&gt;Making Fedora &lt;span class="caps"&gt;USB&lt;/span&gt; Media
+    page&lt;/a&gt;,
+    use &lt;code&gt;liveusb-creator&lt;/code&gt; to setup the installation image on the &lt;span class="caps"&gt;USB&lt;/span&gt;
+    flash drive (I needed to start it with the &lt;code&gt;--reset-mbr&lt;/code&gt; option).
+    You can also use other tools (dd if you&amp;#8217;re not on a Fedora-based
+    distro), or a &lt;span class="caps"&gt;DVD&lt;/span&gt;, but this is the method I&amp;nbsp;chose.&lt;/li&gt;
+&lt;li&gt;Due to a &lt;a href="https://fedorahosted.org/liveusb-creator/ticket/810"&gt;bug in
+    liveusb-creator&lt;/a&gt;,
+    you may need to manually edit &lt;code&gt;/EFI/boot/grub.cfg&lt;/code&gt; on the created
+    &lt;span class="caps"&gt;USB&lt;/span&gt; stick if grub gives you a file not found error. If that happens,
+    please see my bug report above for the action to take (in short, you
+    need to mount the &lt;span class="caps"&gt;USB&lt;/span&gt; stick, &lt;code&gt;chmod u+w /EFI/boot/grub.cfg&lt;/code&gt; then
+    edit that file and replace every occurrence of &amp;#8220;isolinux&amp;#8221; with
+    &amp;#8220;syslinux&amp;#8221; and every occurrence of
+    &amp;#8220;root=live:&lt;span class="caps"&gt;LABEL&lt;/span&gt;=Fedora-18-x86_64-Live-&lt;span class="caps"&gt;KDE&lt;/span&gt;.iso&amp;#8221; with&amp;nbsp;&amp;#8220;root=live:&lt;span class="caps"&gt;LABEL&lt;/span&gt;=&lt;span class="caps"&gt;LIVE&lt;/span&gt;&amp;#8221;).&lt;/li&gt;
+&lt;li&gt;Boot the &lt;span class="caps"&gt;USB&lt;/span&gt; drive (use the alt key when you turn on the laptop to
+    select the &lt;span class="caps"&gt;USB&lt;/span&gt; drive) and just install Fedora normally, letting it
+    do its thing. Select a boot disk and let it put &lt;span class="caps"&gt;GRUB2&lt;/span&gt; on the &lt;span class="caps"&gt;EFI&lt;/span&gt;&amp;nbsp;partition.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;When you boot, it will boot to &lt;span class="caps"&gt;GRUB&lt;/span&gt;. There will be some options for Mac
+&lt;span class="caps"&gt;OS&lt;/span&gt; there, but they don&amp;#8217;t work (more on that below). If you want to boot
+Mac, hold down the alt/option key when you power on the laptop, which
+will bring you to the boot disk selector and you can pick the Mac disk.
+I know it&amp;#8217;s not pretty or ideal, but it&amp;#8217;s the best option right&amp;nbsp;now.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Making it&amp;nbsp;Better:&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;&lt;span class="caps"&gt;GRUB2&lt;/span&gt; tries to automatically detect other OSes and configure them in the
+boot loader (this is done through &lt;code&gt;/etc/grub.d/30_os-prober&lt;/code&gt;, commonly
+just referred to as &lt;code&gt;os-prober&lt;/code&gt;). It tries to boot Mac directly through
+the xnu_kernel64 module, which not only isn&amp;#8217;t installed on the boot
+partition by default, but just doesn&amp;#8217;t work with at least Mountain Lion
+(10.8). So getting &lt;span class="caps"&gt;GRUB&lt;/span&gt; to boot Mac means either having the bugs in the
+xnu module fixed, or figuring out how to setup a chainloader to boot
+from &lt;span class="caps"&gt;GRUB&lt;/span&gt; to Mac. The latter is probably the method I&amp;#8217;ll investigate,
+but for now, since I rarely use Mac, I&amp;#8217;m happy having to use the alt key
+at boot to get there. To remove the annoying, broken Mac &lt;span class="caps"&gt;OS&lt;/span&gt; options from
+the grub screen, run the following commands as root (they assume you
+have your &lt;span class="caps"&gt;EFI&lt;/span&gt; partition mounted at &lt;code&gt;/boot/efi&lt;/code&gt; which I believe Fedora
+should do by&amp;nbsp;default:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;cp /boot/efi/EFI/fedora/grub.cfg /boot/efi/EFI/fedora/grub.cfg.bak
+&lt;span class="nb"&gt;echo&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;GRUB_DISABLE_OS_PROBER=&amp;quot;true&amp;quot;&amp;#39;&lt;/span&gt; &amp;gt;&amp;gt; /etc/default/grub
+grub2-mkconfig &amp;gt; /boot/efi/&lt;span class="caps"&gt;EFI&lt;/span&gt;/fedora/grub.cfg
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;&lt;strong&gt;Thoughts on the Fedora 18 Anaconda&amp;nbsp;Installer&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;I found a couple of issues with the new Anaconda 18 installer that were
+either unweildy or confusing for someone who&amp;#8217;s been installing Linux for
+a long time. Overall, the new installer is very nice. It has a clean,
+even elegant &lt;span class="caps"&gt;UI&lt;/span&gt;, a relatively nice flow from start to completion, and is
+certainly beginner-friendly. It has fewer options than any Linux
+installer I&amp;#8217;ve ever used before - not even options for package
+selection, firewall or SELinux configuration, etc. - but I guess this is
+in line with the goal of making Fedora a desktop &lt;span class="caps"&gt;OS&lt;/span&gt; for the masses. I
+would have appreciated an &amp;#8220;advanced mode&amp;#8221; installer that was more like
+Fedora 17 (or even much older versions), but I guess I&amp;#8217;m an edge case,
+at least in the Fedora community. However, I did find two things
+especially difficult, both related to the fact that my laptop has two
+main drives (a &lt;span class="caps"&gt;500GB&lt;/span&gt; hard drive and a &lt;span class="caps"&gt;120GB&lt;/span&gt;&amp;nbsp;&lt;span class="caps"&gt;SSD&lt;/span&gt;):&lt;/p&gt;
+&lt;p&gt;First, the installer prompted me to select a &amp;#8220;boot disk&amp;#8221;. I guess I
+should have read the installation guide, but I assumed that nomenclature
+translated to either &amp;#8220;which disk should the automatic partitiioning put
+yout &lt;code&gt;/boot&lt;/code&gt; partition on&amp;#8221; or &amp;#8220;which disk should I set the bootable flag
+on in the partition table&amp;#8221;. In fact, it means &amp;#8220;which disk should I put
+&lt;span class="caps"&gt;GRUB&lt;/span&gt; on the &lt;span class="caps"&gt;EFI&lt;/span&gt; partition of&amp;#8221;. I installed, rebooted, and was shocked -
+and somewhat distressed - to boot directly to &lt;span class="caps"&gt;GRUB2&lt;/span&gt; instead of the
+rEFInd installation I had setup. The installer didn&amp;#8217;t have any of the
+previously-customary &amp;#8220;warning: this will overwrite your &lt;span class="caps"&gt;MBR&lt;/span&gt;/&lt;span class="caps"&gt;EFI&lt;/span&gt; boot
+partition&amp;#8221; notices, so I felt safe letting it continue. It turned out
+that this was the way I ended up going, and it also turns out that
+there&amp;#8217;s a bug in Anaconda that makes it fail installation if you tell it
+not to write a bootloader to disk (though it&amp;#8217;s patched by one line of
+Python code). But I was deeply distressed that - contrary to the
+experience of every, admittedly more complicated, Linux installer I&amp;#8217;d
+used before - the Fedora 18 installer overwrote my &lt;span class="caps"&gt;EFI&lt;/span&gt; bootloader
+(analogous to overwriting the &lt;span class="caps"&gt;MBR&lt;/span&gt; on a &lt;span class="caps"&gt;BIOS&lt;/span&gt; boot machine) without ever
+warning me or asking for a&amp;nbsp;confirmation.&lt;/p&gt;
+&lt;p&gt;Secondly, the partitioning tool is clearly designed for only one
+destination disk. The overview screen lists configured partitions by
+label and mount point, but not by physical device, so figuring out which
+partitions are on which physical disks takes a click on each and every
+partition to view that information in the detail panel. When you create
+a new partition, it&amp;#8217;s automatically put in a &lt;span class="caps"&gt;LVM&lt;/span&gt; volume group spanning
+all disks. Changing the target of the automatically created volume group
+requires a few clicks, as does changing the physical disks backing any
+new volume groups. To assign a newly created partition to a specific
+disk, you have to click on an unlabeled &amp;#8220;tool&amp;#8221; icon under the list of
+partitions, far away from the information on the partition in question.
+It&amp;#8217;s a nice interface for someone who clicks the &amp;#8220;partition
+automatically&amp;#8221; button, or who just knows they want to add &amp;#8220;an extra
+partition&amp;#8221;, but for anyone who has a specific layout in mind (like
+having &lt;code&gt;/&lt;/code&gt;, &lt;code&gt;/boot&lt;/code&gt; and &lt;code&gt;/var&lt;/code&gt;, specifically sized, on the &lt;span class="caps"&gt;SSD&lt;/span&gt; and
+&lt;code&gt;/home&lt;/code&gt; on the rotating disk) it takes about 4-5 more clicks and dialogs
+to add a partition than the last Fedora installer did. Mainly, it&amp;#8217;s
+lacking any sort of Advanced Mode for partitioning that allows the user
+to quickly and accurately layout a more complex partitioning&amp;nbsp;scheme.&lt;/p&gt;
+&lt;p&gt;Below are some screenshots from the Fedora 17 and Fedora 18 Installation
+Guides, which contrast both the overview of all partitions and the
+individual partition&amp;nbsp;settings:&lt;/p&gt;
+&lt;p&gt;Fedora 18 Overview, from &lt;a href="http://docs.fedoraproject.org/en-US/Fedora/18/html/Installation_Guide/s1-diskpartitioning-x86.html"&gt;9.13. Creating a Custom Partition
+Layout&lt;/a&gt;:  &lt;/p&gt;
+&lt;p&gt;&lt;img alt="image" src="http://www.dedoimedo.com/images/computers_years/2013_1/fedora-18-installer-configure-partitions.jpg" /&gt;  &lt;/p&gt;
+&lt;p&gt;Fedora 17 Overview, from &lt;a href="http://docs.fedoraproject.org/en-US/Fedora/17/html/Installation_Guide/s1-diskpartitioning-x86.html"&gt;9.14. Creating a Custom Layout or Modifying
+the Default
+Layout&lt;/a&gt;:  &lt;/p&gt;
+&lt;p&gt;&lt;img alt="image" src="http://docs.fedoraproject.org/en-US/Fedora/17/html/Installation_Guide/images/diskpartitioning/ddmain.png" /&gt;  &lt;/p&gt;
+&lt;p&gt;Fedora 18 Partition Creation/Editing, from &lt;a href="http://docs.fedoraproject.org/en-US/Fedora/18/html/Installation_Guide/Create_LVM-x86.html"&gt;9.13.3. Create &lt;span class="caps"&gt;LVM&lt;/span&gt; Logical
+Volume&lt;/a&gt;:  &lt;/p&gt;
+&lt;p&gt;&lt;img alt="image" src="http://docs.fedoraproject.org/en-US/Fedora/18/html/Installation_Guide/images/diskpartitioning/lvm-pv.png" /&gt;  &lt;/p&gt;
+&lt;p&gt;Fedora 17 Partition Creation/Editing, from &lt;a href="http://docs.fedoraproject.org/en-US/Fedora/17/html/Installation_Guide/Adding_Partitions-x86.html"&gt;9.14.2. Adding
+Partitions&lt;/a&gt;:  &lt;/p&gt;
+&lt;p&gt;&lt;img alt="image" src="http://docs.fedoraproject.org/en-US/Fedora/17/html/Installation_Guide/images/diskpartitioning/part-add.png" /&gt;&lt;/p&gt;</summary><category term="bootloader"></category><category term="efi"></category><category term="fedora"></category><category term="gpt"></category><category term="grub"></category><category term="installation"></category><category term="laptop"></category><category term="mac"></category><category term="macbook"></category><category term="os x"></category></entry><entry><title>New MacBook Pro; Dual boot with Linux</title><link href="http://newblog.jasonantman.com/2010/06/new-macbook-pro-dual-boot-with-linux/" rel="alternate"></link><updated>2010-06-22T15:17:00-04:00</updated><author><name>admin</name></author><id>tag:newblog.jasonantman.com,2010-06-22:2010/06/new-macbook-pro-dual-boot-with-linux/</id><summary type="html">&lt;p&gt;So in the first bit of good news lately, after four years as a
+part-timer, this Monday I start my full-time position at Rutgers as a
+Linux SysAdmin. Not really anything different - same office, same work,
+just another day a week and a pay bump (plus benefits and all that). My
+only real change on the first day will be a 3-hour &lt;span class="caps"&gt;HR&lt;/span&gt; orientation and
+moving my workstation to public address space. But, on the positive
+side, my new laptop just came in - a shiny new 13&amp;#8221; MacBook Pro, 2.4GHz
+Core2 Duo, &lt;span class="caps"&gt;4GB&lt;/span&gt; &lt;span class="caps"&gt;RAM&lt;/span&gt;, &lt;span class="caps"&gt;250GB&lt;/span&gt; &lt;span class="caps"&gt;HDD&lt;/span&gt;. Every time I see Mac packaging, I
+remember why they cost so much - the box must be half the&amp;nbsp;price!&lt;/p&gt;
+&lt;p&gt;&lt;img alt="MacBook Pro" src="/GFX/newMacBookPro.jpg" /&gt;&lt;/p&gt;
+&lt;p&gt;If all goes well, I&amp;#8217;ll have the machine setup to dual-boot &lt;span class="caps"&gt;OSX&lt;/span&gt; and Linux
+(specifically &lt;a href="http://www.opensuse.org"&gt;OpenSuSE&lt;/a&gt; 11.2. I&amp;#8217;ll post notes
+when I have it&amp;nbsp;done.&lt;/p&gt;
+&lt;p&gt;The list of things I have to figure out beyond just getting both OSes&amp;nbsp;running:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Do I want to use Mac for more than a select few apps that require it
+    (i.e. possibly as another day-to-day &lt;span class="caps"&gt;OS&lt;/span&gt;)? If so, I need to figure
+    out file sharing between the OSes, what I want unified from my
+    profiles/homedirs, Firefox profile sharing,&amp;nbsp;etc.&lt;/li&gt;
+&lt;li&gt;How to do a simple shared&amp;nbsp;partition?&lt;/li&gt;
+&lt;li&gt;&lt;span class="caps"&gt;FUSE&lt;/span&gt;/&lt;span class="caps"&gt;SSHFS&lt;/span&gt; on the Mac&amp;nbsp;side.&lt;/li&gt;
+&lt;li&gt;Is there a way to select the boot &lt;span class="caps"&gt;OS&lt;/span&gt; (rEFIt) from&amp;nbsp;Linux?&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Stay&amp;nbsp;tuned&amp;#8230;&lt;/p&gt;</summary><category term="apple"></category><category term="dual boot"></category><category term="laptop"></category><category term="linux"></category><category term="mac"></category><category term="macbook"></category><category term="opensuse"></category></entry></feed>

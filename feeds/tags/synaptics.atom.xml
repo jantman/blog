@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Jason Antman's Blog</title><link href="http://newblog.jasonantman.com/" rel="alternate"></link><link href="http://newblog.jasonantman.com/feeds/tags/synaptics.atom.xml" rel="self"></link><id>http://newblog.jasonantman.com/</id><updated>2012-01-27T17:51:00-05:00</updated><entry><title>Synaptics touchpad driver synclient in Fedora 16 / Xorg with UDEV</title><link href="http://newblog.jasonantman.com/2012/01/synaptics-touchpad-driver-synclient-in-fedora-16-xorg-with-udev/" rel="alternate"></link><updated>2012-01-27T17:51:00-05:00</updated><author><name>admin</name></author><id>tag:newblog.jasonantman.com,2012-01-27:2012/01/synaptics-touchpad-driver-synclient-in-fedora-16-xorg-with-udev/</id><summary type="html">&lt;p&gt;I just installed &lt;a href="http://fedoraproject.org"&gt;Fedora 16&lt;/a&gt; on an older &lt;span class="caps"&gt;IBM&lt;/span&gt;
+&lt;a href="http://www.thinkwiki.org/wiki/Category:T42"&gt;ThinkPad T42&lt;/a&gt; laptop.
+Unfortunately, the two mouse buttons below the
+&lt;a href="http://www.thinkwiki.org/wiki/UltraNav"&gt;UltraNav&lt;/a&gt; touchpad just won&amp;#8217;t
+work at all. Before opening up the case and fiddling around, I decided
+to try a software solution. Even after fairly exhaustive research, I
+couldn&amp;#8217;t find anyone with a similar&amp;nbsp;problem.&lt;/p&gt;
+&lt;p&gt;I did, however, find out that the synaptics touchpad driver has a
+&lt;code&gt;synclient&lt;/code&gt; tool that can output the hardware events read directly from
+the input device. I tried running &lt;code&gt;synclient -m 100&lt;/code&gt; (to monitor
+hardware events every 100ms), but the only output that I got was
+&lt;code&gt;Can't access shared memory area. SHMConfig disabled?&lt;/code&gt;. This was all a
+bit confusing to me, since Fedora 16 doesn&amp;#8217;t even use an &lt;code&gt;xorg.conf&lt;/code&gt;
+file. I was even more confused by a fair amount of information saying
+that SHMConfig is no longer used in synaptics&amp;nbsp;1.2+.&lt;/p&gt;
+&lt;p&gt;Long story short, the solution lies in
+&lt;code&gt;/usr/share/X11/xorg.conf.d/50-synaptics.conf&lt;/code&gt;, which holds the
+synaptics config snippets for xorg. All you need to do is add the
+SHMConfig line before the end of the&amp;nbsp;section:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;Section &amp;quot;InputClass&amp;quot;
+    Identifier &amp;quot;touchpad catchall&amp;quot;
+    Driver &amp;quot;synaptics&amp;quot;
+    ...
+    Option &amp;quot;SHMConfig&amp;quot; &amp;quot;on&amp;quot;
+EndSection
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;and then restart your X server. Now, running &lt;code&gt;synclient -m&lt;/code&gt; should work&amp;nbsp;fine.&lt;/p&gt;
+&lt;p&gt;I have to thank Red Hat&amp;#8217;s &lt;a href="http://fedoraproject.org/wiki/User:Kevin"&gt;Kevin
+Fenzi&lt;/a&gt; (nirik on &lt;a href="http://webchat.freenode.net/?randomnick=1&amp;amp;channels=fedora&amp;amp;uio=d4"&gt;#fedora on
+irc.freenode.org&lt;/a&gt;)
+for putting another set of eyeballs on the problem, and throwing out
+some ideas that finally led me to the&amp;nbsp;solution.&lt;/p&gt;</summary><category term="synaptics"></category><category term="synclient"></category><category term="thinkpad"></category><category term="touchpad"></category><category term="xorg"></category></entry></feed>

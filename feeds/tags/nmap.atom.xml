@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Jason Antman's Blog</title><link href="http://newblog.jasonantman.com/" rel="alternate"></link><link href="http://newblog.jasonantman.com/feeds/tags/nmap.atom.xml" rel="self"></link><id>http://newblog.jasonantman.com/</id><updated>2011-01-30T20:00:00-05:00</updated><entry><title>Consolidation of nmap port scan results to HTML table</title><link href="http://newblog.jasonantman.com/2011/01/consolidation-of-nmap-port-scan-results-to-html-table/" rel="alternate"></link><updated>2011-01-30T20:00:00-05:00</updated><author><name>admin</name></author><id>tag:newblog.jasonantman.com,2011-01-30:2011/01/consolidation-of-nmap-port-scan-results-to-html-table/</id><summary type="html">&lt;p&gt;I spent a good part of the weekend auditing the security of my
+infrastructure at home, since I haven&amp;#8217;t given it much attention lately.
+One of my first steps was doing a port scan with
+&lt;a href="http://www.nmap.org"&gt;nmap&lt;/a&gt; of my public IPs from a remote host, both to
+make sure there&amp;#8217;s nothing showing up that shouldn&amp;#8217;t be and to get an
+idea of what a potential attacker might see. However, given all of
+nmap&amp;#8217;s options for different &lt;span class="caps"&gt;TCP&lt;/span&gt; scans, it seemed like a lot of data to
+sort through. Without finding any good solution in my cursory search, I
+wrote up a little &lt;span class="caps"&gt;PHP&lt;/span&gt; script that takes any number of &lt;span class="caps"&gt;XML&lt;/span&gt; nmap scan
+files on the command line, parses out the hosts and ports found in each
+of them, and presents a nice table showing the result for each host/port
+for each scan&amp;nbsp;file.&lt;/p&gt;
+&lt;p&gt;The current version of the script can be found at
+&lt;a href="https://github.com/jantman/misc-scripts/blob/master/nmap-xml-to-table.php"&gt;https://github.com/jantman/misc-scripts/blob/master/nmap-xml-to-table.php&lt;/a&gt;,
+and simply called as &lt;code&gt;./nmap-xml-to-table.php file1.xml file2.xml [...]&lt;/code&gt;
+and outputs &lt;span class="caps"&gt;HTML&lt;/span&gt; to&amp;nbsp;stdout.&lt;/p&gt;</summary><category term="nmap"></category><category term="security"></category></entry><entry><title>Using nmap to quickly ping all hosts in an address range</title><link href="http://newblog.jasonantman.com/2010/02/using-nmap-to-quickly-ping-all-hosts-in-an-address-range/" rel="alternate"></link><updated>2010-02-08T09:10:00-05:00</updated><author><name>admin</name></author><id>tag:newblog.jasonantman.com,2010-02-08:2010/02/using-nmap-to-quickly-ping-all-hosts-in-an-address-range/</id><summary type="html">&lt;p&gt;At $&lt;span class="caps"&gt;WORK&lt;/span&gt;, the subnet we use for some of our workstations and test boxes
+was only recently setup with &lt;span class="caps"&gt;DHCP&lt;/span&gt;. Previously, we&amp;#8217;d used
+&lt;span class="caps"&gt;IP&lt;/span&gt;-by-Whiteboard in the office. As a result, most of the recent machines
+use &lt;span class="caps"&gt;DHCP&lt;/span&gt;, but there are a few older ones still around using static
+addresses. I recently had to add a new machine, so I had to go through
+the process of finding out which IPs are in use and which aren&amp;#8217;t (since
+some aren&amp;#8217;t in&amp;nbsp;&lt;span class="caps"&gt;DHCP&lt;/span&gt;).&lt;/p&gt;
+&lt;p&gt;I decided to be good and update &lt;span class="caps"&gt;DHCP&lt;/span&gt; with records for all machines in
+the subnet, whether they&amp;#8217;re actually using &lt;span class="caps"&gt;DHCP&lt;/span&gt; or not. There&amp;#8217;s a quick
+way to do this with &lt;code&gt;nmap&lt;/code&gt; using the options for ping scan (&lt;code&gt;-sP&lt;/code&gt;) and
+always resolve &lt;span class="caps"&gt;DNS&lt;/span&gt; (&lt;code&gt;-R&lt;/code&gt;):&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="gp"&gt;#&lt;/span&gt; nmap -sP -R 172.16.43.129-159
+&lt;span class="go"&gt;Host ar01-hill-hill.example.com (172.16.43.129) appears to be up.&lt;/span&gt;
+&lt;span class="go"&gt;&lt;span class="caps"&gt;MAC&lt;/span&gt; Address: 00:11:&lt;span class="caps"&gt;BC&lt;/span&gt;:7D:28:0A (Cisco Systems)&lt;/span&gt;
+&lt;span class="go"&gt;Host ccf-hill019-1.example.com (172.16.43.130) appears to be up.&lt;/span&gt;
+&lt;span class="go"&gt;&lt;span class="caps"&gt;MAC&lt;/span&gt; Address: 00:00:&lt;span class="caps"&gt;AA&lt;/span&gt;:63:54:&lt;span class="caps"&gt;BB&lt;/span&gt; (Xerox)&lt;/span&gt;
+&lt;span class="go"&gt;Host ccf-hill019-2.example.com (172.16.43.131) appears to be down.&lt;/span&gt;
+&lt;span class="go"&gt;Host ccf-hill019-3.example.com (172.16.43.132) appears to be down.&lt;/span&gt;
+&lt;span class="go"&gt;Host ccf-hill019-4.example.com (172.16.43.133) appears to be down.&lt;/span&gt;
+&lt;span class="go"&gt;Host ccf-hill019-5.example.com (172.16.43.134) appears to be down.&lt;/span&gt;
+&lt;span class="go"&gt;Host ccf-hill019-6.example.com (172.16.43.135) appears to be down.&lt;/span&gt;
+&lt;span class="go"&gt;Host ccf-hill019-7.example.com (172.16.43.136) appears to be up.&lt;/span&gt;
+&lt;span class="go"&gt;Host speakeasy.example.com (172.16.43.137) appears to be up.&lt;/span&gt;
+&lt;span class="go"&gt;&lt;span class="caps"&gt;MAC&lt;/span&gt; Address: 00:17:A4:13:&lt;span class="caps"&gt;EB&lt;/span&gt;:57 (Global Data Services)&lt;/span&gt;
+&lt;span class="go"&gt;Host ccf-hill019-9.example.com (172.16.43.138) appears to be up.&lt;/span&gt;
+&lt;span class="go"&gt;&lt;span class="caps"&gt;MAC&lt;/span&gt; Address: 00:17:A4:13:E8:17 (Global Data Services)&lt;/span&gt;
+&lt;span class="go"&gt;Host ccf-hill019-10.example.com (172.16.43.139) appears to be down.&lt;/span&gt;
+&lt;span class="go"&gt;Host testmac01.example.com (172.16.43.140) appears to be down.&lt;/span&gt;
+&lt;span class="go"&gt;Host ccf-hill019-12.example.com (172.16.43.141) appears to be down.&lt;/span&gt;
+&lt;span class="go"&gt;Host ccf-hill019-13.example.com (172.16.43.142) appears to be up.&lt;/span&gt;
+&lt;span class="go"&gt;&lt;span class="caps"&gt;MAC&lt;/span&gt; Address: 00:0D:29:59:58:00 (Cisco)&lt;/span&gt;
+&lt;span class="go"&gt;Host ccf-hill019-14.example.com (172.16.43.143) appears to be down.&lt;/span&gt;
+&lt;span class="go"&gt;Host ccf-hill019-15.example.com (172.16.43.144) appears to be down.&lt;/span&gt;
+&lt;span class="go"&gt;Host ccf-hill019-16.example.com (172.16.43.145) appears to be down.&lt;/span&gt;
+&lt;span class="go"&gt;Host ccf-hill019-17.example.com (172.16.43.146) appears to be down.&lt;/span&gt;
+&lt;span class="go"&gt;Host ccf-hill019-18.example.com (172.16.43.147) appears to be up.&lt;/span&gt;
+&lt;span class="go"&gt;&lt;span class="caps"&gt;MAC&lt;/span&gt; Address: 00:1E:C2:0D:C1:98 (Unknown)&lt;/span&gt;
+&lt;span class="go"&gt;Host ccf-hill019-19.example.com (172.16.43.148) appears to be down.&lt;/span&gt;
+&lt;span class="go"&gt;Host ccf-hill019-20.example.com (172.16.43.149) appears to be down.&lt;/span&gt;
+&lt;span class="go"&gt;Host ccf-hill019-21.example.com (172.16.43.150) appears to be down.&lt;/span&gt;
+&lt;span class="go"&gt;Host lordkris.example.com (172.16.43.151) appears to be down.&lt;/span&gt;
+&lt;span class="go"&gt;Host ccf-hill019-23.example.com (172.16.43.152) appears to be down.&lt;/span&gt;
+&lt;span class="go"&gt;Host ccf-hill019-24.example.com (172.16.43.153) appears to be down.&lt;/span&gt;
+&lt;span class="go"&gt;Host ccf-hill019-25.example.com (172.16.43.154) appears to be down.&lt;/span&gt;
+&lt;span class="go"&gt;Host ccf-hill019-26.example.com (172.16.43.155) appears to be down.&lt;/span&gt;
+&lt;span class="go"&gt;Host ccf-hill019-27.example.com (172.16.43.156) appears to be down.&lt;/span&gt;
+&lt;span class="go"&gt;Host ccf-hill019-28.example.com (172.16.43.157) appears to be down.&lt;/span&gt;
+&lt;span class="go"&gt;Host ccf-hill019-29.example.com (172.16.43.158) appears to be down.&lt;/span&gt;
+&lt;span class="go"&gt;Host ccf-hill019-30.example.com (172.16.43.159) appears to be down.&lt;/span&gt;
+&lt;span class="go"&gt;Nmap finished: 31 &lt;span class="caps"&gt;IP&lt;/span&gt; addresses (7 hosts up) scanned in 0.892 seconds&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;As you can see, the results also (very usefully) include &lt;span class="caps"&gt;MAC&lt;/span&gt; addresses,
+so it&amp;#8217;s pretty easy to update &lt;span class="caps"&gt;DHCP&lt;/span&gt; as&amp;nbsp;needed.&lt;/p&gt;</summary><category term="dhcp"></category><category term="nmap"></category><category term="ping"></category><category term="sysadmin"></category></entry></feed>

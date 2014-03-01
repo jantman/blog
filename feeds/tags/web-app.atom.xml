@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Jason Antman's Blog</title><link href="http://newblog.jasonantman.com/" rel="alternate"></link><link href="http://newblog.jasonantman.com/feeds/tags/web-app.atom.xml" rel="self"></link><id>http://newblog.jasonantman.com/</id><updated>2012-02-03T13:32:00-05:00</updated><entry><title>F5 BigIp - Manually Changing Session Persistence Cookies on the Client Side</title><link href="http://newblog.jasonantman.com/2012/02/f5-bigip-manually-changing-session-persistence-cookies-on-the-client-side/" rel="alternate"></link><updated>2012-02-03T13:32:00-05:00</updated><author><name>admin</name></author><id>tag:newblog.jasonantman.com,2012-02-03:2012/02/f5-bigip-manually-changing-session-persistence-cookies-on-the-client-side/</id><summary type="html">&lt;p&gt;Yesterday I was asked to help out a bit debugging issues with a site
+that sits behind a &lt;a href="http://www.f5.com/products/big-ip/"&gt;F5 &lt;span class="caps"&gt;BIG&lt;/span&gt;-&lt;span class="caps"&gt;IP&lt;/span&gt;&lt;/a&gt; load
+balancer (&lt;span class="caps"&gt;LB&lt;/span&gt;). It&amp;#8217;s a pretty simple site, load balanced between two web
+servers. The developers were complaining about intermittent page load
+issues, so I immediately considered a problem with one of the two
+servers (&lt;em&gt;ass&lt;/em&gt;uming that the devs were clearing cookies and cache
+between attempts). The &lt;span class="caps"&gt;LB&lt;/span&gt; is using &lt;span class="caps"&gt;HTTP&lt;/span&gt; Cookies for client session
+persistence, but no matter how many times I cleared my cookies, I kept
+being sent to the same back-end server. I know I could have added an
+iRule to the &lt;span class="caps"&gt;LB&lt;/span&gt;, but it seems like bad practice to change a production
+configuration for debugging something like&amp;nbsp;this.&lt;/p&gt;
+&lt;p&gt;If your site uses a BigIp with cookies for persistence, it&amp;#8217;s no problem
+to edit the cookies manually to force yourself to another back-end
+server. Simply look through the cookies for a given site using something
+like the &lt;a href="https://addons.mozilla.org/en-US/firefox/addon/web-developer/"&gt;Web Developer addon for
+Firefox&lt;/a&gt;;
+the BigIp cookie is named like &amp;#8220;BigIpServer&amp;lt;poolname&gt;&amp;#8221;. The encoding
+information is specified by F5 in their knowledge base &lt;a href="http://support.f5.com/kb/en-us/solutions/public/6000/900/sol6917.html"&gt;sol6917:
+Overview of &lt;span class="caps"&gt;BIG&lt;/span&gt;-&lt;span class="caps"&gt;IP&lt;/span&gt; persistence cookie
+encoding&lt;/a&gt;.
+I also managed to find a Perl one-liner from Tyler Krpata, Manger of
+Security Engineering at Constant Contact, &lt;a href="http://www.tylerkrpata.com/2009/06/decode-f5-bigip-cookie-in-one-line-of.html"&gt;in a post on his
+blog&lt;/a&gt;.
+I built on that work to develop the following perl script, which can
+both encode and decode BigIP cookie &lt;span class="caps"&gt;IP&lt;/span&gt;/port values. The latest version lives
+on my &lt;a href="https://github.com/jantman/misc-scripts/blob/master/bigipcookie.pl"&gt;GitHub misc-scripts repository&lt;/a&gt;.&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="c1"&gt;#!/usr/bin/perl&lt;/span&gt;
+
+&lt;span class="c1"&gt;#&lt;/span&gt;
+&lt;span class="c1"&gt;# Perl script to de/encode F5 BigIp persistence cookies.&lt;/span&gt;
+&lt;span class="c1"&gt;#&lt;/span&gt;
+&lt;span class="c1"&gt;# The latest version of this script can always be obtained from:&lt;/span&gt;
+&lt;span class="c1"&gt;#    via &lt;span class="caps"&gt;HTTP&lt;/span&gt; ot &lt;span class="caps"&gt;SVN&lt;/span&gt;&lt;/span&gt;
+&lt;span class="c1"&gt;#&lt;/span&gt;
+&lt;span class="c1"&gt;# Update information and description can be found at:&lt;/span&gt;
+&lt;span class="c1"&gt;#   &lt;/span&gt;
+&lt;span class="c1"&gt;#&lt;/span&gt;
+&lt;span class="c1"&gt;# Copyright 2012 Jason Antman  .&lt;/span&gt;
+&lt;span class="c1"&gt;#&lt;/span&gt;
+&lt;span class="c1"&gt;#########################################################################################&lt;/span&gt;
+&lt;span class="c1"&gt;#&lt;/span&gt;
+&lt;span class="c1"&gt;# &lt;span class="caps"&gt;LICENSE&lt;/span&gt;: AGPLv3 &lt;/span&gt;
+&lt;span class="c1"&gt;#&lt;/span&gt;
+&lt;span class="c1"&gt;#    This program is free software: you can redistribute it and/or modify&lt;/span&gt;
+&lt;span class="c1"&gt;#    it under the terms of the &lt;span class="caps"&gt;GNU&lt;/span&gt; Affero General Public License as published by&lt;/span&gt;
+&lt;span class="c1"&gt;#    the Free Software Foundation, either version 3 of the License, or&lt;/span&gt;
+&lt;span class="c1"&gt;#    (at your option) any later version.&lt;/span&gt;
+&lt;span class="c1"&gt;#&lt;/span&gt;
+&lt;span class="c1"&gt;#    This program is distributed in the hope that it will be useful,&lt;/span&gt;
+&lt;span class="c1"&gt;#    but &lt;span class="caps"&gt;WITHOUT&lt;/span&gt; &lt;span class="caps"&gt;ANY&lt;/span&gt; &lt;span class="caps"&gt;WARRANTY&lt;/span&gt;; without even the implied warranty of&lt;/span&gt;
+&lt;span class="c1"&gt;#    &lt;span class="caps"&gt;MERCHANTABILITY&lt;/span&gt; or &lt;span class="caps"&gt;FITNESS&lt;/span&gt; &lt;span class="caps"&gt;FOR&lt;/span&gt; A &lt;span class="caps"&gt;PARTICULAR&lt;/span&gt; &lt;span class="caps"&gt;PURPOSE&lt;/span&gt;.  See the&lt;/span&gt;
+&lt;span class="c1"&gt;#    &lt;span class="caps"&gt;GNU&lt;/span&gt; Affero General Public License for more details.&lt;/span&gt;
+&lt;span class="c1"&gt;#&lt;/span&gt;
+&lt;span class="c1"&gt;#    You should have received a copy of the &lt;span class="caps"&gt;GNU&lt;/span&gt; Affero General Public License&lt;/span&gt;
+&lt;span class="c1"&gt;#    along with this program.  If not, see .&lt;/span&gt;
+&lt;span class="c1"&gt;#&lt;/span&gt;
+&lt;span class="c1"&gt;# If you make any modifications/fixes/feature additions, it would be greatly appreciated&lt;/span&gt;
+&lt;span class="c1"&gt;# if you send them back to me at the above email address.&lt;/span&gt;
+&lt;span class="c1"&gt;#&lt;/span&gt;
+&lt;span class="c1"&gt;#########################################################################################&lt;/span&gt;
+&lt;span class="c1"&gt;#&lt;/span&gt;
+&lt;span class="c1"&gt;# &lt;span class="caps"&gt;CREDITS&lt;/span&gt;:&lt;/span&gt;
+&lt;span class="c1"&gt;# - F5 itself for the formula: &lt;/span&gt;
+&lt;span class="c1"&gt;# - Tyler Krpata &lt;/span&gt;
+&lt;span class="c1"&gt;#     for the Perl one-liner that this logic is based on.&lt;/span&gt;
+&lt;span class="c1"&gt;#&lt;/span&gt;
+&lt;span class="c1"&gt;# $HeadURL: http://svn.jasonantman.com/misc-scripts/bigipcookie.pl $&lt;/span&gt;
+&lt;span class="c1"&gt;# $LastChangedRevision: 27 $&lt;/span&gt;
+&lt;span class="c1"&gt;#&lt;/span&gt;
+&lt;span class="c1"&gt;# Changelog:&lt;/span&gt;
+&lt;span class="c1"&gt;#&lt;/span&gt;
+&lt;span class="c1"&gt;# 2012-02-02 Jason Antman :&lt;/span&gt;
+&lt;span class="c1"&gt;#   - initial version&lt;/span&gt;
+&lt;span class="c1"&gt;#&lt;/span&gt;
+
+&lt;span class="k"&gt;use&lt;/span&gt; &lt;span class="n"&gt;strict&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="k"&gt;use&lt;/span&gt; &lt;span class="n"&gt;warnings&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+
+&lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt; &lt;span class="nv"&gt;$#&lt;span class="caps"&gt;ARGV&lt;/span&gt;&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt; &lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="k"&gt;print&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;&lt;span class="caps"&gt;USAGE&lt;/span&gt;: bigipcookie.pl \n&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+    &lt;span class="nb"&gt;exit&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+
+&lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;$&lt;span class="caps"&gt;ARGV&lt;/span&gt;&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="o"&gt;=~&lt;/span&gt; &lt;span class="sr"&gt;m/^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3}):(\d+)$/&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="k"&gt;my&lt;/span&gt; &lt;span class="nv"&gt;$ipEnc&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nv"&gt;$1&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;$2&lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="mi"&gt;256&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;$3&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;256&lt;/span&gt;&lt;span class="o"&gt;**&lt;/span&gt;&lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;$4&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;256&lt;/span&gt;&lt;span class="o"&gt;**&lt;/span&gt;&lt;span class="mi"&gt;3&lt;/span&gt;&lt;span class="p"&gt;));&lt;/span&gt;
+    &lt;span class="k"&gt;my&lt;/span&gt; &lt;span class="nv"&gt;$portEnc&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nb"&gt;hex&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;join&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nb"&gt;reverse&lt;/span&gt; &lt;span class="p"&gt;((&lt;/span&gt;&lt;span class="nb"&gt;sprintf&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;%04x&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nv"&gt;$5&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;=~&lt;/span&gt;&lt;span class="sr"&gt; /../g&lt;/span&gt;&lt;span class="p"&gt;));&lt;/span&gt;
+    &lt;span class="k"&gt;print&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;$ipEnc.$portEnc.0000\n&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;span class="k"&gt;elsif&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;$&lt;span class="caps"&gt;ARGV&lt;/span&gt;&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="o"&gt;=~&lt;/span&gt; &lt;span class="sr"&gt;m/^(\d+)\.(\d+)\.0000$/&lt;/span&gt;&lt;span class="p"&gt;){&lt;/span&gt;
+    &lt;span class="c1"&gt;# decode a cookie value&lt;/span&gt;
+    &lt;span class="k"&gt;my&lt;/span&gt; &lt;span class="nv"&gt;$ipEnc&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nv"&gt;$1&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+    &lt;span class="k"&gt;my&lt;/span&gt; &lt;span class="nv"&gt;$portEnc&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nv"&gt;$2&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+    &lt;span class="k"&gt;my&lt;/span&gt; &lt;span class="nv"&gt;$ip&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nb"&gt;join&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;.&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nb"&gt;map&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="nb"&gt;hex&lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt; &lt;span class="nb"&gt;reverse&lt;/span&gt; &lt;span class="p"&gt;((&lt;/span&gt;&lt;span class="nb"&gt;sprintf&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;%08x&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nb"&gt;split&lt;/span&gt; &lt;span class="sr"&gt;/\./&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nv"&gt;$ipEnc&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;=~&lt;/span&gt;&lt;span class="sr"&gt; /../g&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+    &lt;span class="k"&gt;my&lt;/span&gt; &lt;span class="nv"&gt;$portDec&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nb"&gt;hex&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;join&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nb"&gt;reverse&lt;/span&gt; &lt;span class="p"&gt;((&lt;/span&gt;&lt;span class="nb"&gt;sprintf&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;%04x&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nv"&gt;$portEnc&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;=~&lt;/span&gt;&lt;span class="sr"&gt; /../g&lt;/span&gt;&lt;span class="p"&gt;));&lt;/span&gt;
+    &lt;span class="k"&gt;print&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;$ip:$portDec\n&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;span class="k"&gt;else&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="k"&gt;print&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;&lt;span class="caps"&gt;USAGE&lt;/span&gt;: bigipcookie.pl \n&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+    &lt;span class="nb"&gt;exit&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;An example of the&amp;nbsp;usage:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="go"&gt;jantman@palantir:pts/8:~/bin/misc-scripts &amp;gt; ./bigipcookie.pl 192.168.23.50:80&lt;/span&gt;
+&lt;span class="go"&gt;840411328.20480.0000&lt;/span&gt;
+&lt;span class="go"&gt;jantman@palantir:pts/8:~/bin/misc-scripts &amp;gt; ./bigipcookie.pl 840411328.20480.0000&lt;/span&gt;
+&lt;span class="go"&gt;192.168.23.50:80&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;On a side note for those of your who are security-conscious: yes, of
+course, this means that if you&amp;#8217;re using BigIp with cookie persistence,
+it is disclosing the internal &lt;span class="caps"&gt;IP&lt;/span&gt; and port of your server to your end&amp;nbsp;users.&lt;/p&gt;</summary><category term="bigip"></category><category term="cookies"></category><category term="debugging"></category><category term="f5"></category><category term="load balancer"></category><category term="perl"></category><category term="persistence"></category><category term="web app"></category></entry></feed>

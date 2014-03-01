@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Jason Antman's Blog</title><link>http://newblog.jasonantman.com/</link><description></description><atom:link href="http://newblog.jasonantman.com/feeds/tags/inkscape.rss.xml" rel="self"></atom:link><lastBuildDate>Wed, 25 Nov 2009 09:24:00 -0500</lastBuildDate><item><title>Making maps from GIS data with Inkscape</title><link>http://newblog.jasonantman.com/2009/11/making-maps-from-gis-data-with-inkscape/</link><description>&lt;p&gt;&lt;strong&gt;&lt;span class="caps"&gt;NOTE&lt;/span&gt;-&lt;/strong&gt; I more or less dropped this project, in favor of a more
+precise approach, as outlined in &lt;a href="/2009/12/using-google-maps-to-produce-usable-printable-maps/"&gt;Using Google Maps to produce usable,
+printable
+maps&lt;/a&gt;.
+This is being left just to give other people&amp;nbsp;ideas.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Background&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;I was recently asked by one of the officers of our volunteer &lt;a href="http://www.mpnj.com/mp_fd.asp"&gt;fire
+department&lt;/a&gt; if I could come up with a
+good map of our town that could be laminated and put in the trucks. We
+currently have a really simple &lt;a href="http://www.mpnj.com/forms/TownMap.pdf"&gt;&lt;span class="caps"&gt;PDF&lt;/span&gt;
+map&lt;/a&gt; of our town, but it was done
+by a for-profit entity and is only available as the single-size &lt;span class="caps"&gt;PDF&lt;/span&gt;. The
+map itself looks&amp;nbsp;like:&lt;/p&gt;
+&lt;p&gt;&lt;img alt="town map" src="GFX/TownMap.png" /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Data&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;With a little research, I was able to find quite a lot of &lt;span class="caps"&gt;GIS&lt;/span&gt; data on
+the &lt;a href="http://www.state.nj.us/dep/gis/"&gt;&lt;span class="caps"&gt;NJ&lt;/span&gt; Department of Environmental Protection &lt;span class="caps"&gt;GIS&lt;/span&gt;
+site&lt;/a&gt;. While the &lt;span class="caps"&gt;GIS&lt;/span&gt; viewer software by
+&lt;a href="http://www.esri.com"&gt;&lt;span class="caps"&gt;ESRI&lt;/span&gt;&lt;/a&gt; seems to be the usual choice, I found that
+the &lt;span class="caps"&gt;GPL&lt;/span&gt;&amp;#8217;ed &lt;a href="http://www.qgis.org/"&gt;Quantum &lt;span class="caps"&gt;GIS&lt;/span&gt;&lt;/a&gt; project (available in the
+OpenSuSE
+&lt;a href="http://download.opensuse.org/repositories/Application:/Geo/"&gt;Application:Geo&lt;/a&gt;
+repository) displayed the data quite nicely. The only major issue was
+with street names - there was no way to label lines with two fields from
+the metadata (the &lt;span class="caps"&gt;TIGER&lt;/span&gt;/Line files have separate fields for the street
+name and the st/rd/ln suffix). More importantly, I needed something that
+both looked nice and included overlays (specifically of the fire
+department&amp;#8217;s hydrant&amp;nbsp;map).&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;&lt;span class="caps"&gt;SVG&lt;/span&gt;&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;A little research led me to the
+&lt;a href="http://wiki.github.com/kbh3rd/shptosvg"&gt;shptosvg&lt;/a&gt; perl script that
+converts a shapefile to &lt;span class="caps"&gt;SVG&lt;/span&gt;. As the streets within our town won&amp;#8217;t change
+any time soon, I figured it was the most logical solution, when
+producing a map for print where I would need to re-scale and edit
+overlay layers - to just get the data I needed into &lt;span class="caps"&gt;SVG&lt;/span&gt; and do the rest
+there. I was able to export both the county roads shapefile and the
+state municipal boundaries shapefile to an &lt;span class="caps"&gt;SVG&lt;/span&gt; drawing, and then open
+that in &lt;a href="http://www.inkscape.org/"&gt;Inkscape&lt;/a&gt;. To export them, I&amp;nbsp;used:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;perl shptosvg.pl -x3300 -y5100 -p1 -d0.5 berrds00.shp muni_boundaries/nj_munis.shp &amp;gt; test2.svg
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;where berrds00.shp is the &lt;span class="caps"&gt;TIGER&lt;/span&gt;/Line roads shapefile for our county
+(from the 2000 census) and muni_boundaries/nj_munis.shp is the
+shapefile for the &lt;span class="caps"&gt;NJ&lt;/span&gt; municipal boundaries. The x and y sizes (3300px and
+5100px, respectively) were based on an 11x17&amp;#8221; sheet printed at&amp;nbsp;300dpi.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Initial&amp;nbsp;Work&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;The initial work was a real pain. I moved each group of objects (the
+municipal boundaries and the county road lines) to a separate layer and
+then ungrouped them. Next, I began the painstaking process of deleting
+all of the objects outside of our town boundary, except the roads
+directly around our town. Once this was done, I used File -&gt; Document
+Properties -&gt; Fit to Page Selection to &amp;#8220;crop&amp;#8221; the canvas to the
+remaining objects. Thanks to the nature of &lt;strong&gt;S&lt;/strong&gt;&lt;span class="caps"&gt;VG&lt;/span&gt;, I was able to crop
+the page down and then scale it up again to 11x17&amp;#8221; without any loss of
+data or quality. I then moved the roads outside of our town (luckily,
+most of the roads from the &lt;span class="caps"&gt;TIGER&lt;/span&gt; data ended up being made up of a series
+of line segments, with most of them having a break at the town boundary)
+to another layer, so that they could be easily given a light gray color.
+I also gave the down boundary a nice red color. Finally, as I neglected
+to include a railroad shapefile when I did the original conversion to
+&lt;span class="caps"&gt;SVG&lt;/span&gt;, and adding one would obviously not jive with the massive deletion
+and re-scaling I&amp;#8217;d done, I drew in the one railroad line running through
+town by hand, and gave it a nice dashed line&amp;nbsp;type.&lt;/p&gt;
+&lt;p&gt;At this point, I ended up with something that looked&amp;nbsp;like:&lt;/p&gt;
+&lt;p&gt;&lt;img alt="inkscape work version 1" src="GFX/inkscape.png" /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Cleaning&amp;nbsp;Up&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;I now had the following tasks to&amp;nbsp;perform:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Find a nicer way to show the street lines. The ideal would be a line
+    made up of 1-2px lines on either side, with a white center. Second
+    best would just be thinner&amp;nbsp;lines.&lt;/li&gt;
+&lt;li&gt;Cleanup the roads around the town boundary - make sure they&amp;#8217;re black
+    within the town and gray outside. If need be. delete some lines and
+    re-draw them to split at the town&amp;nbsp;boundary.&lt;/li&gt;
+&lt;li&gt;Add labels for the bordering&amp;nbsp;towns.&lt;/li&gt;
+&lt;li&gt;The big one - add street name&amp;nbsp;labels.&lt;/li&gt;
+&lt;li&gt;Perhaps add in icons/labels/boxes for churches, schools, municipal
+    buildings,&amp;nbsp;etc.&lt;/li&gt;
+&lt;li&gt;Add in, once I get a copy of the map, the fire department hydrant
+    locations as another&amp;nbsp;layer.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;And the added bonuses that I&amp;#8217;d like to&amp;nbsp;do:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Add house numbering on a block level for each&amp;nbsp;street.&lt;/li&gt;
+&lt;li&gt;Add a grid overlay, with an index of streets by grid square on the&amp;nbsp;back.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;As of right now (about &lt;span class="caps"&gt;9AM&lt;/span&gt; on November 25, 2009) this is where I stand.
+I&amp;#8217;ll update a bit more when I get farther&amp;nbsp;along.&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Wed, 25 Nov 2009 09:24:00 -0500</pubDate><guid>tag:newblog.jasonantman.com,2009-11-25:2009/11/making-maps-from-gis-data-with-inkscape/</guid><category>gis</category><category>inkscape</category><category>map</category><category>shapefile</category><category>svg</category></item></channel></rss>

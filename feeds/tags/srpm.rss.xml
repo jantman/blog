@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Jason Antman's Blog</title><link>http://newblog.jasonantman.com/</link><description></description><atom:link href="http://newblog.jasonantman.com/feeds/tags/srpm.rss.xml" rel="self"></atom:link><lastBuildDate>Tue, 28 May 2013 10:26:00 -0400</lastBuildDate><item><title>Script to easily rebuild a SRPM</title><link>http://newblog.jasonantman.com/2013/05/script-to-easily-rebuild-a-srpm/</link><description>&lt;p&gt;Between &lt;span class="caps"&gt;RHEL&lt;/span&gt;/CentOS 5 and 6 the default &lt;span class="caps"&gt;RPM&lt;/span&gt; compression format was
+changed to xz. As such, trying to build a recent Fedora or Cent6 &lt;span class="caps"&gt;SRPM&lt;/span&gt; on
+Cent5 will error out with a message like
+&lt;code&gt;error: unpacking of archive failed on file foo;51a4c2a5: cpio: MD5 sum mismatch&lt;/code&gt;
+because tar on CentOS 5 doesn&amp;#8217;t support&amp;nbsp;xz.&lt;/p&gt;
+&lt;p&gt;Here&amp;#8217;s a quick and dirty little script to use &lt;code&gt;rpm2cpio&lt;/code&gt; to rebuild a
+&lt;span class="caps"&gt;SRPM&lt;/span&gt; using the host&amp;#8217;s native &lt;span class="caps"&gt;RPM&lt;/span&gt; compression. The latest version will
+live at
+&lt;a href="https://github.com/jantman/misc-scripts/blob/master/rebuild_srpm.sh"&gt;https://github.com/jantman/misc-scripts/blob/master/rebuild_srpm.sh&lt;/a&gt;&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="c"&gt;#!/bin/bash&lt;/span&gt;
+&lt;span class="c"&gt;#&lt;/span&gt;
+&lt;span class="c"&gt;# Script to rebuild a &lt;span class="caps"&gt;SRPM&lt;/span&gt; 1:1, useful when you want to build a &lt;span class="caps"&gt;RHEL&lt;/span&gt;/CentOS 6&lt;/span&gt;
+&lt;span class="c"&gt;# &lt;span class="caps"&gt;SRPM&lt;/span&gt; on a &lt;span class="caps"&gt;RHEL&lt;/span&gt;/CentOS 5 system that doesn&amp;#39;t support newer compression (cpio: &lt;span class="caps"&gt;MD5&lt;/span&gt; sum mismatch)&lt;/span&gt;
+&lt;span class="c"&gt;#&lt;/span&gt;
+&lt;span class="c"&gt;# by Jason Antman &lt;/span&gt;
+&lt;span class="c"&gt;# The latest version of this script will always live at:&lt;/span&gt;
+&lt;span class="c"&gt;# &lt;/span&gt;
+&lt;span class="c"&gt;#&lt;/span&gt;
+
+&lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="o"&gt;[[&lt;/span&gt; -z &lt;span class="s2"&gt;&amp;quot;$1&amp;quot;&lt;/span&gt; &lt;span class="o"&gt;||&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;$1&amp;quot;&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;-h&amp;quot;&lt;/span&gt; &lt;span class="o"&gt;||&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;$1&amp;quot;&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;--help&amp;quot;&lt;/span&gt; &lt;span class="o"&gt;]]&lt;/span&gt;
+&lt;span class="k"&gt;then&lt;/span&gt;
+&lt;span class="k"&gt;    &lt;/span&gt;&lt;span class="nb"&gt;echo&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;&lt;span class="caps"&gt;USAGE&lt;/span&gt;: rebuild_srpm.sh  &amp;quot;&lt;/span&gt;
+    &lt;span class="nb"&gt;exit &lt;/span&gt;1
+&lt;span class="k"&gt;fi&lt;/span&gt;
+
+&lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="o"&gt;[[&lt;/span&gt; -z &lt;span class="s2"&gt;&amp;quot;$2&amp;quot;&lt;/span&gt; &lt;span class="o"&gt;]]&lt;/span&gt;
+&lt;span class="k"&gt;then&lt;/span&gt;
+&lt;span class="k"&gt;    &lt;/span&gt;&lt;span class="nv"&gt;&lt;span class="caps"&gt;OUTDIR&lt;/span&gt;&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="sb"&gt;`&lt;/span&gt;&lt;span class="nb"&gt;pwd&lt;/span&gt;&lt;span class="sb"&gt;`&lt;/span&gt;
+&lt;span class="k"&gt;else&lt;/span&gt;
+&lt;span class="k"&gt;    &lt;/span&gt;&lt;span class="nv"&gt;&lt;span class="caps"&gt;OUTDIR&lt;/span&gt;&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;$2&amp;quot;&lt;/span&gt;
+&lt;span class="k"&gt;fi&lt;/span&gt;
+
+&lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="o"&gt;[[&lt;/span&gt; ! -e &lt;span class="s2"&gt;&amp;quot;$1&amp;quot;&lt;/span&gt; &lt;span class="o"&gt;]]&lt;/span&gt;
+&lt;span class="k"&gt;then&lt;/span&gt;
+&lt;span class="k"&gt;    &lt;/span&gt;&lt;span class="nb"&gt;echo&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;&lt;span class="caps"&gt;ERROR&lt;/span&gt;: &lt;span class="caps"&gt;SRPM&lt;/span&gt; file not found: $1&amp;quot;&lt;/span&gt;
+    &lt;span class="nb"&gt;exit &lt;/span&gt;1
+&lt;span class="k"&gt;fi&lt;/span&gt;
+
+&lt;span class="k"&gt;if&lt;/span&gt; ! which rpmbuild &amp;amp;&amp;gt; /dev/null
+&lt;span class="k"&gt;then&lt;/span&gt;
+&lt;span class="k"&gt;    &lt;/span&gt;&lt;span class="nb"&gt;echo&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;rpmbuild could not be found. please install. (sudo yum install rpm-build)&amp;quot;&lt;/span&gt;
+    &lt;span class="nb"&gt;exit &lt;/span&gt;1
+&lt;span class="k"&gt;fi&lt;/span&gt;
+
+&lt;span class="k"&gt;if&lt;/span&gt; ! which rpm2cpio &amp;amp;&amp;gt; /dev/null
+&lt;span class="k"&gt;then&lt;/span&gt;
+&lt;span class="k"&gt;    &lt;/span&gt;&lt;span class="nb"&gt;echo&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;rpm2cpio could not be found. please install. (sudo yum install rpm)&amp;quot;&lt;/span&gt;
+    &lt;span class="nb"&gt;exit &lt;/span&gt;1
+&lt;span class="k"&gt;fi&lt;/span&gt;
+
+&lt;span class="nv"&gt;&lt;span class="caps"&gt;SRPM&lt;/span&gt;&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="sb"&gt;`&lt;/span&gt;dirname &lt;span class="s2"&gt;&amp;quot;$1&amp;quot;&lt;/span&gt;&lt;span class="sb"&gt;`&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;/&amp;quot;&lt;/span&gt;&lt;span class="sb"&gt;`&lt;/span&gt;basename &lt;span class="s2"&gt;&amp;quot;$1&amp;quot;&lt;/span&gt;&lt;span class="sb"&gt;`&lt;/span&gt;
+&lt;span class="nv"&gt;&lt;span class="caps"&gt;TEMPDIR&lt;/span&gt;&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="sb"&gt;`&lt;/span&gt;mktemp -d&lt;span class="sb"&gt;`&lt;/span&gt;
+&lt;span class="nv"&gt;&lt;span class="caps"&gt;STARTPWD&lt;/span&gt;&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="sb"&gt;`&lt;/span&gt;&lt;span class="nb"&gt;pwd&lt;/span&gt;&lt;span class="sb"&gt;`&lt;/span&gt;
+
+&lt;span class="nb"&gt;echo&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;Rebuilding $&lt;span class="caps"&gt;SRPM&lt;/span&gt;...&amp;quot;&lt;/span&gt;
+
+&lt;span class="c"&gt;# copy srpm into tempdir&lt;/span&gt;
+cp &lt;span class="nv"&gt;$&lt;span class="caps"&gt;SRPM&lt;/span&gt;&lt;/span&gt; &lt;span class="nv"&gt;$&lt;span class="caps"&gt;TEMPDIR&lt;/span&gt;&lt;/span&gt;
+
+&lt;span class="nb"&gt;pushd&lt;/span&gt; &lt;span class="nv"&gt;$&lt;span class="caps"&gt;TEMPDIR&lt;/span&gt;&lt;/span&gt; &amp;amp;&amp;gt;/dev/null
+
+&lt;span class="c"&gt;# setup local build dir structure&lt;/span&gt;
+mkdir -p rpm rpm/&lt;span class="caps"&gt;BUILD&lt;/span&gt; rpm/&lt;span class="caps"&gt;RPMS&lt;/span&gt; rpm/&lt;span class="caps"&gt;SOURCES&lt;/span&gt; rpm/&lt;span class="caps"&gt;SPECS&lt;/span&gt; rpm/&lt;span class="caps"&gt;SRPMS&lt;/span&gt; rpm/&lt;span class="caps"&gt;RPMS&lt;/span&gt;/athlon rpm/&lt;span class="caps"&gt;RPMS&lt;/span&gt;/i&lt;span class="se"&gt;\[&lt;/span&gt;3456&lt;span class="se"&gt;\]&lt;/span&gt;86 rpm/&lt;span class="caps"&gt;RPMS&lt;/span&gt;/i386 rpm/&lt;span class="caps"&gt;RPMS&lt;/span&gt;/noarch rpm/&lt;span class="caps"&gt;RPMS&lt;/span&gt;/x86_64
+
+&lt;span class="c"&gt;# setup rpmmacros file&lt;/span&gt;
+cat /dev/null &amp;gt; &lt;span class="nv"&gt;$&lt;span class="caps"&gt;TEMPDIR&lt;/span&gt;&lt;/span&gt;/.rpmmacros
+&lt;span class="nb"&gt;echo&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;%_topdir        $&lt;span class="caps"&gt;TEMPDIR&lt;/span&gt;/rpm&amp;quot;&lt;/span&gt; &amp;gt;&amp;gt; ~/.rpmmacros
+
+&lt;span class="nb"&gt;echo&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;Extracting &lt;span class="caps"&gt;SRPM&lt;/span&gt;...&amp;quot;&lt;/span&gt;
+&lt;span class="nb"&gt;pushd&lt;/span&gt; &lt;span class="nv"&gt;$&lt;span class="caps"&gt;TEMPDIR&lt;/span&gt;&lt;/span&gt;/rpm/&lt;span class="caps"&gt;SOURCES&lt;/span&gt;/ &amp;amp;&amp;gt;/dev/null
+rpm2cpio &lt;span class="nv"&gt;$&lt;span class="caps"&gt;SRPM&lt;/span&gt;&lt;/span&gt; | cpio -idmv &amp;amp;&amp;gt;/dev/null
+&lt;span class="nb"&gt;popd&lt;/span&gt; &amp;amp;&amp;gt;/dev/null
+
+&lt;span class="c"&gt;# build the &lt;span class="caps"&gt;SRPM&lt;/span&gt; from the spec and sources&lt;/span&gt;
+&lt;span class="c"&gt;# we&amp;#39;re just building a &lt;span class="caps"&gt;SRPM&lt;/span&gt; so we can ignore dependencies&lt;/span&gt;
+&lt;span class="nb"&gt;echo&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;Rebuilding &lt;span class="caps"&gt;SRPM&lt;/span&gt;...&amp;quot;&lt;/span&gt;
+&lt;span class="nv"&gt;NEW_SRPM&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="sb"&gt;`&lt;/span&gt;rpmbuild -bs --nodeps --macros&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nv"&gt;$&lt;span class="caps"&gt;TEMPDIR&lt;/span&gt;&lt;/span&gt;/.rpmmacros &lt;span class="nv"&gt;$&lt;span class="caps"&gt;TEMPDIR&lt;/span&gt;&lt;/span&gt;/rpm/&lt;span class="caps"&gt;SOURCES&lt;/span&gt;/*.spec | grep &lt;span class="s2"&gt;&amp;quot;^Wrote: &amp;quot;&lt;/span&gt; | awk &lt;span class="s1"&gt;&amp;#39;{print $2}&amp;#39;&lt;/span&gt;&lt;span class="sb"&gt;`&lt;/span&gt;
+
+&lt;span class="nb"&gt;echo&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;Copying to $&lt;span class="caps"&gt;OUTDIR&lt;/span&gt;&amp;quot;&lt;/span&gt;
+cp &lt;span class="nv"&gt;$NEW_SRPM&lt;/span&gt; &lt;span class="nv"&gt;$&lt;span class="caps"&gt;OUTDIR&lt;/span&gt;&lt;/span&gt;/
+
+&lt;span class="nb"&gt;echo&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;Wrote file to $&lt;span class="caps"&gt;OUTDIR&lt;/span&gt;/`basename $NEW_SRPM`&amp;quot;&lt;/span&gt;
+
+&lt;span class="c"&gt;# cleanup&lt;/span&gt;
+&lt;span class="nb"&gt;cd&lt;/span&gt; &lt;span class="nv"&gt;$&lt;span class="caps"&gt;STARTPWD&lt;/span&gt;&lt;/span&gt;
+rm -Rf &lt;span class="nv"&gt;$&lt;span class="caps"&gt;TEMPDIR&lt;/span&gt;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Tue, 28 May 2013 10:26:00 -0400</pubDate><guid>tag:newblog.jasonantman.com,2013-05-28:2013/05/script-to-easily-rebuild-a-srpm/</guid><category>lzma</category><category>packaging</category><category>rpm</category><category>rpm2cpio</category><category>rpmbuild</category><category>srpm</category><category>xz</category></item></channel></rss>

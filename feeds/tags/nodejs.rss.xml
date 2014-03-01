@@ -1,0 +1,286 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Jason Antman's Blog</title><link>http://newblog.jasonantman.com/</link><description></description><atom:link href="http://newblog.jasonantman.com/feeds/tags/nodejs.rss.xml" rel="self"></atom:link><lastBuildDate>Thu, 06 Jun 2013 20:47:00 -0400</lastBuildDate><item><title>Modern (0.10.x+) NodeJS RPMs on CentOS/REHL 5 and 6</title><link>http://newblog.jasonantman.com/2013/06/modern-0-10-x-nodejs-rpms-on-centosrehl-5-and-6/</link><description>&lt;p&gt;I posted back in January about &lt;a href="/2013/01/rpm-spec-files-for-nodejs-0-9-5-and-v8-on-centos-5/"&gt;&lt;span class="caps"&gt;RPM&lt;/span&gt; Spec Files for nodejs 0.9.5 and v8
+on CentOS
+6&lt;/a&gt;. In
+that post I also said that I was unable to get recent NodeJS to build on
+CentOS 5 because of a long chain of dependencies including node-gyp, v8,
+http-parser, glibc, etc. I said I couldn&amp;#8217;t get it to build. Well, I have
+good news for both distro&amp;nbsp;versions.&lt;/p&gt;
+&lt;p&gt;On the CentOS/&lt;span class="caps"&gt;RHEL&lt;/span&gt; 6 side, thanks to a lot of work by &lt;span class="caps"&gt;T. C.
+&lt;/span&gt;Hollingsworth and others, NodeJS 0.10.5 is currently in the official
+&lt;a href="http://fedoraproject.org/wiki/EPEL"&gt;&lt;span class="caps"&gt;EPEL&lt;/span&gt;&lt;/a&gt; repositories. They seem to be
+keeping the packages pretty current, but if you need newer, you can
+always grab the SRPMs from &lt;span class="caps"&gt;EPEL&lt;/span&gt; and build the newer versions. This is
+great, because it means I no longer need to maintain the spec files and
+do my own builds. I don&amp;#8217;t think I really did anything to help get this
+package in &lt;span class="caps"&gt;EPEL&lt;/span&gt;, other than ping a few people and comment on a few&amp;nbsp;tickets.&lt;/p&gt;
+&lt;p&gt;For CentOS/&lt;span class="caps"&gt;RHEL&lt;/span&gt; 5, I finally have packages, but they&amp;#8217;re not exactly
+pretty. The dependency solving issues still stand; they&amp;#8217;re rooted at the
+dependency of node-gyp which requires the v8 C++ JavaScript library, and
+is required to compile shared object addons. The best solution that I
+(and a few others) could find is simply not to build node-gyp, and not
+to have support for addons or package any addons; we just have the
+binaries that NodeJS&amp;#8217;s Makefile creates, and everything else is
+interpreted. A &lt;a href="https://twitter.com/toxigenicpoem"&gt;coworker&lt;/a&gt; found
+&lt;a href="https://github.com/kazuhisya/nodejs-rpm"&gt;https://github.com/kazuhisya/nodejs-rpm&lt;/a&gt;
+which contains a configure patch and specfile for a dead-simple CentOS
+5/6 &lt;span class="caps"&gt;RPM&lt;/span&gt; of NodeJS 0.10.9, which essentially just uses &lt;span class="caps"&gt;EPEL&lt;/span&gt;&amp;#8217;s python26
+packages to power the NodeJS build process, configures and uses the
+Makefile&amp;#8217;s &lt;code&gt;make binary&lt;/code&gt; command to spit out a NodeJS binary tarball,
+and then packages that. That whole process way out of line from the
+&lt;a href="http://fedoraproject.org/wiki/Packaging:Guidelines"&gt;Fedora Packaging
+Guidelines&lt;/a&gt;, and
+also only dumps out nodejs, nodejs-binary and nodejs-debuginfo packages,
+so I also can&amp;#8217;t just substitute in a different package name in my puppet
+manifests (which install nodejs, nodejs-devel and npm packages). So I
+&lt;a href="https://github.com/jantman/nodejs-rpm-centos5"&gt;forked that repository&lt;/a&gt;
+and made some changes to the specfile: I gave the package name a prefix
+(&amp;#8220;cmgd_&amp;#8221;, since that&amp;#8217;s where I work these days) and some warnings in
+the description, to make it abundantly clear that these packages are
+very far from what you find in &lt;span class="caps"&gt;EPEL&lt;/span&gt; and other repositories, and broke
+npm and the devel files out into their own subpackages. Hopefully this
+spec file will be of use to someone else who also has the unfortunate
+need of supporting recent NodeJS on CentOS 5. If there&amp;#8217;s enough
+interest, I&amp;#8217;ll consider building the packages and putting them in a
+repository&amp;nbsp;somewhere.&lt;/p&gt;
+&lt;p&gt;You can see the NodeJS 0.10.9 on CentOS 5 spec file, a patch, and the
+READMEs at
+&lt;a href="https://github.com/jantman/nodejs-rpm-centos5"&gt;https://github.com/jantman/nodejs-rpm-centos5&lt;/a&gt;.
+Patches and/or pull requests are greatly appreciated, especially from
+anyone who wants to make the spec file more Fedora guidelines&amp;nbsp;compliant.&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Thu, 06 Jun 2013 20:47:00 -0400</pubDate><guid>tag:newblog.jasonantman.com,2013-06-06:2013/06/modern-0-10-x-nodejs-rpms-on-centosrehl-5-and-6/</guid><category>build</category><category>centos</category><category>EPEL</category><category>node</category><category>nodejs</category><category>package</category><category>packaging</category><category>redhat</category><category>RHEL</category><category>rpm</category><category>specfile</category></item><item><title>Search for a small-scale but automated RPM build system</title><link>http://newblog.jasonantman.com/2013/05/search-for-a-small-scale-but-automated-rpm-build-system/</link><description>&lt;p&gt;&lt;strong&gt;This post is part of a series of older draft posts from a few months
+ago that I&amp;#8217;m just getting around to publishing. Unfortunately, I have
+yet to find a build system that meets my requirements (see the last&amp;nbsp;paragraph).&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;At work, we have a handful - currently a really small number - of &lt;span class="caps"&gt;RPM&lt;/span&gt;
+packages that we need to build and deploy internally for our CentOS
+server infrastructure. A number of them are just pulled down from
+specific third-party repositories and rebuilt to have the vendor set as
+us, and some are internally patched or developed software. We run
+websites, and on the product side, we&amp;#8217;re a
+Python/&lt;a href="https://www.djangoproject.com/"&gt;Django&lt;/a&gt; shop (in fact, probably
+one of the largest Django apps out there). We don&amp;#8217;t deploy our Django
+apps via &lt;span class="caps"&gt;RPM&lt;/span&gt;, so building and distributing RPMs is definitely not one of
+our core competencies. In fact, we really only want to do it when we&amp;#8217;re
+testing/deploying a new distro, or when an upstream package is&amp;nbsp;updated.&lt;/p&gt;
+&lt;p&gt;Last week I pulled a ticket to deploy &lt;a href="http://nodejs.org/"&gt;node.js&lt;/a&gt; to
+one of our build hosts, and we&amp;#8217;ve got a few things in the pipeline that
+also rely on it. I found the
+&lt;a href="https://github.com/puppetlabs/puppetlabs-nodejs"&gt;puppetlabs-nodejs&lt;/a&gt;
+module on Github that&amp;#8217;s supposed to install it on &lt;span class="caps"&gt;RHEL&lt;/span&gt;/CentOS, but it
+pulls packages from
+&lt;a href="http://patches.fedorapeople.org/oldnode/stable/"&gt;http://patches.fedorapeople.org/oldnode/stable/&lt;/a&gt;,
+and the newest version of nodejs there is 0.6.18, which is quite old. I
+can&amp;#8217;t find any actively maintained sources of newer nodejs packages for
+&lt;span class="caps"&gt;RHEL&lt;/span&gt;/CentOS (yeah, I know, that&amp;#8217;s one down side to the
+distributions&amp;#8230;). However, I did find that nodejs 0.9.5 is being &lt;a href="http://koji.fedoraproject.org/koji/packageinfo?packageID=15154"&gt;built
+for Fedora 18/19 in the Fedora build
+system&lt;/a&gt;,
+is already in the Fedora 18 Testing and Fedora Rawhide repos, but is
+failing its &lt;span class="caps"&gt;EL6&lt;/span&gt; builds in their system. The decision I&amp;#8217;ve come to is to
+use the puppetlabs-nodejs module to install it, but try and rebuild the
+Fedora 18 RPMs under CentOS 5 and&amp;nbsp;6.&lt;/p&gt;
+&lt;p&gt;So that&amp;#8217;s the background. Now, my current task: to search for an &lt;span class="caps"&gt;RPM&lt;/span&gt;
+build system for my current job. My core requirements, in no specific
+order,&amp;nbsp;are:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Be relatively easy and quick to use for people who have a specfile
+    or &lt;span class="caps"&gt;SRPM&lt;/span&gt; and want to be able to &amp;#8220;ensure =&gt; present&amp;#8221; the finished &lt;span class="caps"&gt;RPM&lt;/span&gt;
+    on a system. i.e., require as little per-package configuration as&amp;nbsp;possible.&lt;/li&gt;
+&lt;li&gt;Be able to handle rebuilding &amp;#8220;all&amp;#8221; of our RPMs when we roll out a
+    new distro version. Doesn&amp;#8217;t necessarily need to be automatic, but
+    should be relatively&amp;nbsp;simple.&lt;/li&gt;
+&lt;li&gt;Ideally, not need to be running constantly - i.e. something that
+    will cope well with build hosts being VMs that are shut down when
+    they&amp;#8217;re not&amp;nbsp;needed.&lt;/li&gt;
+&lt;li&gt;Handle automatically putting successfully built packages into a
+    repository, ideally with some sort of (manual) promotion process
+    from staging to&amp;nbsp;stable.&lt;/li&gt;
+&lt;li&gt;Have minimal external (infrastructure) dependencies that we can&amp;#8217;t
+    satisfy with existing&amp;nbsp;systems.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;So, the first step was to research existing &lt;span class="caps"&gt;RPM&lt;/span&gt; build systems and how
+others do this. Here&amp;#8217;s a list of what I could find online, though most
+of these are from distributions and software vendors/projects, not
+end-user companies that are only building for internal&amp;nbsp;use.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href="https://fedorahosted.org/koji/wiki"&gt;Koji&lt;/a&gt; is the build system used
+    by &lt;a href="http://fedoraproject.org/wiki/Koji"&gt;Fedora&lt;/a&gt; and RedHat. It&amp;#8217;s
+    about as full-featured as any can be, and I&amp;#8217;m familiar with it from
+    my time at &lt;a href="http://koji.rutgers.edu/koji/"&gt;Rutgers University&lt;/a&gt;, as
+    it&amp;#8217;s used to maintain their CentOS/&lt;span class="caps"&gt;RHEL&lt;/span&gt; packages. It&amp;#8217;s based largely
+    on Mock. However, &lt;a href="http://fedoraproject.org/wiki/Koji/ServerHowTo"&gt;setting up the build
+    server&lt;/a&gt; is no
+    trivial task; there are few installations outside of Fedora/RedHat,
+    and it relies on either Kerberos or an &lt;span class="caps"&gt;SSL&lt;/span&gt; &lt;span class="caps"&gt;CA&lt;/span&gt; infrastructure to
+    authenticate machines and clients. So, it&amp;#8217;s designed for too large a
+    scale and too much infrastructure for&amp;nbsp;me.&lt;/li&gt;
+&lt;li&gt;&lt;span class="caps"&gt;PLD&lt;/span&gt; Linux has a &lt;a href="https://www.pld-linux.org/developingpld/builderscript"&gt;builder
+    script&lt;/a&gt; that
+    seems to automate &lt;code&gt;rpmbuild&lt;/code&gt; as well as fetching sources and
+    resolving/building dependencies. I haven&amp;#8217;t looked at the script yet,
+    but apparently it&amp;#8217;s in &lt;span class="caps"&gt;PLD&lt;/span&gt;&amp;#8217;s &amp;#8220;rpm-build-tools&amp;#8221;&amp;nbsp;package.&lt;/li&gt;
+&lt;li&gt;&lt;span class="caps"&gt;PLD&lt;/span&gt; Linux also has a &lt;span class="caps"&gt;CVS&lt;/span&gt; repository for something called
+    &lt;a href="http://cvs.pld-linux.org/cgi-bin/cvsweb/pld-builder.new"&gt;pld-builder.new&lt;/a&gt;.
+    The
+    &lt;a href="http://cvs.pld-linux.org/cgi-bin/cvsweb/pld-builder.new/doc/README?rev=1.5"&gt;&lt;span class="caps"&gt;README&lt;/span&gt;&lt;/a&gt;
+    and
+    &lt;a href="http://cvs.pld-linux.org/cgi-bin/cvsweb/pld-builder.new/doc/ARCHITECTURE?rev=1.6"&gt;&lt;span class="caps"&gt;ARCHITECTURE&lt;/span&gt;&lt;/a&gt;
+    files make it sound like a relatively simple mainly-Python system
+    that builds &lt;span class="caps"&gt;SRPMS&lt;/span&gt; and binary packages when requested, and most
+    importantly, seems like a simple system that uses little more than
+    shared filesystem access for communication and&amp;nbsp;coordination.&lt;/li&gt;
+&lt;li&gt;&lt;span class="caps"&gt;ALT&lt;/span&gt; Linux has &lt;a href="http://en.altlinux.org/Sisyphus"&gt;Sisyphus&lt;/a&gt;, which
+    combines repository management and web interface tools, package
+    building and testing tools, and&amp;nbsp;more.&lt;/li&gt;
+&lt;li&gt;The Dries &lt;span class="caps"&gt;RPM&lt;/span&gt; repository uses (or at least used&amp;#8230; my reference is
+    quite old) &lt;a href="http://dries.ulyssis.org/rpm/pydar2/index.html"&gt;pydar2&lt;/a&gt;,
+    &amp;#8220;a distributed client/server program which allows you to build
+    multiple spec files on multiple distribution/architecture
+    combinations automatically.&amp;#8221; That sounds like it could be what I
+    need, but the last update says that it isn&amp;#8217;t finished yet, and that
+    was in &lt;strong&gt;2005&lt;/strong&gt;.&lt;/li&gt;
+&lt;li&gt;Mandriva Linux has pretty extensive information on their build
+    system &lt;a href="http://wiki.mandriva.com/en/Category:Build_System"&gt;on their
+    wiki&lt;/a&gt; and a
+    &lt;a href="http://wiki.mandriva.com/en/Development/Packaging/BuildSystem/Theory"&gt;build system theory
+    page&lt;/a&gt;,
+    but it seems to be largely a hodgepodge of shell scripts and
+    cronjobs, and is likely not a candidate for use by anyone other than
+    its&amp;nbsp;designers.&lt;/li&gt;
+&lt;li&gt;Argeo provides the &lt;a href="https://www.argeo.org/wiki/SLC"&gt;&lt;span class="caps"&gt;SLC&lt;/span&gt; framework&lt;/a&gt;
+    which has a &amp;#8220;&lt;span class="caps"&gt;RPM&lt;/span&gt; Factory&amp;#8221; component, but I can&amp;#8217;t seem to find much
+    more than a wiki page, and can&amp;#8217;t tell if it&amp;#8217;s a build automation
+    system or just handles mocking packages and putting them in a repo
+    on a single&amp;nbsp;host.&lt;/li&gt;
+&lt;li&gt;Dag Wieers&amp;#8217; repositories use (or used) a set of python scripts
+    called &lt;a href="http://dag.wieers.com/home-made/dar/"&gt;&lt;span class="caps"&gt;DAR&lt;/span&gt;, &amp;#8220;Dynamic Apt Repository
+    builder&amp;#8221;&lt;/a&gt;. They&amp;#8217;re on
+    &lt;a href="https://github.com/dagwieers/dar"&gt;github&lt;/a&gt; but are listed as &amp;#8220;old&amp;#8221;
+    and haven&amp;#8217;t been updated in at least 2 years. The features sound
+    quite interesting, and though it&amp;#8217;s based on the Apt repo format, it
+    might provide some good ideas for implementing a similar&amp;nbsp;system.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;Update four months later:&lt;/strong&gt; I&amp;#8217;ve yet to find a build system that meets
+my requirements above. For the moment I&amp;#8217;m only managing \~20 packages,
+so my &amp;#8220;build system&amp;#8221; is a single shell script that reads in some
+environment variables and runs through using
+&lt;a href="http://fedoraproject.org/wiki/Projects/Mock"&gt;mock&lt;/a&gt; to build them in the
+correct order (including pushing the finished RPMs back into the local
+repository that mock reads from) and then pushing the finished packages
+to our internal repository. Maybe when I have some spare time, I&amp;#8217;ll
+consider a project to either make a slightly better (but simple) &lt;span class="caps"&gt;RPM&lt;/span&gt;
+build system based on Python, or get our
+&lt;a href="http://jenkins-ci.org/"&gt;Jenkins&lt;/a&gt; install to handle this for&amp;nbsp;me.&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Mon, 13 May 2013 05:00:00 -0400</pubDate><guid>tag:newblog.jasonantman.com,2013-05-13:2013/05/search-for-a-small-scale-but-automated-rpm-build-system/</guid><category>build</category><category>linux</category><category>nodejs</category><category>package</category><category>packaging</category><category>repository</category><category>rpm</category><category>rpmbuild</category><category>software</category><category>sysadmin</category><category>yum</category></item><item><title>RPM Spec Files for nodejs 0.9.5 and v8 on CentOS 6</title><link>http://newblog.jasonantman.com/2013/01/rpm-spec-files-for-nodejs-0-9-5-and-v8-on-centos-5/</link><description>&lt;p&gt;The latest version of nodejs that I could find as an &lt;span class="caps"&gt;RPM&lt;/span&gt; for CentOS was
+0.6.16, from
+&lt;a href="http://patches.fedorapeople.org/oldnode/stable/"&gt;http://patches.fedorapeople.org/oldnode/stable/&lt;/a&gt;.
+That&amp;#8217;s the one that puppetlabs currently uses in their
+&lt;a href="https://github.com/puppetlabs/puppetlabs-nodejs"&gt;puppetlabs-nodejs&lt;/a&gt;
+module. There is, however, a nodejs 0.9.5 &lt;span class="caps"&gt;RPM&lt;/span&gt; in the Fedora Rawhide (19)
+repository. Below are some patches to that specfile, and the specfile
+for its v8 dependency, to get them to build on CentOS 6. You can also
+find the full specfiles on my &lt;a href="https://github.com/jantman/specfiles"&gt;github specfile
+repository&lt;/a&gt;. I had originally
+wanted to get them built on CentOS 5 as well, but after following the
+dependency tree from nodejs to http-parser to gyp, and then finding
+issues in the gyp source that are incompatible with CentOS 5&amp;#8217;s python
+2.4, I gave up on that&amp;nbsp;target.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;nodejs.spec&lt;/strong&gt;, diff from Fedora Rawhide nodejs-0.9.5-9.fc18.src.rpm,
+buildID=377755 (&lt;a href="https://raw.github.com/jantman/specfiles/master/nodejs.spec"&gt;full
+specfile&lt;/a&gt;)&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="gh"&gt;diff --git a/nodejs.spec b/nodejs.spec&lt;/span&gt;
+&lt;span class="gh"&gt;index 050ed86..86c0f4b 100644&lt;/span&gt;
+&lt;span class="gd"&gt;--- a/nodejs.spec&lt;/span&gt;
+&lt;span class="gi"&gt;+++ b/nodejs.spec&lt;/span&gt;
+&lt;span class="gu"&gt;@@ -1,6 +1,6 @@&lt;/span&gt;
+ Name: nodejs
+ Version: 0.9.5
+&lt;span class="gd"&gt;-Release: 9%{?dist}&lt;/span&gt;
+&lt;span class="gi"&gt;+Release: 10%{?dist}&lt;/span&gt;
+ Summary: JavaScript runtime
+ License: &lt;span class="caps"&gt;MIT&lt;/span&gt; and &lt;span class="caps"&gt;ASL&lt;/span&gt; 2.0 and &lt;span class="caps"&gt;ISC&lt;/span&gt; and &lt;span class="caps"&gt;BSD&lt;/span&gt;
+ Group: Development/Languages
+&lt;span class="gu"&gt;@@ -25,7 +25,7 @@ Source6: nodejs-fixdep&lt;/span&gt;
+ BuildRequires: v8-devel &amp;gt;= %{v8_ge}
+ BuildRequires: http-parser-devel &amp;gt;= 2.0
+ BuildRequires: libuv-devel
+&lt;span class="gd"&gt;-BuildRequires: c-ares-devel&lt;/span&gt;
+&lt;span class="gi"&gt;+BuildRequires: c-ares-devel &amp;gt;= 1.9.0&lt;/span&gt;
+ BuildRequires: zlib-devel
+ # Node.js requires some features from openssl 1.0.1 for &lt;span class="caps"&gt;SPDY&lt;/span&gt; support
+ BuildRequires: openssl-devel &amp;gt;= 1:1.0.1
+&lt;span class="gu"&gt;@@ -165,9 +165,13 @@ cp -p common.gypi %{buildroot}%{_datadir}/node&lt;/span&gt;
+
+ %files docs
+ %{_defaultdocdir}/%{name}-docs-%{version}
+&lt;span class="gd"&gt;-%doc &lt;span class="caps"&gt;LICENSE&lt;/span&gt;&lt;/span&gt;
+
+ %changelog
+&lt;span class="gi"&gt;+* Thu Jan 31 2013 Jason Antman  - 0.9.5-10&lt;/span&gt;
+&lt;span class="gi"&gt;+- specify build requirement of c-ares-devel &amp;gt;= 1.9.0&lt;/span&gt;
+&lt;span class="gi"&gt;+- specify build requirement of libuv-devel 0.9.4&lt;/span&gt;
+&lt;span class="gi"&gt;+- remove duplicate %doc &lt;span class="caps"&gt;LICENSE&lt;/span&gt; that was causing cpio &amp;#39;Bad magic&amp;#39; error on CentOS6&lt;/span&gt;
+&lt;span class="gi"&gt;+&lt;/span&gt;
+ * Sat Jan 12 2013 &lt;span class="caps"&gt;T.C.&lt;/span&gt; Hollingsworth  - 0.9.5-9
+ - fix brown paper bag bug in requires generation script
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;&lt;strong&gt;v8.spec&lt;/strong&gt;, diff from Fedora Rawhide 3.13.7.5-2 (&lt;a href="https://raw.github.com/jantman/specfiles/master/v8.spec"&gt;full
+specfile&lt;/a&gt;)&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="gd"&gt;--- v8.spec.orig       2013-01-26 16:03:18.000000000 -0500&lt;/span&gt;
+&lt;span class="gi"&gt;+++ v8.spec     2013-01-31 09:04:51.068029459 -0500&lt;/span&gt;
+&lt;span class="gu"&gt;@@ -21,9 +21,11 @@&lt;/span&gt;
+
+ # %%global svnver 20110721svn8716
+
+&lt;span class="gi"&gt;+%{!?python_sitelib: %define python_sitelib %(%{__python} -c &amp;quot;import distutils.sysconfig as d; print d.get_python_lib()&amp;quot;)}&lt;/span&gt;
+&lt;span class="gi"&gt;+&lt;/span&gt;
+ Name:          v8
+ Version:       %{somajor}.%{sominor}.%{sobuild}.%{sotiny}
+&lt;span class="gd"&gt;-Release:       2%{?dist}&lt;/span&gt;
+&lt;span class="gi"&gt;+Release:       5%{?dist}&lt;/span&gt;
+ Epoch:         1
+ Summary:       JavaScript Engine
+ Group:         System Environment/Libraries
+&lt;span class="gu"&gt;@@ -32,7 +34,7 @@&lt;/span&gt;
+ Source0:       http://commondatastorage.googleapis.com/chromium-browser-official/v8-%{version}.tar.bz2
+ BuildRoot:     %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
+ ExclusiveArch: %{ix86} x86_64 %{arm}
+&lt;span class="gd"&gt;-BuildRequires: scons, readline-devel, libicu-devel&lt;/span&gt;
+&lt;span class="gi"&gt;+BuildRequires: scons, readline-devel, libicu-devel, ncurses-devel&lt;/span&gt;
+
+ %description
+ V8 is Google&amp;#39;s open source JavaScript engine. V8 is written in C++ and is used 
+&lt;span class="gu"&gt;@@ -51,8 +53,13 @@&lt;/span&gt;
+ %setup -q -n %{name}-%{version}
+
+ # -fno-strict-aliasing is needed with gcc 4.4 to get past some ugly code
+&lt;span class="gd"&gt;-PARSED_OPT_FLAGS=`echo \&amp;#39;$RPM_OPT_FLAGS -fPIC -fno-strict-aliasing -Wno-unused-parameter -Wno-error=strict-overflow -Wno-error=unused-local-typedefs -Wno-unused-but-set-variable\&amp;#39;| sed &amp;quot;s/ /&amp;#39;,/g&amp;quot; | sed &amp;quot;s/&amp;#39;,/&amp;#39;, &amp;#39;/g&amp;quot;`&lt;/span&gt;
+&lt;span class="gi"&gt;+%if 0%{?el5}&lt;/span&gt;
+&lt;span class="gi"&gt;+PARSED_OPT_FLAGS=`echo \&amp;#39;$RPM_OPT_FLAGS -fPIC -fno-strict-aliasing -Wno-unused-parameter -lncurses\&amp;#39;| sed &amp;quot;s/ /&amp;#39;,/g&amp;quot; | sed &amp;quot;s/&amp;#39;,/&amp;#39;, &amp;#39;/g&amp;quot;`&lt;/span&gt;
+&lt;span class="gi"&gt;+sed -i &amp;quot;s|&amp;#39;-O3&amp;#39;,|$PARSED_OPT_FLAGS,|g&amp;quot; SConstruct&lt;/span&gt;
+&lt;span class="gi"&gt;+%else&lt;/span&gt;
+&lt;span class="gi"&gt;+PARSED_OPT_FLAGS=`echo \&amp;#39;$RPM_OPT_FLAGS -fPIC -fno-strict-aliasing -Wno-unused-parameter -Wno-error=strict-overflow -Wno-unused-but-set-variable\&amp;#39;| sed &amp;quot;s/ /&amp;#39;,/g&amp;quot; | sed &amp;quot;s/&amp;#39;,/&amp;#39;, &amp;#39;/g&amp;quot;`&lt;/span&gt;
+ sed -i &amp;quot;s|&amp;#39;-O3&amp;#39;,|$PARSED_OPT_FLAGS,|g&amp;quot; SConstruct
+&lt;span class="gi"&gt;+%endif&lt;/span&gt;
+
+ # clear spurious executable bits
+ find . \( -name \*.cc -o -name \*.h -o -name \*.py \) -a -executable   
+&lt;span class="gu"&gt;@@ -198,6 +205,17 @@&lt;/span&gt;
+ %{python_sitelib}/j*.py*
+
+ %changelog
+&lt;span class="gi"&gt;+* Thu Jan 31 2013 Jason Antman  - 1:3.13.7.5-5&lt;/span&gt;
+&lt;span class="gi"&gt;+- remove -Werror=unused-local-typedefs on cent6&lt;/span&gt;
+&lt;span class="gi"&gt;+&lt;/span&gt;
+&lt;span class="gi"&gt;+* Wed Jan 30 2013 Jason Antman  - 1:3.13.7.5-4&lt;/span&gt;
+&lt;span class="gi"&gt;+- define python_sitelib if it isn&amp;#39;t already (CentOS 5)&lt;/span&gt;
+&lt;span class="gi"&gt;+&lt;/span&gt;
+&lt;span class="gi"&gt;+* Wed Jan 30 2013 Jason Antman  - 1:3.13.7.5-3&lt;/span&gt;
+&lt;span class="gi"&gt;+- pull 3.13.7.5-2 &lt;span class="caps"&gt;SRPM&lt;/span&gt; from Fedora 19 Koji most recent build&lt;/span&gt;
+&lt;span class="gi"&gt;+- add ncurses-devel BuildRequires&lt;/span&gt;
+&lt;span class="gi"&gt;+- modify PARSED_OPT_FLAGS to work with g++ 4.1.2 on CentOS 5&lt;/span&gt;
+&lt;span class="gi"&gt;+ &lt;/span&gt;
+ * Sat Jan 26 2013 &lt;span class="caps"&gt;T.C.&lt;/span&gt; Hollingsworth  - 1:3.13.7.5-2
+ - rebuild for icu-50
+ - ignore new &lt;span class="caps"&gt;GCC&lt;/span&gt; 4.8 warning
+&lt;/pre&gt;&lt;/div&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Thu, 31 Jan 2013 14:13:00 -0500</pubDate><guid>tag:newblog.jasonantman.com,2013-01-31:2013/01/rpm-spec-files-for-nodejs-0-9-5-and-v8-on-centos-5/</guid><category>build</category><category>centos</category><category>node</category><category>nodejs</category><category>package</category><category>packaging</category><category>redhat</category><category>RHEL</category><category>rpm</category><category>specfile</category></item></channel></rss>

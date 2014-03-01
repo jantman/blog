@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Jason Antman's Blog</title><link>http://newblog.jasonantman.com/</link><description></description><atom:link href="http://newblog.jasonantman.com/feeds/tags/api.rss.xml" rel="self"></atom:link><lastBuildDate>Fri, 20 Jan 2012 22:49:00 -0500</lastBuildDate><item><title>PHP Script to Query Linode DNS Manager API</title><link>http://newblog.jasonantman.com/2012/01/php-script-to-query-linode-dns-manager-api/</link><description>&lt;p&gt;I&amp;#8217;m in the process of moving all of my public-facing services, currently
+hosted on a single
+&lt;a href="http://www.linode.com/?r=5c8ad2931b410b55455aadbcf0a8d86d6f698a91"&gt;Linode&lt;/a&gt;,
+to a new virtual machine (still with Linode, of course, just a new
+CentOS 6 &lt;span class="caps"&gt;VM&lt;/span&gt;). Of course, I&amp;#8217;ve got a &lt;em&gt;lot&lt;/em&gt; (about 60) of &lt;span class="caps"&gt;DNS&lt;/span&gt; records,
+spread across 8 domains, that point at the old machine. For name-based
+vhosts in Apache, my usual procedure is to migrate everything over to
+the new host and then change &lt;span class="caps"&gt;DNS&lt;/span&gt;, and once the change propagates (I&amp;#8217;m
+using Linode&amp;#8217;s &lt;span class="caps"&gt;DNS&lt;/span&gt; hosting, so it makes things a &lt;span class="caps"&gt;LOT&lt;/span&gt; easier but I don&amp;#8217;t
+have &lt;code&gt;rndc reload&lt;/code&gt; anymore) I test in a browser and, assuming all is
+well, disable the vhost on the old server. To do all this, I need an
+easy way to get a list of all the &lt;span class="caps"&gt;DNS&lt;/span&gt; records that still point to the
+old&amp;nbsp;machine.&lt;/p&gt;
+&lt;p&gt;Luckily, to augment their web-based control panel (Linode Manager),
+Linode has a pretty full-featured &lt;a href="http://www.linode.com/api/"&gt;&lt;span class="caps"&gt;API&lt;/span&gt;&lt;/a&gt; with
+bindings for Python, Perl, &lt;span class="caps"&gt;PHP&lt;/span&gt;, Ruby, Java and others. While I like
+Python and I&amp;#8217;m starting to learn Perl (by trying to shift most of my
+non-time-sensitive scripting to it) for my new job, &lt;span class="caps"&gt;PHP&lt;/span&gt; is still my
+strongest language (and the majority of my existing administrative
+scripting is written in it, especially handy when it comes time to add a
+web front-end to things). So I wrote the following script to query
+Linode&amp;#8217;s &lt;a href="http://www.linode.com/api/dns"&gt;&lt;span class="caps"&gt;DNS&lt;/span&gt; Manager &lt;span class="caps"&gt;API&lt;/span&gt;&lt;/a&gt; using &lt;a href="https://github.com/krmdrms/linode/"&gt;Kerem
+Durmus&amp;#8217; Linode &lt;span class="caps"&gt;API&lt;/span&gt; &lt;span class="caps"&gt;PHP&lt;/span&gt; wrapper&lt;/a&gt;
+(installation instructions and info at that Github link). The script
+simply writes all Linode &lt;span class="caps"&gt;DNS&lt;/span&gt; records for all zones to a &lt;span class="caps"&gt;CSV&lt;/span&gt; file (this
+could take a while if you have a lot of&amp;nbsp;records&amp;#8230;).&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="x"&gt;   *&lt;/span&gt;
+&lt;span class="x"&gt;   * &lt;span class="caps"&gt;INSTALLATION&lt;/span&gt; (as per krmdrms &lt;span class="caps"&gt;README&lt;/span&gt;):&lt;/span&gt;
+&lt;span class="x"&gt;   *  pear install Net_URL2-0.3.1&lt;/span&gt;
+&lt;span class="x"&gt;   *  pear install HTTP_Request2-0.5.2&lt;/span&gt;
+&lt;span class="x"&gt;   *  pear channel-discover pear.keremdurmus.com&lt;/span&gt;
+&lt;span class="x"&gt;   *  pear install krmdrms/Services_Linode&lt;/span&gt;
+&lt;span class="x"&gt;   *&lt;/span&gt;
+&lt;span class="x"&gt;   * Also requires php-openssl / php5-openssl&lt;/span&gt;
+&lt;span class="x"&gt;   *&lt;/span&gt;
+&lt;span class="x"&gt;   * &lt;span class="caps"&gt;USAGE&lt;/span&gt;: php linodeDnsToCsv.php&lt;/span&gt;
+&lt;span class="x"&gt;   *&lt;/span&gt;
+&lt;span class="x"&gt;   * Copyright 2011 Jason Antman  , all rights reserved.&lt;/span&gt;
+&lt;span class="x"&gt;   * This script is free for use by anyone anywhere, provided that you comply with the following terms:&lt;/span&gt;
+&lt;span class="x"&gt;   * 1) Keep this notice and copyright statement intact.&lt;/span&gt;
+&lt;span class="x"&gt;   * 2) Send any substantial changes, improvements or bog fixes back to me at the above address.&lt;/span&gt;
+&lt;span class="x"&gt;   * 3) If you include this in a product or redistribute it, you notify me, and include my name in the credits or changelog.&lt;/span&gt;
+&lt;span class="x"&gt;   *&lt;/span&gt;
+&lt;span class="x"&gt;   * The following &lt;span class="caps"&gt;URL&lt;/span&gt; always points to the newest version of this script. If you obtained it from another source, you should&lt;/span&gt;
+&lt;span class="x"&gt;   * check here:&lt;/span&gt;
+&lt;span class="x"&gt;   * $HeadURL: http://svn.jasonantman.com/misc-scripts/linodeDnsToCsv.php $&lt;/span&gt;
+&lt;span class="x"&gt;   * $LastChangedRevision: 25 $&lt;/span&gt;
+&lt;span class="x"&gt;   *&lt;/span&gt;
+&lt;span class="x"&gt;   * &lt;span class="caps"&gt;CHANGELOG&lt;/span&gt;:&lt;/span&gt;
+&lt;span class="x"&gt;   * 2011-12-17 Jason Antman :&lt;/span&gt;
+&lt;span class="x"&gt;   *    merged into my svn repo&lt;/span&gt;
+&lt;span class="x"&gt;   * 2011-09-12 Jason Antman :&lt;/span&gt;
+&lt;span class="x"&gt;   *    initial version of script&lt;/span&gt;
+&lt;span class="x"&gt;   *&lt;/span&gt;
+&lt;span class="x"&gt;   */&lt;/span&gt;
+
+&lt;span class="x"&gt;require_once(&amp;quot;/var/www/linode_apikey.php&amp;quot;); // &lt;span class="caps"&gt;PHP&lt;/span&gt; file containing:   define(&amp;quot;API_KEY_LINODE&amp;quot;, &amp;quot;myApiKeyHere&amp;quot;);&lt;/span&gt;
+&lt;span class="x"&gt;require_once(&amp;#39;Services/Linode.php&amp;#39;);&lt;/span&gt;
+
+&lt;span class="x"&gt;// get list of all domains&lt;/span&gt;
+&lt;span class="x"&gt;$domains = array(); // &lt;span class="caps"&gt;DOMAINID&lt;/span&gt; =&amp;gt; domain.tld&lt;/span&gt;
+&lt;span class="x"&gt;try {&lt;/span&gt;
+&lt;span class="x"&gt;  $linode = new Services_Linode(API_KEY_LINODE);&lt;/span&gt;
+&lt;span class="x"&gt;  $result = $linode-&amp;gt;domain_list();&lt;/span&gt;
+
+&lt;span class="x"&gt;  foreach($result[&amp;#39;&lt;span class="caps"&gt;DATA&lt;/span&gt;&amp;#39;] as $domain)&lt;/span&gt;
+&lt;span class="x"&gt;    {&lt;/span&gt;
+&lt;span class="x"&gt;      $domains[$domain[&amp;#39;&lt;span class="caps"&gt;DOMAINID&lt;/span&gt;&amp;#39;]] = $domain[&amp;quot;&lt;span class="caps"&gt;DOMAIN&lt;/span&gt;&amp;quot;];&lt;/span&gt;
+&lt;span class="x"&gt;    }&lt;/span&gt;
+&lt;span class="x"&gt;}&lt;/span&gt;
+&lt;span class="x"&gt;catch (Services_Linode_Exception $e)&lt;/span&gt;
+&lt;span class="x"&gt;{&lt;/span&gt;
+&lt;span class="x"&gt;  echo $e-&amp;gt;getMessage();&lt;/span&gt;
+&lt;span class="x"&gt;}&lt;/span&gt;
+
+&lt;span class="x"&gt;$records = array(); // array of resource records&lt;/span&gt;
+&lt;span class="x"&gt;$linode-&amp;gt;batching = true;&lt;/span&gt;
+&lt;span class="x"&gt;foreach($domains as $id =&amp;gt; $name)&lt;/span&gt;
+&lt;span class="x"&gt;{&lt;/span&gt;
+&lt;span class="x"&gt;  $linode-&amp;gt;domain_resource_list(array(&amp;#39;DomainID&amp;#39; =&amp;gt; $id));&lt;/span&gt;
+&lt;span class="x"&gt;}&lt;/span&gt;
+
+&lt;span class="x"&gt;try {&lt;/span&gt;
+&lt;span class="x"&gt;  $result = $linode-&amp;gt;batchFlush();&lt;/span&gt;
+
+&lt;span class="x"&gt;  foreach($result as $batchPart)&lt;/span&gt;
+&lt;span class="x"&gt;    {&lt;/span&gt;
+&lt;span class="x"&gt;      foreach($batchPart[&amp;#39;&lt;span class="caps"&gt;DATA&lt;/span&gt;&amp;#39;] as $rrec)&lt;/span&gt;
+&lt;span class="x"&gt;    {&lt;/span&gt;
+&lt;span class="x"&gt;      if(! isset($records[$rrec[&amp;#39;&lt;span class="caps"&gt;DOMAINID&lt;/span&gt;&amp;#39;]])){ $records[$rrec[&amp;#39;&lt;span class="caps"&gt;DOMAINID&lt;/span&gt;&amp;#39;]] = array();}&lt;/span&gt;
+&lt;span class="x"&gt;      $records[$rrec[&amp;#39;&lt;span class="caps"&gt;DOMAINID&lt;/span&gt;&amp;#39;]][$rrec[&amp;#39;&lt;span class="caps"&gt;RESOURCEID&lt;/span&gt;&amp;#39;]] = array(&amp;#39;name&amp;#39; =&amp;gt; $rrec[&amp;#39;&lt;span class="caps"&gt;NAME&lt;/span&gt;&amp;#39;], &amp;#39;type&amp;#39; =&amp;gt; $rrec[&amp;#39;&lt;span class="caps"&gt;TYPE&lt;/span&gt;&amp;#39;], &amp;#39;target&amp;#39; =&amp;gt; $rrec[&amp;#39;&lt;span class="caps"&gt;TARGET&lt;/span&gt;&amp;#39;]);&lt;/span&gt;
+&lt;span class="x"&gt;    }&lt;/span&gt;
+&lt;span class="x"&gt;    }&lt;/span&gt;
+&lt;span class="x"&gt;}&lt;/span&gt;
+&lt;span class="x"&gt;catch (Services_Linode_Exception $e)&lt;/span&gt;
+&lt;span class="x"&gt;{&lt;/span&gt;
+&lt;span class="x"&gt;  echo $e-&amp;gt;getMessage();&lt;/span&gt;
+&lt;span class="x"&gt;}&lt;/span&gt;
+
+&lt;span class="x"&gt;echo &amp;#39;&amp;quot;recid&amp;quot;,&amp;quot;domain&amp;quot;,&amp;quot;name&amp;quot;,&amp;quot;type&amp;quot;,&amp;quot;target&amp;quot;&amp;#39;.&amp;quot;\n&amp;quot;;&lt;/span&gt;
+&lt;span class="x"&gt;foreach($domains as $id =&amp;gt; $name)&lt;/span&gt;
+&lt;span class="x"&gt;{&lt;/span&gt;
+&lt;span class="x"&gt;  foreach($records[$id] as $recid =&amp;gt; $arr)&lt;/span&gt;
+&lt;span class="x"&gt;    {&lt;/span&gt;
+&lt;span class="x"&gt;      echo &amp;#39;&amp;quot;&amp;#39;.$recid.&amp;#39;&amp;quot;,&amp;quot;&amp;#39;.$name.&amp;#39;&amp;quot;,&amp;quot;&amp;#39;.$arr[&amp;#39;name&amp;#39;].&amp;#39;&amp;quot;,&amp;quot;&amp;#39;.$arr[&amp;#39;type&amp;#39;].&amp;#39;&amp;quot;,&amp;quot;&amp;#39;.$arr[&amp;#39;target&amp;#39;].&amp;quot;\&amp;quot;\n&amp;quot;;&lt;/span&gt;
+&lt;span class="x"&gt;    }&lt;/span&gt;
+&lt;span class="x"&gt;}&lt;/span&gt;
+
+
+&lt;span class="x"&gt;?&amp;gt;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;That will print out a list containing the Linode &lt;span class="caps"&gt;DNS&lt;/span&gt; record id (recid),
+domain, record name, type and&amp;nbsp;target:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&amp;quot;recid&amp;quot;,&amp;quot;domain&amp;quot;,&amp;quot;name&amp;quot;,&amp;quot;type&amp;quot;,&amp;quot;target&amp;quot;
+&amp;quot;137423&amp;quot;,&amp;quot;jasonantman.com&amp;quot;,&amp;quot;&amp;quot;,&amp;quot;TXT&amp;quot;,&amp;quot;v=spf1 mx:jasonantman.com -all&amp;quot;
+&amp;quot;3597859&amp;quot;,&amp;quot;jasonantman.com&amp;quot;,&amp;quot;&amp;quot;,&amp;quot;MX&amp;quot;,&amp;quot;linode1.jasonantman.com&amp;quot;
+&amp;quot;3488952&amp;quot;,&amp;quot;jasonantman.com&amp;quot;,&amp;quot;&amp;quot;,&amp;quot;mx&amp;quot;,&amp;quot;linode2.jasonantman.com&amp;quot;
+&amp;quot;3472952&amp;quot;,&amp;quot;jasonantman.com&amp;quot;,&amp;quot;blog&amp;quot;,&amp;quot;CNAME&amp;quot;,&amp;quot;linode1.jasonantman.com&amp;quot;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;If you want to, say, search for only records that include host
+&amp;#8220;example&amp;#8221;, you could use grep and awk&amp;nbsp;like:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;php linodeDnsToCsv.php | grep linode1 | grep -v &lt;span class="s1"&gt;&amp;#39;&amp;quot;linode1&amp;quot;,&amp;quot;a&amp;quot;&amp;#39;&lt;/span&gt; | awk -F , &lt;span class="s1"&gt;&amp;#39;{printf &amp;quot;%-27s %-20s %-7s %s\n&amp;quot;, $2, $3, $4, $5}&amp;#39;&lt;/span&gt; | sed &lt;span class="s1"&gt;&amp;#39;s/&amp;quot;//g&amp;#39;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;I hope this helps someone else out, and saves them a few minutes of&amp;nbsp;coding&amp;#8230;&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Fri, 20 Jan 2012 22:49:00 -0500</pubDate><guid>tag:newblog.jasonantman.com,2012-01-20:2012/01/php-script-to-query-linode-dns-manager-api/</guid><category>api</category><category>dns</category><category>linode</category><category>PHP</category><category>sysadmin</category></item></channel></rss>

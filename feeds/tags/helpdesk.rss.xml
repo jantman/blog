@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Jason Antman's Blog</title><link>http://newblog.jasonantman.com/</link><description></description><atom:link href="http://newblog.jasonantman.com/feeds/tags/helpdesk.rss.xml" rel="self"></atom:link><lastBuildDate>Tue, 23 Jun 2009 16:45:00 -0400</lastBuildDate><item><title>Netgear ReadyNAS 1100 and long UID numbers</title><link>http://newblog.jasonantman.com/2009/06/netgear-readynas-1100-and-long-uid-numbers/</link><description>&lt;p&gt;I spent part of the day installing a &lt;a href="http://www.netgear.com/Products/Storage/ReadyNAS1100.aspx"&gt;Netgear ReadyNAS
+1100&lt;/a&gt; for
+backup storage. It&amp;#8217;s a cute little 1U storage appliance with 4 &lt;span class="caps"&gt;SATA&lt;/span&gt; disk
+bays, two Gig copper ports and about every sort of hokey service you
+could possibly want in something that&amp;#8217;s billed as a small business
+storage server but running a sort-of-scaled-up home appliance &lt;span class="caps"&gt;OS&lt;/span&gt;. That
+being said, it comes at a wonderful price (we bought one empty and added
+4x 1.&lt;span class="caps"&gt;5TB&lt;/span&gt; disks) and runs&amp;nbsp;Linux.&lt;/p&gt;
+&lt;p&gt;I had a few minor issues with the installation (more along the lines of
+trying to do things that weren&amp;#8217;t clearly documented rather than problems
+with the unit). NetGear tech support (&amp;#8220;ProSupport Labs&amp;#8221;) was quite good
+once I got past the first level or two, and Mark H. who helped me with
+most of my issues was one of the best tech support people I&amp;#8217;ve ever
+spoken to. In fact, he probably ties with &lt;a href="/2007/03/managing-g1-proliant-servers-with-modern-linux/"&gt;Paulo from
+&lt;span class="caps"&gt;HP&lt;/span&gt;&lt;/a&gt;
+for the best tech support person I&amp;#8217;ve ever dealt&amp;nbsp;with.&lt;/p&gt;
+&lt;p&gt;Anyway, the only issue with the NetGear installation that we weren&amp;#8217;t
+able to resolve was the fact that the web configuration tool
+(&amp;#8220;Frontview&amp;#8221;) will only accept UIDs of a maximum of five characters.
+Here at Rutgers, we have a unified &lt;span class="caps"&gt;UID&lt;/span&gt; space, with numbers well in
+excess of 100,000. As a result, my plan of having &lt;span class="caps"&gt;NFS&lt;/span&gt; play well wasn&amp;#8217;t
+really going to work. Mark wasn&amp;#8217;t able to come up with a solution
+(obviously - it&amp;#8217;s something that, at best, can get fixed in the next
+version of the firmware) but he took copious notes, had me confirm them,
+and told me he&amp;#8217;d bring it up to the ReadyNAS engineering team when they
+meet Thursday, and will try and e-mail me back to follow up. He also
+spent quite some time on the phone with me, both of us researching what
+kernel the ReadyNAS 4.1.5 firmware runs (2.6.17.8, mostly vanilla Debian
+as per mark) and when long &lt;span class="caps"&gt;UID&lt;/span&gt; support was available (at least 2.4).
+Overall, I was very impressed that Mark knew quite a bit about Linux -
+even more than your average Linux desktop user - and quite a bit about
+the internals of the&amp;nbsp;ReadyNAS.&lt;/p&gt;
+&lt;p&gt;Just on a hunch, after my tech support call, I used the Frontview
+&amp;#8220;Config Backup&amp;#8221; tool&amp;#8217;s &amp;#8220;Users and Groups&amp;#8221; option to backup the user and
+group information. Sure enough, it was just a force-download of a Zip
+archive&amp;#8230; of the pertinent files. I was able to hand-hack /etc/passwd
+and re-upload it, and it seemed to work&amp;nbsp;fine.&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;The following is &lt;strong&gt;&lt;span class="caps"&gt;NOT&lt;/span&gt;&lt;/strong&gt; endorsed by Netgear in any way, shape or form.
+It&amp;#8217;s a hack that may or may not work. Do this at your own risk - I have
+no idea if some future (or past) firmware change might make bad things
+happen, or whether there are some features which don&amp;#8217;t jive with this.
+All I&amp;#8217;ve tested is &lt;span class="caps"&gt;HTTP&lt;/span&gt; logins, the fact that the web interface shows
+the &gt;2\^16 &lt;span class="caps"&gt;UID&lt;/span&gt; correctly, and&amp;nbsp;&lt;span class="caps"&gt;NFS&lt;/span&gt;.&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Procedure:&lt;/strong&gt;&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Create desired user in Frontview tool, leaving &lt;span class="caps"&gt;UID&lt;/span&gt; field blank. (In
+    my case, the user is assigned the next sequential &lt;span class="caps"&gt;UID&lt;/span&gt;,&amp;nbsp;1002).&lt;/li&gt;
+&lt;li&gt;Frontview &amp;#8220;System&amp;#8221; -&gt; &amp;#8220;Config Backup&amp;#8221;, &amp;#8220;Backup&amp;#8221; tab, select only
+    &amp;#8220;Users and&amp;nbsp;Groups&amp;#8221;.&lt;/li&gt;
+&lt;li&gt;Download config files and&amp;nbsp;unzip.&lt;/li&gt;
+&lt;li&gt;Open &lt;code&gt;/etc/passwd&lt;/code&gt; from the config archive in a text editor, change the
+    automatically assigned &lt;span class="caps"&gt;UID&lt;/span&gt; (1002) to the desired &lt;span class="caps"&gt;UID&lt;/span&gt;&amp;nbsp;(101739).&lt;/li&gt;
+&lt;li&gt;Re-zip the directory tree and re-upload to&amp;nbsp;ReadyNAS.&lt;/li&gt;
+&lt;li&gt;Enjoy.&lt;/li&gt;
+&lt;/ol&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Tue, 23 Jun 2009 16:45:00 -0400</pubDate><guid>tag:newblog.jasonantman.com,2009-06-23:2009/06/netgear-readynas-1100-and-long-uid-numbers/</guid><category>debian</category><category>helpdesk</category><category>netgear</category><category>readynas</category></item></channel></rss>

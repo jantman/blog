@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Jason Antman's Blog</title><link href="http://newblog.jasonantman.com/" rel="alternate"></link><link href="http://newblog.jasonantman.com/feeds/tags/awk.atom.xml" rel="self"></link><id>http://newblog.jasonantman.com/</id><updated>2010-12-21T11:45:00-05:00</updated><entry><title>MySQL General Query Log and Awk Trimming Columns</title><link href="http://newblog.jasonantman.com/2010/12/mysql-general-query-log-and-awk-trimming-columns/" rel="alternate"></link><updated>2010-12-21T11:45:00-05:00</updated><author><name>admin</name></author><id>tag:newblog.jasonantman.com,2010-12-21:2010/12/mysql-general-query-log-and-awk-trimming-columns/</id><summary type="html">&lt;p&gt;So today I started to implement a number of complex regex-based rules
+and templates to get &lt;a href="http://www.rsyslog.com"&gt;rsyslog&lt;/a&gt; to parse &lt;span class="caps"&gt;ISC&lt;/span&gt;
+DHCPd logs in realtime. Unfortunately one of my templates must have been
+wrong, because I started seeing some errors about a field that cannot be
+blank in &lt;code&gt;/var/log/messages&lt;/code&gt;. Unfortunately, rsyslog doesn&amp;#8217;t log the
+query that raised the error, or the name of the template, or anything
+else useful - just that there was a database error. With over a dozen
+new templates, this didn&amp;#8217;t help much. But the following technique&amp;nbsp;did:&lt;/p&gt;
+&lt;p&gt;MySQLd has a &lt;a href="http://dev.mysql.com/doc/refman/5.1/en/query-log.html"&gt;General Query
+Log&lt;/a&gt; that can be
+activated by addling a line&amp;nbsp;like:  &lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;log=/tmp/query.log`
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;to &lt;code&gt;/etc/my.cnf&lt;/code&gt; under the &lt;code&gt;[mysqld]&lt;/code&gt; section. This will log *all*
+queries to the specified log file, even if they resulted in an error or
+did not manipulate&amp;nbsp;data.&lt;/p&gt;
+&lt;p&gt;I couldn&amp;#8217;t find documentation on the log file format, but I observed
+that each line appeared to begin with some whitespace, then a number
+(perhaps a connection or section number, or maybe some sort of query
+ordering number), then the word &amp;#8220;Query&amp;#8221;, then the query. The following
+awk expression prints everything from the third column on, dropping the
+first two columns (the number and&amp;nbsp;&amp;#8220;Query&amp;#8221;):  &lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;awk &lt;span class="s1"&gt;&amp;#39;{ for (i=2; i&amp;lt;=&lt;span class="caps"&gt;NF&lt;/span&gt;; i++) printf &amp;quot;%s &amp;quot;, $i; printf &amp;quot;\n&amp;quot;; }&amp;#39;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;For easy analysis, the output of that can be piped into &lt;code&gt;sort&lt;/code&gt; and then
+&lt;code&gt;uniq&lt;/code&gt;.&lt;/p&gt;</summary><category term="awk"></category><category term="database"></category><category term="logging"></category><category term="mysql"></category></entry></feed>

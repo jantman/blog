@@ -1,0 +1,334 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Jason Antman's Blog</title><link href="http://newblog.jasonantman.com/" rel="alternate"></link><link href="http://newblog.jasonantman.com/feeds/tags/solaris.atom.xml" rel="self"></link><id>http://newblog.jasonantman.com/</id><updated>2008-10-27T15:27:00-04:00</updated><entry><title>My biggest problem with Linux</title><link href="http://newblog.jasonantman.com/2008/10/my-biggest-problem-with-linux/" rel="alternate"></link><updated>2008-10-27T15:27:00-04:00</updated><author><name>admin</name></author><id>tag:newblog.jasonantman.com,2008-10-27:2008/10/my-biggest-problem-with-linux/</id><summary type="html">&lt;p&gt;For one of my wonderful classes, Internet Security, I&amp;#8217;m doing a
+presentation on &amp;#8220;patch management&amp;#8221;. While I&amp;#8217;m obligated to cover Windows
+- and, of course, will talk about MacOS - I&amp;#8217;ll obviously be spending a
+good deal of time on the Unix/Linux side of things. This has gotten me
+thinking about one of my biggest problems with Linux (and specifically
+&lt;a href="http://www.opensuse.org"&gt;OpenSuSE&lt;/a&gt;, my usual default distro. Patch
+management is utterly&amp;nbsp;awful.&lt;/p&gt;
+&lt;p&gt;Here&amp;#8217;s the problem: I have about a dozen machines under my control. I
+need to keep them all up-to-date. Currently, I manually do patches and
+upgrades via YaST or zypper. I thought about scripting this through
+zypper, but that doesn&amp;#8217;t make any sense - the packages on the machines
+are far from homogenous, so there&amp;#8217;s no clear way to make one script that
+updates them all. I considered using Puppet or CFengine or something of
+that sort, but that&amp;#8217;s too heavy-weight for me - for only a dozen
+machines, many of which are personal or development only, that&amp;#8217;s a lot
+to keep track of by hand, and a lot of work defining which patches
+should be applied, and which machines shouldn&amp;#8217;t be&amp;nbsp;changed.&lt;/p&gt;
+&lt;p&gt;My other peeve is distribution upgrades. About three of my machines are
+still running OpenSuSE 10.0 or 10.1, both of which are unsupported, and
+no longer even have downloads available. Why? Becuase I&amp;#8217;ve done major
+OpenSuSE upgrades before, broken a &lt;span class="caps"&gt;LOT&lt;/span&gt; of stuff, and I simply can&amp;#8217;t risk
+that on machines that can&amp;#8217;t stand extended downtime. This process
+*needs* to be made easier. Bottom line - it should be made no more
+difficult or unreliable than a kernel upgrade. &lt;span class="caps"&gt;IMHO&lt;/span&gt;, the biggest selling
+point for Solaris is its&amp;#8217; ability to do a total upgrade to a second
+partition, and switch-over at runtime. Why doesn&amp;#8217;t Linux (or SuSE) have
+this&amp;nbsp;yet?&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;What&amp;#8217;s my ideal solution?&lt;/em&gt; A curses application that uses text-file
+backends (curses so I can run it over &lt;span class="caps"&gt;SSH&lt;/span&gt; even if I have a slow link or
+high latency, like from a &lt;span class="caps"&gt;SSH&lt;/span&gt; session on my cell phone, if need be). The
+app would allow me to list all of the machines I want managed. It would
+connect to the machines over standard &lt;span class="caps"&gt;SSH&lt;/span&gt;, and would leave an extensive
+audit trail of what&amp;#8217;s done, both on the management console and on the
+machines (as well as running as a dedicated user). The application would
+maintain an inventory of all of the packages on every machine. It would
+check daily for new patches/updates to any of those packages, and e-mail
+me a daily summary of what&amp;#8217;s new, including all dependency changes, and
+which machines need the update. It would also allow me to define, on a
+per-machine (or per-group-of-machines) basis, rules for packages that
+must stay at their current version - i.e. I have a bunch of &lt;span class="caps"&gt;PHP4&lt;/span&gt; apps,
+so machine X needs to stay at &lt;span class="caps"&gt;PHP4&lt;/span&gt;. The e-mail summary would include any
+packages that aren&amp;#8217;t going to be updated for a specific machine because
+of dependency/version rules, as well as warnings about any new packages
+that have a dependency that has a rule set. I could then run the main
+curses app on my admin machine and, starting from &lt;span class="caps"&gt;NO&lt;/span&gt; selections, select
+which updates I want to apply and whether I want to ignore or create new
+rules to keep something at its current version, on a per-machine or
+per-group basis. This curses app would generate a file (&lt;span class="caps"&gt;XML&lt;/span&gt;?) of what to
+do (which would also be generated or edited by hand, easily). The &lt;span class="caps"&gt;XML&lt;/span&gt;
+file would then be fed into a script that downloads all of the needed
+packages to a central (local) mirror (or, optionally, for remote
+machines, has them download locally on the machine), checksums them, and
+then installs them (running commands over &lt;span class="caps"&gt;SSH&lt;/span&gt;) on all applicable
+machines. It would then keep a log of all changes, both on each machine
+changed (in a master changelog file) and on the central administrative
+machine. &lt;strong&gt;Most importantly&lt;/strong&gt;, the curses interface would have a simple,
+quick way to back out any specific update or group of updates for all
+machines, a group of machines, or one machine. All data needed to back
+out a change would be kept on each machine (say, cleaned up at the next
+update of that package and all of its&amp;#8217; dependencies) with
+machine-readable instructions kept in a central file, allowing local
+rollbacks - i.e. a machine goes down, I realize that it was because of
+an update to package X, and on the local machine I can check the
+changelog, see an entry like &amp;#8220;Package X updated 1.0.0 to 1.0.1 on
+yyyy-mm-dd, Change &lt;span class="caps"&gt;ID&lt;/span&gt; 1234&amp;#8221; and then, to rollback, simply issue a
+command like &amp;#8220;patchmgt rollback 1234&amp;#8221; on the effected&amp;nbsp;machine.&lt;/p&gt;
+&lt;p&gt;Just some ideas, and a little&amp;nbsp;rant.&lt;/p&gt;</summary><category term="linux"></category><category term="patch management"></category><category term="solaris"></category><category term="updates"></category><category term="upgrades"></category></entry><entry><title>Rutgers Student Linux Group and Sun</title><link href="http://newblog.jasonantman.com/2008/03/rutgers-student-linux-group-and-sun/" rel="alternate"></link><updated>2008-03-26T23:46:00-04:00</updated><author><name>admin</name></author><id>tag:newblog.jasonantman.com,2008-03-26:2008/03/rutgers-student-linux-group-and-sun/</id><summary type="html">&lt;p&gt;The next week will be quite busy. For one, I&amp;#8217;m going to attempt an
+&lt;a href="http://www.opensolaris.org/os/"&gt;OpenSolaris&lt;/a&gt; operating system
+installation on my &lt;a href="http://event.asus.com/eeepc/microsites/en/index.htm"&gt;Asus
+eeePC&lt;/a&gt;. Last I
+heard, there were some compatibility issues - though this was my first
+attempt at running the Solaris operating system on a laptop, and it took
+quite an effort to get my favorite mainstream Linux distro installed on
+the eeePC, though I&amp;#8217;ve been running that on laptops for 6+&amp;nbsp;years.&lt;/p&gt;
+&lt;p&gt;This Sunday, March 30&lt;sup&gt;th&lt;/sup&gt;, the &lt;a href="http://ruslug.rutgers.edu/w/"&gt;Rutgers University Student Linux Users&amp;#8217;
+Group&lt;/a&gt; (&lt;span class="caps"&gt;RUSLUG&lt;/span&gt;) will be hosting our annual
+Installfest in the &lt;a href="http://ruslug.rutgers.edu/w/EitDirections"&gt;&lt;span class="caps"&gt;EIT&lt;/span&gt; Lab&lt;/a&gt;
+from 10 &lt;span class="caps"&gt;AM&lt;/span&gt; until 6 &lt;span class="caps"&gt;PM&lt;/span&gt;. While the event is generally marketed towards
+Linux newbies, it&amp;#8217;s usually attended by a diverse range of students (and
+staff) from first-timers to Solaris sysadmins. I&amp;#8217;ll be attendance, as
+always, and will also be conducting some demos of new Sun technology
+(mainly OpenSolaris and NetBeans). For anyone in the New
+Brunswick/Pisctaway area, I&amp;#8217;ll also be armed with some door prizes and a
+whole plethora of CDs and DVDs. For anyone interested, I&amp;#8217;ll be providing
+information and pointers on NetBeans and Solaris, as well as
+installation assistance (and maybe some prizes) for anyone looking to
+give OpenSolaris a whirl on their&amp;nbsp;system.&lt;/p&gt;
+&lt;p&gt;Following up the Installfest, on Tuesday, April 1&lt;sup&gt;st&lt;/sup&gt; at 9 &lt;span class="caps"&gt;PM&lt;/span&gt; (also in
+the &lt;span class="caps"&gt;EIT&lt;/span&gt; lab) will be the &lt;span class="caps"&gt;RUSLUG&lt;/span&gt; Newbie Night. It&amp;#8217;s generally a
+fun-filled evening with &lt;a href="http://www.ubuntu.com/"&gt;Ubuntu&lt;/a&gt; LiveCDs and a
+general Q&amp;amp;A session about Linux. Generally this includes one-on-one
+assistance for new Linux users. In an effort to raise the level of
+content (and provide a diversion for more experienced users if there
+aren&amp;#8217;t many new faces), I&amp;#8217;ll be once again demo&amp;#8217;ing some Sun technology,
+and specifically providing an overview of my recently completed personal
+mailserver migration from SuSE Linux to OpenSolaris. Once again,
+visitors can expect some door prizes and lots of fun CDs to take&amp;nbsp;home.&lt;/p&gt;
+&lt;p&gt;In other &lt;span class="caps"&gt;RUSLUG&lt;/span&gt;&amp;nbsp;news:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;It looks like I&amp;#8217;ll be running to become an officer next year. Anyone
+    else at Rutgers can feel free to contact me with ideas,&amp;nbsp;etc.&lt;/li&gt;
+&lt;li&gt;&lt;span class="caps"&gt;RUSLUG&lt;/span&gt;&amp;#8217;s current box,
+    &lt;a href="http://ruslug.rutgers.edu/"&gt;ruslug.rutgers.edu&lt;/a&gt;, is a Dell desktop
+    thrown on a shelf in a closet. I&amp;#8217;d like to find someone willing to
+    help out with procuring a new box. It doesn&amp;#8217;t need to be anything
+    fancy - just pretty simple, though I&amp;#8217;d like to look into high
+    capacity storage for mirroring distros. &lt;span class="caps"&gt;FYI&lt;/span&gt;, the current box is a
+    Dell desktop with a 1.7GHz P-4 (&lt;span class="caps"&gt;256KB&lt;/span&gt; cache), 512 &lt;span class="caps"&gt;MB&lt;/span&gt; &lt;span class="caps"&gt;RAM&lt;/span&gt;, and about
+    &lt;span class="caps"&gt;250GB&lt;/span&gt; of &lt;span class="caps"&gt;IDE&lt;/span&gt; storage (&lt;span class="caps"&gt;150GB&lt;/span&gt; + &lt;span class="caps"&gt;100GB&lt;/span&gt;, no &lt;span class="caps"&gt;RAID&lt;/span&gt;). We don&amp;#8217;t need a big
+    upgrade in processor power, but more &lt;span class="caps"&gt;RAM&lt;/span&gt; and &lt;span class="caps"&gt;RAID&lt;/span&gt; for the system and
+    user disks would be nice (distro mirrors can be a big &lt;span class="caps"&gt;IDE&lt;/span&gt;/&lt;span class="caps"&gt;SATA&lt;/span&gt; or an
+    external&amp;nbsp;disk).&lt;/li&gt;
+&lt;/ul&gt;</summary><category term="ruslug"></category><category term="solaris"></category><category term="sun"></category></entry><entry><title>Sun Blade 150 working!</title><link href="http://newblog.jasonantman.com/2007/12/sun-blade-150-working/" rel="alternate"></link><updated>2007-12-14T02:44:00-05:00</updated><author><name>admin</name></author><id>tag:newblog.jasonantman.com,2007-12-14:2007/12/sun-blade-150-working/</id><summary type="html">&lt;p&gt;Yes, it&amp;#8217;s 3 &lt;span class="caps"&gt;AM&lt;/span&gt; here, and I&amp;#8217;ve been working since about 6 &lt;span class="caps"&gt;PM&lt;/span&gt; on this. But
+I finally got one of my two surplus (and fully locked down in &lt;span class="caps"&gt;NVRAM&lt;/span&gt;) Sun
+Blade 150 workstations up and running. I encountered a few problems
+along the way, but managed to solve them - more or&amp;nbsp;less.&lt;/p&gt;
+&lt;h2 id="problem-1-nvram-password-set-impossible-to-install-an-os"&gt;Problem 1 - &lt;span class="caps"&gt;NVRAM&lt;/span&gt; password set, impossible to install an&amp;nbsp;&lt;span class="caps"&gt;OS&lt;/span&gt;.&lt;/h2&gt;
+&lt;p&gt;I did a &lt;em&gt;lot&lt;/em&gt; of googling, and asking for advice. Eventually, I came
+by a forum post expressing success with a procedure of pulling out and
+then re-inserting the &lt;span class="caps"&gt;NVRAM&lt;/span&gt; *while* the system is powered on. This
+left my system un-bootable. I pulled the chip again, and found two pins
+bent. I straightened them, re-inserted, and rebooted using the Stop+N
+Equivalent Functionality (after powering on the system, once you hear
+the &lt;span class="caps"&gt;POST&lt;/span&gt; beep, click the power button twice quickly). This temporarily
+resets the &lt;span class="caps"&gt;NVRAM&lt;/span&gt; to default settings. I found that the password was
+gone, and was able to issue the &amp;#8220;set-defaults&amp;#8221; command at the &amp;#8220;ok&gt;&amp;#8221;
+prompt. I then popped in the Solaris 10 install &lt;span class="caps"&gt;CD&lt;/span&gt;, issued the
+&amp;#8220;reset-all&amp;#8221; command to reboot, and used Stop+A at boot to bring up a
+boot menu, and told it to boot from &lt;span class="caps"&gt;CDROM&lt;/span&gt; (&amp;#8220;boot cdrom&amp;#8221;). Installation
+then&amp;nbsp;started.&lt;/p&gt;
+&lt;h2 id="problem-2-invalid-nvram"&gt;Problem 2 - Invalid&amp;nbsp;&lt;span class="caps"&gt;NVRAM&lt;/span&gt;&lt;/h2&gt;
+&lt;p&gt;After the above procedure, when booting, I got a message following the
+Sun banner stating that there was a problem with the IDprom checksum.
+When the install &lt;span class="caps"&gt;CD&lt;/span&gt; booted, I also got messages stating &amp;#8220;Invalid format
+code in IDprom&amp;#8221;, &amp;#8220;Warning: IDprom checksum error&amp;#8221;, and &amp;#8220;os-io Invalid
+format code in IDprom&amp;#8221;. After another five hours of work, I found that
+it&amp;#8217;s essentially something I have to live with. While OpenBoot previous
+to version 4 allowed use of the &amp;#8220;mkp&amp;#8221; and &amp;#8220;mkpl&amp;#8221; commands to directly
+write the IDprom, version 4 and above allows no access to this. The
+IDprom was reporting an ethernet (mac) address of all zeros.
+Unfortunately, there seems to be no way to correct this as far as I&amp;#8217;ve
+found. However, it didn&amp;#8217;t effect my &lt;span class="caps"&gt;OS&lt;/span&gt; installation&amp;#8230;&amp;nbsp;much.&lt;/p&gt;
+&lt;p&gt;*There may be a way to access the IDprom through OpenBoot 4.x, but I
+couldn&amp;#8217;t find any reference to it online, and couldn&amp;#8217;t figure out the
+&lt;span class="caps"&gt;FORTH&lt;/span&gt; commands from the reference&amp;nbsp;docs.&lt;/p&gt;
+&lt;p&gt;Some helpful links for the above problems include the OpenBoot 4.x
+Command Reference Manual, currently found
+&lt;a href="http://dlc.sun.com/pdf/816-1177-10/816-1177-10.pdf"&gt;here&lt;/a&gt;, as well as
+the Sun Blade 150 Service Manual (from
+&lt;a href="http://docs.sun.com/"&gt;docs.sun.com&lt;/a&gt;), document 816-4379-10, currently
+indexed with the Sun Blade 150 docs
+&lt;a href="http://docs.sun.com/app/docs/coll/sb150"&gt;here&lt;/a&gt;. It was also
+interesting, in my search for help, to look at the OpenBoot 3.x Command
+Manual, and see how easy it was to re-write the IDprom on older Sun
+Blade&amp;nbsp;workstations.&lt;/p&gt;
+&lt;p&gt;Pleaese note that the advice given in the &lt;a href="http://040.digital-bless.com/texts/Unofficial_Sun_Blade_100_FAQ.htm"&gt;Unofficial SunBlade 100
+&lt;span class="caps"&gt;FAQ&lt;/span&gt;&lt;/a&gt;
+and the &lt;a href="http://www.squirrel.com/sun-nvram-hostid.faq.html"&gt;squirrel.com Sun &lt;span class="caps"&gt;NVRAM&lt;/span&gt;
+&lt;span class="caps"&gt;FAQ&lt;/span&gt;&lt;/a&gt; doesn&amp;#8217;t seem to
+work on the 150 with OpenBoot 4.x. From what I can tell, all of that
+advice applies only to OpenBoot&amp;nbsp;3.x!&lt;/p&gt;
+&lt;p&gt;Some other helpful links included an ITworld.com article on &lt;a href="http://open.itworld.com/5040/nlsunixfirmware070111/page_1.html"&gt;Sun &lt;span class="caps"&gt;NVRAM&lt;/span&gt;
+passwords&lt;/a&gt;,
+&lt;a href="http://forum.java.sun.com/thread.jspa?threadID=5093819&amp;amp;messageID=9329080"&gt;this&lt;/a&gt;
+Sun Developer Forum post, and
+&lt;a href="http://forum.java.sun.com/thread.jspa?threadID=5093819&amp;amp;messageID=9329080"&gt;this&lt;/a&gt;
+post on password&amp;nbsp;recovery.&lt;/p&gt;
+&lt;h2 id="problem-3-mac-ethernet-address-is-000000000000"&gt;Problem 3 - &lt;span class="caps"&gt;MAC&lt;/span&gt; / Ethernet address is&amp;nbsp;00:00:00:00:00:00&lt;/h2&gt;
+&lt;p&gt;When booting Solaris, I found that I couldn&amp;#8217;t get &lt;span class="caps"&gt;DHCP&lt;/span&gt;. When I finally
+got the &lt;span class="caps"&gt;OS&lt;/span&gt; running and logged in as root, I realized something
+interesting - I couldn&amp;#8217;t access or ping anything past the one switch I
+was connected to. But everything on that switch was fine, pinging both
+from and to the Solaris box. I ping&amp;#8217;ed from my laptop, and then thought
+to run &amp;#8220;arp -a&amp;#8221;. It showed a &lt;span class="caps"&gt;MAC&lt;/span&gt; address of 00:00:00:00:00:00! Running
+&amp;#8220;ifconfig -a&amp;#8221; on the Solaris box confirmed this. Luckily, the first time
+I booted this box, I wrote down the ethernet address and hostID as shown
+on the banner. I ran a quick ifconfig to setup the correct &lt;span class="caps"&gt;MAC&lt;/span&gt;, like
+&amp;#8220;ifconfig eri0 ether xx:xx:xx:xx:xx:xx&amp;#8221;. Networking now worked
+perfectly, and I could get to everything on the &lt;span class="caps"&gt;LAN&lt;/span&gt; as well as browse
+the web. It would be good to somehow reset this in &lt;span class="caps"&gt;NVRAM&lt;/span&gt;, but for now
+I&amp;#8217;m just going to add it to the startup scripts somewhere. One forum
+post that I found suggested adding the previous ifconfig command to the
+top of /etc/rc.c/init.d/network, which I&amp;#8217;ve done and will see how it
+works at the next&amp;nbsp;boot.&lt;/p&gt;
+&lt;h2 id="problem-4-cant-login-to-smc-solaris-management-console"&gt;Problem 4 - Can&amp;#8217;t login to &lt;span class="caps"&gt;SMC&lt;/span&gt; (Solaris Management&amp;nbsp;Console)&lt;/h2&gt;
+&lt;p&gt;My next task after getting the system up and running, and getting
+networking working, as to give myself a user account. I was logged in
+using the Java Desktop System, so I opened a terminal and ran &amp;#8220;smc &amp;amp;&amp;#8221;.
+After the usual initialization wait, I loaded the toolboxes for the
+local machine, and connected. When I clicked on the &amp;#8220;users&amp;#8221; module and
+entered my root password, I got an invalid password / login failed
+message. I tried again and again, even checking against the post-it that
+I wrote the password on until I memorize it. Nothing. Searching the
+forums, I came by this
+&lt;a href="http://forum.java.sun.com/thread.jspa?threadID=5104081&amp;amp;messageID=9354742"&gt;post&lt;/a&gt;,
+but the value in /etc/security/policy.conf was correctly set to &amp;#8221;
+CRYPT_DEFAULT=__unix__&amp;#8221;. So, on a wild hunch, I used &amp;#8220;passwd&amp;#8221; to
+reset my password to a shorter one, which I use on a few other
+(unimportant) workstations.&amp;nbsp;Magic!&lt;/p&gt;
+&lt;p&gt;I now have, after two days of work, a working Solaris box. Now that I
+have a good &lt;span class="caps"&gt;OS&lt;/span&gt; install, in order to get the other box working, I
+*should* just be able to swap HDDs, boot, login as root, and use the
+&amp;#8220;eeprom&amp;#8221; command to set &amp;#8220;security-mode&amp;#8221; to &amp;#8220;none&amp;#8221;, bypassing all of this&amp;nbsp;bull****.&lt;/p&gt;</summary><category term="nvram"></category><category term="openboot"></category><category term="password"></category><category term="smc"></category><category term="solaris"></category><category term="sun"></category><category term="sunblade"></category></entry><entry><title>*nix</title><link href="http://newblog.jasonantman.com/2007/09/nix/" rel="alternate"></link><updated>2007-09-28T13:22:00-04:00</updated><author><name>admin</name></author><id>tag:newblog.jasonantman.com,2007-09-28:2007/09/nix/</id><summary type="html">&lt;p&gt;First off, my Sun blog should be coming sometime this weekend/early next
+week. If I post anything interesting there, I&amp;#8217;ll be sure to cross-post&amp;nbsp;it.&lt;/p&gt;
+&lt;p&gt;This morning at work, while reading &lt;a href="http://digg.com"&gt;Digg&lt;/a&gt;, I came by
+two interesting links that got me thinking:
+&lt;a href="http://www.foogazi.com/2007/09/27/5-reasons-your-parents-should-use-linux/"&gt;5 Reasons Your Parents Should Use
+Linux&lt;/a&gt;
+and &lt;a href="http://warpedvisions.org/2006/12/30/ten-things-linux-distros-get-right-that-ms-doesnt/"&gt;Ten Things Linux Distros Get Right (That &lt;span class="caps"&gt;MS&lt;/span&gt;
+Doesn&amp;#8217;t)&lt;/a&gt;.
+Now, I&amp;#8217;ll admit, my *nix experience is pretty much limited to Linux.
+I&amp;#8217;ve used &lt;span class="caps"&gt;BSD&lt;/span&gt; a few times, but only as pre-built images for embedded
+systems like my &lt;a href="http://www.soekris.com"&gt;Soekris&lt;/a&gt; boxen. I&amp;#8217;ve used
+Solaris mainly just as a user/web developer in &lt;span class="caps"&gt;SSH&lt;/span&gt; at work. And while I
+now have a work computer running Solaris 10 and a &lt;span class="caps"&gt;SXDE&lt;/span&gt; image on my
+laptop, I&amp;#8217;m still relatively new - and, given that I&amp;#8217;m now doing
+hardware support and wireless work, I don&amp;#8217;t even know what I need
+another machine in the office&amp;nbsp;for.&lt;/p&gt;
+&lt;p&gt;That being said, the second link got me thinking. Specifically, about
+something I read in &lt;a href="http://www.catb.org/~esr/writings/taoup/"&gt;The Art of Unix
+Programming&lt;/a&gt; [Wikipedia] by
+Eric S. Raymond (available online
+&lt;a href="http://www.catb.org/~esr/writings/taoup/html/"&gt;here&lt;/a&gt;) with regards to
+interface design. One quote that I was able to find in the online
+version, comes from Chapter 11, under the subtitle &amp;#8220;Tradeoffs between
+&lt;span class="caps"&gt;CLI&lt;/span&gt; and Visual Interfaces&amp;#8221;, &amp;#8220;Resistance to &lt;span class="caps"&gt;CLI&lt;/span&gt; interfaces tends to
+decrease as users become more expert. In many problem domains, users
+(especially frequent
+users) reach a crossover point at which the concision and expressiveness
+of &lt;span class="caps"&gt;CLI&lt;/span&gt; becomes more valuable than avoiding its mnemonic load. Thus, for
+example, computing novices prefer the ease of &lt;span class="caps"&gt;GUI&lt;/span&gt; desktops, but
+experienced users often gradually discover that they prefer typing
+commands to a&amp;nbsp;shell.&amp;#8221;&lt;/p&gt;
+&lt;p&gt;There is another similar
+quote in the book, mentioning how resistance to the &lt;span class="caps"&gt;CLI&lt;/span&gt; drops as
+&lt;em&gt;typing speed&lt;/em&gt;&amp;nbsp;increases.&lt;/p&gt;
+&lt;p&gt;Unfortunately, in some areas I&amp;#8217;m still bound to Windows. Though my only
+personal use for it is to control an ancient Umax Mirage IIse &lt;span class="caps"&gt;SCSI&lt;/span&gt;
+scanner (with only Windows and Mac drivers), I ultimately need to touch
+it now and then - whether on my mother&amp;#8217;s box (she claims she has to have
+Windows and &lt;span class="caps"&gt;MS&lt;/span&gt; Office because &amp;#8220;that&amp;#8217;s what businesses use&amp;#8221;) or as admin
+of the four boxes at the &lt;a href="http://www.midlandparkambulance.com"&gt;Ambulance
+Corps&lt;/a&gt; where I&amp;nbsp;volunteer.&lt;/p&gt;
+&lt;p&gt;However, whenever I am (unfortunately) pushed into the task of working
+on a Windows box, I always feel something lacking. To be blunt, I don&amp;#8217;t
+see how experienced users can deal with it. And this isn&amp;#8217;t just an issue
+of multiple desktops, or reliability (I expect my desktop to have months
+of uptime, and my servers to have years). This isn&amp;#8217;t just pro-Linux,
+it&amp;#8217;s anti-Windows. Linux is great. Solaris seems wonderful, and I can&amp;#8217;t
+want to move my servers over. And, believe it or not, due to playing
+around with the Solaris Management Console, for the first time in 5
+years, I plan on running X on my servers.
+What this is, is a talk about total workflow. Years ago, I reached the
+point where I am more comfortable at the command line, or in an
+Ncurses-style &lt;span class="caps"&gt;GUI&lt;/span&gt;, than in&amp;nbsp;X.&lt;/p&gt;
+&lt;p&gt;I an attribute this to two factors - verbosity and speed. The &lt;span class="caps"&gt;CLI&lt;/span&gt; is as
+verbose as anything can get. I remember setting a static &lt;span class="caps"&gt;IP&lt;/span&gt; on a Windows
+box. I had to navigate the Start menu, open up the control panel, the
+network thingy, click on the network card, and work through a series of
+dialogs. In Linux, I clicked on the terminal icon, typed &amp;#8220;sudo ifconfig
+eth0 up 192.168.0.211&amp;#8221; and then a password. Done. Likewise, refreshing a
+&lt;span class="caps"&gt;DHCP&lt;/span&gt; lease on Windows requires a whole bunch of &amp;#8220;repair connection&amp;#8221;
+nonsense, whereas in Linux all it requires is &amp;#8220;dhclient eth0&amp;#8221;. The
+bottom line I know what I&amp;#8217;m doing. Windows should have an option to let
+me quickly do&amp;nbsp;it.&lt;/p&gt;
+&lt;p&gt;Speed is a related issue. Click, click-click, drag, click, click&amp;#8230;.
+what about just typing? Even for people who aren&amp;#8217;t &lt;span class="caps"&gt;CLI&lt;/span&gt;-friendly, there&amp;#8217;s
+Ncurses. YaST2, the SuSE/openSuSE administration tool, has both &lt;span class="caps"&gt;GUI&lt;/span&gt; and
+Ncurses interfaces. I always use the Ncurses interface. Why? Because
+I&amp;#8217;ve been using it for years. I know that if I want to add a user
+through YaST, I hit the down arrow 7 times, tab once, down 5, enter. Tab
+once more to bring up the add user dialog. I can do this in well under a
+second. What&amp;#8217;s the bottom line? Well, first of all, my hands are already
+on the keyboard. That&amp;#8217;s where they like to stay. That&amp;#8217;s where they&amp;#8217;re
+comfortable. My fingers need to move a *lot* less to navigate with the
+arrow keys, tab, and enter than they do to use a mouse. If you know what
+you&amp;#8217;re doing, if you already know what you&amp;#8217;re looking for, then a mouse
+is slower than the speed of thought (or&amp;nbsp;reaction).&lt;/p&gt;
+&lt;p&gt;So where&amp;#8217;s the Windows bashing? Simple. How do people at Microsoft deal
+with this? How does the guy who *wrote* that network settings dialog
+deal with navigating the &lt;span class="caps"&gt;GUI&lt;/span&gt; every time, even though he already knows
+exactly what he wants to do - and probably the system calls to do&amp;nbsp;it?&lt;/p&gt;
+&lt;p&gt;The bottom line is that every time I sit down at a Windows machine, I
+wonder how the most popular &lt;span class="caps"&gt;OS&lt;/span&gt; is one that doesn&amp;#8217;t give any thought to
+advanced users. I know that I can type faster than I can move a mouse,
+why don&amp;#8217;t you let me use that? More importantly, why didn&amp;#8217;t Microsoft
+ever think that people would use computers on a network? When I
+installed Solaris, I wanted to edit a config file. I hadn&amp;#8217;t customized
+&lt;em&gt;anything&lt;/em&gt; yet, hadn&amp;#8217;t installed any other software, nothing. Yet, I
+was able to open up a terminal and grab my .emacs file from my laptop in
+one line&amp;nbsp;(scp).&lt;/p&gt;
+&lt;p&gt;To be totally honest, the question running through my mind is something
+like &amp;#8220;everything is so much quicker on Linux. How do experts deal with&amp;nbsp;Windows?&amp;#8221;&lt;/p&gt;</summary><category term="Digg"></category><category term="Eric S Raymond"></category><category term="linux"></category><category term="solaris"></category><category term="sun"></category><category term="Unix"></category></entry><entry><title>Sun, Solaris, other fun stuff</title><link href="http://newblog.jasonantman.com/2007/09/sun-solaris-other-fun-stuff/" rel="alternate"></link><updated>2007-09-26T14:36:00-04:00</updated><author><name>admin</name></author><id>tag:newblog.jasonantman.com,2007-09-26:2007/09/sun-solaris-other-fun-stuff/</id><summary type="html">&lt;p&gt;A few bits of news, none of them too&amp;nbsp;important:&lt;/p&gt;
+&lt;p&gt;I&amp;#8217;ve just been hired as the Sun Microsystems Campus Ambassador for
+Rutgers University. Essentially, my job is to tell students, faculty,
+staff, and researchers about Sun&amp;#8217;s open source technologies and what
+they can do. This involves giving some tech demos and talks, some
+networking, and completing a lot of training on my part. Hopefully also
+getting to hand out some neat Sun swag around campus. I have to admit,
+I&amp;#8217;ve never been a real fan of &lt;span class="caps"&gt;GUI&lt;/span&gt; IDEs - I do pretty much all of my
+development (admittedly, very little in Java, most of my work is simple
+&lt;span class="caps"&gt;PHP&lt;/span&gt; stuff) on Emacs. That being said, I&amp;#8217;m really pyched about trying
+some new stuff like &lt;span class="caps"&gt;J2EE&lt;/span&gt; and maybe some Ruby. However, I also looked
+over some of our training materials on the upcoming
+&lt;a href="http://www.netbeans.org/"&gt;NetBean&lt;/a&gt;s 6.0, and truthfully, I&amp;#8217;m damn
+interested. I haven&amp;#8217;t used a Java &lt;span class="caps"&gt;IDE&lt;/span&gt; since three years ago in high
+school, and it looks as though they&amp;#8217;ve come a very long&amp;nbsp;way.&lt;/p&gt;
+&lt;p&gt;I&amp;#8217;m also really getting into Solaris. The new
+&lt;a href="http://www.opensolaris.org"&gt;openSolaris&lt;/a&gt; / Solaris Express releases
+have a lot of great features - and I can&amp;#8217;t want to get my hands on a
+machine running Zones, Containers, and &lt;span class="caps"&gt;ZFS&lt;/span&gt;, just to mention a few
+technologies. I setup Solaris 10 on one of my work computers, and I&amp;#8217;m
+hooked. It&amp;#8217;s fine for a desktop, but I can honestly say that after a few
+minutes playing around with the Solaris Management Console, I&amp;#8217;m
+seriously considering ditching SuSE (now OpenSuSE) which I&amp;#8217;ve been using
+as a server &lt;span class="caps"&gt;OS&lt;/span&gt; for some 7 years, and switching over to&amp;nbsp;Solaris.&lt;/p&gt;
+&lt;p&gt;Unfortunately, Solaris is really an enterprise &lt;span class="caps"&gt;OS&lt;/span&gt;. That means it has
+loads of wonderful features that are also rock-solid, and was designed
+with the idea of centrally-administered servers in mind - something that
+SuSE only caught onto recently. However, that also means that it is
+intended to run on what I would call &amp;#8220;new&amp;#8221; hardware. In other words,
+don&amp;#8217;t look to put Solaris 10 or Solaris Express (openSolaris / Solaris
+11) on your 386. And if you&amp;#8217;re like me and running something along the
+lines of a Generation 1 Compaq Proliant &lt;span class="caps"&gt;ML370&lt;/span&gt; with a 2nd-generation
+SmartArray &lt;span class="caps"&gt;RAID&lt;/span&gt; controller (a system that was made about 10 years ago),
+you might have some issues. It appears that the &amp;#8216;smartii&amp;#8217; &lt;span class="caps"&gt;RAID&lt;/span&gt; driver
+(and &lt;span class="caps"&gt;EISA&lt;/span&gt; support) was removed from Solaris 10 in 6/06. The solution?
+I&amp;#8217;m going to be looking into buying a bunch of new systems, possibly
+Dell PowerEdge servers and, if I can get the cash, a few Sun&amp;nbsp;systems.&lt;/p&gt;
+&lt;p&gt;Lastly, within the week, I&amp;#8217;ll be setting up a blog at
+&lt;a href="http://blogs.sun.com"&gt;blogs.sun.com&lt;/a&gt;. This will probably contain a lot
+of Rutgers-specific information, but will also most definitely include
+my notes on Sun products, and a healthy amount of Solaris-related&amp;nbsp;information.&lt;/p&gt;</summary><category term="solaris"></category><category term="sun"></category></entry></feed>

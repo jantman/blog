@@ -1,0 +1,277 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Jason Antman's Blog</title><link>http://newblog.jasonantman.com/</link><description></description><atom:link href="http://newblog.jasonantman.com/feeds/tags/hyperic.rss.xml" rel="self"></atom:link><lastBuildDate>Fri, 08 Feb 2008 16:54:00 -0500</lastBuildDate><item><title>F/OSS Monitoring Comparison - Hyperic Part I</title><link>http://newblog.jasonantman.com/2008/02/foss-monitoring-comparison-hyperic-part-i/</link><description>&lt;p&gt;So, I&amp;#8217;ve made some headway on the comparison. I have Hyperic installed
+and partly configured, albeit without email alerts yet. I&amp;#8217;ve found some
+serious features that I need missing, but I&amp;#8217;m going to give it a full
+run before I move on to&amp;nbsp;another.&lt;/p&gt;
+&lt;p&gt;The full text, updated a few times a day, is available on &lt;a href="http://www.jasonantman.com/wiki/index.php/Network_Monitoring_Comparison"&gt;my
+wiki&lt;/a&gt;.
+Here&amp;#8217;s a bit of an&amp;nbsp;excerpt:  &lt;/p&gt;
+&lt;h3 id="part-i-installation"&gt;Part I -&amp;nbsp;Installation&lt;/h3&gt;
+&lt;ol&gt;
+&lt;li&gt;setup Xen virtual machine running OpenSuSE 10.3 base packages. (3
+    hours, some server problems, some Xen problems, and some time
+    learning Xen administration from the&amp;nbsp;&lt;span class="caps"&gt;CLI&lt;/span&gt;)&lt;/li&gt;
+&lt;li&gt;Download &lt;code&gt;hyperic-hq-installer-3.2.0-607-x86-linux.tgz&lt;/code&gt; from
+    &lt;a href="http://www.hyperic.com/downloads/dl-hq-oss.html" title="http://www.hyperic.com/downloads/dl-hq-oss.html"&gt;Hyperic&lt;/a&gt;
+    and&amp;nbsp;extract.&lt;/li&gt;
+&lt;li&gt;Browse to
+    &lt;a href="http://support.hyperic.com/confluence/display/DOC/Full+Installation+Guide" title="http://support.hyperic.com/confluence/display/DOC/Full+Installation+Guide"&gt;http://support.hyperic.com/confluence/display/&lt;span class="caps"&gt;DOC&lt;/span&gt;/Full+Installation+Guide&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;code&gt;cd&lt;/code&gt; into &lt;code&gt;hyperic-hq-installer&lt;/code&gt; and run &lt;code&gt;./setup.sh -full&lt;/code&gt;&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;The installation can&amp;#8217;t be run as root (though I assumed it would
+    need root&amp;nbsp;privileges).&lt;/li&gt;
+&lt;li&gt;I selected to install all 3 components - Server, Shell, and&amp;nbsp;Agent.&lt;/li&gt;
+&lt;li&gt;Well, whoops! Sorta stupid to not allow installation as root,
+    when the default location to install to is &lt;code&gt;/home/hyperic&lt;/code&gt;. How
+    do they expect an arbitrary user to install there? Even worse,
+    it appears that the default OpenSuSE 10.3 installation doesn&amp;#8217;t
+    come with &lt;code&gt;sudo&lt;/code&gt; (!!!!) so I can&amp;#8217;t try&amp;nbsp;that.&lt;/li&gt;
+&lt;li&gt;As root, create &lt;code&gt;/home/hyperic&lt;/code&gt; and chown to my&amp;nbsp;user.&lt;/li&gt;
+&lt;li&gt;Repear the above steps (well, hopefully not all of&amp;nbsp;them).&lt;/li&gt;
+&lt;li&gt;Default ports for everything - web &lt;span class="caps"&gt;GUI&lt;/span&gt; on 7080, &lt;span class="caps"&gt;HTTPS&lt;/span&gt; web &lt;span class="caps"&gt;GUI&lt;/span&gt; on
+    7443, jnp service on 2099, mbean server on&amp;nbsp;9093,&lt;/li&gt;
+&lt;li&gt;Change domain names in default URLs to logical ones for my test
+    environment (no real &lt;span class="caps"&gt;DNS&lt;/span&gt;, just IPcop hosts, so
+    devel-hyperic1.localdomian). I hope that I can change these
+    later, or even better that absolute paths aren&amp;#8217;t used too much,
+    as this will screw with my idea of using &lt;span class="caps"&gt;SSH&lt;/span&gt; port forwarding for
+    remote&amp;nbsp;access.&lt;/li&gt;
+&lt;li&gt;Leave the default &lt;span class="caps"&gt;SMTP&lt;/span&gt; server alone and change it later - I
+    odn&amp;#8217;t even have mail running here at the&amp;nbsp;apartment.&lt;/li&gt;
+&lt;li&gt;Use the built-in PostgreSQL database with default port of&amp;nbsp;9432.&lt;/li&gt;
+&lt;li&gt;Go with the defaults for everything after&amp;nbsp;this.&lt;/li&gt;
+&lt;li&gt;Everything runs nicely, and then it tells you to login to
+    another terminal as root and run a script. I&amp;#8217;m not sure I like
+    this method, but I guess it works. Login and do&amp;nbsp;it.&lt;/li&gt;
+&lt;li&gt;How will it start the builtin database? As my user???? Yup.
+    postgres is running as my user. Wonderful. Nothing in the
+    &lt;a href="http://support.hyperic.com/confluence/display/DOC/Full+Installation+Guide" title="http://support.hyperic.com/confluence/display/DOC/Full+Installation+Guide"&gt;install
+    document&lt;/a&gt;
+    mentioned user creation. Was this just assumed? Because in the
+    naive world I live in, most installer scripts (think Nagios)
+    create a user for you, or tell you&amp;nbsp;to.&lt;/li&gt;
+&lt;li&gt;Setup script complete. A few instructions&amp;nbsp;follow&amp;#8230;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Run &lt;code&gt;/home/hyperic/server-3.2.0/bin/hq-server.sh start&lt;/code&gt;&amp;#8230; as my
+    user. &lt;em&gt;Note to self:&lt;/em&gt; setup a user for Postgres and Hyperic. Believe
+    it or not, but it booted - but followed with the message, &amp;#8220;Login to
+    &lt;span class="caps"&gt;HQ&lt;/span&gt; at:
+    &lt;a href="http://127.0.0.1:7080/" title="http://127.0.0.1:7080/"&gt;http://127.0.0.1:7080/&lt;/a&gt;&amp;#8221;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;Browsed to
+    &lt;a href="http://devel-hyperic1:7080/" title="http://devel-hyperic1:7080"&gt;http://devel-hyperic1:7080&lt;/a&gt;
+    and was greeted by a startup page, saying that the server was 18%
+    finished booting. My, I yearn for little C binaries and a &lt;span class="caps"&gt;PHP&lt;/span&gt;&amp;nbsp;frontend.&lt;/li&gt;
+&lt;li&gt;Page turns blank and stops there. I refresh, and get a login page. I
+    enter my username and password, and get a little message box where
+    the &amp;#8220;invalid password&amp;#8221; box usually is - says &amp;#8220;Server is still
+    booting&amp;#8221;. This is over a minute later. I&amp;#8217;m happy to see
+    Apache/Coyote1.1, but would like to be able to get into Hyperic in
+    less time than it takes the machine to boot to a graphical login
+    screen (ok, granted, I&amp;#8217;m running &lt;span class="caps"&gt;XFCE&lt;/span&gt;). In SuSE&amp;#8217;s YaST Xen Monitor,
+    I see that the &lt;span class="caps"&gt;VM&lt;/span&gt; is at 45% of its&amp;#8217; &lt;span class="caps"&gt;464MB&lt;/span&gt; &lt;span class="caps"&gt;RAM&lt;/span&gt;, and 90% &lt;span class="caps"&gt;CPU&lt;/span&gt; - with
+    8.5% consumed by&amp;nbsp;dom0.&lt;/li&gt;
+&lt;li&gt;&lt;span class="caps"&gt;CPU&lt;/span&gt; usage for the &lt;span class="caps"&gt;VM&lt;/span&gt; drops to 1% and I login again. &lt;span class="caps"&gt;BAM&lt;/span&gt;! Hyperic &lt;span class="caps"&gt;HQ&lt;/span&gt;.
+    Aside from the fact that it shows &lt;span class="caps"&gt;NO&lt;/span&gt; resources&amp;#8230; oh&amp;#8230; start the&amp;nbsp;Agent.&lt;/li&gt;
+&lt;li&gt;Start the Agent on the &lt;span class="caps"&gt;VM&lt;/span&gt; running Hyperic. It asks me for the server
+    &lt;span class="caps"&gt;IP&lt;/span&gt; address. What, no &lt;span class="caps"&gt;DNS&lt;/span&gt;? I enter the &lt;span class="caps"&gt;IP&lt;/span&gt; as it is&amp;#8230; for now. I keep
+    everything at defaults, including using the hqadmin username and
+    password. Successfully&amp;nbsp;started.&lt;/li&gt;
+&lt;li&gt;&lt;span class="caps"&gt;BAM&lt;/span&gt;! In Dashboard, I see the auto-discovered host with the right
+    hostname, as well as Tomcat, Agent, JBoss, and PostgreSQL. Amazing!
+    Click &amp;#8220;Add to&amp;nbsp;Inventory&amp;#8221;.&lt;/li&gt;
+&lt;li&gt;Check out the &amp;#8220;Resources&amp;#8221; -&gt; &amp;#8220;Browse&amp;#8221; screen. It knows this machine
+    is OpenSuSE 10.3, and I see my four services (listed above). Of
+    course, no metrics yet, but I see the correct &lt;span class="caps"&gt;IP&lt;/span&gt;, gateway, &lt;span class="caps"&gt;DNS&lt;/span&gt;,
+    vendor (SuSE), kernel version, &lt;span class="caps"&gt;RAM&lt;/span&gt;, architecture, and &lt;span class="caps"&gt;CPU&lt;/span&gt;&amp;nbsp;speed.&lt;/li&gt;
+&lt;li&gt;Looking through the &amp;#8220;Inventory&amp;#8221; screen, I see everything - NICs and
+    MACs, running servers and one service (a &lt;span class="caps"&gt;CPU&lt;/span&gt; resource). What more
+    could a man want in&amp;#8230;let&amp;#8217;s see.. just over an&amp;nbsp;hour!&lt;/li&gt;
+&lt;li&gt;I really *love* the &amp;#8220;Views&amp;#8221; screen which, even out-of-the-box,
+    allows &amp;#8220;Live Exec&amp;#8221; information from cpuinfo, df, ifconfig, netstat,
+    top, who, and&amp;nbsp;more.&lt;/li&gt;
+&lt;li&gt;Well, it&amp;#8217;s 03:35, and I have work and class tomorrow. I think it&amp;#8217;s
+    time to give Part I a rest. But&amp;nbsp;first&amp;#8230;&lt;/li&gt;
+&lt;li&gt;Go to the &amp;#8220;Platform&amp;#8221; page for my one machine and&amp;#8230; &lt;span class="caps"&gt;YES&lt;/span&gt;! Graphs are
+    starting to&amp;nbsp;appear!&lt;/li&gt;
+&lt;li&gt;Following the suggestion
+    &lt;a href="http://support.hyperic.com/confluence/display/DOC/HQ+Quick+Start#HQQuickStart-enableTracking" title="http://support.hyperic.com/confluence/display/DOC/HQ+Quick+Start#HQQuickStart-enableTracking"&gt;here&lt;/a&gt;,
+    I enable log and config tracking on the platform for &lt;code&gt;/var/log/warn&lt;/code&gt;
+    and &lt;code&gt;/etc/hosts&lt;/code&gt;,&amp;nbsp;respecitvely.&lt;/li&gt;
+&lt;li&gt;Before I call it a night (now 03:42), I stop back at the &lt;a href="http://www.hyperic.com/downloads/dl-hq-oss.html" title="http://www.hyperic.com/downloads/dl-hq-oss.html"&gt;downloads
+    page&lt;/a&gt;
+    and grab the Linux x86 Agent for the dom0 machine, hoping to get
+    some physical information as well. While I&amp;#8217;m at it, I grab the Linux
+    &lt;span class="caps"&gt;AMD64&lt;/span&gt; Agent to try on my laptop. I create &amp;#8220;hyperic&amp;#8221; users on each
+    system. On the base Xen server, I give it a shot and get &amp;#8220;Unable to
+    register agent: Error communicating with agent: Unauthorized&amp;#8221;. Same
+    thing on the&amp;nbsp;laptop.&lt;/li&gt;
+&lt;li&gt;Did a little reading
+    &lt;a href="http://support.hyperic.com/confluence/display/DOC/Installation+Non-Windows#InstallationNon-Windows-install" title="http://support.hyperic.com/confluence/display/DOC/Installation+Non-Windows#InstallationNon-Windows-install"&gt;here&lt;/a&gt;.
+    As to keeping all of the defaults, it turns out that both clients
+    had firewalls blocking &lt;span class="caps"&gt;TCP&lt;/span&gt; port 2144. I opened it up on both, and
+    also set the &lt;span class="caps"&gt;IP&lt;/span&gt; address (that the server uses to contact the client)
+    to the correct ones. Viola! Now I have 3 clients connected, and
+    gatheirng data for the next \~16 hours until I have time to check it
+    out&amp;nbsp;agian.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;More to come in Part &lt;span class="caps"&gt;II&lt;/span&gt; tomorrow - actually doing something with
+Hyperic. For&lt;br /&gt;
+now (04:08), time to&amp;nbsp;sleep.&lt;/p&gt;
+&lt;h3 id="part-ii-configuration"&gt;Part &lt;span class="caps"&gt;II&lt;/span&gt; -&amp;nbsp;Configuration&lt;/h3&gt;
+&lt;p&gt;Unfortunately, I haven&amp;#8217;t had much time to play with Hyperic in the two
+days&lt;br /&gt;
+since installation. The most I&amp;#8217;ve really done is setup Agents on my
+laptop,&lt;br /&gt;
+desktop, and the host machine (both dom0 and domU for Hyperic), so that
+they&lt;br /&gt;
+start to collect&amp;nbsp;data.&lt;/p&gt;
+&lt;p&gt;While I found a lot of upsetting stuff in the features list (see below),
+I&lt;br /&gt;
+decided to go ahead and add some other devices. On the network at the&lt;br /&gt;
+apartment, I have two manageable switches (a Linksys and a 3Com) - which
+pretty&lt;br /&gt;
+much make up the sum of non-host equipment. I also have an IPcop box,
+though I&lt;br /&gt;
+assume the standard Linux Agent will handle that. The one item missing
+that I&lt;br /&gt;
+have at home is my set of &lt;span class="caps"&gt;APC&lt;/span&gt; SmartUPS UPSs with &lt;span class="caps"&gt;SNMP&lt;/span&gt; cards, but I guess
+I&amp;#8217;ll&lt;br /&gt;
+just have to skip them for this&amp;nbsp;review.&lt;/p&gt;
+&lt;p&gt;First, I went in and added a platform (Resources-&gt;Browse, Tools
+Menu-&gt;Add&lt;br /&gt;
+Platform) for the 3Com switch (a SuperStack &lt;span class="caps"&gt;II&lt;/span&gt; Switch 3300). It showed&lt;br /&gt;
+successful creation - but nothing else. I went in and entered the &lt;span class="caps"&gt;SNMP&lt;/span&gt;&lt;br /&gt;
+community string, &lt;span class="caps"&gt;IP&lt;/span&gt;, and version (1). In about a minute or so, I
+started to&lt;br /&gt;
+see metrics - Availability, &lt;span class="caps"&gt;IP&lt;/span&gt; Forwards, &lt;span class="caps"&gt;IP&lt;/span&gt; In Receives, an &lt;span class="caps"&gt;IP&lt;/span&gt; In
+Received per&lt;br /&gt;
+Second. While it&amp;#8217;s quite basic, that&amp;#8217;s good for a starting point. While
+the&lt;br /&gt;
+[&lt;a href="http://support.hyperic.com/confluence/display/DOCSHQ30/Network+Device+platform" title="http://support.hyperic.com/confluence/display/DOCSHQ30/Network+Device+platform"&gt;http://support.hyperic.com/confluence/display/&lt;span class="caps"&gt;DOCSHQ30&lt;/span&gt;/Network+Device+platform&lt;/a&gt;&lt;br /&gt;
+Network Device Platform] documentation lists lots of metrics that can
+be&lt;br /&gt;
+enabled, I&amp;#8217;d also like telnet availability and - my big one since I use
+a&lt;br /&gt;
+&amp;#8220;cute&amp;#8221; (crappy) IPcop installation for local &lt;span class="caps"&gt;DNS&lt;/span&gt;, a dig on &lt;span class="caps"&gt;DNS&lt;/span&gt; to make
+sure&lt;br /&gt;
+the entry is there. In the Monitor screen, I was able to enable a bunch
+of&lt;br /&gt;
+additional metrics (by clicking on the &amp;#8220;Show All Metrics&amp;#8221; link), though&lt;br /&gt;
+there&amp;#8217;s also no way (that I can find) to monitor the status of
+individual&lt;br /&gt;&amp;nbsp;ports.&lt;/p&gt;
+&lt;p&gt;Next, I browsed through the &amp;#8220;Administration&amp;#8221; pages, setup a few users,
+and&lt;br /&gt;
+started setting *way* more default metrics for various platforms,
+services,&lt;br /&gt;
+and servers. While I don&amp;#8217;t have mail running yet, that will come this&lt;br /&gt;
+weekend. While I added a lot of things as &amp;#8220;Default On&amp;#8221;, I still need to
+go&lt;br /&gt;
+back and add more things in the templates as&amp;nbsp;Indicators.&lt;/p&gt;
+&lt;p&gt;I also added some escalations, though they&amp;#8217;re quite simple - you can
+notify &lt;span class="caps"&gt;HQ&lt;/span&gt;&lt;br /&gt;
+users or &amp;#8220;other users&amp;#8221; by email or &lt;span class="caps"&gt;SMS&lt;/span&gt;, write to SysLog, or suppress
+alerts&lt;br /&gt;
+for 0 minutes to 24 hours. Hopefully I&amp;#8217;ll also find a plugin for
+Asterisk&lt;br /&gt;
+integration. One striking omission is user groups. Also, the concept of&lt;br /&gt;
+&amp;#8220;Roles&amp;#8221; (maybe their idea of groups?) is only available in the
+Enterprise&lt;br /&gt;&amp;nbsp;version.&lt;/p&gt;
+&lt;p&gt;At this point, I also notice one other majoe issue, though perhaps I&amp;#8217;ll
+find a&lt;br /&gt;
+solution in my experimentation - there doesn&amp;#8217;t be a way to setup
+default&lt;br /&gt;
+alerts for metrics. If they have all of this platform, server, and
+service&lt;br /&gt;
+information defined as default templates, why not just have a way to
+assign&lt;br /&gt;
+default users (and groups) to these objects, and have default alerts&lt;br /&gt;&amp;nbsp;generated?&lt;/p&gt;
+&lt;p&gt;In terms of Apache 2.2 monitoring, out-of-the-box, nothing worked. No
+metrics&lt;br /&gt;
+at all. Firstly, Hyperic requires the mod_status module. Persoanlly,
+I&amp;#8217;d&lt;br /&gt;
+rather handle all of that through a backend, like Nagios. Secondly, it
+got the&lt;br /&gt;
+pidfile and apache2ctl paths wrong. Furthermore, it has no &amp;#8220;smart&amp;#8221;
+checking for resources - while my Apache 2.2 resource config was clearly
+wrong (wrong &lt;span class="caps"&gt;PID&lt;/span&gt; file path, no mod_status), Hyperic didn&amp;#8217;t detect this
+and was showing the resource as&amp;nbsp;&amp;#8220;Down&amp;#8221;.&lt;/p&gt;
+&lt;p&gt;After that, I setup a bunch of alerts for things that I thought would be
+off-kilter a lot (like &lt;span class="caps"&gt;WARN&lt;/span&gt; log entries on my laptop, high memory usage
+on some stressed machines, etc.) as well as log and config file
+monitoring and alerts for them. While I didn&amp;#8217;t have mail working yet, I
+figured I might as well get that stuff&amp;nbsp;running.&lt;/p&gt;
+&lt;p&gt;On the Xen dom0 host that runs the Hyperic vm (box called xenmaster1), I
+wasn&amp;#8217;t able to add config file tracking for any of the /etc/xen/ files.
+At this point I notice some serious shortcomings - not only is it not
+possible to define a template of alerts for a given
+platform/server/service, it&amp;#8217;s also impossible to define a template for
+alerts. I also noticed that it&amp;#8217;s not possible to define groups of
+contacts. This wasn&amp;#8217;t much of a problem for my test installation - the
+alerts are only going to my roommate and I - but it would surely be an
+issue in any larger&amp;nbsp;setting.&lt;/p&gt;
+&lt;p&gt;At this point in configuration, I come to a make-or-break point. With
+some of these shortcomings, I really need a way to call a script with
+alert information when an alert is generated - whether it&amp;#8217;s to dial out
+through Asterisk or just automatically create a ticket for the&amp;nbsp;problem.&lt;/p&gt;
+&lt;p&gt;Adding alerts is a cumbersome process. You have to browse to a page for
+a specific metric - which means going to the page for a specific
+platform, server, or service - and then opening the page for that
+metric. The actual alert creation takes up two pages - one for the
+metric, threshold, and time-based criteria, and a second for who to
+alert. This means that to add alerts for a machine, you need to view the
+platform page as well as the services and servers pages, and each metric&amp;nbsp;therein.&lt;/p&gt;
+&lt;p&gt;I&amp;#8217;ll be posting some more in the days to come. From a &lt;a href="http://forums.hyperic.com/jiveforums/thread.jspa?messageID=14561&amp;amp;#14561"&gt;post at the
+Hyperic
+Forums&lt;/a&gt;,
+I was able to find out that a Xen plugin is in the works, but for the
+Open Source version, the only way to trigger a script is to send an
+email and have it handled by a filter such as&amp;nbsp;Procmail.&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Fri, 08 Feb 2008 16:54:00 -0500</pubDate><guid>tag:newblog.jasonantman.com,2008-02-08:2008/02/foss-monitoring-comparison-hyperic-part-i/</guid><category>hyperic</category><category>monitoring</category><category>open source</category></item><item><title>Network Monitoring Trials - Part I</title><link>http://newblog.jasonantman.com/2008/02/network-monitoring-trials-part-i/</link><description>&lt;p&gt;After dinner tonight, I&amp;#8217;m going to start setting up my Xen VMs and
+installing some monitoring software. I&amp;#8217;ve decided that
+&lt;a href="http://www.hyperic.com/"&gt;Hyperic&lt;/a&gt; and &lt;a href="http://www.opennms.org"&gt;OpenNMS&lt;/a&gt;
+will be the first round - mainly because their free versions seem to be
+the most heavy-weight, and will probably take more installation time.
+&lt;a href="http://www.groundworkopensource.com/"&gt;GroundWork Open Source&lt;/a&gt; will come
+sometime later this&amp;nbsp;week.&lt;/p&gt;
+&lt;p&gt;While the research that I did today has led me to start formulating some
+opinions on each of the contestants, I&amp;#8217;m going to withhold comment until
+I get all three up and running, and have done some real work with&amp;nbsp;them.&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Tue, 05 Feb 2008 20:26:00 -0500</pubDate><guid>tag:newblog.jasonantman.com,2008-02-05:2008/02/network-monitoring-trials-part-i/</guid><category>groundwork</category><category>hyperic</category><category>monitoring</category><category>opennms</category></item><item><title>Google Loves Me! and Monitoring System Testing</title><link>http://newblog.jasonantman.com/2008/02/google-loves-me-and-monitoring-system-testing/</link><description>&lt;p&gt;I happened to visit Google Webmaster Tools tonight. On the down side, a
+lot more of my redirected pages
+(&lt;a href="http://jantman.dyndns.org:10011/"&gt;jantman.dyndns.org:10011&lt;/a&gt;) are
+indexed than those from the domain
+(&lt;a href="http://www.jasonantman.com"&gt;jasonantman.com&lt;/a&gt;). On the positive side,
+my search stats are quite impressive - for example, &lt;a href="http://www.google.com/search?num=50&amp;amp;hl=en&amp;amp;safe=off&amp;amp;q=hpadu&amp;amp;btnG=Search"&gt;searching
+&amp;#8220;hpadu&amp;#8221;&lt;/a&gt;
+(the &lt;span class="caps"&gt;HP&lt;/span&gt; Proliant Array Diagnostic Utility) gives my
+&lt;a href="http://www.jasonantman.com"&gt;Wiki&lt;/a&gt;as the #9 result - searching &lt;a href="http://www.google.com/search?q=hpasm+sles10&amp;amp;hl=en"&gt;&amp;#8220;hpasm
+sles10&amp;#8221;&lt;/a&gt; shows my
+site as #3! Most amazingly, there are only two &lt;span class="caps"&gt;HP&lt;/span&gt; pages above mine in
+both of the&amp;nbsp;queries.&lt;/p&gt;
+&lt;p&gt;I guess trying to put every bit of knowledge I pick up in my blog or
+wiki pays off. And hopefully some people are getting&amp;nbsp;help.&lt;/p&gt;
+&lt;p&gt;On another note, later this week I&amp;#8217;m going to setup two virtual machines
+on my spare PowerEdge 650 to test some &lt;a href="/2008/01/network-monitoring.html"&gt;network monitoring
+systems&lt;/a&gt;
+- specifically, &lt;a href="http://www.hyperic.com/products/hq_oss.html"&gt;Hyperic
+&lt;span class="caps"&gt;HQ&lt;/span&gt;&lt;/a&gt;,
+&lt;a href="http://www.opennms.org/"&gt;OpenNMS&lt;/a&gt;, and &lt;a href="http://www.groundworkopensource.com/products/os-overview.html"&gt;Groundwork Open
+Source&lt;/a&gt;.
+Thanks to &lt;a href="http://www.johnmwillis.com"&gt;John&lt;/a&gt;, Peter, and &lt;a href="http://jeffgehlbach.com/"&gt;Jeff
+G&lt;/a&gt;. (of OpenNMS) for finding my little-known
+blog and suggesting I try them. I don&amp;#8217;t know how much I&amp;#8217;ll be able to
+run on this poor system (2.4GHz P-&lt;span class="caps"&gt;III&lt;/span&gt; is the fastest I have, but &lt;span class="caps"&gt;768MB&lt;/span&gt;
+&lt;span class="caps"&gt;RAM&lt;/span&gt; is a bit weak), but I&amp;#8217;ll do the best I can, and post my&amp;nbsp;results.&lt;/p&gt;
+&lt;p&gt;One comment - I can&amp;#8217;t seem to find a feature list for
+&lt;a href="http://www.opennms.org/"&gt;OpenNMS&lt;/a&gt;, so I may be wrong, but it looks like
+&lt;a href="http://www.hyperic.com/products/hq_oss.html"&gt;Hyperic &lt;span class="caps"&gt;HQ&lt;/span&gt;&lt;/a&gt; may be in the
+lead at the moment, simply because it seems to include built-in asset
+tracking with hardware discovery - something that takes me way too long
+to manually keep up-to-date. On another side-note, the web site for
+&lt;a href="http://www.groundworkopensource.com/products/os-overview.html"&gt;Groundwork Open
+Source&lt;/a&gt;
+leaves a sour taste in my mouth, as it&amp;#8217;s pretty sparse - there&amp;#8217;s a lot
+of space given to the Enterprise edition, but not much text about the
+Open Source&amp;nbsp;version.&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Tue, 05 Feb 2008 03:15:00 -0500</pubDate><guid>tag:newblog.jasonantman.com,2008-02-05:2008/02/google-loves-me-and-monitoring-system-testing/</guid><category>google</category><category>groundwork</category><category>hyperic</category><category>montoring</category><category>opennms</category></item></channel></rss>

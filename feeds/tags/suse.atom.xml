@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Jason Antman's Blog</title><link href="http://newblog.jasonantman.com/" rel="alternate"></link><link href="http://newblog.jasonantman.com/feeds/tags/suse.atom.xml" rel="self"></link><id>http://newblog.jasonantman.com/</id><updated>2008-09-11T11:40:00-04:00</updated><entry><title>Microsoft and Novell Deliver Joint Virtualization Solution - or do they?</title><link href="http://newblog.jasonantman.com/2008/09/microsoft-and-novell-deliver-joint-virtualization-solution-or-do-they/" rel="alternate"></link><updated>2008-09-11T11:40:00-04:00</updated><author><name>admin</name></author><id>tag:newblog.jasonantman.com,2008-09-11:2008/09/microsoft-and-novell-deliver-joint-virtualization-solution-or-do-they/</id><summary type="html">&lt;p&gt;From PRNewsWire: &lt;a href="http://www.prnewswire.com/cgi-bin/stories.pl?ACCT=104&amp;amp;STORY=/www/story/09-11-2008/0004883058&amp;amp;EDATE="&gt;Microsoft and Novell Deliver Joint Virtualization
+Solution Through
+Partners&lt;/a&gt;.
+The headline of the press release: &amp;#8220;Supported by Dell and other channel
+partners, solution includes &lt;span class="caps"&gt;SUSE&lt;/span&gt; Linux Enterprise Server running as
+optimized guest on Windows Server 2008&amp;nbsp;Hyper-V.&amp;#8221;&lt;/p&gt;
+&lt;p&gt;Now, maybe I&amp;#8217;m not up on the news regarding my favorite distribution,
+but it seems to me that a deal allowing SuSE to be virtualized as a
+&lt;strong&gt;guest&lt;/strong&gt; under Windows is not only &amp;#8220;joint&amp;#8221;, but plain moronic. Despite
+the marketing efforts of Microsoft, Unix-based systems (including Linux)
+have always had the upper hand in availability, reliability, and&amp;nbsp;performance.&lt;/p&gt;
+&lt;p&gt;I must say, from what I&amp;#8217;ve heard, Windows Server is getting *much*
+better in these areas - and I&amp;#8217;ve even heard that the latest version
+includes an option to install without a graphical environment, and even
+includes a command-line that&amp;#8217;s useful. It&amp;#8217;s about&amp;nbsp;time.&lt;/p&gt;
+&lt;p&gt;However, it seems to me, that any virtualization deal between Microsoft
+and a Linux distributor can provide only one logical solution: Windows
+Server virtualized as a guest in a high-availability Linux host. More
+importantly, without the insane per-processor licensing - a per-&lt;span class="caps"&gt;VM&lt;/span&gt;
+instance license that&amp;#8217;s hardware-agnostic and allows VMs to be migrated
+across hardware as the admin sees&amp;nbsp;fit.&lt;/p&gt;
+&lt;p&gt;Oh, and one more insight. If Microsoft wants to be a serious player in
+the virtualization arena, here&amp;#8217;s a few &amp;#8220;simple&amp;#8221;&amp;nbsp;steps:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Get Windows Server to work correctly under Xen, VirtualBox, etc.
+    Certify it. Provide the correct guest &lt;span class="caps"&gt;OS&lt;/span&gt; tool&amp;nbsp;packages&lt;/li&gt;
+&lt;li&gt;Provide simple management of Windows in a virtualized environment -
+    minimally, a standard &lt;span class="caps"&gt;SSH&lt;/span&gt; server that&amp;#8217;s compatible with OpenSSH, a
+    &lt;span class="caps"&gt;GUI&lt;/span&gt;-less environment, and a serial&amp;nbsp;console.&lt;/li&gt;
+&lt;li&gt;Get rid of per-processor licenses. Provide a basic license that
+    allows for, say, 10 VMs to be running at once, and allows as many
+    installs as needed - the only licensing is based on the amount of
+    VMs actually running. i.e., if you have 10 VMs and one gets
+    corrupted, you can bring that one down and online a back-up image,
+    without violating the&amp;nbsp;license.&lt;/li&gt;
+&lt;li&gt;Make licensing processor-agnostic. Want to migrate a Xen &lt;span class="caps"&gt;VM&lt;/span&gt; (Windows
+    guest) from a dual-core Pentium to an 8-core Xeon, or even a 16
+    processor &lt;span class="caps"&gt;SPARC&lt;/span&gt;? Sure, no&amp;nbsp;problem.&lt;/li&gt;
+&lt;/ol&gt;</summary><category term="microsoft"></category><category term="novell"></category><category term="suse"></category><category term="virtualization"></category></entry><entry><title>LIRC and Hauppauge PVR-150 on OpenSuSE 11.0</title><link href="http://newblog.jasonantman.com/2008/09/lirc-and-hauppauge-pvr-150-on-opensuse-110/" rel="alternate"></link><updated>2008-09-01T10:37:00-04:00</updated><author><name>admin</name></author><id>tag:newblog.jasonantman.com,2008-09-01:2008/09/lirc-and-hauppauge-pvr-150-on-opensuse-110/</id><summary type="html">&lt;p&gt;Well, despite what&amp;#8217;s been said elsewhere, it &lt;em&gt;&lt;span class="caps"&gt;IS&lt;/span&gt;&lt;/em&gt; possible! It&amp;#8217;s a bit
+error-ridden at first, but here is the procedure that I used to compile
+and install the &lt;span class="caps"&gt;PVR&lt;/span&gt;-150 patched &lt;span class="caps"&gt;LIRC&lt;/span&gt;&amp;nbsp;0.8.3-&lt;span class="caps"&gt;CVS&lt;/span&gt;.&lt;/p&gt;
+&lt;p&gt;First, Download the tarball mentioned in the &lt;a href="http://www.blushingpenguin.com/mark/blog/?p=24"&gt;Version 3 blog
+post&lt;/a&gt; at &lt;a href="http://www.blushingpenguin.com/mark/blog/"&gt;Marks
+Braindump&lt;/a&gt;. You can pretty
+much follow his instructions on the installation in the blog post, with
+some changes that are specific to getting it to compile on OpenSuSE&amp;nbsp;11.&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;First, remove all traces of the OpenSuSE &lt;span class="caps"&gt;LIRC&lt;/span&gt; from you system.
+    Uninstall the &lt;span class="caps"&gt;RPMS&lt;/span&gt; and everything else that goes with them. Then
+    unload all of the kernel modules, especially lirc_i2c (if you have
+    it&amp;nbsp;loaded).&lt;/li&gt;
+&lt;li&gt;In your kernel source directory, run
+    &lt;code&gt;make oldconfig &amp;amp;&amp;amp; make prepare.&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;In your kernel source directory, run &lt;code&gt;make prepare scripts&lt;/code&gt; which,
+    among other things, compiles the required &lt;code&gt;genksyms&lt;/code&gt; scurript.&lt;/li&gt;
+&lt;li&gt;I was getting a compile error like &amp;#8220;&lt;span class="caps"&gt;WARNING&lt;/span&gt;: Symbol version dump
+    /usr/src/`uname -r`/Module.symvers is missing&amp;#8221;. Find out which
+    kernel you&amp;#8217;re running (&lt;code&gt;uname -r&lt;/code&gt;). In yout kernel source directory,
+    copy your Module.symvers file from /usr/src/linux-obj. I was running
+    i386 architecture with the &amp;#8220;default&amp;#8221; kernel, so mine was located at
+    &lt;code&gt;/usr/src/linux-obj/i386/debug/Module.symvers&lt;/code&gt;. Copy that into
+    &lt;code&gt;/usr/src/linux&lt;/code&gt;.&lt;/li&gt;
+&lt;li&gt;In the lirc (patched) directory, run &lt;code&gt;setup.sh&lt;/code&gt; as instructed. &lt;span class="caps"&gt;DO&lt;/span&gt;
+    &lt;span class="caps"&gt;NOT&lt;/span&gt; tell it to run configure - just save settings and&amp;nbsp;exit.&lt;/li&gt;
+&lt;li&gt;Edit the generated &lt;code&gt;configure.sh&lt;/code&gt; file, adding a
+    &lt;code&gt;--with-kerneldir=/usr/src/KERNELDIR&lt;/code&gt;, replacing &lt;span class="caps"&gt;KERNELDIR&lt;/span&gt; with the
+    actual path to your kernel soruce (i.e. /usr/src/`uname&amp;nbsp;-r`).&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;make&lt;/code&gt;. If no errors, &lt;code&gt;make install&lt;/code&gt;.&lt;/li&gt;
+&lt;li&gt;I decided to reboot at this point, and when I did, everything worked&amp;nbsp;perfectly.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Also, I found that I needed to explicitly specify &lt;code&gt;--device=/dev/lirc0&lt;/code&gt;
+when starting &lt;span class="caps"&gt;LIRC&lt;/span&gt;, as well as not specifying a driver. I just took the
+&lt;code&gt;/etc/init.d/lirc&lt;/code&gt; from the official OpenSuSE 11.0 package, commented
+out line 108 in &lt;code&gt;makeargs()&lt;/code&gt; that adds the &lt;code&gt;-H $LIRC_DRIVER&lt;/code&gt; to the
+args, and added &lt;code&gt;LIRC_DEVICE="/dev/lirc0"&lt;/code&gt; to the top after the &lt;span class="caps"&gt;INIT&lt;/span&gt;&amp;nbsp;info.&lt;/p&gt;
+&lt;p&gt;Unfortunately, figuring out this process took me a long time. I&amp;#8217;ve
+reconstructed these instructions from various post-it notes, the
+whiteboard next to my desk, and some bash history files and terminal
+dumps. If this doesn&amp;#8217;t seem to work for you, please drop an email to
+jason &lt;span class="caps"&gt;AT&lt;/span&gt; jason antman &lt;span class="caps"&gt;DOT&lt;/span&gt; com, with as much information as you have, and
+I&amp;#8217;ll figure it out and update the&amp;nbsp;instructions.&lt;/p&gt;
+&lt;p&gt;Now, finally, an up-to-date system &lt;span class="caps"&gt;AND&lt;/span&gt; &lt;a href="http://www.mythtv.org"&gt;MythTV&lt;/a&gt;.&lt;/p&gt;</summary><category term="hauppauge"></category><category term="linux"></category><category term="lirc"></category><category term="mythtv"></category><category term="opensuse"></category><category term="pvr-150"></category><category term="suse"></category></entry><entry><title>SunSPOT; CarPC; MediaWiki Logging</title><link href="http://newblog.jasonantman.com/2008/05/sunspot-carpc-mediawiki-logging/" rel="alternate"></link><updated>2008-05-07T10:03:00-04:00</updated><author><name>admin</name></author><id>tag:newblog.jasonantman.com,2008-05-07:2008/05/sunspot-carpc-mediawiki-logging/</id><summary type="html">&lt;p&gt;Well, finals season is upon me. That&amp;#8217;s probably why I haven&amp;#8217;t been
+posting much lately (I haven&amp;#8217;t even been checking &lt;a href="http://reader.google.com/"&gt;Google
+Reader&lt;/a&gt; - I&amp;#8217;ll have to delete a few thousand
+entries when I get back into the swing of things). I&amp;#8217;ve been pretty
+busy, between studying, projects, and work. I&amp;#8217;ll be working 4 days a
+week through June 20th, as well as taking night classes 4 nigths a week
+(unfortunately not the same 4 days) through July 3, in an effort to
+graduate Rutgers on time (after transferring in and also switching
+majors). Work after June 20th is up in the air - who knows how hard the
+budget cuts will&amp;nbsp;hit.&lt;/p&gt;
+&lt;p&gt;My internship as the Sun Microsystems Campus Ambassador to Rutgers is
+over on May 12th. I got a chance to do the Rutgers &lt;span class="caps"&gt;IT&lt;/span&gt; Vendor Fair with
+Sun, and met a few cool people - especially including Matt McGrath of
+&lt;a href="http://www.conres.com/"&gt;Continental Resources&lt;/a&gt;, a Sun Strategic iForce
+Partner, who&amp;#8217;s doing some wonderful things with the &lt;a href="http://www.sun.com/solutions/landing/industry/education/edu_essentials.jsp"&gt;Sun Education
+Essentials Matching Grant
+Program&lt;/a&gt;,
+and &lt;a href="http://opsamericas.com/"&gt;Skip Paul&lt;/a&gt;, a Linux Systems Engineer for
+Novell&amp;#8217;s Open Platform Solutions group. I also finally cracked open my
+demo set of &lt;a href="http://www.sunspotworld.com/"&gt;SunSPOT&lt;/a&gt;s. Wonderful little
+devices, radio, run Java on the bare metal, and have temperature
+sensors, accelerometers, and liberal I/O. My first development exereice
+will probably be making a temperature and acceleration data logger for
+my truck, but there&amp;#8217;s surely more to come. They&amp;#8217;re&amp;nbsp;great!&lt;/p&gt;
+&lt;p&gt;My newest project - which I&amp;#8217;m hoping to spend nearly the whole summer on
+- is the &lt;a href="http://www.jasonantman.com/tuxtruck/"&gt;TuxTruck&lt;/a&gt;. I&amp;#8217;ve been
+frustrated with the lack of &amp;#8220;smartness&amp;#8221; in my truck (an 06 Ford F-250),
+not to mention having to remember my &lt;span class="caps"&gt;MP3&lt;/span&gt; player so I can listen to
+podcasts on the way to work, and having so many gadgets in my truck. So,
+the solution is obvious: a Linux-based
+&lt;a href="http://en.wikipedia.org/wiki/Carpc"&gt;CarPC&lt;/a&gt;. A nice little Mini-&lt;span class="caps"&gt;ATX&lt;/span&gt; box
+under a seat, with a 7&amp;#8221; pull-out touchscreen in the dash (replacing the
+factory radio). It&amp;#8217;s a big, complicated, and expensive project - but I
+want one, and I could use some experience with smaller systems.&lt;br /&gt;
+The major features I have&amp;nbsp;planned:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Realtime &lt;span class="caps"&gt;GPS&lt;/span&gt;&amp;nbsp;navigation&lt;/li&gt;
+&lt;li&gt;Hands-free bluetooth calls from my cell, with address book, routing
+    to contact address, possibly voice&amp;nbsp;dialing.&lt;/li&gt;
+&lt;li&gt;Realtime&amp;nbsp;weather&lt;/li&gt;
+&lt;li&gt;&lt;span class="caps"&gt;OBD&lt;/span&gt;-&lt;span class="caps"&gt;II&lt;/span&gt; interface, for vehicle diagnostics and fuel
+    efficiency/performance&amp;nbsp;profiling&lt;/li&gt;
+&lt;li&gt;Audio - at a minimum searching and playing MP3s, and automatically
+    downloading podcasts and throwing them in a playlist. Perhaps also
+    an &lt;span class="caps"&gt;AM&lt;/span&gt;/&lt;span class="caps"&gt;FM&lt;/span&gt;&amp;nbsp;tuner&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;It&amp;#8217;s not an easy project. So far, the major challenges seem to&amp;nbsp;be:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;No full-featured &lt;span class="caps"&gt;GPS&lt;/span&gt; navigation package available. The ones that are
+    available don&amp;#8217;t seem to be too easy to integrate into my planned
+    &lt;span class="caps"&gt;GUI&lt;/span&gt;, which will allot them 800x420 pixels (on an 800x480 screen) and
+    requre the bottom toolbar to be always&amp;nbsp;available.&lt;/li&gt;
+&lt;li&gt;How to handle processing of multiple data streams that require
+    near-real-time processing - specifically, &lt;span class="caps"&gt;GPS&lt;/span&gt; with text-to-speech,
+    turn-by-turn directions, plus playing audio, plus responding to an
+    incoming phone call in a timely manner, pausing the audio, and
+    stopping &lt;span class="caps"&gt;GPS&lt;/span&gt; audio but continuing&amp;nbsp;navigation.&lt;/li&gt;
+&lt;li&gt;Whether to install a smaller stereo and use aux input for audio, or
+    totally rip out the stereo, use an amp with the computer as its only
+    input, and then how to control&amp;nbsp;volume?&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;There will be more to come in the future. For now, take a look at &lt;a href="https://github.com/jantman/tuxtruck"&gt;the
+TuxTruck github&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Update Saturday, March 2, 2013&lt;/strong&gt; - I&amp;#8217;m in the process of migrating my
+legacy &lt;span class="caps"&gt;CVS&lt;/span&gt; and Subversion repositories to
+&lt;a href="http://github.com/jantman/"&gt;github.com&lt;/a&gt;. The forgotten &lt;span class="caps"&gt;SVN&lt;/span&gt; repository
+for TuxTruck has been migrated there, and the &lt;span class="caps"&gt;CVS&lt;/span&gt; repository will soon
+be moved there as well. Tuxtruck.org has been permanently taken offline
+and redirected to the GitHub&amp;nbsp;repository.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Mediawiki Logging&lt;/strong&gt; - I recently
+had a situation where I had to confirm how much work someone had done on
+a MediaWiki-based project. The Recent Changes page only goes back 30
+days, and walking through the History of each page is a pain. After
+looking around in the database a bit, I found a few tables of&amp;nbsp;interest:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;Table &amp;#8220;users&amp;#8221; includes fields &amp;#8220;user_touched&amp;#8221; (last time the user
+    was updated) and &amp;#8220;user_editcount&amp;#8221; (a really simple count of the
+    users&amp;#8217; number of&amp;nbsp;edits).&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Table &amp;#8220;recentchanges&amp;#8221; holds a lot of data&amp;#8230; seemingly the entire
+    life of the&amp;nbsp;wiki&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;</summary><category term="bluetooth"></category><category term="car"></category><category term="carpc"></category><category term="conres"></category><category term="gps"></category><category term="linux"></category><category term="mediawiki"></category><category term="novell"></category><category term="obd"></category><category term="rutgers"></category><category term="sun"></category><category term="sunspot"></category><category term="suse"></category><category term="tuxtruck"></category></entry></feed>

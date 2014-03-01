@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Jason Antman's Blog</title><link>http://newblog.jasonantman.com/</link><description></description><atom:link href="http://newblog.jasonantman.com/feeds/tags/database.rss.xml" rel="self"></atom:link><lastBuildDate>Wed, 04 May 2011 08:47:00 -0400</lastBuildDate><item><title>Simple Diagrams of MySQL Schema</title><link>http://newblog.jasonantman.com/2011/05/simple-diagrams-of-mysql-schema/</link><description>&lt;p&gt;Jess Robinson&amp;#8217;s
+&lt;a href="http://search.cpan.org/~jrobinson/SQL-Translator/"&gt;&lt;span class="caps"&gt;SQL&lt;/span&gt;-Translator&lt;/a&gt; &lt;span class="caps"&gt;CPAN&lt;/span&gt;
+module translates and parses &lt;span class="caps"&gt;SQL&lt;/span&gt; statements. The
+&lt;a href="http://sqlfairy.sourceforge.net/"&gt;SQLfairy&lt;/a&gt; project has some nice
+binaries that, among other things, use GraphViz or &lt;span class="caps"&gt;GD&lt;/span&gt; to draw pseudo-&lt;span class="caps"&gt;ER&lt;/span&gt;
+diagrams from &lt;span class="caps"&gt;SQL&lt;/span&gt; &lt;span class="caps"&gt;CREATE&lt;/span&gt; statements. Drawing a diagram of an &lt;span class="caps"&gt;SQL&lt;/span&gt; schema
+is as easy as
+&lt;code&gt;sqlt-diagram --db=MySQL -o schema.png -i png -t "title" --color --gutter 100 -c 2 schema-erd.sql&lt;/code&gt;.
+There are a few minor issues - the program seems to choke on the &lt;span class="caps"&gt;LOCK&lt;/span&gt;
+&lt;span class="caps"&gt;TABLES&lt;/span&gt; statements in &lt;code&gt;mysqldump&lt;/code&gt; output. But overall, the results are
+quite nice. The script can take (as easy as putting it in a Makefile)
+mysqldump output and generate a diagram like the one below, including
+foreign key constraints. I also found a simple intro and example in a
+post on &lt;a href="http://nsaunders.wordpress.com/2009/01/11/easy-visualisation-of-database-schemas-using-sqlfairy/"&gt;Neil
+Saunders&lt;/a&gt;&amp;#8216;&amp;nbsp;blog.&lt;/p&gt;
+&lt;p&gt;&lt;img alt="sqlfairy output" src="/GFX/sqlfairy.png" /&gt;&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Wed, 04 May 2011 08:47:00 -0400</pubDate><guid>tag:newblog.jasonantman.com,2011-05-04:2011/05/simple-diagrams-of-mysql-schema/</guid><category>database</category><category>db</category><category>diagram</category><category>mysql</category><category>sql</category></item><item><title>MySQL General Query Log and Awk Trimming Columns</title><link>http://newblog.jasonantman.com/2010/12/mysql-general-query-log-and-awk-trimming-columns/</link><description>&lt;p&gt;So today I started to implement a number of complex regex-based rules
+and templates to get &lt;a href="http://www.rsyslog.com"&gt;rsyslog&lt;/a&gt; to parse &lt;span class="caps"&gt;ISC&lt;/span&gt;
+DHCPd logs in realtime. Unfortunately one of my templates must have been
+wrong, because I started seeing some errors about a field that cannot be
+blank in &lt;code&gt;/var/log/messages&lt;/code&gt;. Unfortunately, rsyslog doesn&amp;#8217;t log the
+query that raised the error, or the name of the template, or anything
+else useful - just that there was a database error. With over a dozen
+new templates, this didn&amp;#8217;t help much. But the following technique&amp;nbsp;did:&lt;/p&gt;
+&lt;p&gt;MySQLd has a &lt;a href="http://dev.mysql.com/doc/refman/5.1/en/query-log.html"&gt;General Query
+Log&lt;/a&gt; that can be
+activated by addling a line&amp;nbsp;like:  &lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;log=/tmp/query.log`
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;to &lt;code&gt;/etc/my.cnf&lt;/code&gt; under the &lt;code&gt;[mysqld]&lt;/code&gt; section. This will log *all*
+queries to the specified log file, even if they resulted in an error or
+did not manipulate&amp;nbsp;data.&lt;/p&gt;
+&lt;p&gt;I couldn&amp;#8217;t find documentation on the log file format, but I observed
+that each line appeared to begin with some whitespace, then a number
+(perhaps a connection or section number, or maybe some sort of query
+ordering number), then the word &amp;#8220;Query&amp;#8221;, then the query. The following
+awk expression prints everything from the third column on, dropping the
+first two columns (the number and&amp;nbsp;&amp;#8220;Query&amp;#8221;):  &lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;awk &lt;span class="s1"&gt;&amp;#39;{ for (i=2; i&amp;lt;=&lt;span class="caps"&gt;NF&lt;/span&gt;; i++) printf &amp;quot;%s &amp;quot;, $i; printf &amp;quot;\n&amp;quot;; }&amp;#39;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;For easy analysis, the output of that can be piped into &lt;code&gt;sort&lt;/code&gt; and then
+&lt;code&gt;uniq&lt;/code&gt;.&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Tue, 21 Dec 2010 11:45:00 -0500</pubDate><guid>tag:newblog.jasonantman.com,2010-12-21:2010/12/mysql-general-query-log-and-awk-trimming-columns/</guid><category>awk</category><category>database</category><category>logging</category><category>mysql</category></item></channel></rss>

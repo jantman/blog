@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Jason Antman's Blog</title><link>http://newblog.jasonantman.com/</link><description></description><atom:link href="http://newblog.jasonantman.com/feeds/tags/bug-tracking.rss.xml" rel="self"></atom:link><lastBuildDate>Mon, 17 Sep 2007 14:47:00 -0400</lastBuildDate><item><title>Bug/Issue Tracking - Update / Review of Eventum</title><link>http://newblog.jasonantman.com/2007/09/bugissue-tracking-update-review-of-eventum/</link><description>&lt;p&gt;So, after many hours of investigating potential bug/issue tracking
+packages, I have chosen one. And gone live with it, all in one weekend.
+After much evaluation, my final choice was
+&lt;a href="http://eventum.mysql.com/"&gt;Eventum&lt;/a&gt; from MySQL (I&amp;#8217;m using the current
+version, 2.0.1). I will admit that it is not perfect. There are some
+features I wanted that weren&amp;#8217;t there, and the documentation is awful.
+But it&amp;#8217;s written in&amp;nbsp;&lt;span class="caps"&gt;PHP&lt;/span&gt;.&lt;/p&gt;
+&lt;p&gt;That being said, it is very much a community-driven project. The support
+on the mailing list, both from other community members and from Bryan
+Alsdorf, has been wonderful. I had some issues viewing the help
+documents, specifically those in pop-ups, but I&amp;#8217;ve been told that most
+new documentation has been moved to the wiki at the link&amp;nbsp;above.&lt;/p&gt;
+&lt;p&gt;The project provides for advanced bug- and issue-tracking including time
+tracking, file attachments, and customizable statuses, priorities, and
+categories. It also provides email integration, both in terms of sending
+email alerts and opening issues (as well as updating and tracking) by
+parsing incoming emails. The email alerts worked out-of-the-box, but I
+did not configure parsing of&amp;nbsp;emails.&lt;/p&gt;
+&lt;p&gt;One of my main requirements which was met perfectly by Eventum is its&amp;#8217;
+ability to easily handle multiple projects. It also has a built-in
+capability to allow anonymous issue submission (enabled on a
+project-by-project basis). You can define custom fields for issues on a
+project-by-project basis, and set them as required fields for either
+registered users, anonymous users, or&amp;nbsp;both.&lt;/p&gt;
+&lt;p&gt;One feature that I found lacking was the possibility for a user to view
+all of the open issues assigned to them. Currently, all user interface
+is on a project-by-project basis. Therefore, listing of open issues is
+only available for the currently selected project. To cope with this, I
+hacked together a little &lt;span class="caps"&gt;PHP&lt;/span&gt; script that just queries the database for
+issues by user and displays it in a simple little&amp;nbsp;page.&lt;/p&gt;
+&lt;p&gt;One of the major features about Eventum that caught my eye was
+integration with a version control system (&lt;span class="caps"&gt;SCM&lt;/span&gt;, as far as the Eventum
+docs are concerned). The feature list stated integration with &lt;span class="caps"&gt;CVS&lt;/span&gt; and
+&lt;span class="caps"&gt;SVN&lt;/span&gt;. When I actually looked into integrating it with &lt;span class="caps"&gt;CVS&lt;/span&gt;, however, the
+problems began. Firstly, the javascript-based help popup would not
+display anything, let alone the proper page. Installation was otherwise
+perfect under Apache2. I was forced to browse to the included &lt;span class="caps"&gt;HTML&lt;/span&gt; file
+manually and check it out. The overview seemed simple enough - throw a
+script in your &lt;span class="caps"&gt;CVSROOT&lt;/span&gt; loginfo file, update a few variables in the
+web-based Eventum configuration, and you&amp;#8217;re off to the races. Reading
+on, I found that the installation page was a confusing jumble of
+references to a deprecated perl script and the current &lt;span class="caps"&gt;PHP&lt;/span&gt; script to
+call from loginfo. Furthermore, database access is provided by having
+the script called from loginfo parse the logging information and then
+&lt;em&gt;run a &lt;span class="caps"&gt;HTTP&lt;/span&gt; &lt;span class="caps"&gt;GET&lt;/span&gt;&lt;/em&gt; on a local script served in the Eventum web
+directory. This added level of abstraction not only confuses me to no
+end, but also introduces the possibility for malicious users to insert
+data in the Eventum &lt;span class="caps"&gt;SCM&lt;/span&gt; database simply by visiting a well-known&amp;nbsp;&lt;span class="caps"&gt;URL&lt;/span&gt;.&lt;/p&gt;
+&lt;p&gt;More importantly, the script provided to be called by loginfo seems to
+expect the old &lt;span class="caps"&gt;CVS&lt;/span&gt; logging format, not the new one being provided by my
+installation of &lt;span class="caps"&gt;CVS&lt;/span&gt; 1.12.12. While annoying, this ended up being a minor
+fix in the provided &amp;#8220;process_cvs_commits.php&amp;#8221; - I simply had to
+rewrite the argument parsing code so that it no longer expects the file,
+old version, and new version (%{sVv}) information to be space-separated
+on the command line in the form of s,V,v tuples, but expects everything
+to be space-separated. I should be cleaning up my fix a bit and
+submitting it for inclusion in the next&amp;nbsp;release.&lt;/p&gt;
+&lt;p&gt;Once patched, &lt;span class="caps"&gt;CVS&lt;/span&gt; integration works perfectly. Simply append an
+identifier to the end of your commit log message, such as &amp;#8220;(issue: 21)&amp;#8221;
+or &amp;#8220;(bug: 21)&amp;#8221; and the commit will be automatically associated with the
+issue of that number. When viewing an issue, a list of associated &lt;span class="caps"&gt;CVS&lt;/span&gt;
+commits can be&amp;nbsp;viewed.&lt;/p&gt;
+&lt;p&gt;It must be remembered that, as I have read, Eventum is used internally
+by MySQL. It is, therefor, a mature project that is well tested in one
+circumstance. I believe that it is mature and generally well-working
+(though I&amp;#8217;ve heard reports that the 2.x tree isn&amp;#8217;t as stable as the
+older versions, which are most likely still in use at MySQL). It must
+also be noted that the issue with &lt;span class="caps"&gt;CVS&lt;/span&gt; integration is most likely only
+with the newer &lt;span class="caps"&gt;CVS&lt;/span&gt; versions using the new logging format (I don&amp;#8217;t know
+when the switch was made) and will probably not be noticed in older
+projects which have established &lt;span class="caps"&gt;CVS&lt;/span&gt;&amp;nbsp;systems.&lt;/p&gt;
+&lt;p&gt;Now, for the opinion section. Eventum has thousands of features. I have
+detailed every issue that I have, which total about five. I found it to
+be a stable system, ready-to-run out of the box. Overall, I think it has
+the best feature set of the open-source bug tracking systems that I
+surveyed, which are probably most of the ones out there. It&amp;#8217;s a great
+project which I&amp;#8217;d recommend to anyone, though if you want more advanced
+features (like integration with &lt;span class="caps"&gt;CVS&lt;/span&gt;, or things not offered such as
+anonymous issue viewing) you should be comfortable with coding in &lt;span class="caps"&gt;PHP&lt;/span&gt;
+until someone makes patches&amp;nbsp;available.&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Mon, 17 Sep 2007 14:47:00 -0400</pubDate><guid>tag:newblog.jasonantman.com,2007-09-17:2007/09/bugissue-tracking-update-review-of-eventum/</guid><category>bug tracking</category><category>eventum</category><category>PHP</category><category>review</category><category>ticketing</category></item><item><title>Bug / Issue Tracking Software</title><link>http://newblog.jasonantman.com/2007/09/bug-issue-tracking-software/</link><description>&lt;p&gt;I recently posted the following to the DevShed forum in hope of an&amp;nbsp;answer:&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;I&amp;#8217;ve spent the last 48 hours reading up on bug
+tracking software. At the moment, I&amp;#8217;m using the SourceForge tracker for
+my public projects and a custom (lightweight kludge) system for internal
+and customer-specific&amp;nbsp;stuff.&lt;/p&gt;
+&lt;p&gt;First off, I&amp;#8217;m looking for something that&amp;#8217;s F/&lt;span class="caps"&gt;OSS&lt;/span&gt; and no-cost. Beyond
+that, it should have a web-based interface, preferably coded in &lt;span class="caps"&gt;PHP&lt;/span&gt; as
+that&amp;#8217;s what I&amp;#8217;m most comfortable writing code&amp;nbsp;for.&lt;/p&gt;
+&lt;p&gt;I&amp;#8217;ve looked into many possibilities. At the moment, they&amp;#8217;re pretty much
+narrowed down to &lt;span class="caps"&gt;RT&lt;/span&gt;, FlySpray, Codetrack, Trac, and a few other
+america&amp;#8217;s promise rorabaugh3possibilities. I&amp;#8217;ve immediately disregarded
+anything without an online demo, so some may have slipped by&amp;nbsp;me.&lt;/p&gt;
+&lt;p&gt;I can do some coding to add a few features as needed, but here&amp;#8217;s what
+I&amp;#8217;m looking&amp;nbsp;for:&lt;/p&gt;
+&lt;p&gt;1) Web-based interface
+2) Ability to handle multiple projects
+3) Ability to handle modules/branches of a project - specifically to be
+used for projects which also have custom, user-specific modifications on
+a branch.
+4) *multiple* bug submission forms - ideally, one for team
+members/technical users, one (simplified) for non-technical end users,
+and one for non-technical users which also collects browser/&lt;span class="caps"&gt;OS&lt;/span&gt;
+information, as many of my projects are web-based.
+5) If possible, integration with &lt;span class="caps"&gt;CVS&lt;/span&gt; or &lt;span class="caps"&gt;SVN&lt;/span&gt; so that I can track commits
+related to a specific bug.
+6) Fine-grained access control. There should be a way to submit an
+anonymous (unregistered user) bug. Anonymous submissions and registered
+user submissions should be authorized on a project-by-project (or
+branch-by-branch) basis. There should also be access control on viewing
+*any* information at all for certain projects/modules (so the same
+system can be used for internal-only&amp;nbsp;projects).&lt;/p&gt;
+&lt;p&gt;I&amp;#8217;m sure that I have a lot of other requirements, but these are the ones
+that stuck out in my mind. Also, though I don&amp;#8217;t have a system up and
+running yet, there&amp;#8217;s a possibility I may be moving to &lt;span class="caps"&gt;LDAP&lt;/span&gt; for all auth,
+so something where I could drop in a custom auth module would be a&amp;nbsp;plus.&lt;/p&gt;
+&lt;p&gt;Any&amp;nbsp;suggestions?&lt;/p&gt;
+&lt;p&gt;I know I probably won&amp;#8217;t find *all* of this in one place, but I&amp;#8217;d like
+to minimize the amount of programming I have to do. After all, starting
+a new programming project to track bugs in an existing one isn&amp;#8217;t
+especially&amp;nbsp;efficient.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;We&amp;#8217;ll see what happens out of&amp;nbsp;it.&lt;/p&gt;
+&lt;p&gt;I recently received a few emails from someone attempting to get &lt;a href="http://www.php-ems-tools.com"&gt;&lt;span class="caps"&gt;PHP&lt;/span&gt; &lt;span class="caps"&gt;EMS&lt;/span&gt;
+Tools&lt;/a&gt; up and running for his &lt;span class="caps"&gt;EMS&lt;/span&gt; agency.
+I did a lot of correspondence via email, and ended up in a bit of a
+predicament. First off, since &lt;span class="caps"&gt;CVS&lt;/span&gt; is down, I had to make a copy of the
+latest development sources from their live location on my web server,
+and revert to using &lt;span class="caps"&gt;RCS&lt;/span&gt; for the development work. Secondly, he wasn&amp;#8217;t
+familiar with the SourceForge trackers and didn&amp;#8217;t have an account with
+them, so I had to manually enter the bug reports. This was not good. I
+need something&amp;nbsp;better.&lt;/p&gt;
+&lt;p&gt;I know that a lot of ticketing systems use e-mail interfaces, but I have
+no interest in that - I want to be able to require certain information
+for certain people. Moreover, I have a few main issues with most of the
+ticketing software I&amp;#8217;ve&amp;nbsp;seen:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;It&amp;#8217;s either designed for development team members or non-technical
+    end users. I want a system that can present an end-user with a
+    simple, non-jargon-filled issue submission form, yet put that right
+    in with issues entered by developers, which would have a greater
+    depth of technical content. Developers should be able to follow-up
+    on users&amp;#8217; tickets and add technical details as needed. Most
+    importantly, since most of my projects are web-based, I want to add
+    &lt;span class="caps"&gt;JS&lt;/span&gt; to the form which will include the users&amp;#8217; browser and &lt;span class="caps"&gt;OS&lt;/span&gt;
+    information in the&amp;nbsp;ticket.&lt;/li&gt;
+&lt;li&gt;I don&amp;#8217;t have a server farm. I don&amp;#8217;t expect to be getting hundreds of
+    bugs a year, let alone week. As such, it makes no sense for me to
+    run a separate system for every project. I want a system that can
+    handle multiple&amp;nbsp;projects.&lt;/li&gt;
+&lt;li&gt;Furthermore, I want it to handle internal projects as well - server
+    upgrades, hardware issue tracking, etc. As such, it should support
+    fine-grained access control, both for viewing and submitting bugs.
+    Some projects should allow anyone to view bugs, and allow a
+    non-registered (provided the email address is valid) user to submit.
+    Some projects shouldn&amp;#8217;t let anyone but me see&amp;nbsp;*anything*.&lt;/li&gt;
+&lt;li&gt;I need support for branches within projects. While &lt;span class="caps"&gt;PHP&lt;/span&gt; &lt;span class="caps"&gt;EMS&lt;/span&gt; Tools
+    only has the trunk publicly available, I now have two branches, one
+    customized for my organization and one for this gentleman&amp;#8217;s
+    organization. I want a system that can understand that these are
+    branches of the main project, and that bugs may pertain to only one
+    of these branches, but that all of the bugs from the trunk will
+    pertain to&amp;nbsp;them.&lt;/li&gt;
+&lt;li&gt;I would love a system that can somehow integrate with &lt;span class="caps"&gt;CVS&lt;/span&gt; or &lt;span class="caps"&gt;SVN&lt;/span&gt;, so
+    that I can associate a specific commit with a specific&amp;nbsp;bug(s).&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;So far, I&amp;#8217;m considering FlySpray, &lt;span class="caps"&gt;RT&lt;/span&gt;, and Trac. I&amp;#8217;m also looking at
+Eventum, Codetrac, and BugZero. I&amp;#8217;m interested in &lt;span class="caps"&gt;OTRS&lt;/span&gt; as I&amp;#8217;ve heard
+good things about it, but I can&amp;#8217;t seem to find a web-based demo. Most
+likely, I&amp;#8217;ll probably give two or three of them a whirl, and then add in
+the custom code to do what I need. Of course, none of this will happen
+until I either get &lt;span class="caps"&gt;CVS&lt;/span&gt; back up or migrate to&amp;nbsp;&lt;span class="caps"&gt;SVN&lt;/span&gt;.&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Fri, 07 Sep 2007 11:44:00 -0400</pubDate><guid>tag:newblog.jasonantman.com,2007-09-07:2007/09/bug-issue-tracking-software/</guid><category>bug tracking</category><category>bugs</category><category>bugzero</category><category>eventum</category><category>flyspray</category><category>otrs</category><category>rt</category><category>ticketing</category><category>trac</category></item></channel></rss>
