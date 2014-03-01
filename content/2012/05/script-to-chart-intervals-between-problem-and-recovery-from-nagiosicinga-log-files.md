@@ -1,7 +1,7 @@
 Title: Script to Chart Intervals Between Problem and Recovery from Nagios/Icinga Log Files
 Date: 2012-05-31 13:54
 Author: admin
-Category: SysAdmin
+Category: Ops
 Tags: chart, icinga, monitoring, Nagios, perl
 Slug: script-to-chart-intervals-between-problem-and-recovery-from-nagiosicinga-log-files
 

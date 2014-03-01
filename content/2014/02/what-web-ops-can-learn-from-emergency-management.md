@@ -1,7 +1,7 @@
 Title: What web ops can learn from emergency management
 Date: 2014-02-26 07:14
 Author: Jason Antman
-Category: DevOps
+Category: Ops
 Tags: disaster, devops, webops
 Slug: what-web-ops-can-learn-from-emergency-management
 Summary: <<<<< summary goes here >>>>>>>

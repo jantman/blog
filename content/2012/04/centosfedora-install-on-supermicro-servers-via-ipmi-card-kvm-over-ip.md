@@ -1,7 +1,7 @@
 Title: CentOS/Fedora Install on SuperMicro Servers via IPMI Card KVM Over IP
 Date: 2012-04-13 15:19
 Author: admin
-Category: SysAdmin
+Category: Ops
 Tags: anaconda, centos, fedora, ipmi, kvm, linux, raritan, supermicro
 Slug: centosfedora-install-on-supermicro-servers-via-ipmi-card-kvm-over-ip
 

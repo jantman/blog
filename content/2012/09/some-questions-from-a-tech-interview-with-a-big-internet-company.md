@@ -1,7 +1,7 @@
 Title: Some questions from a tech interview with a big Internet company
 Date: 2012-09-12 05:00
 Author: admin
-Category: SysAdmin
+Category: Ops
 Tags: hiring, interview, questions, sysadmin
 Slug: some-questions-from-a-tech-interview-with-a-big-internet-company
 

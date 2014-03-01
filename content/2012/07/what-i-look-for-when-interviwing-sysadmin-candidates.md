@@ -1,7 +1,7 @@
 Title: What I Look For When Interviwing SysAdmin Candidates
 Date: 2012-07-05 11:07
 Author: admin
-Category: SysAdmin
+Category: Ops
 Slug: what-i-look-for-when-interviwing-sysadmin-candidates
 
 I recently came by a question on ServerFault, [Listing side projects in

@@ -1,7 +1,7 @@
 Title: Passing data / key value pairs from KVM qemu host to guests (CentOS Linux)
 Date: 2013-08-30 18:51
 Author: admin
-Category: SysAdmin
+Category: Ops
 Tags: kvm, libvirt, linux, qemu, virtualization
 Slug: passing-data-key-value-pairs-from-kvm-qemu-host-to-guests
 Status: draft

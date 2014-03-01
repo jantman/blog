@@ -1,7 +1,7 @@
 Title: Rating Your Technical Skills in an Interview or Phone Screen
 Date: 2013-06-11 06:08
 Author: admin
-Category: SysAdmin
+Category: Ops
 Tags: engineer, hiring, hr, interview, ops, phone screen
 Slug: rating-your-technical-skills-in-an-interview-or-phone-screen
 Status: draft

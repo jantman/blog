@@ -1,7 +1,7 @@
 Title: Dear Mom and Dad - or, a book about what I actually do
 Date: 2012-08-05 08:52
 Author: admin
-Category: SysAdmin
+Category: Ops
 Tags: books, limoncelli, sysadmin
 Slug: dear-mom-and-dad-or-a-book-about-what-i-actually-do
 

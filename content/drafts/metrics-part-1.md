@@ -1,7 +1,7 @@
 Title: Metrics Part 1
 Date: 2013-03-06 21:24
 Author: admin
-Category: SysAdmin
+Category: Ops
 Tags: diamond, graphing, graphite, metrics, monitoring, munin, statsd
 Slug: metrics-part-1
 Status: draft

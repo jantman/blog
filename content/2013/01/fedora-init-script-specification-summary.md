@@ -1,7 +1,7 @@
 Title: Fedora Init Script Specification Summary
 Date: 2013-01-03 11:30
 Author: admin
-Category: SysAdmin
+Category: Ops
 Tags: centos, fedora, init, redhat, startup
 Slug: fedora-init-script-specification-summary
 

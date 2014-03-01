@@ -1,7 +1,7 @@
 Title: What Does a Sysadmin Look Like in 10 Years?
 Date: 2012-04-15 22:29
 Author: admin
-Category: SysAdmin
+Category: Ops
 Tags: engineer, sysadmin
 Slug: what-does-a-sysadmin-look-like-in-10-years
 

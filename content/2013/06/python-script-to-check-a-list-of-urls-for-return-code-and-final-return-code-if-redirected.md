@@ -1,7 +1,7 @@
 Title: Python script to check a list of URLs for return code, and final return code if redirected
 Date: 2013-06-10 06:00
 Author: admin
-Category: SysAdmin
+Category: Ops
 Tags: http, python, redirect, urllib
 Slug: python-script-to-check-a-list-of-urls-for-return-code-and-final-return-code-if-redirected
 

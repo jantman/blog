@@ -1,7 +1,7 @@
 Title: Perl script to convert F5 BigIp VIP address to list of internal pool member addresses
 Date: 2012-04-24 22:04
 Author: admin
-Category: SysAdmin
+Category: Ops
 Tags: bigip, f5, load balancer, perl
 Slug: perl-script-to-convert-f5-bigip-vip-address-to-list-of-internal-pool-member-addresses
 
