@@ -9,7 +9,8 @@ AUTHOR = u'Jason Antman'
 SITENAME = u"Jason Antman's Blog"
 #SITESUBTITLE = u"Subtitle here"
 DISQUS_SITENAME = 'jasonantman'
-#GOOGLE_ANALYTICS = 'UA-XXXX-YYYY'
+GOOGLE_ANALYTICS = 'UA-2718127-2'
+GA_DOMAIN = 'jasonantman.com'
 #SITEURL = 'http://blog.jasonantman.com' # TODO
 
 # Uncomment following line if you want document-relative URLs when developing

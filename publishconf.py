@@ -16,7 +16,7 @@ RELATIVE_URLS = False
 # TODO - update feedburner? see http://docs.getpelican.com/en/3.3.0/settings.html#feedburner
 FEED_DOMAIN = SITEURL
 FEED_ATOM = 'feeds/feed.atom.xml'
-FEED_RSS = None 'feeds/feed.rss.xml'
+FEED_RSS = 'feeds/feed.rss.xml'
 FEED_ALL_ATOM = 'feeds/all.atom.xml'
 FEED_ALL_RSS = 'feeds/all.rss.xml'
 CATEGORY_FEED_ATOM = 'feeds/categories/%s.atom.xml'
@@ -26,8 +26,3 @@ TAG_FEED_RSS = 'feeds/tags/%s.rss.xml'
 FEED_MAX_ITEMS = 500
 
 DELETE_OUTPUT_DIRECTORY = True
-
-# Following items are often useful when publishing
-
-#DISQUS_SITENAME = ""
-#GOOGLE_ANALYTICS = ""
