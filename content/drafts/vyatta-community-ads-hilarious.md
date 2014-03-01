@@ -1,7 +1,7 @@
 Title: Vyatta Community Ads - Hilarious
 Date: 2013-05-12 06:35
 Author: admin
-Category: Miscellaneous Geek Stuff, opensource
+Category: Miscellaneous
 Tags: ads, cisco, funny, router, vyatta
 Slug: vyatta-community-ads-hilarious
 Status: draft
