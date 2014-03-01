@@ -64,7 +64,7 @@ paths, I was still having some issues...
 In WordPress, I was using the
 [WP-Syntax](http://wordpress.org/extend/plugins/wp-syntax/) plugin to perform
 syntax hilighting via [GeSHi](http://qbnz.com/highlighter/). The plugin uses
-<pre> tags with a `lang=` attribute to specify the language, like:
+pre tags with a `lang=` attribute to specify the language, like:
 
 ````
 <pre lang="bash">
