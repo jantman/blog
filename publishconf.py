@@ -23,6 +23,6 @@ CATEGORY_FEED_ATOM = 'feeds/categories/%s.atom.xml'
 CATEGORY_FEED_RSS = 'feeds/categories/%s.rss.xml'
 TAG_FEED_ATOM = 'feeds/tags/%s.atom.xml'
 TAG_FEED_RSS = 'feeds/tags/%s.rss.xml'
-FEED_MAX_ITEMS = 100
+FEED_MAX_ITEMS = 50
 
 DELETE_OUTPUT_DIRECTORY = True
