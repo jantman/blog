@@ -1,5 +1,95 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Jason Antman's Blog</title><link href="http://blog.jasonantman.com/" rel="alternate"></link><link href="http://blog.jasonantman.com/feeds/feed.atom.xml" rel="self"></link><id>http://blog.jasonantman.com/</id><updated>2014-01-01T15:15:00-05:00</updated><entry><title>Planning Migration from WordPress to Static Site</title><link href="http://blog.jasonantman.com/2014/01/planning-migration-from-wordpress-to-static-site/" rel="alternate"></link><updated>2014-01-01T15:15:00-05:00</updated><author><name>admin</name></author><id>tag:blog.jasonantman.com,2014-01-01:2014/01/planning-migration-from-wordpress-to-static-site/</id><summary type="html">&lt;p&gt;Right now, this blog, my email, and a whole bunch of other services are
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Jason Antman's Blog</title><link href="http://blog.jasonantman.com/" rel="alternate"></link><link href="http://blog.jasonantman.com/feeds/feed.atom.xml" rel="self"></link><id>http://blog.jasonantman.com/</id><updated>2014-02-28T22:21:00-05:00</updated><entry><title>Converting WordPress Posts to Pelican MarkDown</title><link href="http://blog.jasonantman.com/2014/02/converting-wordpress-posts-to-pelican-markdown/" rel="alternate"></link><updated>2014-02-28T22:21:00-05:00</updated><author><name>Jason Antman</name></author><id>tag:blog.jasonantman.com,2014-02-28:2014/02/converting-wordpress-posts-to-pelican-markdown/</id><summary type="html">&lt;p&gt;A few weeks ago, I
+&lt;a href="/2014/01/planning-migration-from-wordpress-to-static-site/"&gt;posted&lt;/a&gt; about my
+plans to convert my self-hosted WordPress blog to a static site using a static
+blog generator. Since then, I&amp;#8217;ve decided to stop working on my exhaustive
+&lt;a href="https://docs.google.com/spreadsheet/ccc?key=0AnHh-ye5DNiNdF9DWkJrT2kzSkNsNVp6cjMzLXJ6VEE&amp;amp;usp=sharing"&gt;static blog generator comparison spreadsheet&lt;/a&gt;
+and just try &lt;a href="http://getpelican.com"&gt;Pelican&lt;/a&gt; - mainly because it&amp;#8217;s written in
+Python which is my current strongest language, comes highly recommended, seems
+to have most of the features I want, and seems to be easily&amp;nbsp;extensible.&lt;/p&gt;
+&lt;p&gt;So, I walked through the documentation for the latest version (3.3.0), started
+a &lt;a href="https://github.com/jantman/blog"&gt;GitHub repo&lt;/a&gt;, and tweaked a bunch of
+settings. The repo is public, so if you want to take a look behind the scenes,
+see my &lt;a href="https://github.com/jantman/blog/blob/master/fabfile.py"&gt;fabfile&lt;/a&gt;,
+etc. feel&amp;nbsp;free. &lt;/p&gt;
+&lt;h2 id="initial-wordpress-import-attempt"&gt;Initial WordPress Import&amp;nbsp;Attempt&lt;/h2&gt;
+&lt;p&gt;I used the WordPress &lt;span class="caps"&gt;XML&lt;/span&gt; Export tool, as instructed in the &lt;a href="http://docs.getpelican.com/en/latest/importer.html"&gt;Pelican Importer documentation&lt;/a&gt;.
+At first, I attempted to do a more-or-less default import from WordPress using
+the &lt;code&gt;pelican-import&lt;/code&gt; tool, which writes rST, and then build the blog. What I
+ended up with was thousands of errors complaining about &amp;#8220;Inline interpreted
+text or phrase reference start-string without end-string&amp;#8221;, &amp;#8220;Explicit markup
+ends without a blank line; unexpected uninden&amp;#8221;, &amp;#8220;malformed hyperlink target&amp;#8221;,
+&amp;#8220;Unknown target name&amp;#8221; on all of my links, and a bevy of other Docutils
+errors. It was so utterly awful that I gave&amp;nbsp;up.&lt;/p&gt;
+&lt;h2 id="wordpress-import-as-markdown"&gt;WordPress Import as&amp;nbsp;MarkDown&lt;/h2&gt;
+&lt;p&gt;Next I tried importing as MarkDown instead of rST,&amp;nbsp;using:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;pelican-import --markup markdown --wpfile -o content/ --dir-page jasonantman039sblog.wordpress.2014-01-11.xml
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;That built without errors, and the posts looked somewhat right out of the
+box, without any of the previous thousands of errors. And the links looked
+mostly right - even the captions for images. Though I&amp;#8217;m working at a Python
+shop and writing a lot of Python these days, my knowledge of MarkDown is still
+much better than rST, so this is fine for me. (I even wrote a &lt;code&gt;fab post&lt;/code&gt; task
+that prompts for a title, generates all of the post metadata, writes it to the
+right file, and opens up an editor on&amp;nbsp;it.)&lt;/p&gt;
+&lt;p&gt;The first problem was that the import script gave me one &amp;#8220;content&amp;#8221; directory
+with 346 &amp;#8220;.md&amp;#8221; files in it - not exactly easy to work with. Luckily the
+metadata was right, so a quick little
+&lt;a href="https://github.com/jantman/blog/blob/master/move_wordpress.sh"&gt;bash script&lt;/a&gt;
+moved the posts into a &lt;span class="caps"&gt;YYYY&lt;/span&gt;/&lt;span class="caps"&gt;MM&lt;/span&gt; directory&amp;nbsp;hierarchy.&lt;/p&gt;
+&lt;h2 id="obvious-problems-with-imported-posts"&gt;Obvious Problems with Imported&amp;nbsp;Posts&lt;/h2&gt;
+&lt;p&gt;After getting the MarkDown import working, and the posts moved to the proper
+paths, I was still having some&amp;nbsp;issues&amp;#8230;&lt;/p&gt;
+&lt;h3 id="syntax-hilighting-gone"&gt;Syntax Hilighting&amp;nbsp;Gone&lt;/h3&gt;
+&lt;p&gt;In WordPress, I was using the
+&lt;a href="http://wordpress.org/extend/plugins/wp-syntax/"&gt;&lt;span class="caps"&gt;WP&lt;/span&gt;-Syntax&lt;/a&gt; plugin to perform
+syntax hilighting via &lt;a href="http://qbnz.com/highlighter/"&gt;GeSHi&lt;/a&gt;. The plugin uses
+&lt;pre&gt; tags with a &lt;code&gt;lang=&lt;/code&gt; attribute to specify the language,&amp;nbsp;like:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&amp;lt;pre lang=&amp;quot;bash&amp;quot;&amp;gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Unfortunately, these translated to some really ugly MarkDown fenced blocks&amp;nbsp;like:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;~~~~ {lang=&amp;quot;bash&amp;quot;}
+cp /boot/efi/EFI/fedora/grub.cfg /boot/efi/EFI/fedora/grub.cfg.bak
+echo &amp;#39;GRUB_DISABLE_OS_PROBER=&amp;quot;true&amp;quot;&amp;#39; &amp;gt;&amp;gt; /etc/default/grub
+grub2-mkconfig &amp;gt; /boot/efi/EFI/fedora/grub.cfg
+~~~~
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;that seem to be just a bit off from what MarkDown/Pygments can handle. The
+places where I just used bare &lt;code&gt;&amp;lt;pre&amp;gt;&lt;/code&gt; blocks translated&amp;nbsp;fine.&lt;/p&gt;
+&lt;p&gt;http://blog.gastove.com/2013-09-17_enabling_line_numbers_for_pygments.html&lt;/p&gt;
+&lt;p&gt;Fixed this by using fenced blocks with the 'lang=' stuff removed, and in class
+syntax like the MarkDown docs suggest. Some four-tab-indents with
+:::identifier&amp;nbsp;work.&lt;/p&gt;
+&lt;h3 id="broken-links"&gt;Broken&amp;nbsp;Links&lt;/h3&gt;
+&lt;p&gt;It seems that something in the conversion process introduced line wraps (could
+it really be Pandoc itself???) Unfortunately, this wreaks havoc with any
+explicit reference links
+that use long (long enough to break across lines) titles, depending on where
+they are in the line. It seems that in some places they end up breaking
+differently in the link in the text and in the link definition, which MarkDown misses, and
+then renders broken links and plain text of the link table at the bottom of
+the page. Manually removing the line breaks and any extraneous spaces seems to
+fix&amp;nbsp;it.&lt;/p&gt;
+&lt;p&gt;So, yes, Pandoc was doing this because of the &lt;code&gt;--reference-links&lt;/code&gt; parameter
+that &lt;code&gt;pelican-import&lt;/code&gt; was calling it with. There was an
+&lt;a href="https://github.com/getpelican/pelican/issues/348"&gt;issue&lt;/a&gt; and
+&lt;a href="https://github.com/getpelican/pelican/pull/642"&gt;pull request&lt;/a&gt; to fix this,
+but when I started with Pelican the last release was 3.3.0 (4 months ago) and
+the &lt;span class="caps"&gt;PR&lt;/span&gt; was merged after that. So, if you're having the same problem and the
+latest release of Pelican is still 3.3.0, you might as well just apply
+&lt;a href="https://github.com/getpelican/pelican/commit/83e4d35b44a422ee8d4b077f505970d03e555f45"&gt;the patch&lt;/a&gt;
+yourself - it's just a very simple removal of a parameter in
+&lt;code&gt;pelican_import.py&lt;/code&gt;.&lt;/p&gt;
+&lt;h2 id="overall-results"&gt;Overall&amp;nbsp;Results&lt;/h2&gt;
+&lt;p&gt;I'm quite happy with the overall results. I also spent a &lt;em&gt;lot&lt;/em&gt; of time manually fixing
+markup issues that didn't translate well through Pandoc, but I suppose that's to be
+expected given that many of my older blog posts had &lt;span class="caps"&gt;HTML&lt;/span&gt;&amp;nbsp;issues.&lt;/p&gt;</summary><category term="pelican"></category><category term="wordpress"></category><category term="blog"></category><category term="markdown"></category></entry><entry><title>Planning Migration from WordPress to Static Site</title><link href="http://blog.jasonantman.com/2014/01/planning-migration-from-wordpress-to-static-site/" rel="alternate"></link><updated>2014-01-01T15:15:00-05:00</updated><author><name>admin</name></author><id>tag:blog.jasonantman.com,2014-01-01:2014/01/planning-migration-from-wordpress-to-static-site/</id><summary type="html">&lt;p&gt;Right now, this blog, my email, and a whole bunch of other services are
 hosted on a &lt;a href="http://linode.com"&gt;Linode&lt;/a&gt; Xen &lt;span class="caps"&gt;VM&lt;/span&gt;. I don&amp;#8217;t really keep up
 to date with administration and upgrades the way I used to, and
 honestly, I&amp;#8217;d rather spend my time working on other things (like
