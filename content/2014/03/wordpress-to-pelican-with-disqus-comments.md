@@ -139,3 +139,6 @@ At this point, Pelican seemed to be working, but WordPress was still left with o
 and that was disabled by the Code Freeze plugin. I probably could have manually patched the Disqus plugin to
 reflect the new thread identifiers, but instead, I chose to just push forward with the switch from WordPress to
 Pelican.
+
+That only took a few hours, and I'm happy to say that I'm now up and running with a Pelican blog, hosted for free
+by GitHub Pages.

@@ -1,11 +1,10 @@
 Title: Converting WordPress Posts to Pelican MarkDown
-Date: 2014-03-01 09:21
+Date: 2014-02-28 22:21
 Tags: pelican,wordpress,blog,markdown
 Category: Miscellaneous Geek Stuff
 Slug: converting-wordpress-posts-to-pelican-markdown
 Author: Jason Antman
 Summary: My adventures converting my WordPress blog to Pelican, the problems I encountered, and how I solved them.
-Status: draft
 
 A few weeks ago, I
 [posted](/2014/01/planning-migration-from-wordpress-to-static-site/) about my
@@ -111,3 +110,8 @@ latest release of Pelican is still 3.3.0, you might as well just apply
 yourself - it's just a very simple removal of a parameter in
 `pelican_import.py`.
 
+## Overall Results
+
+I'm quite happy with the overall results. I also spent a *lot* of time manually fixing
+markup issues that didn't translate well through Pandoc, but I suppose that's to be
+expected given that many of my older blog posts had HTML issues.
