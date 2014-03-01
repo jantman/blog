@@ -1,5 +1,5 @@
 Title: Converting WordPress Posts to Pelican MarkDown
-Date: 2014-01-19 09:21
+Date: 2014-03-01 09:21
 Tags: pelican,wordpress,blog,markdown
 Category: Miscellaneous Geek Stuff
 Slug: converting-wordpress-posts-to-pelican-markdown
