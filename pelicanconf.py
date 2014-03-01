@@ -8,9 +8,9 @@ from __future__ import unicode_literals
 AUTHOR = u'Jason Antman'
 SITENAME = u"Jason Antman's Blog"
 #SITESUBTITLE = u"Subtitle here"
-#DISQUS_SITENAME = None
+DISQUS_SITENAME = 'jasonantman'
 #GOOGLE_ANALYTICS = 'UA-XXXX-YYYY'
-SITEURL = '' # TODO
+#SITEURL = 'http://blog.jasonantman.com' # TODO
 
 # Uncomment following line if you want document-relative URLs when developing
 RELATIVE_URLS = True
