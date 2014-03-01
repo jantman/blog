@@ -10,7 +10,7 @@ import sys
 sys.path.append(os.curdir)
 from pelicanconf import *
 
-SITEURL = 'http://newblog.jasonantman.com'
+SITEURL = 'http://blog.jasonantman.com'
 RELATIVE_URLS = False
 
 # TODO - update feedburner? see http://docs.getpelican.com/en/3.3.0/settings.html#feedburner
