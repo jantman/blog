@@ -8,7 +8,7 @@ from __future__ import unicode_literals
 AUTHOR = u'Jason Antman'
 SITENAME = u"Jason Antman's Blog"
 #SITESUBTITLE = u"Subtitle here"
-DISQUS_SITENAME = 'jasonantman'
+DISQUS_SITENAME = 'jantman'
 GOOGLE_ANALYTICS = 'UA-2718127-2'
 GA_DOMAIN = 'jasonantman.com'
 #SITEURL = 'http://blog.jasonantman.com' # TODO
