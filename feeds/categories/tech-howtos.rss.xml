@@ -1,5 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Jason Antman's Blog</title><link>http://blog.jasonantman.com/</link><description></description><atom:link href="http://blog.jasonantman.com/feeds/categories/tech-howtos.rss.xml" rel="self"></atom:link><lastBuildDate>Sat, 01 Mar 2014 09:09:00 -0500</lastBuildDate><item><title>Wordpress to Pelican with Disqus comments</title><link>http://blog.jasonantman.com/2014/03/wordpress-to-pelican-with-disqus-comments/</link><description>&lt;p&gt;This is the second part of my WordPress to &lt;a href="http://getpelican.com"&gt;Pelican&lt;/a&gt; conversion saga.
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Jason Antman's Blog</title><link>http://blog.jasonantman.com/</link><description></description><atom:link href="http://blog.jasonantman.com/feeds/categories/tech-howtos.rss.xml" rel="self"></atom:link><lastBuildDate>Sat, 01 Mar 2014 19:01:00 -0500</lastBuildDate><item><title>Python script to backup Disqus comments</title><link>http://blog.jasonantman.com/2014/03/python-script-to-backup-disqus-comments/</link><description>&lt;p&gt;Since I just &lt;a href="/2014/03/wordpress-to-pelican-with-disqus-comments"&gt;switched this blog to using Disqus for commenting&lt;/a&gt;,
+I wanted a way to back up comments in case something goes wrong (like,
+Disqus going the way of del.icio.us&amp;nbsp;bookmarking).&lt;/p&gt;
+&lt;p&gt;I whipped up a quick &lt;a href="https://github.com/jantman/misc-scripts/blob/master/disqus_backup.py"&gt;Python script&lt;/a&gt;
+using the official &lt;a href="https://github.com/disqus/disqus-python"&gt;Disqus Python &lt;span class="caps"&gt;API&lt;/span&gt; client&lt;/a&gt;. It grabs the forum details,
+threads list and posts (comments) list, and writes them out to a &lt;span class="caps"&gt;JSON&lt;/span&gt;&amp;nbsp;file.&lt;/p&gt;
+&lt;p&gt;It doesn&amp;#8217;t have any restore feature, but it captures all of the&amp;nbsp;data.&lt;/p&gt;
+&lt;p&gt;My first test made it look like there &lt;em&gt;may&lt;/em&gt; be some posts and theads missing (my import from
+wordpress showed 56 threads and 146 comments, but this script only grabbed 52 and 125 respectively),
+so exercise some caution until I verify what the problem is. If you happen to figure it out,
+please submit a&amp;nbsp;&lt;span class="caps"&gt;PR&lt;/span&gt;.&lt;/p&gt;
+&lt;p&gt;The script is available on GitHub at &lt;a href="https://github.com/jantman/misc-scripts/blob/master/disqus_backup.py"&gt;https://github.com/jantman/misc-scripts/blob/master/disqus_backup.py&lt;/a&gt;.&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">Jason Antman</dc:creator><pubDate>Sat, 01 Mar 2014 19:01:00 -0500</pubDate><guid>tag:blog.jasonantman.com,2014-03-01:2014/03/python-script-to-backup-disqus-comments/</guid><category>pelican</category><category>disqus</category><category>python</category></item><item><title>Wordpress to Pelican with Disqus comments</title><link>http://blog.jasonantman.com/2014/03/wordpress-to-pelican-with-disqus-comments/</link><description>&lt;p&gt;This is the second part of my WordPress to &lt;a href="http://getpelican.com"&gt;Pelican&lt;/a&gt; conversion saga.
 In the &lt;a href="/2014/03/converting-wordpress-posts-to-pelican-markdown/"&gt;last post&lt;/a&gt; I ran through some
 of the issues that I faced when converting the posts themselves, setting up my theme and settings,
 etc. In this post, I&amp;#8217;ll discuss the saga of moving from WordPress comments to Disqus&amp;nbsp;comments.&lt;/p&gt;
@@ -3730,33 +3741,4 @@ mv svn-commit.foo svn-commit.tmp
 
 
 &lt;p&gt;Using this method, running &lt;code&gt;svn commit&lt;/code&gt; will pull up your text editor
-with &amp;#8220;&lt;span class="caps"&gt;BY&lt;/span&gt;: username&amp;#8221; already inserted in the commit&amp;nbsp;message.&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Wed, 05 Jan 2011 11:23:00 -0500</pubDate><guid>tag:blog.jasonantman.com,2011-01-05:2011/01/client-side-subversion-commit-message-hooks/</guid><category>linux</category><category>puppet</category><category>subversion</category><category>svn</category></item><item><title>MySQL General Query Log and Awk Trimming Columns</title><link>http://blog.jasonantman.com/2010/12/mysql-general-query-log-and-awk-trimming-columns/</link><description>&lt;p&gt;So today I started to implement a number of complex regex-based rules
-and templates to get &lt;a href="http://www.rsyslog.com"&gt;rsyslog&lt;/a&gt; to parse &lt;span class="caps"&gt;ISC&lt;/span&gt;
-DHCPd logs in realtime. Unfortunately one of my templates must have been
-wrong, because I started seeing some errors about a field that cannot be
-blank in &lt;code&gt;/var/log/messages&lt;/code&gt;. Unfortunately, rsyslog doesn&amp;#8217;t log the
-query that raised the error, or the name of the template, or anything
-else useful - just that there was a database error. With over a dozen
-new templates, this didn&amp;#8217;t help much. But the following technique&amp;nbsp;did:&lt;/p&gt;
-&lt;p&gt;MySQLd has a &lt;a href="http://dev.mysql.com/doc/refman/5.1/en/query-log.html"&gt;General Query
-Log&lt;/a&gt; that can be
-activated by addling a line&amp;nbsp;like:  &lt;/p&gt;
-&lt;div class="codehilite"&gt;&lt;pre&gt;log=/tmp/query.log`
-&lt;/pre&gt;&lt;/div&gt;
-
-
-&lt;p&gt;to &lt;code&gt;/etc/my.cnf&lt;/code&gt; under the &lt;code&gt;[mysqld]&lt;/code&gt; section. This will log *all*
-queries to the specified log file, even if they resulted in an error or
-did not manipulate&amp;nbsp;data.&lt;/p&gt;
-&lt;p&gt;I couldn&amp;#8217;t find documentation on the log file format, but I observed
-that each line appeared to begin with some whitespace, then a number
-(perhaps a connection or section number, or maybe some sort of query
-ordering number), then the word &amp;#8220;Query&amp;#8221;, then the query. The following
-awk expression prints everything from the third column on, dropping the
-first two columns (the number and&amp;nbsp;&amp;#8220;Query&amp;#8221;):  &lt;/p&gt;
-&lt;div class="codehilite"&gt;&lt;pre&gt;awk &lt;span class="s1"&gt;&amp;#39;{ for (i=2; i&amp;lt;=&lt;span class="caps"&gt;NF&lt;/span&gt;; i++) printf &amp;quot;%s &amp;quot;, $i; printf &amp;quot;\n&amp;quot;; }&amp;#39;&lt;/span&gt;
-&lt;/pre&gt;&lt;/div&gt;
-
-
-&lt;p&gt;For easy analysis, the output of that can be piped into &lt;code&gt;sort&lt;/code&gt; and then
-&lt;code&gt;uniq&lt;/code&gt;.&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Tue, 21 Dec 2010 11:45:00 -0500</pubDate><guid>tag:blog.jasonantman.com,2010-12-21:2010/12/mysql-general-query-log-and-awk-trimming-columns/</guid><category>awk</category><category>database</category><category>logging</category><category>mysql</category></item></channel></rss>
+with &amp;#8220;&lt;span class="caps"&gt;BY&lt;/span&gt;: username&amp;#8221; already inserted in the commit&amp;nbsp;message.&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Wed, 05 Jan 2011 11:23:00 -0500</pubDate><guid>tag:blog.jasonantman.com,2011-01-05:2011/01/client-side-subversion-commit-message-hooks/</guid><category>linux</category><category>puppet</category><category>subversion</category><category>svn</category></item></channel></rss>
