@@ -1,5 +1,34 @@
 <?xml version="1.0" encoding="utf-8"?>
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Jason Antman's Blog</title><link>http://blog.jasonantman.com/</link><description></description><atom:link href="http://blog.jasonantman.com/feeds/all.rss.xml" rel="self"></atom:link><lastBuildDate>Sat, 22 Mar 2014 09:38:00 -0400</lastBuildDate><item><title>NSA Targeting SysAdmins</title><link>http://blog.jasonantman.com/2014/03/nsa-targeting-sysadmins/</link><description>&lt;p&gt;I try not to rant too much, but I feel that this one was needed. If you&amp;#8217;re looking for
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Jason Antman's Blog</title><link>http://blog.jasonantman.com/</link><description></description><atom:link href="http://blog.jasonantman.com/feeds/all.rss.xml" rel="self"></atom:link><lastBuildDate>Wed, 07 May 2014 21:58:00 -0400</lastBuildDate><item><title>dashsnap.py - A Script to Snapshot a Graphite Dashboard</title><link>http://blog.jasonantman.com/2014/05/dashsnap-a-script-to-snapshot-a-graphite-dashboard/</link><description>&lt;p&gt;As we push more and more and more metrics into &lt;a href="http://graphite.wikidot.com/"&gt;Graphite&lt;/a&gt;
+at work, we&amp;#8217;ve found the need to preserve data from an incident or outage to be quite
+important. Especially now that we&amp;#8217;re feeding a &lt;em&gt;lot&lt;/em&gt; of our data at 10-second intervals,
+and our storage schemas generally start aggregating that past 24 hours (God only knows
+how many spikes are gone if you look a week later), it&amp;#8217;s important to capture as much
+data as we think we&amp;#8217;ll need as soon after the incident as&amp;nbsp;possible.&lt;/p&gt;
+&lt;p&gt;To this end, a few days (and nights) into a relatively major crisis, I wrote a little
+python script, &lt;a href="https://github.com/jantman/misc-scripts/blob/master/dashsnap.py"&gt;dashsnap.py&lt;/a&gt;.
+It&amp;#8217;s horribly simple; pass it the hostname to your graphite server (if &amp;#8220;graphite&amp;#8221; doesn&amp;#8217;t
+resolve to what you want), the name of a dashboard, optionally a height and width for images
+(the default is currently 1024x768), and either a from and to date/time or a list of graphite
+&lt;span class="caps"&gt;URL&lt;/span&gt;-style intervals (the default is a ginormous &amp;#8220;-10minutes,-30minutes,-1hours,-2hours,-4hours,-6hours,-12hours,-24hours,-36hours&amp;#8221;).
+It will find all graphs on your dashboard, and locally save (in a horribly named directory)
+both PNGs of all the graphs, as well as the &lt;em&gt;raw &lt;span class="caps"&gt;JSON&lt;/span&gt; data&lt;/em&gt; for them. It&amp;#8217;ll also write
+(2 &lt;span class="caps"&gt;AM&lt;/span&gt;-simple) &lt;span class="caps"&gt;HTML&lt;/span&gt; index files to all of the intervals and graphs within&amp;nbsp;them.&lt;/p&gt;
+&lt;p&gt;Here&amp;#8217;s a view of the index page using the default&amp;nbsp;intervals:&lt;/p&gt;
+&lt;p&gt;&lt;a href="/GFX/dashsnap_index.png"&gt;&lt;img alt="screenshot of rendered index page" src="/GFX/dashsnap_index_sm.png" /&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;And here&amp;#8217;s the page showing graphs and &lt;span class="caps"&gt;JSON&lt;/span&gt; links for an individual dashboard for one&amp;nbsp;interval:&lt;/p&gt;
+&lt;p&gt;&lt;a href="/GFX/dashsnap_page.png"&gt;&lt;img alt="screenshot of one interval page" src="/GFX/dashsnap_page_sm.png" /&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;I&amp;#8217;ll quickly admit right now that this is alpha software, if you can even call it that.
+I guess in reality it&amp;#8217;s a late-night fix to a problem that deserves more. But, if it can
+save someone else a few hours late at night, it&amp;#8217;s worth mentioning. PRs are welcome, as
+are issues and suggestions on GitHub for bugs, or for where I should take this; I like
+the handy little &lt;span class="caps"&gt;CLI&lt;/span&gt; script (though the output could use quite a bit of visual work),
+but I&amp;#8217;m also toying around with the idea of creating a service to take the snapshots
+and store them, mostly thinking about it being part of something like
+&lt;a href="https://github.com/etsy/morgue"&gt;Etsy&amp;#8217;s Morgue&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;The latest version of the source for dashsnap will (within the forseeable future)
+be available&amp;nbsp;at:&lt;/p&gt;
+&lt;p&gt;&lt;a href="https://github.com/jantman/misc-scripts/blob/master/dashsnap.py"&gt;https://github.com/jantman/misc-scripts/blob/master/dashsnap.py&lt;/a&gt;&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">Jason Antman</dc:creator><pubDate>Wed, 07 May 2014 21:58:00 -0400</pubDate><guid>tag:blog.jasonantman.com,2014-05-07:2014/05/dashsnap-a-script-to-snapshot-a-graphite-dashboard/</guid><category>graphite</category><category>monitoring</category></item><item><title>NSA Targeting SysAdmins</title><link>http://blog.jasonantman.com/2014/03/nsa-targeting-sysadmins/</link><description>&lt;p&gt;I try not to rant too much, but I feel that this one was needed. If you&amp;#8217;re looking for
 objective, technical information, skip this&amp;nbsp;one.&lt;/p&gt;
 &lt;p&gt;When I was younger and more naive, I had near complete trust in the &lt;span class="caps"&gt;US&lt;/span&gt; government. There&amp;#8217;s a Constitution,
 and they abide by it, and so do I. Since 2001, that feeling has eroded a bit. Since 2008, it&amp;#8217;s eroded even
@@ -3052,27 +3081,4 @@ but there&amp;#8217;s &lt;a href="http://www.mediaburst.co.uk/blog/creating-perl
 Mediaburst&lt;/a&gt;,
 &lt;a href="http://www2.mbstatic.co.uk/wp-content/uploads/2009/09/cpan2rpmmb"&gt;cpan2rpmmb&lt;/a&gt;,
 that seems to incorporate some nice improvements and worked quite well
-for&amp;nbsp;me.&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Tue, 15 May 2012 15:01:00 -0400</pubDate><guid>tag:blog.jasonantman.com,2012-05-15:2012/05/creating-rpms-from-perl-cpan-modules/</guid><category>cpan</category><category>cpan2rpm</category><category>perl</category><category>rpm</category><category>yum</category></item><item><title>Perl script to convert F5 BigIp VIP address to list of internal pool member addresses</title><link>http://blog.jasonantman.com/2012/04/perl-script-to-convert-f5-bigip-vip-address-to-list-of-internal-pool-member-addresses/</link><description>&lt;p&gt;I often find myself logging in to the web &lt;span class="caps"&gt;UI&lt;/span&gt; of &lt;a href="http://www.f5.com/products/big-ip/"&gt;F5
-BigIp&lt;/a&gt; load balancers and tracing
-down a &lt;span class="caps"&gt;VIP&lt;/span&gt; address to the servers that actually back it. This is an
-arduous, repetitive task of tracing from the &lt;span class="caps"&gt;VIP&lt;/span&gt; list to the &lt;span class="caps"&gt;VIP&lt;/span&gt; details
-page to find the default pool, then matching up that in the pool list
-and checking the pool members page. Luckily, the F5 boxes have a &lt;a href="https://devcentral.f5.com/"&gt;web
-service &lt;span class="caps"&gt;API&lt;/span&gt;&lt;/a&gt; that can be used for tasks like
-this. They have &lt;span class="caps"&gt;GPL&lt;/span&gt; sample code in Perl that uses only
-&lt;a href="http://search.cpan.org/~mkutter/SOAP-Lite-0.714/lib/SOAP/Lite.pm"&gt;&lt;span class="caps"&gt;SOAP&lt;/span&gt;::Lite&lt;/a&gt;
-(as well as Getopt::Long and Pod::Usage) to interact with an F5 BigIp. I
-wrote a simple script to trace a &lt;span class="caps"&gt;VIP&lt;/span&gt; to the appropriate internal pool
-member addresses, assuming you have a simple configuration of &lt;span class="caps"&gt;VIP&lt;/span&gt; -&gt;
-Single default pool -&amp;gt; pool&amp;nbsp;members.&lt;/p&gt;
-&lt;p&gt;Usage is quite&amp;nbsp;simple:&lt;/p&gt;
-&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="gp"&gt;&amp;gt;&lt;/span&gt; ./VipToInternalHosts.pl --host&lt;span class="o"&gt;=&lt;/span&gt;prod-lb1.example.com --user&lt;span class="o"&gt;=&lt;/span&gt;myname --pass&lt;span class="o"&gt;=&lt;/span&gt;mypassword --vip&lt;span class="o"&gt;=&lt;/span&gt;128.6.30.130:80
-&lt;span class="go"&gt;&lt;span class="caps"&gt;VIP&lt;/span&gt; 128.6.30.130:80 (f5_vip_name) -&amp;gt; Pool &amp;#39;pool_name&amp;#39;&lt;/span&gt;
-&lt;span class="go"&gt;Members of Pool &amp;#39;pool_name&amp;#39;:&lt;/span&gt;
-&lt;span class="go"&gt;    10.145.15.10:80&lt;/span&gt;
-&lt;span class="go"&gt;    10.145.15.11:80&lt;/span&gt;
-&lt;/pre&gt;&lt;/div&gt;
-
-
-&lt;p&gt;The code can be found at
-&lt;a href="https://github.com/jantman/misc-scripts/blob/master/VipToInternalHosts.pl"&gt;https://github.com/jantman/misc-scripts/blob/master/VipToInternalHosts.pl&lt;/a&gt;. I hope it&amp;#8217;s of use to someone else as&amp;nbsp;well.&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Tue, 24 Apr 2012 22:04:00 -0400</pubDate><guid>tag:blog.jasonantman.com,2012-04-24:2012/04/perl-script-to-convert-f5-bigip-vip-address-to-list-of-internal-pool-member-addresses/</guid><category>bigip</category><category>f5</category><category>load balancer</category><category>perl</category></item></channel></rss>
+for&amp;nbsp;me.&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Tue, 15 May 2012 15:01:00 -0400</pubDate><guid>tag:blog.jasonantman.com,2012-05-15:2012/05/creating-rpms-from-perl-cpan-modules/</guid><category>cpan</category><category>cpan2rpm</category><category>perl</category><category>rpm</category><category>yum</category></item></channel></rss>

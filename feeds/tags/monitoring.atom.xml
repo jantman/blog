@@ -1,5 +1,34 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Jason Antman's Blog</title><link href="http://blog.jasonantman.com/" rel="alternate"></link><link href="http://blog.jasonantman.com/feeds/tags/monitoring.atom.xml" rel="self"></link><id>http://blog.jasonantman.com/</id><updated>2012-07-07T06:34:00-04:00</updated><entry><title>Nagios Check Plugin for Rsnapshot Backups</title><link href="http://blog.jasonantman.com/2012/07/nagios-check-plugin-for-rsnapshot-backups/" rel="alternate"></link><updated>2012-07-07T06:34:00-04:00</updated><author><name>admin</name></author><id>tag:blog.jasonantman.com,2012-07-07:2012/07/nagios-check-plugin-for-rsnapshot-backups/</id><summary type="html">&lt;p&gt;In a previous post, I described how I do &lt;a href="/2012/01/secure-rsnapshot-backups-over-the-wan-via-ssh/"&gt;Secure rsnapshot backups over
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Jason Antman's Blog</title><link href="http://blog.jasonantman.com/" rel="alternate"></link><link href="http://blog.jasonantman.com/feeds/tags/monitoring.atom.xml" rel="self"></link><id>http://blog.jasonantman.com/</id><updated>2014-05-07T21:58:00-04:00</updated><entry><title>dashsnap.py - A Script to Snapshot a Graphite Dashboard</title><link href="http://blog.jasonantman.com/2014/05/dashsnap-a-script-to-snapshot-a-graphite-dashboard/" rel="alternate"></link><updated>2014-05-07T21:58:00-04:00</updated><author><name>Jason Antman</name></author><id>tag:blog.jasonantman.com,2014-05-07:2014/05/dashsnap-a-script-to-snapshot-a-graphite-dashboard/</id><summary type="html">&lt;p&gt;As we push more and more and more metrics into &lt;a href="http://graphite.wikidot.com/"&gt;Graphite&lt;/a&gt;
+at work, we&amp;#8217;ve found the need to preserve data from an incident or outage to be quite
+important. Especially now that we&amp;#8217;re feeding a &lt;em&gt;lot&lt;/em&gt; of our data at 10-second intervals,
+and our storage schemas generally start aggregating that past 24 hours (God only knows
+how many spikes are gone if you look a week later), it&amp;#8217;s important to capture as much
+data as we think we&amp;#8217;ll need as soon after the incident as&amp;nbsp;possible.&lt;/p&gt;
+&lt;p&gt;To this end, a few days (and nights) into a relatively major crisis, I wrote a little
+python script, &lt;a href="https://github.com/jantman/misc-scripts/blob/master/dashsnap.py"&gt;dashsnap.py&lt;/a&gt;.
+It&amp;#8217;s horribly simple; pass it the hostname to your graphite server (if &amp;#8220;graphite&amp;#8221; doesn&amp;#8217;t
+resolve to what you want), the name of a dashboard, optionally a height and width for images
+(the default is currently 1024x768), and either a from and to date/time or a list of graphite
+&lt;span class="caps"&gt;URL&lt;/span&gt;-style intervals (the default is a ginormous &amp;#8220;-10minutes,-30minutes,-1hours,-2hours,-4hours,-6hours,-12hours,-24hours,-36hours&amp;#8221;).
+It will find all graphs on your dashboard, and locally save (in a horribly named directory)
+both PNGs of all the graphs, as well as the &lt;em&gt;raw &lt;span class="caps"&gt;JSON&lt;/span&gt; data&lt;/em&gt; for them. It&amp;#8217;ll also write
+(2 &lt;span class="caps"&gt;AM&lt;/span&gt;-simple) &lt;span class="caps"&gt;HTML&lt;/span&gt; index files to all of the intervals and graphs within&amp;nbsp;them.&lt;/p&gt;
+&lt;p&gt;Here&amp;#8217;s a view of the index page using the default&amp;nbsp;intervals:&lt;/p&gt;
+&lt;p&gt;&lt;a href="/GFX/dashsnap_index.png"&gt;&lt;img alt="screenshot of rendered index page" src="/GFX/dashsnap_index_sm.png" /&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;And here&amp;#8217;s the page showing graphs and &lt;span class="caps"&gt;JSON&lt;/span&gt; links for an individual dashboard for one&amp;nbsp;interval:&lt;/p&gt;
+&lt;p&gt;&lt;a href="/GFX/dashsnap_page.png"&gt;&lt;img alt="screenshot of one interval page" src="/GFX/dashsnap_page_sm.png" /&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;I&amp;#8217;ll quickly admit right now that this is alpha software, if you can even call it that.
+I guess in reality it&amp;#8217;s a late-night fix to a problem that deserves more. But, if it can
+save someone else a few hours late at night, it&amp;#8217;s worth mentioning. PRs are welcome, as
+are issues and suggestions on GitHub for bugs, or for where I should take this; I like
+the handy little &lt;span class="caps"&gt;CLI&lt;/span&gt; script (though the output could use quite a bit of visual work),
+but I&amp;#8217;m also toying around with the idea of creating a service to take the snapshots
+and store them, mostly thinking about it being part of something like
+&lt;a href="https://github.com/etsy/morgue"&gt;Etsy&amp;#8217;s Morgue&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;The latest version of the source for dashsnap will (within the forseeable future)
+be available&amp;nbsp;at:&lt;/p&gt;
+&lt;p&gt;&lt;a href="https://github.com/jantman/misc-scripts/blob/master/dashsnap.py"&gt;https://github.com/jantman/misc-scripts/blob/master/dashsnap.py&lt;/a&gt;&lt;/p&gt;</summary><category term="graphite"></category><category term="monitoring"></category></entry><entry><title>Nagios Check Plugin for Rsnapshot Backups</title><link href="http://blog.jasonantman.com/2012/07/nagios-check-plugin-for-rsnapshot-backups/" rel="alternate"></link><updated>2012-07-07T06:34:00-04:00</updated><author><name>admin</name></author><id>tag:blog.jasonantman.com,2012-07-07:2012/07/nagios-check-plugin-for-rsnapshot-backups/</id><summary type="html">&lt;p&gt;In a previous post, I described how I do &lt;a href="/2012/01/secure-rsnapshot-backups-over-the-wan-via-ssh/"&gt;Secure rsnapshot backups over
 the &lt;span class="caps"&gt;WAN&lt;/span&gt; via
 &lt;span class="caps"&gt;SSH&lt;/span&gt;&lt;/a&gt;. While my
 layout of rsnapshot configuration files, data, and log files is a bit
