@@ -1,5 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Jason Antman's Blog</title><link href="http://blog.jasonantman.com/" rel="alternate"></link><link href="http://blog.jasonantman.com/feeds/categories/tech-howtos.atom.xml" rel="self"></link><id>http://blog.jasonantman.com/</id><updated>2014-03-01T19:01:00-05:00</updated><entry><title>Python script to backup Disqus comments</title><link href="http://blog.jasonantman.com/2014/03/python-script-to-backup-disqus-comments/" rel="alternate"></link><updated>2014-03-01T19:01:00-05:00</updated><author><name>Jason Antman</name></author><id>tag:blog.jasonantman.com,2014-03-01:2014/03/python-script-to-backup-disqus-comments/</id><summary type="html">&lt;p&gt;Since I just &lt;a href="/2014/03/wordpress-to-pelican-with-disqus-comments"&gt;switched this blog to using Disqus for commenting&lt;/a&gt;,
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Jason Antman's Blog</title><link href="http://blog.jasonantman.com/" rel="alternate"></link><link href="http://blog.jasonantman.com/feeds/categories/tech-howtos.atom.xml" rel="self"></link><id>http://blog.jasonantman.com/</id><updated>2014-05-12T09:34:00-04:00</updated><entry><title>Remotely-controlled deck.js slide presentations</title><link href="http://blog.jasonantman.com/2014/05/remotely-controlled-deckjs-slide-presentations/" rel="alternate"></link><updated>2014-05-12T09:34:00-04:00</updated><author><name>Jason Antman</name></author><id>tag:blog.jasonantman.com,2014-05-12:2014/05/remotely-controlled-deckjs-slide-presentations/</id><summary type="html">&lt;p&gt;I&amp;#8217;ve been struggling to find a good, cross-platform remote meeting solution. We&amp;#8217;re using &lt;a href="http://www.imeet.com"&gt;iMeet&lt;/a&gt;
+at work at the moment, but there&amp;#8217;s no way to present or screen share from a Linux machine. For most of our ops and
+automation team daily and weekly meetings, we use &lt;a href="http://www.teamspeak.com/"&gt;TeamSpeak&lt;/a&gt; - sure it&amp;#8217;s not open source,
+but it&amp;#8217;s simple, supports all OSes that matter to us (Mac, Linux, Windows, Android and iOS), can be self-hosted,
+and has the holy grail, functional push-to-talk. But it&amp;#8217;s audio&amp;nbsp;only.&lt;/p&gt;
+&lt;p&gt;On Friday I was running two short elaboration meetings, and had quick little slide decks done up in &lt;a href="http://imakewebthings.com/deck.js/"&gt;deck.js&lt;/a&gt;
+to keep us on track. I couldn&amp;#8217;t help but think, gee, it sure would be nice if instead of switching to Mac or a &lt;span class="caps"&gt;VM&lt;/span&gt; and sharing my screen,
+we could just use the audio communication mediums that we already do, and I could simply control the slides in a&amp;nbsp;browser.&lt;/p&gt;
+&lt;p&gt;Well this morning I stumbled on &lt;a href="http://cleverchris.com/"&gt;Chris Jaure&lt;/a&gt;&amp;#8216;s &lt;a href="https://github.com/chrisjaure/deckjs-remote"&gt;deckjs-remote&lt;/a&gt;
+project that does exactly that. It&amp;#8217;s a nodejs npm module that runs a websocket server, and allows people to join a session and follow
+along as the presenter changes&amp;nbsp;slides.&lt;/p&gt;
+&lt;p&gt;I did have a few hiccups getting it working - mainly some issues with &lt;span class="caps"&gt;CORS&lt;/span&gt;. The &lt;span class="caps"&gt;README&lt;/span&gt;.md has a large block of markup to be added to
+the slide deck html to support &amp;#8220;older browsers that don&amp;#8217;t support &lt;span class="caps"&gt;CORS&lt;/span&gt;.&amp;#8221; I&amp;#8217;m running Firefox 28.0 (Firefox has supported &lt;span class="caps"&gt;CORS&lt;/span&gt; since
+3.0, quite a few years back) and still needed to add this to get everything working. I also needed to manually add a script tag
+for socket.io coming from the nodejs server in order to get everything&amp;nbsp;working.&lt;/p&gt;
+&lt;p&gt;There&amp;#8217;s a bit of a delay for the socket connection to come up after initially loading the page, but once that&amp;#8217;s done, the presenter
+(&amp;#8220;master&amp;#8221; session) should get the password prompt, and any guests should get a prompt asking if they want to join the current
+session. Perhaps the best part is that the nodejs server interally stores each deck by &lt;span class="caps"&gt;URL&lt;/span&gt;, so it seems to work perfectly fine
+when running one instance for N presenters (i.e. a single instance running persistently on a shared&amp;nbsp;server).&lt;/p&gt;</summary><category term="slide"></category><category term="presentation"></category><category term="deck.js"></category><category term="deckjs"></category><category term="javascript"></category></entry><entry><title>Python script to backup Disqus comments</title><link href="http://blog.jasonantman.com/2014/03/python-script-to-backup-disqus-comments/" rel="alternate"></link><updated>2014-03-01T19:01:00-05:00</updated><author><name>Jason Antman</name></author><id>tag:blog.jasonantman.com,2014-03-01:2014/03/python-script-to-backup-disqus-comments/</id><summary type="html">&lt;p&gt;Since I just &lt;a href="/2014/03/wordpress-to-pelican-with-disqus-comments"&gt;switched this blog to using Disqus for commenting&lt;/a&gt;,
 I wanted a way to back up comments in case something goes wrong (like,
 Disqus going the way of del.icio.us&amp;nbsp;bookmarking).&lt;/p&gt;
 &lt;p&gt;I whipped up a quick &lt;a href="https://github.com/jantman/misc-scripts/blob/master/disqus_backup.py"&gt;Python script&lt;/a&gt;
@@ -3709,36 +3727,4 @@ This quick little bash script does the trick, and just echos the&amp;nbsp;userna
 &lt;span class="nv"&gt;LogUID&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="sb"&gt;`&lt;/span&gt;cat /proc/&lt;span class="s2"&gt;&amp;quot;$&lt;span class="caps"&gt;PID&lt;/span&gt;&amp;quot;&lt;/span&gt;/loginuid&lt;span class="sb"&gt;`&lt;/span&gt; &lt;span class="c"&gt;# get loginuid of current process&lt;/span&gt;
 &lt;span class="nv"&gt;username&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="sb"&gt;`&lt;/span&gt;getent passwd &lt;span class="s2"&gt;&amp;quot;$LogUID&amp;quot;&lt;/span&gt; | awk -F &lt;span class="s2"&gt;&amp;quot;:&amp;quot;&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;{print $1}&amp;#39;&lt;/span&gt;&lt;span class="sb"&gt;`&lt;/span&gt; &lt;span class="c"&gt;# translate loginuid to username&lt;/span&gt;
 &lt;span class="nb"&gt;echo&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;$username&amp;quot;&lt;/span&gt;
-&lt;/pre&gt;&lt;/div&gt;</summary><category term="linux"></category><category term="login"></category><category term="sudo"></category><category term="username"></category></entry><entry><title>Client-side subversion commit message hooks</title><link href="http://blog.jasonantman.com/2011/01/client-side-subversion-commit-message-hooks/" rel="alternate"></link><updated>2011-01-05T11:23:00-05:00</updated><author><name>admin</name></author><id>tag:blog.jasonantman.com,2011-01-05:2011/01/client-side-subversion-commit-message-hooks/</id><summary type="html">&lt;p&gt;While I know this isn&amp;#8217;t best practice, since we use &lt;span class="caps"&gt;LDAP&lt;/span&gt;-based auth for
-our Linux boxes (including a sudoers file based on &lt;span class="caps"&gt;LDAP&lt;/span&gt; group
-membership), we usually do work on some boxes as root (&lt;code&gt;sudo su -&lt;/code&gt;).
-This includes our &lt;a href="http://www.puppetlabs.com/"&gt;puppetmaster&lt;/a&gt;, where
-configs are kept in subversion and edited as root. The one problem with
-this is how to get the username of the actual committer, not root, in
-subversion&amp;nbsp;messages.&lt;/p&gt;
-&lt;p&gt;The theory that I came up with is a &lt;a href="/2011/01/how-to-get-actual-login-username-when-using-sudo-su/"&gt;shell script that finds out who the
-actual user
-is&lt;/a&gt;, and
-then tacking this onto the beginning of the subversion commit message
-(since there&amp;#8217;s no real way to do client-side hooks in subversion). While
-I struggled with subversion&amp;#8217;s lack of good client hooks, I came up with
-a theory based on a script that preloads svn-commit.tmp and then calls
-the text editor. It&amp;#8217;s actually quite&amp;nbsp;simple.&lt;/p&gt;
-&lt;p&gt;First, in your .bashrc or wherever you setup environment variables,
-&lt;code&gt;export SVN_EDITOR=/usr/local/bin/svnPreCommitClientHook.sh&lt;/code&gt;. This way,
-every time you run &lt;code&gt;svn commit&lt;/code&gt;, instead of calling your text editor
-with &lt;code&gt;svn-commit.tmp&lt;/code&gt; as an argument, the bash script will do what it
-needs to (commit message preloading) with svn-commit.tmp and &lt;em&gt;then&lt;/em&gt; call
-your editor to finish the&amp;nbsp;message.&lt;/p&gt;
-&lt;p&gt;&lt;code&gt;/usr/local/bin/svnPreCommitClientHook.sh&lt;/code&gt;:&lt;/p&gt;
-&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="c"&gt;#!/bin/bash&lt;/span&gt;
-&lt;span class="nv"&gt;&lt;span class="caps"&gt;LOGNAME&lt;/span&gt;&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="sb"&gt;`&lt;/span&gt;/usr/local/bin/getLogname.py&lt;span class="sb"&gt;`&lt;/span&gt; &lt;span class="c"&gt;# script to get user&amp;#39;s actual login name, even if using sudo su&lt;/span&gt;
-&lt;span class="nb"&gt;echo&lt;/span&gt; -e &lt;span class="s2"&gt;&amp;quot;\nBY: $&lt;span class="caps"&gt;LOGNAME&lt;/span&gt;&amp;quot;&lt;/span&gt; &amp;gt; svn-commit.foo
-cat svn-commit.tmp &amp;gt;&amp;gt; svn-commit.foo
-mv svn-commit.foo svn-commit.tmp
-&lt;span class="s2"&gt;&amp;quot;$&lt;span class="caps"&gt;EDITOR&lt;/span&gt;&amp;quot;&lt;/span&gt; svn-commit.tmp
-&lt;/pre&gt;&lt;/div&gt;
-
-
-&lt;p&gt;Using this method, running &lt;code&gt;svn commit&lt;/code&gt; will pull up your text editor
-with &amp;#8220;&lt;span class="caps"&gt;BY&lt;/span&gt;: username&amp;#8221; already inserted in the commit&amp;nbsp;message.&lt;/p&gt;</summary><category term="linux"></category><category term="puppet"></category><category term="subversion"></category><category term="svn"></category></entry></feed>
+&lt;/pre&gt;&lt;/div&gt;</summary><category term="linux"></category><category term="login"></category><category term="sudo"></category><category term="username"></category></entry></feed>
