@@ -1,5 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Jason Antman's Blog</title><link>http://blog.jasonantman.com/</link><description></description><atom:link href="http://blog.jasonantman.com/feeds/feed.rss.xml" rel="self"></atom:link><lastBuildDate>Mon, 12 May 2014 09:34:00 -0400</lastBuildDate><item><title>Remotely-controlled deck.js slide presentations</title><link>http://blog.jasonantman.com/2014/05/remotely-controlled-deckjs-slide-presentations/</link><description>&lt;p&gt;I&amp;#8217;ve been struggling to find a good, cross-platform remote meeting solution. We&amp;#8217;re using &lt;a href="http://www.imeet.com"&gt;iMeet&lt;/a&gt;
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Jason Antman's Blog</title><link>http://blog.jasonantman.com/</link><description></description><atom:link href="http://blog.jasonantman.com/feeds/feed.rss.xml" rel="self"></atom:link><lastBuildDate>Thu, 10 Jul 2014 06:45:00 -0400</lastBuildDate><item><title>bashrc Vagrant / VirtualBox reminder</title><link>http://blog.jasonantman.com/2014/07/bashrc-vagrant-virtualbox-reminder/</link><description>&lt;p&gt;Lately I&amp;#8217;ve been using VirtualBox VMs, both managed by Vagrant and otherwise, quite a lot.
+I&amp;#8217;ve also been doing a bunch of development work with them. And inevitably, I close a screen
+window and fo on with my work and end up with a few &amp;#8220;orphaned&amp;#8221; virtualbox VMs running that
+I&amp;#8217;ve forgotten&amp;nbsp;about.&lt;/p&gt;
+&lt;p&gt;Below is the snippet I&amp;#8217;ve added to my &lt;code&gt;~/.bashrc&lt;/code&gt; to keep me aware of this situation. Unfortunately
+the &lt;code&gt;vagrant global-status&lt;/code&gt; command is relatively slow, so this adds (on my machine) about
+1.5 seconds of wall-clock time to my &lt;code&gt;.bashrc&lt;/code&gt; (hence the process check&amp;nbsp;first).&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="c"&gt;# Vagrant/VirtualBox reminder&lt;/span&gt;
+&lt;span class="k"&gt;if &lt;/span&gt;pgrep VBoxHeadless &amp;amp;&amp;gt;/dev/null; &lt;span class="k"&gt;then&lt;/span&gt;
+&lt;span class="k"&gt;    &lt;/span&gt;&lt;span class="nv"&gt;vblist&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="k"&gt;$(&lt;/span&gt;VBoxManage list runningvms&lt;span class="k"&gt;)&lt;/span&gt;
+    &lt;span class="o"&gt;[&lt;/span&gt; -n &lt;span class="s2"&gt;&amp;quot;${vblist}&amp;quot;&lt;/span&gt; &lt;span class="o"&gt;]&lt;/span&gt; &lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class="nb"&gt;echo&lt;/span&gt; -e &lt;span class="s2"&gt;&amp;quot;\e[1;31mRunning VirtualBox VMs:\e[0m\n${vblist}\n&amp;quot;&lt;/span&gt;
+    &lt;span class="k"&gt;if &lt;/span&gt;which vagrant &amp;amp;&amp;gt; /dev/null &lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt; vagrant &lt;span class="nb"&gt;help&lt;/span&gt; | grep -q global-status; &lt;span class="k"&gt;then&lt;/span&gt;
+&lt;span class="k"&gt;        &lt;/span&gt;&lt;span class="nv"&gt;vagrantstatus&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="k"&gt;$(&lt;/span&gt;vagrant global-status | sed &lt;span class="s1"&gt;&amp;#39;/^\s*$/q&amp;#39;&lt;/span&gt;&lt;span class="k"&gt;)&lt;/span&gt;
+        &lt;span class="nb"&gt;echo&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;$vagrantstatus&amp;quot;&lt;/span&gt; | grep -q running &lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class="o"&gt;{&lt;/span&gt; &lt;span class="nb"&gt;echo&lt;/span&gt; -e &lt;span class="s2"&gt;&amp;quot;\e[1;31mRunning Vagrant Machines:\e[0m&amp;quot;&lt;/span&gt; ; &lt;span class="nb"&gt;echo&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;$vagrantstatus&amp;quot;&lt;/span&gt; | head -2; &lt;span class="nb"&gt;echo&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;$vagrantstatus&amp;quot;&lt;/span&gt; | grep running; &lt;span class="o"&gt;}&lt;/span&gt;
+    &lt;span class="k"&gt;fi&lt;/span&gt;
+&lt;span class="k"&gt;fi&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">Jason Antman</dc:creator><pubDate>Thu, 10 Jul 2014 06:45:00 -0400</pubDate><guid>tag:blog.jasonantman.com,2014-07-10:2014/07/bashrc-vagrant-virtualbox-reminder/</guid><category>vagrant</category><category>bashrc</category><category>profile</category><category>virtualbox</category></item><item><title>Remotely-controlled deck.js slide presentations</title><link>http://blog.jasonantman.com/2014/05/remotely-controlled-deckjs-slide-presentations/</link><description>&lt;p&gt;I&amp;#8217;ve been struggling to find a good, cross-platform remote meeting solution. We&amp;#8217;re using &lt;a href="http://www.imeet.com"&gt;iMeet&lt;/a&gt;
 at work at the moment, but there&amp;#8217;s no way to present or screen share from a Linux machine. For most of our ops and
 automation team daily and weekly meetings, we use &lt;a href="http://www.teamspeak.com/"&gt;TeamSpeak&lt;/a&gt; - sure it&amp;#8217;s not open source,
 but it&amp;#8217;s simple, supports all OSes that matter to us (Mac, Linux, Windows, Android and iOS), can be self-hosted,
@@ -3050,35 +3066,4 @@ recovery are along the Y axis and the count is along the X&amp;nbsp;axis:&lt;/p&
 &lt;span class="go"&gt;16-29:(0)&lt;/span&gt;
 &lt;span class="go"&gt;30-59:(0)&lt;/span&gt;
 &lt;span class="go"&gt;60+:(0)&lt;/span&gt;
-&lt;/pre&gt;&lt;/div&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Thu, 31 May 2012 13:54:00 -0400</pubDate><guid>tag:blog.jasonantman.com,2012-05-31:2012/05/script-to-chart-intervals-between-problem-and-recovery-from-nagiosicinga-log-files/</guid><category>chart</category><category>icinga</category><category>monitoring</category><category>Nagios</category><category>perl</category></item><item><title>Apache httpd - logging for sites with and without load balancing</title><link>http://blog.jasonantman.com/2012/05/apache-httpd-logging-for-sites-with-and-without-load-balancing/</link><description>&lt;p&gt;There are a few unfortunate places where I have an Apache httpd server
-serving multiple vhosts, some behind a F5 BigIp load balancer and some
-with direct traffic. For sites behind the &lt;span class="caps"&gt;LB&lt;/span&gt;, the remote &lt;span class="caps"&gt;IP&lt;/span&gt;/host will
-always show up as the &lt;span class="caps"&gt;LB&lt;/span&gt;&amp;#8217;s &lt;span class="caps"&gt;IP&lt;/span&gt;/host, not that of the actual client. Using
-the default configuration with LogFormat directives in &lt;code&gt;httpd.conf&lt;/code&gt;,
-this means that either we need to define log formats per-vhost or lose
-the client &lt;span class="caps"&gt;IP&lt;/span&gt; in one of our scenarios (&lt;span class="caps"&gt;LB&lt;/span&gt; or no&amp;nbsp;&lt;span class="caps"&gt;LB&lt;/span&gt;).&lt;/p&gt;
-&lt;p&gt;I came by a simple solution to this on &lt;a href="http://www.maretmanu.org/homepage/inform/apache-forwarded.php"&gt;Emmanuel
-Chantréau&lt;/a&gt;&amp;#8216;s
-blog, and here is my condensed version of it. It sets an environment
-variable (&amp;#8220;bigip-request&amp;#8221;) if the BIOrigClientAddr request header is set
-(this header holds the client&amp;#8217;s &lt;span class="caps"&gt;IP&lt;/span&gt;; it&amp;#8217;s the BigIp proprietary version
-of the X-Forwarded-For header. You could easily substitute that more
-standard header in the following snippet) and then sets the &amp;#8220;combined&amp;#8221;
-LogFormat based on that variable - a version using BIOrigClientAddr if
-it is set, and a version using the normal &amp;#8220;%h&amp;#8221; remote host&amp;nbsp;otherwise.&lt;/p&gt;
-&lt;p&gt;In&amp;nbsp;httpd.conf:&lt;/p&gt;
-&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="c"&gt;# set the &amp;quot;bigip-request&amp;quot; env variable to &amp;quot;1&amp;quot; if there is a BIOrigClientAddr header in the request                                                                                                   &lt;/span&gt;
-&lt;span class="nb"&gt;SetEnvIf&lt;/span&gt; BIOrigClientAddr . bigip-request
-&lt;span class="c"&gt;# we&amp;#39;ll use this following LogFormat (BIOrigClientAddr in place of remote host) as &amp;quot;combined&amp;quot; &lt;span class="caps"&gt;IF&lt;/span&gt; the bigip-request env variable is set                                                                     &lt;/span&gt;
-&lt;span class="nb"&gt;LogFormat&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;%{BIOrigClientAddr}i %l %u %t %v \&amp;quot;%r\&amp;quot; %&amp;gt;s %b \&amp;quot;%{Referer}i\&amp;quot; \&amp;quot;%{User-Agent}i\&amp;quot;&amp;quot;&lt;/span&gt; combined_lb
-&lt;span class="c"&gt;# else we&amp;#39;ll use this one (remote host &lt;span class="caps"&gt;IP&lt;/span&gt; address) as &amp;quot;combined&amp;quot; &lt;span class="caps"&gt;IF&lt;/span&gt; the bigip-request env variable is &lt;span class="caps"&gt;NOT&lt;/span&gt; set                                                                                   &lt;/span&gt;
-&lt;span class="nb"&gt;LogFormat&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;%h %l %u %t %v \&amp;quot;%r\&amp;quot; %&amp;gt;s %b \&amp;quot;%{Referer}i\&amp;quot; \&amp;quot;%{User-Agent}i\&amp;quot;&amp;quot;&lt;/span&gt; combined
-&lt;/pre&gt;&lt;/div&gt;
-
-
-&lt;p&gt;And then in our vhost&amp;nbsp;configuration:&lt;/p&gt;
-&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="c"&gt;# use this log format if we&amp;#39;re behind an &lt;span class="caps"&gt;LB&lt;/span&gt;&lt;/span&gt;
-&lt;span class="nb"&gt;CustomLog&lt;/span&gt; logs/&amp;lt;%= domain %&amp;gt;_access_log combined env=!bigip-request
-&lt;span class="c"&gt;# or this format if we&amp;#39;re not&lt;/span&gt;
-&lt;span class="nb"&gt;CustomLog&lt;/span&gt; logs/&amp;lt;%= domain %&amp;gt;_access_log combined_lb env=bigip-request
-&lt;/pre&gt;&lt;/div&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Wed, 30 May 2012 09:46:00 -0400</pubDate><guid>tag:blog.jasonantman.com,2012-05-30:2012/05/apache-httpd-logging-for-sites-with-and-without-load-balancing/</guid><category>apache</category><category>bigip</category><category>f5</category><category>httpd</category><category>load balancer</category><category>logging</category></item></channel></rss>
+&lt;/pre&gt;&lt;/div&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Thu, 31 May 2012 13:54:00 -0400</pubDate><guid>tag:blog.jasonantman.com,2012-05-31:2012/05/script-to-chart-intervals-between-problem-and-recovery-from-nagiosicinga-log-files/</guid><category>chart</category><category>icinga</category><category>monitoring</category><category>Nagios</category><category>perl</category></item></channel></rss>

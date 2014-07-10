@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Jason Antman's Blog</title><link>http://blog.jasonantman.com/</link><description></description><atom:link href="http://blog.jasonantman.com/feeds/tags/profile.rss.xml" rel="self"></atom:link><lastBuildDate>Thu, 10 Jul 2014 06:45:00 -0400</lastBuildDate><item><title>bashrc Vagrant / VirtualBox reminder</title><link>http://blog.jasonantman.com/2014/07/bashrc-vagrant-virtualbox-reminder/</link><description>&lt;p&gt;Lately I&amp;#8217;ve been using VirtualBox VMs, both managed by Vagrant and otherwise, quite a lot.
+I&amp;#8217;ve also been doing a bunch of development work with them. And inevitably, I close a screen
+window and fo on with my work and end up with a few &amp;#8220;orphaned&amp;#8221; virtualbox VMs running that
+I&amp;#8217;ve forgotten&amp;nbsp;about.&lt;/p&gt;
+&lt;p&gt;Below is the snippet I&amp;#8217;ve added to my &lt;code&gt;~/.bashrc&lt;/code&gt; to keep me aware of this situation. Unfortunately
+the &lt;code&gt;vagrant global-status&lt;/code&gt; command is relatively slow, so this adds (on my machine) about
+1.5 seconds of wall-clock time to my &lt;code&gt;.bashrc&lt;/code&gt; (hence the process check&amp;nbsp;first).&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="c"&gt;# Vagrant/VirtualBox reminder&lt;/span&gt;
+&lt;span class="k"&gt;if &lt;/span&gt;pgrep VBoxHeadless &amp;amp;&amp;gt;/dev/null; &lt;span class="k"&gt;then&lt;/span&gt;
+&lt;span class="k"&gt;    &lt;/span&gt;&lt;span class="nv"&gt;vblist&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="k"&gt;$(&lt;/span&gt;VBoxManage list runningvms&lt;span class="k"&gt;)&lt;/span&gt;
+    &lt;span class="o"&gt;[&lt;/span&gt; -n &lt;span class="s2"&gt;&amp;quot;${vblist}&amp;quot;&lt;/span&gt; &lt;span class="o"&gt;]&lt;/span&gt; &lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class="nb"&gt;echo&lt;/span&gt; -e &lt;span class="s2"&gt;&amp;quot;\e[1;31mRunning VirtualBox VMs:\e[0m\n${vblist}\n&amp;quot;&lt;/span&gt;
+    &lt;span class="k"&gt;if &lt;/span&gt;which vagrant &amp;amp;&amp;gt; /dev/null &lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt; vagrant &lt;span class="nb"&gt;help&lt;/span&gt; | grep -q global-status; &lt;span class="k"&gt;then&lt;/span&gt;
+&lt;span class="k"&gt;        &lt;/span&gt;&lt;span class="nv"&gt;vagrantstatus&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="k"&gt;$(&lt;/span&gt;vagrant global-status | sed &lt;span class="s1"&gt;&amp;#39;/^\s*$/q&amp;#39;&lt;/span&gt;&lt;span class="k"&gt;)&lt;/span&gt;
+        &lt;span class="nb"&gt;echo&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;$vagrantstatus&amp;quot;&lt;/span&gt; | grep -q running &lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class="o"&gt;{&lt;/span&gt; &lt;span class="nb"&gt;echo&lt;/span&gt; -e &lt;span class="s2"&gt;&amp;quot;\e[1;31mRunning Vagrant Machines:\e[0m&amp;quot;&lt;/span&gt; ; &lt;span class="nb"&gt;echo&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;$vagrantstatus&amp;quot;&lt;/span&gt; | head -2; &lt;span class="nb"&gt;echo&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;$vagrantstatus&amp;quot;&lt;/span&gt; | grep running; &lt;span class="o"&gt;}&lt;/span&gt;
+    &lt;span class="k"&gt;fi&lt;/span&gt;
+&lt;span class="k"&gt;fi&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">Jason Antman</dc:creator><pubDate>Thu, 10 Jul 2014 06:45:00 -0400</pubDate><guid>tag:blog.jasonantman.com,2014-07-10:2014/07/bashrc-vagrant-virtualbox-reminder/</guid><category>vagrant</category><category>bashrc</category><category>profile</category><category>virtualbox</category></item></channel></rss>
