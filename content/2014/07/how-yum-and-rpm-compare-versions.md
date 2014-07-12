@@ -45,15 +45,15 @@ to "0" if it was null/Nonem, and then uses ``compare_values()`` to compare each 
 to a function called ``rpmvercmp()`` (see below). The algorithm for ``labelCompare()`` is as follows:
 
 1. Set each epoch value to 0 if it's null/None.
-1. Compare the epoch values using ``compare_values()``. If they're not equal, return that result, else
+2. Compare the epoch values using ``compare_values()``. If they're not equal, return that result, else
    move on to the next portion (version). The logic within ``compare_values()`` is that if one is empty/null
    and the other is not, the non-empty one is greater, and that ends the comparison. If neither of
    them is empty/not present, compare them using ``rpmvercmp()`` and follow the same logic; if one
    is "greater" (newer) than the other, that's the end result of the comparison. Otherwise, move
    on to the next component (version).
-2. Compare the versions using the same logic.
-3. Compare the releases using the same logic.
-4. If all of the components are "equal", the packages are the same.
+3. Compare the versions using the same logic.
+4. Compare the releases using the same logic.
+5. If all of the components are "equal", the packages are the same.
 
 The real magic, obviously, happens in ``rpmvercmp()``, the rpm library function to compare two
 versions (or epochs, or releases). That's also where the madness happens.
@@ -71,24 +71,24 @@ for the remaining characters in each string until something is unequal, or a str
 
 1. If the strings are binary equal (``a == b``), they're equal, return 0.
 2. Loop over the strings, left-to-right.
-   1. Trim anything that's not ``[A-Za-z0-9]`` or tilde (``~``) from the front of both strings.
-   2. If both strings start with a tilde, discard it and move on to the next character.
-   3. If string ``a`` starts with a tilde and string ``b`` does not, return -1 (string ``a`` is older);
-      and the inverse if string ``b`` starts with a tilde and string ``a`` does not.
-   4. End the loop if either string has reached zero length.
-   5. If the first character of ``a`` is a digit, pop the leading chunk of continuous digits from
-      each string (which may be '' for ``b`` if only one ``a`` starts with digits). If ``a`` begins
-	  with a letter, do the same for leading letters.
-   6. If the segement from ``b`` had 0 length, return ` if the segment from ``a`` was numeric, or
-      ``b`` if it was alphabetic. The logical result of this is that if ``a`` begins with numbers
-	  and ``b`` does not, ``a`` is newer (return 1). If ``a`` begins with letters and ``b`` does not,
-	  then ``a`` is older (return -1). If the leading character(s) from ``a`` and ``b`` were both
-	  numbers or both letters, continue on.
-   7. If the leading segments were both numeric, discard any leading zeros and *whichever one is longer
-      wins*. If ``a`` is longer than ``b`` (without leading zeroes), return 1, and vice-versa. If
-	  they're of the same length, continue on.
-   8. Compare the leading segments with ``strcmp()`` (or ``<=>`` in Ruby). If that returns a non-zero
-      value, then return that value. Else continue to the next iteration of the loop.
+    1. Trim anything that's not ``[A-Za-z0-9]`` or tilde (``~``) from the front of both strings.
+    2. If both strings start with a tilde, discard it and move on to the next character.
+    3. If string ``a`` starts with a tilde and string ``b`` does not, return -1 (string ``a`` is older);
+       and the inverse if string ``b`` starts with a tilde and string ``a`` does not.
+    4. End the loop if either string has reached zero length.
+    5. If the first character of ``a`` is a digit, pop the leading chunk of continuous digits from
+       each string (which may be '' for ``b`` if only one ``a`` starts with digits). If ``a`` begins
+	   with a letter, do the same for leading letters.
+    6. If the segement from ``b`` had 0 length, return ` if the segment from ``a`` was numeric, or
+       ``b`` if it was alphabetic. The logical result of this is that if ``a`` begins with numbers
+	   and ``b`` does not, ``a`` is newer (return 1). If ``a`` begins with letters and ``b`` does not,
+	   then ``a`` is older (return -1). If the leading character(s) from ``a`` and ``b`` were both
+	   numbers or both letters, continue on.
+    7. If the leading segments were both numeric, discard any leading zeros and *whichever one is longer
+       wins*. If ``a`` is longer than ``b`` (without leading zeroes), return 1, and vice-versa. If
+	   they're of the same length, continue on.
+    8. Compare the leading segments with ``strcmp()`` (or ``<=>`` in Ruby). If that returns a non-zero
+       value, then return that value. Else continue to the next iteration of the loop.
 3. If the loop ended (nothing has been returned yet, either both strings are totally the same or they're
    the same up to the end of one of them, like with "1.2.3" and "1.2.3b"), then the longest wins -
    if what's left of ``a`` is longer than what's left of ``b``, return 1. Vice-versa for if what's
