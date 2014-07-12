@@ -1,5 +1,90 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Jason Antman's Blog</title><link href="http://blog.jasonantman.com/" rel="alternate"></link><link href="http://blog.jasonantman.com/feeds/categories/miscellaneous.atom.xml" rel="self"></link><id>http://blog.jasonantman.com/</id><updated>2014-03-01T14:14:00-05:00</updated><entry><title>Blog Moved from Self-hosted WordPress to Pelican on GitHub Pages</title><link href="http://blog.jasonantman.com/2014/03/blog-moved-from-self-hosted-wordpress-to-pelican-on-github-pages/" rel="alternate"></link><updated>2014-03-01T14:14:00-05:00</updated><author><name>Jason Antman</name></author><id>tag:blog.jasonantman.com,2014-03-01:2014/03/blog-moved-from-self-hosted-wordpress-to-pelican-on-github-pages/</id><summary type="html">&lt;p&gt;I just finally finished my migration from self-hosted WordPress to &lt;a href="http://getpelican.com"&gt;Pelican&lt;/a&gt;, a Python-based
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Jason Antman's Blog</title><link href="http://blog.jasonantman.com/" rel="alternate"></link><link href="http://blog.jasonantman.com/feeds/categories/miscellaneous.atom.xml" rel="self"></link><id>http://blog.jasonantman.com/</id><updated>2014-07-11T23:31:00-04:00</updated><entry><title>How Yum and RPM Compare Versions</title><link href="http://blog.jasonantman.com/2014/07/how-yum-and-rpm-compare-versions/" rel="alternate"></link><updated>2014-07-11T23:31:00-04:00</updated><author><name>Jason Antman</name></author><id>tag:blog.jasonantman.com,2014-07-11:2014/07/how-yum-and-rpm-compare-versions/</id><summary type="html">&lt;p&gt;I was recently tripped up by a bug in Puppet, &lt;a href="https://tickets.puppetlabs.com/browse/PUP-1244"&gt;&lt;span class="caps"&gt;PUP&lt;/span&gt;-1244&lt;/a&gt;,
+dealing with how it compares package versions. All of Puppet&amp;#8217;s Package types assumed
+&lt;a href="http://semver.org/"&gt;semantic versioning&lt;/a&gt;, and that&amp;#8217;s far from the case for RPMs and therefore Yum. This
+manifested itself in how Puppet validates package installations - if a version was explicitly specified
+and Yum/&lt;span class="caps"&gt;RPM&lt;/span&gt; could install it, puppet would shell out to them and install the package, but then report
+a failure in its post-install validation, as the &lt;em&gt;exact&lt;/em&gt; version string specified isn&amp;#8217;t present.
+For example, many RedHat/CentOS packages (such as those from &lt;span class="caps"&gt;EPEL&lt;/span&gt;) include a release string with the major
+version of the distribution they were packged for - i.e. &amp;#8220;.el5&amp;#8221; or &amp;#8220;.el6&amp;#8221;. If Puppet was instructed to
+install package &amp;#8220;foo&amp;#8221; version &amp;#8220;1.2.3&amp;#8221;, but the actual package in the repositories was &amp;#8220;foo-1.2.3-el5&amp;#8221;,
+Puppet would cause the package to be installed, but then report&amp;nbsp;failure.&lt;/p&gt;
+&lt;p&gt;I cut a &lt;a href="https://github.com/puppetlabs/puppet/pull/2866"&gt;pull request&lt;/a&gt; against the Puppet4 branch to
+fix these issues, essentially re-implementing yum and rpm&amp;#8217;s version comparison logic in Ruby. It took
+me a few days of research and sorting through source code (and in the process I found that &lt;code&gt;yum&lt;/code&gt;, despite
+its use in so many distributions, has no unit tests at all) but I finally got it finished. In the process,
+I found out exactly how&amp;#8230; weird&amp;#8230; &lt;span class="caps"&gt;RPM&lt;/span&gt;&amp;#8217;s version comparison rules&amp;nbsp;are.&lt;/p&gt;
+&lt;h3 id="package-naming-and-parsing"&gt;Package Naming and&amp;nbsp;Parsing&lt;/h3&gt;
+&lt;p&gt;&lt;span class="caps"&gt;RPM&lt;/span&gt; package names are made up of five parts; the package name, epoch, version, release, and architecture.
+This format is commonly referred to as the acronym &lt;span class="caps"&gt;NEVRA&lt;/span&gt;. The epoch is not always included; it is assumed
+to be zero (0) on any packages that lack it explicitly. The format for the whole string is &lt;code&gt;n-e:v-r.a&lt;/code&gt;.
+For my purposes, I was only really concerned with comparing the &lt;span class="caps"&gt;EVR&lt;/span&gt; portion; Puppet knows about package names
+and the bug herein was with what Puppet calls the &amp;#8220;version&amp;#8221; (&lt;span class="caps"&gt;EVR&lt;/span&gt; in yum/rpm parlance). Parsing is pretty&amp;nbsp;simple:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;If there is a &lt;code&gt;:&lt;/code&gt; in the string, everything before it is the epoch. If not, the epoch is&amp;nbsp;zero.&lt;/li&gt;
+&lt;li&gt;If there is a &lt;code&gt;-&lt;/code&gt; in the &lt;em&gt;remaining&lt;/em&gt; string, everything before the first &lt;code&gt;-&lt;/code&gt; is the version,
+  and everything after it is the release. If there isn&amp;#8217;t one, the release is considered&amp;nbsp;null/nill/None/whatever.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="how-yum-compares-evr"&gt;How Yum Compares&amp;nbsp;&lt;span class="caps"&gt;EVR&lt;/span&gt;&lt;/h3&gt;
+&lt;p&gt;Once the package string is parsed into its &lt;span class="caps"&gt;EVR&lt;/span&gt; components, yum calls &lt;code&gt;rpmUtils.miscutils.compareEVR()&lt;/code&gt;,
+which does some data type massaging for the inputs, and then calls out to &lt;code&gt;rpm.labelCompare()&lt;/code&gt;
+(found in &lt;code&gt;rpm.git/python/header-py.c&lt;/code&gt;). &lt;code&gt;labelCompare()&lt;/code&gt; sets each epoch
+to &amp;#8220;0&amp;#8221; if it was null/Nonem, and then uses &lt;code&gt;compare_values()&lt;/code&gt; to compare each &lt;span class="caps"&gt;EVR&lt;/span&gt; portion, which in turn falls through
+to a function called &lt;code&gt;rpmvercmp()&lt;/code&gt; (see below). The algorithm for &lt;code&gt;labelCompare()&lt;/code&gt; is as&amp;nbsp;follows:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Set each epoch value to 0 if it&amp;#8217;s&amp;nbsp;null/None.&lt;/li&gt;
+&lt;li&gt;Compare the epoch values using &lt;code&gt;compare_values()&lt;/code&gt;. If they&amp;#8217;re not equal, return that result, else
+   move on to the next portion (version). The logic within &lt;code&gt;compare_values()&lt;/code&gt; is that if one is empty/null
+   and the other is not, the non-empty one is greater, and that ends the comparison. If neither of
+   them is empty/not present, compare them using &lt;code&gt;rpmvercmp()&lt;/code&gt; and follow the same logic; if one
+   is &amp;#8220;greater&amp;#8221; (newer) than the other, that&amp;#8217;s the end result of the comparison. Otherwise, move
+   on to the next component&amp;nbsp;(version).&lt;/li&gt;
+&lt;li&gt;Compare the versions using the same&amp;nbsp;logic.&lt;/li&gt;
+&lt;li&gt;Compare the releases using the same&amp;nbsp;logic.&lt;/li&gt;
+&lt;li&gt;If all of the components are &amp;#8220;equal&amp;#8221;, the packages are the&amp;nbsp;same.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;The real magic, obviously, happens in &lt;code&gt;rpmvercmp()&lt;/code&gt;, the rpm library function to compare two
+versions (or epochs, or releases). That&amp;#8217;s also where the madness&amp;nbsp;happens.&lt;/p&gt;
+&lt;h3 id="how-rpm-compares-version-parts"&gt;How &lt;span class="caps"&gt;RPM&lt;/span&gt; Compares Version&amp;nbsp;Parts&lt;/h3&gt;
+&lt;p&gt;&lt;span class="caps"&gt;RPM&lt;/span&gt; is written in C. Converting all of the buffer and pointer processing for these strings
+over to Ruby was quite a pain. That being said, I didn&amp;#8217;t make this up, this is actually the
+algorithm that &lt;code&gt;rpmvercmp()&lt;/code&gt; (&lt;code&gt;lib/rpmvercmp.c&lt;/code&gt;) uses to compare version &amp;#8220;parts&amp;#8221;
+(epoch, version, release). This function returns 0 if the strings are equal, 1 if &lt;code&gt;a&lt;/code&gt; (the
+first string argument) is newer than &lt;code&gt;b&lt;/code&gt; (the second string argument), or -1 if
+&lt;code&gt;a&lt;/code&gt; is older than &lt;code&gt;b&lt;/code&gt;. Also keep in mind that this uses pointers in C, so it works by removing
+a sequence of 0 or more characters from the front of each string, comparing them, and then repeating
+for the remaining characters in each string until something is unequal, or a string reaches its&amp;nbsp;end.&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;If the strings are binary equal (&lt;code&gt;a == b&lt;/code&gt;), they&amp;#8217;re equal, return&amp;nbsp;0.&lt;/li&gt;
+&lt;li&gt;Loop over the strings, left-to-right.&lt;ol&gt;
+&lt;li&gt;Trim anything that&amp;#8217;s not &lt;code&gt;[A-Za-z0-9]&lt;/code&gt; or tilde (&lt;code&gt;~&lt;/code&gt;) from the front of both&amp;nbsp;strings.&lt;/li&gt;
+&lt;li&gt;If both strings start with a tilde, discard it and move on to the next&amp;nbsp;character.&lt;/li&gt;
+&lt;li&gt;If string &lt;code&gt;a&lt;/code&gt; starts with a tilde and string &lt;code&gt;b&lt;/code&gt; does not, return -1 (string &lt;code&gt;a&lt;/code&gt; is older);
+   and the inverse if string &lt;code&gt;b&lt;/code&gt; starts with a tilde and string &lt;code&gt;a&lt;/code&gt; does&amp;nbsp;not.&lt;/li&gt;
+&lt;li&gt;End the loop if either string has reached zero&amp;nbsp;length.&lt;/li&gt;
+&lt;li&gt;If the first character of &lt;code&gt;a&lt;/code&gt; is a digit, pop the leading chunk of continuous digits from
+   each string (which may be &amp;#8221; for &lt;code&gt;b&lt;/code&gt; if only one &lt;code&gt;a&lt;/code&gt; starts with digits). If &lt;code&gt;a&lt;/code&gt; begins
+   with a letter, do the same for leading&amp;nbsp;letters.&lt;/li&gt;
+&lt;li&gt;If the segement from &lt;code&gt;b&lt;/code&gt; had 0 length, return ` if the segment from &lt;code&gt;a&lt;/code&gt; was numeric, or
+   &lt;code&gt;b&lt;/code&gt; if it was alphabetic. The logical result of this is that if &lt;code&gt;a&lt;/code&gt; begins with numbers
+   and &lt;code&gt;b&lt;/code&gt; does not, &lt;code&gt;a&lt;/code&gt; is newer (return 1). If &lt;code&gt;a&lt;/code&gt; begins with letters and &lt;code&gt;b&lt;/code&gt; does not,
+   then &lt;code&gt;a&lt;/code&gt; is older (return -1). If the leading character(s) from &lt;code&gt;a&lt;/code&gt; and &lt;code&gt;b&lt;/code&gt; were both
+   numbers or both letters, continue&amp;nbsp;on.&lt;/li&gt;
+&lt;li&gt;If the leading segments were both numeric, discard any leading zeros and &lt;em&gt;whichever one is longer
+   wins&lt;/em&gt;. If &lt;code&gt;a&lt;/code&gt; is longer than &lt;code&gt;b&lt;/code&gt; (without leading zeroes), return 1, and vice-versa. If
+   they&amp;#8217;re of the same length, continue&amp;nbsp;on.&lt;/li&gt;
+&lt;li&gt;Compare the leading segments with &lt;code&gt;strcmp()&lt;/code&gt; (or &lt;code&gt;&amp;lt;=&amp;gt;&lt;/code&gt; in Ruby). If that returns a non-zero
+   value, then return that value. Else continue to the next iteration of the&amp;nbsp;loop.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;li&gt;If the loop ended (nothing has been returned yet, either both strings are totally the same or they&amp;#8217;re
+   the same up to the end of one of them, like with &amp;#8220;1.2.3&amp;#8221; and &amp;#8220;1.2.3b&amp;#8221;), then the longest wins -
+   if what&amp;#8217;s left of &lt;code&gt;a&lt;/code&gt; is longer than what&amp;#8217;s left of &lt;code&gt;b&lt;/code&gt;, return 1. Vice-versa for if what&amp;#8217;s
+   left of &lt;code&gt;b&lt;/code&gt; is longer than what&amp;#8217;s left of &lt;code&gt;a&lt;/code&gt;. And finally, if what&amp;#8217;s left of them is the same
+   length, return&amp;nbsp;0.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Well there you have it. Quite convoluted. And full of things like the &amp;#8220;~&amp;#8221; magic character (&amp;#8220;~1&amp;#8221; is always
+older than&amp;nbsp;&amp;#8220;9999zzzz&amp;#8221;).&lt;/p&gt;</summary><category term="rpm"></category><category term="yum"></category><category term="puppet"></category><category term="versions"></category></entry><entry><title>Blog Moved from Self-hosted WordPress to Pelican on GitHub Pages</title><link href="http://blog.jasonantman.com/2014/03/blog-moved-from-self-hosted-wordpress-to-pelican-on-github-pages/" rel="alternate"></link><updated>2014-03-01T14:14:00-05:00</updated><author><name>Jason Antman</name></author><id>tag:blog.jasonantman.com,2014-03-01:2014/03/blog-moved-from-self-hosted-wordpress-to-pelican-on-github-pages/</id><summary type="html">&lt;p&gt;I just finally finished my migration from self-hosted WordPress to &lt;a href="http://getpelican.com"&gt;Pelican&lt;/a&gt;, a Python-based
 static site generator, hosted on &lt;a href="http://pages.github.com/"&gt;GitHub Pages&lt;/a&gt;. It&amp;#8217;s not only easier and free, but also the
 first step in my plan to migrate off of my &lt;a href="http://linode.com"&gt;Linode&lt;/a&gt; &lt;span class="caps"&gt;VM&lt;/span&gt; and onto a mix of &lt;span class="caps"&gt;EC2&lt;/span&gt; and free&amp;nbsp;services.&lt;/p&gt;
 &lt;p&gt;I&amp;#8217;m sure this post will be &lt;a href="/2009/02/wordpress-installation-finished/"&gt;around in five years&lt;/a&gt; when there&amp;#8217;s a smarter way
@@ -2279,244 +2364,4 @@ or tab characters, and I don&amp;#8217;t know what shell the phone has on&amp;nb
 &lt;/ul&gt;</summary></entry><entry><title>A Cartoon about Me</title><link href="http://blog.jasonantman.com/2010/02/a-cartoon-about-me/" rel="alternate"></link><updated>2010-02-22T14:33:00-05:00</updated><author><name>admin</name></author><id>tag:blog.jasonantman.com,2010-02-22:2010/02/a-cartoon-about-me/</id><summary type="html">&lt;p&gt;Just found this today on one of my all-time favorite sites,
 &lt;a href="http://xkcd.com"&gt;&lt;span class="caps"&gt;XKCD&lt;/span&gt;&lt;/a&gt;. I swear it&amp;#8217;s about&amp;nbsp;me:&lt;/p&gt;
 &lt;p&gt;&lt;a href="http://www.xkcd.com/705/"&gt;&lt;img alt="XKCD number
-705" src="http://imgs.xkcd.com/comics/devotion_to_duty.png" /&gt;&lt;/a&gt;&lt;/p&gt;</summary><category term="humor"></category><category term="sysadmin"></category><category term="XKCD"></category></entry><entry><title>Interesting Links for Tuesday, January 26th 2010</title><link href="http://blog.jasonantman.com/2010/01/interesting-links-for-tuesday-january-26th-2010/" rel="alternate"></link><updated>2010-01-26T11:15:00-05:00</updated><author><name>admin</name></author><id>tag:blog.jasonantman.com,2010-01-26:2010/01/interesting-links-for-tuesday-january-26th-2010/</id><summary type="html">&lt;p&gt;&lt;strong&gt;Interesting Links for Tuesday, January 26&lt;sup&gt;th&lt;/sup&gt; 2010&lt;/strong&gt;&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;&lt;a href="http://www.wired.com/thisdayintech/2010/01/0125robot-kills-worker/"&gt;Jan. 25, 1979: Robot Kills&amp;nbsp;Human&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href="http://www.wired.com/threatlevel/2010/01/lawyers-challenge-filesharing-verdict/"&gt;Lawyers Challenge $54,000 &lt;span class="caps"&gt;P2P&lt;/span&gt; Fine As&amp;nbsp;Unconstitutional&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href="http://www.wired.com/threatlevel/2010/01/verizon-terminating-internet-accessinternet-access/"&gt;Verizon Terminating Copyright Infringers&amp;#8217; Internet&amp;nbsp;Access&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href="http://www.freesoftwaremagazine.com/columns/linux_performance_linux_slow_bloated"&gt;Linux performance: is Linux becoming just too slow and&amp;nbsp;bloated?&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href="http://technologizer.com/2010/01/24/edisons-kindle/"&gt;Mr. Edison&amp;#8217;s Kindle: Fifteen amazing gadget ideas that were way,
-    way ahead of their
-    time&lt;/a&gt; &lt;em&gt;(though,
-    I must say, the author of this blog is really looking at things from
-    a modern-day perspective, and his commentary seems to miss how truly
-    brilliant these ideas were at the&amp;nbsp;time)&lt;/em&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href="http://www.eff.org/deeplinks/2010/01/blogging-acta-across-globe-cippics-david-fewer-wha"&gt;&lt;span class="caps"&gt;EFF&lt;/span&gt;: Blogging &lt;span class="caps"&gt;ACTA&lt;/span&gt; Across the Globe: &lt;span class="caps"&gt;CIPPIC&lt;/span&gt;&amp;#8217;s David Fewer on What
-    &lt;span class="caps"&gt;ACTA&lt;/span&gt; Means for Canadian&amp;nbsp;Citizens&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href="http://sourceforge.net/blog/clarifying-sourceforgenets-denial-of-site-access-for-certain-persons-in-accordance-with-us-law/"&gt;Clarifying SourceForge.net’s denial of site access for certain
-    persons in accordance with &lt;span class="caps"&gt;US&lt;/span&gt;&amp;nbsp;law&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href="http://www.eff.org/deeplinks/2010/01/clinton-internet-freedom-and-principled-stands"&gt;&lt;span class="caps"&gt;EFF&lt;/span&gt;: Clinton on Internet Freedom, and Principled&amp;nbsp;Stands&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;And, most importantly&amp;#8230; &lt;a href="http://www.linuxinsider.com/rsstory/69193.html"&gt;Report: Linux Gains Ground, Windows
-Stumbles&lt;/a&gt;. Apparently,
-according to Net Applications, Linux&amp;#8217;s market share rose from 1 to 1.02
-percent in December 2009, a small but hopeful increase. Windows
-marketshare fell from 92.52% to&amp;nbsp;92.21%.&lt;/p&gt;
-&lt;p&gt;Like any statistic, there are always multiple sources. The
-&lt;a href="www.w3counter.com"&gt;W3Counter.com&lt;/a&gt; reports are a bit brighter for&amp;nbsp;Linux:&lt;/p&gt;
-&lt;table&gt;
-&lt;tr&gt;
-&lt;th&gt;
-&lt;span class="caps"&gt;OS&lt;/span&gt;
-
-&lt;/th&gt;
-&lt;th&gt;
-Nov 2009
-
-&lt;/th&gt;
-&lt;th&gt;
-Dec. 2009
-
-&lt;/th&gt;
-&lt;th&gt;
-Change
-
-&lt;/th&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;th&gt;
-Windows &lt;span class="caps"&gt;XP&lt;/span&gt;
-
-&lt;/th&gt;
-&lt;td&gt;
-57.57%
-
-&lt;/td&gt;
-&lt;td&gt;
-56.61%
-
-&lt;/td&gt;
-&lt;td&gt;
-&lt;span style="color: red;"&gt;-0.96%&lt;/span&gt;
-
-&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;th&gt;
-Windows Vista
-
-&lt;/th&gt;
-&lt;td&gt;
-21.73%
-
-&lt;/td&gt;
-&lt;td&gt;
-21.29%
-
-&lt;/td&gt;
-&lt;td&gt;
-&lt;span style="color: red;"&gt;-0.44%&lt;/span&gt;
-
-&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;th&gt;
-Windows 7
-
-&lt;/th&gt;
-&lt;td&gt;
-4.54%
-
-&lt;/td&gt;
-&lt;td&gt;
-6.80%
-
-&lt;/td&gt;
-&lt;td&gt;
-+2.26%
-
-&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;th&gt;
-Windows (Other)
-
-&lt;/th&gt;
-&lt;td&gt;
-1.85%
-
-&lt;/td&gt;
-&lt;td&gt;
-1.73%
-
-&lt;/td&gt;
-&lt;td&gt;
-&lt;span style="color: red;"&gt;-0.12%&lt;/span&gt;
-
-&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;th&gt;
-Mac
-
-&lt;/th&gt;
-&lt;td&gt;
-7.46%
-
-&lt;/td&gt;
-&lt;td&gt;
-7.44%
-
-&lt;/td&gt;
-&lt;td&gt;
-&lt;span style="color: red;"&gt;-0.02%&lt;/span&gt;
-
-&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;th&gt;
-Linux
-
-&lt;/th&gt;
-&lt;td&gt;
-1.80%
-
-&lt;/td&gt;
-&lt;td&gt;
-2.14%
-
-&lt;/td&gt;
-&lt;td&gt;
-+0.34%
-
-&lt;/td&gt;
-&lt;/tr&gt;
-&lt;/table&gt;
-
-&lt;p&gt;If this is accurate, it shows Linux with a sifnigicant 1-month gain in
-marketshare. Also notable is that in December, Android showed up for the
-first time, at 0.08%. In all reasonabless, that can be added to the
-Linux&amp;nbsp;row.&lt;/p&gt;
-&lt;p&gt;Also of interest are W3Counter&amp;#8217;s browser&amp;nbsp;stats:&lt;/p&gt;
-&lt;table&gt;
-&lt;tr&gt;
-&lt;th&gt;
-Browser
-
-&lt;/th&gt;
-&lt;th&gt;
-Nov 2009
-
-&lt;/th&gt;
-&lt;th&gt;
-Dec. 2009
-
-&lt;/th&gt;
-&lt;th&gt;
-Change
-
-&lt;/th&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;th&gt;
-&lt;span class="caps"&gt;IE&lt;/span&gt;
-
-&lt;/th&gt;
-&lt;td&gt;
-51.14%
-
-&lt;/td&gt;
-&lt;td&gt;
-50.3%
-
-&lt;/td&gt;
-&lt;td&gt;
-&lt;span style="color: red;"&gt;-0.84%&lt;/span&gt;
-
-&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;th&gt;
-Firefox
-
-&lt;/th&gt;
-&lt;td&gt;
-31.85%
-
-&lt;/td&gt;
-&lt;td&gt;
-32%
-
-&lt;/td&gt;
-&lt;td&gt;
-+0.15%
-
-&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;th&gt;
-Safari
-
-&lt;/th&gt;
-&lt;td&gt;
-4.58%
-
-&lt;/td&gt;
-&lt;td&gt;
-4.62%
-
-&lt;/td&gt;
-&lt;td&gt;
-+0.04%
-
-&lt;/td&gt;
-&lt;/tr&gt;
-&lt;/table&gt;
-
-&lt;p&gt;Also worth noting on the Browser front is that &lt;span class="caps"&gt;IE8&lt;/span&gt;&amp;#8217;s market share rose
-from 21.21% (November) to 22.43% (December) while Firefox 3.5&amp;#8217;s share
-jumped from 20.49% in November to 22.18% in December, a very significant
-stride for the brand new Firefox version. While &lt;span class="caps"&gt;IE8&lt;/span&gt; has been out
-considerably longer than Firefox 3.5, they&amp;#8217;re already almost tied in
-market share (and if another jump like that happens, Firefox 3.5 will be
-in the lead next&amp;nbsp;month).&lt;/p&gt;</summary></entry></feed>
+705" src="http://imgs.xkcd.com/comics/devotion_to_duty.png" /&gt;&lt;/a&gt;&lt;/p&gt;</summary><category term="humor"></category><category term="sysadmin"></category><category term="XKCD"></category></entry></feed>
