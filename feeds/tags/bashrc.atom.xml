@@ -1,5 +1,118 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Jason Antman's Blog</title><link href="http://blog.jasonantman.com/" rel="alternate"></link><link href="http://blog.jasonantman.com/feeds/tags/bashrc.atom.xml" rel="self"></link><id>http://blog.jasonantman.com/</id><updated>2014-07-10T06:45:00-04:00</updated><entry><title>bashrc Vagrant / VirtualBox reminder</title><link href="http://blog.jasonantman.com/2014/07/bashrc-vagrant-virtualbox-reminder/" rel="alternate"></link><updated>2014-07-10T06:45:00-04:00</updated><author><name>Jason Antman</name></author><id>tag:blog.jasonantman.com,2014-07-10:2014/07/bashrc-vagrant-virtualbox-reminder/</id><summary type="html">&lt;p&gt;Lately I&amp;#8217;ve been using VirtualBox VMs, both managed by Vagrant and otherwise, quite a lot.
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Jason Antman's Blog</title><link href="http://blog.jasonantman.com/" rel="alternate"></link><link href="http://blog.jasonantman.com/feeds/tags/bashrc.atom.xml" rel="self"></link><id>http://blog.jasonantman.com/</id><updated>2014-07-25T10:09:00-04:00</updated><entry><title>Session Save and Restore with Bash and GNU Screen</title><link href="http://blog.jasonantman.com/2014/07/session-save-and-restore-with-bash-and-gnu-screen/" rel="alternate"></link><updated>2014-07-25T10:09:00-04:00</updated><author><name>Jason Antman</name></author><id>tag:blog.jasonantman.com,2014-07-25:2014/07/session-save-and-restore-with-bash-and-gnu-screen/</id><summary type="html">&lt;p&gt;I&amp;#8217;ve been using &lt;a href="http://www.gnu.org/software/screen/"&gt;&lt;span class="caps"&gt;GNU&lt;/span&gt; Screen&lt;/a&gt; for a very long time; I pretty much do &lt;em&gt;all&lt;/em&gt; of my
+daily work in it. I have long-lived screen sessions pretty much everywhere; at any given time, I&amp;#8217;ve got a session running
+on my desktop (that probably has 19 windows open and active) and a few on various remote hosts. I also have a really
+bad habit of using screen windows to hold work in progress, things that I need to revisit, and what I want to do
+next. This isn&amp;#8217;t as big of a deal on boxes in a datacenter that rarely go down, but my home desktop ends up getting
+rebooted every few weeks (and not always at planned&amp;nbsp;times).&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Warning&lt;/strong&gt; - what I&amp;#8217;m about to describe is, really, a fragile and somewhat ugly hack. I&amp;#8217;m pretty sure that if I took
+the time to learn and switch to zsh (or another, more modern shell) and tmux, I could probably do this easier. But my
+shell environment is something I&amp;#8217;m pretty stuck in. So, if this is useful to anyone else, cool. But caveat&amp;nbsp;emptor.&lt;/p&gt;
+&lt;p&gt;screen 4.2.0 introduced some extensions to the &lt;code&gt;-Q&lt;/code&gt; remote querying capabilities, including the ability to retrieve a
+list of current windows and their titles via &lt;code&gt;screen -Q windows&lt;/code&gt;. A few months ago, I wrapped a python script around
+this that reads the currently open windows along with their title and window number, and writes out &lt;code&gt;~/.screenrc.save&lt;/code&gt;
+that&amp;#8217;s &lt;code&gt;~/.screenrc&lt;/code&gt; with &lt;code&gt;screen -t&lt;/code&gt; lines to recreate my currently open windows with their titles. After a system
+crash or reboot, I could &lt;code&gt;screen -c ~/.screenrc.save&lt;/code&gt; and get all of my windows and their titles back. So, that&amp;#8217;s
+a slightly better reminder of what I was working on assuming I keep my titles relevant. But each window just dumped
+me into &lt;code&gt;~/&lt;/code&gt; like usual, so I&amp;#8217;d just have the window title to remind me what I was working&amp;nbsp;on. &lt;/p&gt;
+&lt;p&gt;I ran this script for a few months; you can see the original version &lt;a href="https://github.com/jantman/misc-scripts/blob/ab6a14774d5dd6250aac98f804c33d3dc26a32eb/savescreen.py"&gt;here&lt;/a&gt;.
+However, this still really isn&amp;#8217;t what I&amp;#8217;d call &amp;#8220;session restore&amp;#8221;. I had window titles as &amp;#8220;hints&amp;#8221; to what I was doing,
+but everything else was left to my&amp;nbsp;memory.&lt;/p&gt;
+&lt;p&gt;Enter some awful &lt;code&gt;bashrc&lt;/code&gt; hackery. Please note that my bashrc is a bit complicated, mainly due to git completion
+and getting a proper prompt for python virtualenvs, but here&amp;#8217;s the magic&amp;nbsp;portion:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="c"&gt;# git prompt - make it work everywhere&lt;/span&gt;
+&lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="o"&gt;[[&lt;/span&gt; -e /usr/share/git/completion/git-prompt.sh &lt;span class="o"&gt;]]&lt;/span&gt;
+&lt;span class="k"&gt;then&lt;/span&gt;
+&lt;span class="k"&gt;    &lt;/span&gt;&lt;span class="nb"&gt;source&lt;/span&gt; /usr/share/git/completion/git-prompt.sh
+&lt;span class="k"&gt;elif&lt;/span&gt; &lt;span class="o"&gt;[[&lt;/span&gt; -e /usr/share/git-core/contrib/completion/git-prompt.sh &lt;span class="o"&gt;]]&lt;/span&gt;
+&lt;span class="k"&gt;then&lt;/span&gt;
+&lt;span class="k"&gt;    &lt;/span&gt;&lt;span class="nb"&gt;source&lt;/span&gt; /usr/share/git-core/contrib/completion/git-prompt.sh
+&lt;span class="k"&gt;elif&lt;/span&gt; &lt;span class="o"&gt;[[&lt;/span&gt; -e ~/bin/git-prompt.sh &lt;span class="o"&gt;]]&lt;/span&gt;
+&lt;span class="k"&gt;then&lt;/span&gt;
+&lt;span class="k"&gt;    &lt;/span&gt;&lt;span class="nb"&gt;source&lt;/span&gt; ~/bin/git-prompt.sh
+&lt;span class="k"&gt;fi&lt;/span&gt;
+
+&lt;span class="c"&gt;#set the &lt;span class="caps"&gt;PROMPT&lt;/span&gt;&lt;/span&gt;
+&lt;span class="nv"&gt;cur_tty&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="k"&gt;$(&lt;/span&gt;&lt;span class="nv"&gt;temp&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="k"&gt;$(&lt;/span&gt;tty&lt;span class="k"&gt;)&lt;/span&gt; ; &lt;span class="nb"&gt;echo&lt;/span&gt; &lt;span class="k"&gt;${&lt;/span&gt;&lt;span class="nv"&gt;temp&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="nv"&gt;5&lt;/span&gt;&lt;span class="k"&gt;})&lt;/span&gt;;
+&lt;span class="c"&gt;# git prompt configutation&lt;/span&gt;
+&lt;span class="nv"&gt;GIT_PS1_SHOWDIRTYSTATE&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;1
+&lt;span class="nv"&gt;GIT_PS1_SHOWUNTRACKEDFILES&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;1
+&lt;span class="nv"&gt;GIT_PS1_SHOWUPSTREAM&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;auto&amp;quot;&lt;/span&gt;
+&lt;span class="nv"&gt;GIT_PS1_SHOWCOLORHINTS&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;1
+
+&lt;span class="c"&gt;# for screen session-saving hack, set per-window history file if in screen&lt;/span&gt;
+&lt;span class="o"&gt;[[&lt;/span&gt; -n &lt;span class="s2"&gt;&amp;quot;$&lt;span class="caps"&gt;STY&lt;/span&gt;&amp;quot;&lt;/span&gt; &lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt; -n &lt;span class="s2"&gt;&amp;quot;$&lt;span class="caps"&gt;WINDOW&lt;/span&gt;&amp;quot;&lt;/span&gt; &lt;span class="o"&gt;]]&lt;/span&gt; &lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class="nb"&gt;export &lt;/span&gt;&lt;span class="nv"&gt;&lt;span class="caps"&gt;HISTFILE&lt;/span&gt;&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="k"&gt;$(&lt;/span&gt;readlink -f ~/.screenhist/&lt;span class="nv"&gt;$&lt;span class="caps"&gt;WINDOW&lt;/span&gt;&lt;/span&gt;&lt;span class="k"&gt;)&lt;/span&gt;
+&lt;span class="nb"&gt;shopt&lt;/span&gt; -s histappend
+
+&lt;span class="c"&gt;# make sure our screen session-saving hack directories exist&lt;/span&gt;
+&lt;span class="o"&gt;[[&lt;/span&gt; -d ~/.screenhist &lt;span class="o"&gt;]]&lt;/span&gt; &lt;span class="o"&gt;||&lt;/span&gt; mkdir ~/.screenhist
+&lt;span class="o"&gt;[[&lt;/span&gt; -d ~/.screendirs &lt;span class="o"&gt;]]&lt;/span&gt; &lt;span class="o"&gt;||&lt;/span&gt; mkdir ~/.screendirs
+
+__wrap_git_ps1 &lt;span class="o"&gt;()&lt;/span&gt;
+&lt;span class="o"&gt;{&lt;/span&gt;
+    &lt;span class="c"&gt;# commands here now get executed every time bash constructs a prompt&lt;/span&gt;
+    &lt;span class="c"&gt;# for screen pwd saving&lt;/span&gt;
+    &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="o"&gt;[[&lt;/span&gt; -n &lt;span class="s2"&gt;&amp;quot;$&lt;span class="caps"&gt;STY&lt;/span&gt;&amp;quot;&lt;/span&gt; &lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt; -n &lt;span class="s2"&gt;&amp;quot;$&lt;span class="caps"&gt;WINDOW&lt;/span&gt;&amp;quot;&lt;/span&gt; &lt;span class="o"&gt;]]&lt;/span&gt;
+    &lt;span class="k"&gt;then&lt;/span&gt;
+&lt;span class="k"&gt;        &lt;/span&gt;&lt;span class="nv"&gt;&lt;span class="caps"&gt;SCREENLINKDIR&lt;/span&gt;&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="k"&gt;$(&lt;/span&gt;readlink -f ~/.screendirs&lt;span class="k"&gt;)&lt;/span&gt;
+        rm -f &lt;span class="nv"&gt;$&lt;span class="caps"&gt;SCREENLINKDIR&lt;/span&gt;&lt;/span&gt;/&lt;span class="nv"&gt;$&lt;span class="caps"&gt;WINDOW&lt;/span&gt;&lt;/span&gt;
+        ln -sf &lt;span class="k"&gt;$(&lt;/span&gt;&lt;span class="nb"&gt;pwd&lt;/span&gt;&lt;span class="k"&gt;)&lt;/span&gt;/ &lt;span class="nv"&gt;$&lt;span class="caps"&gt;SCREENLINKDIR&lt;/span&gt;&lt;/span&gt;/&lt;span class="nv"&gt;$&lt;span class="caps"&gt;WINDOW&lt;/span&gt;&lt;/span&gt;
+    &lt;span class="k"&gt;fi&lt;/span&gt;
+    &lt;span class="c"&gt;# virtualenv stuff for prompt&lt;/span&gt;
+    &lt;span class="nv"&gt;venv&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;&amp;#39;&lt;/span&gt;
+    &lt;span class="o"&gt;[[&lt;/span&gt; &lt;span class="nv"&gt;$VIRTUAL_ENV&lt;/span&gt; !&lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;&amp;quot;&lt;/span&gt; &lt;span class="o"&gt;]]&lt;/span&gt; &lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class="nv"&gt;venv&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;\[\033[31m\](${VIRTUAL_ENV##*/})\e[0m&amp;quot;&lt;/span&gt;
+    __git_ps1 &lt;span class="s2"&gt;&amp;quot;$venv\u@\h:$cur_tty:\w&amp;quot;&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;\\\$ &amp;quot;&lt;/span&gt;
+    &lt;span class="nb"&gt;history&lt;/span&gt; -a
+&lt;span class="o"&gt;}&lt;/span&gt;
+&lt;span class="nv"&gt;PROMPT_COMMAND&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;__wrap_git_ps1&amp;#39;&lt;/span&gt;
+&lt;span class="nb"&gt;export &lt;/span&gt;&lt;span class="nv"&gt;&lt;span class="caps"&gt;PS2&lt;/span&gt;&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&amp;gt; &amp;quot;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;So&amp;#8230; the hack. First we source the git prompt scripts that come with git (trying the
+locations they should be at on all of the machines I commonly use, and if it can&amp;#8217;t find
+any of them, falling back to a copy in my homedir) and set some configuration variables
+for them (as well as capturing the current tty). We then (conditionally on being inside
+a screen window) set our history file to a per-screen-window path, and have history append.
+At this point we also make sure some directories we&amp;#8217;ll use&amp;nbsp;exist.&lt;/p&gt;
+&lt;p&gt;Now the real fun. &lt;code&gt;PROMPT_COMMAND&lt;/code&gt; specifies a function for bash to execute to build the
+prompt string; this is called every time bash needs to display the prompt (so, effectively,
+every time a command completes in the shell). We set it to &lt;code&gt;__wrap_git_ps1&lt;/code&gt;, a function we
+just defined. The magic happens in this function. Screen sets some environment variables
+inside each window, including &lt;code&gt;STY&lt;/code&gt; (the name of the screen session you&amp;#8217;re in) and
+&lt;code&gt;WINDOW&lt;/code&gt;, the current window number. If both of these are set, we symlink our current
+&lt;code&gt;pwd&lt;/code&gt; to &lt;code&gt;~/.screendirs/$WINDOW&lt;/code&gt; (note some hackery, explicitly removing the link if it
+already exists, to get this to work correctly). We then throw in some python virtualenv-specific
+prompt settings, and pass on the strings we&amp;#8217;ve constructed to &lt;code&gt;__git_ps1&lt;/code&gt; which adds the
+git-specific information, and then sets &lt;code&gt;PS1&lt;/code&gt; correctly. Finally, we explicitly append to
+current history, to make sure the history on disk is always accurate and&amp;nbsp;up-to-date.&lt;/p&gt;
+&lt;p&gt;This works in combination with the &lt;a href="https://github.com/jantman/misc-scripts/blob/master/savescreen.py"&gt;latest version&lt;/a&gt;
+of savescreen.py, which has some minor changes. The line to create each window,&amp;nbsp;formerly:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="n"&gt;fh&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;write&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;screen -t &lt;/span&gt;&lt;span class="se"&gt;\&amp;quot;&lt;/span&gt;&lt;span class="s"&gt;{name}&lt;/span&gt;&lt;span class="se"&gt;\&amp;quot;&lt;/span&gt;&lt;span class="s"&gt; {num}&lt;/span&gt;&lt;span class="se"&gt;\n&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;format&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;name&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="n"&gt;windows&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;n&lt;/span&gt;&lt;span class="p"&gt;],&lt;/span&gt; &lt;span class="n"&gt;num&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="n"&gt;n&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;becomes:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="n"&gt;fh&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;write&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;screen -t &lt;/span&gt;&lt;span class="se"&gt;\&amp;quot;&lt;/span&gt;&lt;span class="s"&gt;{name}&lt;/span&gt;&lt;span class="se"&gt;\&amp;quot;&lt;/span&gt;&lt;span class="s"&gt; {num} sh -c &lt;/span&gt;&lt;span class="se"&gt;\&amp;quot;&lt;/span&gt;&lt;span class="s"&gt;cd $(readlink -fn {dirpath}/{num}); bash&lt;/span&gt;&lt;span class="se"&gt;\&amp;quot;\n&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;format&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;name&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="n"&gt;windows&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;n&lt;/span&gt;&lt;span class="p"&gt;],&lt;/span&gt; &lt;span class="n"&gt;num&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="n"&gt;n&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;dirpath&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="n"&gt;dirpath&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;When each window is created at startup, we &lt;code&gt;cd&lt;/code&gt; into the previous &lt;code&gt;pwd&lt;/code&gt; (the path
+that the &lt;code&gt;~/.screendirs/$WINDOW&lt;/code&gt; symlink, created by bashrc, points to) and then
+call our shell. When this is combined with the &lt;code&gt;HISTFILE&lt;/code&gt; change, the effect is that
+&lt;code&gt;screen -c ~/.screenrc.save&lt;/code&gt; brings us back into a screen session that has not only
+all of our previous windows and their titles, but also a shell in each window&amp;#8217;s previous
+working directory, and that window&amp;#8217;s&amp;nbsp;history.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Limitations&lt;/strong&gt;:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;I should&amp;#8217;ve also used &lt;code&gt;$STY&lt;/code&gt; in each of the paths, so this would be multi-session-safe.
+   I didn&amp;#8217;t, so this has undefined behavior if more than one screen session is running as
+   your&amp;nbsp;user.&lt;/li&gt;
+&lt;li&gt;A lot of this is lost, obviously, if you &lt;code&gt;sudo su&lt;/code&gt; or &lt;code&gt;ssh&lt;/code&gt;, or in any other way end up
+   as a different&amp;nbsp;user.&lt;/li&gt;
+&lt;li&gt;I&amp;#8217;m thinking about rolling in some method of automatic &lt;code&gt;virtualenv&lt;/code&gt; activation (since it,
+   unfortunately, doesn&amp;#8217;t have anything like &lt;code&gt;.rvmrc&lt;/code&gt;). Maybe in the next&amp;nbsp;version.&lt;/li&gt;
+&lt;/ol&gt;</summary><category term="bash"></category><category term="screen"></category><category term="restore"></category><category term="bashrc"></category></entry><entry><title>bashrc Vagrant / VirtualBox reminder</title><link href="http://blog.jasonantman.com/2014/07/bashrc-vagrant-virtualbox-reminder/" rel="alternate"></link><updated>2014-07-10T06:45:00-04:00</updated><author><name>Jason Antman</name></author><id>tag:blog.jasonantman.com,2014-07-10:2014/07/bashrc-vagrant-virtualbox-reminder/</id><summary type="html">&lt;p&gt;Lately I&amp;#8217;ve been using VirtualBox VMs, both managed by Vagrant and otherwise, quite a lot.
 I&amp;#8217;ve also been doing a bunch of development work with them. And inevitably, I close a screen
 window and fo on with my work and end up with a few &amp;#8220;orphaned&amp;#8221; virtualbox VMs running that
 I&amp;#8217;ve forgotten&amp;nbsp;about.&lt;/p&gt;
