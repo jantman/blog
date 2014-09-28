@@ -1,5 +1,50 @@
 <?xml version="1.0" encoding="utf-8"?>
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Jason Antman's Blog</title><link>http://blog.jasonantman.com/</link><description></description><atom:link href="http://blog.jasonantman.com/feeds/categories/tech-howtos.rss.xml" rel="self"></atom:link><lastBuildDate>Fri, 25 Jul 2014 10:09:00 -0400</lastBuildDate><item><title>Session Save and Restore with Bash and GNU Screen</title><link>http://blog.jasonantman.com/2014/07/session-save-and-restore-with-bash-and-gnu-screen/</link><description>&lt;p&gt;I&amp;#8217;ve been using &lt;a href="http://www.gnu.org/software/screen/"&gt;&lt;span class="caps"&gt;GNU&lt;/span&gt; Screen&lt;/a&gt; for a very long time; I pretty much do &lt;em&gt;all&lt;/em&gt; of my
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Jason Antman's Blog</title><link>http://blog.jasonantman.com/</link><description></description><atom:link href="http://blog.jasonantman.com/feeds/categories/tech-howtos.rss.xml" rel="self"></atom:link><lastBuildDate>Sat, 27 Sep 2014 21:20:00 -0400</lastBuildDate><item><title>Pushover Notifications for Shell Command Completion and Status</title><link>http://blog.jasonantman.com/2014/09/pushover-notifications-for-shell-command-completion-and-status/</link><description>&lt;p&gt;Lately I&amp;#8217;ve been doing a bunch of work with &lt;a href="http://www.packer.io/"&gt;packer&lt;/a&gt; building &lt;a href="http://www.vagrantup.com/"&gt;Vagrant&lt;/a&gt;
+machine images, and using &lt;a href="http://serverspec.org/"&gt;serverspec&lt;/a&gt; to run automated acceptance tests on the images. Unfortunately,
+this ends up being a ~40-minute cycle time for the full image to provision and test. So, lots of watching text slowly scroll
+down a screen, and finding something else to do. It&amp;#8217;s the weekend; I want to get this project finished, but I&amp;#8217;ve got other
+things to&amp;nbsp;do.&lt;/p&gt;
+&lt;p&gt;So, I wrote a little bash wrapper around &lt;a href="https://github.com/jnwatts"&gt;jnwatts&amp;#8217;&lt;/a&gt;
+&lt;a href="https://raw.githubusercontent.com/jnwatts/pushover.sh/master/pushover.sh"&gt;pushover.sh&lt;/a&gt;. Assuming wherever you put this
+is in your path, simply prefix any command with &lt;code&gt;pushover&lt;/code&gt;, and you&amp;#8217;ll get a handy &lt;a href="https://pushover.net/"&gt;Pushover&lt;/a&gt;
+notification when it completes, along with the exit status and some other useful&amp;nbsp;information.&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="c"&gt;#!/bin/bash&lt;/span&gt;
+&lt;span class="c"&gt;#&lt;/span&gt;
+&lt;span class="c"&gt;# Notify command completion and exit status via pushover&lt;/span&gt;
+&lt;span class="c"&gt;# uses pushover.sh from https://raw.githubusercontent.com/jnwatts/pushover.sh/master/pushover.sh&lt;/span&gt;
+&lt;span class="c"&gt;#&lt;/span&gt;
+
+&lt;span class="nv"&gt;&lt;span class="caps"&gt;APIKEY&lt;/span&gt;&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;Your Pushover &lt;span class="caps"&gt;API&lt;/span&gt; Key Here&amp;quot;&lt;/span&gt;
+&lt;span class="nv"&gt;&lt;span class="caps"&gt;USERKEY&lt;/span&gt;&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;Your Pushover User Key Here&amp;quot;&lt;/span&gt;
+
+&lt;span class="nv"&gt;$@&lt;/span&gt;
+&lt;span class="nv"&gt;exitcode&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nv"&gt;$?&lt;/span&gt;
+&lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="o"&gt;[&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;$exitcode&amp;quot;&lt;/span&gt; -eq 0 &lt;span class="o"&gt;]&lt;/span&gt;
+&lt;span class="k"&gt;then&lt;/span&gt;
+&lt;span class="k"&gt;    &lt;/span&gt;pushover.sh -p 0 -t &lt;span class="s2"&gt;&amp;quot;Command Succeeded&amp;quot;&lt;/span&gt; -T &lt;span class="s2"&gt;&amp;quot;$&lt;span class="caps"&gt;APIKEY&lt;/span&gt;&amp;quot;&lt;/span&gt; -U &lt;span class="s2"&gt;&amp;quot;$&lt;span class="caps"&gt;USERKEY&lt;/span&gt;&amp;quot;&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;succeeded on $(hostname): $@ (in $(pwd))&amp;quot;&lt;/span&gt;
+    &lt;span class="nb"&gt;echo&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;(sent pushover success notification)&amp;quot;&lt;/span&gt;
+&lt;span class="k"&gt;else&lt;/span&gt;
+&lt;span class="k"&gt;    &lt;/span&gt;pushover.sh -p 0 -t &lt;span class="s2"&gt;&amp;quot;Command Failed&amp;quot;&lt;/span&gt; -T &lt;span class="s2"&gt;&amp;quot;$&lt;span class="caps"&gt;APIKEY&lt;/span&gt;&amp;quot;&lt;/span&gt; -U &lt;span class="s2"&gt;&amp;quot;$&lt;span class="caps"&gt;USERKEY&lt;/span&gt;&amp;quot;&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;failed (exit $exitcode) on $(hostname): $@ (in $(pwd))&amp;quot;&lt;/span&gt;
+    &lt;span class="nb"&gt;echo&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;(sent pushover failure notification)&amp;quot;&lt;/span&gt;
+&lt;span class="k"&gt;fi&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;So, for example, a failing spec&amp;nbsp;test:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;jantman@phoenix:pts/4:~/CMG/git/puppet-cm (AUTO-415=)$ pushover bundle exec rake spec
+&amp;lt;lots of failing spec output that exits non-0&amp;gt;
+(sent pushover failure notification)
+jantman@phoenix:pts/4:~/CMG/git/puppet-cm (AUTO-415=)$
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Would send me a handy pushover message when it&amp;nbsp;finishes:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;Command Failed
+failed (exit 1) on phoenix: bundle exec rake spec (in /home/jantman/CMG/git/puppet-cm)
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Hopefully this is useful to someone else as&amp;nbsp;well&amp;#8230;&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">Jason Antman</dc:creator><pubDate>Sat, 27 Sep 2014 21:20:00 -0400</pubDate><guid>tag:blog.jasonantman.com,2014-09-27:2014/09/pushover-notifications-for-shell-command-completion-and-status/</guid><category>pushover</category><category>shell</category><category>notifications</category></item><item><title>Session Save and Restore with Bash and GNU Screen</title><link>http://blog.jasonantman.com/2014/07/session-save-and-restore-with-bash-and-gnu-screen/</link><description>&lt;p&gt;I&amp;#8217;ve been using &lt;a href="http://www.gnu.org/software/screen/"&gt;&lt;span class="caps"&gt;GNU&lt;/span&gt; Screen&lt;/a&gt; for a very long time; I pretty much do &lt;em&gt;all&lt;/em&gt; of my
 daily work in it. I have long-lived screen sessions pretty much everywhere; at any given time, I&amp;#8217;ve got a session running
 on my desktop (that probably has 19 windows open and active) and a few on various remote hosts. I also have a really
 bad habit of using screen windows to hold work in progress, things that I need to revisit, and what I want to do
@@ -3756,46 +3801,4 @@ for each scan&amp;nbsp;file.&lt;/p&gt;
 &lt;p&gt;The current version of the script can be found at
 &lt;a href="https://github.com/jantman/misc-scripts/blob/master/nmap-xml-to-table.php"&gt;https://github.com/jantman/misc-scripts/blob/master/nmap-xml-to-table.php&lt;/a&gt;,
 and simply called as &lt;code&gt;./nmap-xml-to-table.php file1.xml file2.xml [...]&lt;/code&gt;
-and outputs &lt;span class="caps"&gt;HTML&lt;/span&gt; to&amp;nbsp;stdout.&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Sun, 30 Jan 2011 20:00:00 -0500</pubDate><guid>tag:blog.jasonantman.com,2011-01-30:2011/01/consolidation-of-nmap-port-scan-results-to-html-table/</guid><category>nmap</category><category>security</category></item><item><title>Vyatta VC5 - Snort alerts to syslog</title><link>http://blog.jasonantman.com/2011/01/vyatta-vc5-snort-alerts-to-syslog/</link><description>&lt;p&gt;I&amp;#8217;m running a &lt;a href="http://www.vyatta.org"&gt;Vyatta&lt;/a&gt; vyatta router at home - in
-my opinion it&amp;#8217;s pretty near &amp;#8220;enterprise grade&amp;#8221;, and I&amp;#8217;m running the
-Community/Core (read: no-cost and almost all Free) on commodity hardware
-with great performance. Granted, I&amp;#8217;m still on the older version (5 as
-opposed to the current 6) since an upgrade will require total downtime
-and a spare set of &lt;span class="caps"&gt;SCSI&lt;/span&gt; disks for the machine it&amp;#8217;s on, but it still
-works quite well. Today I decided to enable the
-&lt;a href="http://www.snort.org"&gt;Snort&lt;/a&gt; &lt;span class="caps"&gt;IDS&lt;/span&gt; on the box. It actually worked quite
-well (albeit stuck at older rules until I upgrade to Vyatta &lt;span class="caps"&gt;VC6&lt;/span&gt;) and
-didn&amp;#8217;t put much more load on the box. For the time being I decided to
-just have it alert on problems and not drop anything, as I&amp;#8217;m getting
-pretty high false positives and the older Vyatta version doesn&amp;#8217;t seem to
-have a way to disregard&amp;nbsp;rules.&lt;/p&gt;
-&lt;p&gt;My biggest complaint was that Vyatta didn&amp;#8217;t see fit to allow alerts by
-syslog. I&amp;#8217;m not a big fan of keeping information like &lt;span class="caps"&gt;IDS&lt;/span&gt; logs stuck on
-the router - I don&amp;#8217;t like logging in to it any more than I have to, it
-doesn&amp;#8217;t have much storage, and I&amp;#8217;d also like to keep stuff like this in
-a more secure location. Through a bit of digging, I found the
-&lt;code&gt;/opt/vyatta/share/perl5/VyattaSnortConfig.pm&lt;/code&gt; Perl module which
-generates the Snort config file from Vyatta&amp;#8217;s &lt;span class="caps"&gt;CLI&lt;/span&gt; stuff. Looking through
-the Perl code, I found the definition of the snort.conf output&amp;nbsp;statements:&lt;/p&gt;
-&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="k"&gt;my&lt;/span&gt; &lt;span class="nv"&gt;$output_def&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s"&gt;&amp;lt;&amp;lt;&lt;span class="caps"&gt;EOD&lt;/span&gt;;&lt;/span&gt;
-&lt;span class="s"&gt;  output alert_unified: alert, limit $log_limit&lt;/span&gt;
-&lt;span class="s"&gt;  output log_null&lt;/span&gt;
-&lt;span class="s"&gt;&lt;span class="caps"&gt;EOD&lt;/span&gt;&lt;/span&gt;
-&lt;/pre&gt;&lt;/div&gt;
-
-
-&lt;p&gt;I simply added a line &lt;code&gt;output alert_syslog: log_local3 log_notice&lt;/code&gt; after the &lt;code&gt;output alert_unified&lt;/code&gt; line.&lt;/p&gt;
-&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="k"&gt;my&lt;/span&gt; &lt;span class="nv"&gt;$output_def&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s"&gt;&amp;lt;&amp;lt;&lt;span class="caps"&gt;EOD&lt;/span&gt;;&lt;/span&gt;
-&lt;span class="s"&gt;  output alert_unified: alert, limit $log_limit&lt;/span&gt;
-&lt;span class="s"&gt;  output alert_syslog: log_local3 log_notice&lt;/span&gt;
-&lt;span class="s"&gt;  output log_null&lt;/span&gt;
-&lt;span class="s"&gt;&lt;span class="caps"&gt;EOD&lt;/span&gt;&lt;/span&gt;
-&lt;/pre&gt;&lt;/div&gt;
-
-
-&lt;p&gt;I then went into Vyatta configuration and changed a rule from alert to pass, committed,
-changed back, committed, and &lt;code&gt;/etc/snort/snort.conf&lt;/code&gt; now had my syslog lines. I&amp;#8217;m now 
-getting snort alerts to local3 in syslog, which is fed to my centralized log server. My
-next project is to find or write something which will parse these logs, generate a daily
-summary email, and maybe check them hourly and alert on any big changes. I also might just
-cron an emailing of the output from Vyatta&amp;#8217;s show ips summary command. So far I have over 11,000 events logged in about 12&amp;nbsp;hours.&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Sun, 30 Jan 2011 19:54:00 -0500</pubDate><guid>tag:blog.jasonantman.com,2011-01-30:2011/01/vyatta-vc5-snort-alerts-to-syslog/</guid><category>security</category><category>snort</category><category>syslog</category><category>vyatta</category></item></channel></rss>
+and outputs &lt;span class="caps"&gt;HTML&lt;/span&gt; to&amp;nbsp;stdout.&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Sun, 30 Jan 2011 20:00:00 -0500</pubDate><guid>tag:blog.jasonantman.com,2011-01-30:2011/01/consolidation-of-nmap-port-scan-results-to-html-table/</guid><category>nmap</category><category>security</category></item></channel></rss>

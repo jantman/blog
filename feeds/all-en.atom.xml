@@ -1,5 +1,50 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Jason Antman's Blog</title><link href="http://blog.jasonantman.com/" rel="alternate"></link><link href="http://blog.jasonantman.com/feeds/all-en.atom.xml" rel="self"></link><id>http://blog.jasonantman.com/</id><updated>2014-07-25T10:09:00-04:00</updated><entry><title>Session Save and Restore with Bash and GNU Screen</title><link href="http://blog.jasonantman.com/2014/07/session-save-and-restore-with-bash-and-gnu-screen/" rel="alternate"></link><updated>2014-07-25T10:09:00-04:00</updated><author><name>Jason Antman</name></author><id>tag:blog.jasonantman.com,2014-07-25:2014/07/session-save-and-restore-with-bash-and-gnu-screen/</id><summary type="html">&lt;p&gt;I&amp;#8217;ve been using &lt;a href="http://www.gnu.org/software/screen/"&gt;&lt;span class="caps"&gt;GNU&lt;/span&gt; Screen&lt;/a&gt; for a very long time; I pretty much do &lt;em&gt;all&lt;/em&gt; of my
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Jason Antman's Blog</title><link href="http://blog.jasonantman.com/" rel="alternate"></link><link href="http://blog.jasonantman.com/feeds/all-en.atom.xml" rel="self"></link><id>http://blog.jasonantman.com/</id><updated>2014-09-27T21:20:00-04:00</updated><entry><title>Pushover Notifications for Shell Command Completion and Status</title><link href="http://blog.jasonantman.com/2014/09/pushover-notifications-for-shell-command-completion-and-status/" rel="alternate"></link><updated>2014-09-27T21:20:00-04:00</updated><author><name>Jason Antman</name></author><id>tag:blog.jasonantman.com,2014-09-27:2014/09/pushover-notifications-for-shell-command-completion-and-status/</id><summary type="html">&lt;p&gt;Lately I&amp;#8217;ve been doing a bunch of work with &lt;a href="http://www.packer.io/"&gt;packer&lt;/a&gt; building &lt;a href="http://www.vagrantup.com/"&gt;Vagrant&lt;/a&gt;
+machine images, and using &lt;a href="http://serverspec.org/"&gt;serverspec&lt;/a&gt; to run automated acceptance tests on the images. Unfortunately,
+this ends up being a ~40-minute cycle time for the full image to provision and test. So, lots of watching text slowly scroll
+down a screen, and finding something else to do. It&amp;#8217;s the weekend; I want to get this project finished, but I&amp;#8217;ve got other
+things to&amp;nbsp;do.&lt;/p&gt;
+&lt;p&gt;So, I wrote a little bash wrapper around &lt;a href="https://github.com/jnwatts"&gt;jnwatts&amp;#8217;&lt;/a&gt;
+&lt;a href="https://raw.githubusercontent.com/jnwatts/pushover.sh/master/pushover.sh"&gt;pushover.sh&lt;/a&gt;. Assuming wherever you put this
+is in your path, simply prefix any command with &lt;code&gt;pushover&lt;/code&gt;, and you&amp;#8217;ll get a handy &lt;a href="https://pushover.net/"&gt;Pushover&lt;/a&gt;
+notification when it completes, along with the exit status and some other useful&amp;nbsp;information.&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="c"&gt;#!/bin/bash&lt;/span&gt;
+&lt;span class="c"&gt;#&lt;/span&gt;
+&lt;span class="c"&gt;# Notify command completion and exit status via pushover&lt;/span&gt;
+&lt;span class="c"&gt;# uses pushover.sh from https://raw.githubusercontent.com/jnwatts/pushover.sh/master/pushover.sh&lt;/span&gt;
+&lt;span class="c"&gt;#&lt;/span&gt;
+
+&lt;span class="nv"&gt;&lt;span class="caps"&gt;APIKEY&lt;/span&gt;&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;Your Pushover &lt;span class="caps"&gt;API&lt;/span&gt; Key Here&amp;quot;&lt;/span&gt;
+&lt;span class="nv"&gt;&lt;span class="caps"&gt;USERKEY&lt;/span&gt;&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;Your Pushover User Key Here&amp;quot;&lt;/span&gt;
+
+&lt;span class="nv"&gt;$@&lt;/span&gt;
+&lt;span class="nv"&gt;exitcode&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nv"&gt;$?&lt;/span&gt;
+&lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="o"&gt;[&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;$exitcode&amp;quot;&lt;/span&gt; -eq 0 &lt;span class="o"&gt;]&lt;/span&gt;
+&lt;span class="k"&gt;then&lt;/span&gt;
+&lt;span class="k"&gt;    &lt;/span&gt;pushover.sh -p 0 -t &lt;span class="s2"&gt;&amp;quot;Command Succeeded&amp;quot;&lt;/span&gt; -T &lt;span class="s2"&gt;&amp;quot;$&lt;span class="caps"&gt;APIKEY&lt;/span&gt;&amp;quot;&lt;/span&gt; -U &lt;span class="s2"&gt;&amp;quot;$&lt;span class="caps"&gt;USERKEY&lt;/span&gt;&amp;quot;&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;succeeded on $(hostname): $@ (in $(pwd))&amp;quot;&lt;/span&gt;
+    &lt;span class="nb"&gt;echo&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;(sent pushover success notification)&amp;quot;&lt;/span&gt;
+&lt;span class="k"&gt;else&lt;/span&gt;
+&lt;span class="k"&gt;    &lt;/span&gt;pushover.sh -p 0 -t &lt;span class="s2"&gt;&amp;quot;Command Failed&amp;quot;&lt;/span&gt; -T &lt;span class="s2"&gt;&amp;quot;$&lt;span class="caps"&gt;APIKEY&lt;/span&gt;&amp;quot;&lt;/span&gt; -U &lt;span class="s2"&gt;&amp;quot;$&lt;span class="caps"&gt;USERKEY&lt;/span&gt;&amp;quot;&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;failed (exit $exitcode) on $(hostname): $@ (in $(pwd))&amp;quot;&lt;/span&gt;
+    &lt;span class="nb"&gt;echo&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;(sent pushover failure notification)&amp;quot;&lt;/span&gt;
+&lt;span class="k"&gt;fi&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;So, for example, a failing spec&amp;nbsp;test:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;jantman@phoenix:pts/4:~/CMG/git/puppet-cm (AUTO-415=)$ pushover bundle exec rake spec
+&amp;lt;lots of failing spec output that exits non-0&amp;gt;
+(sent pushover failure notification)
+jantman@phoenix:pts/4:~/CMG/git/puppet-cm (AUTO-415=)$
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Would send me a handy pushover message when it&amp;nbsp;finishes:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;Command Failed
+failed (exit 1) on phoenix: bundle exec rake spec (in /home/jantman/CMG/git/puppet-cm)
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Hopefully this is useful to someone else as&amp;nbsp;well&amp;#8230;&lt;/p&gt;</summary><category term="pushover"></category><category term="shell"></category><category term="notifications"></category></entry><entry><title>Session Save and Restore with Bash and GNU Screen</title><link href="http://blog.jasonantman.com/2014/07/session-save-and-restore-with-bash-and-gnu-screen/" rel="alternate"></link><updated>2014-07-25T10:09:00-04:00</updated><author><name>Jason Antman</name></author><id>tag:blog.jasonantman.com,2014-07-25:2014/07/session-save-and-restore-with-bash-and-gnu-screen/</id><summary type="html">&lt;p&gt;I&amp;#8217;ve been using &lt;a href="http://www.gnu.org/software/screen/"&gt;&lt;span class="caps"&gt;GNU&lt;/span&gt; Screen&lt;/a&gt; for a very long time; I pretty much do &lt;em&gt;all&lt;/em&gt; of my
 daily work in it. I have long-lived screen sessions pretty much everywhere; at any given time, I&amp;#8217;ve got a session running
 on my desktop (that probably has 19 windows open and active) and a few on various remote hosts. I also have a really
 bad habit of using screen windows to hold work in progress, things that I need to revisit, and what I want to do
@@ -3156,61 +3201,4 @@ has links to my &lt;span class="caps"&gt;SVN&lt;/span&gt; repo, and a bunch of o
     24x7x365. Small shop? Sure. But I learned a &lt;span class="caps"&gt;LOT&lt;/span&gt;, especially about
     how to make things resilient enough that I didn&amp;#8217;t get paged&amp;nbsp;often.&lt;/li&gt;
 &lt;/ul&gt;
-&lt;p&gt;I&amp;#8217;m sure I&amp;#8217;ll update this over time as I distill more of my&amp;nbsp;ideas.&lt;/p&gt;</summary></entry><entry><title>Tools for watching apache httpd and memcached</title><link href="http://blog.jasonantman.com/2012/06/tools-for-watching-apache-httpd-and-memcached/" rel="alternate"></link><updated>2012-06-26T13:46:00-04:00</updated><author><name>admin</name></author><id>tag:blog.jasonantman.com,2012-06-26:2012/06/tools-for-watching-apache-httpd-and-memcached/</id><summary type="html">&lt;p&gt;Recently I was working on a code release on a site running &lt;span class="caps"&gt;PHP&lt;/span&gt; on
-&lt;a href="http://httpd.apache.org/"&gt;Apache httpd&lt;/a&gt;, and using
-&lt;a href="http://memcached.org/"&gt;memcached&lt;/a&gt;. Without getting into specifics, we
-had a number of issues that were both Apache and memcached problems, and
-little visibility into them as it was running on an older server without
-much monitoring in place. I started looking around for simple tools that
-could provide a bit more insight, without many dependencies (as the
-machine is a relatively minimalist install). Here are some of the
-options I&amp;nbsp;found:&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;
-&lt;p&gt;&lt;a href="http://code.google.com/p/memcache-top/"&gt;memcache-top&lt;/a&gt; - A top-like
-    script that pulls stats from memcached instances and can show both
-    per-instance, total and average usage %, hit rate, number of
-    connections, time to run the stats query, evictions, gets, sets, and
-    read and write amounts. Best of all, it&amp;#8217;s a very small perl script
-    that requires only &lt;span class="caps"&gt;IO&lt;/span&gt;::Socket and Time::HiRes. Here&amp;#8217;s a small
-    example of the&amp;nbsp;output:&lt;/p&gt;
-&lt;div class="codehilite"&gt;&lt;pre&gt;memcache-top v0.6       (default port: 11211, color: on, refresh: 3 seconds)
-
-INSTANCE                USAGE   HIT %   CONN    TIME    EVICT   GETS    SETS    READ    WRITE
-127.0.0.1:11211         86.6%   99.4%   115     0.6ms   0.0     4114    1669    1.3M    24.2M
-127.0.0.1:11212         85.5%   59.9%   2       0.4ms   0.0     0       0       90      8055
-
-AVERAGE:                86.0%   79.6%   58      0.5ms   0.0     2057    834     682.4K  12.1M
-
-TOTAL:          0.9GB/  1.0GB           117     1.0ms   0.0     4114    1669    1.3M    24.2M
-&lt;/pre&gt;&lt;/div&gt;
-
-
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;&lt;a href="https://github.com/dormando/damemtop"&gt;damemtop&lt;/a&gt; is also a nice
-    top-like memcached tool. On the positive side, you can specify any
-    column from &amp;#8220;stats&amp;#8221;, &amp;#8220;stats items&amp;#8221; or &amp;#8220;stats slabs&amp;#8221; in the
-    configuration file, and can choose between average or one-second
-    snapshots for each column. On the down side, it requires the &lt;span class="caps"&gt;YAML&lt;/span&gt;
-    and AnyEvent Perl modules, so it has some uncommon&amp;nbsp;dependencies.&lt;/p&gt;
-&lt;div class="codehilite"&gt;&lt;pre&gt;damemtop: Tue Jun 26 14:02:24 2012 [sort: hostname asc] [delay: 3s]
-hostname           all_version  all_fill_rate  hit_rate  evictions  curr_items  curr_connections   cmd_get  cmd_set  bytes_written  bytes_read  get_hits  get_misses  
-TOTAL:             
-NA                 NA           NA             NA        NA         NA          NA                 87       32       491,735        30,894      86        1           
-AVERAGE:           
-NA                 NA           86.00%         99.00%    NA         NA          NA                 43       16       122,933        7,723       43        1           
-10.200.1.78:11211  1.2.6        86.63%         98.04%    0          0           -1.00204024880524  51       19       386,492        21,613      50        1           
-10.200.1.78:11212  1.2.6        85.46%         NA        0          0           0                  0        0        11,373         31          0         0           
-10.200.1.79:11211  1.2.6        87.31%         100.00%   0          0           -1.00204024880524  36       13       82,479         9,219       36        0           
-10.200.1.79:11212  1.2.6        85.08%         NA        0          0           0                  0        0        11,389         31          0         0           
-loop took: 0.305617094039917
-&lt;/pre&gt;&lt;/div&gt;
-
-
-&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;I&amp;#8217;m still looking around for something for apache that uses mod_status
-and isn&amp;#8217;t too verbose; ideally I&amp;#8217;d like to be able to watch memcached,
-apache response codes/times, and apache mod_status all in the same
-terminal&amp;nbsp;window.&lt;/p&gt;</summary><category term="apache"></category><category term="memcached"></category><category term="perl"></category><category term="top"></category><category term="troubleshooting"></category></entry></feed>
+&lt;p&gt;I&amp;#8217;m sure I&amp;#8217;ll update this over time as I distill more of my&amp;nbsp;ideas.&lt;/p&gt;</summary></entry></feed>

@@ -1,5 +1,50 @@
 <?xml version="1.0" encoding="utf-8"?>
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Jason Antman's Blog</title><link>http://blog.jasonantman.com/</link><description></description><atom:link href="http://blog.jasonantman.com/feeds/tags/shell.rss.xml" rel="self"></atom:link><lastBuildDate>Tue, 11 Jun 2013 07:09:00 -0400</lastBuildDate><item><title>Quick Tip: Timestamping bash history</title><link>http://blog.jasonantman.com/2013/06/quick-tip-timestamping-bash-history/</link><description>&lt;p&gt;Here&amp;#8217;s a tiny little snippet that I have in my &lt;code&gt;.bashrc&lt;/code&gt; which really
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Jason Antman's Blog</title><link>http://blog.jasonantman.com/</link><description></description><atom:link href="http://blog.jasonantman.com/feeds/tags/shell.rss.xml" rel="self"></atom:link><lastBuildDate>Sat, 27 Sep 2014 21:20:00 -0400</lastBuildDate><item><title>Pushover Notifications for Shell Command Completion and Status</title><link>http://blog.jasonantman.com/2014/09/pushover-notifications-for-shell-command-completion-and-status/</link><description>&lt;p&gt;Lately I&amp;#8217;ve been doing a bunch of work with &lt;a href="http://www.packer.io/"&gt;packer&lt;/a&gt; building &lt;a href="http://www.vagrantup.com/"&gt;Vagrant&lt;/a&gt;
+machine images, and using &lt;a href="http://serverspec.org/"&gt;serverspec&lt;/a&gt; to run automated acceptance tests on the images. Unfortunately,
+this ends up being a ~40-minute cycle time for the full image to provision and test. So, lots of watching text slowly scroll
+down a screen, and finding something else to do. It&amp;#8217;s the weekend; I want to get this project finished, but I&amp;#8217;ve got other
+things to&amp;nbsp;do.&lt;/p&gt;
+&lt;p&gt;So, I wrote a little bash wrapper around &lt;a href="https://github.com/jnwatts"&gt;jnwatts&amp;#8217;&lt;/a&gt;
+&lt;a href="https://raw.githubusercontent.com/jnwatts/pushover.sh/master/pushover.sh"&gt;pushover.sh&lt;/a&gt;. Assuming wherever you put this
+is in your path, simply prefix any command with &lt;code&gt;pushover&lt;/code&gt;, and you&amp;#8217;ll get a handy &lt;a href="https://pushover.net/"&gt;Pushover&lt;/a&gt;
+notification when it completes, along with the exit status and some other useful&amp;nbsp;information.&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="c"&gt;#!/bin/bash&lt;/span&gt;
+&lt;span class="c"&gt;#&lt;/span&gt;
+&lt;span class="c"&gt;# Notify command completion and exit status via pushover&lt;/span&gt;
+&lt;span class="c"&gt;# uses pushover.sh from https://raw.githubusercontent.com/jnwatts/pushover.sh/master/pushover.sh&lt;/span&gt;
+&lt;span class="c"&gt;#&lt;/span&gt;
+
+&lt;span class="nv"&gt;&lt;span class="caps"&gt;APIKEY&lt;/span&gt;&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;Your Pushover &lt;span class="caps"&gt;API&lt;/span&gt; Key Here&amp;quot;&lt;/span&gt;
+&lt;span class="nv"&gt;&lt;span class="caps"&gt;USERKEY&lt;/span&gt;&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;Your Pushover User Key Here&amp;quot;&lt;/span&gt;
+
+&lt;span class="nv"&gt;$@&lt;/span&gt;
+&lt;span class="nv"&gt;exitcode&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nv"&gt;$?&lt;/span&gt;
+&lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="o"&gt;[&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;$exitcode&amp;quot;&lt;/span&gt; -eq 0 &lt;span class="o"&gt;]&lt;/span&gt;
+&lt;span class="k"&gt;then&lt;/span&gt;
+&lt;span class="k"&gt;    &lt;/span&gt;pushover.sh -p 0 -t &lt;span class="s2"&gt;&amp;quot;Command Succeeded&amp;quot;&lt;/span&gt; -T &lt;span class="s2"&gt;&amp;quot;$&lt;span class="caps"&gt;APIKEY&lt;/span&gt;&amp;quot;&lt;/span&gt; -U &lt;span class="s2"&gt;&amp;quot;$&lt;span class="caps"&gt;USERKEY&lt;/span&gt;&amp;quot;&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;succeeded on $(hostname): $@ (in $(pwd))&amp;quot;&lt;/span&gt;
+    &lt;span class="nb"&gt;echo&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;(sent pushover success notification)&amp;quot;&lt;/span&gt;
+&lt;span class="k"&gt;else&lt;/span&gt;
+&lt;span class="k"&gt;    &lt;/span&gt;pushover.sh -p 0 -t &lt;span class="s2"&gt;&amp;quot;Command Failed&amp;quot;&lt;/span&gt; -T &lt;span class="s2"&gt;&amp;quot;$&lt;span class="caps"&gt;APIKEY&lt;/span&gt;&amp;quot;&lt;/span&gt; -U &lt;span class="s2"&gt;&amp;quot;$&lt;span class="caps"&gt;USERKEY&lt;/span&gt;&amp;quot;&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;failed (exit $exitcode) on $(hostname): $@ (in $(pwd))&amp;quot;&lt;/span&gt;
+    &lt;span class="nb"&gt;echo&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;(sent pushover failure notification)&amp;quot;&lt;/span&gt;
+&lt;span class="k"&gt;fi&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;So, for example, a failing spec&amp;nbsp;test:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;jantman@phoenix:pts/4:~/CMG/git/puppet-cm (AUTO-415=)$ pushover bundle exec rake spec
+&amp;lt;lots of failing spec output that exits non-0&amp;gt;
+(sent pushover failure notification)
+jantman@phoenix:pts/4:~/CMG/git/puppet-cm (AUTO-415=)$
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Would send me a handy pushover message when it&amp;nbsp;finishes:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;Command Failed
+failed (exit 1) on phoenix: bundle exec rake spec (in /home/jantman/CMG/git/puppet-cm)
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Hopefully this is useful to someone else as&amp;nbsp;well&amp;#8230;&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">Jason Antman</dc:creator><pubDate>Sat, 27 Sep 2014 21:20:00 -0400</pubDate><guid>tag:blog.jasonantman.com,2014-09-27:2014/09/pushover-notifications-for-shell-command-completion-and-status/</guid><category>pushover</category><category>shell</category><category>notifications</category></item><item><title>Quick Tip: Timestamping bash history</title><link>http://blog.jasonantman.com/2013/06/quick-tip-timestamping-bash-history/</link><description>&lt;p&gt;Here&amp;#8217;s a tiny little snippet that I have in my &lt;code&gt;.bashrc&lt;/code&gt; which really
 comes in handy when trying to figure out what I did on a system when.
 One of the first things I do when (eek) building out or working on a
 one-off machine (or setting up a new laptop/desktop, as I am right now)
