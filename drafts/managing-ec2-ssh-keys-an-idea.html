@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:og="http://ogp.me/ns#"
+      xmlns:fb="https://www.facebook.com/2008/fbml">
+<head>
+    <title>Managing EC2 SSH Keys - An Idea</title>
+    <!-- Using the latest rendering mode for IE -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Open Graph tags -->
+
+    <!-- Bootstrap -->
+        <link rel="stylesheet" href="http://blog.jasonantman.com/theme/css/bootstrap.flatly.min.css" type="text/css"/>
+    <link href="http://blog.jasonantman.com/theme/css/font-awesome.min.css" rel="stylesheet">
+    <link href="http://blog.jasonantman.com/theme/css/pygments.css" rel="stylesheet">
+        <link href="http://blog.jasonantman.com/theme/css/typogrify.css" rel="stylesheet">
+    <link rel="stylesheet" href="http://blog.jasonantman.com/theme/css/style.css" type="text/css"/>
+    <!-- JavaScript plugins (requires jQuery) -->
+    <script src="http://code.jquery.com/jquery.js"></script>
+
+    <link rel="stylesheet" href="http://blog.jasonantman.com/theme/css/forkongithub.min.css" type="text/css" />
+
+        <link href="http://blog.jasonantman.com/feeds/all.atom.xml" type="application/atom+xml" rel="alternate"
+              title="Jason Antman's Blog ATOM Feed"/>
+        <link href="http://blog.jasonantman.com/feeds/all.rss.xml" type="application/atom+xml" rel="alternate"
+              title="Jason Antman's Blog RSS Feed"/>
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-2718127-2', 'jasonantman.com');
+  ga('send', 'pageview');
+
+</script>
+</head>
+<body>
+<span id="forkongithub"><a href="https://github.com/jantman/blog">Fork me on GitHub</a></span><nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="http://blog.jasonantman.com" class="navbar-brand">Jason Antman's Blog</a>
+        </div>
+        <div class="collapse navbar-collapse navbar-ex1-collapse">
+            <ul class="nav navbar-nav">
+                         <li><a href="http://blog.jasonantman.com/pages/about.html">
+                             About
+                          </a></li>
+                        <li >
+                            <a href="http://blog.jasonantman.com/categories/ideas-and-rants/index.html">Ideas and rants</a>
+                        </li>
+                        <li >
+                            <a href="http://blog.jasonantman.com/categories/miscellaneous/index.html">Miscellaneous</a>
+                        </li>
+                        <li >
+                            <a href="http://blog.jasonantman.com/categories/monitoring/index.html">Monitoring</a>
+                        </li>
+                        <li >
+                            <a href="http://blog.jasonantman.com/categories/ops/index.html">Ops</a>
+                        </li>
+                        <li >
+                            <a href="http://blog.jasonantman.com/categories/projects/index.html">Projects</a>
+                        </li>
+                        <li >
+                            <a href="http://blog.jasonantman.com/categories/puppet/index.html">Puppet</a>
+                        </li>
+                        <li class="active">
+                            <a href="http://blog.jasonantman.com/categories/tech-howtos/index.html">Tech howtos</a>
+                        </li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="http://blog.jasonantman.com/archives.html"><i class="icon-th-list"></i>Archives</a></li>
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+</nav>
+<!-- /.navbar -->
+<div class="container">
+    <div class="row">
+        <div class="col-lg-9">
+    <section id="content">
+        <article>
+            <header class="page-header">
+                <h1>
+                    <a href="http://blog.jasonantman.com/2014/10/managing-ec2-ssh-keys-an-idea/"
+                       rel="bookmark"
+                       title="Permalink to Managing EC2 SSH Keys - An Idea">
+                        Managing <span class="caps">EC2</span> <span class="caps">SSH</span> Keys - An&nbsp;Idea
+                    </a>
+                </h1>
+<a href="http://twitter.com/share" class="twitter-share-button" data-count="horizontal" data-via="j_antman">Tweet</a><script type="text/javascript" src="http://platform.twitter.com/widgets.js"></script>
+            </header>
+            <div class="entry-content">
+                <div class="panel">
+                    <div class="panel-body">
+<footer class="post-info">
+    <span class="label label-default">Date</span>
+    <span class="published">
+        <i class="icon-calendar"></i>Sat 04 October 2014
+    </span>
+
+
+
+<span class="label label-default">Tags</span>
+	<a href="http://blog.jasonantman.com/tags/ssh/index.html">ssh</a>
+        /
+	<a href="http://blog.jasonantman.com/tags/ec2/index.html">ec2</a>
+        /
+	<a href="http://blog.jasonantman.com/tags/aws/index.html">aws</a>
+        /
+	<a href="http://blog.jasonantman.com/tags/keys/index.html">keys</a>
+        /
+	<a href="http://blog.jasonantman.com/tags/public-key/index.html">public key</a>
+        /
+	<a href="http://blog.jasonantman.com/tags/pubkey/index.html">pubkey</a>
+</footer><!-- /.post-info -->                    </div>
+                </div>
+                <p>At work, we have a bunch of <span class="caps">EC2</span> instances (currently hundreds, and growing quickly). We also have a bunch
+(probably now around 100, counting contractors) of users. Some users (mainly engineers) need access (<span class="caps">SSH</span>) to all
+of the <span class="caps">EC2</span> instances; many users need access only to their team&#8217;s instances. While I usually advocate sanity checks
+and training over access control for employees, many teams have expressed legitimate concern that they don&#8217;t want
+others on their instances - commands that are normal to run in dev/test (like data loads) might be disastrous
+on production instances. So, as part of our automation and tooling team, I&#8217;ve had to come up with a way to manage
+all this. Right now we have a single &#8220;bastion&#8221; (a.k.a. jump box / ssh gateway / keyhole) instance, with a single
+shared used keyed to access every <span class="caps">EC2</span> instance. This doesn&#8217;t&nbsp;scale.</p>
+<p>What follows is one theory of mine on how to solve this problem. I&#8217;ve been thinking about this for the past
+day; this might not be the Right answer, and it&#8217;s just a theory at this point, but I think it&nbsp;works.</p>
+<h1 id="requirements-and-assumptions">Requirements and&nbsp;Assumptions</h1>
+<ul>
+<li>We have Active Directory as the one source of authentication/authorization truth, but it&#8217;s only in the corporate
+  network. For various reasons both technical and political, accessing it from <span class="caps">AWS</span> (whether directly, over <span class="caps">VPN</span>,
+  via replication, or via data feeds to a separate <span class="caps">LDAP</span> infrastructure in <span class="caps">EC2</span>) is simply not&nbsp;possible.</li>
+<li>We want to control <span class="caps">SSH</span> access to a bunch of instances. Some of them are persistent and some are ephemeral. Some
+  are pre-baked AMIs in auto-scaling groups, with <em>no</em> changes made outside the <span class="caps">AMI</span>. Some of them are persistent
+  or semi-persistent instances that run Puppet every 30 minutes. Some of them are somewhat special, and can&#8217;t be
+  trivially torn&nbsp;down.</li>
+<li>Most of our instances are in a <span class="caps">VPC</span>, and have proper security controls which include <span class="caps">SSH</span> access from only a specifically
+  whitelisted range of IPs. However, some instances are in &#8220;<span class="caps">EC2</span> Classic&#8221; and have <span class="caps">SSH</span> open to the world. We want a
+  solution that also protects these&nbsp;instances.</li>
+<li>We&#8217;re mainly concerned with securing access from (a) users inadvertantly accessing an instance they shouldn&#8217;t be
+  on, (b) outside/untrusted parties, and (c) former employees. We trust our employees within reason, and accept that,
+  within our security stance, if an employee <em>really</em> wants privilege escalation, they&#8217;re going to get it. We&#8217;re not
+  overly concerned with protecting against determined, malicious users who already have some access but want&nbsp;more.</li>
+<li>Our current process for security cleanup for former employees is largely based on corporate <span class="caps">IT</span> (or is it <span class="caps">HR</span>?) turning
+  off their <span class="caps">AD</span> account. We want to minimize additional steps that need to be completed when someone has access&nbsp;revoked.</li>
+<li>Any solution that we choose needs to be usable with self-service <span class="caps">AWS</span>; i.e. any user can spin up their own instances
+  or stacks, provided that they use an <span class="caps">AMI</span> that is either built by our automation team, or follows guidelines on what
+  must be included in all&nbsp;AMIs.</li>
+<li>We have some administrative accounts (Jenkins, as well as some shared privileged accounts on select machines) that need
+  unrestricted access to&nbsp;everything.</li>
+<li>Local user accounts aren&#8217;t an option. This would mean running Puppet constantly on every image and/or rebuilding
+  every image each time we gain or lose an employee. That would be especially difficult when we occasionally have
+  project-based&nbsp;contractors.</li>
+<li>We&#8217;re <span class="caps">OK</span> with having a bastion/keyhole server in <span class="caps">AWS</span>, we just don&#8217;t want everyone to be able to access&nbsp;everything.</li>
+<li>Our intended network security stance is to have bastion/keyhole servers in <span class="caps">AWS</span> (ideally one per <span class="caps">AZ</span>), which are only
+  reachable via <span class="caps">SSH</span> from selected public addresses on our corporate network (which can only be reached by current
+  employees with valid, working access). All other instances should only allow <span class="caps">SSH</span> from these selected&nbsp;hosts.</li>
+<li>Despite the above, we don&#8217;t want to rely on an instance being properly configured as our only security measure;
+  if an instance is incorrectly configured to accept <span class="caps">SSH</span> from 0.0.0.0/0, we still want to prevent users whose
+  access has been revoked from logging in to the&nbsp;instance.</li>
+<li>We don&#8217;t need access to be granted and revoked immediately. We&#8217;ll assume that in normal operating conditions,
+  thirty (30) minutes is a reasonable amount of time to either grant or revoke a user&#8217;s&nbsp;access.</li>
+<li>We want to minimize reliance on our existing corporate infrastructure, so that <span class="caps">AWS</span> can be used for business
+  continuity&nbsp;purposes.</li>
+</ul>
+<h1 id="main-goals">Main&nbsp;Goals</h1>
+<ul>
+<li>Provide users with <span class="caps">SSH</span> access to <span class="caps">EC2</span> servers; privilege should be able to be granted to a subset of users and/or groups
+  for each &#8220;application&#8221;. Users should not be able to access other&nbsp;instances.</li>
+<li>Allow a fixed list of users access to every&nbsp;instance.</li>
+<li>Be able to revoke a user&#8217;s access without rebuilding instances or ssh-in-a-loop&#8217;ing to all of&nbsp;them.</li>
+<li>Many instances are not going to be running Puppet after initial provisioning/<span class="caps">AMI</span> creation, so as much as we love Puppet,
+  it&#8217;s not an option to solve this&nbsp;problem.</li>
+<li>This should involve a minimum of administrative overhead when a user leaves the&nbsp;company.</li>
+</ul>
+<h1 id="proposed-solution">Proposed&nbsp;Solution</h1>
+<p>My solution relies on <span class="caps">SSH</span> agent forwarding and the <code>AuthorizedKeysCommand</code> introduced in OpenSSH <span class="caps">XXX</span>, most likely inspired by (or maybe literally the same code)
+as the patch formerly used by GitHub. This allows sshd to execute an arbitrary command, passing it the login username, which returns output identical to what would
+be in the <code>authorized_keys</code> file. If none of the keys successfully authenticate the user, authentication continues using the usual <code>AuthorizedKeysFile</code>. We take
+advantage of this feature, in addition to <span class="caps">SSH</span> agent forwarding, to provide our granular access control. Public keys are pulled from a central location <em>at login time</em>
+(and cached for a set amount of time); each user has control over their own public keys, and a central process builds sets of public keys authorized to access a given
+group of&nbsp;instances.</p>
+<h2 id="infrastructure">Infrastructure</h2>
+<p>Each <span class="caps">EC2</span> instance will be a member of an Access Group, which is a unique identifier for the set of users authorized to access instances
+in the group. In implementation, Access Groups will likely just be a tag on <span class="caps">EC2</span> instances that maps to a set of predefined values
+(see below for&nbsp;more).</p>
+<p>We will have a number of &#8220;bastion&#8221; (keyhole/jump box/<span class="caps">SSH</span> gateway) hosts, ideally one in each Availability Zone where we have instances.
+These bastion hosts will only be reachable from within our corporate network (or our <span class="caps">VPN</span>); therefore, users must have
+current access to our corporate network (where we can rely on Active Directory and other systems to handle authorization) in order to
+gain access to <span class="caps">AWS</span>. All other <span class="caps">EC2</span> instances will only be reachable over <span class="caps">SSH</span> from one of these bastion hosts. The bastion hosts themselves
+will not have <span class="caps">SSH</span> keys to access other instances; they will, however, have <span class="caps">SSH</span> agent forwarding&nbsp;enabled.</p>
+<p>Users reach <span class="caps">AWS</span> instances by SSHing from a host attached to our corporate network (including <span class="caps">VPN</span> hosts) to a bastion host in <span class="caps">EC2</span>. From there,
+they <span class="caps">SSH</span> to the destination instance, making use of <span class="caps">SSH</span> agent forwarding to use their local key to authenticate to the instance. We get both
+a restricted entry point to <span class="caps">AWS</span> (the bastion host, which can enforce further security and logging methods) and the ability to authenticate users
+using their own personal public keys on the destination&nbsp;instances.</p>
+<p>To make it easier for end-users, we could develop a wrapper script like <a href="https://pypi.python.org/pypi/ec2-ssh">Instagram&#8217;s ec2-ssh</a> that
+checks for a valid, running ssh agent with keys in it, and then crafts the correct <span class="caps">SSH</span> command to land the user on the desired end
+host - i.e. something like <code>ec2ssh instance_id</code> would generate and execute a command like <code>ssh -At bastion_hostname 'ssh instance_ip'</code>.</p>
+<h2 id="on-the-client-instances">On the Client&nbsp;(Instances)</h2>
+<p>Each instance, when initially built/provisioned, is given a <code>get\_authorized\_keys</code> script, which is configured to be run by sshd as the
+<code>AuthorizedKeysCommand</code>. This script uses one of the following three public key distribution services to retrieve the authorized public keys
+for that instance, which are then echoed on <span class="caps">STDOUT</span> and used to authenticate the user. For the sake of simplicity, we&#8217;ll assume (which is
+currently the case in our infrastructure) that this script will only run for a single non-root user that is used for logins; it will exit
+without returning any output for any other users on the system, effectively preventing logins to&nbsp;them.</p>
+<p>The script will first check for authorized keys cached locally (either on disk or in memory, to be determined). If they&#8217;re found and less
+than some age threshold (we&#8217;ll say five minutes), the cached version is returned. This is intended to both reduce latency when performing
+multiple sequential logins, and to allow logins to continue functioning through short periods of degraded network connectivity. If no recent
+keys are found cached on disk, the script will retrieve them from the configured public key distribution service. If the service does not
+return an appropriate response within an acceptable time limit, or is unreachable, the script will exit with no output. This will prevent
+logins from users authorized with this method, but will fall through to the standard <code>AuthorizedKeysFile</code> method. A number of permanent
+authorized public keys will be included in each instance, to allow emergency administrative access in the event that the key distribution
+service&nbsp;fails.</p>
+<p>If we&#8217;re willing to assume that the instances themselves are trusted (which I think is a valid assumption), the key retrieval script on
+each instance will determine the Access Group that the instance belongs to, and then request the authorized keys for that Access Group.
+Determination of Access Group will likely be made via user data passed into the instance at provisioning time, or via retrieval of a
+tag value for the&nbsp;instance.</p>
+<p>If assuming trust locally on the instance is not sufficient, then the burden of identifying the instance&#8217;s access group is shifted
+to the key distribution service (likely by identifying the <span class="caps">IP</span> address of the requesting instance, and then using the <span class="caps">EC2</span> <span class="caps">API</span> to
+determine which group that instance belongs to). With this solution, only the second alternative key distribution service is&nbsp;feasible.</p>
+<p>If a shoter delay to authorization changes is needed, it would be feasible for clients to also run a separate process
+(cronjob, daemon, etc.) that polls the key distribution service at a regular interval to check for updates (i.e.
+<span class="caps">HTTP</span> <span class="caps">HEAD</span>, something <span class="caps">SQS</span>-based, etc.) and updates the local cache when they&nbsp;occur.</p>
+<h1 id="public-key-distribution-service">Public Key Distribution&nbsp;Service</h1>
+<p>Instances will retrieve their authorized public keys from a key distribution service. Three examples&nbsp;follow:</p>
+<h2 id="alternative-1-scalable-architecture-aws-and-local">Alternative 1 - Scalable Architecture - <span class="caps">AWS</span> and&nbsp;Local</h2>
+<p>Keys will be managed by a web-based application (with a complete and documented <span class="caps">API</span>) living in the corporate data center.
+The application will provide facilities for authorized users (managers, operations) to define new Access Groups and modify
+the list of users allowed to access them. Individual end-users will be able to manage their public keys. At a set interval,
+standalone script will retrieve a list of all users defined in the application and check the status of their corporate Active
+Directory accounts. Any users whose accounts have been deactivated or locked will be flagged as such in the application. Whenever
+a change is made in the application (including a user being flagged as deactivated), all Access Groups including that user
+will have the union of all active members&#8217; public keys written to a file in an S3 bucket that&#8217;s only writable by the privileged
+user running the application. All instances will have <span class="caps">IAM</span> roles that allow them to read the&nbsp;bucket.</p>
+<p>This method allows us to provide self-service to users and application administrators, and keeps all data about users within
+the corporate network. It provides automatic revocation of access for disabled Active Directory accounts. It does introduce
+a delay in revocation of access for disabled <span class="caps">AD</span> accounts, but a delay of ~10 minutes is certainly not a concern in our&nbsp;environment.</p>
+<h2 id="alternative-2-scalable-architecture-entirely-in-aws">Alternative 2 - Scalable Architecture Entirely in&nbsp;<span class="caps">AWS</span></h2>
+<p>A similar application exists, but lives entirely in <span class="caps">AWS</span>, utilizing its native high availability technologies (i.e. multi-<span class="caps">AZ</span>
+<span class="caps">RDS</span> as a data store). A script still runs in the corporate data center, but all it does is query the <span class="caps">API</span> for a list of all
+active users, check <span class="caps">AD</span> account status, and deactivate any users that no longer have a valid account. Instead of writing the
+authorized key files to an S3 bucket, the application serves them directly in real-time. The application could
+store keys and data in a <span class="caps">RDBMS</span>, or perhaps something like OpenLDAP, depending on which technologies are best known and
+what the performance requirements&nbsp;are.</p>
+<p>This is more of an infrastructure challenge and introduces additional points for failure; if the application above (1)
+fails, it will only impact <em>changes</em> to access, whereas if this application fails, all user access (aside from the static
+emergency keys) will break. However, this method allows us to control access at a level finer than Access Groups; rules
+could be developed based on any attributes of the requesting instance, including (if the latency was allowable) queries
+to the <span class="caps">EC2</span> <span class="caps">API</span> for instance-speicifc&nbsp;data.</p>
+<h2 id="alternative-3-simple-architecture">Alternative 3 - Simple&nbsp;Architecture</h2>
+<p>A text file stores mappings of Access Groups to the Active Directory users and groups authorized for them. The text file
+is manually maintained, stored in version control, and all changes must comply with an access policy and be peer-reviewed.
+A script runs at a set interval (let&#8217;s say cron every 5-10 minutes) that reads the user/group mapping, translates groups
+to their membership list, and checks the <span class="caps">AD</span> account status of every listed user. Users without valid/current/enabled accounts
+are removed from the lists in memory. For the remaining (active) users for each Access Group, their <code>~/.ssh/authorized_keys</code>
+file is read. All user&#8217;s authorized_keys files are concatenated together per Access Group, and the result is written to
+an S3&nbsp;bucket.</p>
+<p>This is by far the simplest method, and relies on our <span class="caps">NFS</span> shared home directories to allow users to manage their public
+keys by simply using the standard file. This keeps all user-related data in our corporate data center, and means that we
+have only one script and its&#8217; cron job to maintain, rather than a whole application. The text-file-based method of access
+control isn&#8217;t terribly scalable, but it should work for the ~100 users that we have to deal with. Checking <span class="caps">AD</span> account status
+when generating the file should provide a feasible safeguard for users whose corporate accounts are locked/revoked without
+requiring someone to remember to also remove them from the <span class="caps">AWS</span> user&nbsp;list.</p>
+<h2 id="limitations">Limitations</h2>
+<p>My company is a CentOS shop. The <code>AuthorizedKeysCommand</code> feature of OpenSSH itself was only released in <a href="http://www.openssh.com/txt/release-6.2">OpenSSH 6.2</a>,
+on March 22, 2013. A patch for it was backported to the 5.3p1 version of openssh-server in <span class="caps">RHEL</span> and CentOS 6. However,
+this method will certainly not work on CentOS 5, which is still running OpenSSH 4.3. Be aware that when the new <code>AuthorizedKeysCommand</code>
+feature was backported, the man page was not updated; <code>man sshd_config</code> is still conspicuously missing these options, and I couldn&#8217;t
+find anything in the <span class="caps">RPM</span> changelog about it, but the <code>openssh-5.3p1-authorized-keys-command.patch</code> file is clearly there in the
+5.3p1 <span class="caps">SRPM</span>, and the options are there but commented out in the <code>sshd_config</code> it provides. I actually thought this would be near-impossible
+to do on CentOS 6 until I found the <code>openssh-ldap</code> package (in the default repos) and discovered that it uses this&nbsp;feature.</p>
+<h2 id="accountability">Accountability</h2>
+<p>If accountability is a concern, we will handle this through detailed logging in every step of the key creation, authorization, distribution
+and retrieval process. In addition, all instances will run sshd with <code>LogLevel VERBOSE</code>, which will log the fingerprint of all public keys
+used to connect to the instance. Logs will be written to a secure, append-only&nbsp;medium.</p>
+<h1 id="references">References</h1>
+<ul>
+<li>There is an existing <code>openssh-ldap</code> package in CentOS that provides instructions on setting up public key storage in an <span class="caps">LDAP</span> backend,
+  using <code>AuthorizedKeysCommand</code>.</li>
+<li><a href="http://andriigrytsenko.net/2013/05/authorizedkeyscommand-support-and-centosrhel-5-x/">Someone said</a> they successfully built the current
+  6.2 OpenSSH for <span class="caps">RHEL</span>/Cent&nbsp;5.</li>
+</ul>
+<h1 id="rejected-ideas">Rejected&nbsp;Ideas</h1>
+<p>While thinking through this I considered and rejected a number of alternate methods. Here are some of&nbsp;them:</p>
+<ul>
+<li>While <span class="caps">SSH</span>&#8217;s relatively new Certificate support (<span class="caps">CA</span>-based) sounds nice, it doesn&#8217;t solve the problem; according to
+  <a href="http://neocri.me/documentation/using-ssh-certificate-authentication/">this blog post</a> it uses a <span class="caps">CA</span> to sign keys,
+  but doesn&#8217;t do a <span class="caps">CRL</span> lookup, it relies on a RevokedKeys file manually sync&#8217;ed to all servers. So, this poses the
+  same problem as managing authorized_keys as a file distributed to&nbsp;instances.</li>
+<li>Managing per-application users or groups on the <span class="caps">AWS</span> bastion hosts requires a lot of administrative overhead, and isn&#8217;t really an option for us.
+  Though this would be a simple implementation using either groups for each application with private keys group-readable,
+  or using per-application users and the proper sudo&nbsp;configuration.</li>
+<li>Prior to finding out about <code>AuthorizedKeysCommand</code>, my top idea was essentially this same implementation on the
+  key distribution server side, but writing it to an S3 bucket, and running a cronjob on each <span class="caps">EC2</span> instance to pull
+  down the authorized_keys&nbsp;file.</li>
+<li>Just Don&#8217;t - See <a href="https://wblinks.com/notes/aws-tips-i-wish-id-known-before-i-started/">this blog post</a>
+  as a reference. But the gist is, &#8220;If you have to <span class="caps">SSH</span> into your servers, then your automation has failed&#8221;.
+  Sure, development and test stacks will be spun up, probably with either a single user&#8217;s key, or a shared
+  key. But after that (i.e. in prod), instances are cattle. Logs should be shipped to a central store, CloudWatch
+  and/or other monitoring technologies (i.e. NewRelic, Diamond to graphite) should get most of the data that&#8217;s
+  needed. I&#8217;m not seriously agreeing to <strong>disable</strong> <span class="caps">SSH</span> access, but to put in place the tools that it&#8217;s needed
+  so rarely (on non-dev instances) that it&#8217;s feasible to ask one of a small group of privileged people to
+  perform the&nbsp;task.</li>
+<li>Trust our users - If someone can push to master, full control of our systems is just a backtick (or popen) away.
+  Recognize that if someone wasn&#8217;t trustworthy, we wouldn&#8217;t hire them. Let everyone access a single bastion host.
+  Discourage unauthorized use via strong password policies and other standard security measures
+  (perhaps <span class="caps">OTP</span>-based two-factor authentication). Discourage malicious use via detailed audit logging, with logs
+  shipped to an append-only secure storage&nbsp;location.</li>
+<li><span class="caps">SUID</span> wrapper script - All users have <span class="caps">SSH</span> access to a bastion host as their normal
+  active directory user. They run a <span class="caps">SUID</span> wrapper script that has a list of which users are allowed to access
+  which <span class="caps">EC2</span> instances (or security groups, subnets, etc). When the user calls this script, it checks if the
+  specified host is in a group they&#8217;re allowed to access, and if so, SSHes to that host using a key only readable
+  by the owner of the script. This is somewhat complex; there&#8217;s a good possibility of security issues with the
+  script itself, and it means that we&#8217;re probably only allowing interactive logins - we&#8217;re limited by the
+  capabilities of the wrapper script, it&#8217;s not just a normal <span class="caps">SSH</span>&nbsp;client.</li>
+<li>Key Pushing- A script runs in one central location. It has a mapping of which users/groups are allowed
+  to access which <span class="caps">EC2</span> instances. Every X minutes the script runs. It grabs <code>~/.ssh/authorized_keys</code> for all
+  users that are allowed <span class="caps">EC2</span> access, and then generates an authorized_keys file for each group of instances.
+  The script checks a cache, and if the file has changed for a group of instances since the last run, it queries
+  the <span class="caps">AWS</span> <span class="caps">API</span> to determine which instances are in that group, and distributes the authorized_keys file to them.
+  The &#8220;distributes&#8221; part would, unfortunately, probably have to be&nbsp;scp.</li>
+<li>Bastion host per application. Users are allowed access to this host either via authorized_keys managed by Puppet,
+  or via sudoers rules on a bastion host in the corporate network. But yeah, we&#8217;d end up with a <strong>lot</strong> of&nbsp;these.</li>
+<li>Various thoughts around <span class="caps">AD</span> in the cloud, replicated <span class="caps">AD</span> in the cloud, OpenLDAP in the cloud pulling from <span class="caps">AD</span>, or
+  <span class="caps">AD</span> over <span class="caps">VPN</span>. These were all rejected either because of corporate security policies, or because relying on internal
+  <span class="caps">AD</span> for authentication would mean that a data center or connectivity failure also affects&nbsp;<span class="caps">AWS</span>.</li>
+<li>Puppet - We actually <em>run</em> puppet on every instance. Maybe against our master, maybe masterless with a script
+  to deploy some modules before every run. At a minimum, it manages ssh authorized keys for ec2_user. We implement
+  some method where each user has a manifest with their own public keys, that they can maintain. Managers can add users
+  to the group(s) for their applications, and that users&#8217; keys are automatically deployed. Revoking keys, on the other
+  hand, is a bigger problem. This requires some sort of &#8220;this person is going away&#8221; procedure, which currently doesn&#8217;t
+  exist (or involve the groups who maintain <span class="caps">AWS</span> infrastructure), and would be one more thing for a human to forget.
+  There are also instances that have &#8220;special stuff&#8221; going on with Puppet that would complicate&nbsp;this.</li>
+<li>Generate a list of authorized keys, turn it into a manifest, and run puppet masterless on it via a cronjob (pulling
+  the manifest from S3). This involves most of the same problems as above, plus means that we have Puppet running
+  in two different ways on some instances (triggered via mco against a master, and cron&#8217;ed in apply&nbsp;mode).</li>
+</ul>
+            </div>
+            <!-- /.entry-content -->
+    <hr />
+    <section class="comments" id="comments">
+        <h2>Comments</h2>
+        <div id="disqus_thread"></div>
+        <script type="text/javascript">
+            /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+            var disqus_shortname = 'jantman'; // required: replace example with your forum shortname
+            var disqus_identifier = 'managing-ec2-ssh-keys-an-idea';
+            var disqus_url = 'http://blog.jasonantman.com/2014/10/managing-ec2-ssh-keys-an-idea/';
+
+            /* * * DON'T EDIT BELOW THIS LINE * * */
+            (function () {
+                var dsq = document.createElement('script');
+                dsq.type = 'text/javascript';
+                dsq.async = true;
+                dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+                (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+            })();
+        </script>
+        <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by
+            Disqus.</a></noscript>
+        <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+
+    </section>
+        </article>
+    </section>
+
+        </div>
+        <div class="col-lg-3 well well-sm" id="sidebar">
+
+<aside>
+    <section>
+        <ul class="list-group list-group-flush">
+
+                <li class="list-group-item"><h4><i class="icon-home icon-large"></i>Recent Posts</h4></li>
+                        <li class="list-group-item">
+                            <a href="http://blog.jasonantman.com/2014/09/pushover-notifications-for-shell-command-completion-and-status/">
+                                Pushover Notifications for Shell Command Completion and&nbsp;Status
+                            </a>
+                        </li>
+                        <li class="list-group-item">
+                            <a href="http://blog.jasonantman.com/2014/07/session-save-and-restore-with-bash-and-gnu-screen/">
+                                Session Save and Restore with Bash and <span class="caps">GNU</span>&nbsp;Screen
+                            </a>
+                        </li>
+                        <li class="list-group-item">
+                            <a href="http://blog.jasonantman.com/2014/07/how-yum-and-rpm-compare-versions/">
+                                How Yum and <span class="caps">RPM</span> Compare&nbsp;Versions
+                            </a>
+                        </li>
+                        <li class="list-group-item">
+                            <a href="http://blog.jasonantman.com/2014/07/bashrc-vagrant-virtualbox-reminder/">
+                                bashrc Vagrant / VirtualBox&nbsp;reminder
+                            </a>
+                        </li>
+                        <li class="list-group-item">
+                            <a href="http://blog.jasonantman.com/2014/05/remotely-controlled-deckjs-slide-presentations/">
+                                Remotely-controlled deck.js slide&nbsp;presentations
+                            </a>
+                        </li>
+
+
+                <li class="list-group-item"><a href="http://blog.jasonantman.com/tags.html"><h4><i class="icon-tags icon-large"></i>Tags</h4></a></li>
+                <li class="list-group-item">
+                        <span class="tag-1">
+                            <a href="http://blog.jasonantman.com/tags/sun/index.html">
+                                sun
+                            </a>
+                        </span>
+                        <span class="tag-1">
+                            <a href="http://blog.jasonantman.com/tags/puppet/index.html">
+                                puppet
+                            </a>
+                        </span>
+                        <span class="tag-1">
+                            <a href="http://blog.jasonantman.com/tags/linux/index.html">
+                                linux
+                            </a>
+                        </span>
+                        <span class="tag-1">
+                            <a href="http://blog.jasonantman.com/tags/android/index.html">
+                                android
+                            </a>
+                        </span>
+                        <span class="tag-1">
+                            <a href="http://blog.jasonantman.com/tags/microsoft/index.html">
+                                microsoft
+                            </a>
+                        </span>
+                        <span class="tag-1">
+                            <a href="http://blog.jasonantman.com/tags/nagios/index.html">
+                                Nagios
+                            </a>
+                        </span>
+                        <span class="tag-1">
+                            <a href="http://blog.jasonantman.com/tags/php/index.html">
+                                PHP
+                            </a>
+                        </span>
+                        <span class="tag-1">
+                            <a href="http://blog.jasonantman.com/tags/blog/index.html">
+                                blog
+                            </a>
+                        </span>
+                        <span class="tag-1">
+                            <a href="http://blog.jasonantman.com/tags/wordpress/index.html">
+                                wordpress
+                            </a>
+                        </span>
+                        <span class="tag-1">
+                            <a href="http://blog.jasonantman.com/tags/sysadmin/index.html">
+                                sysadmin
+                            </a>
+                        </span>
+                        <span class="tag-1">
+                            <a href="http://blog.jasonantman.com/tags/monitoring/index.html">
+                                monitoring
+                            </a>
+                        </span>
+                        <span class="tag-1">
+                            <a href="http://blog.jasonantman.com/tags/security/index.html">
+                                security
+                            </a>
+                        </span>
+                        <span class="tag-1">
+                            <a href="http://blog.jasonantman.com/tags/google/index.html">
+                                google
+                            </a>
+                        </span>
+                        <span class="tag-2">
+                            <a href="http://blog.jasonantman.com/tags/rpm/index.html">
+                                rpm
+                            </a>
+                        </span>
+                        <span class="tag-2">
+                            <a href="http://blog.jasonantman.com/tags/dns/index.html">
+                                dns
+                            </a>
+                        </span>
+                        <span class="tag-2">
+                            <a href="http://blog.jasonantman.com/tags/firefox/index.html">
+                                firefox
+                            </a>
+                        </span>
+                        <span class="tag-2">
+                            <a href="http://blog.jasonantman.com/tags/droid/index.html">
+                                droid
+                            </a>
+                        </span>
+                        <span class="tag-2">
+                            <a href="http://blog.jasonantman.com/tags/apache/index.html">
+                                apache
+                            </a>
+                        </span>
+                        <span class="tag-2">
+                            <a href="http://blog.jasonantman.com/tags/logging/index.html">
+                                logging
+                            </a>
+                        </span>
+                        <span class="tag-2">
+                            <a href="http://blog.jasonantman.com/tags/syslog/index.html">
+                                syslog
+                            </a>
+                        </span>
+                </li>
+        </ul>
+    </section>
+    <section>
+    <ul class="list-group list-group-flush">
+    <li class="list-group-item" style="padding: 10px 15px 0px 15px;"><h4><i class="icon-twitter
+    icon-large"></i>Twitter <a href="https://twitter.com/j_antman"
+    class="twitter-follow-button" data-show-count="false"
+    data-dnt="true">Follow @j_antman</a></h4>
+<script>!function(d,s,id){var
+  js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document,
+  'script', 'twitter-wjs');</script></li>
+    </ul>
+    <a class="twitter-timeline" data-dnt="true"
+    href="https://twitter.com/j_antman"
+    data-chrome="transparent noheader" data-widget-id="429640274453594113">Tweets by @j_antman</a>
+    <script>!function(d,s,id){var
+    js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+"://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+    </section>
+    <section>
+    <ul class="list-group list-group-flush">
+    <li class="list-group-item"><h4><i class="icon-github icon-large"></i>GitHub Repos</h4></li>
+        <div id="gh_repos">
+            <p class="list-group-item">Status updating...</p>
+        </div>
+            <a href="https://github.com/jantman">@jantman</a> on GitHub
+    </ul>
+        <script type="text/javascript">
+            $(document).ready(function () {
+                if (!window.jXHR) {
+                    var jxhr = document.createElement('script');
+                    jxhr.type = 'text/javascript';
+                    jxhr.src = 'http://blog.jasonantman.com/theme/js/jXHR.js';
+                    var s = document.getElementsByTagName('script')[0];
+                    s.parentNode.insertBefore(jxhr, s);
+                }
+
+                github.showRepos({
+                    user: 'jantman',
+                    count: 5,
+                    skip_forks: false,
+                    target: '#gh_repos'
+                });
+            });
+        </script>
+        <script src="http://blog.jasonantman.com/theme/js/github.js" type="text/javascript"></script>
+    </section>
+</aside>        </div>
+    </div>
+</div>
+<footer>
+    <div class="container">
+        <hr>
+        <p class="pull-right"><i class="icon-arrow-up"></i> <a href="#">Back to top</a></p>
+
+
+        <p>&copy; 2014 Jason Antman &middot; Powered by <a href="https://github.com/DandyDev/pelican-bootstrap3" target="_blank">pelican-bootstrap3</a>,
+            <a href="http://docs.getpelican.com/" target="_blank">Pelican</a>,
+            <a href="http://getbootstrap.com" target="_blank">Bootstrap</a></p>
+    </div>
+</footer>
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="http://blog.jasonantman.com/theme/js/bootstrap.min.js"></script>
+
+<!-- Enable responsive features in IE8 with Respond.js (https://github.com/scottjehl/Respond) -->
+<script src="http://blog.jasonantman.com/theme/js/respond.min.js"></script>
+    <script type="text/javascript">
+        /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+        var disqus_shortname = 'jantman'; // required: replace example with your forum shortname
+
+        /* * * DON'T EDIT BELOW THIS LINE * * */
+        (function () {
+            var s = document.createElement('script');
+            s.async = true;
+            s.type = 'text/javascript';
+            s.src = '//' + disqus_shortname + '.disqus.com/count.js';
+            (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+        }());
+    </script>
+
+
+</body>
+</html>
