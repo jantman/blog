@@ -30,9 +30,9 @@ Requirements and Assumptions
   or semi-persistent instances that run Puppet every 30 minutes. Some of them are somewhat special, and can't be
   trivially torn down.
 * Most of our instances are in a VPC, and have proper security controls which include SSH access from only a specifically
-  whitelisted range of IPs. However, some instances are in "EC2 Classic" and have SSH open to the world. We want a
+  white-listed range of IPs. However, some instances are in "EC2 Classic" and have SSH open to the world. We want a
   solution that also protects these instances.
-* We're mainly concerned with securing access from (a) users inadvertantly accessing an instance they shouldn't be
+* We're mainly concerned with securing access from (a) users inadvertently accessing an instance they shouldn't be
   on, (b) outside/untrusted parties, and (c) former employees. We trust our employees within reason, and accept that,
   within our security stance, if an employee _really_ wants privilege escalation, they're going to get it. We're not
   overly concerned with protecting against determined, malicious users who already have some access but want more.
@@ -129,7 +129,7 @@ to the key distribution service (likely by identifying the IP address of the req
 determine which group that instance belongs to). With this solution, only the second alternative key distribution service is
 feasible.
 
-If a shoter delay to authorization changes is needed, it would be feasible for clients to also run a separate process
+If a shorter delay to authorization changes is needed, it would be feasible for clients to also run a separate process
 (cronjob, daemon, etc.) that polls the key distribution service at a regular interval to check for updates (i.e.
 HTTP HEAD, something SQS-based, etc.) and updates the local cache when they occur.
 
@@ -170,7 +170,7 @@ This is more of an infrastructure challenge and introduces additional points for
 fails, it will only impact _changes_ to access, whereas if this application fails, all user access (aside from the static
 emergency keys) will break. However, this method allows us to control access at a level finer than Access Groups; rules
 could be developed based on any attributes of the requesting instance, including (if the latency was allowable) queries
-to the EC2 API for instance-speicifc data.
+to the EC2 API for instance-specific data.
 
 Alternative 3 - Simple Architecture
 -----------------------------------
