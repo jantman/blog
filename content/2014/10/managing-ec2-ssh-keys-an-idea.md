@@ -5,7 +5,6 @@ Category: Tech HowTos
 Tags: ssh, ec2, aws, keys, public key, pubkey
 Slug: managing-ec2-ssh-keys-an-idea
 Summary: An idea on how to manage EC2 SSH keys for a large number of users
-Status: draft
 
 At work, we have a bunch of EC2 instances (currently hundreds, and growing quickly). We also have a bunch
 (probably now around 100, counting contractors) of users. Some users - mainly engineers - need SSH access to all
