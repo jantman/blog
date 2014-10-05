@@ -126,13 +126,13 @@
 </footer><!-- /.post-info -->                    </div>
                 </div>
                 <p>At work, we have a bunch of <span class="caps">EC2</span> instances (currently hundreds, and growing quickly). We also have a bunch
-(probably now around 100, counting contractors) of users. Some users (mainly engineers) need access (<span class="caps">SSH</span>) to all
-of the <span class="caps">EC2</span> instances; many users need access only to their team&#8217;s instances. While I usually advocate sanity checks
+(probably now around 100, counting contractors) of users. Some users - mainly engineers - need <span class="caps">SSH</span> access to all
+of the <span class="caps">EC2</span> instances; many others only need access to their team&#8217;s instances. While I usually advocate sanity checks
 and training over access control for employees, many teams have expressed legitimate concern that they don&#8217;t want
-others on their instances - commands that are normal to run in dev/test (like data loads) might be disastrous
-on production instances. So, as part of our automation and tooling team, I&#8217;ve had to come up with a way to manage
-all this. Right now we have a single &#8220;bastion&#8221; (a.k.a. jump box / ssh gateway / keyhole) instance, with a single
-shared used keyed to access every <span class="caps">EC2</span> instance. This doesn&#8217;t&nbsp;scale.</p>
+others on their instances; commands that are safe to run in dev/test (like loading test data) might be disastrous
+on production instances. So, as part of our automation and tooling team, I&#8217;ve been trying to come up with a way to manage
+access to all these instances. Right now we have a single &#8220;bastion&#8221; (a.k.a. jump box / ssh gateway / keyhole) instance, with a single
+shared used keyed to access every <span class="caps">EC2</span> instance; that doesn&#8217;t scale and doesn&#8217;t meet the security&nbsp;requirements.</p>
 <p>What follows is one theory of mine on how to solve this problem. I&#8217;ve been thinking about this for the past
 day; this might not be the Right answer, and it&#8217;s just a theory at this point, but I think it&nbsp;works.</p>
 <h1 id="requirements-and-assumptions">Requirements and&nbsp;Assumptions</h1>
@@ -145,9 +145,9 @@ day; this might not be the Right answer, and it&#8217;s just a theory at this po
   or semi-persistent instances that run Puppet every 30 minutes. Some of them are somewhat special, and can&#8217;t be
   trivially torn&nbsp;down.</li>
 <li>Most of our instances are in a <span class="caps">VPC</span>, and have proper security controls which include <span class="caps">SSH</span> access from only a specifically
-  whitelisted range of IPs. However, some instances are in &#8220;<span class="caps">EC2</span> Classic&#8221; and have <span class="caps">SSH</span> open to the world. We want a
+  white-listed range of IPs. However, some instances are in &#8220;<span class="caps">EC2</span> Classic&#8221; and have <span class="caps">SSH</span> open to the world. We want a
   solution that also protects these&nbsp;instances.</li>
-<li>We&#8217;re mainly concerned with securing access from (a) users inadvertantly accessing an instance they shouldn&#8217;t be
+<li>We&#8217;re mainly concerned with securing access from (a) users inadvertently accessing an instance they shouldn&#8217;t be
   on, (b) outside/untrusted parties, and (c) former employees. We trust our employees within reason, and accept that,
   within our security stance, if an employee <em>really</em> wants privilege escalation, they&#8217;re going to get it. We&#8217;re not
   overly concerned with protecting against determined, malicious users who already have some access but want&nbsp;more.</li>
@@ -184,7 +184,8 @@ day; this might not be the Right answer, and it&#8217;s just a theory at this po
 <li>This should involve a minimum of administrative overhead when a user leaves the&nbsp;company.</li>
 </ul>
 <h1 id="proposed-solution">Proposed&nbsp;Solution</h1>
-<p>My solution relies on <span class="caps">SSH</span> agent forwarding and the <code>AuthorizedKeysCommand</code> introduced in OpenSSH <span class="caps">XXX</span>, most likely inspired by (or maybe literally the same code)
+<p>My solution relies on <span class="caps">SSH</span> agent forwarding and the <code>AuthorizedKeysCommand</code> introduced in OpenSSH 6.2 (see &#8220;Limitations&#8221;, below, for more information),
+most likely inspired by (or maybe literally the same code)
 as the patch formerly used by GitHub. This allows sshd to execute an arbitrary command, passing it the login username, which returns output identical to what would
 be in the <code>authorized_keys</code> file. If none of the keys successfully authenticate the user, authentication continues using the usual <code>AuthorizedKeysFile</code>. We take
 advantage of this feature, in addition to <span class="caps">SSH</span> agent forwarding, to provide our granular access control. Public keys are pulled from a central location <em>at login time</em>
@@ -206,8 +207,8 @@ using their own personal public keys on the destination&nbsp;instances.</p>
 <p>To make it easier for end-users, we could develop a wrapper script like <a href="https://pypi.python.org/pypi/ec2-ssh">Instagram&#8217;s ec2-ssh</a> that
 checks for a valid, running ssh agent with keys in it, and then crafts the correct <span class="caps">SSH</span> command to land the user on the desired end
 host - i.e. something like <code>ec2ssh instance_id</code> would generate and execute a command like <code>ssh -At bastion_hostname 'ssh instance_ip'</code>.</p>
-<h2 id="on-the-client-instances">On the Client&nbsp;(Instances)</h2>
-<p>Each instance, when initially built/provisioned, is given a <code>get\_authorized\_keys</code> script, which is configured to be run by sshd as the
+<h2 id="on-the-servers-instances">On the Servers&nbsp;(Instances)</h2>
+<p>Each instance, when initially built/provisioned, is given a <code>get_authorized_keys</code> script, which is configured to be run by sshd as the
 <code>AuthorizedKeysCommand</code>. This script uses one of the following three public key distribution services to retrieve the authorized public keys
 for that instance, which are then echoed on <span class="caps">STDOUT</span> and used to authenticate the user. For the sake of simplicity, we&#8217;ll assume (which is
 currently the case in our infrastructure) that this script will only run for a single non-root user that is used for logins; it will exit
@@ -227,7 +228,7 @@ tag value for the&nbsp;instance.</p>
 <p>If assuming trust locally on the instance is not sufficient, then the burden of identifying the instance&#8217;s access group is shifted
 to the key distribution service (likely by identifying the <span class="caps">IP</span> address of the requesting instance, and then using the <span class="caps">EC2</span> <span class="caps">API</span> to
 determine which group that instance belongs to). With this solution, only the second alternative key distribution service is&nbsp;feasible.</p>
-<p>If a shoter delay to authorization changes is needed, it would be feasible for clients to also run a separate process
+<p>If a shorter delay to authorization changes is needed, it would be feasible for instances to also run a separate process
 (cronjob, daemon, etc.) that polls the key distribution service at a regular interval to check for updates (i.e.
 <span class="caps">HTTP</span> <span class="caps">HEAD</span>, something <span class="caps">SQS</span>-based, etc.) and updates the local cache when they&nbsp;occur.</p>
 <h1 id="public-key-distribution-service">Public Key Distribution&nbsp;Service</h1>
@@ -236,10 +237,11 @@ determine which group that instance belongs to). With this solution, only the se
 <p>Keys will be managed by a web-based application (with a complete and documented <span class="caps">API</span>) living in the corporate data center.
 The application will provide facilities for authorized users (managers, operations) to define new Access Groups and modify
 the list of users allowed to access them. Individual end-users will be able to manage their public keys. At a set interval,
-standalone script will retrieve a list of all users defined in the application and check the status of their corporate Active
+a standalone script will retrieve a list of all users defined in the application and check the status of their corporate Active
 Directory accounts. Any users whose accounts have been deactivated or locked will be flagged as such in the application. Whenever
-a change is made in the application (including a user being flagged as deactivated), all Access Groups including that user
-will have the union of all active members&#8217; public keys written to a file in an S3 bucket that&#8217;s only writable by the privileged
+a change is made in the application (including a user being flagged as deactivated), all Access Groups that include that user
+will have their authorized_keys file (composed of the authorized_keys files of all users with access) written to an S3 bucket
+that&#8217;s only writable by the privileged
 user running the application. All instances will have <span class="caps">IAM</span> roles that allow them to read the&nbsp;bucket.</p>
 <p>This method allows us to provide self-service to users and application administrators, and keeps all data about users within
 the corporate network. It provides automatic revocation of access for disabled Active Directory accounts. It does introduce
@@ -255,7 +257,7 @@ what the performance requirements&nbsp;are.</p>
 fails, it will only impact <em>changes</em> to access, whereas if this application fails, all user access (aside from the static
 emergency keys) will break. However, this method allows us to control access at a level finer than Access Groups; rules
 could be developed based on any attributes of the requesting instance, including (if the latency was allowable) queries
-to the <span class="caps">EC2</span> <span class="caps">API</span> for instance-speicifc&nbsp;data.</p>
+to the <span class="caps">EC2</span> <span class="caps">API</span> for instance-specific&nbsp;data.</p>
 <h2 id="alternative-3-simple-architecture">Alternative 3 - Simple&nbsp;Architecture</h2>
 <p>A text file stores mappings of Access Groups to the Active Directory users and groups authorized for them. The text file
 is manually maintained, stored in version control, and all changes must comply with an access policy and be peer-reviewed.
@@ -270,6 +272,31 @@ have only one script and its&#8217; cron job to maintain, rather than a whole ap
 control isn&#8217;t terribly scalable, but it should work for the ~100 users that we have to deal with. Checking <span class="caps">AD</span> account status
 when generating the file should provide a feasible safeguard for users whose corporate accounts are locked/revoked without
 requiring someone to remember to also remove them from the <span class="caps">AWS</span> user&nbsp;list.</p>
+<h2 id="advantages-over-other-solutions">Advantages Over Other&nbsp;Solutions</h2>
+<ul>
+<li>Self-service for users and for managers/administrators of&nbsp;applications.</li>
+<li>No manual intervention when a user leaves the company; users automatically deactivated when their <span class="caps">AD</span> account&nbsp;is.</li>
+<li>No cron job or daemon to run on instances, and no centralized process to break key distribution; each instance
+  automatically pulls the current authorized keys when a login is&nbsp;attempted.</li>
+<li>Doesn&#8217;t depend on Puppet, so it allows individual applications to use Puppet as they desire, without complication
+  or&nbsp;confusion.</li>
+<li>Only depends on centralized (corporate data center) infrastructure for key updates (at most). Failure of connectivity
+  between <span class="caps">AWS</span> and the corporate data center can be worked around assuming there is an alternate path of access (such as
+  a bastion host that allows logins from engineers/managers from a trusted outside&nbsp;host).</li>
+<li>Management of access can be delegated to application owners/managers, while still allowing engineers full&nbsp;access.</li>
+<li>Uses the strength of public key authentication; no passwords to&nbsp;change.</li>
+<li>Ensures that select static trusted keys always have access to instances, even during a failure of the key distribution&nbsp;system.</li>
+<li>In emergencies, keys could be distributed directly to the authorized_keys file, bypassing the distribution system,
+  or key file cache lifetime could be&nbsp;increased.</li>
+<li>Can be easily audited by having a scheduled job add a key for all instances, wait ~15 minutes, and then attempt <span class="caps">SSH</span>
+  connections to all&nbsp;instances.</li>
+</ul>
+<h2 id="trade-offs">Trade-Offs</h2>
+<ul>
+<li>Delay between user access addition/removal and updates (though this can be minimized by a shorter cache&nbsp;time).</li>
+<li>Latency during initial login with a cold&nbsp;cache.</li>
+<li>Addition of another system that could&nbsp;break.</li>
+</ul>
 <h2 id="limitations">Limitations</h2>
 <p>My company is a CentOS shop. The <code>AuthorizedKeysCommand</code> feature of OpenSSH itself was only released in <a href="http://www.openssh.com/txt/release-6.2">OpenSSH 6.2</a>,
 on March 22, 2013. A patch for it was backported to the 5.3p1 version of openssh-server in <span class="caps">RHEL</span> and CentOS 6. However,
@@ -278,16 +305,19 @@ feature was backported, the man page was not updated; <code>man sshd_config</cod
 find anything in the <span class="caps">RPM</span> changelog about it, but the <code>openssh-5.3p1-authorized-keys-command.patch</code> file is clearly there in the
 5.3p1 <span class="caps">SRPM</span>, and the options are there but commented out in the <code>sshd_config</code> it provides. I actually thought this would be near-impossible
 to do on CentOS 6 until I found the <code>openssh-ldap</code> package (in the default repos) and discovered that it uses this&nbsp;feature.</p>
+<p>Also, this solution requires (depending on which alternative is chosen) working access to either S3 or instances serving an application.
+Assuming proper configuration (and distribution across AZs) this should be a&nbsp;non-issue.</p>
 <h2 id="accountability">Accountability</h2>
 <p>If accountability is a concern, we will handle this through detailed logging in every step of the key creation, authorization, distribution
 and retrieval process. In addition, all instances will run sshd with <code>LogLevel VERBOSE</code>, which will log the fingerprint of all public keys
 used to connect to the instance. Logs will be written to a secure, append-only&nbsp;medium.</p>
-<h1 id="references">References</h1>
+<h1 id="references-and-further-details">References and Further&nbsp;Details</h1>
 <ul>
 <li>There is an existing <code>openssh-ldap</code> package in CentOS that provides instructions on setting up public key storage in an <span class="caps">LDAP</span> backend,
   using <code>AuthorizedKeysCommand</code>.</li>
 <li><a href="http://andriigrytsenko.net/2013/05/authorizedkeyscommand-support-and-centosrhel-5-x/">Someone said</a> they successfully built the current
   6.2 OpenSSH for <span class="caps">RHEL</span>/Cent&nbsp;5.</li>
+<li>An <span class="caps">EC2</span> instance can retrieve its own tags using tools such as <code>awscli</code> or <code>ec2-api-tools</code> and an appropriate <span class="caps">IAM</span> role set on the&nbsp;instance.</li>
 </ul>
 <h1 id="rejected-ideas">Rejected&nbsp;Ideas</h1>
 <p>While thinking through this I considered and rejected a number of alternate methods. Here are some of&nbsp;them:</p>
@@ -411,58 +441,8 @@ used to connect to the instance. Logs will be written to a secure, append-only&n
                 <li class="list-group-item"><a href="http://blog.jasonantman.com/tags.html"><h4><i class="icon-tags icon-large"></i>Tags</h4></a></li>
                 <li class="list-group-item">
                         <span class="tag-1">
-                            <a href="http://blog.jasonantman.com/tags/sun/index.html">
-                                sun
-                            </a>
-                        </span>
-                        <span class="tag-1">
                             <a href="http://blog.jasonantman.com/tags/puppet/index.html">
                                 puppet
-                            </a>
-                        </span>
-                        <span class="tag-1">
-                            <a href="http://blog.jasonantman.com/tags/linux/index.html">
-                                linux
-                            </a>
-                        </span>
-                        <span class="tag-1">
-                            <a href="http://blog.jasonantman.com/tags/android/index.html">
-                                android
-                            </a>
-                        </span>
-                        <span class="tag-1">
-                            <a href="http://blog.jasonantman.com/tags/microsoft/index.html">
-                                microsoft
-                            </a>
-                        </span>
-                        <span class="tag-1">
-                            <a href="http://blog.jasonantman.com/tags/nagios/index.html">
-                                Nagios
-                            </a>
-                        </span>
-                        <span class="tag-1">
-                            <a href="http://blog.jasonantman.com/tags/php/index.html">
-                                PHP
-                            </a>
-                        </span>
-                        <span class="tag-1">
-                            <a href="http://blog.jasonantman.com/tags/blog/index.html">
-                                blog
-                            </a>
-                        </span>
-                        <span class="tag-1">
-                            <a href="http://blog.jasonantman.com/tags/wordpress/index.html">
-                                wordpress
-                            </a>
-                        </span>
-                        <span class="tag-1">
-                            <a href="http://blog.jasonantman.com/tags/sysadmin/index.html">
-                                sysadmin
-                            </a>
-                        </span>
-                        <span class="tag-1">
-                            <a href="http://blog.jasonantman.com/tags/monitoring/index.html">
-                                monitoring
                             </a>
                         </span>
                         <span class="tag-1">
@@ -471,18 +451,58 @@ used to connect to the instance. Logs will be written to a secure, append-only&n
                             </a>
                         </span>
                         <span class="tag-1">
+                            <a href="http://blog.jasonantman.com/tags/linux/index.html">
+                                linux
+                            </a>
+                        </span>
+                        <span class="tag-1">
+                            <a href="http://blog.jasonantman.com/tags/sun/index.html">
+                                sun
+                            </a>
+                        </span>
+                        <span class="tag-1">
+                            <a href="http://blog.jasonantman.com/tags/blog/index.html">
+                                blog
+                            </a>
+                        </span>
+                        <span class="tag-1">
+                            <a href="http://blog.jasonantman.com/tags/sysadmin/index.html">
+                                sysadmin
+                            </a>
+                        </span>
+                        <span class="tag-1">
+                            <a href="http://blog.jasonantman.com/tags/wordpress/index.html">
+                                wordpress
+                            </a>
+                        </span>
+                        <span class="tag-1">
+                            <a href="http://blog.jasonantman.com/tags/microsoft/index.html">
+                                microsoft
+                            </a>
+                        </span>
+                        <span class="tag-1">
+                            <a href="http://blog.jasonantman.com/tags/monitoring/index.html">
+                                monitoring
+                            </a>
+                        </span>
+                        <span class="tag-1">
+                            <a href="http://blog.jasonantman.com/tags/android/index.html">
+                                android
+                            </a>
+                        </span>
+                        <span class="tag-1">
+                            <a href="http://blog.jasonantman.com/tags/nagios/index.html">
+                                Nagios
+                            </a>
+                        </span>
+                        <span class="tag-1">
                             <a href="http://blog.jasonantman.com/tags/google/index.html">
                                 google
                             </a>
                         </span>
-                        <span class="tag-2">
-                            <a href="http://blog.jasonantman.com/tags/rpm/index.html">
-                                rpm
-                            </a>
-                        </span>
-                        <span class="tag-2">
-                            <a href="http://blog.jasonantman.com/tags/dns/index.html">
-                                dns
+                        <span class="tag-1">
+                            <a href="http://blog.jasonantman.com/tags/php/index.html">
+                                PHP
                             </a>
                         </span>
                         <span class="tag-2">
@@ -496,6 +516,21 @@ used to connect to the instance. Logs will be written to a secure, append-only&n
                             </a>
                         </span>
                         <span class="tag-2">
+                            <a href="http://blog.jasonantman.com/tags/rpm/index.html">
+                                rpm
+                            </a>
+                        </span>
+                        <span class="tag-2">
+                            <a href="http://blog.jasonantman.com/tags/dns/index.html">
+                                dns
+                            </a>
+                        </span>
+                        <span class="tag-2">
+                            <a href="http://blog.jasonantman.com/tags/syslog/index.html">
+                                syslog
+                            </a>
+                        </span>
+                        <span class="tag-2">
                             <a href="http://blog.jasonantman.com/tags/apache/index.html">
                                 apache
                             </a>
@@ -503,11 +538,6 @@ used to connect to the instance. Logs will be written to a secure, append-only&n
                         <span class="tag-2">
                             <a href="http://blog.jasonantman.com/tags/logging/index.html">
                                 logging
-                            </a>
-                        </span>
-                        <span class="tag-2">
-                            <a href="http://blog.jasonantman.com/tags/syslog/index.html">
-                                syslog
                             </a>
                         </span>
                 </li>
