@@ -8,13 +8,13 @@ Summary: An idea on how to manage EC2 SSH keys for a large number of users
 Status: draft
 
 At work, we have a bunch of EC2 instances (currently hundreds, and growing quickly). We also have a bunch
-(probably now around 100, counting contractors) of users. Some users (mainly engineers) need access (SSH) to all
-of the EC2 instances; many users need access only to their team's instances. While I usually advocate sanity checks
+(probably now around 100, counting contractors) of users. Some users - mainly engineers - need SSH access to all
+of the EC2 instances; many others only need access to their team's instances. While I usually advocate sanity checks
 and training over access control for employees, many teams have expressed legitimate concern that they don't want
-others on their instances - commands that are normal to run in dev/test (like data loads) might be disastrous
-on production instances. So, as part of our automation and tooling team, I've had to come up with a way to manage
-all this. Right now we have a single "bastion" (a.k.a. jump box / ssh gateway / keyhole) instance, with a single
-shared used keyed to access every EC2 instance. This doesn't scale.
+others on their instances; commands that are safe to run in dev/test (like loading test data) might be disastrous
+on production instances. So, as part of our automation and tooling team, I've been trying to come up with a way to manage
+access to all these instances. Right now we have a single "bastion" (a.k.a. jump box / ssh gateway / keyhole) instance, with a single
+shared used keyed to access every EC2 instance; that doesn't scale and doesn't meet the security requirements.
 
 What follows is one theory of mine on how to solve this problem. I've been thinking about this for the past
 day; this might not be the Right answer, and it's just a theory at this point, but I think it works.
@@ -72,7 +72,8 @@ Main Goals
 Proposed Solution
 =================
 
-My solution relies on SSH agent forwarding and the ``AuthorizedKeysCommand`` introduced in OpenSSH XXX, most likely inspired by (or maybe literally the same code)
+My solution relies on SSH agent forwarding and the ``AuthorizedKeysCommand`` introduced in OpenSSH 6.2 (see "Limitations", below, for more information),
+most likely inspired by (or maybe literally the same code)
 as the patch formerly used by GitHub. This allows sshd to execute an arbitrary command, passing it the login username, which returns output identical to what would
 be in the ``authorized_keys`` file. If none of the keys successfully authenticate the user, authentication continues using the usual ``AuthorizedKeysFile``. We take
 advantage of this feature, in addition to SSH agent forwarding, to provide our granular access control. Public keys are pulled from a central location _at login time_
@@ -101,10 +102,10 @@ To make it easier for end-users, we could develop a wrapper script like [Instagr
 checks for a valid, running ssh agent with keys in it, and then crafts the correct SSH command to land the user on the desired end
 host - i.e. something like ``ec2ssh instance_id`` would generate and execute a command like ``ssh -At bastion_hostname 'ssh instance_ip'``.
 
-On the Client (Instances)
+On the Servers (Instances)
 -------------------------
 
-Each instance, when initially built/provisioned, is given a ``get\_authorized\_keys`` script, which is configured to be run by sshd as the
+Each instance, when initially built/provisioned, is given a ``get_authorized_keys`` script, which is configured to be run by sshd as the
 ``AuthorizedKeysCommand``. This script uses one of the following three public key distribution services to retrieve the authorized public keys
 for that instance, which are then echoed on STDOUT and used to authenticate the user. For the sake of simplicity, we'll assume (which is
 currently the case in our infrastructure) that this script will only run for a single non-root user that is used for logins; it will exit
@@ -129,7 +130,7 @@ to the key distribution service (likely by identifying the IP address of the req
 determine which group that instance belongs to). With this solution, only the second alternative key distribution service is
 feasible.
 
-If a shorter delay to authorization changes is needed, it would be feasible for clients to also run a separate process
+If a shorter delay to authorization changes is needed, it would be feasible for instances to also run a separate process
 (cronjob, daemon, etc.) that polls the key distribution service at a regular interval to check for updates (i.e.
 HTTP HEAD, something SQS-based, etc.) and updates the local cache when they occur.
 
@@ -144,10 +145,11 @@ Alternative 1 - Scalable Architecture - AWS and Local
 Keys will be managed by a web-based application (with a complete and documented API) living in the corporate data center.
 The application will provide facilities for authorized users (managers, operations) to define new Access Groups and modify
 the list of users allowed to access them. Individual end-users will be able to manage their public keys. At a set interval,
-standalone script will retrieve a list of all users defined in the application and check the status of their corporate Active
+a standalone script will retrieve a list of all users defined in the application and check the status of their corporate Active
 Directory accounts. Any users whose accounts have been deactivated or locked will be flagged as such in the application. Whenever
-a change is made in the application (including a user being flagged as deactivated), all Access Groups including that user
-will have the union of all active members' public keys written to a file in an S3 bucket that's only writable by the privileged
+a change is made in the application (including a user being flagged as deactivated), all Access Groups that include that user
+will have their authorized\_keys file (composed of the authorized\_keys files of all users with access) written to an S3 bucket
+that's only writable by the privileged
 user running the application. All instances will have IAM roles that allow them to read the bucket.
 
 This method allows us to provide self-service to users and application administrators, and keeps all data about users within
@@ -190,6 +192,34 @@ control isn't terribly scalable, but it should work for the ~100 users that we h
 when generating the file should provide a feasible safeguard for users whose corporate accounts are locked/revoked without
 requiring someone to remember to also remove them from the AWS user list.
 
+Advantages Over Other Solutions
+-------------------------------
+
+* Self-service for users and for managers/administrators of applications.
+* No manual intervention when a user leaves the company; users automatically deactivated when their AD account is.
+* No cron job or daemon to run on instances, and no centralized process to break key distribution; each instance
+  automatically pulls the current authorized keys when a login is attempted.
+* Doesn't depend on Puppet, so it allows individual applications to use Puppet as they desire, without complication
+  or confusion.
+* Only depends on centralized (corporate data center) infrastructure for key updates (at most). Failure of connectivity
+  between AWS and the corporate data center can be worked around assuming there is an alternate path of access (such as
+  a bastion host that allows logins from engineers/managers from a trusted outside host).
+* Management of access can be delegated to application owners/managers, while still allowing engineers full access.
+* Uses the strength of public key authentication; no passwords to change.
+* Ensures that select static trusted keys always have access to instances, even during a failure of the key distribution
+  system.
+* In emergencies, keys could be distributed directly to the authorized\_keys file, bypassing the distribution system,
+  or key file cache lifetime could be increased.
+* Can be easily audited by having a scheduled job add a key for all instances, wait ~15 minutes, and then attempt SSH
+  connections to all instances.
+
+Trade-Offs
+-----------
+
+* Delay between user access addition/removal and updates (though this can be minimized by a shorter cache time).
+* Latency during initial login with a cold cache.
+* Addition of another system that could break.
+
 Limitations
 -------------
 
@@ -201,6 +231,9 @@ find anything in the RPM changelog about it, but the ``openssh-5.3p1-authorized-
 5.3p1 SRPM, and the options are there but commented out in the ``sshd_config`` it provides. I actually thought this would be near-impossible
 to do on CentOS 6 until I found the ``openssh-ldap`` package (in the default repos) and discovered that it uses this feature.
 
+Also, this solution requires (depending on which alternative is chosen) working access to either S3 or instances serving an application.
+Assuming proper configuration (and distribution across AZs) this should be a non-issue.
+
 Accountability
 ---------------
 
@@ -208,13 +241,14 @@ If accountability is a concern, we will handle this through detailed logging in 
 and retrieval process. In addition, all instances will run sshd with ``LogLevel VERBOSE``, which will log the fingerprint of all public keys
 used to connect to the instance. Logs will be written to a secure, append-only medium.
 
-References
-===========
+References and Further Details
+==============================
 
 * There is an existing ``openssh-ldap`` package in CentOS that provides instructions on setting up public key storage in an LDAP backend,
   using ``AuthorizedKeysCommand``.
 * [Someone said](http://andriigrytsenko.net/2013/05/authorizedkeyscommand-support-and-centosrhel-5-x/) they successfully built the current
   6.2 OpenSSH for RHEL/Cent 5.
+* An EC2 instance can retrieve its own tags using tools such as ``awscli`` or ``ec2-api-tools`` and an appropriate IAM role set on the instance.
 
 Rejected Ideas
 ===============
