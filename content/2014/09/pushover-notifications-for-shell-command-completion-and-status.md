@@ -27,14 +27,23 @@ notification when it completes, along with the exit status and some other useful
 APIKEY="Your Pushover API Key Here"
 USERKEY="Your Pushover User Key Here"
 
+stime=$(date '+%s')
 $@
 exitcode=$?
+# timer
+etime=$(date '+%s')
+dt=$((etime - stime))
+ds=$((dt % 60))
+dm=$(((dt / 60) % 60))
+dh=$((dt / 3600))
+times=$(printf '%d:%02d:%02d' $dh $dm $ds)
+# end timer
 if [ "$exitcode" -eq 0 ]
 then
-    pushover.sh -p 0 -t "Command Succeeded" -T "$APIKEY" -U "$USERKEY" "succeeded on $(hostname): $@ (in $(pwd))"
+    pushover.sh -p 0 -t "Command Succeeded" -T "$APIKEY" -U "$USERKEY" "succeeded in ${times} on $(hostname): $@ (in $(pwd))"
     echo "(sent pushover success notification)"
 else
-    pushover.sh -p 0 -t "Command Failed" -T "$APIKEY" -U "$USERKEY" "failed (exit $exitcode) on $(hostname): $@ (in $(pwd))"
+    pushover.sh -p 0 -s falling -t "Command Failed" -T "$APIKEY" -U "$USERKEY" "failed in ${times} (exit $exitcode) on $(hostname): $@ (in $(pwd))"
     echo "(sent pushover failure notification)"
 fi
 
@@ -43,13 +52,13 @@ fi
 So, for example, a failing spec test:
 
     jantman@phoenix:pts/4:~/CMG/git/puppet-cm (AUTO-415=)$ pushover bundle exec rake spec
-	<lots of failing spec output that exits non-0>
+	<lots of failing spec output that exits non-0 after 1 minute 10 seconds>
 	(sent pushover failure notification)
 	jantman@phoenix:pts/4:~/CMG/git/puppet-cm (AUTO-415=)$ 
 
 Would send me a handy pushover message when it finishes:
 
     Command Failed
-	failed (exit 1) on phoenix: bundle exec rake spec (in /home/jantman/CMG/git/puppet-cm)
+	failed in 0:01:10 (exit 1) on phoenix: bundle exec rake spec (in /home/jantman/CMG/git/puppet-cm)
 
 Hopefully this is useful to someone else as well...
