@@ -137,14 +137,23 @@ notification when it completes, along with the exit status and some other useful
 <span class="nv"><span class="caps">APIKEY</span></span><span class="o">=</span><span class="s2">&quot;Your Pushover <span class="caps">API</span> Key Here&quot;</span>
 <span class="nv"><span class="caps">USERKEY</span></span><span class="o">=</span><span class="s2">&quot;Your Pushover User Key Here&quot;</span>
 
+<span class="nv">stime</span><span class="o">=</span><span class="k">$(</span>date <span class="s1">&#39;+%s&#39;</span><span class="k">)</span>
 <span class="nv">$@</span>
 <span class="nv">exitcode</span><span class="o">=</span><span class="nv">$?</span>
+<span class="c"># timer</span>
+<span class="nv">etime</span><span class="o">=</span><span class="k">$(</span>date <span class="s1">&#39;+%s&#39;</span><span class="k">)</span>
+<span class="nv">dt</span><span class="o">=</span><span class="k">$((</span>etime <span class="o">-</span> stime<span class="k">))</span>
+<span class="nv">ds</span><span class="o">=</span><span class="k">$((</span>dt <span class="o">%</span> <span class="m">60</span><span class="k">))</span>
+<span class="nv">dm</span><span class="o">=</span><span class="k">$((</span><span class="o">(</span>dt <span class="o">/</span> <span class="m">60</span><span class="o">)</span> <span class="o">%</span> <span class="m">60</span><span class="k">))</span>
+<span class="nv">dh</span><span class="o">=</span><span class="k">$((</span>dt <span class="o">/</span> <span class="m">3600</span><span class="k">))</span>
+<span class="nb">times</span><span class="o">=</span><span class="k">$(</span><span class="nb">printf</span> <span class="s1">&#39;%d:%02d:%02d&#39;</span> <span class="nv">$dh</span> <span class="nv">$dm</span> <span class="nv">$ds</span><span class="k">)</span>
+<span class="c"># end timer</span>
 <span class="k">if</span> <span class="o">[</span> <span class="s2">&quot;$exitcode&quot;</span> -eq 0 <span class="o">]</span>
 <span class="k">then</span>
-<span class="k">    </span>pushover.sh -p 0 -t <span class="s2">&quot;Command Succeeded&quot;</span> -T <span class="s2">&quot;$<span class="caps">APIKEY</span>&quot;</span> -U <span class="s2">&quot;$<span class="caps">USERKEY</span>&quot;</span> <span class="s2">&quot;succeeded on $(hostname): $@ (in $(pwd))&quot;</span>
+<span class="k">    </span>pushover.sh -p 0 -t <span class="s2">&quot;Command Succeeded&quot;</span> -T <span class="s2">&quot;$<span class="caps">APIKEY</span>&quot;</span> -U <span class="s2">&quot;$<span class="caps">USERKEY</span>&quot;</span> <span class="s2">&quot;succeeded in ${times} on $(hostname): $@ (in $(pwd))&quot;</span>
     <span class="nb">echo</span> <span class="s2">&quot;(sent pushover success notification)&quot;</span>
 <span class="k">else</span>
-<span class="k">    </span>pushover.sh -p 0 -t <span class="s2">&quot;Command Failed&quot;</span> -T <span class="s2">&quot;$<span class="caps">APIKEY</span>&quot;</span> -U <span class="s2">&quot;$<span class="caps">USERKEY</span>&quot;</span> <span class="s2">&quot;failed (exit $exitcode) on $(hostname): $@ (in $(pwd))&quot;</span>
+<span class="k">    </span>pushover.sh -p 0 -s falling -t <span class="s2">&quot;Command Failed&quot;</span> -T <span class="s2">&quot;$<span class="caps">APIKEY</span>&quot;</span> -U <span class="s2">&quot;$<span class="caps">USERKEY</span>&quot;</span> <span class="s2">&quot;failed in ${times} (exit $exitcode) on $(hostname): $@ (in $(pwd))&quot;</span>
     <span class="nb">echo</span> <span class="s2">&quot;(sent pushover failure notification)&quot;</span>
 <span class="k">fi</span>
 </pre></div>
@@ -152,7 +161,7 @@ notification when it completes, along with the exit status and some other useful
 
 <p>So, for example, a failing spec&nbsp;test:</p>
 <div class="codehilite"><pre>jantman@phoenix:pts/4:~/CMG/git/puppet-cm (AUTO-415=)$ pushover bundle exec rake spec
-&lt;lots of failing spec output that exits non-0&gt;
+&lt;lots of failing spec output that exits non-0 after 1 minute 10 seconds&gt;
 (sent pushover failure notification)
 jantman@phoenix:pts/4:~/CMG/git/puppet-cm (AUTO-415=)$
 </pre></div>
@@ -160,7 +169,7 @@ jantman@phoenix:pts/4:~/CMG/git/puppet-cm (AUTO-415=)$
 
 <p>Would send me a handy pushover message when it&nbsp;finishes:</p>
 <div class="codehilite"><pre>Command Failed
-failed (exit 1) on phoenix: bundle exec rake spec (in /home/jantman/CMG/git/puppet-cm)
+failed in 0:01:10 (exit 1) on phoenix: bundle exec rake spec (in /home/jantman/CMG/git/puppet-cm)
 </pre></div>
 
 
@@ -232,33 +241,13 @@ failed (exit 1) on phoenix: bundle exec rake spec (in /home/jantman/CMG/git/pupp
                 <li class="list-group-item"><a href="http://blog.jasonantman.com/tags.html"><h4><i class="icon-tags icon-large"></i>Tags</h4></a></li>
                 <li class="list-group-item">
                         <span class="tag-1">
+                            <a href="http://blog.jasonantman.com/tags/monitoring/index.html">
+                                monitoring
+                            </a>
+                        </span>
+                        <span class="tag-1">
                             <a href="http://blog.jasonantman.com/tags/linux/index.html">
                                 linux
-                            </a>
-                        </span>
-                        <span class="tag-1">
-                            <a href="http://blog.jasonantman.com/tags/nagios/index.html">
-                                Nagios
-                            </a>
-                        </span>
-                        <span class="tag-1">
-                            <a href="http://blog.jasonantman.com/tags/sun/index.html">
-                                sun
-                            </a>
-                        </span>
-                        <span class="tag-1">
-                            <a href="http://blog.jasonantman.com/tags/security/index.html">
-                                security
-                            </a>
-                        </span>
-                        <span class="tag-1">
-                            <a href="http://blog.jasonantman.com/tags/blog/index.html">
-                                blog
-                            </a>
-                        </span>
-                        <span class="tag-1">
-                            <a href="http://blog.jasonantman.com/tags/puppet/index.html">
-                                puppet
                             </a>
                         </span>
                         <span class="tag-1">
@@ -267,13 +256,23 @@ failed (exit 1) on phoenix: bundle exec rake spec (in /home/jantman/CMG/git/pupp
                             </a>
                         </span>
                         <span class="tag-1">
-                            <a href="http://blog.jasonantman.com/tags/microsoft/index.html">
-                                microsoft
+                            <a href="http://blog.jasonantman.com/tags/sun/index.html">
+                                sun
                             </a>
                         </span>
                         <span class="tag-1">
-                            <a href="http://blog.jasonantman.com/tags/wordpress/index.html">
-                                wordpress
+                            <a href="http://blog.jasonantman.com/tags/blog/index.html">
+                                blog
+                            </a>
+                        </span>
+                        <span class="tag-1">
+                            <a href="http://blog.jasonantman.com/tags/android/index.html">
+                                android
+                            </a>
+                        </span>
+                        <span class="tag-1">
+                            <a href="http://blog.jasonantman.com/tags/nagios/index.html">
+                                Nagios
                             </a>
                         </span>
                         <span class="tag-1">
@@ -282,18 +281,28 @@ failed (exit 1) on phoenix: bundle exec rake spec (in /home/jantman/CMG/git/pupp
                             </a>
                         </span>
                         <span class="tag-1">
+                            <a href="http://blog.jasonantman.com/tags/wordpress/index.html">
+                                wordpress
+                            </a>
+                        </span>
+                        <span class="tag-1">
                             <a href="http://blog.jasonantman.com/tags/google/index.html">
                                 google
                             </a>
                         </span>
                         <span class="tag-1">
-                            <a href="http://blog.jasonantman.com/tags/monitoring/index.html">
-                                monitoring
+                            <a href="http://blog.jasonantman.com/tags/microsoft/index.html">
+                                microsoft
                             </a>
                         </span>
                         <span class="tag-1">
-                            <a href="http://blog.jasonantman.com/tags/android/index.html">
-                                android
+                            <a href="http://blog.jasonantman.com/tags/security/index.html">
+                                security
+                            </a>
+                        </span>
+                        <span class="tag-1">
+                            <a href="http://blog.jasonantman.com/tags/puppet/index.html">
+                                puppet
                             </a>
                         </span>
                         <span class="tag-2">
@@ -302,8 +311,8 @@ failed (exit 1) on phoenix: bundle exec rake spec (in /home/jantman/CMG/git/pupp
                             </a>
                         </span>
                         <span class="tag-2">
-                            <a href="http://blog.jasonantman.com/tags/syslog/index.html">
-                                syslog
+                            <a href="http://blog.jasonantman.com/tags/firefox/index.html">
+                                firefox
                             </a>
                         </span>
                         <span class="tag-2">
@@ -312,18 +321,18 @@ failed (exit 1) on phoenix: bundle exec rake spec (in /home/jantman/CMG/git/pupp
                             </a>
                         </span>
                         <span class="tag-2">
-                            <a href="http://blog.jasonantman.com/tags/firefox/index.html">
-                                firefox
-                            </a>
-                        </span>
-                        <span class="tag-2">
-                            <a href="http://blog.jasonantman.com/tags/apache/index.html">
-                                apache
+                            <a href="http://blog.jasonantman.com/tags/syslog/index.html">
+                                syslog
                             </a>
                         </span>
                         <span class="tag-2">
                             <a href="http://blog.jasonantman.com/tags/dns/index.html">
                                 dns
+                            </a>
+                        </span>
+                        <span class="tag-2">
+                            <a href="http://blog.jasonantman.com/tags/apache/index.html">
+                                apache
                             </a>
                         </span>
                         <span class="tag-2">

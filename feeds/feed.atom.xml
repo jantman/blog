@@ -265,14 +265,23 @@ notification when it completes, along with the exit status and some other useful
 &lt;span class="nv"&gt;&lt;span class="caps"&gt;APIKEY&lt;/span&gt;&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;Your Pushover &lt;span class="caps"&gt;API&lt;/span&gt; Key Here&amp;quot;&lt;/span&gt;
 &lt;span class="nv"&gt;&lt;span class="caps"&gt;USERKEY&lt;/span&gt;&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;Your Pushover User Key Here&amp;quot;&lt;/span&gt;
 
+&lt;span class="nv"&gt;stime&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="k"&gt;$(&lt;/span&gt;date &lt;span class="s1"&gt;&amp;#39;+%s&amp;#39;&lt;/span&gt;&lt;span class="k"&gt;)&lt;/span&gt;
 &lt;span class="nv"&gt;$@&lt;/span&gt;
 &lt;span class="nv"&gt;exitcode&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nv"&gt;$?&lt;/span&gt;
+&lt;span class="c"&gt;# timer&lt;/span&gt;
+&lt;span class="nv"&gt;etime&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="k"&gt;$(&lt;/span&gt;date &lt;span class="s1"&gt;&amp;#39;+%s&amp;#39;&lt;/span&gt;&lt;span class="k"&gt;)&lt;/span&gt;
+&lt;span class="nv"&gt;dt&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="k"&gt;$((&lt;/span&gt;etime &lt;span class="o"&gt;-&lt;/span&gt; stime&lt;span class="k"&gt;))&lt;/span&gt;
+&lt;span class="nv"&gt;ds&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="k"&gt;$((&lt;/span&gt;dt &lt;span class="o"&gt;%&lt;/span&gt; &lt;span class="m"&gt;60&lt;/span&gt;&lt;span class="k"&gt;))&lt;/span&gt;
+&lt;span class="nv"&gt;dm&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="k"&gt;$((&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;dt &lt;span class="o"&gt;/&lt;/span&gt; &lt;span class="m"&gt;60&lt;/span&gt;&lt;span class="o"&gt;)&lt;/span&gt; &lt;span class="o"&gt;%&lt;/span&gt; &lt;span class="m"&gt;60&lt;/span&gt;&lt;span class="k"&gt;))&lt;/span&gt;
+&lt;span class="nv"&gt;dh&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="k"&gt;$((&lt;/span&gt;dt &lt;span class="o"&gt;/&lt;/span&gt; &lt;span class="m"&gt;3600&lt;/span&gt;&lt;span class="k"&gt;))&lt;/span&gt;
+&lt;span class="nb"&gt;times&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="k"&gt;$(&lt;/span&gt;&lt;span class="nb"&gt;printf&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;%d:%02d:%02d&amp;#39;&lt;/span&gt; &lt;span class="nv"&gt;$dh&lt;/span&gt; &lt;span class="nv"&gt;$dm&lt;/span&gt; &lt;span class="nv"&gt;$ds&lt;/span&gt;&lt;span class="k"&gt;)&lt;/span&gt;
+&lt;span class="c"&gt;# end timer&lt;/span&gt;
 &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="o"&gt;[&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;$exitcode&amp;quot;&lt;/span&gt; -eq 0 &lt;span class="o"&gt;]&lt;/span&gt;
 &lt;span class="k"&gt;then&lt;/span&gt;
-&lt;span class="k"&gt;    &lt;/span&gt;pushover.sh -p 0 -t &lt;span class="s2"&gt;&amp;quot;Command Succeeded&amp;quot;&lt;/span&gt; -T &lt;span class="s2"&gt;&amp;quot;$&lt;span class="caps"&gt;APIKEY&lt;/span&gt;&amp;quot;&lt;/span&gt; -U &lt;span class="s2"&gt;&amp;quot;$&lt;span class="caps"&gt;USERKEY&lt;/span&gt;&amp;quot;&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;succeeded on $(hostname): $@ (in $(pwd))&amp;quot;&lt;/span&gt;
+&lt;span class="k"&gt;    &lt;/span&gt;pushover.sh -p 0 -t &lt;span class="s2"&gt;&amp;quot;Command Succeeded&amp;quot;&lt;/span&gt; -T &lt;span class="s2"&gt;&amp;quot;$&lt;span class="caps"&gt;APIKEY&lt;/span&gt;&amp;quot;&lt;/span&gt; -U &lt;span class="s2"&gt;&amp;quot;$&lt;span class="caps"&gt;USERKEY&lt;/span&gt;&amp;quot;&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;succeeded in ${times} on $(hostname): $@ (in $(pwd))&amp;quot;&lt;/span&gt;
     &lt;span class="nb"&gt;echo&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;(sent pushover success notification)&amp;quot;&lt;/span&gt;
 &lt;span class="k"&gt;else&lt;/span&gt;
-&lt;span class="k"&gt;    &lt;/span&gt;pushover.sh -p 0 -t &lt;span class="s2"&gt;&amp;quot;Command Failed&amp;quot;&lt;/span&gt; -T &lt;span class="s2"&gt;&amp;quot;$&lt;span class="caps"&gt;APIKEY&lt;/span&gt;&amp;quot;&lt;/span&gt; -U &lt;span class="s2"&gt;&amp;quot;$&lt;span class="caps"&gt;USERKEY&lt;/span&gt;&amp;quot;&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;failed (exit $exitcode) on $(hostname): $@ (in $(pwd))&amp;quot;&lt;/span&gt;
+&lt;span class="k"&gt;    &lt;/span&gt;pushover.sh -p 0 -s falling -t &lt;span class="s2"&gt;&amp;quot;Command Failed&amp;quot;&lt;/span&gt; -T &lt;span class="s2"&gt;&amp;quot;$&lt;span class="caps"&gt;APIKEY&lt;/span&gt;&amp;quot;&lt;/span&gt; -U &lt;span class="s2"&gt;&amp;quot;$&lt;span class="caps"&gt;USERKEY&lt;/span&gt;&amp;quot;&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;failed in ${times} (exit $exitcode) on $(hostname): $@ (in $(pwd))&amp;quot;&lt;/span&gt;
     &lt;span class="nb"&gt;echo&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;(sent pushover failure notification)&amp;quot;&lt;/span&gt;
 &lt;span class="k"&gt;fi&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
@@ -280,7 +289,7 @@ notification when it completes, along with the exit status and some other useful
 
 &lt;p&gt;So, for example, a failing spec&amp;nbsp;test:&lt;/p&gt;
 &lt;div class="codehilite"&gt;&lt;pre&gt;jantman@phoenix:pts/4:~/CMG/git/puppet-cm (AUTO-415=)$ pushover bundle exec rake spec
-&amp;lt;lots of failing spec output that exits non-0&amp;gt;
+&amp;lt;lots of failing spec output that exits non-0 after 1 minute 10 seconds&amp;gt;
 (sent pushover failure notification)
 jantman@phoenix:pts/4:~/CMG/git/puppet-cm (AUTO-415=)$
 &lt;/pre&gt;&lt;/div&gt;
@@ -288,7 +297,7 @@ jantman@phoenix:pts/4:~/CMG/git/puppet-cm (AUTO-415=)$
 
 &lt;p&gt;Would send me a handy pushover message when it&amp;nbsp;finishes:&lt;/p&gt;
 &lt;div class="codehilite"&gt;&lt;pre&gt;Command Failed
-failed (exit 1) on phoenix: bundle exec rake spec (in /home/jantman/CMG/git/puppet-cm)
+failed in 0:01:10 (exit 1) on phoenix: bundle exec rake spec (in /home/jantman/CMG/git/puppet-cm)
 &lt;/pre&gt;&lt;/div&gt;
 
 
