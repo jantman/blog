@@ -59,15 +59,15 @@ depending on what environment that host is in. On RedHat based systems,
 we'd add the variables to `/etc/sysconfig/httpd` for production:
 
 ~~~~{.bash}
-HTTPD_ENV_NAME="prod"
-HTTPD_ENV_URL_PART=""
+export HTTPD_ENV_NAME="prod"
+export HTTPD_ENV_URL_PART=""
 ~~~~
 
 or for QA:
 
 ~~~~{.bash}
-HTTPD_ENV_NAME="qa"
-HTTPD_ENV_URL_PART="qa."
+export HTTPD_ENV_NAME="qa"
+export HTTPD_ENV_URL_PART="qa."
 ~~~~
 
 Those variables will now be available to httpd within the configurations
