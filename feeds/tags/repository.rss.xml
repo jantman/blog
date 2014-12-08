@@ -1,5 +1,110 @@
 <?xml version="1.0" encoding="utf-8"?>
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Jason Antman's Blog</title><link>http://blog.jasonantman.com/</link><description></description><atom:link href="http://blog.jasonantman.com/feeds/tags/repository.rss.xml" rel="self"></atom:link><lastBuildDate>Mon, 13 May 2013 05:00:00 -0400</lastBuildDate><item><title>Search for a small-scale but automated RPM build system</title><link>http://blog.jasonantman.com/2013/05/search-for-a-small-scale-but-automated-rpm-build-system/</link><description>&lt;p&gt;&lt;strong&gt;This post is part of a series of older draft posts from a few months
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Jason Antman's Blog</title><link>http://blog.jasonantman.com/</link><description></description><atom:link href="http://blog.jasonantman.com/feeds/tags/repository.rss.xml" rel="self"></atom:link><lastBuildDate>Sun, 07 Dec 2014 18:24:00 -0500</lastBuildDate><item><title>Idea for a Generic Method to Communicate Repository/Project Status</title><link>http://blog.jasonantman.com/2014/12/idea-for-a-generic-method-to-communicate-repositoryproject-status/</link><description>&lt;p&gt;First, something funny, before my possibly-hair-brained&amp;nbsp;scheme:&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://www.commitstrip.com/en/2014/11/25/west-side-project-story/"&gt;&lt;img alt="commitstrip.com &amp;quot;side project&amp;quot; comic strip" src="http://www.commitstrip.com/wp-content/uploads/2014/11/Strip-Side-project-650-finalenglish.jpg" /&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;I know I&amp;#8217;m not alone in having a mess of &lt;a href="https://github.com/jantman?tab=repositories"&gt;repositories on GitHub&lt;/a&gt;; I personally have over 90, and they&amp;#8217;re
+all in various states of &amp;#8220;doneness.&amp;#8221; Some are working and undergoing active development. Some should be
+working, but I no longer use them (and sometimes lack &amp;#8220;things&amp;#8221; needed to use them, especially the case
+with projects linked to specific hardware). Some of them were ideas that never took off; some of these
+I intend on finishing, and some I never want to touch&amp;nbsp;again.&lt;/p&gt;
+&lt;p&gt;While GitHub has a &lt;a href="https://help.github.com/articles/about-releases/"&gt;Releases&lt;/a&gt; feature, at best (where everyone
+understands and follows &lt;a href="http://semver.org/"&gt;semantic versioning&lt;/a&gt;), it can only differentiate &amp;#8220;initial development&amp;#8221;
+(prior to stable public release) versions from those after them. It may be an indication of the usability or completeness
+of the software, but not of its current state of&amp;nbsp;maintenance.&lt;/p&gt;
+&lt;p&gt;The questions that I&amp;#8217;d really like to be able to answer about a given project or repository&amp;nbsp;are:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;What is the &amp;#8220;completeness&amp;#8221; of the code? Should it be usable, or is it functionally&amp;nbsp;incomplete?&lt;/li&gt;
+&lt;li&gt;What is the status of development efforts? Is this actively developed, or supported (even if bugfix-only), or totally&amp;nbsp;abandoned?&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;I&amp;#8217;d like to be able to easily communicate this to people who come across my work, and also
+track it for my own needs - I have enough repositories with barely-started concepts that I
+occasionally forget about them. I&amp;#8217;d also, of course, like to be able to know this information
+about other peoples&amp;#8217; work as&amp;nbsp;well.&lt;/p&gt;
+&lt;p&gt;Ideally, I thought that this should be a GitHub feature, exposed via the &lt;span class="caps"&gt;API&lt;/span&gt; and the &lt;span class="caps"&gt;UI&lt;/span&gt;. However,
+there are a number of problems with&amp;nbsp;that:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;It would require GitHub to implement the feature. Quite ironically, GitHub is &lt;a href="https://github.com/isaacs/github/issues/6"&gt;not very open&lt;/a&gt;
+about issues and feature requests for their platform itself, and the only good way to suggest something is &lt;a href="https://github.com/isaacs/github"&gt;unofficial&lt;/a&gt;.&lt;/li&gt;
+&lt;li&gt;It would be tied to GitHub directly. When the next big thing comes along, or for projects using other services (like Gitorious, or even non-git hosting),
+it would be rendered&amp;nbsp;useless.&lt;/li&gt;
+&lt;li&gt;The status really describes the code/project itself, not the GitHub repository per se, so it should live with the&amp;nbsp;code.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;So, I&amp;#8217;m brainstorming a straightforward semi-standardized way of communicating this information. Assuming
+it&amp;#8217;s not implemented in GitHub itself, but rather becomes part of the repository content, that poses some
+interesting questions for both what information is communicated and how to communicate it. What follows is
+really my brainstorming and initial ideas. I&amp;#8217;d very much appreciate it if anyone who&amp;#8217;s interested submits
+their ideas and comments. I fully intend to start using something like this for my own projects but, not to
+be too arrogant, I think it&amp;#8217;s a useful idea and could benefit from some accepted&amp;nbsp;standard.&lt;/p&gt;
+&lt;h2 id="what-to-communicate"&gt;What to&amp;nbsp;Communicate&lt;/h2&gt;
+&lt;p&gt;The first question is what data to communicate. Ideally, this would be one of a standardized set of
+repository/project status identifiers, along with a textual description that could be provided by
+the author, for additional clarity. My humble suggestion (very much a &lt;span class="caps"&gt;WIP&lt;/span&gt;) of the possible statuses,
+along with the suggested (canonical) description of their&amp;nbsp;meanings:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Concept&lt;/strong&gt; - Minimal or no implementation has been done&amp;nbsp;yet.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;&lt;span class="caps"&gt;WIP&lt;/span&gt;&lt;/strong&gt; - Initial development is in progress, but there has not yet been a stable, usable release suitable for the&amp;nbsp;public.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Suspended&lt;/strong&gt; - A &lt;span class="caps"&gt;WIP&lt;/span&gt; project that has had work stopped for the time being; the author(s) intend on resuming&amp;nbsp;work.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Abandoned&lt;/strong&gt; - A &lt;span class="caps"&gt;WIP&lt;/span&gt; project that has been abandoned; the author(s) do not intend on continuing&amp;nbsp;development.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Active&lt;/strong&gt; - The project has reached a stable, usable state and is being actively&amp;nbsp;developed.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Inactive&lt;/strong&gt; - The project has reached a stable, usable state but is no longer being actively developed; support/maintenance will be provided as time&amp;nbsp;allows.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Unsupported&lt;/strong&gt; - The project has reached a stable, usable state but the author(s) have ceased all work on it. A new maintainer may be&amp;nbsp;desired.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;I assume that there might be some dissenting opinions on whether this list of statuses is complete, or perhaps too long.
+However I feel that it&amp;#8217;s the minimum set required to describe a project along the two axes which I consider important:
+usability (is the code here complete enough to &amp;#8220;work&amp;#8221; for something) and support/development status (is it being worked on,
+or are there plans to do so in the future). I&amp;#8217;m certainly open to opinions on&amp;nbsp;this.&lt;/p&gt;
+&lt;h2 id="how-to-communicate-it"&gt;How to Communicate&amp;nbsp;It&lt;/h2&gt;
+&lt;p&gt;I view this as a more complex question technically, as doing this within the repository content (instead of in a GitHub &lt;span class="caps"&gt;API&lt;/span&gt;)
+necessarily involves polluting that repository. My main two technical requirements (at least with my own intended use in mind)
+are that the status be readable both by human and machine, and that the status should be available in one place within the
+repository (i.e. in only one place for both humans and machines, and not requiring any&amp;nbsp;transformation).&lt;/p&gt;
+&lt;p&gt;The best I&amp;#8217;ve been able to come up with so far is either including the status in a special file (likely a specially-named dotfile),
+or including it in the &lt;span class="caps"&gt;README&lt;/span&gt;. The dotfile method is optimized for machine-reading - it would be a single file, likely named
+&amp;#8220;.repostatus.org&amp;#8221;, with a simple specified format. It&amp;#8217;s easy and cheap for a machine to find and parse, and shouldn&amp;#8217;t be too cumbersome
+to add. But it pollutes the repository with another file, and worse, it would be quite unlikely to be found by a human who isn&amp;#8217;t
+familiar with this practice, so it loses a lot in terms of human readability and&amp;nbsp;intuitiveness.&lt;/p&gt;
+&lt;p&gt;On the other hand, adding something special to the &lt;span class="caps"&gt;README&lt;/span&gt; file is much more human-centric. The &amp;#8220;something&amp;#8221; could be a simple
+string or link, or even better, a &lt;a href="http://shields.io/"&gt;badge&lt;/a&gt;. It would appear clearly when rendered on GitHub, and should also appear anywhere
+else the readme is rendered (i.e. in online documentation or in packages of the project). However, this poses a few&amp;nbsp;challenges:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;It wouldn&amp;#8217;t necessarily be possible to have a status that&amp;#8217;s machine-readable but not rendered to the human observer. Sure, this
+sort of goes against half of the purpose of this idea, but some people probably wouldn&amp;#8217;t want this extra piece of information
+cluttering up their &lt;span class="caps"&gt;README&lt;/span&gt;. It&amp;#8217;s possible to put comments in &lt;a href="http://docutils.sourceforge.net/docs/ref/rst/restructuredtext.html#comments"&gt;rST&lt;/a&gt;,
+but &lt;a href="http://stackoverflow.com/questions/4823468/store-comments-in-markdown-syntax"&gt;markdown support&lt;/a&gt; isn&amp;#8217;t nearly as reliable,
+being a bit of a&amp;nbsp;hack.&lt;/li&gt;
+&lt;li&gt;This is optimized for human readers. In order to be detected by machine, the repository would need to be searched for
+a readme file (even assuming the convention of &amp;#8220;^&lt;span class="caps"&gt;README&lt;/span&gt;*&amp;#8221;, there&amp;#8217;s a myriad of possible file extensions that could be used),
+which isn&amp;#8217;t necessarily a cheap operation (especially since it would require access to the file listing within the&amp;nbsp;repository).&lt;/li&gt;
+&lt;li&gt;Furthermore, machine detection would need to be able to either parse the markup (if any), or do string search on the file
+contents. Once again, a more expensive&amp;nbsp;operation.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id="current-theory"&gt;Current&amp;nbsp;Theory&lt;/h2&gt;
+&lt;p&gt;At the moment, I&amp;#8217;m leaning towards this theory of&amp;nbsp;implementation:&lt;/p&gt;
+&lt;p&gt;Badges are placed in the project&amp;#8217;s &lt;span class="caps"&gt;README&lt;/span&gt; indicating the status. The badges would be sourced from specified URLs, served
+by &lt;a href="http://repostatus.org"&gt;repostatus.org&lt;/a&gt; and linked to specified URLs describing the status (likely of the form
+http://repostatus.org/1.0/#active). Machine determination of status would be made by a string match for one of
+the specified status URLs - nothing more is needed. It would be simple enough to simply specify that, for machine
+determination, the first file in the repository (sorted in lexicographical order) beginning with &amp;#8220;readme&amp;#8221; (case-insensitive) and containing
+a matching &lt;span class="caps"&gt;URL&lt;/span&gt; determines the status. For human users, the badge image could be combined with descriptive alt-text, and
+possibly followed by a more descriptive explanation, if the author chose so. This would eliminate the need for a fixed
+set of possible readme file names, and the need for machine identification to be able to parse all possible&amp;nbsp;markups.&lt;/p&gt;
+&lt;p&gt;The visual impact to the readme document (assuming it&amp;#8217;s rendered) would be minimal. Here are some quick takes on
+a first set of badges, along with the alt text set on them (which could be changed by the user, or also included
+in plain text next to the&amp;nbsp;badge).&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;img alt="Repo Status: Concept - Minimal or no implementation has been done yet." src="http://img.shields.io/badge/repo%20status-Concept-ffffff.svg" /&gt; Repo Status: Concept - Minimal or no implementation has been done&amp;nbsp;yet.&lt;/li&gt;
+&lt;li&gt;&lt;img alt="Repo Status: WIP - Initial development is in progress, but there has not yet been a stable, usable release suitable for the public." src="http://img.shields.io/badge/repo%20status-WIP-yellow.svg" /&gt; Repo Status: &lt;span class="caps"&gt;WIP&lt;/span&gt; - Initial development is in progress, but there has not yet been a stable, usable release suitable for the&amp;nbsp;public.&lt;/li&gt;
+&lt;li&gt;&lt;img alt="Repo Status: Suspended - A WIP project that has had work stopped for the time being; the author(s) intend on resuming work." src="http://img.shields.io/badge/repo%20status-Suspended-orange.svg" /&gt; Repo Status: Suspended - A &lt;span class="caps"&gt;WIP&lt;/span&gt; project that has had work stopped for the time being; the author(s) intend on resuming&amp;nbsp;work.&lt;/li&gt;
+&lt;li&gt;&lt;img alt="Repo Status: Abandoned - A WIP project that has been abandoned; the author(s) do not intend on continuing development." src="http://img.shields.io/badge/repo%20status-Abandoned-000000.svg" /&gt; Repo Status: Abandoned - A &lt;span class="caps"&gt;WIP&lt;/span&gt; project that has been abandoned; the author(s) do not intend on continuing&amp;nbsp;development.&lt;/li&gt;
+&lt;li&gt;&lt;img alt="Repo Status: Active - The project has reached a stable, usable state and is being actively developed." src="http://img.shields.io/badge/repo%20status-Active-brightgreen.svg" /&gt; Repo Status: Active - The project has reached a stable, usable state and is being actively&amp;nbsp;developed.&lt;/li&gt;
+&lt;li&gt;&lt;img alt="Repo Status: Inactive - The project has reached a stable, usable state and is no longer being actively developed; support/maintenance will be done as time allows." src="http://img.shields.io/badge/repo%20status-Inactive-yellowgreen.svg" /&gt; Repo Status: Inactive - The project has reached a stable, usable state and is no longer being actively developed; support/maintenance will be done as time&amp;nbsp;allows.&lt;/li&gt;
+&lt;li&gt;&lt;img alt="Repo Status: Unsupported - The project has reached a stable, usable state but the author(s) have ceased all work on it. A new maintainer may be desired." src="http://img.shields.io/badge/repo%20status-Unsupported-lightgrey.svg" /&gt; Repo Status: Unsupported - The project has reached a stable, usable state but the author(s) have ceased all work on it. A new maintainer may be&amp;nbsp;desired.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;If the readme is (for some strange reason) primarily intended for a non-rendered view, it would be acceptable to
+include just the &lt;span class="caps"&gt;URL&lt;/span&gt; to the status description, optionally with some human-readable&amp;nbsp;text.&lt;/p&gt;
+&lt;p&gt;I&amp;#8217;ll probably start using something like this for my personal projects. I intend on even writing up a spec
+for the &lt;span class="caps"&gt;README&lt;/span&gt;-based variant, along with some formatting and parsing/machine identification rules. Any and
+all comments are welcome. This is the result of a few hours&amp;#8217; sporadic thought one afternoon, so I&amp;#8217;m sure there
+are some major issues I haven&amp;#8217;t realized yet. Please pass them along, or tell me if this is of any interest to&amp;nbsp;you.&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">Jason Antman</dc:creator><pubDate>Sun, 07 Dec 2014 18:24:00 -0500</pubDate><guid>tag:blog.jasonantman.com,2014-12-07:2014/12/idea-for-a-generic-method-to-communicate-repositoryproject-status/</guid><category>repository</category><category>project</category><category>git</category><category>github</category></item><item><title>Search for a small-scale but automated RPM build system</title><link>http://blog.jasonantman.com/2013/05/search-for-a-small-scale-but-automated-rpm-build-system/</link><description>&lt;p&gt;&lt;strong&gt;This post is part of a series of older draft posts from a few months
 ago that I&amp;#8217;m just getting around to publishing. Unfortunately, I have
 yet to find a build system that meets my requirements (see the last&amp;nbsp;paragraph).&lt;/strong&gt;&lt;/p&gt;
 &lt;p&gt;At work, we have a handful - currently a really small number - of &lt;span class="caps"&gt;RPM&lt;/span&gt;
