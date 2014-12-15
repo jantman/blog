@@ -2,10 +2,9 @@ Title: Watching Jenkins Jobs and CloudFormation Updates with Pushover Notificati
 Date: 2014-12-14 19:22
 Author: Jason Antman
 Category: Tech HowTos
-Tags: 
+Tags: script, pushover, jenkins, hudson, aws, cloudformation
 Slug: watching-jenkins-jobs-and-cloudformation-updates-with-pushover-notification
 Summary: Some scripts to watch the status of Jenkins jobs and CloudFormation updates, and send Pushover notifications.
-Status: draft
 
 A few months ago I [posted](http://blog.jasonantman.com/2014/09/pushover-notifications-for-shell-command-completion-and-status/)
 about a script I wrote to send [Pushover](https://pushover.net/) notifications for shell command completion.
