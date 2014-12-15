@@ -1,5 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Jason Antman's Blog</title><link href="http://blog.jasonantman.com/" rel="alternate"></link><link href="http://blog.jasonantman.com/feeds/all.atom.xml" rel="self"></link><id>http://blog.jasonantman.com/</id><updated>2014-12-07T18:24:00-05:00</updated><entry><title>Idea for a Generic Method to Communicate Repository/Project Status</title><link href="http://blog.jasonantman.com/2014/12/idea-for-a-generic-method-to-communicate-repositoryproject-status/" rel="alternate"></link><updated>2014-12-07T18:24:00-05:00</updated><author><name>Jason Antman</name></author><id>tag:blog.jasonantman.com,2014-12-07:2014/12/idea-for-a-generic-method-to-communicate-repositoryproject-status/</id><summary type="html">&lt;p&gt;First, something funny, before my possibly-hair-brained&amp;nbsp;scheme:&lt;/p&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Jason Antman's Blog</title><link href="http://blog.jasonantman.com/" rel="alternate"></link><link href="http://blog.jasonantman.com/feeds/all.atom.xml" rel="self"></link><id>http://blog.jasonantman.com/</id><updated>2014-12-14T19:22:00-05:00</updated><entry><title>Watching Jenkins Jobs and CloudFormation Updates with Pushover Notification</title><link href="http://blog.jasonantman.com/2014/12/watching-jenkins-jobs-and-cloudformation-updates-with-pushover-notification/" rel="alternate"></link><updated>2014-12-14T19:22:00-05:00</updated><author><name>Jason Antman</name></author><id>tag:blog.jasonantman.com,2014-12-14:2014/12/watching-jenkins-jobs-and-cloudformation-updates-with-pushover-notification/</id><summary type="html">&lt;p&gt;A few months ago I &lt;a href="http://blog.jasonantman.com/2014/09/pushover-notifications-for-shell-command-completion-and-status/"&gt;posted&lt;/a&gt;
+about a script I wrote to send &lt;a href="https://pushover.net/"&gt;Pushover&lt;/a&gt; notifications for shell command&amp;nbsp;completion.&lt;/p&gt;
+&lt;p&gt;I&amp;#8217;ve been doing quite a bit of work lately both with testing some &lt;a href="http://jenkins-ci.org/"&gt;Jenkins&lt;/a&gt; jobs, and spinning up
+&lt;span class="caps"&gt;AWS&lt;/span&gt; stacks using &lt;a href="https://aws.amazon.com/cloudformation/"&gt;CloudFormation&lt;/a&gt;. Last week I wrote two python scripts to aid in&amp;nbsp;this.&lt;/p&gt;
+&lt;p&gt;&lt;a href="https://github.com/jantman/misc-scripts/blob/master/watch_cloudformation.py"&gt;watch_cloudformation.py&lt;/a&gt; uses the popular &lt;a href="https://github.com/boto/boto"&gt;boto&lt;/a&gt;
+Python &lt;span class="caps"&gt;AWS&lt;/span&gt; interface to list (and display) the events on a specified CloudFormation stack, and exit 0 or 1 when it finds a (&lt;span class="caps"&gt;CREATE&lt;/span&gt;|&lt;span class="caps"&gt;UPDATE&lt;/span&gt;)_(&lt;span class="caps"&gt;FAILED&lt;/span&gt;|&lt;span class="caps"&gt;COMPLETE&lt;/span&gt;) event.
+It also optionally uses &lt;a href="https://pypi.python.org/pypi/python-pushover"&gt;python-pushover&lt;/a&gt; to send the notification to your devices via&amp;nbsp;Pushover.&lt;/p&gt;
+&lt;p&gt;&lt;a href="https://github.com/jantman/misc-scripts/blob/master/watch_jenkins.py"&gt;watch_jenkins.py&lt;/a&gt; takes the &lt;span class="caps"&gt;URL&lt;/span&gt; to a Jenkins job or build, and uses
+&lt;a href="https://pypi.python.org/pypi/python-jenkins"&gt;python-jenkins&lt;/a&gt; to poll the status of the build (or the latest build, if given a Job url)
+and display the result when the build finishes, also optionally using python-pushover to send notifications to your&amp;nbsp;device.&lt;/p&gt;
+&lt;p&gt;They&amp;#8217;re really quick-and-dirty scripts and might not be suitable for everyone&amp;#8217;s use case, but I took the time to write them,
+so hopefully they&amp;#8217;ll be useful to someone&amp;nbsp;else.&lt;/p&gt;</summary><category term="script"></category><category term="pushover"></category><category term="jenkins"></category><category term="hudson"></category><category term="aws"></category><category term="cloudformation"></category></entry><entry><title>Idea for a Generic Method to Communicate Repository/Project Status</title><link href="http://blog.jasonantman.com/2014/12/idea-for-a-generic-method-to-communicate-repositoryproject-status/" rel="alternate"></link><updated>2014-12-07T18:24:00-05:00</updated><author><name>Jason Antman</name></author><id>tag:blog.jasonantman.com,2014-12-07:2014/12/idea-for-a-generic-method-to-communicate-repositoryproject-status/</id><summary type="html">&lt;p&gt;First, something funny, before my possibly-hair-brained&amp;nbsp;scheme:&lt;/p&gt;
 &lt;p&gt;&lt;a href="http://www.commitstrip.com/en/2014/11/25/west-side-project-story/"&gt;&lt;img alt="commitstrip.com &amp;quot;side project&amp;quot; comic strip" src="http://www.commitstrip.com/wp-content/uploads/2014/11/Strip-Side-project-650-finalenglish.jpg" /&gt;&lt;/a&gt;&lt;/p&gt;
 &lt;p&gt;I know I&amp;#8217;m not alone in having a mess of &lt;a href="https://github.com/jantman?tab=repositories"&gt;repositories on GitHub&lt;/a&gt;; I personally have over 90, and they&amp;#8217;re
 all in various states of &amp;#8220;doneness.&amp;#8221; Some are working and undergoing active development. Some should be
@@ -3412,30 +3423,4 @@ justify any sort of book budget at work, you should buy the book. And
 while you&amp;#8217;re at it, if you haven&amp;#8217;t read Tom&amp;#8217;s other books, you should
 buy those too. You might be in the unfortunate position - like I am - of
 probably never being able to implement most of his suggestions at work,
-but at least you&amp;#8217;ll be aware of&amp;nbsp;them&amp;#8230;&lt;/p&gt;</summary><category term="books"></category><category term="limoncelli"></category><category term="sysadmin"></category></entry><entry><title>Logging OpenSSH SFTP Transactions</title><link href="http://blog.jasonantman.com/2012/07/logging-openssh-sftp-transactions/" rel="alternate"></link><updated>2012-07-16T08:47:00-04:00</updated><author><name>admin</name></author><id>tag:blog.jasonantman.com,2012-07-16:2012/07/logging-openssh-sftp-transactions/</id><summary type="html">&lt;p&gt;I just came across a really handy post on &lt;a href="https://plus.google.com/117561367404774597588/posts"&gt;David
-Busby&lt;/a&gt;&amp;#8216;s blog:
-&lt;a href="http://blog.oneiroi.co.uk/linux/enable-logging-in-the-sftp-subsystem/"&gt;Enable logging in the &lt;span class="caps"&gt;SFTP&lt;/span&gt; subsystem -
-Oneiroi&lt;/a&gt;.
-From OpenSSH 4.4 on, you can pass arguments to Subsystem calls, and the
-sftp subsystem supports logging to an aribtrary syslog facility and
-priority. Simply adding a line&amp;nbsp;like:&lt;/p&gt;
-&lt;div class="codehilite"&gt;&lt;pre&gt;Subsystem       sftp    /usr/libexec/openssh/sftp-server -f LOCAL5 -l INFO
-&lt;/pre&gt;&lt;/div&gt;
-
-
-&lt;p&gt;and the appropriate lines to your syslog config will give you a handy
-transfer log&amp;nbsp;like:&lt;/p&gt;
-&lt;div class="codehilite"&gt;&lt;pre&gt;Jul 16 09:22:25 hostname sftp-server[2058]: session opened for local user jantman from [A.B.C.D]
-Jul 16 09:22:26 hostname sftp-server[2058]: open &amp;quot;/home/jantman/temp/sftp_test&amp;quot; flags WRITE,CREATE,TRUNCATE mode 0666
-Jul 16 09:22:45 hostname sftp-server[2058]: close &amp;quot;/home/jantman/temp/sftp_test&amp;quot; bytes read 0 written 1464813
-Jul 16 09:23:08 hostname sftp-server[2058]: session closed for local user jantman from [A.B.C.D]
-Jul 16 09:27:50 hostname sftp-server[2309]: session opened for local user jantman from [A.B.C.D]
-Jul 16 09:27:50 hostname sftp-server[2309]: open &amp;quot;/home/jantman/temp/sftp_test&amp;quot; flags READ mode 0666
-Jul 16 09:27:54 hostname sftp-server[2309]: close &amp;quot;/home/jantman/temp/sftp_test&amp;quot; bytes read 1464813 written 0
-Jul 16 09:27:54 hostname sftp-server[2309]: session closed for local user jantman from [A.B.C.D]
-&lt;/pre&gt;&lt;/div&gt;
-
-
-&lt;p&gt;If you have syslog write these logs to their own file, remember to setup
-log rotation for&amp;nbsp;them.&lt;/p&gt;
-&lt;p&gt;Unfortunately, I&amp;#8217;m not aware of any way to log &lt;span class="caps"&gt;SCP&lt;/span&gt; file&amp;nbsp;transfers.&lt;/p&gt;</summary><category term="logging"></category><category term="openssh"></category><category term="sftp"></category><category term="ssh"></category></entry></feed>
+but at least you&amp;#8217;ll be aware of&amp;nbsp;them&amp;#8230;&lt;/p&gt;</summary><category term="books"></category><category term="limoncelli"></category><category term="sysadmin"></category></entry></feed>
