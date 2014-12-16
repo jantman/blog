@@ -5,6 +5,18 @@ Category: Ops
 Tags: centos, fedora, init, redhat, startup
 Slug: fedora-init-script-specification-summary
 
+__Note__ 2014-12-16: I'm leaving this here for historical reasons, and since
+some older OS versions still need properly-written init scripts. Since starting
+to use [Arch Linux](https://www.archlinux.org/) on my laptop, I've become a
+convert to the [systemd](http://www.freedesktop.org/wiki/Software/systemd/)
+world. I know this is a [hot topic](http://en.wikipedia.org/wiki/Systemd#Criticism)
+and has sparked a lot of controversy. While I agree with some of the arguments
+in principal, I strongly feel that systemd provides the interface that
+Linux needs in modern times, and provides a unified solution to many problems
+that were previously solved in myriad ways inside init scripts. In short,
+if your distro supports systemd, I'd recommend to skip past this page
+and go ahead and write a [unit file](http://www.freedesktop.org/software/systemd/man/systemd.unit.html).
+
 I've been deploying some new software lately (specifically
 [selenesse](https://github.com/marisaseal/selenesse), which combines
 [Selenium](http://seleniumhq.org/) and [fitnesse](http://fitnesse.org/),
