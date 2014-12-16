@@ -28,42 +28,40 @@ when you're done.
     your keys, etc.).
 3.  First, we import the public and private keys to GPG:
 
-~~~~{.console}
-testuser:~$ cd .gnupg
-testuser:~/.gnupg$ gpg --import TestUser_public.key 
-gpg: keyring `/home/testuser/.gnupg/secring.gpg` created
-gpg: key 17AD8D3D: public key "Test User (Test User) " imported
-gpg: Total number processed: 1
-gpg:               imported: 1  (RSA: 1)
-
-testuser:~/.gnupg$ gpg --allow-secret-key-import --import TestUser_secret.key 
-gpg: key 17AD8D3D: secret key imported
-gpg: key 17AD8D3D: "Test User (Test User) " not changed
-gpg: Total number processed: 1
-gpg:              unchanged: 1
-gpg:       secret keys read: 1
-gpg:   secret keys imported: 1
-~~~~
+        :::console
+        testuser:~$ cd .gnupg
+        testuser:~/.gnupg$ gpg --import TestUser_public.key 
+        gpg: keyring `/home/testuser/.gnupg/secring.gpg` created
+        gpg: key 17AD8D3D: public key "Test User (Test User) " imported
+        gpg: Total number processed: 1
+        gpg:               imported: 1  (RSA: 1)
+        
+        testuser:~/.gnupg$ gpg --allow-secret-key-import --import TestUser_secret.key 
+        gpg: key 17AD8D3D: secret key imported
+        gpg: key 17AD8D3D: "Test User (Test User) " not changed
+        gpg: Total number processed: 1
+        gpg:              unchanged: 1
+        gpg:       secret keys read: 1
+        gpg:   secret keys imported: 1
 
 4.  Check that the keys are there:
 
-~~~~{.console}
-testuser:~/.gnupg$ gpg --list-keys
-/home/testuser/.gnupg/pubring.gpg
---------------------------------
-pub   2048R/17AD8D3D 2013-08-24
-uid                  Test User (Test User) 
-sub   2048R/40D9F35E 2013-08-24
-
-testuser:~/.gnupg$ gpg --list-secret-keys
-/home/testuser/.gnupg/secring.gpg
---------------------------------
-sec   2048R/17AD8D3D 2013-08-24
-uid                  Test User (Test User) 
-ssb   2048R/40D9F35E 2013-08-24
-
-testuser:~/.gnupg$ 
-~~~~
+        :::console
+        testuser:~/.gnupg$ gpg --list-keys
+        /home/testuser/.gnupg/pubring.gpg
+        --------------------------------
+        pub   2048R/17AD8D3D 2013-08-24
+        uid                  Test User (Test User) 
+        sub   2048R/40D9F35E 2013-08-24
+        
+        testuser:~/.gnupg$ gpg --list-secret-keys
+        /home/testuser/.gnupg/secring.gpg
+        --------------------------------
+        sec   2048R/17AD8D3D 2013-08-24
+        uid                  Test User (Test User) 
+        ssb   2048R/40D9F35E 2013-08-24
+        
+        testuser:~/.gnupg$ 
 
 5.  Note the fingerprint of the key which is, in this case, `17AD8D3D`.
 
@@ -77,57 +75,54 @@ testuser:~/.gnupg$
     file on a ramdisk. In this example, the actual passphrase for the
     key is "test". Here's our text file:
 
-~~~~{.console}
-testuser:~/.gnupg$ cat /tmp/passphrases 
-bad
-notgood
-notright
-test
-~~~~
+        :::console
+        testuser:~/.gnupg$ cat /tmp/passphrases 
+        bad
+        notgood
+        notright
+        test
 
 2.  Next, create a test data file to try to sign/encrypt:
 
-~~~~{.console}
-testuser:~/.gnupg$ echo "test input" > /tmp/test.in
-~~~~
+        :::console
+        testuser:~/.gnupg$ echo "test input" > /tmp/test.in
 
 3.  Now we run the actual test (see below for more information...)
 
-~~~~{.console}
-testuser:~/.gnupg$ for p in `cat /tmp/passphrases`; do echo "$p" | gpg -q --sign --local-user 17AD8D3D --passphrase-fd 0 --output /dev/null --yes /tmp/test.in && (echo "CORRECT passphrase: $p" && break); done
-Reading passphrase from file descriptor 0    
-
-You need a passphrase to unlock the secret key for
-user: "Test User (Test User) "
-2048-bit RSA key, ID 17AD8D3D, created 2013-08-24
-
-gpg: skipped "17AD8D3D": bad passphrase
-gpg: signing failed: bad passphrase
-Reading passphrase from file descriptor 0    
-
-You need a passphrase to unlock the secret key for
-user: "Test User (Test User) "
-2048-bit RSA key, ID 17AD8D3D, created 2013-08-24
-
-gpg: skipped "17AD8D3D": bad passphrase
-gpg: signing failed: bad passphrase
-Reading passphrase from file descriptor 0    
-
-You need a passphrase to unlock the secret key for
-user: "Test User (Test User) "
-2048-bit RSA key, ID 17AD8D3D, created 2013-08-24
-
-gpg: skipped "17AD8D3D": bad passphrase
-gpg: signing failed: bad passphrase
-Reading passphrase from file descriptor 0    
-
-You need a passphrase to unlock the secret key for
-user: "Test User (Test User) "
-2048-bit RSA key, ID 17AD8D3D, created 2013-08-24
-
-CORRECT passphrase: test
-testuser:~/.gnupg$ 
-~~~~
+        :::console
+        testuser:~/.gnupg$ for p in `cat /tmp/passphrases`; do echo "$p" | gpg -q --sign --local-user 17AD8D3D --passphrase-fd 0 --output /dev/null --yes /tmp/test.in && (echo "CORRECT passphrase: $p" && break); done
+        Reading passphrase from file descriptor 0    
+        
+        You need a passphrase to unlock the secret key for
+        user: "Test User (Test User) "
+        2048-bit RSA key, ID 17AD8D3D, created 2013-08-24
+        
+        gpg: skipped "17AD8D3D": bad passphrase
+        gpg: signing failed: bad passphrase
+        Reading passphrase from file descriptor 0    
+        
+        You need a passphrase to unlock the secret key for
+        user: "Test User (Test User) "
+        2048-bit RSA key, ID 17AD8D3D, created 2013-08-24
+        
+        gpg: skipped "17AD8D3D": bad passphrase
+        gpg: signing failed: bad passphrase
+        Reading passphrase from file descriptor 0    
+        
+        You need a passphrase to unlock the secret key for
+        user: "Test User (Test User) "
+        2048-bit RSA key, ID 17AD8D3D, created 2013-08-24
+        
+        gpg: skipped "17AD8D3D": bad passphrase
+        gpg: signing failed: bad passphrase
+        Reading passphrase from file descriptor 0    
+        
+        You need a passphrase to unlock the secret key for
+        user: "Test User (Test User) "
+        2048-bit RSA key, ID 17AD8D3D, created 2013-08-24
+        
+        CORRECT passphrase: test
+        testuser:~/.gnupg$ 
 
 4.  And there we have it, the working passphrase. I'm sure there's a
     more efficient way to do this, and probably a more secure way, but
@@ -138,12 +133,11 @@ testuser:~/.gnupg$
 The actual command that we ran, rewritten with some linebreaks for
 legibility, is:
 
-~~~~{.bash}
-for p in `cat /tmp/passphrases`
-do
-    echo "$p" | gpg -q --sign --local-user 17AD8D3D --passphrase-fd 0 --output /dev/null --yes /tmp/test.in && (echo "CORRECT passphrase: $p" && break)
-done
-~~~~
+    :::bash
+    for p in `cat /tmp/passphrases`
+    do
+        echo "$p" | gpg -q --sign --local-user 17AD8D3D --passphrase-fd 0 --output /dev/null --yes /tmp/test.in && (echo "CORRECT passphrase: $p" && break)
+    done
 
 This loops over each line in the passphrases file (each passphrase that
 we want to try), and for each one, echoes the password and pipes it to
