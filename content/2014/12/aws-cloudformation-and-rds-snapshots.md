@@ -55,6 +55,9 @@ I've described how RDS resources behave currently without a stack policy protect
 describes which properties can be updated in-place ("Update requires: No interruption" or "some interruptions")
 and which trigger complete replacement of the RDS instance ("Update requires: replacement").
 
+When you try to update a protected resource through the ``aws`` CLI tools, the update will appear to have worked, but the event
+log on the stack will show the update denied and the update will be rolled back.
+
 Restoring Snapshots and DBName
 -------------------------------
 
@@ -145,10 +148,27 @@ wrapped in a Rakefile (I plan on changing this to use [boto](https://github.com/
 inside a [Jenkins](http://jenkins-ci.org/) job). What follows is a quick high-level guide
 on how to accomplish various RDS-related tasks, using the template snippet below.
 
-* __Build a new stack using a RDS snapshot__:
+* __Build a new stack using a RDS snapshot and a stack policy to prevent updates__:
 
         :::bash
-        $ aws cloudformation create-stack --stack-name mystack --template-body file:///home/myuser/cloudformation_template.json --parameters ParameterKey=DBSnapshotIdentifier,ParameterValue='my-snapshot-identifier'
+        $ cat /tmp/stack_policy.json
+		{
+          "Statement" : [
+            {
+              "Effect" : "Deny",
+              "Action" : "Update:*",
+              "Principal": "*",
+              "Resource" : "LogicalResourceId/DBInstance"
+            },
+            {
+              "Effect" : "Allow",
+              "Action" : "Update:*",
+              "Principal": "*",
+              "Resource" : "*"
+            }
+          ]
+        }
+        $ aws cloudformation create-stack --stack-name mystack --stack-policy-body file:///tmp/stack_policy.json --template-body file:///home/myuser/cloudformation_template.json --parameters ParameterKey=DBSnapshotIdentifier,ParameterValue='my-snapshot-identifier'
 
 * __Temporarily override stack policy to allow updates__:
 
@@ -166,7 +186,7 @@ on how to accomplish various RDS-related tasks, using the template snippet below
               ]
             }
 
-    2. In the following ``aws`` commands, append ``--stack-policy-during-update-url file:///home/myuser/allow_all_updates.json``
+    2. In the following ``aws`` commands, append ``--stack-policy-during-update-body file:///home/myuser/allow_all_updates.json``
 
 * __Update a stack (built using a RDS snapshot), without losing data__:
 
