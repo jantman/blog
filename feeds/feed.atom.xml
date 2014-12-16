@@ -1,5 +1,292 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Jason Antman's Blog</title><link href="http://blog.jasonantman.com/" rel="alternate"></link><link href="http://blog.jasonantman.com/feeds/feed.atom.xml" rel="self"></link><id>http://blog.jasonantman.com/</id><updated>2014-12-14T19:22:00-05:00</updated><entry><title>Watching Jenkins Jobs and CloudFormation Updates with Pushover Notification</title><link href="http://blog.jasonantman.com/2014/12/watching-jenkins-jobs-and-cloudformation-updates-with-pushover-notification/" rel="alternate"></link><updated>2014-12-14T19:22:00-05:00</updated><author><name>Jason Antman</name></author><id>tag:blog.jasonantman.com,2014-12-14:2014/12/watching-jenkins-jobs-and-cloudformation-updates-with-pushover-notification/</id><summary type="html">&lt;p&gt;A few months ago I &lt;a href="http://blog.jasonantman.com/2014/09/pushover-notifications-for-shell-command-completion-and-status/"&gt;posted&lt;/a&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Jason Antman's Blog</title><link href="http://blog.jasonantman.com/" rel="alternate"></link><link href="http://blog.jasonantman.com/feeds/feed.atom.xml" rel="self"></link><id>http://blog.jasonantman.com/</id><updated>2014-12-15T09:29:00-05:00</updated><entry><title>AWS CloudFormation and RDS Snapshots</title><link href="http://blog.jasonantman.com/2014/12/aws-cloudformation-and-rds-snapshots/" rel="alternate"></link><updated>2014-12-15T09:29:00-05:00</updated><author><name>Jason Antman</name></author><id>tag:blog.jasonantman.com,2014-12-15:2014/12/aws-cloudformation-and-rds-snapshots/</id><summary type="html">&lt;p&gt;For the past few weeks, I&amp;#8217;ve been working on spinning up a WordPress stack on Amazon &lt;span class="caps"&gt;AWS&lt;/span&gt;. It&amp;#8217;s intended to be a production application,
+so it uses Multi-&lt;span class="caps"&gt;AZ&lt;/span&gt; and a few other tricks to try to achieve relatively high fault tolerance (nothing insane, still in one region). It uses
+&lt;span class="caps"&gt;AWS&lt;/span&gt;&amp;#8217;s &lt;a href="https://aws.amazon.com/rds/"&gt;&lt;span class="caps"&gt;RDS&lt;/span&gt;&lt;/a&gt; hosted MySQL service for the database, and the stacks are created with &lt;a href="https://aws.amazon.com/cloudformation/"&gt;CloudFormation&lt;/a&gt;.
+Using CloudFormation has been an utterly wonderful experience and being able to spin up an entire stack - multiple autoscaling web server
+instances, a database, memcache, etc. with the click of a button in ~20 minutes - is as close to operations nirvana as I&amp;#8217;ve ever&amp;nbsp;gotten.&lt;/p&gt;
+&lt;p&gt;One of the last steps for me was to work on database backups and restoration; both restoring the production application&amp;#8217;s database to a
+previous snapshot, and restoring a production database snapshot to a test or development stack. This took a few days of testing, and I
+wasn&amp;#8217;t able to find much complete information on the nuances of it; there are also some pieces that are not intuitive and (&lt;span class="caps"&gt;IMO&lt;/span&gt;) not
+documented well enough in the &lt;span class="caps"&gt;AWS&lt;/span&gt; docs. In short, it&amp;#8217;s horribly easy to blow away your entire database. So, I&amp;#8217;m going to attempt to document
+some of what I learned, in the hope that it will benefit&amp;nbsp;others.&lt;/p&gt;
+&lt;p&gt;At the bottom of this post I&amp;#8217;ve included some snippets from my CloudFormation template, which I make reference to. It&amp;#8217;s probably worth looking
+through that, as I make reference to some of the names used in it. Also, to make sense of this, you should be familiar with the nomenclature used by CloudFormation,
+such as the &lt;a href="http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/template-anatomy.html"&gt;template anatomy&lt;/a&gt; and the difference between
+parameters and properties, and resources and&amp;nbsp;instances.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Note:&lt;/strong&gt; I&amp;#8217;m writing this in mid-December 2014. I&amp;#8217;ll make every effort to keep this updated as I continue working with &lt;span class="caps"&gt;AWS&lt;/span&gt;, but it&amp;#8217;s possible
+that some of the problems described herein will be fixed by &lt;span class="caps"&gt;AWS&lt;/span&gt; in the&amp;nbsp;future.&lt;/p&gt;
+&lt;h2 id="deletionpolicy-snapshot"&gt;DeletionPolicy&amp;nbsp;Snapshot&lt;/h2&gt;
+&lt;p&gt;CloudFormation resources support a &lt;a href="http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-attribute-deletionpolicy.html"&gt;DeletionPolicy&lt;/a&gt;
+attribute that says what to do to a resource when deleted. For &lt;span class="caps"&gt;RDS&lt;/span&gt; instances, &amp;#8220;Snapshot&amp;#8221; is an option, which takes a manual snapshot when the resource
+is deleted (manual snapshots, unlike the automated daily ones, live on even after the instance is deleted). Be warned, this only takes effect when you
+delete the &lt;strong&gt;entire stack&lt;/strong&gt;. If you make a change to one of the &lt;a href="http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-rds-database-instance.html"&gt;DBInstance properties&lt;/a&gt;
+that requires a &lt;a href="http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks.html#update-replacement"&gt;resource replacement&lt;/a&gt; to
+take effect, the &lt;span class="caps"&gt;RDS&lt;/span&gt; instance will be replaced with a new one, and all of the data and automatic snapshots from the old one will be deleted.
+That last part deserves repeating: automatic snapshots (the daily ones created by &lt;span class="caps"&gt;RDS&lt;/span&gt;) are tied to the instance; if the instance is replaced
+by CloudFormation, you lose all automatic (backup) snapshots with&amp;nbsp;it.&lt;/p&gt;
+&lt;h2 id="stack-policy-to-prevent-updates"&gt;Stack Policy to Prevent&amp;nbsp;Updates&lt;/h2&gt;
+&lt;p&gt;To prevent &lt;span class="caps"&gt;RDS&lt;/span&gt; data loss from accidentally changing a property of the instance, it&amp;#8217;s wise to add a
+&lt;a href="http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/protect-stack-resources.html"&gt;stack policy to prevent updates to &lt;span class="caps"&gt;RDS&lt;/span&gt; resources&lt;/a&gt;.
+This will prevent CloudFormation from making any changes to the &lt;span class="caps"&gt;RDS&lt;/span&gt; instance at all. Once the stack policy
+is in place, in order to make changes to the &lt;span class="caps"&gt;RDS&lt;/span&gt; instance you would either need to set a temporary stack policy
+to allow the update (see the &amp;#8220;Updating Protected Resources&amp;#8221; section of the &lt;a href="http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/protect-stack-resources.html"&gt;stack policy documentation&lt;/a&gt;)
+or simply delete and re-create the stack (the recommended method, if it&amp;#8217;s feasible for&amp;nbsp;you).&lt;/p&gt;
+&lt;p&gt;Setting a proper stack policy should prevent many of the pitfalls I describe below; however, for completeness,
+I&amp;#8217;ve described how &lt;span class="caps"&gt;RDS&lt;/span&gt; resources behave currently without a stack policy protecting them. The
+&lt;a href="http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-rds-database-instance.html"&gt;&lt;span class="caps"&gt;AWS&lt;/span&gt;::&lt;span class="caps"&gt;RDS&lt;/span&gt;::DBInstance resource documentation&lt;/a&gt;
+describes which properties can be updated in-place (&amp;#8220;Update requires: No interruption&amp;#8221; or &amp;#8220;some interruptions&amp;#8221;)
+and which trigger complete replacement of the &lt;span class="caps"&gt;RDS&lt;/span&gt; instance (&amp;#8220;Update requires:&amp;nbsp;replacement&amp;#8221;).&lt;/p&gt;
+&lt;p&gt;When you try to update a protected resource through the &lt;code&gt;aws&lt;/code&gt; &lt;span class="caps"&gt;CLI&lt;/span&gt; tools, the update will appear to have worked, but the event
+log on the stack will show the update denied and the update will be rolled&amp;nbsp;back.&lt;/p&gt;
+&lt;h2 id="restoring-snapshots-and-dbname"&gt;Restoring Snapshots and&amp;nbsp;DBName&lt;/h2&gt;
+&lt;p&gt;The DBSnapshotIdentifier property on a MySQL &lt;span class="caps"&gt;RDS&lt;/span&gt; instance specifies a &lt;span class="caps"&gt;RDS&lt;/span&gt; snapshot to restore into the instance. The DBName
+property will create a new &lt;span class="caps"&gt;RDS&lt;/span&gt; instance with a single blank database of that name. This bears repeating again; if the DBName
+property ever changes, your &lt;span class="caps"&gt;RDS&lt;/span&gt; instance will be replaced with one with a new, blank database of that name.
+When creating a MySQL &lt;span class="caps"&gt;RDS&lt;/span&gt; instance, you can specify either the &lt;code&gt;DBName&lt;/code&gt; or &lt;code&gt;DBSnapshotIdentifier&lt;/code&gt; property, but not both;
+if you attempt to specify both, you&amp;#8217;ll get an error, &amp;#8220;DBName must be null when Restoring for this&amp;nbsp;Engine.&amp;#8221;&lt;/p&gt;
+&lt;p&gt;If you want to restore a snapshot to a new &lt;span class="caps"&gt;RDS&lt;/span&gt; instance, you&amp;#8217;ll need to ensure that &lt;code&gt;DBName&lt;/code&gt; is null (either not specified at all, or the special &lt;code&gt;AWS::NoValue&lt;/code&gt;
+&lt;a href="http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/pseudo-parameter-reference.html"&gt;pseudo parameter&lt;/a&gt;). In order
+to do this automatically (and since NoValue/null can&amp;#8217;t be passed in as a template parameter), in the template snippet below I&amp;#8217;ve defined a
+&lt;code&gt;UseDbSnapshot&lt;/code&gt; &lt;a href="http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/conditions-section-structure.html"&gt;condition&lt;/a&gt;
+that evaluates to true if the &lt;code&gt;DBSnapshotIdentifier&lt;/code&gt; parameter is not empty. In my &lt;code&gt;RDS::DBInstance&lt;/code&gt; resource,
+I conditionally set (using &lt;a href="http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/intrinsic-function-reference-conditions.html#d0e42982"&gt;&lt;code&gt;Fn::If&lt;/code&gt;&lt;/a&gt;)
+the &lt;code&gt;DBSnapshotIdentifier&lt;/code&gt; and &lt;code&gt;DBName&lt;/code&gt; properties depending on the value of &lt;code&gt;UseDbSnapshot&lt;/code&gt;. The end result is that if the
+&lt;code&gt;DBSnapshotIdentifier&lt;/code&gt; parameter is not empty, it is passed in as the &lt;code&gt;DBSnapshotIdentifier&lt;/code&gt; property of the resource and
+the &lt;code&gt;DBName&lt;/code&gt; property is set to &lt;code&gt;AWS::NoValue&lt;/code&gt;. Otherwise, the &lt;code&gt;DBSnapshotIdentifier&lt;/code&gt; property is set to &lt;code&gt;AWS::NoValue&lt;/code&gt;
+and the &lt;code&gt;DBName&lt;/code&gt; parameter is passed in to the corresponding property on the resource (indicating to create a new blank database
+of that&amp;nbsp;name).&lt;/p&gt;
+&lt;p&gt;To explain this a bit more, CloudFormation seems to have no introspection into &lt;span class="caps"&gt;RDS&lt;/span&gt; instances. The &lt;code&gt;DBName&lt;/code&gt; parameter
+exists only in CloudFormation itself, and is only evaluated as a diff from the previous template; if it changes,
+CloudFormation spins up a completely new &lt;span class="caps"&gt;RDS&lt;/span&gt; instance with a single blank database of that name. Whether or not
+the value of &lt;code&gt;DBName&lt;/code&gt; matches the database currently in the &lt;span class="caps"&gt;RDS&lt;/span&gt; instance (say, restored from a snapshot)
+is not known by CloudFormation. In short, if you create an &lt;span class="caps"&gt;RDS&lt;/span&gt; instance from a snapshot of a &amp;#8220;foo&amp;#8221; database
+and then change the template to have a &lt;code&gt;DBName&lt;/code&gt; of &amp;#8220;foo&amp;#8221;, CloudFormation will spin up a new &lt;span class="caps"&gt;RDS&lt;/span&gt; instance
+with an empty &amp;#8220;foo&amp;#8221;&amp;nbsp;database.&lt;/p&gt;
+&lt;h2 id="restoring-to-a-new-stack"&gt;Restoring to a New&amp;nbsp;Stack&lt;/h2&gt;
+&lt;p&gt;When restoring to a new stack (stack creation), specify the &lt;code&gt;DBSnapshotIdentifier&lt;/code&gt; and make sure &lt;code&gt;DBName&lt;/code&gt; is set
+to &lt;code&gt;AWS::NoValue&lt;/code&gt; per the previous paragraph (condition in the template). Note that for the life of the stack, you
+must continue specifying these parameters (or the &amp;#8220;use previous value&amp;#8221; option for them). Using my example template
+below, if you restored into a new stack using the &lt;code&gt;DBSnapshotIdentifier&lt;/code&gt; parameter and then later updated the stack
+and omitted that parameter (which, because of the condition, would set it to &lt;code&gt;NoValue&lt;/code&gt; and set the &lt;code&gt;DBName&lt;/code&gt; parameter
+to its default value) the &lt;span class="caps"&gt;RDS&lt;/span&gt; instance would be replaced with a new one with a blank&amp;nbsp;database.&lt;/p&gt;
+&lt;p&gt;Because of this, stack updates should always use the previous value for the &lt;code&gt;DBSnapshotIdentifier&lt;/code&gt; parameter; this can
+be done through the &lt;span class="caps"&gt;AWS&lt;/span&gt; Console, or using the &lt;code&gt;aws&lt;/code&gt; command line tools and a parameter like: &lt;code&gt;--parameters ParameterKey=DBSnapshotIdentifier,UsePreviousValue=true&lt;/code&gt;.&lt;/p&gt;
+&lt;h2 id="restoring-to-an-existing-stack"&gt;Restoring to an Existing&amp;nbsp;Stack&lt;/h2&gt;
+&lt;p&gt;Restoring a snapshot to an existing stack is a bit more nuanced. You can&amp;#8217;t restore a snapshot to an existing &lt;span class="caps"&gt;RDS&lt;/span&gt; instance,
+you can only restore to a new instance. If you do this through the &lt;span class="caps"&gt;AWS&lt;/span&gt; Console, you&amp;#8217;ll end up with an &lt;span class="caps"&gt;RDS&lt;/span&gt; instance disconnected
+from your CloudFormation stack. So the way to do this is more or less the same as restoring to a new stack - specify
+the &lt;code&gt;DBSnapshotIdentifier&lt;/code&gt; parameter for your template, and it will create a new &lt;span class="caps"&gt;RDS&lt;/span&gt; instance with the snapshot. The same
+rules about using previous values for the parameters hold true. If you used a stack policy to prevent updates to the &lt;span class="caps"&gt;RDS&lt;/span&gt;
+instance, you&amp;#8217;ll need to override that with a temporary policy when doing the&amp;nbsp;restore.&lt;/p&gt;
+&lt;p&gt;There are a few caveats to keep in mind with this procedure. The first, obviously, is that there may be some application downtime
+when the existing database is replaced with the new (restored) one, and any writes will obviously be lost. Also, this only
+works on &lt;span class="caps"&gt;RDS&lt;/span&gt; instances that were created with DBName or a &lt;strong&gt;different&lt;/strong&gt; snapshot. In order to restore the same snapshot to
+an &lt;span class="caps"&gt;RDS&lt;/span&gt; resource a second time, you need to first update with the &lt;code&gt;DBSnapshotIdentifier&lt;/code&gt; parameter removed and have the &lt;span class="caps"&gt;RDS&lt;/span&gt;
+instance re-created with an empty database, and then update again with the &lt;code&gt;DBSnapshotIdentifier&lt;/code&gt; in order to do the restore.
+This is because CloudFormation doesn&amp;#8217;t reconcile the current state of instances to determine which actions to take, it only diffs
+the updated template against the existing one. If the existing template and the updated one have the same value for the &lt;span class="caps"&gt;RDS&lt;/span&gt; instance&amp;#8217;s
+properties (specifically &lt;code&gt;DBSnapshotIdentifier&lt;/code&gt;), CloudFormation determines there are no changes, and does&amp;nbsp;nothing.&lt;/p&gt;
+&lt;h2 id="launchconfig-metadata-issues"&gt;LaunchConfig Metadata&amp;nbsp;Issues&lt;/h2&gt;
+&lt;p&gt;The &lt;span class="caps"&gt;EC2&lt;/span&gt; instances I&amp;#8217;m using for this project are &amp;#8220;baked&amp;#8221; AMIs (built with &lt;a href="https://packer.io/"&gt;packer.io&lt;/a&gt;) in an Auto-Scaling Group (&lt;span class="caps"&gt;ASG&lt;/span&gt;).
+They use a &lt;a href="http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-as-launchconfig.html"&gt;LaunchConfig&lt;/a&gt; to write
+out a file on disk with the database connection information for the application. In addition, my &lt;span class="caps"&gt;ASG&lt;/span&gt; has an &lt;a href="http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-attribute-updatepolicy.html"&gt;UpdatePolicy&lt;/a&gt;
+designed to perform rolling updates (termination and replacement) of &lt;span class="caps"&gt;EC2&lt;/span&gt; instances when their properties&amp;nbsp;change.&lt;/p&gt;
+&lt;p&gt;In my testing, I noticed a number of times where updates to the &lt;span class="caps"&gt;RDS&lt;/span&gt; resource that triggered creation of a new &lt;span class="caps"&gt;RDS&lt;/span&gt; instance - such as restoring from
+a snapshot in an existing stack, or changing the DBName - properly triggered an update of the LaunchConfig, but failed to trigger
+the rolling update of the &lt;span class="caps"&gt;EC2&lt;/span&gt; instances. This left the application in a state where one or more (sometimes all) of the &lt;span class="caps"&gt;EC2&lt;/span&gt;
+instances couldn&amp;#8217;t connect to the database, because the file written out by the LaunchConfig still contained the old &lt;span class="caps"&gt;DB&lt;/span&gt; connection
+information. For non-production stacks where the entire stack can be deleted and recreated instead of updating the &lt;span class="caps"&gt;RDS&lt;/span&gt; resource,
+this shouldn&amp;#8217;t be an issue. Otherwise, if changes are made that replace the &lt;span class="caps"&gt;RDS&lt;/span&gt; instance, I&amp;#8217;d recommend watching for the
+LaunchConfig update completion, and manually terminating instances (or increasing the size of the &lt;span class="caps"&gt;ASG&lt;/span&gt; to add instances)
+to ensure that the running &lt;span class="caps"&gt;EC2&lt;/span&gt; instances have the updated&amp;nbsp;LaunchConfig.&lt;/p&gt;
+&lt;p&gt;Another option would be to use the &lt;a href="http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/cfn-hup.html"&gt;cfn-hup daemon&lt;/a&gt; to
+listen for stack updates that cause changes in resource metadata, and perform the required actions without needing the rolling update
+to replace the&amp;nbsp;instances.&lt;/p&gt;
+&lt;h2 id="how-to-do-things-using-the-template-below"&gt;How to Do Things Using the Template&amp;nbsp;Below&lt;/h2&gt;
+&lt;p&gt;I&amp;#8217;m currently using the &lt;code&gt;aws&lt;/code&gt; command line tools to perform stack creation and updates,
+wrapped in a Rakefile (I plan on changing this to use &lt;a href="https://github.com/boto/boto"&gt;boto&lt;/a&gt;
+inside a &lt;a href="http://jenkins-ci.org/"&gt;Jenkins&lt;/a&gt; job). What follows is a quick high-level guide
+on how to accomplish various &lt;span class="caps"&gt;RDS&lt;/span&gt;-related tasks, using the template snippet&amp;nbsp;below.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;Build a new stack using a &lt;span class="caps"&gt;RDS&lt;/span&gt; snapshot and a stack policy to prevent updates&lt;/strong&gt;:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="nv"&gt;$ &lt;/span&gt;cat /tmp/stack_policy.json
+&lt;span class="o"&gt;{&lt;/span&gt;
+  &lt;span class="s2"&gt;&amp;quot;Statement&amp;quot;&lt;/span&gt; : &lt;span class="o"&gt;[&lt;/span&gt;
+    &lt;span class="o"&gt;{&lt;/span&gt;
+      &lt;span class="s2"&gt;&amp;quot;Effect&amp;quot;&lt;/span&gt; : &lt;span class="s2"&gt;&amp;quot;Deny&amp;quot;&lt;/span&gt;,
+      &lt;span class="s2"&gt;&amp;quot;Action&amp;quot;&lt;/span&gt; : &lt;span class="s2"&gt;&amp;quot;Update:*&amp;quot;&lt;/span&gt;,
+      &lt;span class="s2"&gt;&amp;quot;Principal&amp;quot;&lt;/span&gt;: &lt;span class="s2"&gt;&amp;quot;*&amp;quot;&lt;/span&gt;,
+      &lt;span class="s2"&gt;&amp;quot;Resource&amp;quot;&lt;/span&gt; : &lt;span class="s2"&gt;&amp;quot;LogicalResourceId/DBInstance&amp;quot;&lt;/span&gt;
+    &lt;span class="o"&gt;}&lt;/span&gt;,
+    &lt;span class="o"&gt;{&lt;/span&gt;
+      &lt;span class="s2"&gt;&amp;quot;Effect&amp;quot;&lt;/span&gt; : &lt;span class="s2"&gt;&amp;quot;Allow&amp;quot;&lt;/span&gt;,
+      &lt;span class="s2"&gt;&amp;quot;Action&amp;quot;&lt;/span&gt; : &lt;span class="s2"&gt;&amp;quot;Update:*&amp;quot;&lt;/span&gt;,
+      &lt;span class="s2"&gt;&amp;quot;Principal&amp;quot;&lt;/span&gt;: &lt;span class="s2"&gt;&amp;quot;*&amp;quot;&lt;/span&gt;,
+      &lt;span class="s2"&gt;&amp;quot;Resource&amp;quot;&lt;/span&gt; : &lt;span class="s2"&gt;&amp;quot;*&amp;quot;&lt;/span&gt;
+    &lt;span class="o"&gt;}&lt;/span&gt;
+  &lt;span class="o"&gt;]&lt;/span&gt;
+&lt;span class="o"&gt;}&lt;/span&gt;
+&lt;span class="nv"&gt;$ &lt;/span&gt;aws cloudformation create-stack --stack-name mystack --stack-policy-body file:///tmp/stack_policy.json --template-body file:///home/myuser/cloudformation_template.json --parameters &lt;span class="nv"&gt;ParameterKey&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;DBSnapshotIdentifier,ParameterValue&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;my-snapshot-identifier&amp;#39;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;Temporarily override stack policy to allow updates&lt;/strong&gt;:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;Create a file with the following contents (we&amp;#8217;ll assume it&amp;#8217;s at &lt;code&gt;/home/myuser/allow_all_updates.json&lt;/code&gt;):&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="p"&gt;{&lt;/span&gt;
+  &lt;span class="nt"&gt;&amp;quot;Statement&amp;quot;&lt;/span&gt; &lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;
+    &lt;span class="p"&gt;{&lt;/span&gt;
+      &lt;span class="nt"&gt;&amp;quot;Effect&amp;quot;&lt;/span&gt; &lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;Allow&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+      &lt;span class="nt"&gt;&amp;quot;Action&amp;quot;&lt;/span&gt; &lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;Update:*&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+      &lt;span class="nt"&gt;&amp;quot;Principal&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;*&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+      &lt;span class="nt"&gt;&amp;quot;Resource&amp;quot;&lt;/span&gt; &lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;*&amp;quot;&lt;/span&gt;
+    &lt;span class="p"&gt;}&lt;/span&gt;
+  &lt;span class="p"&gt;]&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;In the following &lt;code&gt;aws&lt;/code&gt; commands, append &lt;code&gt;--stack-policy-during-update-body file:///home/myuser/allow_all_updates.json&lt;/code&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;Update a stack (built using a &lt;span class="caps"&gt;RDS&lt;/span&gt; snapshot), without losing data&lt;/strong&gt;:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="nv"&gt;$ &lt;/span&gt;aws cloudformation update-stack --stack-name mystack --template-body file:///home/myuser/cloudformation_template.json --parameters &lt;span class="nv"&gt;ParameterKey&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;DBSnapshotIdentifier,UsePreviousValue&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nb"&gt;true&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;Load a &lt;span class="caps"&gt;RDS&lt;/span&gt; snapshot into an existing stack&lt;/strong&gt; (that isn&amp;#8217;t already using this&amp;nbsp;snapshot):&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="nv"&gt;$ &lt;/span&gt;aws cloudformation update-stack --stack-name mystack --template-body file:///home/myuser/cloudformation_template.json --parameters &lt;span class="nv"&gt;ParameterKey&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;DBSnapshotIdentifier,ParameterValue&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;my-snapshot-identifier&amp;#39;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;Load a &lt;span class="caps"&gt;RDS&lt;/span&gt; snapshot into an existing stack again&lt;/strong&gt; (i.e. restore from the same snapshot a second time; this one is a&amp;nbsp;kludge):&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="nv"&gt;$ &lt;/span&gt;&lt;span class="c"&gt;# re-create the &lt;span class="caps"&gt;RDS&lt;/span&gt; instance with a blank &lt;span class="caps"&gt;DB&lt;/span&gt; (DBName)&lt;/span&gt;
+&lt;span class="nv"&gt;$ &lt;/span&gt;aws cloudformation update-stack --stack-name mystack --template-body file:///home/myuser/cloudformation_template.json --parameters &lt;span class="nv"&gt;ParameterKey&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;DBSnapshotIdentifier,ParameterValue&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;&amp;#39;&lt;/span&gt;
+&lt;span class="nv"&gt;$ &lt;/span&gt;&lt;span class="c"&gt;# then load the snapshot again&lt;/span&gt;
+&lt;span class="nv"&gt;$ &lt;/span&gt;aws cloudformation update-stack --stack-name mystack --template-body file:///home/myuser/cloudformation_template.json --parameters &lt;span class="nv"&gt;ParameterKey&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;DBSnapshotIdentifier,ParameterValue&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;my-snapshot-identifier&amp;#39;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id="cloudformation-template-snippet"&gt;CloudFormation Template&amp;nbsp;Snippet&lt;/h2&gt;
+&lt;p&gt;This is by no means complete, but just includes the parameters, conditions, and resources which I make reference&amp;nbsp;to.&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="p"&gt;{&lt;/span&gt;
+  &lt;span class="nt"&gt;&amp;quot;Parameters&amp;quot;&lt;/span&gt; &lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="nt"&gt;&amp;quot;DBName&amp;quot;&lt;/span&gt; &lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+      &lt;span class="nt"&gt;&amp;quot;Default&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;wordpress&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+      &lt;span class="nt"&gt;&amp;quot;Description&amp;quot;&lt;/span&gt; &lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;The WordPress database name&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+      &lt;span class="nt"&gt;&amp;quot;Type&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;String&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+      &lt;span class="nt"&gt;&amp;quot;MinLength&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;1&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+      &lt;span class="nt"&gt;&amp;quot;MaxLength&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;64&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+      &lt;span class="nt"&gt;&amp;quot;AllowedPattern&amp;quot;&lt;/span&gt; &lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;[a-zA-Z][a-zA-Z0-9]*&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+      &lt;span class="nt"&gt;&amp;quot;ConstraintDescription&amp;quot;&lt;/span&gt; &lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;must begin with a letter and contain only alphanumeric characters.&amp;quot;&lt;/span&gt;
+    &lt;span class="p"&gt;},&lt;/span&gt;
+    &lt;span class="nt"&gt;&amp;quot;DBSnapshotIdentifier&amp;quot;&lt;/span&gt; &lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+      &lt;span class="nt"&gt;&amp;quot;Description&amp;quot;&lt;/span&gt; &lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot; The &lt;span class="caps"&gt;RDS&lt;/span&gt; MySQL snapshot name to restore to the new &lt;span class="caps"&gt;DB&lt;/span&gt; instance.&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+      &lt;span class="nt"&gt;&amp;quot;Type&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;String&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+      &lt;span class="nt"&gt;&amp;quot;Default&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;&amp;quot;&lt;/span&gt;
+    &lt;span class="p"&gt;},&lt;/span&gt;
+  &lt;span class="p"&gt;},&lt;/span&gt;
+
+  &lt;span class="nt"&gt;&amp;quot;Conditions&amp;quot;&lt;/span&gt; &lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="nt"&gt;&amp;quot;UseDbSnapshot&amp;quot;&lt;/span&gt; &lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+      &lt;span class="nt"&gt;&amp;quot;Fn::Not&amp;quot;&lt;/span&gt; &lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="p"&gt;[{&lt;/span&gt;
+        &lt;span class="nt"&gt;&amp;quot;Fn::Equals&amp;quot;&lt;/span&gt; &lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;
+          &lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="nt"&gt;&amp;quot;Ref&amp;quot;&lt;/span&gt; &lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;DBSnapshotIdentifier&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;},&lt;/span&gt;
+          &lt;span class="s2"&gt;&amp;quot;&amp;quot;&lt;/span&gt;
+        &lt;span class="p"&gt;]&lt;/span&gt;
+      &lt;span class="p"&gt;}]&lt;/span&gt;
+    &lt;span class="p"&gt;}&lt;/span&gt;
+  &lt;span class="p"&gt;},&lt;/span&gt;
+
+  &lt;span class="nt"&gt;&amp;quot;Resources&amp;quot;&lt;/span&gt; &lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="nt"&gt;&amp;quot;DBInstance&amp;quot;&lt;/span&gt; &lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+      &lt;span class="nt"&gt;&amp;quot;Type&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;&lt;span class="caps"&gt;AWS&lt;/span&gt;::&lt;span class="caps"&gt;RDS&lt;/span&gt;::DBInstance&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+      &lt;span class="nt"&gt;&amp;quot;Properties&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+        &lt;span class="nt"&gt;&amp;quot;DBName&amp;quot;&lt;/span&gt;            &lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+          &lt;span class="nt"&gt;&amp;quot;Fn::If&amp;quot;&lt;/span&gt; &lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;
+            &lt;span class="s2"&gt;&amp;quot;UseDbSnapshot&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+            &lt;span class="p"&gt;{&lt;/span&gt; &lt;span class="nt"&gt;&amp;quot;Ref&amp;quot;&lt;/span&gt; &lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;&lt;span class="caps"&gt;AWS&lt;/span&gt;::NoValue&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;},&lt;/span&gt;
+            &lt;span class="p"&gt;{&lt;/span&gt; &lt;span class="nt"&gt;&amp;quot;Ref&amp;quot;&lt;/span&gt; &lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;DBName&amp;quot;&lt;/span&gt; &lt;span class="p"&gt;}&lt;/span&gt;
+          &lt;span class="p"&gt;]&lt;/span&gt;
+        &lt;span class="p"&gt;},&lt;/span&gt;
+        &lt;span class="nt"&gt;&amp;quot;Engine&amp;quot;&lt;/span&gt;            &lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;MySQL&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+        &lt;span class="nt"&gt;&amp;quot;MasterUsername&amp;quot;&lt;/span&gt;    &lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt; &lt;span class="nt"&gt;&amp;quot;Ref&amp;quot;&lt;/span&gt; &lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;DBUsername&amp;quot;&lt;/span&gt; &lt;span class="p"&gt;},&lt;/span&gt;
+        &lt;span class="nt"&gt;&amp;quot;DBInstanceClass&amp;quot;&lt;/span&gt;   &lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt; &lt;span class="nt"&gt;&amp;quot;Ref&amp;quot;&lt;/span&gt; &lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;DBClass&amp;quot;&lt;/span&gt; &lt;span class="p"&gt;},&lt;/span&gt;
+        &lt;span class="nt"&gt;&amp;quot;DBSecurityGroups&amp;quot;&lt;/span&gt;  &lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="p"&gt;[{&lt;/span&gt; &lt;span class="nt"&gt;&amp;quot;Ref&amp;quot;&lt;/span&gt; &lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;DBSecurityGroup&amp;quot;&lt;/span&gt; &lt;span class="p"&gt;}],&lt;/span&gt;
+        &lt;span class="nt"&gt;&amp;quot;DBSubnetGroupName&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt; &lt;span class="nt"&gt;&amp;quot;Ref&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;DBSubnetGroup&amp;quot;&lt;/span&gt; &lt;span class="p"&gt;},&lt;/span&gt;
+        &lt;span class="nt"&gt;&amp;quot;AllocatedStorage&amp;quot;&lt;/span&gt;  &lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt; &lt;span class="nt"&gt;&amp;quot;Ref&amp;quot;&lt;/span&gt; &lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;DBAllocatedStorage&amp;quot;&lt;/span&gt; &lt;span class="p"&gt;},&lt;/span&gt;
+        &lt;span class="nt"&gt;&amp;quot;MasterUserPassword&amp;quot;&lt;/span&gt; &lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt; &lt;span class="nt"&gt;&amp;quot;Ref&amp;quot;&lt;/span&gt; &lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;DBPassword&amp;quot;&lt;/span&gt; &lt;span class="p"&gt;},&lt;/span&gt;
+        &lt;span class="nt"&gt;&amp;quot;DBSnapshotIdentifier&amp;quot;&lt;/span&gt; &lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+          &lt;span class="nt"&gt;&amp;quot;Fn::If&amp;quot;&lt;/span&gt; &lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;
+            &lt;span class="s2"&gt;&amp;quot;UseDbSnapshot&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+            &lt;span class="p"&gt;{&lt;/span&gt; &lt;span class="nt"&gt;&amp;quot;Ref&amp;quot;&lt;/span&gt; &lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;DBSnapshotIdentifier&amp;quot;&lt;/span&gt; &lt;span class="p"&gt;},&lt;/span&gt;
+            &lt;span class="p"&gt;{&lt;/span&gt; &lt;span class="nt"&gt;&amp;quot;Ref&amp;quot;&lt;/span&gt; &lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;&lt;span class="caps"&gt;AWS&lt;/span&gt;::NoValue&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;
+          &lt;span class="p"&gt;]&lt;/span&gt;
+        &lt;span class="p"&gt;},&lt;/span&gt;
+        &lt;span class="nt"&gt;&amp;quot;MultiAZ&amp;quot;&lt;/span&gt; &lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="kc"&gt;true&lt;/span&gt;
+      &lt;span class="p"&gt;},&lt;/span&gt;
+      &lt;span class="nt"&gt;&amp;quot;DeletionPolicy&amp;quot;&lt;/span&gt; &lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;Snapshot&amp;quot;&lt;/span&gt;
+    &lt;span class="p"&gt;},&lt;/span&gt;
+    &lt;span class="nt"&gt;&amp;quot;WebServerGroup&amp;quot;&lt;/span&gt; &lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+      &lt;span class="nt"&gt;&amp;quot;Type&amp;quot;&lt;/span&gt; &lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;&lt;span class="caps"&gt;AWS&lt;/span&gt;::AutoScaling::AutoScalingGroup&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+      &lt;span class="nt"&gt;&amp;quot;Properties&amp;quot;&lt;/span&gt; &lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+        &lt;span class="nt"&gt;&amp;quot;LaunchConfigurationName&amp;quot;&lt;/span&gt; &lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt; &lt;span class="nt"&gt;&amp;quot;Ref&amp;quot;&lt;/span&gt; &lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;LaunchConfig&amp;quot;&lt;/span&gt; &lt;span class="p"&gt;},&lt;/span&gt;
+      &lt;span class="p"&gt;},&lt;/span&gt;
+      &lt;span class="nt"&gt;&amp;quot;UpdatePolicy&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+        &lt;span class="nt"&gt;&amp;quot;AutoScalingRollingUpdate&amp;quot;&lt;/span&gt; &lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+          &lt;span class="nt"&gt;&amp;quot;MinInstancesInService&amp;quot;&lt;/span&gt; &lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;1&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+          &lt;span class="nt"&gt;&amp;quot;MaxBatchSize&amp;quot;&lt;/span&gt; &lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;1&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+          &lt;span class="nt"&gt;&amp;quot;WaitOnResourceSignals&amp;quot;&lt;/span&gt; &lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;true&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+          &lt;span class="nt"&gt;&amp;quot;PauseTime&amp;quot;&lt;/span&gt; &lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;&lt;span class="caps"&gt;PT10M&lt;/span&gt;&amp;quot;&lt;/span&gt;
+        &lt;span class="p"&gt;},&lt;/span&gt;
+        &lt;span class="nt"&gt;&amp;quot;AutoScalingScheduledAction&amp;quot;&lt;/span&gt; &lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+          &lt;span class="nt"&gt;&amp;quot;IgnoreUnmodifiedGroupSizeProperties&amp;quot;&lt;/span&gt; &lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="kc"&gt;true&lt;/span&gt;
+        &lt;span class="p"&gt;}&lt;/span&gt;
+      &lt;span class="p"&gt;},&lt;/span&gt;
+      &lt;span class="nt"&gt;&amp;quot;CreationPolicy&amp;quot;&lt;/span&gt; &lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+        &lt;span class="nt"&gt;&amp;quot;ResourceSignal&amp;quot;&lt;/span&gt; &lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+          &lt;span class="nt"&gt;&amp;quot;Timeout&amp;quot;&lt;/span&gt; &lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;&lt;span class="caps"&gt;PT10M&lt;/span&gt;&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+          &lt;span class="nt"&gt;&amp;quot;Count&amp;quot;&lt;/span&gt; &lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;2&amp;quot;&lt;/span&gt;
+        &lt;span class="p"&gt;}&lt;/span&gt;
+      &lt;span class="p"&gt;}&lt;/span&gt;
+    &lt;span class="p"&gt;},&lt;/span&gt;
+    &lt;span class="nt"&gt;&amp;quot;LaunchConfig&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+      &lt;span class="nt"&gt;&amp;quot;Type&amp;quot;&lt;/span&gt; &lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;&lt;span class="caps"&gt;AWS&lt;/span&gt;::AutoScaling::LaunchConfiguration&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+      &lt;span class="nt"&gt;&amp;quot;Metadata&amp;quot;&lt;/span&gt; &lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+        &lt;span class="nt"&gt;&amp;quot;&lt;span class="caps"&gt;AWS&lt;/span&gt;::CloudFormation::Init&amp;quot;&lt;/span&gt; &lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+          &lt;span class="nt"&gt;&amp;quot;config&amp;quot;&lt;/span&gt; &lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+            &lt;span class="nt"&gt;&amp;quot;files&amp;quot;&lt;/span&gt; &lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+              &lt;span class="nt"&gt;&amp;quot;/opt/wordpress/cloudformation_db.php&amp;quot;&lt;/span&gt; &lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+                &lt;span class="nt"&gt;&amp;quot;content&amp;quot;&lt;/span&gt; &lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt; &lt;span class="nt"&gt;&amp;quot;Fn::Join&amp;quot;&lt;/span&gt; &lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;
+                  &lt;span class="s2"&gt;&amp;quot;&amp;lt;?php\n&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+                  &lt;span class="s2"&gt;&amp;quot;define(&amp;#39;DB_NAME&amp;#39;,          &amp;#39;&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="nt"&gt;&amp;quot;Ref&amp;quot;&lt;/span&gt; &lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;DBName&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;},&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;&amp;#39;);\n&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+                  &lt;span class="s2"&gt;&amp;quot;define(&amp;#39;DB_USER&amp;#39;,          &amp;#39;&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="nt"&gt;&amp;quot;Ref&amp;quot;&lt;/span&gt; &lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;DBUsername&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;},&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;&amp;#39;);\n&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+                  &lt;span class="s2"&gt;&amp;quot;define(&amp;#39;DB_PASSWORD&amp;#39;,      &amp;#39;&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="nt"&gt;&amp;quot;Ref&amp;quot;&lt;/span&gt; &lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;DBPassword&amp;quot;&lt;/span&gt; &lt;span class="p"&gt;},&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;&amp;#39;);\n&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+                  &lt;span class="s2"&gt;&amp;quot;define(&amp;#39;DB_HOST&amp;#39;,          &amp;#39;&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="nt"&gt;&amp;quot;Fn::GetAtt&amp;quot;&lt;/span&gt; &lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;DBInstance&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;Endpoint.Address&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;]},&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&amp;#39;);\n&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+                &lt;span class="p"&gt;]]&lt;/span&gt; &lt;span class="p"&gt;},&lt;/span&gt;
+              &lt;span class="p"&gt;}&lt;/span&gt;
+            &lt;span class="p"&gt;}&lt;/span&gt;
+          &lt;span class="p"&gt;}&lt;/span&gt;
+        &lt;span class="p"&gt;}&lt;/span&gt;
+      &lt;span class="p"&gt;}&lt;/span&gt;
+    &lt;span class="p"&gt;}&lt;/span&gt;
+  &lt;span class="p"&gt;}&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;</summary><category term="aws"></category><category term="cloudformation"></category><category term="rds"></category><category term="mysql"></category><category term="snapshot"></category></entry><entry><title>Watching Jenkins Jobs and CloudFormation Updates with Pushover Notification</title><link href="http://blog.jasonantman.com/2014/12/watching-jenkins-jobs-and-cloudformation-updates-with-pushover-notification/" rel="alternate"></link><updated>2014-12-14T19:22:00-05:00</updated><author><name>Jason Antman</name></author><id>tag:blog.jasonantman.com,2014-12-14:2014/12/watching-jenkins-jobs-and-cloudformation-updates-with-pushover-notification/</id><summary type="html">&lt;p&gt;A few months ago I &lt;a href="http://blog.jasonantman.com/2014/09/pushover-notifications-for-shell-command-completion-and-status/"&gt;posted&lt;/a&gt;
 about a script I wrote to send &lt;a href="https://pushover.net/"&gt;Pushover&lt;/a&gt; notifications for shell command&amp;nbsp;completion.&lt;/p&gt;
 &lt;p&gt;I&amp;#8217;ve been doing quite a bit of work lately both with testing some &lt;a href="http://jenkins-ci.org/"&gt;Jenkins&lt;/a&gt; jobs, and spinning up
 &lt;span class="caps"&gt;AWS&lt;/span&gt; stacks using &lt;a href="https://aws.amazon.com/cloudformation/"&gt;CloudFormation&lt;/a&gt;. Last week I wrote two python scripts to aid in&amp;nbsp;this.&lt;/p&gt;
@@ -3373,69 +3660,4 @@ You can also strip off the uniq command, and see the list sorted by&amp;nbsp;md5
 &lt;p&gt;A &lt;span class="caps"&gt;GUI&lt;/span&gt; alternative would be to use
 &lt;a href="http://www.pixelbeat.org/fslint/"&gt;fslint&lt;/a&gt;, which is a graphical tool
 that can (among other things) display a list of the duplicate files
-within a path or set of&amp;nbsp;paths.&lt;/p&gt;</summary><category term="compare"></category><category term="diff"></category></entry><entry><title>Dear Mom and Dad - or, a book about what I actually do</title><link href="http://blog.jasonantman.com/2012/08/dear-mom-and-dad-or-a-book-about-what-i-actually-do/" rel="alternate"></link><updated>2012-08-05T08:52:00-04:00</updated><author><name>admin</name></author><id>tag:blog.jasonantman.com,2012-08-05:2012/08/dear-mom-and-dad-or-a-book-about-what-i-actually-do/</id><summary type="html">&lt;p&gt;I&amp;#8217;ve followed &lt;a href="http://everythingsysadmin.com/"&gt;Tom Limoncelli&amp;#8217;s blog&lt;/a&gt;
-for quite a while; his books &lt;a href="http://everythingsysadmin.com/aboutbook.html"&gt;The Practice of System and Network
-Administration&lt;/a&gt; and &lt;a href="http://www.tomontime.com/"&gt;Time
-Management for System Administrators&lt;/a&gt; were
-infinitely helpful in the early days of my professional life, and are
-among the few (literally, 4 or 5) books that live on my desk. His
-insight and information into the soft skills of &lt;span class="caps"&gt;SA&lt;/span&gt; work - time
-management, hiring, working in teams, etc. - is not only excellent, but
-also all too rare in a largely technical&amp;nbsp;field.&lt;/p&gt;
-&lt;p&gt;Anyway, Tom posted the below article to his blog about a book that
-recently came out, &lt;a href="http://www.amazon.com/dp/0195374126/tomontime-20"&gt;&amp;#8220;Taming Information Technology: Lessons from Studies
-of System Administrators&amp;#8221; by Eser Kandogan, Paul Maglio, Eben Haber and
-John Bailey&lt;/a&gt;. I
-haven&amp;#8217;t read the book yet, and at $56, it&amp;#8217;s going to be a while before
-my book budget recovers enough to justify it. But going on what I&amp;#8217;ve
-read from Tom and others, I want it. Not only do I want to read it, but
-I want to pass it around to my parents and in-laws and everyone else who
-has asked what I do for a living, and I found myself at a loss for a
-less-than-6-hour-long explanation. So, here&amp;#8217;s what Tom wrote on&amp;nbsp;it:&lt;/p&gt;
-&lt;blockquote&gt;
-&lt;p&gt;Dear Mom And&amp;nbsp;Dad,&lt;/p&gt;
-&lt;p&gt;Many times I&amp;#8217;ve tried to explain to you what I do for a living.
-&amp;#8220;Computer system administrator&amp;#8221; or &amp;#8220;sysadmin&amp;#8221; is a career that is
-difficult to explain and I&amp;#8217;m sure my attempts have left you even more
-confused. I have good news. Oxford University Press has just published
-a book by 4 scientists who video taped sysadmins doing their job,
-analysed what they do, and explains it to the non-computer person.
-They do it by telling compelling stories of sysadmins at work plus
-they give interesting analysis with great&amp;nbsp;insight.&lt;/p&gt;
-&lt;p&gt;Why did they do this? Because businesses depend on technology more and
-more and that means they depend on sysadmins more and more. Yet most
-CEOs don&amp;#8217;t understand what we do. The scientists made some interesting
-discoveries: that our jobs are high-stress, high-risk, and highly
-collaborative. We invent our own tools, often on the spot, to solve
-complex problems. We are men and women of every age group. It is a
-career unlike any other. These are things that most people don&amp;#8217;t know
-about our profession. The book is very engaging: Some of the chapters
-read like the opening scene of &amp;#8220;Indiana Jones&amp;#8221;; others like &amp;#8220;Gorillas
-in the Mist.&amp;#8221; Kandogan, Maglio, Haber and Bailey have put together a
-very serious, scientific book with care and&amp;nbsp;compassion.&lt;/p&gt;
-&lt;p&gt;I&amp;#8217;m not one of the sysadmins they studied but every story they tell
-reminds me of real experiences I have&amp;nbsp;had.&lt;/p&gt;
-&lt;p&gt;I hope you enjoy reading this book. I know I&amp;nbsp;did.&lt;/p&gt;
-&lt;p&gt;Pre-order it here:
-&lt;a href="http://www.amazon.com/dp/0195374126/tomontime-20"&gt;http://www.amazon.com/dp/0195374126/tomontime-20&lt;/a&gt;&lt;/p&gt;
-&lt;p&gt;Sincerely your son,&lt;br /&gt;&amp;nbsp;Tom&lt;/p&gt;
-&lt;p&gt;&lt;span class="caps"&gt;P.S.&lt;/span&gt; In all seriousness, I read a preview copy of this book and highly
-recommend it to others. You may have seen the authors speak at Usenix
-&lt;span class="caps"&gt;LISA&lt;/span&gt; or &lt;span class="caps"&gt;LOPSA&lt;/span&gt; &lt;span class="caps"&gt;PICC&lt;/span&gt; conferences where they showed clips of the video
-tapes they made. The book conveys the same stories, plus many more,
-with interesting analysis. If you think that the profession of system
-administration would benefit from non-sysadmins better understanding
-what we do, I highly recommend you pre-order this book and share it.
-You can pre-order it here: &lt;a href="http://www.amazon.com/dp/0195374126/tomontime-20"&gt;&amp;#8220;Taming Information Technology: Lessons
-from Studies of System Administrators&amp;#8221; by Eser Kandogan, Paul Maglio,
-Eben Haber and John&amp;nbsp;Bailey&lt;/a&gt;&lt;/p&gt;
-&lt;p&gt;More about the book here:
-&lt;a href="http://everythingsysadmin.com/2012/07/kandogan.html"&gt;http://everythingsysadmin.com/2012/07/kandogan.html&lt;/a&gt;&lt;/p&gt;
-&lt;/blockquote&gt;
-&lt;p&gt;If you have any interest, I encourage you to go out and buy the book. If
-you know someone who&amp;#8217;s an &lt;span class="caps"&gt;SA&lt;/span&gt;, you should buy them the book. If you can
-justify any sort of book budget at work, you should buy the book. And
-while you&amp;#8217;re at it, if you haven&amp;#8217;t read Tom&amp;#8217;s other books, you should
-buy those too. You might be in the unfortunate position - like I am - of
-probably never being able to implement most of his suggestions at work,
-but at least you&amp;#8217;ll be aware of&amp;nbsp;them&amp;#8230;&lt;/p&gt;</summary><category term="books"></category><category term="limoncelli"></category><category term="sysadmin"></category></entry></feed>
+within a path or set of&amp;nbsp;paths.&lt;/p&gt;</summary><category term="compare"></category><category term="diff"></category></entry></feed>
