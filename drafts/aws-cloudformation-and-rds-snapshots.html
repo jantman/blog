@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:og="http://ogp.me/ns#"
+      xmlns:fb="https://www.facebook.com/2008/fbml">
+<head>
+    <title>AWS CloudFormation and RDS Snapshots</title>
+    <!-- Using the latest rendering mode for IE -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Open Graph tags -->
+
+    <!-- Bootstrap -->
+        <link rel="stylesheet" href="http://blog.jasonantman.com/theme/css/bootstrap.flatly.min.css" type="text/css"/>
+    <link href="http://blog.jasonantman.com/theme/css/font-awesome.min.css" rel="stylesheet">
+    <link href="http://blog.jasonantman.com/theme/css/pygments.css" rel="stylesheet">
+        <link href="http://blog.jasonantman.com/theme/css/typogrify.css" rel="stylesheet">
+    <link rel="stylesheet" href="http://blog.jasonantman.com/theme/css/style.css" type="text/css"/>
+    <!-- JavaScript plugins (requires jQuery) -->
+    <script src="http://code.jquery.com/jquery.js"></script>
+
+    <link rel="stylesheet" href="http://blog.jasonantman.com/theme/css/forkongithub.min.css" type="text/css" />
+
+        <link href="http://blog.jasonantman.com/feeds/all.atom.xml" type="application/atom+xml" rel="alternate"
+              title="Jason Antman's Blog ATOM Feed"/>
+        <link href="http://blog.jasonantman.com/feeds/all.rss.xml" type="application/atom+xml" rel="alternate"
+              title="Jason Antman's Blog RSS Feed"/>
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-2718127-2', 'jasonantman.com');
+  ga('send', 'pageview');
+
+</script>
+</head>
+<body>
+<span id="forkongithub"><a href="https://github.com/jantman/blog">Fork me on GitHub</a></span><nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="http://blog.jasonantman.com" class="navbar-brand">Jason Antman's Blog</a>
+        </div>
+        <div class="collapse navbar-collapse navbar-ex1-collapse">
+            <ul class="nav navbar-nav">
+                         <li><a href="http://blog.jasonantman.com/pages/about.html">
+                             About
+                          </a></li>
+                        <li >
+                            <a href="http://blog.jasonantman.com/categories/ideas-and-rants/index.html">Ideas and rants</a>
+                        </li>
+                        <li >
+                            <a href="http://blog.jasonantman.com/categories/miscellaneous/index.html">Miscellaneous</a>
+                        </li>
+                        <li >
+                            <a href="http://blog.jasonantman.com/categories/monitoring/index.html">Monitoring</a>
+                        </li>
+                        <li >
+                            <a href="http://blog.jasonantman.com/categories/ops/index.html">Ops</a>
+                        </li>
+                        <li >
+                            <a href="http://blog.jasonantman.com/categories/projects/index.html">Projects</a>
+                        </li>
+                        <li >
+                            <a href="http://blog.jasonantman.com/categories/puppet/index.html">Puppet</a>
+                        </li>
+                        <li class="active">
+                            <a href="http://blog.jasonantman.com/categories/tech-howtos/index.html">Tech howtos</a>
+                        </li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="http://blog.jasonantman.com/archives.html"><i class="icon-th-list"></i>Archives</a></li>
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+</nav>
+<!-- /.navbar -->
+<div class="container">
+    <div class="row">
+        <div class="col-lg-9">
+    <section id="content">
+        <article>
+            <header class="page-header">
+                <h1>
+                    <a href="http://blog.jasonantman.com/2014/12/aws-cloudformation-and-rds-snapshots/"
+                       rel="bookmark"
+                       title="Permalink to AWS CloudFormation and RDS Snapshots">
+                        <span class="caps">AWS</span> CloudFormation and <span class="caps">RDS</span>&nbsp;Snapshots
+                    </a>
+                </h1>
+<a href="http://twitter.com/share" class="twitter-share-button" data-count="horizontal" data-via="j_antman">Tweet</a><script type="text/javascript" src="http://platform.twitter.com/widgets.js"></script>
+            </header>
+            <div class="entry-content">
+                <div class="panel">
+                    <div class="panel-body">
+<footer class="post-info">
+    <span class="label label-default">Date</span>
+    <span class="published">
+        <i class="icon-calendar"></i>Mon 15 December 2014
+    </span>
+
+
+
+<span class="label label-default">Tags</span>
+	<a href="http://blog.jasonantman.com/tags/aws/index.html">aws</a>
+        /
+	<a href="http://blog.jasonantman.com/tags/cloudformation/index.html">cloudformation</a>
+        /
+	<a href="http://blog.jasonantman.com/tags/rds/index.html">rds</a>
+        /
+	<a href="http://blog.jasonantman.com/tags/mysql/index.html">mysql</a>
+        /
+	<a href="http://blog.jasonantman.com/tags/snapshot/index.html">snapshot</a>
+</footer><!-- /.post-info -->                    </div>
+                </div>
+                <p>For the past few weeks, I&#8217;ve been working on spinning up a WordPress stack on Amazon <span class="caps">AWS</span>. It&#8217;s intended to be a production application,
+so it uses Multi-<span class="caps">AZ</span> and a few other tricks to try to achieve relatively high fault tolerance (nothing insane, still in one region). It uses
+<span class="caps">AWS</span>&#8217;s <a href="https://aws.amazon.com/rds/"><span class="caps">RDS</span></a> hosted MySQL service for the database, and the stacks are created with <a href="https://aws.amazon.com/cloudformation/">CloudFormation</a>.
+Using CloudFormation has been an utterly wonderful experience and being able to spin up an entire stack - multiple autoscaling web server
+instances, a database, memcache, etc. with the click of a button in ~20 minutes - is as close to operations nirvana as I&#8217;ve ever&nbsp;gotten.</p>
+<p>One of the last steps for me was to work on database backups and restoration; both restoring the production application&#8217;s database to a
+previous snapshot, and restoring a production database snapshot to a test or development stack. This took a few days of testing, and I
+wasn&#8217;t able to find much complete information on the nuances of it; there are also some pieces that are not intuitive and (<span class="caps">IMO</span>) not
+documented well enough in the <span class="caps">AWS</span> docs. In short, it&#8217;s horribly easy to blow away your entire database. So, I&#8217;m going to attempt to document
+some of what I learned, in the hope that it will benefit&nbsp;others.</p>
+<p>At the bottom of this post I&#8217;ve included some snippets from my CloudFormation template, which I make reference to. It&#8217;s probably worth looking
+through that, as I make reference to some of the names used in it. Also, to make sense of this, you should be familiar with the nomenclature used by CloudFormation,
+such as the <a href="http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/template-anatomy.html">template anatomy</a> and the difference between
+parameters and properties, and resources and&nbsp;instances.</p>
+<p><strong>Note:</strong> I&#8217;m writing this in mid-December 2014. I&#8217;ll make every effort to keep this updated as I continue working with <span class="caps">AWS</span>, but it&#8217;s possible
+that some of the problems described herein will be fixed by <span class="caps">AWS</span> in the&nbsp;future.</p>
+<h2 id="deletionpolicy-snapshot">DeletionPolicy&nbsp;Snapshot</h2>
+<p>CloudFormation resources support a <a href="http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-attribute-deletionpolicy.html">DeletionPolicy</a>
+attribute that says what to do to a resource when deleted. For <span class="caps">RDS</span> instances, &#8220;Snapshot&#8221; is an option, which takes a manual snapshot when the resource
+is deleted (manual snapshots, unlike the automated daily ones, live on even after the instance is deleted). Be warned, this only takes effect when you
+delete the <strong>entire stack</strong>. If you make a change to one of the <a href="http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-rds-database-instance.html">DBInstance properties</a>
+that requires a <a href="http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks.html#update-replacement">resource replacement</a> to
+take effect, the <span class="caps">RDS</span> instance will be replaced with a new one, and all of the data and automatic snapshots from the old one will be deleted.
+That last part deserves repeating: automatic snapshots (the daily ones created by <span class="caps">RDS</span>) are tied to the instance; if the instance is replaced
+by CloudFormation, you lose all automatic (backup) snapshots with&nbsp;it.</p>
+<h2 id="stack-policy-to-prevent-updates">Stack Policy to Prevent&nbsp;Updates</h2>
+<p>To prevent <span class="caps">RDS</span> data loss from accidentally changing a property of the instance, it&#8217;s wise to add a
+<a href="http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/protect-stack-resources.html">stack policy to prevent updates to <span class="caps">RDS</span> resources</a>.
+This will prevent CloudFormation from making any changes to the <span class="caps">RDS</span> instance at all. Once the stack policy
+is in place, in order to make changes to the <span class="caps">RDS</span> instance you would either need to set a temporary stack policy
+to allow the update (see the &#8220;Updating Protected Resources&#8221; section of the <a href="http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/protect-stack-resources.html">stack policy documentation</a>)
+or simply delete and re-create the stack (the recommended method, if it&#8217;s feasible for&nbsp;you).</p>
+<p>Setting a proper stack policy should prevent many of the pitfalls I describe below; however, for completeness,
+I&#8217;ve described how <span class="caps">RDS</span> resources behave currently without a stack policy protecting them. The
+<a href="http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-rds-database-instance.html"><span class="caps">AWS</span>::<span class="caps">RDS</span>::DBInstance resource documentation</a>
+describes which properties can be updated in-place (&#8220;Update requires: No interruption&#8221; or &#8220;some interruptions&#8221;)
+and which trigger complete replacement of the <span class="caps">RDS</span> instance (&#8220;Update requires:&nbsp;replacement&#8221;).</p>
+<p>When you try to update a protected resource through the <code>aws</code> <span class="caps">CLI</span> tools, the update will appear to have worked, but the event
+log on the stack will show the update denied and the update will be rolled&nbsp;back.</p>
+<h2 id="restoring-snapshots-and-dbname">Restoring Snapshots and&nbsp;DBName</h2>
+<p>The DBSnapshotIdentifier property on a MySQL <span class="caps">RDS</span> instance specifies a <span class="caps">RDS</span> snapshot to restore into the instance. The DBName
+property will create a new <span class="caps">RDS</span> instance with a single blank database of that name. This bears repeating again; if the DBName
+property ever changes, your <span class="caps">RDS</span> instance will be replaced with one with a new, blank database of that name.
+When creating a MySQL <span class="caps">RDS</span> instance, you can specify either the <code>DBName</code> or <code>DBSnapshotIdentifier</code> property, but not both;
+if you attempt to specify both, you&#8217;ll get an error, &#8220;DBName must be null when Restoring for this&nbsp;Engine.&#8221;</p>
+<p>If you want to restore a snapshot to a new <span class="caps">RDS</span> instance, you&#8217;ll need to ensure that <code>DBName</code> is null (either not specified at all, or the special <code>AWS::NoValue</code>
+<a href="http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/pseudo-parameter-reference.html">pseudo parameter</a>). In order
+to do this automatically (and since NoValue/null can&#8217;t be passed in as a template parameter), in the template snippet below I&#8217;ve defined a
+<code>UseDbSnapshot</code> <a href="http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/conditions-section-structure.html">condition</a>
+that evaluates to true if the <code>DBSnapshotIdentifier</code> parameter is not empty. In my <code>RDS::DBInstance</code> resource,
+I conditionally set (using <a href="http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/intrinsic-function-reference-conditions.html#d0e42982"><code>Fn::If</code></a>)
+the <code>DBSnapshotIdentifier</code> and <code>DBName</code> properties depending on the value of <code>UseDbSnapshot</code>. The end result is that if the
+<code>DBSnapshotIdentifier</code> parameter is not empty, it is passed in as the <code>DBSnapshotIdentifier</code> property of the resource and
+the <code>DBName</code> property is set to <code>AWS::NoValue</code>. Otherwise, the <code>DBSnapshotIdentifier</code> property is set to <code>AWS::NoValue</code>
+and the <code>DBName</code> parameter is passed in to the corresponding property on the resource (indicating to create a new blank database
+of that&nbsp;name).</p>
+<p>To explain this a bit more, CloudFormation seems to have no introspection into <span class="caps">RDS</span> instances. The <code>DBName</code> parameter
+exists only in CloudFormation itself, and is only evaluated as a diff from the previous template; if it changes,
+CloudFormation spins up a completely new <span class="caps">RDS</span> instance with a single blank database of that name. Whether or not
+the value of <code>DBName</code> matches the database currently in the <span class="caps">RDS</span> instance (say, restored from a snapshot)
+is not known by CloudFormation. In short, if you create an <span class="caps">RDS</span> instance from a snapshot of a &#8220;foo&#8221; database
+and then change the template to have a <code>DBName</code> of &#8220;foo&#8221;, CloudFormation will spin up a new <span class="caps">RDS</span> instance
+with an empty &#8220;foo&#8221;&nbsp;database.</p>
+<h2 id="restoring-to-a-new-stack">Restoring to a New&nbsp;Stack</h2>
+<p>When restoring to a new stack (stack creation), specify the <code>DBSnapshotIdentifier</code> and make sure <code>DBName</code> is set
+to <code>AWS::NoValue</code> per the previous paragraph (condition in the template). Note that for the life of the stack, you
+must continue specifying these parameters (or the &#8220;use previous value&#8221; option for them). Using my example template
+below, if you restored into a new stack using the <code>DBSnapshotIdentifier</code> parameter and then later updated the stack
+and omitted that parameter (which, because of the condition, would set it to <code>NoValue</code> and set the <code>DBName</code> parameter
+to its default value) the <span class="caps">RDS</span> instance would be replaced with a new one with a blank&nbsp;database.</p>
+<p>Because of this, stack updates should always use the previous value for the <code>DBSnapshotIdentifier</code> parameter; this can
+be done through the <span class="caps">AWS</span> Console, or using the <code>aws</code> command line tools and a parameter like: <code>--parameters ParameterKey=DBSnapshotIdentifier,UsePreviousValue=true</code>.</p>
+<h2 id="restoring-to-an-existing-stack">Restoring to an Existing&nbsp;Stack</h2>
+<p>Restoring a snapshot to an existing stack is a bit more nuanced. You can&#8217;t restore a snapshot to an existing <span class="caps">RDS</span> instance,
+you can only restore to a new instance. If you do this through the <span class="caps">AWS</span> Console, you&#8217;ll end up with an <span class="caps">RDS</span> instance disconnected
+from your CloudFormation stack. So the way to do this is more or less the same as restoring to a new stack - specify
+the <code>DBSnapshotIdentifier</code> parameter for your template, and it will create a new <span class="caps">RDS</span> instance with the snapshot. The same
+rules about using previous values for the parameters hold true. If you used a stack policy to prevent updates to the <span class="caps">RDS</span>
+instance, you&#8217;ll need to override that with a temporary policy when doing the&nbsp;restore.</p>
+<p>There are a few caveats to keep in mind with this procedure. The first, obviously, is that there may be some application downtime
+when the existing database is replaced with the new (restored) one, and any writes will obviously be lost. Also, this only
+works on <span class="caps">RDS</span> instances that were created with DBName or a <strong>different</strong> snapshot. In order to restore the same snapshot to
+an <span class="caps">RDS</span> resource a second time, you need to first update with the <code>DBSnapshotIdentifier</code> parameter removed and have the <span class="caps">RDS</span>
+instance re-created with an empty database, and then update again with the <code>DBSnapshotIdentifier</code> in order to do the restore.
+This is because CloudFormation doesn&#8217;t reconcile the current state of instances to determine which actions to take, it only diffs
+the updated template against the existing one. If the existing template and the updated one have the same value for the <span class="caps">RDS</span> instance&#8217;s
+properties (specifically <code>DBSnapshotIdentifier</code>), CloudFormation determines there are no changes, and does&nbsp;nothing.</p>
+<h2 id="launchconfig-metadata-issues">LaunchConfig Metadata&nbsp;Issues</h2>
+<p>The <span class="caps">EC2</span> instances I&#8217;m using for this project are &#8220;baked&#8221; AMIs (built with <a href="https://packer.io/">packer.io</a>) in an Auto-Scaling Group (<span class="caps">ASG</span>).
+They use a <a href="http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-as-launchconfig.html">LaunchConfig</a> to write
+out a file on disk with the database connection information for the application. In addition, my <span class="caps">ASG</span> has an <a href="http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-attribute-updatepolicy.html">UpdatePolicy</a>
+designed to perform rolling updates (termination and replacement) of <span class="caps">EC2</span> instances when their properties&nbsp;change.</p>
+<p>In my testing, I noticed a number of times where updates to the <span class="caps">RDS</span> resource that triggered creation of a new <span class="caps">RDS</span> instance - such as restoring from
+a snapshot in an existing stack, or changing the DBName - properly triggered an update of the LaunchConfig, but failed to trigger
+the rolling update of the <span class="caps">EC2</span> instances. This left the application in a state where one or more (sometimes all) of the <span class="caps">EC2</span>
+instances couldn&#8217;t connect to the database, because the file written out by the LaunchConfig still contained the old <span class="caps">DB</span> connection
+information. For non-production stacks where the entire stack can be deleted and recreated instead of updating the <span class="caps">RDS</span> resource,
+this shouldn&#8217;t be an issue. Otherwise, if changes are made that replace the <span class="caps">RDS</span> instance, I&#8217;d recommend watching for the
+LaunchConfig update completion, and manually terminating instances (or increasing the size of the <span class="caps">ASG</span> to add instances)
+to ensure that the running <span class="caps">EC2</span> instances have the updated&nbsp;LaunchConfig.</p>
+<p>Another option would be to use the <a href="http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/cfn-hup.html">cfn-hup daemon</a> to
+listen for stack updates that cause changes in resource metadata, and perform the required actions without needing the rolling update
+to replace the&nbsp;instances.</p>
+<h2 id="how-to-do-things-using-the-template-below">How to Do Things Using the Template&nbsp;Below</h2>
+<p>I&#8217;m currently using the <code>aws</code> command line tools to perform stack creation and updates,
+wrapped in a Rakefile (I plan on changing this to use <a href="https://github.com/boto/boto">boto</a>
+inside a <a href="http://jenkins-ci.org/">Jenkins</a> job). What follows is a quick high-level guide
+on how to accomplish various <span class="caps">RDS</span>-related tasks, using the template snippet&nbsp;below.</p>
+<ul>
+<li>
+<p><strong>Build a new stack using a <span class="caps">RDS</span> snapshot and a stack policy to prevent updates</strong>:</p>
+<div class="codehilite"><pre><span class="nv">$ </span>cat /tmp/stack_policy.json
+<span class="o">{</span>
+  <span class="s2">&quot;Statement&quot;</span> : <span class="o">[</span>
+    <span class="o">{</span>
+      <span class="s2">&quot;Effect&quot;</span> : <span class="s2">&quot;Deny&quot;</span>,
+      <span class="s2">&quot;Action&quot;</span> : <span class="s2">&quot;Update:*&quot;</span>,
+      <span class="s2">&quot;Principal&quot;</span>: <span class="s2">&quot;*&quot;</span>,
+      <span class="s2">&quot;Resource&quot;</span> : <span class="s2">&quot;LogicalResourceId/DBInstance&quot;</span>
+    <span class="o">}</span>,
+    <span class="o">{</span>
+      <span class="s2">&quot;Effect&quot;</span> : <span class="s2">&quot;Allow&quot;</span>,
+      <span class="s2">&quot;Action&quot;</span> : <span class="s2">&quot;Update:*&quot;</span>,
+      <span class="s2">&quot;Principal&quot;</span>: <span class="s2">&quot;*&quot;</span>,
+      <span class="s2">&quot;Resource&quot;</span> : <span class="s2">&quot;*&quot;</span>
+    <span class="o">}</span>
+  <span class="o">]</span>
+<span class="o">}</span>
+<span class="nv">$ </span>aws cloudformation create-stack --stack-name mystack --stack-policy-body file:///tmp/stack_policy.json --template-body file:///home/myuser/cloudformation_template.json --parameters <span class="nv">ParameterKey</span><span class="o">=</span>DBSnapshotIdentifier,ParameterValue<span class="o">=</span><span class="s1">&#39;my-snapshot-identifier&#39;</span>
+</pre></div>
+
+
+</li>
+<li>
+<p><strong>Temporarily override stack policy to allow updates</strong>:</p>
+<ol>
+<li>
+<p>Create a file with the following contents (we&#8217;ll assume it&#8217;s at <code>/home/myuser/allow_all_updates.json</code>):</p>
+<div class="codehilite"><pre><span class="p">{</span>
+  <span class="nt">&quot;Statement&quot;</span> <span class="p">:</span> <span class="p">[</span>
+    <span class="p">{</span>
+      <span class="nt">&quot;Effect&quot;</span> <span class="p">:</span> <span class="s2">&quot;Allow&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;Action&quot;</span> <span class="p">:</span> <span class="s2">&quot;Update:*&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;Principal&quot;</span><span class="p">:</span> <span class="s2">&quot;*&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;Resource&quot;</span> <span class="p">:</span> <span class="s2">&quot;*&quot;</span>
+    <span class="p">}</span>
+  <span class="p">]</span>
+<span class="p">}</span>
+</pre></div>
+
+
+</li>
+<li>
+<p>In the following <code>aws</code> commands, append <code>--stack-policy-during-update-body file:///home/myuser/allow_all_updates.json</code></p>
+</li>
+</ol>
+</li>
+<li>
+<p><strong>Update a stack (built using a <span class="caps">RDS</span> snapshot), without losing data</strong>:</p>
+<div class="codehilite"><pre><span class="nv">$ </span>aws cloudformation update-stack --stack-name mystack --template-body file:///home/myuser/cloudformation_template.json --parameters <span class="nv">ParameterKey</span><span class="o">=</span>DBSnapshotIdentifier,UsePreviousValue<span class="o">=</span><span class="nb">true</span>
+</pre></div>
+
+
+</li>
+<li>
+<p><strong>Load a <span class="caps">RDS</span> snapshot into an existing stack</strong> (that isn&#8217;t already using this&nbsp;snapshot):</p>
+<div class="codehilite"><pre><span class="nv">$ </span>aws cloudformation update-stack --stack-name mystack --template-body file:///home/myuser/cloudformation_template.json --parameters <span class="nv">ParameterKey</span><span class="o">=</span>DBSnapshotIdentifier,ParameterValue<span class="o">=</span><span class="s1">&#39;my-snapshot-identifier&#39;</span>
+</pre></div>
+
+
+</li>
+<li>
+<p><strong>Load a <span class="caps">RDS</span> snapshot into an existing stack again</strong> (i.e. restore from the same snapshot a second time; this one is a&nbsp;kludge):</p>
+<div class="codehilite"><pre><span class="nv">$ </span><span class="c"># re-create the <span class="caps">RDS</span> instance with a blank <span class="caps">DB</span> (DBName)</span>
+<span class="nv">$ </span>aws cloudformation update-stack --stack-name mystack --template-body file:///home/myuser/cloudformation_template.json --parameters <span class="nv">ParameterKey</span><span class="o">=</span>DBSnapshotIdentifier,ParameterValue<span class="o">=</span><span class="s1">&#39;&#39;</span>
+<span class="nv">$ </span><span class="c"># then load the snapshot again</span>
+<span class="nv">$ </span>aws cloudformation update-stack --stack-name mystack --template-body file:///home/myuser/cloudformation_template.json --parameters <span class="nv">ParameterKey</span><span class="o">=</span>DBSnapshotIdentifier,ParameterValue<span class="o">=</span><span class="s1">&#39;my-snapshot-identifier&#39;</span>
+</pre></div>
+
+
+</li>
+</ul>
+<h2 id="cloudformation-template-snippet">CloudFormation Template&nbsp;Snippet</h2>
+<p>This is by no means complete, but just includes the parameters, conditions, and resources which I make reference&nbsp;to.</p>
+<div class="codehilite"><pre><span class="p">{</span>
+  <span class="nt">&quot;Parameters&quot;</span> <span class="p">:</span> <span class="p">{</span>
+    <span class="nt">&quot;DBName&quot;</span> <span class="p">:</span> <span class="p">{</span>
+      <span class="nt">&quot;Default&quot;</span><span class="p">:</span> <span class="s2">&quot;wordpress&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;Description&quot;</span> <span class="p">:</span> <span class="s2">&quot;The WordPress database name&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;Type&quot;</span><span class="p">:</span> <span class="s2">&quot;String&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;MinLength&quot;</span><span class="p">:</span> <span class="s2">&quot;1&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;MaxLength&quot;</span><span class="p">:</span> <span class="s2">&quot;64&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;AllowedPattern&quot;</span> <span class="p">:</span> <span class="s2">&quot;[a-zA-Z][a-zA-Z0-9]*&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;ConstraintDescription&quot;</span> <span class="p">:</span> <span class="s2">&quot;must begin with a letter and contain only alphanumeric characters.&quot;</span>
+    <span class="p">},</span>
+    <span class="nt">&quot;DBSnapshotIdentifier&quot;</span> <span class="p">:</span> <span class="p">{</span>
+      <span class="nt">&quot;Description&quot;</span> <span class="p">:</span> <span class="s2">&quot; The <span class="caps">RDS</span> MySQL snapshot name to restore to the new <span class="caps">DB</span> instance.&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;Type&quot;</span><span class="p">:</span> <span class="s2">&quot;String&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;Default&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span>
+    <span class="p">},</span>
+  <span class="p">},</span>
+
+  <span class="nt">&quot;Conditions&quot;</span> <span class="p">:</span> <span class="p">{</span>
+    <span class="nt">&quot;UseDbSnapshot&quot;</span> <span class="p">:</span> <span class="p">{</span>
+      <span class="nt">&quot;Fn::Not&quot;</span> <span class="p">:</span> <span class="p">[{</span>
+        <span class="nt">&quot;Fn::Equals&quot;</span> <span class="p">:</span> <span class="p">[</span>
+          <span class="p">{</span><span class="nt">&quot;Ref&quot;</span> <span class="p">:</span> <span class="s2">&quot;DBSnapshotIdentifier&quot;</span><span class="p">},</span>
+          <span class="s2">&quot;&quot;</span>
+        <span class="p">]</span>
+      <span class="p">}]</span>
+    <span class="p">}</span>
+  <span class="p">},</span>
+
+  <span class="nt">&quot;Resources&quot;</span> <span class="p">:</span> <span class="p">{</span>
+    <span class="nt">&quot;DBInstance&quot;</span> <span class="p">:</span> <span class="p">{</span>
+      <span class="nt">&quot;Type&quot;</span><span class="p">:</span> <span class="s2">&quot;<span class="caps">AWS</span>::<span class="caps">RDS</span>::DBInstance&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;Properties&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="nt">&quot;DBName&quot;</span>            <span class="p">:</span> <span class="p">{</span>
+          <span class="nt">&quot;Fn::If&quot;</span> <span class="p">:</span> <span class="p">[</span>
+            <span class="s2">&quot;UseDbSnapshot&quot;</span><span class="p">,</span>
+            <span class="p">{</span> <span class="nt">&quot;Ref&quot;</span> <span class="p">:</span> <span class="s2">&quot;<span class="caps">AWS</span>::NoValue&quot;</span><span class="p">},</span>
+            <span class="p">{</span> <span class="nt">&quot;Ref&quot;</span> <span class="p">:</span> <span class="s2">&quot;DBName&quot;</span> <span class="p">}</span>
+          <span class="p">]</span>
+        <span class="p">},</span>
+        <span class="nt">&quot;Engine&quot;</span>            <span class="p">:</span> <span class="s2">&quot;MySQL&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;MasterUsername&quot;</span>    <span class="p">:</span> <span class="p">{</span> <span class="nt">&quot;Ref&quot;</span> <span class="p">:</span> <span class="s2">&quot;DBUsername&quot;</span> <span class="p">},</span>
+        <span class="nt">&quot;DBInstanceClass&quot;</span>   <span class="p">:</span> <span class="p">{</span> <span class="nt">&quot;Ref&quot;</span> <span class="p">:</span> <span class="s2">&quot;DBClass&quot;</span> <span class="p">},</span>
+        <span class="nt">&quot;DBSecurityGroups&quot;</span>  <span class="p">:</span> <span class="p">[{</span> <span class="nt">&quot;Ref&quot;</span> <span class="p">:</span> <span class="s2">&quot;DBSecurityGroup&quot;</span> <span class="p">}],</span>
+        <span class="nt">&quot;DBSubnetGroupName&quot;</span><span class="p">:</span> <span class="p">{</span> <span class="nt">&quot;Ref&quot;</span><span class="p">:</span> <span class="s2">&quot;DBSubnetGroup&quot;</span> <span class="p">},</span>
+        <span class="nt">&quot;AllocatedStorage&quot;</span>  <span class="p">:</span> <span class="p">{</span> <span class="nt">&quot;Ref&quot;</span> <span class="p">:</span> <span class="s2">&quot;DBAllocatedStorage&quot;</span> <span class="p">},</span>
+        <span class="nt">&quot;MasterUserPassword&quot;</span> <span class="p">:</span> <span class="p">{</span> <span class="nt">&quot;Ref&quot;</span> <span class="p">:</span> <span class="s2">&quot;DBPassword&quot;</span> <span class="p">},</span>
+        <span class="nt">&quot;DBSnapshotIdentifier&quot;</span> <span class="p">:</span> <span class="p">{</span>
+          <span class="nt">&quot;Fn::If&quot;</span> <span class="p">:</span> <span class="p">[</span>
+            <span class="s2">&quot;UseDbSnapshot&quot;</span><span class="p">,</span>
+            <span class="p">{</span> <span class="nt">&quot;Ref&quot;</span> <span class="p">:</span> <span class="s2">&quot;DBSnapshotIdentifier&quot;</span> <span class="p">},</span>
+            <span class="p">{</span> <span class="nt">&quot;Ref&quot;</span> <span class="p">:</span> <span class="s2">&quot;<span class="caps">AWS</span>::NoValue&quot;</span><span class="p">}</span>
+          <span class="p">]</span>
+        <span class="p">},</span>
+        <span class="nt">&quot;MultiAZ&quot;</span> <span class="p">:</span> <span class="kc">true</span>
+      <span class="p">},</span>
+      <span class="nt">&quot;DeletionPolicy&quot;</span> <span class="p">:</span> <span class="s2">&quot;Snapshot&quot;</span>
+    <span class="p">},</span>
+    <span class="nt">&quot;WebServerGroup&quot;</span> <span class="p">:</span> <span class="p">{</span>
+      <span class="nt">&quot;Type&quot;</span> <span class="p">:</span> <span class="s2">&quot;<span class="caps">AWS</span>::AutoScaling::AutoScalingGroup&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;Properties&quot;</span> <span class="p">:</span> <span class="p">{</span>
+        <span class="nt">&quot;LaunchConfigurationName&quot;</span> <span class="p">:</span> <span class="p">{</span> <span class="nt">&quot;Ref&quot;</span> <span class="p">:</span> <span class="s2">&quot;LaunchConfig&quot;</span> <span class="p">},</span>
+      <span class="p">},</span>
+      <span class="nt">&quot;UpdatePolicy&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="nt">&quot;AutoScalingRollingUpdate&quot;</span> <span class="p">:</span> <span class="p">{</span>
+          <span class="nt">&quot;MinInstancesInService&quot;</span> <span class="p">:</span> <span class="s2">&quot;1&quot;</span><span class="p">,</span>
+          <span class="nt">&quot;MaxBatchSize&quot;</span> <span class="p">:</span> <span class="s2">&quot;1&quot;</span><span class="p">,</span>
+          <span class="nt">&quot;WaitOnResourceSignals&quot;</span> <span class="p">:</span> <span class="s2">&quot;true&quot;</span><span class="p">,</span>
+          <span class="nt">&quot;PauseTime&quot;</span> <span class="p">:</span> <span class="s2">&quot;<span class="caps">PT10M</span>&quot;</span>
+        <span class="p">},</span>
+        <span class="nt">&quot;AutoScalingScheduledAction&quot;</span> <span class="p">:</span> <span class="p">{</span>
+          <span class="nt">&quot;IgnoreUnmodifiedGroupSizeProperties&quot;</span> <span class="p">:</span> <span class="kc">true</span>
+        <span class="p">}</span>
+      <span class="p">},</span>
+      <span class="nt">&quot;CreationPolicy&quot;</span> <span class="p">:</span> <span class="p">{</span>
+        <span class="nt">&quot;ResourceSignal&quot;</span> <span class="p">:</span> <span class="p">{</span>
+          <span class="nt">&quot;Timeout&quot;</span> <span class="p">:</span> <span class="s2">&quot;<span class="caps">PT10M</span>&quot;</span><span class="p">,</span>
+          <span class="nt">&quot;Count&quot;</span> <span class="p">:</span> <span class="s2">&quot;2&quot;</span>
+        <span class="p">}</span>
+      <span class="p">}</span>
+    <span class="p">},</span>
+    <span class="nt">&quot;LaunchConfig&quot;</span><span class="p">:</span> <span class="p">{</span>
+      <span class="nt">&quot;Type&quot;</span> <span class="p">:</span> <span class="s2">&quot;<span class="caps">AWS</span>::AutoScaling::LaunchConfiguration&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;Metadata&quot;</span> <span class="p">:</span> <span class="p">{</span>
+        <span class="nt">&quot;<span class="caps">AWS</span>::CloudFormation::Init&quot;</span> <span class="p">:</span> <span class="p">{</span>
+          <span class="nt">&quot;config&quot;</span> <span class="p">:</span> <span class="p">{</span>
+            <span class="nt">&quot;files&quot;</span> <span class="p">:</span> <span class="p">{</span>
+              <span class="nt">&quot;/opt/wordpress/cloudformation_db.php&quot;</span> <span class="p">:</span> <span class="p">{</span>
+                <span class="nt">&quot;content&quot;</span> <span class="p">:</span> <span class="p">{</span> <span class="nt">&quot;Fn::Join&quot;</span> <span class="p">:</span> <span class="p">[</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="p">[</span>
+                  <span class="s2">&quot;&lt;?php\n&quot;</span><span class="p">,</span>
+                  <span class="s2">&quot;define(&#39;DB_NAME&#39;,          &#39;&quot;</span><span class="p">,</span> <span class="p">{</span><span class="nt">&quot;Ref&quot;</span> <span class="p">:</span> <span class="s2">&quot;DBName&quot;</span><span class="p">},</span> <span class="s2">&quot;&#39;);\n&quot;</span><span class="p">,</span>
+                  <span class="s2">&quot;define(&#39;DB_USER&#39;,          &#39;&quot;</span><span class="p">,</span> <span class="p">{</span><span class="nt">&quot;Ref&quot;</span> <span class="p">:</span> <span class="s2">&quot;DBUsername&quot;</span><span class="p">},</span> <span class="s2">&quot;&#39;);\n&quot;</span><span class="p">,</span>
+                  <span class="s2">&quot;define(&#39;DB_PASSWORD&#39;,      &#39;&quot;</span><span class="p">,</span> <span class="p">{</span><span class="nt">&quot;Ref&quot;</span> <span class="p">:</span> <span class="s2">&quot;DBPassword&quot;</span> <span class="p">},</span> <span class="s2">&quot;&#39;);\n&quot;</span><span class="p">,</span>
+                  <span class="s2">&quot;define(&#39;DB_HOST&#39;,          &#39;&quot;</span><span class="p">,</span> <span class="p">{</span><span class="nt">&quot;Fn::GetAtt&quot;</span> <span class="p">:</span> <span class="p">[</span><span class="s2">&quot;DBInstance&quot;</span><span class="p">,</span> <span class="s2">&quot;Endpoint.Address&quot;</span><span class="p">]},</span><span class="s2">&quot;&#39;);\n&quot;</span><span class="p">,</span>
+                <span class="p">]]</span> <span class="p">},</span>
+              <span class="p">}</span>
+            <span class="p">}</span>
+          <span class="p">}</span>
+        <span class="p">}</span>
+      <span class="p">}</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+            </div>
+            <!-- /.entry-content -->
+    <hr />
+    <section class="comments" id="comments">
+        <h2>Comments</h2>
+        <div id="disqus_thread"></div>
+        <script type="text/javascript">
+            /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+            var disqus_shortname = 'jantman'; // required: replace example with your forum shortname
+            var disqus_identifier = 'aws-cloudformation-and-rds-snapshots';
+            var disqus_url = 'http://blog.jasonantman.com/2014/12/aws-cloudformation-and-rds-snapshots/';
+
+            /* * * DON'T EDIT BELOW THIS LINE * * */
+            (function () {
+                var dsq = document.createElement('script');
+                dsq.type = 'text/javascript';
+                dsq.async = true;
+                dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+                (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+            })();
+        </script>
+        <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by
+            Disqus.</a></noscript>
+        <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+
+    </section>
+        </article>
+    </section>
+
+        </div>
+        <div class="col-lg-3 well well-sm" id="sidebar">
+
+<aside>
+    <section>
+        <ul class="list-group list-group-flush">
+
+                <li class="list-group-item"><h4><i class="icon-home icon-large"></i>Recent Posts</h4></li>
+                        <li class="list-group-item">
+                            <a href="http://blog.jasonantman.com/2014/12/watching-jenkins-jobs-and-cloudformation-updates-with-pushover-notification/">
+                                Watching Jenkins Jobs and CloudFormation Updates with Pushover&nbsp;Notification
+                            </a>
+                        </li>
+                        <li class="list-group-item">
+                            <a href="http://blog.jasonantman.com/2014/12/idea-for-a-generic-method-to-communicate-repositoryproject-status/">
+                                Idea for a Generic Method to Communicate Repository/Project&nbsp;Status
+                            </a>
+                        </li>
+                        <li class="list-group-item">
+                            <a href="http://blog.jasonantman.com/2014/10/managing-ec2-ssh-keys-an-idea/">
+                                Managing <span class="caps">EC2</span> <span class="caps">SSH</span> Keys - An&nbsp;Idea
+                            </a>
+                        </li>
+                        <li class="list-group-item">
+                            <a href="http://blog.jasonantman.com/2014/09/pushover-notifications-for-shell-command-completion-and-status/">
+                                Pushover Notifications for Shell Command Completion and&nbsp;Status
+                            </a>
+                        </li>
+                        <li class="list-group-item">
+                            <a href="http://blog.jasonantman.com/2014/07/session-save-and-restore-with-bash-and-gnu-screen/">
+                                Session Save and Restore with Bash and <span class="caps">GNU</span>&nbsp;Screen
+                            </a>
+                        </li>
+
+
+                <li class="list-group-item"><a href="http://blog.jasonantman.com/tags.html"><h4><i class="icon-tags icon-large"></i>Tags</h4></a></li>
+                <li class="list-group-item">
+                        <span class="tag-1">
+                            <a href="http://blog.jasonantman.com/tags/microsoft/index.html">
+                                microsoft
+                            </a>
+                        </span>
+                        <span class="tag-1">
+                            <a href="http://blog.jasonantman.com/tags/php/index.html">
+                                PHP
+                            </a>
+                        </span>
+                        <span class="tag-1">
+                            <a href="http://blog.jasonantman.com/tags/puppet/index.html">
+                                puppet
+                            </a>
+                        </span>
+                        <span class="tag-1">
+                            <a href="http://blog.jasonantman.com/tags/google/index.html">
+                                google
+                            </a>
+                        </span>
+                        <span class="tag-1">
+                            <a href="http://blog.jasonantman.com/tags/wordpress/index.html">
+                                wordpress
+                            </a>
+                        </span>
+                        <span class="tag-1">
+                            <a href="http://blog.jasonantman.com/tags/sun/index.html">
+                                sun
+                            </a>
+                        </span>
+                        <span class="tag-1">
+                            <a href="http://blog.jasonantman.com/tags/nagios/index.html">
+                                Nagios
+                            </a>
+                        </span>
+                        <span class="tag-1">
+                            <a href="http://blog.jasonantman.com/tags/security/index.html">
+                                security
+                            </a>
+                        </span>
+                        <span class="tag-1">
+                            <a href="http://blog.jasonantman.com/tags/android/index.html">
+                                android
+                            </a>
+                        </span>
+                        <span class="tag-1">
+                            <a href="http://blog.jasonantman.com/tags/sysadmin/index.html">
+                                sysadmin
+                            </a>
+                        </span>
+                        <span class="tag-1">
+                            <a href="http://blog.jasonantman.com/tags/linux/index.html">
+                                linux
+                            </a>
+                        </span>
+                        <span class="tag-1">
+                            <a href="http://blog.jasonantman.com/tags/blog/index.html">
+                                blog
+                            </a>
+                        </span>
+                        <span class="tag-1">
+                            <a href="http://blog.jasonantman.com/tags/monitoring/index.html">
+                                monitoring
+                            </a>
+                        </span>
+                        <span class="tag-2">
+                            <a href="http://blog.jasonantman.com/tags/apache/index.html">
+                                apache
+                            </a>
+                        </span>
+                        <span class="tag-2">
+                            <a href="http://blog.jasonantman.com/tags/droid/index.html">
+                                droid
+                            </a>
+                        </span>
+                        <span class="tag-2">
+                            <a href="http://blog.jasonantman.com/tags/rpm/index.html">
+                                rpm
+                            </a>
+                        </span>
+                        <span class="tag-2">
+                            <a href="http://blog.jasonantman.com/tags/firefox/index.html">
+                                firefox
+                            </a>
+                        </span>
+                        <span class="tag-2">
+                            <a href="http://blog.jasonantman.com/tags/logging/index.html">
+                                logging
+                            </a>
+                        </span>
+                        <span class="tag-2">
+                            <a href="http://blog.jasonantman.com/tags/dns/index.html">
+                                dns
+                            </a>
+                        </span>
+                        <span class="tag-2">
+                            <a href="http://blog.jasonantman.com/tags/syslog/index.html">
+                                syslog
+                            </a>
+                        </span>
+                </li>
+        </ul>
+    </section>
+    <section>
+    <ul class="list-group list-group-flush">
+    <li class="list-group-item" style="padding: 10px 15px 0px 15px;"><h4><i class="icon-twitter
+    icon-large"></i>Twitter <a href="https://twitter.com/j_antman"
+    class="twitter-follow-button" data-show-count="false"
+    data-dnt="true">Follow @j_antman</a></h4>
+<script>!function(d,s,id){var
+  js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document,
+  'script', 'twitter-wjs');</script></li>
+    </ul>
+    <a class="twitter-timeline" data-dnt="true"
+    href="https://twitter.com/j_antman"
+    data-chrome="transparent noheader" data-widget-id="429640274453594113">Tweets by @j_antman</a>
+    <script>!function(d,s,id){var
+    js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+"://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+    </section>
+    <section>
+    <ul class="list-group list-group-flush">
+    <li class="list-group-item"><h4><i class="icon-github icon-large"></i>GitHub Repos</h4></li>
+        <div id="gh_repos">
+            <p class="list-group-item">Status updating...</p>
+        </div>
+            <a href="https://github.com/jantman">@jantman</a> on GitHub
+    </ul>
+        <script type="text/javascript">
+            $(document).ready(function () {
+                if (!window.jXHR) {
+                    var jxhr = document.createElement('script');
+                    jxhr.type = 'text/javascript';
+                    jxhr.src = 'http://blog.jasonantman.com/theme/js/jXHR.js';
+                    var s = document.getElementsByTagName('script')[0];
+                    s.parentNode.insertBefore(jxhr, s);
+                }
+
+                github.showRepos({
+                    user: 'jantman',
+                    count: 5,
+                    skip_forks: false,
+                    target: '#gh_repos'
+                });
+            });
+        </script>
+        <script src="http://blog.jasonantman.com/theme/js/github.js" type="text/javascript"></script>
+    </section>
+</aside>        </div>
+    </div>
+</div>
+<footer>
+    <div class="container">
+        <hr>
+        <p class="pull-right"><i class="icon-arrow-up"></i> <a href="#">Back to top</a></p>
+
+
+        <p>&copy; 2014 Jason Antman &middot; Powered by <a href="https://github.com/DandyDev/pelican-bootstrap3" target="_blank">pelican-bootstrap3</a>,
+            <a href="http://docs.getpelican.com/" target="_blank">Pelican</a>,
+            <a href="http://getbootstrap.com" target="_blank">Bootstrap</a></p>
+    </div>
+</footer>
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="http://blog.jasonantman.com/theme/js/bootstrap.min.js"></script>
+
+<!-- Enable responsive features in IE8 with Respond.js (https://github.com/scottjehl/Respond) -->
+<script src="http://blog.jasonantman.com/theme/js/respond.min.js"></script>
+    <script type="text/javascript">
+        /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+        var disqus_shortname = 'jantman'; // required: replace example with your forum shortname
+
+        /* * * DON'T EDIT BELOW THIS LINE * * */
+        (function () {
+            var s = document.createElement('script');
+            s.async = true;
+            s.type = 'text/javascript';
+            s.src = '//' + disqus_shortname + '.disqus.com/count.js';
+            (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+        }());
+    </script>
+
+
+</body>
+</html>
