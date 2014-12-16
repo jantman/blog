@@ -5,7 +5,6 @@ Category: Tech HowTos
 Tags: aws, cloudformation, rds, mysql, snapshot
 Slug: aws-cloudformation-and-rds-snapshots
 Summary: Some tips, tricks and non-intuitive information about working with AWS CloudFormation and RDS snapshots.
-Status: draft
 
 For the past few weeks, I've been working on spinning up a WordPress stack on Amazon AWS. It's intended to be a production application,
 so it uses Multi-AZ and a few other tricks to try to achieve relatively high fault tolerance (nothing insane, still in one region). It uses
