@@ -145,16 +145,16 @@ wrapped in a Rakefile (I plan on changing this to use [boto](https://github.com/
 inside a [Jenkins](http://jenkins-ci.org/) job). What follows is a quick high-level guide
 on how to accomplish various RDS-related tasks, using the template snippet below.
 
-* __Build a new stack, using a RDS snapshot__ -
+* __Build a new stack using a RDS snapshot__:
 
-~~~~{.bash}
-$ aws cloudformation create-stack --stack-name mystack --template-body file:///home/myuser/cloudformation_template.json --parameters ParameterKey=DBSnapshotIdentifier,ParameterValue='my-snapshot-identifier'
-~~~~
+        :::bash
+        $ aws cloudformation create-stack --stack-name mystack --template-body file:///home/myuser/cloudformation_template.json --parameters ParameterKey=DBSnapshotIdentifier,ParameterValue='my-snapshot-identifier'
 
-* __Temporarily override stack policy to allow updates__
+* __Temporarily override stack policy to allow updates__:
 
     1. Create a file with the following contents (we'll assume it's at ``/home/myuser/allow_all_updates.json``):
-            ~~~~{.json}
+
+            :::json
             {
               "Statement" : [
                 {
@@ -165,29 +165,26 @@ $ aws cloudformation create-stack --stack-name mystack --template-body file:///h
                 }
               ]
             }
-            ~~~~
+
     2. In the following ``aws`` commands, append ``--stack-policy-during-update-url file:///home/myuser/allow_all_updates.json``
 
-* __Update a stack (built using a RDS snapshot), without losing data__ -
+* __Update a stack (built using a RDS snapshot), without losing data__:
 
-~~~~{.bash}
-$ aws cloudformation update-stack --stack-name mystack --template-body file:///home/myuser/cloudformation_template.json --parameters ParameterKey=DBSnapshotIdentifier,UsePreviousValue=true
-~~~~
+        :::bash
+        $ aws cloudformation update-stack --stack-name mystack --template-body file:///home/myuser/cloudformation_template.json --parameters ParameterKey=DBSnapshotIdentifier,UsePreviousValue=true
 
-* __Load a RDS snapshot into an existing stack__ (that isn't already using this snapshot) -
+* __Load a RDS snapshot into an existing stack__ (that isn't already using this snapshot):
 
-~~~~{.bash}
-$ aws cloudformation update-stack --stack-name mystack --template-body file:///home/myuser/cloudformation_template.json --parameters ParameterKey=DBSnapshotIdentifier,ParameterValue='my-snapshot-identifier'
-~~~~
+        :::bash
+        $ aws cloudformation update-stack --stack-name mystack --template-body file:///home/myuser/cloudformation_template.json --parameters ParameterKey=DBSnapshotIdentifier,ParameterValue='my-snapshot-identifier'
 
-* __Load a RDS snapshot into an existing stack again__ - (i.e. restore from the same snapshot a second time; this one is a kludge)
+* __Load a RDS snapshot into an existing stack again__ (i.e. restore from the same snapshot a second time; this one is a kludge):
 
-~~~~{.bash}
-$ # re-create the RDS instance with a blank DB (DBName)
-$ aws cloudformation update-stack --stack-name mystack --template-body file:///home/myuser/cloudformation_template.json --parameters ParameterKey=DBSnapshotIdentifier,ParameterValue=''
-$ # then load the snapshot again
-$ aws cloudformation update-stack --stack-name mystack --template-body file:///home/myuser/cloudformation_template.json --parameters ParameterKey=DBSnapshotIdentifier,ParameterValue='my-snapshot-identifier'
-~~~~
+        :::bash
+        $ # re-create the RDS instance with a blank DB (DBName)
+        $ aws cloudformation update-stack --stack-name mystack --template-body file:///home/myuser/cloudformation_template.json --parameters ParameterKey=DBSnapshotIdentifier,ParameterValue=''
+        $ # then load the snapshot again
+        $ aws cloudformation update-stack --stack-name mystack --template-body file:///home/myuser/cloudformation_template.json --parameters ParameterKey=DBSnapshotIdentifier,ParameterValue='my-snapshot-identifier'
 
 CloudFormation Template Snippet
 --------------------------------
