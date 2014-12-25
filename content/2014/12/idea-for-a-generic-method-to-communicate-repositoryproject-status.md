@@ -6,6 +6,8 @@ Tags: repository, project, git, github
 Slug: idea-for-a-generic-method-to-communicate-repositoryproject-status
 Summary: Some ideas for generic methods of communicating the status of a project / source code repository to humans and machines.
 
+Update 2014-12-24: I actually did something with this. See [repostatus.org](http://www.repostatus.org).
+
 First, something funny, before my possibly-hair-brained scheme:
 
 [![commitstrip.com "side project" comic strip](http://www.commitstrip.com/wp-content/uploads/2014/11/Strip-Side-project-650-finalenglish.jpg)](http://www.commitstrip.com/en/2014/11/25/west-side-project-story/)
