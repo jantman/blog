@@ -70,4 +70,4 @@ they could have been "old" versions in 2007. All that being said, assuming
 that tea4cups hasn't changed too much since then, this should give you
 at least a general idea of how this all fit together and is possible.
 
-The code that I have is available as a 35K .tar.gz archive [here](http://blog.jasonantman.com/GFX/printAccounting.tar.gz).
+The code that I have is available as a 35K .tar.gz archive [here](/GFX/printAccounting.tar.gz).
