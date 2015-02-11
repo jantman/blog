@@ -51,3 +51,23 @@ information from the printer (IPP) and local files.
 
 All in all, for something that didn't exist 24 hours ago, I think it's
 working pretty well so far.
+
+__Update 2015-02-11:__ Someone (comments below) has found this and asked
+for further information. Sadly, I wrote this stuff eight years ago, and
+haven't been running it in seven or so. I _did_ manage to find the CVS
+repository in my backups, so I have some of the code. It's certainly not
+functional or documented, but it should give you at least a general idea
+of how all this fits together. Be aware that there _are_ some known issues,
+so I wouldn't consider the data it gives (at least when it comes to ink
+usage) as more than a rough estimate. The original idea was to do print
+accounting for my roommates and I (being good geeks we had three printers
+including a color laser - a bit of a novelty at the time - and an 11x17"
+laser) so we could evenly split the bill when it came time to buy toner.
+The accounting code is PHP, and really bad PHP at that. There's a
+a web interface, but unfortunately the database schema is long gone.
+I have no idea what versions of packages this was written for, but assume
+they could have been "old" versions in 2007. All that being said, assuming
+that tea4cups hasn't changed too much since then, this should give you
+at least a general idea of how this all fit together and is possible.
+
+The code that I have is available as a 35K .tar.gz archive [here](http://blog.jasonantman.com/GFX/printAccounting.tar.gz).
