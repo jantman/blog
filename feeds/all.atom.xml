@@ -1,5 +1,52 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Jason Antman's Blog</title><link href="http://blog.jasonantman.com/" rel="alternate"></link><link href="http://blog.jasonantman.com/feeds/all.atom.xml" rel="self"></link><id>http://blog.jasonantman.com/</id><updated>2014-12-15T09:29:00-05:00</updated><entry><title>AWS CloudFormation and RDS Snapshots</title><link href="http://blog.jasonantman.com/2014/12/aws-cloudformation-and-rds-snapshots/" rel="alternate"></link><updated>2014-12-15T09:29:00-05:00</updated><author><name>Jason Antman</name></author><id>tag:blog.jasonantman.com,2014-12-15:2014/12/aws-cloudformation-and-rds-snapshots/</id><summary type="html">&lt;p&gt;For the past few weeks, I&amp;#8217;ve been working on spinning up a WordPress stack on Amazon &lt;span class="caps"&gt;AWS&lt;/span&gt;. It&amp;#8217;s intended to be a production application,
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Jason Antman's Blog</title><link href="http://blog.jasonantman.com/" rel="alternate"></link><link href="http://blog.jasonantman.com/feeds/all.atom.xml" rel="self"></link><id>http://blog.jasonantman.com/</id><updated>2015-02-21T10:33:00-05:00</updated><entry><title>RSpec Matcher For Hash Item Value</title><link href="http://blog.jasonantman.com/2015/02/rspec-matcher-for-hash-item-value/" rel="alternate"></link><updated>2015-02-21T10:33:00-05:00</updated><author><name>Jason Antman</name></author><id>tag:blog.jasonantman.com,2015-02-21:2015/02/rspec-matcher-for-hash-item-value/</id><summary type="html">&lt;p&gt;I&amp;#8217;ve been working on a project to move my &lt;a href="http://linode.com"&gt;Linode&lt;/a&gt; &lt;span class="caps"&gt;VM&lt;/span&gt; to an
+Amazon &lt;span class="caps"&gt;EC2&lt;/span&gt; instance; the entire instance is a &amp;#8220;baked&amp;#8221; &lt;span class="caps"&gt;AMI&lt;/span&gt; built by Puppet. Since
+I&amp;#8217;d like to be able to rebuild this quickly, I&amp;#8217;m using &lt;a href="http://serverspec.org/"&gt;ServerSpec&lt;/a&gt;
+(which I have some non-technical issues with, but that&amp;#8217;s a long story) to run full
+integration tests of the whole system - check that packages are installed, services
+are running, and even make live &lt;span class="caps"&gt;HTTP&lt;/span&gt; requests agsinst&amp;nbsp;it.&lt;/p&gt;
+&lt;p&gt;One part of this was making live &lt;span class="caps"&gt;HTTP&lt;/span&gt; requests (from inside ServerSpec / &lt;a href="http://rspec.info/"&gt;rspec&lt;/a&gt;)
+and checking &lt;span class="caps"&gt;HTTP&lt;/span&gt; response headers. Unfortunately, rspec doesn&amp;#8217;t have a nice, clean way to make
+assertions about a hash&amp;nbsp;item.&lt;/p&gt;
+&lt;p&gt;So, I wrote a little Ruby Gem to do this, &lt;a href="https://github.com/jantman/rspec-matcher-hash-item"&gt;rspec-matcher-hash-item&lt;/a&gt;. At the moment it just
+has one matcher, &lt;code&gt;have_hash_item_matching&lt;/code&gt;. This operates on a hash, and takes two arguments,
+a key and a regex for the value. It allows me to do simple but useful things&amp;nbsp;like:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;  &lt;span class="n"&gt;describe&lt;/span&gt; &lt;span class="n"&gt;http_get&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;80&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;testapp1.jasonantman.com&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;/testapp1234&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="k"&gt;do&lt;/span&gt;
+    &lt;span class="n"&gt;its&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="ss"&gt;:headers&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt; &lt;span class="n"&gt;should&lt;/span&gt; &lt;span class="n"&gt;have_hash_item_matching&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;server&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="sr"&gt;/nginx\/1\./&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;}&lt;/span&gt;
+  &lt;span class="k"&gt;end&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;(The &lt;code&gt;http_get&lt;/code&gt; serverspec matcher is coming in a future gem and blog&amp;nbsp;post)&lt;/p&gt;
+&lt;p&gt;Among other things, it prints diffs on&amp;nbsp;failure:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;  2) privatepuppet::ec2::vhosts::testapp1 Http_get &amp;quot;&amp;quot; headers should include key &amp;#39;server&amp;#39; matching /badvalue/
+     On host `54.149.198.147&amp;#39;
+     Failure/Error: its(:headers) { should have_hash_item_matching(&amp;#39;server&amp;#39;, /badvalue/) }
+       expected that hash[server] would match /badvalue/
+       Diff:
+       @@ -1,2 +1,6 @@
+       -[&amp;quot;server&amp;quot;, /badvalue/]
+       +&amp;quot;connection&amp;quot; =&amp;gt; &amp;quot;close&amp;quot;,
+       +&amp;quot;content-type&amp;quot; =&amp;gt; &amp;quot;text/plain&amp;quot;,
+       +&amp;quot;date&amp;quot; =&amp;gt; &amp;quot;Sat, 21 Feb 2015 16:07:42 GMT&amp;quot;,
+       +&amp;quot;server&amp;quot; =&amp;gt; &amp;quot;nginx/1.6.2&amp;quot;,
+       +&amp;quot;transfer-encoding&amp;quot; =&amp;gt; &amp;quot;chunked&amp;quot;,
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Using the gem is as simple as including it in your &lt;code&gt;Gemfile&lt;/code&gt;:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;gem &amp;quot;rspec-matcher-hash-item&amp;quot;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;And adding a line to your &lt;code&gt;spec_helper.rb&lt;/code&gt;:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;require &amp;#39;rspec_matcher_hash_item&amp;#39;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Note that the gem is written for&amp;nbsp;rspec3.&lt;/p&gt;
+&lt;p&gt;This is available at &lt;a href="https://rubygems.org/gems/rspec-matcher-hash-item"&gt;rubygems.org&lt;/a&gt; or from
+&lt;a href="https://github.com/jantman/rspec-matcher-hash-item"&gt;GitHub&lt;/a&gt;. See GitHub for the&amp;nbsp;documentation.&lt;/p&gt;</summary><category term="ruby"></category><category term="rspec"></category><category term="spec"></category><category term="testing"></category></entry><entry><title>AWS CloudFormation and RDS Snapshots</title><link href="http://blog.jasonantman.com/2014/12/aws-cloudformation-and-rds-snapshots/" rel="alternate"></link><updated>2014-12-15T09:29:00-05:00</updated><author><name>Jason Antman</name></author><id>tag:blog.jasonantman.com,2014-12-15:2014/12/aws-cloudformation-and-rds-snapshots/</id><summary type="html">&lt;p&gt;For the past few weeks, I&amp;#8217;ve been working on spinning up a WordPress stack on Amazon &lt;span class="caps"&gt;AWS&lt;/span&gt;. It&amp;#8217;s intended to be a production application,
 so it uses Multi-&lt;span class="caps"&gt;AZ&lt;/span&gt; and a few other tricks to try to achieve relatively high fault tolerance (nothing insane, still in one region). It uses
 &lt;span class="caps"&gt;AWS&lt;/span&gt;&amp;#8217;s &lt;a href="https://aws.amazon.com/rds/"&gt;&lt;span class="caps"&gt;RDS&lt;/span&gt;&lt;/a&gt; hosted MySQL service for the database, and the stacks are created with &lt;a href="https://aws.amazon.com/cloudformation/"&gt;CloudFormation&lt;/a&gt;.
 Using CloudFormation has been an utterly wonderful experience and being able to spin up an entire stack - multiple autoscaling web server
@@ -3644,21 +3691,4 @@ bug, should be&amp;nbsp;logical.&lt;/p&gt;
 &lt;li&gt;&lt;a href="http://qsapp.com/wiki/Github"&gt;Github - Quicksilver&amp;nbsp;Wiki&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a href="https://github.com/carmaa/inception/wiki/Contributor-Workflow-with-Github"&gt;Contributor Workflow with Github · carmaa/inception&amp;nbsp;Wiki&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a href="http://help.github.com/fork-a-repo/"&gt;Help.GitHub - Fork A&amp;nbsp;Repo&lt;/a&gt;&lt;/li&gt;
-&lt;/ol&gt;</summary><category term="foreman"></category><category term="git"></category><category term="github"></category><category term="workflow"></category></entry><entry><title>Easily comparing a bunch of files in one directory</title><link href="http://blog.jasonantman.com/2012/08/easily-comparing-a-bunch-of-files-in-one-directory/" rel="alternate"></link><updated>2012-08-10T09:50:00-04:00</updated><author><name>admin</name></author><id>tag:blog.jasonantman.com,2012-08-10:2012/08/easily-comparing-a-bunch-of-files-in-one-directory/</id><summary type="html">&lt;p&gt;So I pulled a specific configuration file (rsyslog.conf) off of a &lt;span class="caps"&gt;LOT&lt;/span&gt; of
-hosts. I&amp;#8217;m going to be managing it with &lt;a href=""&gt;Puppet&lt;/a&gt;, but before I do, I
-need to know what&amp;#8217;s out there already lest it get overwritten. I used
-&lt;a href="http://code.google.com/p/parallel-ssh/"&gt;pssh&lt;/a&gt; with &lt;code&gt;cat&lt;/code&gt; and an output
-directory to grab the file from all 30 servers in question. Now, I&amp;#8217;ve
-got a directory with 30 files in it, and I need to figure out how many
-different files (by contents) there are, and which ones&amp;nbsp;differ.&lt;/p&gt;
-&lt;div class="codehilite"&gt;&lt;pre&gt;find . -type f -exec md5sum &lt;span class="s1"&gt;&amp;#39;{}&amp;#39;&lt;/span&gt; &lt;span class="se"&gt;\;&lt;/span&gt; | sort | uniq -d -w 36
-&lt;/pre&gt;&lt;/div&gt;
-
-
-&lt;p&gt;This will check the contents of each file by &lt;span class="caps"&gt;MD5&lt;/span&gt; checksum, and print out
-the (lexographically) first file in each group, along with its &lt;span class="caps"&gt;MD5&lt;/span&gt; sum.
-You can also strip off the uniq command, and see the list sorted by&amp;nbsp;md5.&lt;/p&gt;
-&lt;p&gt;A &lt;span class="caps"&gt;GUI&lt;/span&gt; alternative would be to use
-&lt;a href="http://www.pixelbeat.org/fslint/"&gt;fslint&lt;/a&gt;, which is a graphical tool
-that can (among other things) display a list of the duplicate files
-within a path or set of&amp;nbsp;paths.&lt;/p&gt;</summary><category term="compare"></category><category term="diff"></category></entry></feed>
+&lt;/ol&gt;</summary><category term="foreman"></category><category term="git"></category><category term="github"></category><category term="workflow"></category></entry></feed>
