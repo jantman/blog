@@ -6,6 +6,21 @@ Tags: ruby, rspec, spec, testing
 Slug: rspec-matcher-for-hash-item-value
 Summary: An RSpec matcher for hash item value regex
 
+__Update:__ Well, this is embarassing. _After_ I posted this, I received a
+[comment](http://blog.jasonantman.com/2015/02/rspec-matcher-for-hash-item-value/#comment-1868422853)
+within a few hours from [@myronmarston](https://twitter.com/myronmarston). I'd originally
+written this matcher for RSpec2, and then had to convert my project to use
+RSpec3. I just blindly converted this matcher over. Myron pointed out that with
+RSpec3's [composable matchers](http://rspec.info/blog/2014/01/new-in-rspec-3-composable-matchers/),
+the functionality of this gem is built-in. It can be done as simply as:
+
+~~~~{.ruby}
+its(:headers) { should include('server' => /nginx\/1\./) }
+~~~~
+
+__As such, I've yanked them gem and am leaving the code and blog post here just for posterity.__
+This should probably not be used.
+
 I've been working on a project to move my [Linode](http://linode.com) VM to an
 Amazon EC2 instance; the entire instance is a "baked" AMI built by Puppet. Since
 I'd like to be able to rebuild this quickly, I'm using [ServerSpec](http://serverspec.org/)
@@ -14,7 +29,7 @@ integration tests of the whole system - check that packages are installed, servi
 are running, and even make live HTTP requests agsinst it.
 
 One part of this was making live HTTP requests (from inside ServerSpec / [rspec](http://rspec.info/))
-and checking HTTP response headers. Unfortunately, rspec doesn't have a nice, clean way to make
+and checking HTTP response headers. Unfortunately, RSpec doesn't have a nice, clean way to make
 assertions about a hash item.
 
 So, I wrote a little Ruby Gem to do this, [rspec-matcher-hash-item](https://github.com/jantman/rspec-matcher-hash-item). At the moment it just
@@ -54,7 +69,7 @@ And adding a line to your ``spec_helper.rb``:
 
     require 'rspec_matcher_hash_item'
 
-Note that the gem is written for rspec3.
+Note that the gem is written for RSpec3.
 
 This is available at [rubygems.org](https://rubygems.org/gems/rspec-matcher-hash-item) or from
 [GitHub](https://github.com/jantman/rspec-matcher-hash-item). See GitHub for the documentation.
