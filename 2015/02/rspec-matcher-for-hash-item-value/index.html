@@ -122,14 +122,27 @@
 	<a href="http://blog.jasonantman.com/tags/testing/index.html">testing</a>
 </footer><!-- /.post-info -->                    </div>
                 </div>
-                <p>I&#8217;ve been working on a project to move my <a href="http://linode.com">Linode</a> <span class="caps">VM</span> to an
+                <p><strong>Update:</strong> Well, this is embarassing. <em>After</em> I posted this, I received a
+<a href="http://blog.jasonantman.com/2015/02/rspec-matcher-for-hash-item-value/#comment-1868422853">comment</a>
+within a few hours from <a href="https://twitter.com/myronmarston">@myronmarston</a>. I&#8217;d originally
+written this matcher for RSpec2, and then had to convert my project to use
+RSpec3. I just blindly converted this matcher over. Myron pointed out that with
+RSpec3&#8217;s <a href="http://rspec.info/blog/2014/01/new-in-rspec-3-composable-matchers/">composable matchers</a>,
+the functionality of this gem is built-in. It can be done as simply&nbsp;as:</p>
+<div class="codehilite"><pre><span class="n">its</span><span class="p">(</span><span class="ss">:headers</span><span class="p">)</span> <span class="p">{</span> <span class="n">should</span> <span class="kp">include</span><span class="p">(</span><span class="s1">&#39;server&#39;</span> <span class="o">=&gt;</span> <span class="sr">/nginx\/1\./</span><span class="p">)</span> <span class="p">}</span>
+</pre></div>
+
+
+<p><strong>As such, I&#8217;ve yanked them gem and am leaving the code and blog post here just for posterity.</strong>
+This should probably not be&nbsp;used.</p>
+<p>I&#8217;ve been working on a project to move my <a href="http://linode.com">Linode</a> <span class="caps">VM</span> to an
 Amazon <span class="caps">EC2</span> instance; the entire instance is a &#8220;baked&#8221; <span class="caps">AMI</span> built by Puppet. Since
 I&#8217;d like to be able to rebuild this quickly, I&#8217;m using <a href="http://serverspec.org/">ServerSpec</a>
 (which I have some non-technical issues with, but that&#8217;s a long story) to run full
 integration tests of the whole system - check that packages are installed, services
 are running, and even make live <span class="caps">HTTP</span> requests agsinst&nbsp;it.</p>
 <p>One part of this was making live <span class="caps">HTTP</span> requests (from inside ServerSpec / <a href="http://rspec.info/">rspec</a>)
-and checking <span class="caps">HTTP</span> response headers. Unfortunately, rspec doesn&#8217;t have a nice, clean way to make
+and checking <span class="caps">HTTP</span> response headers. Unfortunately, RSpec doesn&#8217;t have a nice, clean way to make
 assertions about a hash&nbsp;item.</p>
 <p>So, I wrote a little Ruby Gem to do this, <a href="https://github.com/jantman/rspec-matcher-hash-item">rspec-matcher-hash-item</a>. At the moment it just
 has one matcher, <code>have_hash_item_matching</code>. This operates on a hash, and takes two arguments,
@@ -167,7 +180,7 @@ a key and a regex for the value. It allows me to do simple but useful things&nbs
 </pre></div>
 
 
-<p>Note that the gem is written for&nbsp;rspec3.</p>
+<p>Note that the gem is written for&nbsp;RSpec3.</p>
 <p>This is available at <a href="https://rubygems.org/gems/rspec-matcher-hash-item">rubygems.org</a> or from
 <a href="https://github.com/jantman/rspec-matcher-hash-item">GitHub</a>. See GitHub for the&nbsp;documentation.</p>
             </div>
@@ -237,53 +250,8 @@ a key and a regex for the value. It allows me to do simple but useful things&nbs
                 <li class="list-group-item"><a href="http://blog.jasonantman.com/tags.html"><h4><i class="icon-tags icon-large"></i>Tags</h4></a></li>
                 <li class="list-group-item">
                         <span class="tag-1">
-                            <a href="http://blog.jasonantman.com/tags/android/index.html">
-                                android
-                            </a>
-                        </span>
-                        <span class="tag-1">
-                            <a href="http://blog.jasonantman.com/tags/puppet/index.html">
-                                puppet
-                            </a>
-                        </span>
-                        <span class="tag-1">
-                            <a href="http://blog.jasonantman.com/tags/google/index.html">
-                                google
-                            </a>
-                        </span>
-                        <span class="tag-1">
-                            <a href="http://blog.jasonantman.com/tags/security/index.html">
-                                security
-                            </a>
-                        </span>
-                        <span class="tag-1">
                             <a href="http://blog.jasonantman.com/tags/blog/index.html">
                                 blog
-                            </a>
-                        </span>
-                        <span class="tag-1">
-                            <a href="http://blog.jasonantman.com/tags/monitoring/index.html">
-                                monitoring
-                            </a>
-                        </span>
-                        <span class="tag-1">
-                            <a href="http://blog.jasonantman.com/tags/sysadmin/index.html">
-                                sysadmin
-                            </a>
-                        </span>
-                        <span class="tag-1">
-                            <a href="http://blog.jasonantman.com/tags/microsoft/index.html">
-                                microsoft
-                            </a>
-                        </span>
-                        <span class="tag-1">
-                            <a href="http://blog.jasonantman.com/tags/wordpress/index.html">
-                                wordpress
-                            </a>
-                        </span>
-                        <span class="tag-1">
-                            <a href="http://blog.jasonantman.com/tags/php/index.html">
-                                PHP
                             </a>
                         </span>
                         <span class="tag-1">
@@ -292,13 +260,78 @@ a key and a regex for the value. It allows me to do simple but useful things&nbs
                             </a>
                         </span>
                         <span class="tag-1">
-                            <a href="http://blog.jasonantman.com/tags/linux/index.html">
-                                linux
+                            <a href="http://blog.jasonantman.com/tags/monitoring/index.html">
+                                monitoring
+                            </a>
+                        </span>
+                        <span class="tag-1">
+                            <a href="http://blog.jasonantman.com/tags/security/index.html">
+                                security
+                            </a>
+                        </span>
+                        <span class="tag-1">
+                            <a href="http://blog.jasonantman.com/tags/sysadmin/index.html">
+                                sysadmin
+                            </a>
+                        </span>
+                        <span class="tag-1">
+                            <a href="http://blog.jasonantman.com/tags/android/index.html">
+                                android
                             </a>
                         </span>
                         <span class="tag-1">
                             <a href="http://blog.jasonantman.com/tags/sun/index.html">
                                 sun
+                            </a>
+                        </span>
+                        <span class="tag-1">
+                            <a href="http://blog.jasonantman.com/tags/puppet/index.html">
+                                puppet
+                            </a>
+                        </span>
+                        <span class="tag-1">
+                            <a href="http://blog.jasonantman.com/tags/wordpress/index.html">
+                                wordpress
+                            </a>
+                        </span>
+                        <span class="tag-1">
+                            <a href="http://blog.jasonantman.com/tags/microsoft/index.html">
+                                microsoft
+                            </a>
+                        </span>
+                        <span class="tag-1">
+                            <a href="http://blog.jasonantman.com/tags/google/index.html">
+                                google
+                            </a>
+                        </span>
+                        <span class="tag-1">
+                            <a href="http://blog.jasonantman.com/tags/php/index.html">
+                                PHP
+                            </a>
+                        </span>
+                        <span class="tag-1">
+                            <a href="http://blog.jasonantman.com/tags/linux/index.html">
+                                linux
+                            </a>
+                        </span>
+                        <span class="tag-2">
+                            <a href="http://blog.jasonantman.com/tags/rpm/index.html">
+                                rpm
+                            </a>
+                        </span>
+                        <span class="tag-2">
+                            <a href="http://blog.jasonantman.com/tags/firefox/index.html">
+                                firefox
+                            </a>
+                        </span>
+                        <span class="tag-2">
+                            <a href="http://blog.jasonantman.com/tags/syslog/index.html">
+                                syslog
+                            </a>
+                        </span>
+                        <span class="tag-2">
+                            <a href="http://blog.jasonantman.com/tags/dns/index.html">
+                                dns
                             </a>
                         </span>
                         <span class="tag-2">
@@ -314,26 +347,6 @@ a key and a regex for the value. It allows me to do simple but useful things&nbs
                         <span class="tag-2">
                             <a href="http://blog.jasonantman.com/tags/droid/index.html">
                                 droid
-                            </a>
-                        </span>
-                        <span class="tag-2">
-                            <a href="http://blog.jasonantman.com/tags/dns/index.html">
-                                dns
-                            </a>
-                        </span>
-                        <span class="tag-2">
-                            <a href="http://blog.jasonantman.com/tags/rpm/index.html">
-                                rpm
-                            </a>
-                        </span>
-                        <span class="tag-2">
-                            <a href="http://blog.jasonantman.com/tags/syslog/index.html">
-                                syslog
-                            </a>
-                        </span>
-                        <span class="tag-2">
-                            <a href="http://blog.jasonantman.com/tags/firefox/index.html">
-                                firefox
                             </a>
                         </span>
                 </li>

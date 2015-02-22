@@ -1,12 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Jason Antman's Blog</title><link href="http://blog.jasonantman.com/" rel="alternate"></link><link href="http://blog.jasonantman.com/feeds/all.atom.xml" rel="self"></link><id>http://blog.jasonantman.com/</id><updated>2015-02-21T10:33:00-05:00</updated><entry><title>RSpec Matcher For Hash Item Value</title><link href="http://blog.jasonantman.com/2015/02/rspec-matcher-for-hash-item-value/" rel="alternate"></link><updated>2015-02-21T10:33:00-05:00</updated><author><name>Jason Antman</name></author><id>tag:blog.jasonantman.com,2015-02-21:2015/02/rspec-matcher-for-hash-item-value/</id><summary type="html">&lt;p&gt;I&amp;#8217;ve been working on a project to move my &lt;a href="http://linode.com"&gt;Linode&lt;/a&gt; &lt;span class="caps"&gt;VM&lt;/span&gt; to an
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Jason Antman's Blog</title><link href="http://blog.jasonantman.com/" rel="alternate"></link><link href="http://blog.jasonantman.com/feeds/all.atom.xml" rel="self"></link><id>http://blog.jasonantman.com/</id><updated>2015-02-21T10:33:00-05:00</updated><entry><title>RSpec Matcher For Hash Item Value</title><link href="http://blog.jasonantman.com/2015/02/rspec-matcher-for-hash-item-value/" rel="alternate"></link><updated>2015-02-21T10:33:00-05:00</updated><author><name>Jason Antman</name></author><id>tag:blog.jasonantman.com,2015-02-21:2015/02/rspec-matcher-for-hash-item-value/</id><summary type="html">&lt;p&gt;&lt;strong&gt;Update:&lt;/strong&gt; Well, this is embarassing. &lt;em&gt;After&lt;/em&gt; I posted this, I received a
+&lt;a href="http://blog.jasonantman.com/2015/02/rspec-matcher-for-hash-item-value/#comment-1868422853"&gt;comment&lt;/a&gt;
+within a few hours from &lt;a href="https://twitter.com/myronmarston"&gt;@myronmarston&lt;/a&gt;. I&amp;#8217;d originally
+written this matcher for RSpec2, and then had to convert my project to use
+RSpec3. I just blindly converted this matcher over. Myron pointed out that with
+RSpec3&amp;#8217;s &lt;a href="http://rspec.info/blog/2014/01/new-in-rspec-3-composable-matchers/"&gt;composable matchers&lt;/a&gt;,
+the functionality of this gem is built-in. It can be done as simply&amp;nbsp;as:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="n"&gt;its&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="ss"&gt;:headers&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt; &lt;span class="n"&gt;should&lt;/span&gt; &lt;span class="kp"&gt;include&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;server&amp;#39;&lt;/span&gt; &lt;span class="o"&gt;=&amp;gt;&lt;/span&gt; &lt;span class="sr"&gt;/nginx\/1\./&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;&lt;strong&gt;As such, I&amp;#8217;ve yanked them gem and am leaving the code and blog post here just for posterity.&lt;/strong&gt;
+This should probably not be&amp;nbsp;used.&lt;/p&gt;
+&lt;p&gt;I&amp;#8217;ve been working on a project to move my &lt;a href="http://linode.com"&gt;Linode&lt;/a&gt; &lt;span class="caps"&gt;VM&lt;/span&gt; to an
 Amazon &lt;span class="caps"&gt;EC2&lt;/span&gt; instance; the entire instance is a &amp;#8220;baked&amp;#8221; &lt;span class="caps"&gt;AMI&lt;/span&gt; built by Puppet. Since
 I&amp;#8217;d like to be able to rebuild this quickly, I&amp;#8217;m using &lt;a href="http://serverspec.org/"&gt;ServerSpec&lt;/a&gt;
 (which I have some non-technical issues with, but that&amp;#8217;s a long story) to run full
 integration tests of the whole system - check that packages are installed, services
 are running, and even make live &lt;span class="caps"&gt;HTTP&lt;/span&gt; requests agsinst&amp;nbsp;it.&lt;/p&gt;
 &lt;p&gt;One part of this was making live &lt;span class="caps"&gt;HTTP&lt;/span&gt; requests (from inside ServerSpec / &lt;a href="http://rspec.info/"&gt;rspec&lt;/a&gt;)
-and checking &lt;span class="caps"&gt;HTTP&lt;/span&gt; response headers. Unfortunately, rspec doesn&amp;#8217;t have a nice, clean way to make
+and checking &lt;span class="caps"&gt;HTTP&lt;/span&gt; response headers. Unfortunately, RSpec doesn&amp;#8217;t have a nice, clean way to make
 assertions about a hash&amp;nbsp;item.&lt;/p&gt;
 &lt;p&gt;So, I wrote a little Ruby Gem to do this, &lt;a href="https://github.com/jantman/rspec-matcher-hash-item"&gt;rspec-matcher-hash-item&lt;/a&gt;. At the moment it just
 has one matcher, &lt;code&gt;have_hash_item_matching&lt;/code&gt;. This operates on a hash, and takes two arguments,
@@ -44,7 +57,7 @@ a key and a regex for the value. It allows me to do simple but useful things&amp
 &lt;/pre&gt;&lt;/div&gt;
 
 
-&lt;p&gt;Note that the gem is written for&amp;nbsp;rspec3.&lt;/p&gt;
+&lt;p&gt;Note that the gem is written for&amp;nbsp;RSpec3.&lt;/p&gt;
 &lt;p&gt;This is available at &lt;a href="https://rubygems.org/gems/rspec-matcher-hash-item"&gt;rubygems.org&lt;/a&gt; or from
 &lt;a href="https://github.com/jantman/rspec-matcher-hash-item"&gt;GitHub&lt;/a&gt;. See GitHub for the&amp;nbsp;documentation.&lt;/p&gt;</summary><category term="ruby"></category><category term="rspec"></category><category term="spec"></category><category term="testing"></category></entry><entry><title>AWS CloudFormation and RDS Snapshots</title><link href="http://blog.jasonantman.com/2014/12/aws-cloudformation-and-rds-snapshots/" rel="alternate"></link><updated>2014-12-15T09:29:00-05:00</updated><author><name>Jason Antman</name></author><id>tag:blog.jasonantman.com,2014-12-15:2014/12/aws-cloudformation-and-rds-snapshots/</id><summary type="html">&lt;p&gt;For the past few weeks, I&amp;#8217;ve been working on spinning up a WordPress stack on Amazon &lt;span class="caps"&gt;AWS&lt;/span&gt;. It&amp;#8217;s intended to be a production application,
 so it uses Multi-&lt;span class="caps"&gt;AZ&lt;/span&gt; and a few other tricks to try to achieve relatively high fault tolerance (nothing insane, still in one region). It uses
