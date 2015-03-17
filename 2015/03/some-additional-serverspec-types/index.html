@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:og="http://ogp.me/ns#"
+      xmlns:fb="https://www.facebook.com/2008/fbml">
+<head>
+    <title>Some Additional Serverspec Types</title>
+    <!-- Using the latest rendering mode for IE -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Open Graph tags -->
+
+    <!-- Bootstrap -->
+        <link rel="stylesheet" href="http://blog.jasonantman.com/theme/css/bootstrap.flatly.min.css" type="text/css"/>
+    <link href="http://blog.jasonantman.com/theme/css/font-awesome.min.css" rel="stylesheet">
+    <link href="http://blog.jasonantman.com/theme/css/pygments.css" rel="stylesheet">
+        <link href="http://blog.jasonantman.com/theme/css/typogrify.css" rel="stylesheet">
+    <link rel="stylesheet" href="http://blog.jasonantman.com/theme/css/style.css" type="text/css"/>
+    <!-- JavaScript plugins (requires jQuery) -->
+    <script src="http://code.jquery.com/jquery.js"></script>
+
+    <link rel="stylesheet" href="http://blog.jasonantman.com/theme/css/forkongithub.min.css" type="text/css" />
+
+        <link href="http://blog.jasonantman.com/feeds/all.atom.xml" type="application/atom+xml" rel="alternate"
+              title="Jason Antman's Blog ATOM Feed"/>
+        <link href="http://blog.jasonantman.com/feeds/all.rss.xml" type="application/atom+xml" rel="alternate"
+              title="Jason Antman's Blog RSS Feed"/>
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-2718127-2', 'jasonantman.com');
+  ga('send', 'pageview');
+
+</script>
+</head>
+<body>
+<span id="forkongithub"><a href="https://github.com/jantman/blog">Fork me on GitHub</a></span><nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="http://blog.jasonantman.com" class="navbar-brand">Jason Antman's Blog</a>
+        </div>
+        <div class="collapse navbar-collapse navbar-ex1-collapse">
+            <ul class="nav navbar-nav">
+                         <li><a href="http://blog.jasonantman.com/pages/about.html">
+                             About
+                          </a></li>
+                        <li >
+                            <a href="http://blog.jasonantman.com/categories/ideas-and-rants/index.html">Ideas and rants</a>
+                        </li>
+                        <li >
+                            <a href="http://blog.jasonantman.com/categories/miscellaneous/index.html">Miscellaneous</a>
+                        </li>
+                        <li >
+                            <a href="http://blog.jasonantman.com/categories/monitoring/index.html">Monitoring</a>
+                        </li>
+                        <li >
+                            <a href="http://blog.jasonantman.com/categories/ops/index.html">Ops</a>
+                        </li>
+                        <li class="active">
+                            <a href="http://blog.jasonantman.com/categories/projects/index.html">Projects</a>
+                        </li>
+                        <li >
+                            <a href="http://blog.jasonantman.com/categories/puppet/index.html">Puppet</a>
+                        </li>
+                        <li >
+                            <a href="http://blog.jasonantman.com/categories/tech-howtos/index.html">Tech howtos</a>
+                        </li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="http://blog.jasonantman.com/archives.html"><i class="icon-th-list"></i>Archives</a></li>
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+</nav>
+<!-- /.navbar -->
+<div class="container">
+    <div class="row">
+        <div class="col-lg-9">
+    <section id="content">
+        <article>
+            <header class="page-header">
+                <h1>
+                    <a href="http://blog.jasonantman.com/2015/03/some-additional-serverspec-types/"
+                       rel="bookmark"
+                       title="Permalink to Some Additional Serverspec Types">
+                        Some Additional Serverspec&nbsp;Types
+                    </a>
+                </h1>
+<a href="http://twitter.com/share" class="twitter-share-button" data-count="horizontal" data-via="j_antman">Tweet</a><script type="text/javascript" src="http://platform.twitter.com/widgets.js"></script>
+            </header>
+            <div class="entry-content">
+                <div class="panel">
+                    <div class="panel-body">
+<footer class="post-info">
+    <span class="label label-default">Date</span>
+    <span class="published">
+        <i class="icon-calendar"></i>Sat 14 March 2015
+    </span>
+
+
+
+<span class="label label-default">Tags</span>
+	<a href="http://blog.jasonantman.com/tags/serverspec/index.html">serverspec</a>
+        /
+	<a href="http://blog.jasonantman.com/tags/specinfra/index.html">specinfra</a>
+        /
+	<a href="http://blog.jasonantman.com/tags/testing/index.html">testing</a>
+        /
+	<a href="http://blog.jasonantman.com/tags/beaker/index.html">beaker</a>
+        /
+	<a href="http://blog.jasonantman.com/tags/ruby/index.html">ruby</a>
+        /
+	<a href="http://blog.jasonantman.com/tags/rspec/index.html">rspec</a>
+        /
+	<a href="http://blog.jasonantman.com/tags/gem/index.html">gem</a>
+</footer><!-- /.post-info -->                    </div>
+                </div>
+                <p><a href="http://serverspec.org/">Serverspec</a> is an rspec-based framework for testing live machines,
+and making assertions about things like the output of commands, installed packages, running
+services, file content, etc. However, it has a relatively limited and basic set of
+<a href="http://serverspec.org/resource_types.html">Resource Types</a> that it can test&nbsp;for.</p>
+<p>Before Serverspec completely disabled their GitHub issue tracker (they now seem to have no
+issue tracker at all), I&#8217;d suggested some improvements for more advanced resource types,
+such as one that can perform an <span class="caps">HTTP</span> <span class="caps">GET</span> against an application and check the status code
+and/or output. I was told in no uncertain terms that this is a task for application integration
+testing, and that it&#8217;s &#8220;not what Serverspec is&nbsp;for.&#8221;</p>
+<p>I humbly disagree. I&#8217;ve begun migrating my <a href="https://www.linode.com/">Linode</a> to an <span class="caps">EC2</span> machine,
+using some technology that I&#8217;ve been using at my day job; specifically, Puppet to configure the
+machine and <a href="https://packer.io/">Packer</a> to build an <span class="caps">AMI</span>. Instead of using <a href="http://aws.amazon.com/cloudformation/">Cloudformation</a>
+to spin up an entire stack, I just use a Rakefile to spin up a new <span class="caps">EC2</span> instance, test it, and
+swap an <a href="http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/elastic-ip-addresses-eip.html">Elastic <span class="caps">IP</span></a>
+if all the tests pass. Of course, this requires that I have relatively complete automated testing
+of the <span class="caps">EC2</span> instance. Stock Serverspec can handle 95% of what I want to test, but there are a few
+other, more complex, things that it can&#8217;t. So, I wrote some code to fix&nbsp;that.</p>
+<p>I&#8217;ll admit right off the bat that this code doesn&#8217;t really work the way Serverspec is intended to,
+but it works and it&#8217;s relatively simple. This largely breaks the abstraction of serverspec using
+<a href="https://github.com/serverspec/specinfra">specinfra</a> under the hood, but I&#8217;m not sure if that&#8217;s even
+a concern (since specinfra seems to be all about testing a running machine via some local command
+execution mechanism, and two of the types that I wrote use network <span class="caps">IO</span>&nbsp;instead).</p>
+<p>For the time being, I&#8217;ve written three additional <a href="http://www.rubydoc.info/gems/serverspec-extended-types/#Types">types</a>
+that solve some specific use cases for&nbsp;me:</p>
+<ul>
+<li>A <a href="http://www.rubydoc.info/gems/serverspec-extended-types/#bitlbee">bitlbee</a>
+type that connects to a <a href="http://www.bitlbee.org/">Bitlbee</a> <span class="caps">IRC</span> gateway, authenticates,
+and checks the running bitlbee version. It has matchers to check whether or not the connection and
+authentication was successful, whether or not it timed out, and the bitlbee version. Parameters for
+the type include login nick and password, bitlbee port, and whether or not to connect with&nbsp;<span class="caps">SSL</span>.</li>
+<li>A <a href="http://www.rubydoc.info/gems/serverspec-extended-types/#http_get">http_get</a>
+type which connects to the system under test (with a specified port) and issues a
+<span class="caps">HTTP</span> <span class="caps">GET</span> request for a specified path, with a specified <code>Host</code> header and a timeout (default
+10 seconds). Matchers are provided for the response content body (string), response headers
+(hash), <span class="caps">HTTP</span> status code, and whether or not the request timed out (which also sets a status of&nbsp;0).</li>
+<li>A <a href="http://www.rubydoc.info/gems/serverspec-extended-types/#virtualenv">virtualenv</a> type for testing
+python <a href="https://virtualenv.pypa.io/en/latest/">virtualenv</a>s. It takes the absolute path to the venv
+on the filesystem, and uses serverspec&#8217;s built-in file and command execution features to ensure that
+the path &#8220;looks like&#8221; a virtualenv, and has matchers for the pip and python versions used in the venv
+as well as the <code>pip freeze</code> output as a hash of requirements and their&nbsp;versions.</li>
+</ul>
+<p>Hopefully this will be of use to someone else as well. As I continue using serverspec, I plan on
+adding to the&nbsp;types.</p>
+<p>The code for serverspec-extended-types is on <a href="https://github.com/jantman/serverspec-extended-types/tree/master">GitHub</a>
+(pull requests and issues welcome) and it&#8217;s packaged and hosted as a <a href="https://rubygems.org/gems/serverspec-extended-types">ruby gem</a>.
+<a href="http://www.rubydoc.info/gems/serverspec-extended-types/0.0.2#Installation">Installation</a> and usage is as simple
+as adding it to your Gemfile and <a href="http://www.rubydoc.info/gems/serverspec-extended-types/0.0.2#Usage">spec_helper</a>
+and then using the types and matchers in your&nbsp;specs.</p>
+            </div>
+            <!-- /.entry-content -->
+    <hr />
+    <section class="comments" id="comments">
+        <h2>Comments</h2>
+        <div id="disqus_thread"></div>
+        <script type="text/javascript">
+            /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+            var disqus_shortname = 'jantman'; // required: replace example with your forum shortname
+            var disqus_identifier = 'some-additional-serverspec-types';
+            var disqus_url = 'http://blog.jasonantman.com/2015/03/some-additional-serverspec-types/';
+
+            /* * * DON'T EDIT BELOW THIS LINE * * */
+            (function () {
+                var dsq = document.createElement('script');
+                dsq.type = 'text/javascript';
+                dsq.async = true;
+                dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+                (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+            })();
+        </script>
+        <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by
+            Disqus.</a></noscript>
+        <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+
+    </section>
+        </article>
+    </section>
+
+        </div>
+        <div class="col-lg-3 well well-sm" id="sidebar">
+
+<aside>
+    <section>
+        <ul class="list-group list-group-flush">
+
+                <li class="list-group-item"><h4><i class="icon-home icon-large"></i>Recent Posts</h4></li>
+                        <li class="list-group-item">
+                            <a href="http://blog.jasonantman.com/2015/03/some-additional-serverspec-types/">
+                                Some Additional Serverspec&nbsp;Types
+                            </a>
+                        </li>
+                        <li class="list-group-item">
+                            <a href="http://blog.jasonantman.com/2015/02/rspec-matcher-for-hash-item-value/">
+                                RSpec Matcher For Hash Item&nbsp;Value
+                            </a>
+                        </li>
+                        <li class="list-group-item">
+                            <a href="http://blog.jasonantman.com/2014/12/aws-cloudformation-and-rds-snapshots/">
+                                <span class="caps">AWS</span> CloudFormation and <span class="caps">RDS</span>&nbsp;Snapshots
+                            </a>
+                        </li>
+                        <li class="list-group-item">
+                            <a href="http://blog.jasonantman.com/2014/12/watching-jenkins-jobs-and-cloudformation-updates-with-pushover-notification/">
+                                Watching Jenkins Jobs and CloudFormation Updates with Pushover&nbsp;Notification
+                            </a>
+                        </li>
+                        <li class="list-group-item">
+                            <a href="http://blog.jasonantman.com/2014/12/idea-for-a-generic-method-to-communicate-repositoryproject-status/">
+                                Idea for a Generic Method to Communicate Repository/Project&nbsp;Status
+                            </a>
+                        </li>
+
+
+                <li class="list-group-item"><a href="http://blog.jasonantman.com/tags.html"><h4><i class="icon-tags icon-large"></i>Tags</h4></a></li>
+                <li class="list-group-item">
+                        <span class="tag-1">
+                            <a href="http://blog.jasonantman.com/tags/monitoring/index.html">
+                                monitoring
+                            </a>
+                        </span>
+                        <span class="tag-1">
+                            <a href="http://blog.jasonantman.com/tags/blog/index.html">
+                                blog
+                            </a>
+                        </span>
+                        <span class="tag-1">
+                            <a href="http://blog.jasonantman.com/tags/android/index.html">
+                                android
+                            </a>
+                        </span>
+                        <span class="tag-1">
+                            <a href="http://blog.jasonantman.com/tags/puppet/index.html">
+                                puppet
+                            </a>
+                        </span>
+                        <span class="tag-1">
+                            <a href="http://blog.jasonantman.com/tags/google/index.html">
+                                google
+                            </a>
+                        </span>
+                        <span class="tag-1">
+                            <a href="http://blog.jasonantman.com/tags/sun/index.html">
+                                sun
+                            </a>
+                        </span>
+                        <span class="tag-1">
+                            <a href="http://blog.jasonantman.com/tags/linux/index.html">
+                                linux
+                            </a>
+                        </span>
+                        <span class="tag-1">
+                            <a href="http://blog.jasonantman.com/tags/wordpress/index.html">
+                                wordpress
+                            </a>
+                        </span>
+                        <span class="tag-1">
+                            <a href="http://blog.jasonantman.com/tags/sysadmin/index.html">
+                                sysadmin
+                            </a>
+                        </span>
+                        <span class="tag-1">
+                            <a href="http://blog.jasonantman.com/tags/nagios/index.html">
+                                Nagios
+                            </a>
+                        </span>
+                        <span class="tag-1">
+                            <a href="http://blog.jasonantman.com/tags/security/index.html">
+                                security
+                            </a>
+                        </span>
+                        <span class="tag-1">
+                            <a href="http://blog.jasonantman.com/tags/microsoft/index.html">
+                                microsoft
+                            </a>
+                        </span>
+                        <span class="tag-1">
+                            <a href="http://blog.jasonantman.com/tags/php/index.html">
+                                PHP
+                            </a>
+                        </span>
+                        <span class="tag-2">
+                            <a href="http://blog.jasonantman.com/tags/firefox/index.html">
+                                firefox
+                            </a>
+                        </span>
+                        <span class="tag-2">
+                            <a href="http://blog.jasonantman.com/tags/droid/index.html">
+                                droid
+                            </a>
+                        </span>
+                        <span class="tag-2">
+                            <a href="http://blog.jasonantman.com/tags/logging/index.html">
+                                logging
+                            </a>
+                        </span>
+                        <span class="tag-2">
+                            <a href="http://blog.jasonantman.com/tags/syslog/index.html">
+                                syslog
+                            </a>
+                        </span>
+                        <span class="tag-2">
+                            <a href="http://blog.jasonantman.com/tags/rpm/index.html">
+                                rpm
+                            </a>
+                        </span>
+                        <span class="tag-2">
+                            <a href="http://blog.jasonantman.com/tags/dns/index.html">
+                                dns
+                            </a>
+                        </span>
+                        <span class="tag-2">
+                            <a href="http://blog.jasonantman.com/tags/apache/index.html">
+                                apache
+                            </a>
+                        </span>
+                </li>
+        </ul>
+    </section>
+    <section>
+    <ul class="list-group list-group-flush">
+    <li class="list-group-item" style="padding: 10px 15px 0px 15px;"><h4><i class="icon-twitter
+    icon-large"></i>Twitter <a href="https://twitter.com/j_antman"
+    class="twitter-follow-button" data-show-count="false"
+    data-dnt="true">Follow @j_antman</a></h4>
+<script>!function(d,s,id){var
+  js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document,
+  'script', 'twitter-wjs');</script></li>
+    </ul>
+    <a class="twitter-timeline" data-dnt="true"
+    href="https://twitter.com/j_antman"
+    data-chrome="transparent noheader" data-widget-id="429640274453594113">Tweets by @j_antman</a>
+    <script>!function(d,s,id){var
+    js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+"://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+    </section>
+    <section>
+    <ul class="list-group list-group-flush">
+    <li class="list-group-item"><h4><i class="icon-github icon-large"></i>GitHub Repos</h4></li>
+        <div id="gh_repos">
+            <p class="list-group-item">Status updating...</p>
+        </div>
+            <a href="https://github.com/jantman">@jantman</a> on GitHub
+    </ul>
+        <script type="text/javascript">
+            $(document).ready(function () {
+                if (!window.jXHR) {
+                    var jxhr = document.createElement('script');
+                    jxhr.type = 'text/javascript';
+                    jxhr.src = 'http://blog.jasonantman.com/theme/js/jXHR.js';
+                    var s = document.getElementsByTagName('script')[0];
+                    s.parentNode.insertBefore(jxhr, s);
+                }
+
+                github.showRepos({
+                    user: 'jantman',
+                    count: 5,
+                    skip_forks: false,
+                    target: '#gh_repos'
+                });
+            });
+        </script>
+        <script src="http://blog.jasonantman.com/theme/js/github.js" type="text/javascript"></script>
+    </section>
+</aside>        </div>
+    </div>
+</div>
+<footer>
+    <div class="container">
+        <hr>
+        <p class="pull-right"><i class="icon-arrow-up"></i> <a href="#">Back to top</a></p>
+
+
+        <p>&copy; 2015 Jason Antman &middot; Powered by <a href="https://github.com/DandyDev/pelican-bootstrap3" target="_blank">pelican-bootstrap3</a>,
+            <a href="http://docs.getpelican.com/" target="_blank">Pelican</a>,
+            <a href="http://getbootstrap.com" target="_blank">Bootstrap</a></p>
+    </div>
+</footer>
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="http://blog.jasonantman.com/theme/js/bootstrap.min.js"></script>
+
+<!-- Enable responsive features in IE8 with Respond.js (https://github.com/scottjehl/Respond) -->
+<script src="http://blog.jasonantman.com/theme/js/respond.min.js"></script>
+    <script type="text/javascript">
+        /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+        var disqus_shortname = 'jantman'; // required: replace example with your forum shortname
+
+        /* * * DON'T EDIT BELOW THIS LINE * * */
+        (function () {
+            var s = document.createElement('script');
+            s.async = true;
+            s.type = 'text/javascript';
+            s.src = '//' + disqus_shortname + '.disqus.com/count.js';
+            (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+        }());
+    </script>
+
+
+</body>
+</html>

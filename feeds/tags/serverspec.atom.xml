@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Jason Antman's Blog</title><link href="http://blog.jasonantman.com/" rel="alternate"></link><link href="http://blog.jasonantman.com/feeds/tags/serverspec.atom.xml" rel="self"></link><id>http://blog.jasonantman.com/</id><updated>2015-03-14T11:58:00-04:00</updated><entry><title>Some Additional Serverspec Types</title><link href="http://blog.jasonantman.com/2015/03/some-additional-serverspec-types/" rel="alternate"></link><updated>2015-03-14T11:58:00-04:00</updated><author><name>Jason Antman</name></author><id>tag:blog.jasonantman.com,2015-03-14:2015/03/some-additional-serverspec-types/</id><summary type="html">&lt;p&gt;&lt;a href="http://serverspec.org/"&gt;Serverspec&lt;/a&gt; is an rspec-based framework for testing live machines,
+and making assertions about things like the output of commands, installed packages, running
+services, file content, etc. However, it has a relatively limited and basic set of
+&lt;a href="http://serverspec.org/resource_types.html"&gt;Resource Types&lt;/a&gt; that it can test&amp;nbsp;for.&lt;/p&gt;
+&lt;p&gt;Before Serverspec completely disabled their GitHub issue tracker (they now seem to have no
+issue tracker at all), I&amp;#8217;d suggested some improvements for more advanced resource types,
+such as one that can perform an &lt;span class="caps"&gt;HTTP&lt;/span&gt; &lt;span class="caps"&gt;GET&lt;/span&gt; against an application and check the status code
+and/or output. I was told in no uncertain terms that this is a task for application integration
+testing, and that it&amp;#8217;s &amp;#8220;not what Serverspec is&amp;nbsp;for.&amp;#8221;&lt;/p&gt;
+&lt;p&gt;I humbly disagree. I&amp;#8217;ve begun migrating my &lt;a href="https://www.linode.com/"&gt;Linode&lt;/a&gt; to an &lt;span class="caps"&gt;EC2&lt;/span&gt; machine,
+using some technology that I&amp;#8217;ve been using at my day job; specifically, Puppet to configure the
+machine and &lt;a href="https://packer.io/"&gt;Packer&lt;/a&gt; to build an &lt;span class="caps"&gt;AMI&lt;/span&gt;. Instead of using &lt;a href="http://aws.amazon.com/cloudformation/"&gt;Cloudformation&lt;/a&gt;
+to spin up an entire stack, I just use a Rakefile to spin up a new &lt;span class="caps"&gt;EC2&lt;/span&gt; instance, test it, and
+swap an &lt;a href="http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/elastic-ip-addresses-eip.html"&gt;Elastic &lt;span class="caps"&gt;IP&lt;/span&gt;&lt;/a&gt;
+if all the tests pass. Of course, this requires that I have relatively complete automated testing
+of the &lt;span class="caps"&gt;EC2&lt;/span&gt; instance. Stock Serverspec can handle 95% of what I want to test, but there are a few
+other, more complex, things that it can&amp;#8217;t. So, I wrote some code to fix&amp;nbsp;that.&lt;/p&gt;
+&lt;p&gt;I&amp;#8217;ll admit right off the bat that this code doesn&amp;#8217;t really work the way Serverspec is intended to,
+but it works and it&amp;#8217;s relatively simple. This largely breaks the abstraction of serverspec using
+&lt;a href="https://github.com/serverspec/specinfra"&gt;specinfra&lt;/a&gt; under the hood, but I&amp;#8217;m not sure if that&amp;#8217;s even
+a concern (since specinfra seems to be all about testing a running machine via some local command
+execution mechanism, and two of the types that I wrote use network &lt;span class="caps"&gt;IO&lt;/span&gt;&amp;nbsp;instead).&lt;/p&gt;
+&lt;p&gt;For the time being, I&amp;#8217;ve written three additional &lt;a href="http://www.rubydoc.info/gems/serverspec-extended-types/#Types"&gt;types&lt;/a&gt;
+that solve some specific use cases for&amp;nbsp;me:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;A &lt;a href="http://www.rubydoc.info/gems/serverspec-extended-types/#bitlbee"&gt;bitlbee&lt;/a&gt;
+type that connects to a &lt;a href="http://www.bitlbee.org/"&gt;Bitlbee&lt;/a&gt; &lt;span class="caps"&gt;IRC&lt;/span&gt; gateway, authenticates,
+and checks the running bitlbee version. It has matchers to check whether or not the connection and
+authentication was successful, whether or not it timed out, and the bitlbee version. Parameters for
+the type include login nick and password, bitlbee port, and whether or not to connect with&amp;nbsp;&lt;span class="caps"&gt;SSL&lt;/span&gt;.&lt;/li&gt;
+&lt;li&gt;A &lt;a href="http://www.rubydoc.info/gems/serverspec-extended-types/#http_get"&gt;http_get&lt;/a&gt;
+type which connects to the system under test (with a specified port) and issues a
+&lt;span class="caps"&gt;HTTP&lt;/span&gt; &lt;span class="caps"&gt;GET&lt;/span&gt; request for a specified path, with a specified &lt;code&gt;Host&lt;/code&gt; header and a timeout (default
+10 seconds). Matchers are provided for the response content body (string), response headers
+(hash), &lt;span class="caps"&gt;HTTP&lt;/span&gt; status code, and whether or not the request timed out (which also sets a status of&amp;nbsp;0).&lt;/li&gt;
+&lt;li&gt;A &lt;a href="http://www.rubydoc.info/gems/serverspec-extended-types/#virtualenv"&gt;virtualenv&lt;/a&gt; type for testing
+python &lt;a href="https://virtualenv.pypa.io/en/latest/"&gt;virtualenv&lt;/a&gt;s. It takes the absolute path to the venv
+on the filesystem, and uses serverspec&amp;#8217;s built-in file and command execution features to ensure that
+the path &amp;#8220;looks like&amp;#8221; a virtualenv, and has matchers for the pip and python versions used in the venv
+as well as the &lt;code&gt;pip freeze&lt;/code&gt; output as a hash of requirements and their&amp;nbsp;versions.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Hopefully this will be of use to someone else as well. As I continue using serverspec, I plan on
+adding to the&amp;nbsp;types.&lt;/p&gt;
+&lt;p&gt;The code for serverspec-extended-types is on &lt;a href="https://github.com/jantman/serverspec-extended-types/tree/master"&gt;GitHub&lt;/a&gt;
+(pull requests and issues welcome) and it&amp;#8217;s packaged and hosted as a &lt;a href="https://rubygems.org/gems/serverspec-extended-types"&gt;ruby gem&lt;/a&gt;.
+&lt;a href="http://www.rubydoc.info/gems/serverspec-extended-types/0.0.2#Installation"&gt;Installation&lt;/a&gt; and usage is as simple
+as adding it to your Gemfile and &lt;a href="http://www.rubydoc.info/gems/serverspec-extended-types/0.0.2#Usage"&gt;spec_helper&lt;/a&gt;
+and then using the types and matchers in your&amp;nbsp;specs.&lt;/p&gt;</summary><category term="serverspec"></category><category term="specinfra"></category><category term="testing"></category><category term="beaker"></category><category term="ruby"></category><category term="rspec"></category><category term="gem"></category></entry></feed>
