@@ -5,7 +5,6 @@ Category: Projects
 Tags: serverspec, specinfra, testing, beaker, ruby, rspec, gem
 Slug: some-additional-serverspec-types
 Summary: Some additional types that I wrote for Serverspec
-Status: draft
 
 [Serverspec](http://serverspec.org/) is an rspec-based framework for testing live machines,
 and making assertions about things like the output of commands, installed packages, running
