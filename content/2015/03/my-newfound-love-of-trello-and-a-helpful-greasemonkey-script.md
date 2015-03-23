@@ -50,6 +50,8 @@ uses Daniel's card naming code (plus fixing the GitHub format a bit and adding s
 the GreaseMonkey/Trello logic from Benjamin's script. Once installed and authenticated with Trello, the script retrieves a list of all of your boards
 and cards, and adds an "Add to Trello" right-click context menu in Firefox, allowing you to add the current page to any list on any of your boards.
 
+[![screenshot of TrelloContextMenu context menu popup in Firefox](/GFX/TrelloContextMenu_sm.png)](/GFX/TrelloContextMenu_large.png)
+
 The script is [available on GitHub](https://github.com/jantman/userscripts#trellocontextmenu) (the link in the README will go to an installable raw
 version of the script), and uses GreaseMonkey's versioning capabilities. At the moment I've only tested it with GreaseMonkey in Firefox, and I don't
 expect it to work elsewhere as it uses a few GreaseMonkey-specific features, such as ``GM_xmlhttpRequest`` and GreaseMoneky's browser-wide SQLite
