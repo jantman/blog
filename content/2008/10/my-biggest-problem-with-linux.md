@@ -5,6 +5,16 @@ Category: Ideas and Rants
 Tags: linux, patch management, solaris, updates, upgrades
 Slug: my-biggest-problem-with-linux
 
+__Update / Notice:__ This post was written in 2008. The world has
+changed since then. A lot. We have good, easy configuration management
+like Puppet, Chef, etc. (which, in fact, I
+[use to manage my desktop and laptop](https://github.com/jantman/workstation-bootstrap))
+and, more importantly, creating and destroying servers can be done in
+[seconds](http://aws.amazon.com/cloudformation/) rather than hours.
+In short, in my opinion, this post is a rant about a problem that no longer
+exists. If you're still thinking of things the way this post does, you're
+doing it wrong.
+
 For one of my wonderful classes, Internet Security, I'm doing a
 presentation on "patch management". While I'm obligated to cover Windows
 - and, of course, will talk about MacOS - I'll obviously be spending a
