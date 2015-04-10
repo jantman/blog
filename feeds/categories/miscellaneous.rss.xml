@@ -1,5 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Jason Antman's Blog</title><link>http://blog.jasonantman.com/</link><description></description><atom:link href="http://blog.jasonantman.com/feeds/categories/miscellaneous.rss.xml" rel="self"></atom:link><lastBuildDate>Sun, 07 Dec 2014 18:24:00 -0500</lastBuildDate><item><title>Idea for a Generic Method to Communicate Repository/Project Status</title><link>http://blog.jasonantman.com/2014/12/idea-for-a-generic-method-to-communicate-repositoryproject-status/</link><description>&lt;p&gt;Update 2014-12-24: I actually did something with this. See &lt;a href="http://www.repostatus.org"&gt;repostatus.org&lt;/a&gt;.&lt;/p&gt;
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Jason Antman's Blog</title><link>http://blog.jasonantman.com/</link><description></description><atom:link href="http://blog.jasonantman.com/feeds/categories/miscellaneous.rss.xml" rel="self"></atom:link><lastBuildDate>Fri, 10 Apr 2015 05:58:00 -0400</lastBuildDate><item><title>Jira to Trello Script</title><link>http://blog.jasonantman.com/2015/04/jira-to-trello-script/</link><description>&lt;p&gt;A few weeks ago, I &lt;a href="/2015/03/my-new-found-love-of-trello-and-a-helpful-greasemonkey-script/"&gt;posted about&lt;/a&gt; how I&amp;#8217;ve
+started using &lt;a href="https://trello.com/"&gt;Trello&lt;/a&gt; to keep track of my work and keep things flowing smoothly. It&amp;#8217;s been
+absolutely wonderful, and I feel more productive and less stressed, and like I have a better idea of what&amp;#8217;s coming
+up. The one thing that Trello is missing is time tracking. I don&amp;#8217;t need anything fancy, all I really wanted was to
+be able to show a time estimate on my cards. I know I could&amp;#8217;ve just put the estimate right in the title of the cards,
+but that seemed like a waste of&amp;nbsp;data.&lt;/p&gt;
+&lt;p&gt;At the moment we&amp;#8217;re using Jira at work, so I wrote &lt;a href="https://github.com/jantman/misc-scripts/blob/master/jira2trello.py"&gt;jira2trello.py&lt;/a&gt;.
+It&amp;#8217;s a pretty simple Python script that uses the &lt;a href="https://pypi.python.org/pypi/trello"&gt;trello&lt;/a&gt; and
+&lt;a href="https://pypi.python.org/pypi/jira"&gt;jira&lt;/a&gt; packages from pypi to iterate over all cards on a specified Trello
+board, and for each card that matches a configurable regular expression for ticket keys (i.e.
+&lt;code&gt;.*((project1|project2|project3)-\d+):.*&lt;/code&gt;), the script&amp;nbsp;will:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Determine if the Jira issue is a subtask, and if so, prefix its title with the issue key of the parent issue,
+using the format of &lt;code&gt;PARENT-xxx -&amp;gt; CHILD-xxx&lt;/code&gt;.&lt;/li&gt;
+&lt;li&gt;Look up the &amp;#8220;Original Estimate&amp;#8221; time tracking field in Jira, and if present, prepend it to the title of
+the&amp;nbsp;card.&lt;/li&gt;
+&lt;li&gt;Regenerate the title of the card, using the current issue summary from&amp;nbsp;Jira.&lt;/li&gt;
+&lt;li&gt;Move the card to a specified &amp;#8220;Done&amp;#8221; list if it&amp;#8217;s closed in&amp;nbsp;Jira.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;There are a few assumptions in the script about how the titles of cards are formed, namely that they follow the
+&lt;code&gt;ISSUE-xxx: Summary Here&lt;/code&gt; format used by my &lt;a href="https://github.com/jantman/userscripts#trellocontextmenu"&gt;TrelloContextMenu&lt;/a&gt;
+Firefox userscript. But I hope that this might be of use to someone else as well. Please feel free to open issues
+or submit pull requests for any improvements that would be helpful, including any assumptions I&amp;#8217;ve made that aren&amp;#8217;t
+valid in your environment. The source can be found on GitHub: &lt;a href="https://github.com/jantman/misc-scripts/blob/master/jira2trello.py"&gt;jira2trello.py&lt;/a&gt;.&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">Jason Antman</dc:creator><pubDate>Fri, 10 Apr 2015 05:58:00 -0400</pubDate><guid>tag:blog.jasonantman.com,2015-04-10:2015/04/jira-to-trello-script/</guid><category>jira</category><category>trello</category><category>python</category><category>ticket</category><category>kanban</category></item><item><title>Idea for a Generic Method to Communicate Repository/Project Status</title><link>http://blog.jasonantman.com/2014/12/idea-for-a-generic-method-to-communicate-repositoryproject-status/</link><description>&lt;p&gt;Update 2014-12-24: I actually did something with this. See &lt;a href="http://www.repostatus.org"&gt;repostatus.org&lt;/a&gt;.&lt;/p&gt;
 &lt;p&gt;First, something funny, before my possibly-hair-brained&amp;nbsp;scheme:&lt;/p&gt;
 &lt;p&gt;&lt;a href="http://www.commitstrip.com/en/2014/11/25/west-side-project-story/"&gt;&lt;img alt="commitstrip.com &amp;quot;side project&amp;quot; comic strip" src="http://www.commitstrip.com/wp-content/uploads/2014/11/Strip-Side-project-650-finalenglish.jpg" /&gt;&lt;/a&gt;&lt;/p&gt;
 &lt;p&gt;I know I&amp;#8217;m not alone in having a mess of &lt;a href="https://github.com/jantman?tab=repositories"&gt;repositories on GitHub&lt;/a&gt;; I personally have over 90, and they&amp;#8217;re
@@ -2448,23 +2471,4 @@ or tab characters, and I don&amp;#8217;t know what shell the phone has on&amp;nb
 &lt;li&gt;&lt;a href="market://details?id=gr.androiddev.WifiScanner"&gt;WifiScanner&lt;/a&gt; (1.7) -
     Simple WiFi scanner app. Shows all detected WiFi APs along with
     &lt;span class="caps"&gt;SSID&lt;/span&gt;, &lt;span class="caps"&gt;BSSID&lt;/span&gt;/&lt;span class="caps"&gt;MAC&lt;/span&gt;, signal level, channel and&amp;nbsp;encryption.&lt;/li&gt;
-&lt;/ul&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Sun, 28 Feb 2010 12:39:00 -0500</pubDate><guid>tag:blog.jasonantman.com,2010-02-28:2010/02/my-android-apps/</guid><category>android</category><category>apps</category><category>droid</category></item><item><title>Links for Tuesday, February 23, 2010</title><link>http://blog.jasonantman.com/2010/02/links-for-tuesday-february-23-2010/</link><description>&lt;ul&gt;
-&lt;li&gt;&lt;a href="http://www.boingboing.net/2010/02/21/acta-internet-enforc.html"&gt;&lt;span class="caps"&gt;ACTA&lt;/span&gt; &amp;#8220;internet enforcement&amp;#8221; chapter leaks Boing&amp;nbsp;Boing&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href="http://www.michaelgeist.ca/content/view/4808/125/"&gt;Michael Geist - &lt;span class="caps"&gt;ACTA&lt;/span&gt; Internet Chapter Leaks: Renegotiates &lt;span class="caps"&gt;WIPO&lt;/span&gt;,
-    Sets 3 Strikes as&amp;nbsp;Model&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href="http://www.pcworld.com/article/189868/chuck_norris_botnet_karatechops_routers_hard.html"&gt;Chuck Norris Botnet Karate-chops Routers Hard -&amp;nbsp;PCWorld&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href="http://www.lockergnome.com/knitter/2007/10/08/boot-linux-faster-with-an-open-bios/"&gt;techblog&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href="http://yro.slashdot.org/story/10/02/22/1447205/Suspension-of-Disbelief?from=rss&amp;amp;utm_source=feedburner&amp;amp;utm_medium=feed&amp;amp;utm_campaign=Feed:+Slashdot/slashdotYourRightsOnline+(Slashdot:+Your+Rights+Online)&amp;amp;utm_content=Google+Reader"&gt;Slashdot Your Rights Online Story | Suspension of&amp;nbsp;Disbelief&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href="http://techflash.com/seattle/2010/02/microsoft_amazon_in_patent_deal.html"&gt;Microsoft, Amazon strike patent deal covering Kindle and&amp;nbsp;Linux&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href="http://www.linuxinsider.com/rsstory/69401.html"&gt;Linux News: Legal: &lt;span class="caps"&gt;FOSS&lt;/span&gt; Dev Gets Damages in Precedent-Setting Model
-    Train&amp;nbsp;Case&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href="http://thedailywtf.com/Articles/Testing-the-Path-to-Pain.aspx"&gt;Testing the Path to Pain - The Daily&amp;nbsp;&lt;span class="caps"&gt;WTF&lt;/span&gt;&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href="http://www.michaelgeist.ca/content/view/4809/125/"&gt;Michael Geist - &lt;span class="caps"&gt;EU&lt;/span&gt; Data Protection Supervisor Warns Against &lt;span class="caps"&gt;ACTA&lt;/span&gt;,
-    Calls 3 Strikes&amp;nbsp;Disproportionate&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href="http://blogs.apache.org/foundation/entry/the_apache_software_foundation_announces2"&gt;The Apache Software Foundation Announces the 15th Anniversary of
-    the Apache &lt;span class="caps"&gt;HTTP&lt;/span&gt; Web Server : The Apache Software Foundation&amp;nbsp;Blog&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href="http://www.fsf.org/blogs/community/google-free-on2-vp8-for-youtube/"&gt;Open letter to Google: free &lt;span class="caps"&gt;VP8&lt;/span&gt;, and use it on YouTube - Free
-    Software&amp;nbsp;Foundation&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href="http://arstechnica.com/open-source/news/2010/02/ruling-foss-devs-can-collect-damages-from-license-violators.ars"&gt;&lt;span class="caps"&gt;FOSS&lt;/span&gt; devs can collect damages from license&amp;nbsp;violators&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href="http://www.wired.com/playbook/2010/02/massive-network-is-an-olympian-feat/"&gt;Massive Network is an Olympian Feat |&amp;nbsp;Playbook&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Tue, 23 Feb 2010 11:55:00 -0500</pubDate><guid>tag:blog.jasonantman.com,2010-02-23:2010/02/links-for-tuesday-february-23-2010/</guid></item></channel></rss>
+&lt;/ul&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Sun, 28 Feb 2010 12:39:00 -0500</pubDate><guid>tag:blog.jasonantman.com,2010-02-28:2010/02/my-android-apps/</guid><category>android</category><category>apps</category><category>droid</category></item></channel></rss>
