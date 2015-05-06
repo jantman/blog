@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:og="http://ogp.me/ns#"
+      xmlns:fb="https://www.facebook.com/2008/fbml">
+<head>
+    <title>Local S3 Server to Acceptance Test Netflix Ice Installation In Isolation</title>
+    <!-- Using the latest rendering mode for IE -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Open Graph tags -->
+
+    <!-- Bootstrap -->
+        <link rel="stylesheet" href="http://blog.jasonantman.com/theme/css/bootstrap.flatly.min.css" type="text/css"/>
+    <link href="http://blog.jasonantman.com/theme/css/font-awesome.min.css" rel="stylesheet">
+    <link href="http://blog.jasonantman.com/theme/css/pygments.css" rel="stylesheet">
+        <link href="http://blog.jasonantman.com/theme/css/typogrify.css" rel="stylesheet">
+    <link rel="stylesheet" href="http://blog.jasonantman.com/theme/css/style.css" type="text/css"/>
+    <!-- JavaScript plugins (requires jQuery) -->
+    <script src="http://code.jquery.com/jquery.js"></script>
+
+    <link rel="stylesheet" href="http://blog.jasonantman.com/theme/css/forkongithub.min.css" type="text/css" />
+
+        <link href="http://blog.jasonantman.com/feeds/all.atom.xml" type="application/atom+xml" rel="alternate"
+              title="Jason Antman's Blog ATOM Feed"/>
+        <link href="http://blog.jasonantman.com/feeds/all.rss.xml" type="application/atom+xml" rel="alternate"
+              title="Jason Antman's Blog RSS Feed"/>
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-2718127-2', 'jasonantman.com');
+  ga('send', 'pageview');
+
+</script>
+</head>
+<body>
+<span id="forkongithub"><a href="https://github.com/jantman/blog">Fork me on GitHub</a></span><nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="http://blog.jasonantman.com" class="navbar-brand">Jason Antman's Blog</a>
+        </div>
+        <div class="collapse navbar-collapse navbar-ex1-collapse">
+            <ul class="nav navbar-nav">
+                         <li><a href="http://blog.jasonantman.com/pages/about.html">
+                             About
+                          </a></li>
+                        <li >
+                            <a href="http://blog.jasonantman.com/categories/ideas-and-rants/index.html">Ideas and rants</a>
+                        </li>
+                        <li >
+                            <a href="http://blog.jasonantman.com/categories/miscellaneous/index.html">Miscellaneous</a>
+                        </li>
+                        <li >
+                            <a href="http://blog.jasonantman.com/categories/monitoring/index.html">Monitoring</a>
+                        </li>
+                        <li >
+                            <a href="http://blog.jasonantman.com/categories/ops/index.html">Ops</a>
+                        </li>
+                        <li >
+                            <a href="http://blog.jasonantman.com/categories/projects/index.html">Projects</a>
+                        </li>
+                        <li >
+                            <a href="http://blog.jasonantman.com/categories/puppet/index.html">Puppet</a>
+                        </li>
+                        <li class="active">
+                            <a href="http://blog.jasonantman.com/categories/tech-howtos/index.html">Tech howtos</a>
+                        </li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="http://blog.jasonantman.com/archives.html"><i class="icon-th-list"></i>Archives</a></li>
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+</nav>
+<!-- /.navbar -->
+<div class="container">
+    <div class="row">
+        <div class="col-lg-9">
+    <section id="content">
+        <article>
+            <header class="page-header">
+                <h1>
+                    <a href="http://blog.jasonantman.com/2015/05/local-s3-server-to-acceptance-test-netflix-ice-installation-in-isolation/"
+                       rel="bookmark"
+                       title="Permalink to Local S3 Server to Acceptance Test Netflix Ice Installation In Isolation">
+                        Local S3 Server to Acceptance Test Netflix Ice Installation In&nbsp;Isolation
+                    </a>
+                </h1>
+<a href="http://twitter.com/share" class="twitter-share-button" data-count="horizontal" data-via="j_antman">Tweet</a><script type="text/javascript" src="http://platform.twitter.com/widgets.js"></script>
+            </header>
+            <div class="entry-content">
+                <div class="panel">
+                    <div class="panel-body">
+<footer class="post-info">
+    <span class="label label-default">Date</span>
+    <span class="published">
+        <i class="icon-calendar"></i>Tue 05 May 2015
+    </span>
+
+
+
+<span class="label label-default">Tags</span>
+	<a href="http://blog.jasonantman.com/tags/netflix/index.html">netflix</a>
+        /
+	<a href="http://blog.jasonantman.com/tags/ice/index.html">ice</a>
+        /
+	<a href="http://blog.jasonantman.com/tags/puppet/index.html">puppet</a>
+        /
+	<a href="http://blog.jasonantman.com/tags/beaker/index.html">beaker</a>
+        /
+	<a href="http://blog.jasonantman.com/tags/acceptance-testing/index.html">acceptance testing</a>
+        /
+	<a href="http://blog.jasonantman.com/tags/aws/index.html">aws</a>
+        /
+	<a href="http://blog.jasonantman.com/tags/s3/index.html">s3</a>
+        /
+	<a href="http://blog.jasonantman.com/tags/fakes3/index.html">fakes3</a>
+        /
+	<a href="http://blog.jasonantman.com/tags/testing/index.html">testing</a>
+</footer><!-- /.post-info -->                    </div>
+                </div>
+                <p>At work, we recently started using <a href="http://netflix.github.io/">Netflix <span class="caps">OSS</span></a>&#8216;s <a href="https://github.com/Netflix/ice">Ice</a> <span class="caps">AWS</span> cost analysis tool.
+It provides a Java daemon to read and parse <span class="caps">AWS</span>&#8217; <a href="http://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/detailed-billing-reports.html">detailed billing reports</a>
+and a web interface to the data (<a href="https://github.com/Netflix/ice/blob/master/README.md#screenshots">screenshots</a>). The single biggest feature for us
+is the ability to do cost breakdowns (by hour/day/week/month) based on Cost Allocation tags in the detailed billing reports. We tag every billable <span class="caps">AWS</span>
+resource with the Application Name, Service Class (environment; dev/test/prod) and Responsible Party. Ice lets us configure &#8220;Application Groups&#8221;
+based on applications as seen from a business/budgetary standpoint and allow up-to-the-hour data on that available to anyone who needs&nbsp;it.</p>
+<p>We spun up the development install of Ice for a few weeks to give it a spin, but once people started complaining that my screen session died and took
+Ice with it, it was clear we needed a real, permanent installation. While there is <a href="https://github.com/mdsol/ice_cookbook">chef</a> and <a href="https://github.com/Answers4AWS/netflixoss-ansible">ansible</a>
+code to install and configure Ice, we&#8217;re a Puppet shop, and there wasn&#8217;t anything available that I could find for Puppet. So, I set about writing a
+module to install and configure Ice, running in Tomcat behind an Nginx proxy. Like any good modern module, I wanted not only <a href="http://rspec-puppet.com/">rspec-puppet</a>
+unit tests but also <a href="https://github.com/puppetlabs/beaker">beaker</a> acceptance tests. For those unfamiliar, Beaker is an acceptance testing framework for Puppet
+that&#8217;s similar to Test Kitchen; it spins up Vagrant machines, runs some code in them, and then uses <a href="http://serverspec.org/">serverspec</a> to make assertions about
+the state of the system (file contents, running processes, command output, etc.) (side note: if you used Beaker prior to the
+<a href="https://github.com/puppetlabs/beaker/blob/master/HISTORY.md#beaker2.0.0">2.0 release</a> in December 2014, you should really try it again; they&#8217;ve made some great&nbsp;improvements).</p>
+<h2 id="the-problem">The&nbsp;Problem</h2>
+<p>This posed a bit of a challenge, as Ice (in addition to being pretty poorly documented) is really designed to run in <span class="caps">AWS</span>. Firstly, the very reason we started running Ice was
+to get a handle on our fast-growing <span class="caps">AWS</span> spend; as a result, we&#8217;re trying hard not to use <span class="caps">AWS</span> for small-scale projects that could use existing resources. Second, while our
+company very unfortunately doesn&#8217;t have an open source policy and isn&#8217;t releasing anything (hopefully this may be changing soon), we try hard to write generic, forge-quality&nbsp;modules.</p>
+<p>As a result, I wanted to use the default Vagrant/VirtualBox provider for Beaker. To make matters worse, in keeping with the spirit of a community module, I didn&#8217;t
+want the acceptance tests to require anything specific to my company, such as an S3 bucket preseeded with our billing data. Ice both reads the detailed billing reports
+(one of its three inputs; <span class="caps">EC2</span> pricing data and your accounts&#8217; reservation pricing/capacity being the others) and writes state from and to S3. So, this was a bit difficult.
+As we don&#8217;t plan on upgrading Ice terribly often, and we wanted to install from the <a href="https://netflixoss.ci.cloudbees.com/job/ice-master/">cloudbees master builds</a>, we wanted
+acceptance testing of not just the provisioning tooling, but also some basic smoke tests for the application&nbsp;itself.</p>
+<h2 id="the-solution">The&nbsp;Solution</h2>
+<p>I managed to come up with a working, albeit somewhat Rube Goldberg, method of getting isolated acceptance tests to work. What follows is the gist of how I got Ice
+working in complete isolation. The majority of this happens in <code>spec/acceptance/0prerequisite_spec.rb</code> which runs first and both does the prerequisite setup
+and validates that everything is setup right and working for the tests. The following solution is based on the amazingly helpful <a href="https://github.com/jubos/fake-s3">fakes3</a>
+Ruby gem, the <a href="http://www.apsis.ch/pound/">Pound</a> reverse proxy, and some <span class="caps">SSL</span> certificate trickery. While my code was specific to Beaker, this should be generic
+enough to use with any system acceptance testing&nbsp;tool.</p>
+<h2 id="prerequisites">Prerequisites</h2>
+<p>First, we obtain or create some files that we&#8217;ll need on the test&nbsp;instance:</p>
+<ol>
+<li>
+<p>Grab a relatively recent Detailed Billing With Resources and Tags zipped <span class="caps">CSV</span> report from an <span class="caps">AWS</span> account of yours (the filename is in the format
+    <code>&lt;ACCOUNT NUMBER&gt;-aws-billing-detailed-line-items-with-resources-and-tags-&lt;YYYY&gt;-&lt;MM&gt;.csv</code>). Manually trim it down to a sufficient sample of data;
+    I took a few hours&#8217; worth of data from one day and trimmed it down to just that referencing a few randomly chosen <span class="caps">RDS</span> instances, ELBs, on-demand <span class="caps">EC2</span>
+    instances and reserved <span class="caps">EC2</span> instances. I then anonymized the account number, resource IDs, tag values, and anything else identifying. Ice needs billing
+    data in order to do anything, so this will serve as our test&nbsp;data.</p>
+</li>
+<li>
+<p>When Ice runs, it attempts to retrieve reserved instance pricing. It appears (I&#8217;ve lost the mailing list or GitHub issue reference) that it&#8217;s typical for
+    the first Ice run on an empty S3 work directory to die because these files are missing. As a result, grab the <code>reservation_prices.oneyear.*</code> files from
+    the S3 work bucket of a running/working Ice installation. This will prevent a time-consuming shutdown of Ice on the first&nbsp;run.</p>
+</li>
+<li>
+<p>Generate a self-signed <span class="caps">SSL</span> key and certificate for <code>fakebucket.s3.amazonaws.com</code>. Package them together in a <span class="caps">PEM</span> file suitable for use in web servers.
+    (Note that most modern S3 <span class="caps">API</span> clients accept a full <span class="caps">URL</span> to a bucket, as there are now third parties that implement the S3 <span class="caps">API</span>. Ice does not; it connects
+    to https://<span class="caps">BUCKETNAME</span>.s3amazonaws.com. As a result, this <span class="caps">SSL</span> foolery is&nbsp;required.)</p>
+</li>
+</ol>
+<h2 id="setup">Setup</h2>
+<ol>
+<li>
+<p>Install the <a href="https://rubygems.org/gems/fakes3">fakes3</a> rubygem; this provides an s3-compliant <span class="caps">API</span> backed by local filesystem storage.
+    Configure it to run during your tests (I set it up as a systemd service, but there are certainly other ways to do this). Note that
+    while fakes3 stores the uploaded data on the local filesystem, it maintains a mapping of known objects in memory; as such, the process
+    always starts completely empty, regardless of what&#8217;s in the backing directory on the filesystem. fakes3 allows all <span class="caps">IAM</span> credentials,
+    so fake ones are fine. It also automatically creates buckets the first time they&#8217;re&nbsp;accessed.</p>
+</li>
+<li>
+<p>Install the <a href="http://www.apsis.ch/pound/">pound</a> reverse proxy and configure it to listen on port 443 with the <span class="caps">PEM</span> file you generated
+    earlier, and proxy to fakes3 (which listens by default on port 10000). The <code>ListenHTTPS</code>section of <code>pound.cfg</code> will need the
+    <code>xHTTP 1</code> directive in order to enable <span class="caps">HTTP</span> verbs other than&nbsp;<span class="caps">GET</span>.</p>
+</li>
+<li>
+<p>Setup a local hosts file entry pointing <code>fakebucket.s3.amazonaws.com</code> at <code>127.0.0.1</code>.</p>
+</li>
+<li>
+<p>After fakes3 starts, upload your sample billing data file and your reserved instance pricing files to the appropriate paths under a
+    bucket called &#8220;fakebucket&#8221;. You can use a tool such as <a href="http://s3tools.org/s3cmd">s3cmd</a> to manipulate its contents, and other
+    supported tools are listed in <a href="https://github.com/jubos/fake-s3/wiki/Supported-Clients">the documentation</a>. This step also serves
+    to validate your Pound configuration, which should pass <span class="caps">HTTPS</span> port 443 traffic through to fakes3 and allow you to store and
+    retrieve&nbsp;objects.</p>
+</li>
+<li>
+<p>Figure out the path to the trusted keystore for the version of Java that you&#8217;re running Ice under. On CentOS 7 with OpenJDK 1.7.0,
+    this was (after a lot of symlinks) <code>/usr/lib/jvm/jre/lib/security/cacerts</code>.</p>
+</li>
+<li>
+<p>Import your self-signed certificate into the Java keystore as a trusted certificate. This will allow <span class="caps">SSL</span> verification to succeed even
+    with a self-signed&nbsp;certificate:</p>
+<div class="codehilite"><pre>/bin/keytool -importcert -alias fakebucket -file fakebucket.s3.amazonaws.com.crt -keystore /usr/lib/jvm/jre/lib/security/cacerts -storepass changeit -trustcacerts -noprompt
+</pre></div>
+
+
+</li>
+<li>
+<p>Configure <code>ice.properties</code> for the above. The important and unintuitive parts that I found&nbsp;are:</p>
+<ol>
+<li>
+<p>Going by the above examples, your billing and work S3 bucket names should both be&nbsp;&#8220;fakebucket&#8221;.</p>
+</li>
+<li>
+<p>Unless you want to mock out bigger parts of the <span class="caps">AWS</span> metadata service, run Ice with
+   <code>-Dice.s3AccessKeyId=NotAValidAccessKeyId -Dice.s3SecretKey=NotAValidAwsSecretKeyXxxxxxxxxxxxxxxxxxx</code>
+   in the <code>JAVA_OPTS</code>. If Ice can&#8217;t retrieve an instance&#8217;s <span class="caps">IAM</span> role from the metadata service
+   (http://169.254.169.254/latest/meta-data/iam/security-credentials/) and doesn&#8217;t have the
+   access and secret keys defined, it won&#8217;t run. Also note that while the documentation is <strong>very</strong>
+   unclear on this, a number of <a href="https://github.com/Netflix/ice/issues/49#issuecomment-23497701">github issues</a>
+   clarify that these need to be passed in as Java runtime options; they can&#8217;t be put in the properties&nbsp;file.</p>
+</li>
+<li>
+<p>Disable the Reservation Capacity Poller (<code>ice.reservationCapacityPoller=false</code>). This service
+   needs to connect to the <span class="caps">EC2</span> <span class="caps">API</span>, and will cause Ice to die if it&nbsp;can&#8217;t.</p>
+</li>
+<li>
+<p>For testing purposes, it&#8217;s a lot simpler and less error-prone (as well as being a lot faster) to
+   test the processor and reader separately - at least in serial instead of simultaneously in the same&nbsp;instance.</p>
+</li>
+</ol>
+</li>
+</ol>
+<p>Once all this is done, running the Ice Processor should retrieve the billing file, process it, and write the processed data to the
+fakes3 bucket. Running the Reader should display the data properly. So far I&#8217;ve been unable to find any features (other than the
+Reservation Capacity Poller, noted above) that don&#8217;t work with this&nbsp;setup.</p>
+<p>Whether it&#8217;s related to Ice itself or ideas for acceptance testing isolated applications, I hope this can be of use to&nbsp;someone&#8230;</p>
+            </div>
+            <!-- /.entry-content -->
+    <hr />
+    <section class="comments" id="comments">
+        <h2>Comments</h2>
+        <div id="disqus_thread"></div>
+        <script type="text/javascript">
+            /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+            var disqus_shortname = 'jantman'; // required: replace example with your forum shortname
+            var disqus_identifier = 'local-s3-server-to-acceptance-test-netflix-ice-installation-in-isolation';
+            var disqus_url = 'http://blog.jasonantman.com/2015/05/local-s3-server-to-acceptance-test-netflix-ice-installation-in-isolation/';
+
+            /* * * DON'T EDIT BELOW THIS LINE * * */
+            (function () {
+                var dsq = document.createElement('script');
+                dsq.type = 'text/javascript';
+                dsq.async = true;
+                dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+                (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+            })();
+        </script>
+        <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by
+            Disqus.</a></noscript>
+        <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+
+    </section>
+        </article>
+    </section>
+
+        </div>
+        <div class="col-lg-3 well well-sm" id="sidebar">
+
+<aside>
+    <section>
+        <ul class="list-group list-group-flush">
+
+                <li class="list-group-item"><h4><i class="icon-home icon-large"></i>Recent Posts</h4></li>
+                        <li class="list-group-item">
+                            <a href="http://blog.jasonantman.com/2015/05/local-s3-server-to-acceptance-test-netflix-ice-installation-in-isolation/">
+                                Local S3 Server to Acceptance Test Netflix Ice Installation In&nbsp;Isolation
+                            </a>
+                        </li>
+                        <li class="list-group-item">
+                            <a href="http://blog.jasonantman.com/2015/04/jira-to-trello-script/">
+                                Jira to Trello&nbsp;Script
+                            </a>
+                        </li>
+                        <li class="list-group-item">
+                            <a href="http://blog.jasonantman.com/2015/03/my-new-found-love-of-trello-and-a-helpful-greasemonkey-script/">
+                                My New-found Love of Trello and a Helpful GreaseMonkey&nbsp;Script
+                            </a>
+                        </li>
+                        <li class="list-group-item">
+                            <a href="http://blog.jasonantman.com/2015/03/some-additional-serverspec-types/">
+                                Some Additional Serverspec&nbsp;Types
+                            </a>
+                        </li>
+                        <li class="list-group-item">
+                            <a href="http://blog.jasonantman.com/2015/02/rspec-matcher-for-hash-item-value/">
+                                RSpec Matcher For Hash Item&nbsp;Value
+                            </a>
+                        </li>
+
+
+                <li class="list-group-item"><a href="http://blog.jasonantman.com/tags.html"><h4><i class="icon-tags icon-large"></i>Tags</h4></a></li>
+                <li class="list-group-item">
+                        <span class="tag-1">
+                            <a href="http://blog.jasonantman.com/tags/security/index.html">
+                                security
+                            </a>
+                        </span>
+                        <span class="tag-1">
+                            <a href="http://blog.jasonantman.com/tags/wordpress/index.html">
+                                wordpress
+                            </a>
+                        </span>
+                        <span class="tag-1">
+                            <a href="http://blog.jasonantman.com/tags/microsoft/index.html">
+                                microsoft
+                            </a>
+                        </span>
+                        <span class="tag-1">
+                            <a href="http://blog.jasonantman.com/tags/google/index.html">
+                                google
+                            </a>
+                        </span>
+                        <span class="tag-1">
+                            <a href="http://blog.jasonantman.com/tags/php/index.html">
+                                PHP
+                            </a>
+                        </span>
+                        <span class="tag-1">
+                            <a href="http://blog.jasonantman.com/tags/nagios/index.html">
+                                Nagios
+                            </a>
+                        </span>
+                        <span class="tag-1">
+                            <a href="http://blog.jasonantman.com/tags/blog/index.html">
+                                blog
+                            </a>
+                        </span>
+                        <span class="tag-1">
+                            <a href="http://blog.jasonantman.com/tags/monitoring/index.html">
+                                monitoring
+                            </a>
+                        </span>
+                        <span class="tag-1">
+                            <a href="http://blog.jasonantman.com/tags/sun/index.html">
+                                sun
+                            </a>
+                        </span>
+                        <span class="tag-1">
+                            <a href="http://blog.jasonantman.com/tags/puppet/index.html">
+                                puppet
+                            </a>
+                        </span>
+                        <span class="tag-1">
+                            <a href="http://blog.jasonantman.com/tags/android/index.html">
+                                android
+                            </a>
+                        </span>
+                        <span class="tag-1">
+                            <a href="http://blog.jasonantman.com/tags/sysadmin/index.html">
+                                sysadmin
+                            </a>
+                        </span>
+                        <span class="tag-1">
+                            <a href="http://blog.jasonantman.com/tags/linux/index.html">
+                                linux
+                            </a>
+                        </span>
+                        <span class="tag-2">
+                            <a href="http://blog.jasonantman.com/tags/apache/index.html">
+                                apache
+                            </a>
+                        </span>
+                        <span class="tag-2">
+                            <a href="http://blog.jasonantman.com/tags/dns/index.html">
+                                dns
+                            </a>
+                        </span>
+                        <span class="tag-2">
+                            <a href="http://blog.jasonantman.com/tags/firefox/index.html">
+                                firefox
+                            </a>
+                        </span>
+                        <span class="tag-2">
+                            <a href="http://blog.jasonantman.com/tags/rpm/index.html">
+                                rpm
+                            </a>
+                        </span>
+                        <span class="tag-2">
+                            <a href="http://blog.jasonantman.com/tags/logging/index.html">
+                                logging
+                            </a>
+                        </span>
+                        <span class="tag-2">
+                            <a href="http://blog.jasonantman.com/tags/syslog/index.html">
+                                syslog
+                            </a>
+                        </span>
+                        <span class="tag-2">
+                            <a href="http://blog.jasonantman.com/tags/droid/index.html">
+                                droid
+                            </a>
+                        </span>
+                </li>
+        </ul>
+    </section>
+    <section>
+    <ul class="list-group list-group-flush">
+    <li class="list-group-item" style="padding: 10px 15px 0px 15px;"><h4><i class="icon-twitter
+    icon-large"></i>Twitter <a href="https://twitter.com/j_antman"
+    class="twitter-follow-button" data-show-count="false"
+    data-dnt="true">Follow @j_antman</a></h4>
+<script>!function(d,s,id){var
+  js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document,
+  'script', 'twitter-wjs');</script></li>
+    </ul>
+    <a class="twitter-timeline" data-dnt="true"
+    href="https://twitter.com/j_antman"
+    data-chrome="transparent noheader" data-widget-id="429640274453594113">Tweets by @j_antman</a>
+    <script>!function(d,s,id){var
+    js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+"://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+    </section>
+    <section>
+    <ul class="list-group list-group-flush">
+    <li class="list-group-item"><h4><i class="icon-github icon-large"></i>GitHub Repos</h4></li>
+        <div id="gh_repos">
+            <p class="list-group-item">Status updating...</p>
+        </div>
+            <a href="https://github.com/jantman">@jantman</a> on GitHub
+    </ul>
+        <script type="text/javascript">
+            $(document).ready(function () {
+                if (!window.jXHR) {
+                    var jxhr = document.createElement('script');
+                    jxhr.type = 'text/javascript';
+                    jxhr.src = 'http://blog.jasonantman.com/theme/js/jXHR.js';
+                    var s = document.getElementsByTagName('script')[0];
+                    s.parentNode.insertBefore(jxhr, s);
+                }
+
+                github.showRepos({
+                    user: 'jantman',
+                    count: 5,
+                    skip_forks: false,
+                    target: '#gh_repos'
+                });
+            });
+        </script>
+        <script src="http://blog.jasonantman.com/theme/js/github.js" type="text/javascript"></script>
+    </section>
+</aside>        </div>
+    </div>
+</div>
+<footer>
+    <div class="container">
+        <hr>
+        <p class="pull-right"><i class="icon-arrow-up"></i> <a href="#">Back to top</a></p>
+
+
+        <p>&copy; 2015 Jason Antman &middot; Powered by <a href="https://github.com/DandyDev/pelican-bootstrap3" target="_blank">pelican-bootstrap3</a>,
+            <a href="http://docs.getpelican.com/" target="_blank">Pelican</a>,
+            <a href="http://getbootstrap.com" target="_blank">Bootstrap</a></p>
+    </div>
+</footer>
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="http://blog.jasonantman.com/theme/js/bootstrap.min.js"></script>
+
+<!-- Enable responsive features in IE8 with Respond.js (https://github.com/scottjehl/Respond) -->
+<script src="http://blog.jasonantman.com/theme/js/respond.min.js"></script>
+    <script type="text/javascript">
+        /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+        var disqus_shortname = 'jantman'; // required: replace example with your forum shortname
+
+        /* * * DON'T EDIT BELOW THIS LINE * * */
+        (function () {
+            var s = document.createElement('script');
+            s.async = true;
+            s.type = 'text/javascript';
+            s.src = '//' + disqus_shortname + '.disqus.com/count.js';
+            (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+        }());
+    </script>
+
+
+</body>
+</html>
