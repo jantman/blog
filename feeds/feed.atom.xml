@@ -1,5 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Jason Antman's Blog</title><link href="http://blog.jasonantman.com/" rel="alternate"></link><link href="http://blog.jasonantman.com/feeds/feed.atom.xml" rel="self"></link><id>http://blog.jasonantman.com/</id><updated>2015-05-05T06:45:00-04:00</updated><entry><title>Local S3 Server to Acceptance Test Netflix Ice Installation In Isolation</title><link href="http://blog.jasonantman.com/2015/05/local-s3-server-to-acceptance-test-netflix-ice-installation-in-isolation/" rel="alternate"></link><updated>2015-05-05T06:45:00-04:00</updated><author><name>Jason Antman</name></author><id>tag:blog.jasonantman.com,2015-05-05:2015/05/local-s3-server-to-acceptance-test-netflix-ice-installation-in-isolation/</id><summary type="html">&lt;p&gt;At work, we recently started using &lt;a href="http://netflix.github.io/"&gt;Netflix &lt;span class="caps"&gt;OSS&lt;/span&gt;&lt;/a&gt;&amp;#8216;s &lt;a href="https://github.com/Netflix/ice"&gt;Ice&lt;/a&gt; &lt;span class="caps"&gt;AWS&lt;/span&gt; cost analysis tool.
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Jason Antman's Blog</title><link href="http://blog.jasonantman.com/" rel="alternate"></link><link href="http://blog.jasonantman.com/feeds/feed.atom.xml" rel="self"></link><id>http://blog.jasonantman.com/</id><updated>2015-06-05T21:20:00-04:00</updated><entry><title>Visualization of when I’m working on personal vs work projects</title><link href="http://blog.jasonantman.com/2015/06/visualization-of-when-im-working-on-personal-vs-work-projects/" rel="alternate"></link><updated>2015-06-05T21:20:00-04:00</updated><author><name>Jason Antman</name></author><id>tag:blog.jasonantman.com,2015-06-05:2015/06/visualization-of-when-im-working-on-personal-vs-work-projects/</id><summary type="html">&lt;p&gt;I was thinking the other day - as I was pushing out some final code reviews for work at &lt;span class="caps"&gt;11PM&lt;/span&gt; before taking a day off -
+about how much work I do outside of &amp;#8220;work hours&amp;#8221;. And the answer is, I don&amp;#8217;t really know, especially when it comes to
+projects that I really enjoy and find interesting. So, I decided to have some fun with &lt;a href="https://github.com/gitpython-developers/GitPython"&gt;GitPython&lt;/a&gt;
+and find&amp;nbsp;out.&lt;/p&gt;
+&lt;p&gt;The result of this was &lt;a href="https://github.com/jantman/misc-scripts/blob/master/whendoiwork.py"&gt;whendoiwork.py&lt;/a&gt;. It&amp;#8217;s a pretty simple script,
+and also makes some pretty big assumptions, but I found the results interesting. Given some local directories which contain git clones
+of my work repositories, and some which contain clones of my personal repos, it iterates over all* of the commits in them by me
+(going by the git author name) in the last N days (default 365); it counts commits to personal repositories as +1 and to work
+repositories as -1, and adds them to buckets per hour of day, per day of week. It then uses &lt;a href="http://matplotlib.org/"&gt;matplotlib&lt;/a&gt;
+to build a heatmap, with the maximum commits per hour for work repos in blue and the maximum per hour for personal in&amp;nbsp;red.&lt;/p&gt;
+&lt;p&gt;I can&amp;#8217;t vouch that it&amp;#8217;s 100% accurate, but the results were interesting to me; while it seems like I tend to do a fair amount
+of work in the evenings, compared to work on personal projects, all of my work for my employer is well contained in my normal
+7-3 work&amp;nbsp;day.&lt;/p&gt;
+&lt;p&gt;Here&amp;#8217;s an example of the output of this script, for my own work, run&amp;nbsp;with:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;./whendoiwork.py -v -a /home/jantman/GIT -b /home/jantman/work/git -b /home/jantman/work/git/ops -d 365 -t &amp;#39;US/Eastern&amp;#39; --repoAlabel personal --repoBlabel work
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Note that this iterates over every commit in all of the git repos it finds, possibly multiple times. On my own
+system (9G of git repos with a few hundred thousand commits), this took about 2&amp;nbsp;minutes.&lt;/p&gt;
+&lt;p&gt;&lt;img alt="heatmap of days of week and hours of day when I commit to work vs personal repos" src="https://raw.githubusercontent.com/jantman/misc-scripts/master/whendoiwork.png" /&gt;&lt;/p&gt;
+&lt;p&gt;If you find any bugs/issues with it, please pass them along by &lt;a href="https://github.com/jantman/misc-scripts/issues"&gt;opening an issue&lt;/a&gt;.&lt;/p&gt;</summary><category term="git"></category><category term="commits"></category><category term="python"></category><category term="graphs"></category><category term="visualization"></category></entry><entry><title>Local S3 Server to Acceptance Test Netflix Ice Installation In Isolation</title><link href="http://blog.jasonantman.com/2015/05/local-s3-server-to-acceptance-test-netflix-ice-installation-in-isolation/" rel="alternate"></link><updated>2015-05-05T06:45:00-04:00</updated><author><name>Jason Antman</name></author><id>tag:blog.jasonantman.com,2015-05-05:2015/05/local-s3-server-to-acceptance-test-netflix-ice-installation-in-isolation/</id><summary type="html">&lt;p&gt;At work, we recently started using &lt;a href="http://netflix.github.io/"&gt;Netflix &lt;span class="caps"&gt;OSS&lt;/span&gt;&lt;/a&gt;&amp;#8216;s &lt;a href="https://github.com/Netflix/ice"&gt;Ice&lt;/a&gt; &lt;span class="caps"&gt;AWS&lt;/span&gt; cost analysis tool.
 It provides a Java daemon to read and parse &lt;span class="caps"&gt;AWS&lt;/span&gt;&amp;#8217; &lt;a href="http://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/detailed-billing-reports.html"&gt;detailed billing reports&lt;/a&gt;
 and a web interface to the data (&lt;a href="https://github.com/Netflix/ice/blob/master/README.md#screenshots"&gt;screenshots&lt;/a&gt;). The single biggest feature for us
 is the ability to do cost breakdowns (by hour/day/week/month) based on Cost Allocation tags in the detailed billing reports. We tag every billable &lt;span class="caps"&gt;AWS&lt;/span&gt;
@@ -3588,60 +3609,4 @@ generation of include/exclude files conditional on having NetBackup&amp;nbsp;ins
 &lt;/ul&gt;
 &lt;/li&gt;
 &lt;/ul&gt;
-&lt;p&gt;Hopefully some of these will be of use to someone else as&amp;nbsp;well.&lt;/p&gt;</summary><category term="facter"></category><category term="nbu"></category><category term="netbackup"></category><category term="puppet"></category><category term="rsyslog"></category><category term="syslog"></category></entry><entry><title>Puppet facter fact for all applied classes, returned as a CSV list</title><link href="http://blog.jasonantman.com/2012/08/puppet-facter-fact-for-all-applied-classes-returned-as-a-csv-list/" rel="alternate"></link><updated>2012-08-22T07:05:00-04:00</updated><author><name>admin</name></author><id>tag:blog.jasonantman.com,2012-08-22:2012/08/puppet-facter-fact-for-all-applied-classes-returned-as-a-csv-list/</id><summary type="html">&lt;p&gt;I&amp;#8217;m unfortunatey stuck, at least for the time being, using flat-file
-manifests to configure my puppet nodes. Without an &lt;span class="caps"&gt;ENC&lt;/span&gt;, it&amp;#8217;s pretty
-difficult to get a good ovewview of what classes are used on each node,
-and what nodes use a given class. I know I could write up a simple web
-tool to do this (unfortunately, given my limited Ruby knowledge, it
-would have to be in &lt;span class="caps"&gt;PHP&lt;/span&gt; or Perl, not a real modification to Dashboard in
-Ruby). But where to get the data&amp;nbsp;from?&lt;/p&gt;
-&lt;p&gt;After some research, I found a &lt;a href="http://sjoeboo.github.com/blog/2012/07/31/updated-puppet-facts-for-puppet-classes/"&gt;puppet fact for puppet
-classes&lt;/a&gt;
-on &lt;a href="http://sjoeboo.github.com/"&gt;Matthew Nicholson&amp;#8217;s Coffee &lt;span class="amp"&gt;&amp;amp;&lt;/span&gt; Beer blog&lt;/a&gt;.
-It parses &lt;code&gt;/var/lib/puppet/classes.txt&lt;/code&gt; and returns the list of classes
-found as a &lt;span class="caps"&gt;JSON&lt;/span&gt; array. Great base, but I wanted something easier, that
-would be more easily parsed from its direct storage in MySQL. My
-modification to his code is onlty a few characters; I dropped out the
-&lt;span class="caps"&gt;JSON&lt;/span&gt; require, and return the classes as a &lt;span class="caps"&gt;CSV&lt;/span&gt; list. This lets me to easy
-&lt;code&gt;LIKE '%,classname,%'&lt;/code&gt; SELECTs in MySQL, and also gives me the fact
-value stored in the puppet &lt;span class="caps"&gt;DB&lt;/span&gt;, so I can build a separate tool around
-that data. Thanks,&amp;nbsp;Matt.&lt;/p&gt;
-&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="c1"&gt;#&lt;/span&gt;
-&lt;span class="c1"&gt;# facter fact for puppet classes on node, pulled from /var/lib/puppet/classes.txt&lt;/span&gt;
-&lt;span class="c1"&gt;# from &lt;/span&gt;
-&lt;span class="c1"&gt;#&lt;/span&gt;
-
-&lt;span class="nb"&gt;require&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;facter&amp;#39;&lt;/span&gt;
-&lt;span class="k"&gt;begin&lt;/span&gt;
-        &lt;span class="no"&gt;Facter&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;hostname&lt;/span&gt;
-        &lt;span class="no"&gt;Facter&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;fqdn&lt;/span&gt;
-&lt;span class="k"&gt;rescue&lt;/span&gt;
-        &lt;span class="no"&gt;Facter&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;loadfacts&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
-&lt;span class="k"&gt;end&lt;/span&gt;
-&lt;span class="n"&gt;hostname&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="no"&gt;Facter&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;value&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;hostname&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
-&lt;span class="n"&gt;fqdn&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="no"&gt;Facter&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;value&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;fqdn&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
-
-&lt;span class="n"&gt;classes_txt&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;/var/lib/puppet/classes.txt&amp;quot;&lt;/span&gt;
-
-&lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="no"&gt;File&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;exists?&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;classes_txt&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="k"&gt;then&lt;/span&gt;
-        &lt;span class="n"&gt;f&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="no"&gt;File&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;new&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;classes_txt&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
-        &lt;span class="n"&gt;classes&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nb"&gt;Array&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;new&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
-        &lt;span class="n"&gt;f&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;readlines&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;each&lt;/span&gt; &lt;span class="k"&gt;do&lt;/span&gt; &lt;span class="o"&gt;|&lt;/span&gt;&lt;span class="n"&gt;line&lt;/span&gt;&lt;span class="o"&gt;|&lt;/span&gt;
-                &lt;span class="n"&gt;line&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;line&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;chomp&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;to_s&lt;/span&gt;
-                &lt;span class="n"&gt;line&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;line&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;sub&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot; &amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;_&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
-                &lt;span class="n"&gt;classes&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;push&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;line&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
-        &lt;span class="k"&gt;end&lt;/span&gt;
-        &lt;span class="n"&gt;classes&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;delete&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;settings&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
-        &lt;span class="n"&gt;classes&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;delete&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="si"&gt;#{&lt;/span&gt;&lt;span class="n"&gt;hostname&lt;/span&gt;&lt;span class="si"&gt;}&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
-        &lt;span class="n"&gt;classes&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;delete&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="si"&gt;#{&lt;/span&gt;&lt;span class="n"&gt;fqdn&lt;/span&gt;&lt;span class="si"&gt;}&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
-        &lt;span class="no"&gt;Facter&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;add&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;puppet_classes_csv&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="k"&gt;do&lt;/span&gt;
-                &lt;span class="n"&gt;setcode&lt;/span&gt; &lt;span class="k"&gt;do&lt;/span&gt;
-                        &lt;span class="n"&gt;classes&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;join&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;,&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
-                &lt;span class="k"&gt;end&lt;/span&gt;
-        &lt;span class="k"&gt;end&lt;/span&gt;
-&lt;span class="k"&gt;end&lt;/span&gt;
-&lt;/pre&gt;&lt;/div&gt;
-
-
-&lt;p&gt;All of my facts are now available in a GitHub repository:
-&lt;a href="https://github.com/jantman/puppet-facter-facts"&gt;https://github.com/jantman/puppet-facter-facts&lt;/a&gt;.&lt;/p&gt;</summary><category term="classes"></category><category term="csv"></category><category term="fact"></category><category term="facter"></category><category term="node"></category><category term="puppet"></category></entry></feed>
+&lt;p&gt;Hopefully some of these will be of use to someone else as&amp;nbsp;well.&lt;/p&gt;</summary><category term="facter"></category><category term="nbu"></category><category term="netbackup"></category><category term="puppet"></category><category term="rsyslog"></category><category term="syslog"></category></entry></feed>
