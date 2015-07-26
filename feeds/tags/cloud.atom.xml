@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Jason Antman's Blog</title><link href="http://blog.jasonantman.com/" rel="alternate"></link><link href="http://blog.jasonantman.com/feeds/tags/cloud.atom.xml" rel="self"></link><id>http://blog.jasonantman.com/</id><updated>2015-07-25T08:35:00-04:00</updated><entry><title>AwsLimitChecker - Check Your AWS Usage Against Service Limits</title><link href="http://blog.jasonantman.com/2015/07/awslimitchecker-check-your-aws-usage-against-service-limits/" rel="alternate"></link><updated>2015-07-25T08:35:00-04:00</updated><author><name>Jason Antman</name></author><id>tag:blog.jasonantman.com,2015-07-25:2015/07/awslimitchecker-check-your-aws-usage-against-service-limits/</id><summary type="html">&lt;p&gt;Over the past year or so, at my day job, we&amp;#8217;ve been leveraging &lt;span class="caps"&gt;AWS&lt;/span&gt; more and more, specifically
+&lt;a href="https://aws.amazon.com/cloudformation/"&gt;CloudFormation&lt;/a&gt; to manage complete application stacks. One
+side-effect of this is that we went through a few periods where we were constantly hitting various
+&lt;span class="caps"&gt;AWS&lt;/span&gt; Service Limits - subnet groups, ElastiCache clusters, security groups, and a whole slew of others.
+In pretty much all these cases, we weren&amp;#8217;t &lt;em&gt;really&lt;/em&gt; aware of the limits; we (the Tooling and
+Automation team) had succeeded in our goal of handing our internal customers the tools to spin up
+complete application environments, per-developer, on-demand. And it was wonderful until we hit some
+magic number of CloudFormation stacks, at which point almost every day for a week or two we had to
+open a new &lt;span class="caps"&gt;AWS&lt;/span&gt; Support ticket to have a different limit increased, and deal with completely broken
+deploys until that was done (or send out a frantic &amp;#8220;someone please delete a dev stack&amp;#8221;&amp;nbsp;email).&lt;/p&gt;
+&lt;p&gt;Early last month we decided that we had to do something about this. As much as I tried, I couldn&amp;#8217;t
+find an existing solution that would monitor our limits and alert us when we approached them; there
+were some open source scripts that would do so for a handful of limits (generally just &lt;span class="caps"&gt;EC2&lt;/span&gt; usage),
+and the proprietary solutions that I was able to find didn&amp;#8217;t seem much better; none of them stated
+that they handle &lt;span class="caps"&gt;VPC&lt;/span&gt; or ElastiCache limits, which had been problematic for us. &lt;span class="caps"&gt;AWS&lt;/span&gt;&amp;#8217;s own
+&lt;a href="https://aws.amazon.com/premiumsupport/trustedadvisor/"&gt;Trusted Advisor&lt;/a&gt; has a Service Limits
+check available to Business- and Enterprise-level support accounts, but it only monitors 17 of the
+94 Service Limits that we identified as relevant to us, and it sends out &lt;em&gt;weekly&lt;/em&gt; alerts. So,
+I decided to write something to solve the problem. My co-workers and I have been trying to get
+corporate legal approval to release our work publicly under an &lt;span class="caps"&gt;OSI&lt;/span&gt;-approved license for years,
+to no avail. I asked my team if they&amp;#8217;d support waiting a while for this work, so I could do it
+entirely in my own time, publicly, under an open source license. Happily, they&amp;nbsp;agreed.&lt;/p&gt;
+&lt;p&gt;Today I&amp;#8217;m making the first release of &lt;a href="https://github.com/jantman/awslimitchecker"&gt;awslimitchecker&lt;/a&gt;,
+an &lt;span class="caps"&gt;AGPL&lt;/span&gt; 3.0-licensed Python tool to calculate your &lt;span class="caps"&gt;AWS&lt;/span&gt; resource usage for various services bound by
+&lt;a href="http://awslimitchecker.readthedocs.org/en/latest/limits.html#current-checks"&gt;service limits&lt;/a&gt;, and tell you which ones exceed a given threshold (actually, warning and critical
+thresholds). Effective limits are hard-coded to the &lt;a href="http://docs.aws.amazon.com/general/latest/gr/aws_service_limits.html"&gt;published defaults&lt;/a&gt;,
+but can be overridden in cases where you&amp;#8217;ve received limit increases, and will be automatically updated
+from Trusted Advisor data for all limits that it monitors (if your account includes the full &lt;span class="caps"&gt;TA&lt;/span&gt; checks).
+awslimitchecker provides warning and critical thresholds that can be set globally as a percentage of the
+limit (defaults are 80% and 99%, respectively) or overridden on a per-limit basis, as either a percentage
+or a fixed integer usage&amp;nbsp;value.&lt;/p&gt;
+&lt;p&gt;awslimitchecker is available &lt;a href="https://pypi.python.org/pypi/awslimitchecker/0.1.0"&gt;from pypi&lt;/a&gt;.
+It is compatible and tested with Python versions 2.6 through 3.4, though the library it uses to communicate
+with &lt;span class="caps"&gt;AWS&lt;/span&gt;, &lt;a href="http://boto.readthedocs.org/en/latest/"&gt;boto&lt;/a&gt;, still has a few &lt;span class="caps"&gt;AWS&lt;/span&gt; services which are not python3-compatible.
+awslimitchecker includes both a Python module with a &lt;a href="http://awslimitchecker.readthedocs.org/en/latest/awslimitchecker.checker.html"&gt;documented &lt;span class="caps"&gt;API&lt;/span&gt;&lt;/a&gt; for those who
+don&amp;#8217;t mind working with Python, and a command line script for those who&amp;nbsp;do.&lt;/p&gt;
+&lt;p&gt;The project is still very young, and only being used by one organization, but it&amp;#8217;s proven
+stable for us, and I&amp;#8217;m more than happy to accept questions, comments, criticisms,
+&lt;a href="https://github.com/jantman/awslimitchecker/issues"&gt;issues/feature requests&lt;/a&gt; and Pull&amp;nbsp;Requests.&lt;/p&gt;</summary><category term="aws"></category><category term="ec2"></category><category term="limits"></category><category term="python"></category><category term="awslimitchecker"></category><category term="cloud"></category></entry></feed>
