@@ -5,7 +5,6 @@ Category: Projects
 Tags: aws, ec2, limits, python, awslimitchecker, cloud
 Slug: awslimitchecker-check-your-aws-usage-against-service-limits
 Summary: Initial release of AwsLimitChecker, a tool to check your AWS usage against service limits and Trusted Advisor.
-Status: draft
 
 Over the past year or so, at my day job, we've been leveraging AWS more and more, specifically
 [CloudFormation](https://aws.amazon.com/cloudformation/) to manage complete application stacks. One
@@ -29,11 +28,11 @@ check available to Business- and Enterprise-level support accounts, but it only 
 I decided to write something to solve the problem. My co-workers and I have been trying to get
 corporate legal approval to release our work publicly under an OSI-approved license for years,
 to no avail. I asked my team if they'd support waiting a while for this work, so I could do it
-entirely in my own time, publicly, under an open source licence. Happily, they agreed.
+entirely in my own time, publicly, under an open source license. Happily, they agreed.
 
 Today I'm making the first release of [awslimitchecker](https://github.com/jantman/awslimitchecker),
 an AGPL 3.0-licensed Python tool to calculate your AWS resource usage for various services bound by
-[service limits](), and tell you which ones exceed a given threshold (actually, warning and critical
+[service limits](http://awslimitchecker.readthedocs.org/en/latest/limits.html#current-checks), and tell you which ones exceed a given threshold (actually, warning and critical
 thresholds). Effective limits are hard-coded to the [published defaults](http://docs.aws.amazon.com/general/latest/gr/aws_service_limits.html),
 but can be overridden in cases where you've received limit increases, and will be automatically updated
 from Trusted Advisor data for all limits that it monitors (if your account includes the full TA checks).
@@ -41,8 +40,10 @@ awslimitchecker provides warning and critical thresholds that can be set globall
 limit (defaults are 80% and 99%, respectively) or overridden on a per-limit basis, as either a percentage
 or a fixed integer usage value.
 
-awslimitchecker is compatible and tested with Python versions 2.6 through 3.4, and available
-[from pypi](). It includes both a Python module with a [documented API]() for those who
+awslimitchecker is available [from pypi](https://pypi.python.org/pypi/awslimitchecker/0.1.0).
+It is compatible and tested with Python versions 2.6 through 3.4, though the library it uses to communicate
+with AWS, [boto](http://boto.readthedocs.org/en/latest/), still has a few AWS services which are not python3-compatible.
+awslimitchecker includes both a Python module with a [documented API](http://awslimitchecker.readthedocs.org/en/latest/awslimitchecker.checker.html) for those who
 don't mind working with Python, and a command line script for those who do.
 
 The project is still very young, and only being used by one organization, but it's proven
