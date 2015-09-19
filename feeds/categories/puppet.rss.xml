@@ -1,5 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Jason Antman's Blog</title><link>http://blog.jasonantman.com/</link><description></description><atom:link href="http://blog.jasonantman.com/feeds/categories/puppet.rss.xml" rel="self"></atom:link><lastBuildDate>Sat, 25 Aug 2012 11:33:00 -0400</lastBuildDate><item><title>Puppet facter facts for syslog daemon type and version, symantec netbackup</title><link>http://blog.jasonantman.com/2012/08/puppet-facter-facts-for-syslog-daemon-type-and-version-symantec-netbackup/</link><description>&lt;p&gt;I have a few more custom facts that I&amp;#8217;ve added to my
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Jason Antman's Blog</title><link>http://blog.jasonantman.com/</link><description></description><atom:link href="http://blog.jasonantman.com/feeds/categories/puppet.rss.xml" rel="self"></atom:link><lastBuildDate>Sat, 19 Sep 2015 11:09:00 -0400</lastBuildDate><item><title>Puppetlabs Beaker SUTs with GUI / Non-Headless</title><link>http://blog.jasonantman.com/2015/09/puppetlabs-beaker-suts-with-gui--non-headless/</link><description>&lt;p&gt;&lt;a href="https://github.com/puppetlabs/beaker/"&gt;Beaker&lt;/a&gt; is a puppetlabs tool for automating acceptance testing
+of puppet modules; in most common use cases, it uses a &lt;a href="https://www.vagrantup.com/"&gt;Vagrant&lt;/a&gt;/
+&lt;a href="https://www.virtualbox.org/"&gt;virtualbox&lt;/a&gt; &lt;span class="caps"&gt;VM&lt;/span&gt; to run the&amp;nbsp;tests.&lt;/p&gt;
+&lt;p&gt;This week, I was writing tests for a &lt;a href="https://github.com/jantman/puppet-archlinux-workstation"&gt;module&lt;/a&gt;
+that configures my desktop and laptop, including installing and setting up Xorg and &lt;span class="caps"&gt;KDE&lt;/span&gt; and the
+&lt;a href="https://github.com/sddm"&gt;&lt;span class="caps"&gt;SDDM&lt;/span&gt;&lt;/a&gt; display manager. I wanted to be able to test that they not only
+got installed, but actually ran without dieing - which required a graphincal environment (ideally,
+I&amp;#8217;d visually confirm this as&amp;nbsp;well).&lt;/p&gt;
+&lt;p&gt;To do this in Vagrant, you&amp;#8217;d just add a &lt;code&gt;gui = true&lt;/code&gt; option to the
+&lt;a href="https://docs.vagrantup.com/v2/virtualbox/configuration.html"&gt;virtualbox provider&lt;/a&gt; in your&amp;nbsp;Vagrantfile.&lt;/p&gt;
+&lt;p&gt;It isn&amp;#8217;t documented anywhere, but I &lt;a href="https://github.com/jantman/puppet-archlinux-workstation/commit/6ca19a24853681c468eba38735c8d2d7f54cd616"&gt;found&lt;/a&gt;
+that Beaker has support for this as well; all you need to do is add &lt;code&gt;vb_gui: true&lt;/code&gt; in your node definition&amp;nbsp;&lt;span class="caps"&gt;YAML&lt;/span&gt;.&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="gd"&gt;--- before.yaml 2015-09-19 11:20:47.772523116 -0400&lt;/span&gt;
+&lt;span class="gi"&gt;+++ after.yaml  2015-09-19 11:20:20.768867546 -0400&lt;/span&gt;
+&lt;span class="gu"&gt;@@ -1,11 +1,12 @@&lt;/span&gt;
+ &lt;span class="caps"&gt;HOSTS&lt;/span&gt;:
+   arch-x64:
+     roles:
+       - master
+     platform: archlinux-2015.09.01-amd64
+     box: jantman/packer-arch-workstation
+     hypervisor: vagrant
+&lt;span class="gi"&gt;+    vb_gui: true&lt;/span&gt;
+
+ &lt;span class="caps"&gt;CONFIG&lt;/span&gt;:
+   log_level: verbose
+   type: foss
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Once that&amp;#8217;s done, the VirtualBox &lt;span class="caps"&gt;VM&lt;/span&gt; will run with a graphical display enabled. This is probably only useful on a local
+machine or if you&amp;#8217;re running on a remote host have you have access to and have &lt;a href="https://www.virtualbox.org/manual/ch07.html"&gt;vrdp&lt;/a&gt;
+enabled, but in some edge cases like my module, it&amp;#8217;s&amp;nbsp;useful.&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">Jason Antman</dc:creator><pubDate>Sat, 19 Sep 2015 11:09:00 -0400</pubDate><guid>tag:blog.jasonantman.com,2015-09-19:2015/09/puppetlabs-beaker-suts-with-gui--non-headless/</guid><category>puppet</category><category>beaker</category><category>sut</category><category>rspec</category><category>virtualbox</category><category>headless</category><category>GUI</category></item><item><title>Puppet facter facts for syslog daemon type and version, symantec netbackup</title><link>http://blog.jasonantman.com/2012/08/puppet-facter-facts-for-syslog-daemon-type-and-version-symantec-netbackup/</link><description>&lt;p&gt;I have a few more custom facts that I&amp;#8217;ve added to my
 &lt;a href="https://github.com/jantman/puppet-facter-facts"&gt;puppet-facter-facts&lt;/a&gt;
 github&amp;nbsp;repository:&lt;/p&gt;
 &lt;ul&gt;
