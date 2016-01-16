@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:og="http://ogp.me/ns#"
+      xmlns:fb="https://www.facebook.com/2008/fbml">
+<head>
+    <title>Raspberry Pi Security System</title>
+    <!-- Using the latest rendering mode for IE -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Open Graph tags -->
+
+    <!-- Bootstrap -->
+        <link rel="stylesheet" href="http://blog.jasonantman.com/theme/css/bootstrap.flatly.min.css" type="text/css"/>
+    <link href="http://blog.jasonantman.com/theme/css/font-awesome.min.css" rel="stylesheet">
+    <link href="http://blog.jasonantman.com/theme/css/pygments.css" rel="stylesheet">
+        <link href="http://blog.jasonantman.com/theme/css/typogrify.css" rel="stylesheet">
+    <link rel="stylesheet" href="http://blog.jasonantman.com/theme/css/style.css" type="text/css"/>
+    <!-- JavaScript plugins (requires jQuery) -->
+    <script src="http://code.jquery.com/jquery.js"></script>
+
+    <link rel="stylesheet" href="http://blog.jasonantman.com/theme/css/forkongithub.min.css" type="text/css" />
+
+        <link href="http://blog.jasonantman.com/feeds/all.atom.xml" type="application/atom+xml" rel="alternate"
+              title="Jason Antman's Blog ATOM Feed"/>
+        <link href="http://blog.jasonantman.com/feeds/all.rss.xml" type="application/atom+xml" rel="alternate"
+              title="Jason Antman's Blog RSS Feed"/>
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-2718127-2', 'jasonantman.com');
+  ga('send', 'pageview');
+
+</script>
+</head>
+<body>
+<span id="forkongithub"><a href="https://github.com/jantman/blog">Fork me on GitHub</a></span><nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="http://blog.jasonantman.com" class="navbar-brand">Jason Antman's Blog</a>
+        </div>
+        <div class="collapse navbar-collapse navbar-ex1-collapse">
+            <ul class="nav navbar-nav">
+                         <li><a href="http://blog.jasonantman.com/pages/about.html">
+                             About
+                          </a></li>
+                        <li >
+                            <a href="http://blog.jasonantman.com/categories/ideas-and-rants/index.html">Ideas and rants</a>
+                        </li>
+                        <li >
+                            <a href="http://blog.jasonantman.com/categories/miscellaneous/index.html">Miscellaneous</a>
+                        </li>
+                        <li >
+                            <a href="http://blog.jasonantman.com/categories/monitoring/index.html">Monitoring</a>
+                        </li>
+                        <li >
+                            <a href="http://blog.jasonantman.com/categories/ops/index.html">Ops</a>
+                        </li>
+                        <li >
+                            <a href="http://blog.jasonantman.com/categories/projects/index.html">Projects</a>
+                        </li>
+                        <li >
+                            <a href="http://blog.jasonantman.com/categories/puppet/index.html">Puppet</a>
+                        </li>
+                        <li class="active">
+                            <a href="http://blog.jasonantman.com/categories/tech-howtos/index.html">Tech howtos</a>
+                        </li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="http://blog.jasonantman.com/archives.html"><i class="icon-th-list"></i>Archives</a></li>
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+</nav>
+<!-- /.navbar -->
+<div class="container">
+    <div class="row">
+        <div class="col-lg-9">
+    <section id="content">
+        <article>
+            <header class="page-header">
+                <h1>
+                    <a href="http://blog.jasonantman.com/2016/01/raspberry-pi-security-system/"
+                       rel="bookmark"
+                       title="Permalink to Raspberry Pi Security System">
+                        Raspberry Pi Security&nbsp;System
+                    </a>
+                </h1>
+<a href="http://twitter.com/share" class="twitter-share-button" data-count="horizontal" data-via="j_antman">Tweet</a><script type="text/javascript" src="http://platform.twitter.com/widgets.js"></script>
+            </header>
+            <div class="entry-content">
+                <div class="panel">
+                    <div class="panel-body">
+<footer class="post-info">
+    <span class="label label-default">Date</span>
+    <span class="published">
+        <i class="icon-calendar"></i>Sat 16 January 2016
+    </span>
+
+
+
+<span class="label label-default">Tags</span>
+	<a href="http://blog.jasonantman.com/tags/rpi/index.html">rpi</a>
+        /
+	<a href="http://blog.jasonantman.com/tags/pi/index.html">pi</a>
+        /
+	<a href="http://blog.jasonantman.com/tags/raspberrypi/index.html">raspberrypi</a>
+        /
+	<a href="http://blog.jasonantman.com/tags/security/index.html">security</a>
+        /
+	<a href="http://blog.jasonantman.com/tags/alarm/index.html">alarm</a>
+        /
+	<a href="http://blog.jasonantman.com/tags/motion/index.html">motion</a>
+        /
+	<a href="http://blog.jasonantman.com/tags/camera/index.html">camera</a>
+</footer><!-- /.post-info -->                    </div>
+                </div>
+                <p>It seems that crime is on the rise in the area where I live, and in my &#8220;gated&#8221; (when they actually close)
+apartment complex. I&#8217;m going out of town for a while to visit family, and was a bit wary of leaving my
+apartment - and all of my posessions, and most importantly my cats, unattended for too long. I&#8217;m having
+some family in the area check on the cats every few days, but that doesn&#8217;t do a lot for my peace of mind
+in a complex that&#8217;s had a few break-ins this&nbsp;year.</p>
+<p>I&#8217;ve played around on previous trips with with <a href="http://www.lavrsen.dk/foswiki/bin/view/Motion/WebHome">motion</a>, a motion-activated video recording tool,
+and a <a href="http://www.amazon.com/Logitech-960-000585-HD-Webcam-C310/dp/B003LVZO8S/ref=sr_1_1?ie=UTF8&amp;qid=1450663461&amp;sr=8-1&amp;keywords=logitech+c310">Logitech C310 webcam</a>,
+but with four cats, it&#8217;s far from a tool to detect a human in my apartment. So, the weekend before my trip,
+I decided to do some&nbsp;tinkering.</p>
+<p>There&#8217;s an &#8220;alarm system&#8221; control panel next to the entry to my apartment, but it appears to be a no-name system that probably
+cost $20 and doesn&#8217;t actually do anything other than sound a chime when the door opens. I turned it off the day I moved in,
+and hadn&#8217;t given it a second thought since. However, it occurred to me that the useless panel next to the washing machine
+probably had magnetic contact switches for the doors. Sure enough, after a few minutes with a multimeter, I found that both
+the entry door and the sliding balcony door have normally-closed magnetic contacts wired back to the panel. After thinking
+over the options for a few minutes, I remembered that I had a <a href="https://www.raspberrypi.org/">Raspberry Pi</a> (the original)
+sitting unused under my <span class="caps">TV</span>, and a <a href="https://www.sparkfun.com/products/11772">PiFace I/O card</a> that I&#8217;d never&nbsp;used.</p>
+<p>After about an hour of connecting some wires and playing around with the wonderfully-simple <a href="http://piface.github.io/pifacedigitalio/">pifacedigitalio</a>
+Python package <a href="https://pypi.python.org/pypi/pifacedigitalio/3.0.5">available on PyPi</a>, I was able to successfully read
+inputs for when either door was open. I figured that this would provide the perfect squelch for motion recording from the
+webcam, as the cats aren&#8217;t able to operate the deadbolt on my front door (I had to replace all of the interior door handles
+with cat-proof&nbsp;models).</p>
+<p><a href="/GFX/rpi_alarm_1_large.jpg"><img alt="Photograph of RPi in alarm enclosure" src="/GFX/rpi_alarm_1_sm.jpg" /></a></p>
+<p><a href="/GFX/rpi_alarm_2_large.jpg"><img alt="Photograph of alarm enclosure closed, showing wires to RPi" src="/GFX/rpi_alarm_2_sm.jpg" /></a></p>
+<p>The system that I&#8217;ve come up with is rather rough around the edges&#8230; to put it lightly. It&#8217;s pretty obvious that it was written
+in a few days, and at this point, it&#8217;s not really intended to be used by anyone who doesn&#8217;t have a good understanding of the
+components (and Python). But I&#8217;m hoping that someone else might find it interesting, or perhaps improve on it. It&#8217;s not terribly
+robust, but it seems to be working acceptably well for my&nbsp;needs.</p>
+<h2 id="components">Components</h2>
+<p>The system is split into a number of components, with some of them running on the Raspberry Pi and some on my desktop&nbsp;computer.</p>
+<p>The Pi is running my <a href="https://github.com/jantman/piface-webhooks">piface-webhooks</a> project (everything needed to set it up on
+<a href="https://www.raspbian.org/">Raspbian</a> or <a href="https://osmc.tv/"><span class="caps">OSMC</span></a> is available in the repo), which is made up of two Python&nbsp;services:</p>
+<ul>
+<li><strong>piface-listener</strong> Is the code that actually polls the PiFace inputs. When the state of an input changes, it writes out
+a file (under <code>/var/spool/piface-webhooks</code> by default) with the input number, state, and&nbsp;timestamp.</li>
+<li><strong>piface-worker</strong> Polls this directory for files; when one is found, it takes some action and then removes the file. The
+current actions are sending an <span class="caps">HTTP</span> webhook, sending a message via <a href="https://pushover.net/">Pushover</a>, and sending an email
+via Gmail. I currently use all of these, mainly for redudnancy. The webhook feature is used to <span class="caps">POST</span> data to <code>motion_piface_handler.py</code>,
+a Flask app running on my&nbsp;desktop.</li>
+</ul>
+<p>My desktop computer is the heart of the system, handling the webcam and most of the &#8220;alarm&#8221;&nbsp;logic:</p>
+<ul>
+<li><a href="http://www.lavrsen.dk/foswiki/bin/view/Motion/WebHome">motion</a> monitors the webcam feed for motion above a certain number of
+pixels. When motion is detected, it saves both <span class="caps">JPEG</span> images and <span class="caps">AVI</span> files to disk, logs the event in a MySQL database, and
+executes a Python script. It also saves a snapshot from the webcam every 30&nbsp;seconds.</li>
+<li><a href="https://github.com/jantman/misc-scripts/blob/master/s3sync_inotify.py">s3sync_inotify.py</a> is a quick Python script I wrote that
+uses Linux inotify to monitor <code>motion</code>&#8216;s output directory for new files (only when they&#8217;ve been closed, and are finished being
+written) and syncs them to an S3 bucket set up for static website hosting. It also generates an <code>index.html</code> file for the bucket,
+with links to all uploaded files. At startup, any files that aren&#8217;t yet synced are uploaded, so it <em>should</em> handle crashes relatively&nbsp;well.</li>
+<li><strong>handle_motion.py</strong> is the command executed by <code>motion</code> when an event is detected; it POSTs data to <code>motion_piface_handler.py</code>.</li>
+<li><strong>motion_piface_handler.py</strong> is the heart of the system, explained&nbsp;below.</li>
+</ul>
+<h2 id="motion_piface_handlerpy-pulling-it-all-together">motion_piface_handler.py - Pulling it all&nbsp;together</h2>
+<p>Webhooks from both the Raspberry Pi door sensor and <code>motion</code>&#8216;s command execution go to a Python <a href="http://flask.pocoo.org/">Flask</a> app
+running on my desktop. This app accepts the incoming data, and also connects to the MySQL database used by Motion. When a <span class="caps">POST</span> from
+<code>piface-worker</code> comes in showing that a door has been opened, it adds a record to the MySQL database with information on the input
+pin (which door) and state (open/closed), and&nbsp;timestamp.</p>
+<p>When a <span class="caps">POST</span> comes in from <code>handle_motion.py</code>, the command executed by <code>motion</code> when a file is written, the app checks to see if
+a door has been opened in the past few minutes. If not, the event is ignored (and logged, of course). However, if a door has been
+opened, the real fun starts. First, the database is queried for the last time a notification was sent out. If one has been sent
+in the past few minutes, the current event is ignored (and a rate-limiting message is logged). If it hasn&#8217;t sent out a message
+recently, the database is queried for the last door event (which door, and if it was opened or closed) as well as the last <span class="caps">AVI</span>
+and last five JPEGs saved by <code>motion</code>. This information is all formatted into a message and sent to my GMail account, and a
+shortened version (with just the door event information, and that motion was detected) is sent to my phone via Pushover, with
+the highest priority and a custom notification&nbsp;sound.</p>
+<p>So far - at least as far as taking my dogs out is concerned - it appears to be working relatively well. There&#8217;s a bit of
+latency in the S3 uploads, especially when AVIs are written, so the files linked in the notification emails may not be
+uploaded before the message goes out. That&#8217;s a bit annying, but something that I think I can live&nbsp;with.</p>
+<p>The use of disk queueing probably isn&#8217;t the best, especially with the Pi&#8217;s <span class="caps">SD</span> card, but I wanted something that was simple
+and didn&#8217;t introduce any additional service dependencies. Each of the components runs as a systemd service, configured to
+always restart, so it should tolerate internal failures relatively well. The Python code has a <em>lot</em> of bare excepts;
+I&#8217;m not sure this was the right way to approach it, but my initial theory was that in the event of an error, I&#8217;m more
+concerned about keeping the system running than getting an individual message through. The point of the system is to let
+me know if my home - and more importantly, my four-legged children - are in danger. I figured that I&#8217;d rather get a delayed
+notification than none at&nbsp;all.</p>
+<h2 id="results">Results</h2>
+<p>After two weeks away, the system worked quite well. It triggered correctly, and quickly, when my family came to check on the cats.
+On average, it took about 3-5 seconds for me to receive the PushOver and GMail notifications for a door open event, and about 30 seconds
+for an alarm (motion after door state change)&nbsp;event.</p>
+<p>However, I did have a few&nbsp;issues:</p>
+<ol>
+<li>Late one night, I got a door open alert when I hadn&#8217;t been expecting anyone. After about half an hour of panic checking the webcam feed
+and watching the logs remotely, I determined that it was a false positive. All was well, there wasn&#8217;t any sign of anyone in the apartment,
+the cats were all wandering (or lounging) around as normal, and the door never registered as closed. A day or two later, the door registered
+as closing. I&#8217;m not sure if this was an issue with the door sensor triggering because of wind or vibration, or an issue with the PiFace itself
+having internal issues reading an input over such a long time, or something with induced current in the long unshielded sensor wire in the wall
+(and possibly compounded by my naive debounce&nbsp;logic).</li>
+<li>Having <code>motion</code> store everything in one directory, and then <code>s3sync_inotify.py</code> sync that to S3 and create an <code>index.html</code> file was a
+bad idea. <code>motion</code> was triggered quite often by the cats; after about a week away, I had ~<span class="caps">10GB</span> of photos and videos in the S3 bucket, and the
+<code>index.html</code> file was over <span class="caps">7MB</span>. Not only did the index page take a painfully long amount of time to load, but generation of it introduced enough
+latency in the upload process that <code>s3sync_inotify.py</code> ended up missing a large number of&nbsp;files.</li>
+</ol>
+<h2 id="next-steps">Next&nbsp;Steps</h2>
+<p>I&#8217;m not sure if I&#8217;ll do much more work on this - we don&#8217;t travel often - but if I do, the next things that I want to tackle&nbsp;are:</p>
+<ul>
+<li>Queueing of outgoing messages, so that network outages won&#8217;t result in completely-lost&nbsp;communication.</li>
+<li>Some sort of heartbeat - ideally to an off-premesis system, such as my <span class="caps">EC2</span> instance - from every process involved, to
+confirm that all of the components (a) are running correctly, and (b) have&nbsp;connectivity.</li>
+<li>Modify the <code>motion</code> output directory structure and <code>s3sync_inotify.py</code> to write into per-day (or per-hour) directories
+and write <code>index.html</code> files for each of&nbsp;them.</li>
+<li>See if there&#8217;s a straightforward way to use systemd&#8217;s <a href="http://www.freedesktop.org/software/systemd/man/sd_notify.html">sd_notify</a>
+from Python, to build a watchdog into the processes and have systemd restart them if they&nbsp;hang.</li>
+<li>Packaging this all together into one or more real repositories, so maybe it can be used by&nbsp;others.</li>
+<li>Cleaning up <code>handle_motion.py</code> and <code>motion_piface_handler.py</code> and releasing them along with everything&nbsp;else.</li>
+</ul>
+            </div>
+            <!-- /.entry-content -->
+    <hr />
+    <section class="comments" id="comments">
+        <h2>Comments</h2>
+        <div id="disqus_thread"></div>
+        <script type="text/javascript">
+            /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+            var disqus_shortname = 'jantman'; // required: replace example with your forum shortname
+            var disqus_identifier = 'raspberry-pi-security-system';
+            var disqus_url = 'http://blog.jasonantman.com/2016/01/raspberry-pi-security-system/';
+
+            /* * * DON'T EDIT BELOW THIS LINE * * */
+            (function () {
+                var dsq = document.createElement('script');
+                dsq.type = 'text/javascript';
+                dsq.async = true;
+                dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+                (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+            })();
+        </script>
+        <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by
+            Disqus.</a></noscript>
+        <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+
+    </section>
+        </article>
+    </section>
+
+        </div>
+        <div class="col-lg-3 well well-sm" id="sidebar">
+
+<aside>
+    <section>
+        <ul class="list-group list-group-flush">
+
+                <li class="list-group-item"><h4><i class="icon-home icon-large"></i>Recent Posts</h4></li>
+                        <li class="list-group-item">
+                            <a href="http://blog.jasonantman.com/2016/01/raspberry-pi-security-system/">
+                                Raspberry Pi Security&nbsp;System
+                            </a>
+                        </li>
+                        <li class="list-group-item">
+                            <a href="http://blog.jasonantman.com/2015/10/a-rant-on-post-secondary-tech-education/">
+                                A Rant on Post-Secondary Tech&nbsp;Education
+                            </a>
+                        </li>
+                        <li class="list-group-item">
+                            <a href="http://blog.jasonantman.com/2015/09/puppetlabs-beaker-suts-with-gui--non-headless/">
+                                Puppetlabs Beaker SUTs with <span class="caps">GUI</span> /&nbsp;Non-Headless
+                            </a>
+                        </li>
+                        <li class="list-group-item">
+                            <a href="http://blog.jasonantman.com/2015/07/awslimitchecker-check-your-aws-usage-against-service-limits/">
+                                AwsLimitChecker - Check Your <span class="caps">AWS</span> Usage Against Service&nbsp;Limits
+                            </a>
+                        </li>
+                        <li class="list-group-item">
+                            <a href="http://blog.jasonantman.com/2015/06/visualization-of-when-im-working-on-personal-vs-work-projects/">
+                                Visualization of when I&#8217;m working on personal vs work&nbsp;projects
+                            </a>
+                        </li>
+
+
+                <li class="list-group-item"><a href="http://blog.jasonantman.com/tags.html"><h4><i class="icon-tags icon-large"></i>Tags</h4></a></li>
+                <li class="list-group-item">
+                        <span class="tag-1">
+                            <a href="http://blog.jasonantman.com/tags/sysadmin/index.html">
+                                sysadmin
+                            </a>
+                        </span>
+                        <span class="tag-1">
+                            <a href="http://blog.jasonantman.com/tags/puppet/index.html">
+                                puppet
+                            </a>
+                        </span>
+                        <span class="tag-1">
+                            <a href="http://blog.jasonantman.com/tags/monitoring/index.html">
+                                monitoring
+                            </a>
+                        </span>
+                        <span class="tag-1">
+                            <a href="http://blog.jasonantman.com/tags/sun/index.html">
+                                sun
+                            </a>
+                        </span>
+                        <span class="tag-1">
+                            <a href="http://blog.jasonantman.com/tags/android/index.html">
+                                android
+                            </a>
+                        </span>
+                        <span class="tag-1">
+                            <a href="http://blog.jasonantman.com/tags/google/index.html">
+                                google
+                            </a>
+                        </span>
+                        <span class="tag-1">
+                            <a href="http://blog.jasonantman.com/tags/microsoft/index.html">
+                                microsoft
+                            </a>
+                        </span>
+                        <span class="tag-1">
+                            <a href="http://blog.jasonantman.com/tags/wordpress/index.html">
+                                wordpress
+                            </a>
+                        </span>
+                        <span class="tag-1">
+                            <a href="http://blog.jasonantman.com/tags/blog/index.html">
+                                blog
+                            </a>
+                        </span>
+                        <span class="tag-1">
+                            <a href="http://blog.jasonantman.com/tags/linux/index.html">
+                                linux
+                            </a>
+                        </span>
+                        <span class="tag-1">
+                            <a href="http://blog.jasonantman.com/tags/nagios/index.html">
+                                Nagios
+                            </a>
+                        </span>
+                        <span class="tag-1">
+                            <a href="http://blog.jasonantman.com/tags/php/index.html">
+                                PHP
+                            </a>
+                        </span>
+                        <span class="tag-1">
+                            <a href="http://blog.jasonantman.com/tags/security/index.html">
+                                security
+                            </a>
+                        </span>
+                        <span class="tag-2">
+                            <a href="http://blog.jasonantman.com/tags/python/index.html">
+                                python
+                            </a>
+                        </span>
+                        <span class="tag-2">
+                            <a href="http://blog.jasonantman.com/tags/rpm/index.html">
+                                rpm
+                            </a>
+                        </span>
+                        <span class="tag-2">
+                            <a href="http://blog.jasonantman.com/tags/dns/index.html">
+                                dns
+                            </a>
+                        </span>
+                        <span class="tag-2">
+                            <a href="http://blog.jasonantman.com/tags/droid/index.html">
+                                droid
+                            </a>
+                        </span>
+                        <span class="tag-2">
+                            <a href="http://blog.jasonantman.com/tags/apache/index.html">
+                                apache
+                            </a>
+                        </span>
+                        <span class="tag-2">
+                            <a href="http://blog.jasonantman.com/tags/syslog/index.html">
+                                syslog
+                            </a>
+                        </span>
+                        <span class="tag-2">
+                            <a href="http://blog.jasonantman.com/tags/firefox/index.html">
+                                firefox
+                            </a>
+                        </span>
+                </li>
+        </ul>
+    </section>
+    <section>
+    <ul class="list-group list-group-flush">
+    <li class="list-group-item" style="padding: 10px 15px 0px 15px;"><h4><i class="icon-twitter
+    icon-large"></i>Twitter <a href="https://twitter.com/j_antman"
+    class="twitter-follow-button" data-show-count="false"
+    data-dnt="true">Follow @j_antman</a></h4>
+<script>!function(d,s,id){var
+  js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document,
+  'script', 'twitter-wjs');</script></li>
+    </ul>
+    <a class="twitter-timeline" data-dnt="true"
+    href="https://twitter.com/j_antman"
+    data-chrome="transparent noheader" data-widget-id="429640274453594113">Tweets by @j_antman</a>
+    <script>!function(d,s,id){var
+    js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+"://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+    </section>
+    <section>
+    <ul class="list-group list-group-flush">
+    <li class="list-group-item"><h4><i class="icon-github icon-large"></i>GitHub Repos</h4></li>
+        <div id="gh_repos">
+            <p class="list-group-item">Status updating...</p>
+        </div>
+            <a href="https://github.com/jantman">@jantman</a> on GitHub
+    </ul>
+        <script type="text/javascript">
+            $(document).ready(function () {
+                if (!window.jXHR) {
+                    var jxhr = document.createElement('script');
+                    jxhr.type = 'text/javascript';
+                    jxhr.src = 'http://blog.jasonantman.com/theme/js/jXHR.js';
+                    var s = document.getElementsByTagName('script')[0];
+                    s.parentNode.insertBefore(jxhr, s);
+                }
+
+                github.showRepos({
+                    user: 'jantman',
+                    count: 5,
+                    skip_forks: false,
+                    target: '#gh_repos'
+                });
+            });
+        </script>
+        <script src="http://blog.jasonantman.com/theme/js/github.js" type="text/javascript"></script>
+    </section>
+</aside>        </div>
+    </div>
+</div>
+<footer>
+    <div class="container">
+        <hr>
+        <p class="pull-right"><i class="icon-arrow-up"></i> <a href="#">Back to top</a></p>
+
+
+        <p>&copy; 2016 Jason Antman &middot; Powered by <a href="https://github.com/DandyDev/pelican-bootstrap3" target="_blank">pelican-bootstrap3</a>,
+            <a href="http://docs.getpelican.com/" target="_blank">Pelican</a>,
+            <a href="http://getbootstrap.com" target="_blank">Bootstrap</a></p>
+    </div>
+</footer>
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="http://blog.jasonantman.com/theme/js/bootstrap.min.js"></script>
+
+<!-- Enable responsive features in IE8 with Respond.js (https://github.com/scottjehl/Respond) -->
+<script src="http://blog.jasonantman.com/theme/js/respond.min.js"></script>
+    <script type="text/javascript">
+        /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+        var disqus_shortname = 'jantman'; // required: replace example with your forum shortname
+
+        /* * * DON'T EDIT BELOW THIS LINE * * */
+        (function () {
+            var s = document.createElement('script');
+            s.async = true;
+            s.type = 'text/javascript';
+            s.src = '//' + disqus_shortname + '.disqus.com/count.js';
+            (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+        }());
+    </script>
+
+
+</body>
+</html>
