@@ -1,11 +1,10 @@
 Title: Raspberry Pi Security System
-Date: 2015-12-20 20:55
+Date: 2016-01-16 10:00
 Author: Jason Antman
 Category: Tech HowTos
 Tags: rpi, pi, raspberrypi, security, alarm, motion, camera
 Slug: raspberry-pi-security-system
 Summary: A Raspberry Pi and webcam security system.
-Status: draft
 
 It seems that crime is on the rise in the area where I live, and in my "gated" (when they actually close)
 apartment complex. I'm going out of town for a while to visit family, and was a bit wary of leaving my
@@ -93,10 +92,35 @@ concerned about keeping the system running than getting an individual message th
 me know if my home - and more importantly, my four-legged children - are in danger. I figured that I'd rather get a delayed
 notification than none at all.
 
-If I do much more work on this, the next things that I want to tackle are:
+## Results
+
+After two weeks away, the system worked quite well. It triggered correctly, and quickly, when my family came to check on the cats.
+On average, it took about 3-5 seconds for me to receive the PushOver and GMail notifications for a door open event, and about 30 seconds
+for an alarm (motion after door state change) event.
+
+However, I did have a few issues:
+
+1. Late one night, I got a door open alert when I hadn't been expecting anyone. After about half an hour of panic checking the webcam feed
+and watching the logs remotely, I determined that it was a false positive. All was well, there wasn't any sign of anyone in the apartment,
+the cats were all wandering (or lounging) around as normal, and the door never registered as closed. A day or two later, the door registered
+as closing. I'm not sure if this was an issue with the door sensor triggering because of wind or vibration, or an issue with the PiFace itself
+having internal issues reading an input over such a long time, or something with induced current in the long unshielded sensor wire in the wall
+(and possibly compounded by my naive debounce logic).
+2. Having ``motion`` store everything in one directory, and then ``s3sync_inotify.py`` sync that to S3 and create an ``index.html`` file was a
+bad idea. ``motion`` was triggered quite often by the cats; after about a week away, I had ~10GB of photos and videos in the S3 bucket, and the
+``index.html`` file was over 7MB. Not only did the index page take a painfully long amount of time to load, but generation of it introduced enough
+latency in the upload process that ``s3sync_inotify.py`` ended up missing a large number of files.
+
+## Next Steps
+
+I'm not sure if I'll do much more work on this - we don't travel often - but if I do, the next things that I want to tackle are:
 
 * Queueing of outgoing messages, so that network outages won't result in completely-lost communication.
 * Some sort of heartbeat - ideally to an off-premesis system, such as my EC2 instance - from every process involved, to
 confirm that all of the components (a) are running correctly, and (b) have connectivity.
+* Modify the ``motion`` output directory structure and ``s3sync_inotify.py`` to write into per-day (or per-hour) directories
+and write ``index.html`` files for each of them.
 * See if there's a straightforward way to use systemd's [sd_notify](http://www.freedesktop.org/software/systemd/man/sd_notify.html)
 from Python, to build a watchdog into the processes and have systemd restart them if they hang.
+* Packaging this all together into one or more real repositories, so maybe it can be used by others.
+* Cleaning up ``handle_motion.py`` and ``motion_piface_handler.py`` and releasing them along with everything else.
