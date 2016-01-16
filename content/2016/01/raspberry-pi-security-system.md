@@ -31,6 +31,10 @@ inputs for when either door was open. I figured that this would provide the perf
 webcam, as the cats aren't able to operate the deadbolt on my front door (I had to replace all of the interior door handles
 with cat-proof models).
 
+[![Photograph of RPi in alarm enclosure](/GFX/rpi_alarm_1_sm.jpg)](/GFX/rpi_alarm_1_large.jpg)
+
+[![Photograph of alarm enclosure closed, showing wires to RPi](/GFX/rpi_alarm_2_sm.jpg)](/GFX/rpi_alarm_2_large.jpg)
+
 The system that I've come up with is rather rough around the edges... to put it lightly. It's pretty obvious that it was written
 in a few days, and at this point, it's not really intended to be used by anyone who doesn't have a good understanding of the
 components (and Python). But I'm hoping that someone else might find it interesting, or perhaps improve on it. It's not terribly
