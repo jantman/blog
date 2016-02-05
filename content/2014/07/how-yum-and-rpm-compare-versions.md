@@ -79,8 +79,8 @@ for the remaining characters in each string until something is unequal, or a str
     5. If the first character of ``a`` is a digit, pop the leading chunk of continuous digits from
        each string (which may be '' for ``b`` if only one ``a`` starts with digits). If ``a`` begins
 	   with a letter, do the same for leading letters.
-    6. If the segement from ``b`` had 0 length, return ` if the segment from ``a`` was numeric, or
-       ``b`` if it was alphabetic. The logical result of this is that if ``a`` begins with numbers
+    6. If the segement from ``b`` had 0 length, return 1 if the segment from ``a`` was numeric, or
+       -1 if it was alphabetic. The logical result of this is that if ``a`` begins with numbers
 	   and ``b`` does not, ``a`` is newer (return 1). If ``a`` begins with letters and ``b`` does not,
 	   then ``a`` is older (return -1). If the leading character(s) from ``a`` and ``b`` were both
 	   numbers or both letters, continue on.
