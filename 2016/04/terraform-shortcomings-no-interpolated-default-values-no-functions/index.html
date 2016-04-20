@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:og="http://ogp.me/ns#"
+      xmlns:fb="https://www.facebook.com/2008/fbml">
+<head>
+    <title>Terraform Shortcomings - No Interpolated Default Values, No Functions, No Conditionals, Local State Storage</title>
+    <!-- Using the latest rendering mode for IE -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Open Graph tags -->
+
+    <!-- Bootstrap -->
+        <link rel="stylesheet" href="http://blog.jasonantman.com/theme/css/bootstrap.flatly.min.css" type="text/css"/>
+    <link href="http://blog.jasonantman.com/theme/css/font-awesome.min.css" rel="stylesheet">
+    <link href="http://blog.jasonantman.com/theme/css/pygments.css" rel="stylesheet">
+        <link href="http://blog.jasonantman.com/theme/css/typogrify.css" rel="stylesheet">
+    <link rel="stylesheet" href="http://blog.jasonantman.com/theme/css/style.css" type="text/css"/>
+    <!-- JavaScript plugins (requires jQuery) -->
+    <script src="http://code.jquery.com/jquery.js"></script>
+
+    <link rel="stylesheet" href="http://blog.jasonantman.com/theme/css/forkongithub.min.css" type="text/css" />
+
+        <link href="http://blog.jasonantman.com/feeds/all.atom.xml" type="application/atom+xml" rel="alternate"
+              title="Jason Antman's Blog ATOM Feed"/>
+        <link href="http://blog.jasonantman.com/feeds/all.rss.xml" type="application/atom+xml" rel="alternate"
+              title="Jason Antman's Blog RSS Feed"/>
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-2718127-2', 'jasonantman.com');
+  ga('send', 'pageview');
+
+</script>
+</head>
+<body>
+<span id="forkongithub"><a href="https://github.com/jantman/blog">Fork me on GitHub</a></span><nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="http://blog.jasonantman.com" class="navbar-brand">Jason Antman's Blog</a>
+        </div>
+        <div class="collapse navbar-collapse navbar-ex1-collapse">
+            <ul class="nav navbar-nav">
+                         <li><a href="http://blog.jasonantman.com/pages/about.html">
+                             About
+                          </a></li>
+                        <li class="active">
+                            <a href="http://blog.jasonantman.com/categories/ideas-and-rants/index.html">Ideas and rants</a>
+                        </li>
+                        <li >
+                            <a href="http://blog.jasonantman.com/categories/miscellaneous/index.html">Miscellaneous</a>
+                        </li>
+                        <li >
+                            <a href="http://blog.jasonantman.com/categories/monitoring/index.html">Monitoring</a>
+                        </li>
+                        <li >
+                            <a href="http://blog.jasonantman.com/categories/ops/index.html">Ops</a>
+                        </li>
+                        <li >
+                            <a href="http://blog.jasonantman.com/categories/projects/index.html">Projects</a>
+                        </li>
+                        <li >
+                            <a href="http://blog.jasonantman.com/categories/puppet/index.html">Puppet</a>
+                        </li>
+                        <li >
+                            <a href="http://blog.jasonantman.com/categories/tech-howtos/index.html">Tech howtos</a>
+                        </li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="http://blog.jasonantman.com/archives.html"><i class="icon-th-list"></i>Archives</a></li>
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+</nav>
+<!-- /.navbar -->
+<div class="container">
+    <div class="row">
+        <div class="col-lg-9">
+    <section id="content">
+        <article>
+            <header class="page-header">
+                <h1>
+                    <a href="http://blog.jasonantman.com/2016/04/terraform-shortcomings-no-interpolated-default-values-no-functions/"
+                       rel="bookmark"
+                       title="Permalink to Terraform Shortcomings - No Interpolated Default Values, No Functions, No Conditionals, Local State Storage">
+                        Terraform Shortcomings - No Interpolated Default Values, No Functions, No Conditionals, Local State&nbsp;Storage
+                    </a>
+                </h1>
+<a href="http://twitter.com/share" class="twitter-share-button" data-count="horizontal" data-via="j_antman">Tweet</a><script type="text/javascript" src="http://platform.twitter.com/widgets.js"></script>
+            </header>
+            <div class="entry-content">
+                <div class="panel">
+                    <div class="panel-body">
+<footer class="post-info">
+    <span class="label label-default">Date</span>
+    <span class="published">
+        <i class="icon-calendar"></i>Tue 19 April 2016
+    </span>
+
+
+
+<span class="label label-default">Tags</span>
+	<a href="http://blog.jasonantman.com/tags/terraform/index.html">terraform</a>
+        /
+	<a href="http://blog.jasonantman.com/tags/hashicorp/index.html">hashicorp</a>
+        /
+	<a href="http://blog.jasonantman.com/tags/aws/index.html">AWS</a>
+        /
+	<a href="http://blog.jasonantman.com/tags/go/index.html">go</a>
+</footer><!-- /.post-info -->                    </div>
+                </div>
+                <p>Lately I&#8217;ve been using HashiCorp&#8217;s <a href="https://www.terraform.io/">Terraform</a> a lot to manage infrastructure. It certainly has some big things going for it; it supports a whole bunch of providers (including on-prem, non-cloud stuff like VMWare and Docker) as well as some database engines and <span class="caps">DNS</span> providers and can even manage GitHub teams, it can plan changes before committing them (which CloudFormation only <a href="https://aws.amazon.com/blogs/aws/new-change-sets-for-aws-cloudformation/">very recently</a> learned), and it can store the current state of your infrastructure in <a href="https://www.consul.io/">Consul</a>. Also a big step past CloudFormation, it has <a href="https://www.terraform.io/docs/provisioners/index.html">provisioners</a> including local execution, remote execution, file copying and Chef (strangely no built-in support for Puppet, but the remote-exec can do that) that can reach out to your newly-created instances and take actions on&nbsp;them.</p>
+<p>Terraform also has a <a href="https://www.terraform.io/docs/providers/template/index.html">template provider</a> that&#8217;s used any time you need a templated file, such as <span class="caps">EC2</span> instance user-data or dynamically generated scripts to place on hosts. Terraform uses a <span class="caps">DSL</span> for its <a href="https://www.terraform.io/docs/configuration/index.html">configuration</a>, either the <span class="caps">JSON</span>-like but slightly-more-human-readable <a href="https://github.com/hashicorp/hcl">Hashicorp Configuration Language (<span class="caps">HCL</span>)</a> or the same information conveyed in pure <span class="caps">JSON</span>. The configuration language supports variables (passed in at the command line or in a file) and is based on <a href="https://www.terraform.io/docs/configuration/interpolation.html">string interpolation</a> with a handful of functions defined. It&#8217;s also worth noting that Terraform is written in Go; it has a <a href="https://www.terraform.io/docs/plugins/index.html">plugin system</a> but only for Providers and Provisioners; there&#8217;s no way to add core functionality (I suppose I&#8217;ve been spolied by Puppet having such good support for adding core functionality via Ruby, or HashiCorp&#8217;s Vagrant having a config file that itself is&nbsp;Ruby).</p>
+<p>Now that I&#8217;ve been nice and said some great things about Terraform (and it really is; at least for the way my current job is managing infrastructure, I&#8217;ve fallen in love with it, and it certainly does fix some shortcomings that I found in CloudFormation, specifically with pre-execution plans and ability to interact with resources), on to my complaints of the&nbsp;day.</p>
+<h2 id="local-state-storage">Local State&nbsp;Storage</h2>
+<p>My first complaint is that by default, Terraform stores the state of your infrastrucutre in a file in your current working directory. It uses this to attempt to figure out the already-existing resources you&#8217;ve created, and only make the required changes. The first time I used terraform, I completely destroyed one of our (luckily non-production) services; coworkers of mine have brought down production services because of&nbsp;this.</p>
+<p>Let&#8217;s say that we have a Terraform configuration which takes one variable, <code>environment</code>. That variable determines the <span class="caps">VPC</span> and subnets we deploy into, our <span class="caps">DNS</span> names, and also gets passed to <span class="caps">EC2</span> instances via user-data. We build our infrastructure with <code>environment = "prod"</code>, and everything works right - we now have a production cluster of our service. Then we want to test some changes, so we run again with <code>environment = "dev"</code>. The naive - and logical - assumption would be that we get a second &#8220;dev&#8221; cluster of our service. Nope. Terraform finds the <code>terraform.tfstate</code> file in our current directory, reads it, and takes it to be the current state of our infrastructure. It sees that we <strong>changed</strong> <code>environment</code> from &#8220;prod&#8221; to &#8220;dev&#8221;&#8230; so it destroys our <span class="caps">EC2</span> instances and <span class="caps">DNS</span> record, and creates new ones for &#8220;dev&#8221; (applying the requested&nbsp;changes).</p>
+<p>This teaches us two important&nbsp;points:</p>
+<ol>
+<li><strong>Always</strong> run <code>terraform plan</code>. Even if you think your changes are trivial, examine what Terraform will do before running <code>apply</code>.</li>
+<li><strong>Always</strong> run <code>terraform</code> through a wrapper. We have a simple Rake task in an internal rubygem that ensures that Terraform will always store state in Consul, so it won&#8217;t be locked to one person&#8217;s local machine, and also removes any local state files before running so they won&#8217;t pollute the run or result in changes intended for one isolated instance of our Terraform configuration from being applied to&nbsp;another.</li>
+</ol>
+<h2 id="functions">Functions</h2>
+<p>Terraform&#8217;s <a href="https://www.terraform.io/docs/configuration/interpolation.html">configuration interpolation</a> has a bunch of built-in functions for working with variables. They&#8217;re a subset of what you&#8217;d expect in a language that is mainly based around strings, arrays and maps/hashes: split, join, concat, lookup (get a hash item by key), index (find the index of an item in a list), element (return the n&#8217;th element of a list), format (sprintf-like), etc. However, there&#8217;s no function to retrieve only unique elements from a list. This becomes a problem especially when dealing with multi-<span class="caps">AZ</span>/multi-subnet <span class="caps">AWS</span> resources, as some of them (e.g. managing a set number individual <span class="caps">EC2</span> instances outside of an <span class="caps">ASG</span>, such as when assigning static IPs) require a list of subnets matching the number of resources, and others (cross-<span class="caps">AZ</span> ELBs) require a list of unique&nbsp;subnets.</p>
+<p>Terraform and its language have no way to add this functionality (<em>see note below</em>); the only option that I&#8217;ve found is to wrap Terraform in some sort of runner (I use <a href="https://github.com/ruby/rake">Rake</a> but you could use any scripting or Make-like language) that does whatever manipulation and calculation is needed, and passes in the necessary values distinct variable values (i.e. the full subnet list, and the unique subnet list, as separate variables). To make this even more difficult, though Terraform supports loading built-time variables from a <span class="caps">JSON</span> or <span class="caps">HCL</span> file instead of the command line, it only supports taking in variables as strings (even in <span class="caps">JSON</span>). So in our subnet example, our wrapper script needs to join the list of subnets into a string (i.e. <span class="caps">CSV</span>) and then whenever we use the variable in Terraform, we need to <code>split()</code> it on our separator character (because Terraform doesn&#8217;t support variable setting or&nbsp;manipulation).</p>
+<p><em><span class="dquo">&#8220;</span>Terraform [has] no way to add this functionality&#8221;</em> - I&#8217;m aware that I could fork Terraform, learn Go, and submit pull requests for all of the features I think would be useful; and if I had maybe half a dozen less unfinished projects, I&#8217;d probably do that. However, this still means that HashiCorp would need to accept and merge my PRs and release a new version, or else I&#8217;d need to build and distribute my forked version. Terraform supports <a href="https://www.terraform.io/docs/plugins/index.html">plugins</a>, but only for Providers and Provisioners, not language internals. What I&#8217;d really like is a way to define plugin functions that could be distributed without having to rebuild all of&nbsp;Terraform.</p>
+<h2 id="no-interpolated-default-variable-values">No Interpolated Default Variable&nbsp;Values</h2>
+<p>Terraform variables can have default values defined for them. However, these default values have no way of using other variables. This means that even for relatively common use cases - like a service that has a name and a <span class="caps">DNS</span> record, both of which can be overridden but with the <span class="caps">DNS</span> record defaulting to &#8220;SERVICE_NAME.example.com&#8221;, you can&#8217;t do that. The only options that I&#8217;ve been able to figure out are to either do it in your wrapper script (which means the Terraform configs can&#8217;t be run without the wrapper) or use the <code>coalesce</code> function to give your variable an empty default value, and then choose a second interpolated string if the variable is&nbsp;empty.</p>
+<h2 id="no-conditionals">No&nbsp;Conditionals</h2>
+<p>Terraform&#8217;s configuration language also lacks conditional statements such as <code>if</code>. This poses a problem with all but the simplest applications, and is certainly likely to be an issue for anyone who wants to do the right thing and use the same tooling to deploy multiple environments. It seems that the only options are to either pass in the necessary information as variables from a wrapper script, or generate Terraform configurations with other tooling. The former works only if the desired result is a variable in your configuration; there&#8217;s simply no way that I&#8217;ve found to have a conditional around resource(s). The only obvious option for that is to take advantage of Terraform&#8217;s ability to read configurations as <span class="caps">JSON</span>, and simply generate your entire terraform configuration with another&nbsp;tool.</p>
+            </div>
+            <!-- /.entry-content -->
+    <hr />
+    <section class="comments" id="comments">
+        <h2>Comments</h2>
+        <div id="disqus_thread"></div>
+        <script type="text/javascript">
+            /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+            var disqus_shortname = 'jantman'; // required: replace example with your forum shortname
+            var disqus_identifier = 'terraform-shortcomings-no-interpolated-default-values-no-functions';
+            var disqus_url = 'http://blog.jasonantman.com/2016/04/terraform-shortcomings-no-interpolated-default-values-no-functions/';
+
+            /* * * DON'T EDIT BELOW THIS LINE * * */
+            (function () {
+                var dsq = document.createElement('script');
+                dsq.type = 'text/javascript';
+                dsq.async = true;
+                dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+                (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+            })();
+        </script>
+        <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by
+            Disqus.</a></noscript>
+        <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+
+    </section>
+        </article>
+    </section>
+
+        </div>
+        <div class="col-lg-3 well well-sm" id="sidebar">
+
+<aside>
+    <section>
+        <ul class="list-group list-group-flush">
+
+                <li class="list-group-item"><h4><i class="icon-home icon-large"></i>Recent Posts</h4></li>
+                        <li class="list-group-item">
+                            <a href="http://blog.jasonantman.com/2016/04/terraform-shortcomings-no-interpolated-default-values-no-functions/">
+                                Terraform Shortcomings - No Interpolated Default Values, No Functions, No Conditionals, Local State&nbsp;Storage
+                            </a>
+                        </li>
+                        <li class="list-group-item">
+                            <a href="http://blog.jasonantman.com/2016/01/raspberry-pi-security-system/">
+                                Raspberry Pi Security&nbsp;System
+                            </a>
+                        </li>
+                        <li class="list-group-item">
+                            <a href="http://blog.jasonantman.com/2015/10/a-rant-on-post-secondary-tech-education/">
+                                A Rant on Post-Secondary Tech&nbsp;Education
+                            </a>
+                        </li>
+                        <li class="list-group-item">
+                            <a href="http://blog.jasonantman.com/2015/09/puppetlabs-beaker-suts-with-gui--non-headless/">
+                                Puppetlabs Beaker SUTs with <span class="caps">GUI</span> /&nbsp;Non-Headless
+                            </a>
+                        </li>
+                        <li class="list-group-item">
+                            <a href="http://blog.jasonantman.com/2015/07/awslimitchecker-check-your-aws-usage-against-service-limits/">
+                                AwsLimitChecker - Check Your <span class="caps">AWS</span> Usage Against Service&nbsp;Limits
+                            </a>
+                        </li>
+
+
+                <li class="list-group-item"><a href="http://blog.jasonantman.com/tags.html"><h4><i class="icon-tags icon-large"></i>Tags</h4></a></li>
+                <li class="list-group-item">
+                        <span class="tag-1">
+                            <a href="http://blog.jasonantman.com/tags/microsoft/index.html">
+                                microsoft
+                            </a>
+                        </span>
+                        <span class="tag-1">
+                            <a href="http://blog.jasonantman.com/tags/monitoring/index.html">
+                                monitoring
+                            </a>
+                        </span>
+                        <span class="tag-1">
+                            <a href="http://blog.jasonantman.com/tags/sun/index.html">
+                                sun
+                            </a>
+                        </span>
+                        <span class="tag-1">
+                            <a href="http://blog.jasonantman.com/tags/nagios/index.html">
+                                Nagios
+                            </a>
+                        </span>
+                        <span class="tag-1">
+                            <a href="http://blog.jasonantman.com/tags/blog/index.html">
+                                blog
+                            </a>
+                        </span>
+                        <span class="tag-1">
+                            <a href="http://blog.jasonantman.com/tags/wordpress/index.html">
+                                wordpress
+                            </a>
+                        </span>
+                        <span class="tag-1">
+                            <a href="http://blog.jasonantman.com/tags/puppet/index.html">
+                                puppet
+                            </a>
+                        </span>
+                        <span class="tag-1">
+                            <a href="http://blog.jasonantman.com/tags/android/index.html">
+                                android
+                            </a>
+                        </span>
+                        <span class="tag-1">
+                            <a href="http://blog.jasonantman.com/tags/php/index.html">
+                                PHP
+                            </a>
+                        </span>
+                        <span class="tag-1">
+                            <a href="http://blog.jasonantman.com/tags/sysadmin/index.html">
+                                sysadmin
+                            </a>
+                        </span>
+                        <span class="tag-1">
+                            <a href="http://blog.jasonantman.com/tags/security/index.html">
+                                security
+                            </a>
+                        </span>
+                        <span class="tag-1">
+                            <a href="http://blog.jasonantman.com/tags/linux/index.html">
+                                linux
+                            </a>
+                        </span>
+                        <span class="tag-1">
+                            <a href="http://blog.jasonantman.com/tags/google/index.html">
+                                google
+                            </a>
+                        </span>
+                        <span class="tag-2">
+                            <a href="http://blog.jasonantman.com/tags/python/index.html">
+                                python
+                            </a>
+                        </span>
+                        <span class="tag-2">
+                            <a href="http://blog.jasonantman.com/tags/droid/index.html">
+                                droid
+                            </a>
+                        </span>
+                        <span class="tag-2">
+                            <a href="http://blog.jasonantman.com/tags/syslog/index.html">
+                                syslog
+                            </a>
+                        </span>
+                        <span class="tag-2">
+                            <a href="http://blog.jasonantman.com/tags/apache/index.html">
+                                apache
+                            </a>
+                        </span>
+                        <span class="tag-2">
+                            <a href="http://blog.jasonantman.com/tags/dns/index.html">
+                                dns
+                            </a>
+                        </span>
+                        <span class="tag-2">
+                            <a href="http://blog.jasonantman.com/tags/rpm/index.html">
+                                rpm
+                            </a>
+                        </span>
+                        <span class="tag-2">
+                            <a href="http://blog.jasonantman.com/tags/firefox/index.html">
+                                firefox
+                            </a>
+                        </span>
+                </li>
+        </ul>
+    </section>
+    <section>
+    <ul class="list-group list-group-flush">
+    <li class="list-group-item" style="padding: 10px 15px 0px 15px;"><h4><i class="icon-twitter
+    icon-large"></i>Twitter <a href="https://twitter.com/j_antman"
+    class="twitter-follow-button" data-show-count="false"
+    data-dnt="true">Follow @j_antman</a></h4>
+<script>!function(d,s,id){var
+  js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document,
+  'script', 'twitter-wjs');</script></li>
+    </ul>
+    <a class="twitter-timeline" data-dnt="true"
+    href="https://twitter.com/j_antman"
+    data-chrome="transparent noheader" data-widget-id="429640274453594113">Tweets by @j_antman</a>
+    <script>!function(d,s,id){var
+    js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+"://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+    </section>
+    <section>
+    <ul class="list-group list-group-flush">
+    <li class="list-group-item"><h4><i class="icon-github icon-large"></i>GitHub Repos</h4></li>
+        <div id="gh_repos">
+            <p class="list-group-item">Status updating...</p>
+        </div>
+            <a href="https://github.com/jantman">@jantman</a> on GitHub
+    </ul>
+        <script type="text/javascript">
+            $(document).ready(function () {
+                if (!window.jXHR) {
+                    var jxhr = document.createElement('script');
+                    jxhr.type = 'text/javascript';
+                    jxhr.src = 'http://blog.jasonantman.com/theme/js/jXHR.js';
+                    var s = document.getElementsByTagName('script')[0];
+                    s.parentNode.insertBefore(jxhr, s);
+                }
+
+                github.showRepos({
+                    user: 'jantman',
+                    count: 5,
+                    skip_forks: false,
+                    target: '#gh_repos'
+                });
+            });
+        </script>
+        <script src="http://blog.jasonantman.com/theme/js/github.js" type="text/javascript"></script>
+    </section>
+</aside>        </div>
+    </div>
+</div>
+<footer>
+    <div class="container">
+        <hr>
+        <p class="pull-right"><i class="icon-arrow-up"></i> <a href="#">Back to top</a></p>
+
+
+        <p>&copy; 2016 Jason Antman &middot; Powered by <a href="https://github.com/DandyDev/pelican-bootstrap3" target="_blank">pelican-bootstrap3</a>,
+            <a href="http://docs.getpelican.com/" target="_blank">Pelican</a>,
+            <a href="http://getbootstrap.com" target="_blank">Bootstrap</a></p>
+    </div>
+</footer>
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="http://blog.jasonantman.com/theme/js/bootstrap.min.js"></script>
+
+<!-- Enable responsive features in IE8 with Respond.js (https://github.com/scottjehl/Respond) -->
+<script src="http://blog.jasonantman.com/theme/js/respond.min.js"></script>
+    <script type="text/javascript">
+        /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+        var disqus_shortname = 'jantman'; // required: replace example with your forum shortname
+
+        /* * * DON'T EDIT BELOW THIS LINE * * */
+        (function () {
+            var s = document.createElement('script');
+            s.async = true;
+            s.type = 'text/javascript';
+            s.src = '//' + disqus_shortname + '.disqus.com/count.js';
+            (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+        }());
+    </script>
+
+
+</body>
+</html>
