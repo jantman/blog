@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Jason Antman's Blog</title><link href="http://blog.jasonantman.com/" rel="alternate"></link><link href="http://blog.jasonantman.com/feeds/tags/api-gateway.atom.xml" rel="self"></link><id>http://blog.jasonantman.com/</id><updated>2016-08-06T21:38:00-04:00</updated><entry><title>Tooling for AWS - webhooks to SQS via API Gateway and Lambda</title><link href="http://blog.jasonantman.com/2016/08/tooling-for-aws-webhooks-to-sqs-via-api-gateway-and-lambda/" rel="alternate"></link><updated>2016-08-06T21:38:00-04:00</updated><author><name>Jason Antman</name></author><id>tag:blog.jasonantman.com,2016-08-06:2016/08/tooling-for-aws-webhooks-to-sqs-via-api-gateway-and-lambda/</id><summary type="html">&lt;p&gt;A few weeks ago at work, I was party to two discussions about possible tooling needs, both very low-priority. One was the possible need to sync MarkDown documentation
+from GitHub repositories to&amp;#8230; another thing that can hold docs. The other was relating to the new Version 2 Docker Registry, &lt;a href="https://github.com/docker/distribution"&gt;distribution&lt;/a&gt;.
+We have some Jenkins jobs that dynamically populate dropdown fields for build parameters with Docker image names and tags, using the &lt;a href="https://wiki.jenkins-ci.org/display/JENKINS/Active+Choices+Plugin"&gt;Active Choices Plugin&lt;/a&gt;.
+Right now we&amp;#8217;re directly querying the Docker Registry &lt;span class="caps"&gt;API&lt;/span&gt; from Groovy, every time the Build With Parameters page is loaded. With the original version 1 Docker Registry,
+images were often missing from the results (eek!) but the performance was good. With the switch to the v2 Registry, it takes almost two minutes to load the page.
+While brainstorming solutions, we decided that caching the list of images and tags in the Registry was the solution. For bonus points, it would also be nice to
+be able to query based on image labels - something that&amp;#8217;s not exposed in the Registry &lt;span class="caps"&gt;API&lt;/span&gt; at all. Luckily, the Registry has an option to fire a webhook every time
+a new image is&amp;nbsp;pushed.&lt;/p&gt;
+&lt;p&gt;Both of these problems have solutions that involve webhooks, from GitHub and Docker Distribution, respectively. They also both involve doing time-consuming things in custom code with the
+data in those hooks - transforming MarkDown to another markup and pushing the result to an on-premesis system in the case of GitHub, and &lt;code&gt;pull&lt;/code&gt;ing and inspecting Docker
+images in the case of the Registry. As such, the &amp;#8220;typical&amp;#8221; webhook things like &lt;a href="https://zapier.com/"&gt;Zapier&lt;/a&gt; won&amp;#8217;t fit the bill. All I really needed was something to receive webhooks
+and push the content of them into a queue. Ideally, it would also be something that would utilize existing services we have, namely&amp;nbsp;&lt;span class="caps"&gt;AWS&lt;/span&gt;.&lt;/p&gt;
+&lt;p&gt;After working a bunch of nights and the good part of a weekend, I have a solution: my new &lt;a href="https://pypi.python.org/pypi/webhook2lambda2sqs"&gt;webhook2lambda2sqs&lt;/a&gt; Python&amp;nbsp;package.&lt;/p&gt;
+&lt;p&gt;This implements what I think is the cheapest and lowest-overhead solution for anyone with an existing &lt;span class="caps"&gt;AWS&lt;/span&gt;&amp;nbsp;account:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Setup an &lt;a href="https://aws.amazon.com/api-gateway/"&gt;&lt;span class="caps"&gt;API&lt;/span&gt; Gateway&lt;/a&gt; that receives json &lt;span class="caps"&gt;POST&lt;/span&gt; and &lt;span class="caps"&gt;GET&lt;/span&gt;&amp;nbsp;requests.&lt;/li&gt;
+&lt;li&gt;It passes them to a &lt;a href="https://aws.amazon.com/lambda/"&gt;Lambda Function&lt;/a&gt; which pushes the content to one or more &lt;a href="https://aws.amazon.com/sqs/"&gt;&lt;span class="caps"&gt;SQS&lt;/span&gt;&lt;/a&gt; queues, for consumption by an&amp;nbsp;application.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;The tooling is written in Python, but leverages &lt;a href="https://www.terraform.io/"&gt;HashiCorp&amp;#8217;s Terraform&lt;/a&gt; to actually manage the &lt;span class="caps"&gt;AWS&lt;/span&gt;&amp;nbsp;resources.&lt;/p&gt;
+&lt;p&gt;From a &lt;span class="caps"&gt;JSON&lt;/span&gt; configuration file as simple&amp;nbsp;as:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;{
+  &amp;quot;endpoints&amp;quot;: {
+    &amp;quot;some_resource_name&amp;quot;: {
+      &amp;quot;method&amp;quot;: &amp;quot;POST&amp;quot;,
+      &amp;quot;queues&amp;quot;: [&amp;quot;myqueue&amp;quot;]
+    },
+  },
+}
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;and a single command (&lt;code&gt;webhook2lambda2sqs genapply&lt;/code&gt;), you&amp;#8217;ll have the complete system up and running, receiving &lt;span class="caps"&gt;HTTP&lt;/span&gt; &lt;span class="caps"&gt;POST&lt;/span&gt; requests
+at an &lt;span class="caps"&gt;AWS&lt;/span&gt;-generated &lt;span class="caps"&gt;URL&lt;/span&gt; and pushing them into the &lt;code&gt;myqueue&lt;/code&gt; &lt;span class="caps"&gt;SQS&lt;/span&gt; queue. Best of all, going by my testing (this is based on the time
+the Lambda function takes to run, which can vary quite a bit), the whole thing is &lt;strong&gt;free for the first 1 million requests per month&lt;/strong&gt;
+if your account is still on the Free Tier, and otherwise is less than $4/month for the first million&amp;nbsp;requests.&lt;/p&gt;
+&lt;p&gt;The configuration can handle setting up multiple distinct endpoint paths in the same &lt;span class="caps"&gt;API&lt;/span&gt; Gateway, each
+sending the data to one or more &lt;span class="caps"&gt;SQS&lt;/span&gt; queues. It also has options for enabling logging (to CloudWatch Logs) both in the function
+and on the &lt;span class="caps"&gt;API&lt;/span&gt; Gateway, pushing &lt;span class="caps"&gt;API&lt;/span&gt; Gateway metrics to CloudWatch, and configuring rate&amp;nbsp;limiting.&lt;/p&gt;
+&lt;p&gt;The &lt;code&gt;webhook2lambda2sqs&lt;/code&gt; program generates the Python code for the lambda function and packages it correctly for Lambda, and
+then generates a Terraform configuration to manage all required &lt;span class="caps"&gt;AWS&lt;/span&gt; resources. Separate commands are available that wrap Terraform
+(mainly to deal with some issues with its &lt;span class="caps"&gt;API&lt;/span&gt; Gateway implementation) to run &lt;code&gt;plan&lt;/code&gt;, &lt;code&gt;apply&lt;/code&gt; and &lt;code&gt;destroy&lt;/code&gt;. There are
+also helper commands to view the Lambda Function and &lt;span class="caps"&gt;API&lt;/span&gt; Gateway logs from CloudWatch, view messages in the queue(s) and
+&lt;span class="caps"&gt;GET&lt;/span&gt; or &lt;span class="caps"&gt;POST&lt;/span&gt; a test message to one or all of the&amp;nbsp;endpoints.&lt;/p&gt;
+&lt;p&gt;Full documentation is available at &lt;a href="http://webhook2lambda2sqs.readthedocs.io/en/latest/"&gt;http://webhook2lambda2sqs.readthedocs.io/en/latest/&lt;/a&gt;
+and the package (Python 2.7, 3.3-3.5) can be downloaded &lt;a href="https://pypi.python.org/pypi/webhook2lambda2sqs"&gt;from PyPI&lt;/a&gt;.&lt;/p&gt;</summary><category term="aws"></category><category term="webhook"></category><category term="lambda"></category><category term="github"></category><category term="api-gateway"></category><category term="sqs"></category><category term="queue"></category><category term="python"></category><category term="terraform"></category></entry></feed>

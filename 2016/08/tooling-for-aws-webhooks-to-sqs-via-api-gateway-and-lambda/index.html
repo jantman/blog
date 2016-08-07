@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:og="http://ogp.me/ns#"
+      xmlns:fb="https://www.facebook.com/2008/fbml">
+<head>
+    <title>Tooling for AWS - webhooks to SQS via API Gateway and Lambda</title>
+    <!-- Using the latest rendering mode for IE -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Open Graph tags -->
+
+    <!-- Bootstrap -->
+        <link rel="stylesheet" href="http://blog.jasonantman.com/theme/css/bootstrap.flatly.min.css" type="text/css"/>
+    <link href="http://blog.jasonantman.com/theme/css/font-awesome.min.css" rel="stylesheet">
+    <link href="http://blog.jasonantman.com/theme/css/pygments.css" rel="stylesheet">
+        <link href="http://blog.jasonantman.com/theme/css/typogrify.css" rel="stylesheet">
+    <link rel="stylesheet" href="http://blog.jasonantman.com/theme/css/style.css" type="text/css"/>
+    <!-- JavaScript plugins (requires jQuery) -->
+    <script src="http://code.jquery.com/jquery.js"></script>
+
+    <link rel="stylesheet" href="http://blog.jasonantman.com/theme/css/forkongithub.min.css" type="text/css" />
+
+        <link href="http://blog.jasonantman.com/feeds/all.atom.xml" type="application/atom+xml" rel="alternate"
+              title="Jason Antman's Blog ATOM Feed"/>
+        <link href="http://blog.jasonantman.com/feeds/all.rss.xml" type="application/atom+xml" rel="alternate"
+              title="Jason Antman's Blog RSS Feed"/>
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-2718127-2', 'jasonantman.com');
+  ga('send', 'pageview');
+
+</script>
+</head>
+<body>
+<span id="forkongithub"><a href="https://github.com/jantman/blog">Fork me on GitHub</a></span><nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="http://blog.jasonantman.com" class="navbar-brand">Jason Antman's Blog</a>
+        </div>
+        <div class="collapse navbar-collapse navbar-ex1-collapse">
+            <ul class="nav navbar-nav">
+                         <li><a href="http://blog.jasonantman.com/pages/about.html">
+                             About
+                          </a></li>
+                        <li >
+                            <a href="http://blog.jasonantman.com/categories/ideas-and-rants/index.html">Ideas and rants</a>
+                        </li>
+                        <li >
+                            <a href="http://blog.jasonantman.com/categories/miscellaneous/index.html">Miscellaneous</a>
+                        </li>
+                        <li >
+                            <a href="http://blog.jasonantman.com/categories/monitoring/index.html">Monitoring</a>
+                        </li>
+                        <li >
+                            <a href="http://blog.jasonantman.com/categories/ops/index.html">Ops</a>
+                        </li>
+                        <li class="active">
+                            <a href="http://blog.jasonantman.com/categories/projects/index.html">Projects</a>
+                        </li>
+                        <li >
+                            <a href="http://blog.jasonantman.com/categories/puppet/index.html">Puppet</a>
+                        </li>
+                        <li >
+                            <a href="http://blog.jasonantman.com/categories/tech-howtos/index.html">Tech howtos</a>
+                        </li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="http://blog.jasonantman.com/archives.html"><i class="icon-th-list"></i>Archives</a></li>
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+</nav>
+<!-- /.navbar -->
+<div class="container">
+    <div class="row">
+        <div class="col-lg-9">
+    <section id="content">
+        <article>
+            <header class="page-header">
+                <h1>
+                    <a href="http://blog.jasonantman.com/2016/08/tooling-for-aws-webhooks-to-sqs-via-api-gateway-and-lambda/"
+                       rel="bookmark"
+                       title="Permalink to Tooling for AWS - webhooks to SQS via API Gateway and Lambda">
+                        Tooling for <span class="caps">AWS</span> - webhooks to <span class="caps">SQS</span> via <span class="caps">API</span> Gateway and&nbsp;Lambda
+                    </a>
+                </h1>
+<a href="http://twitter.com/share" class="twitter-share-button" data-count="horizontal" data-via="j_antman">Tweet</a><script type="text/javascript" src="http://platform.twitter.com/widgets.js"></script>
+            </header>
+            <div class="entry-content">
+                <div class="panel">
+                    <div class="panel-body">
+<footer class="post-info">
+    <span class="label label-default">Date</span>
+    <span class="published">
+        <i class="icon-calendar"></i>Sat 06 August 2016
+    </span>
+
+
+
+<span class="label label-default">Tags</span>
+	<a href="http://blog.jasonantman.com/tags/aws/index.html">aws</a>
+        /
+	<a href="http://blog.jasonantman.com/tags/webhook/index.html">webhook</a>
+        /
+	<a href="http://blog.jasonantman.com/tags/lambda/index.html">lambda</a>
+        /
+	<a href="http://blog.jasonantman.com/tags/github/index.html">github</a>
+        /
+	<a href="http://blog.jasonantman.com/tags/api-gateway/index.html">api-gateway</a>
+        /
+	<a href="http://blog.jasonantman.com/tags/sqs/index.html">sqs</a>
+        /
+	<a href="http://blog.jasonantman.com/tags/queue/index.html">queue</a>
+        /
+	<a href="http://blog.jasonantman.com/tags/python/index.html">python</a>
+        /
+	<a href="http://blog.jasonantman.com/tags/terraform/index.html">terraform</a>
+</footer><!-- /.post-info -->                    </div>
+                </div>
+                <p>A few weeks ago at work, I was party to two discussions about possible tooling needs, both very low-priority. One was the possible need to sync MarkDown documentation
+from GitHub repositories to&#8230; another thing that can hold docs. The other was relating to the new Version 2 Docker Registry, <a href="https://github.com/docker/distribution">distribution</a>.
+We have some Jenkins jobs that dynamically populate dropdown fields for build parameters with Docker image names and tags, using the <a href="https://wiki.jenkins-ci.org/display/JENKINS/Active+Choices+Plugin">Active Choices Plugin</a>.
+Right now we&#8217;re directly querying the Docker Registry <span class="caps">API</span> from Groovy, every time the Build With Parameters page is loaded. With the original version 1 Docker Registry,
+images were often missing from the results (eek!) but the performance was good. With the switch to the v2 Registry, it takes almost two minutes to load the page.
+While brainstorming solutions, we decided that caching the list of images and tags in the Registry was the solution. For bonus points, it would also be nice to
+be able to query based on image labels - something that&#8217;s not exposed in the Registry <span class="caps">API</span> at all. Luckily, the Registry has an option to fire a webhook every time
+a new image is&nbsp;pushed.</p>
+<p>Both of these problems have solutions that involve webhooks, from GitHub and Docker Distribution, respectively. They also both involve doing time-consuming things in custom code with the
+data in those hooks - transforming MarkDown to another markup and pushing the result to an on-premesis system in the case of GitHub, and <code>pull</code>ing and inspecting Docker
+images in the case of the Registry. As such, the &#8220;typical&#8221; webhook things like <a href="https://zapier.com/">Zapier</a> won&#8217;t fit the bill. All I really needed was something to receive webhooks
+and push the content of them into a queue. Ideally, it would also be something that would utilize existing services we have, namely&nbsp;<span class="caps">AWS</span>.</p>
+<p>After working a bunch of nights and the good part of a weekend, I have a solution: my new <a href="https://pypi.python.org/pypi/webhook2lambda2sqs">webhook2lambda2sqs</a> Python&nbsp;package.</p>
+<p>This implements what I think is the cheapest and lowest-overhead solution for anyone with an existing <span class="caps">AWS</span>&nbsp;account:</p>
+<ul>
+<li>Setup an <a href="https://aws.amazon.com/api-gateway/"><span class="caps">API</span> Gateway</a> that receives json <span class="caps">POST</span> and <span class="caps">GET</span>&nbsp;requests.</li>
+<li>It passes them to a <a href="https://aws.amazon.com/lambda/">Lambda Function</a> which pushes the content to one or more <a href="https://aws.amazon.com/sqs/"><span class="caps">SQS</span></a> queues, for consumption by an&nbsp;application.</li>
+</ul>
+<p>The tooling is written in Python, but leverages <a href="https://www.terraform.io/">HashiCorp&#8217;s Terraform</a> to actually manage the <span class="caps">AWS</span>&nbsp;resources.</p>
+<p>From a <span class="caps">JSON</span> configuration file as simple&nbsp;as:</p>
+<div class="codehilite"><pre>{
+  &quot;endpoints&quot;: {
+    &quot;some_resource_name&quot;: {
+      &quot;method&quot;: &quot;POST&quot;,
+      &quot;queues&quot;: [&quot;myqueue&quot;]
+    },
+  },
+}
+</pre></div>
+
+
+<p>and a single command (<code>webhook2lambda2sqs genapply</code>), you&#8217;ll have the complete system up and running, receiving <span class="caps">HTTP</span> <span class="caps">POST</span> requests
+at an <span class="caps">AWS</span>-generated <span class="caps">URL</span> and pushing them into the <code>myqueue</code> <span class="caps">SQS</span> queue. Best of all, going by my testing (this is based on the time
+the Lambda function takes to run, which can vary quite a bit), the whole thing is <strong>free for the first 1 million requests per month</strong>
+if your account is still on the Free Tier, and otherwise is less than $4/month for the first million&nbsp;requests.</p>
+<p>The configuration can handle setting up multiple distinct endpoint paths in the same <span class="caps">API</span> Gateway, each
+sending the data to one or more <span class="caps">SQS</span> queues. It also has options for enabling logging (to CloudWatch Logs) both in the function
+and on the <span class="caps">API</span> Gateway, pushing <span class="caps">API</span> Gateway metrics to CloudWatch, and configuring rate&nbsp;limiting.</p>
+<p>The <code>webhook2lambda2sqs</code> program generates the Python code for the lambda function and packages it correctly for Lambda, and
+then generates a Terraform configuration to manage all required <span class="caps">AWS</span> resources. Separate commands are available that wrap Terraform
+(mainly to deal with some issues with its <span class="caps">API</span> Gateway implementation) to run <code>plan</code>, <code>apply</code> and <code>destroy</code>. There are
+also helper commands to view the Lambda Function and <span class="caps">API</span> Gateway logs from CloudWatch, view messages in the queue(s) and
+<span class="caps">GET</span> or <span class="caps">POST</span> a test message to one or all of the&nbsp;endpoints.</p>
+<p>Full documentation is available at <a href="http://webhook2lambda2sqs.readthedocs.io/en/latest/">http://webhook2lambda2sqs.readthedocs.io/en/latest/</a>
+and the package (Python 2.7, 3.3-3.5) can be downloaded <a href="https://pypi.python.org/pypi/webhook2lambda2sqs">from PyPI</a>.</p>
+            </div>
+            <!-- /.entry-content -->
+    <hr />
+    <section class="comments" id="comments">
+        <h2>Comments</h2>
+        <div id="disqus_thread"></div>
+        <script type="text/javascript">
+            /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+            var disqus_shortname = 'jantman'; // required: replace example with your forum shortname
+            var disqus_identifier = 'tooling-for-aws-webhooks-to-sqs-via-api-gateway-and-lambda';
+            var disqus_url = 'http://blog.jasonantman.com/2016/08/tooling-for-aws-webhooks-to-sqs-via-api-gateway-and-lambda/';
+
+            /* * * DON'T EDIT BELOW THIS LINE * * */
+            (function () {
+                var dsq = document.createElement('script');
+                dsq.type = 'text/javascript';
+                dsq.async = true;
+                dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+                (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+            })();
+        </script>
+        <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by
+            Disqus.</a></noscript>
+        <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+
+    </section>
+        </article>
+    </section>
+
+        </div>
+        <div class="col-lg-3 well well-sm" id="sidebar">
+
+<aside>
+    <section>
+        <ul class="list-group list-group-flush">
+
+                <li class="list-group-item"><h4><i class="icon-home icon-large"></i>Recent Posts</h4></li>
+                        <li class="list-group-item">
+                            <a href="http://blog.jasonantman.com/2016/08/tooling-for-aws-webhooks-to-sqs-via-api-gateway-and-lambda/">
+                                Tooling for <span class="caps">AWS</span> - webhooks to <span class="caps">SQS</span> via <span class="caps">API</span> Gateway and&nbsp;Lambda
+                            </a>
+                        </li>
+                        <li class="list-group-item">
+                            <a href="http://blog.jasonantman.com/2016/06/a-short-comment-on-gun-rights-in-america/">
+                                A Short Comment on Gun Rights in&nbsp;America
+                            </a>
+                        </li>
+                        <li class="list-group-item">
+                            <a href="http://blog.jasonantman.com/2016/04/terraform-shortcomings-no-interpolated-default-values-no-functions/">
+                                Terraform Shortcomings - No Interpolated Default Values, No Functions, No Conditionals, Local State&nbsp;Storage
+                            </a>
+                        </li>
+                        <li class="list-group-item">
+                            <a href="http://blog.jasonantman.com/2016/01/raspberry-pi-security-system/">
+                                Raspberry Pi Security&nbsp;System
+                            </a>
+                        </li>
+                        <li class="list-group-item">
+                            <a href="http://blog.jasonantman.com/2015/10/a-rant-on-post-secondary-tech-education/">
+                                A Rant on Post-Secondary Tech&nbsp;Education
+                            </a>
+                        </li>
+
+
+                <li class="list-group-item"><a href="http://blog.jasonantman.com/tags.html"><h4><i class="icon-tags icon-large"></i>Tags</h4></a></li>
+                <li class="list-group-item">
+                        <span class="tag-1">
+                            <a href="http://blog.jasonantman.com/tags/google/index.html">
+                                google
+                            </a>
+                        </span>
+                        <span class="tag-1">
+                            <a href="http://blog.jasonantman.com/tags/microsoft/index.html">
+                                microsoft
+                            </a>
+                        </span>
+                        <span class="tag-1">
+                            <a href="http://blog.jasonantman.com/tags/puppet/index.html">
+                                puppet
+                            </a>
+                        </span>
+                        <span class="tag-1">
+                            <a href="http://blog.jasonantman.com/tags/android/index.html">
+                                android
+                            </a>
+                        </span>
+                        <span class="tag-1">
+                            <a href="http://blog.jasonantman.com/tags/monitoring/index.html">
+                                monitoring
+                            </a>
+                        </span>
+                        <span class="tag-1">
+                            <a href="http://blog.jasonantman.com/tags/blog/index.html">
+                                blog
+                            </a>
+                        </span>
+                        <span class="tag-1">
+                            <a href="http://blog.jasonantman.com/tags/sun/index.html">
+                                sun
+                            </a>
+                        </span>
+                        <span class="tag-1">
+                            <a href="http://blog.jasonantman.com/tags/linux/index.html">
+                                linux
+                            </a>
+                        </span>
+                        <span class="tag-1">
+                            <a href="http://blog.jasonantman.com/tags/security/index.html">
+                                security
+                            </a>
+                        </span>
+                        <span class="tag-1">
+                            <a href="http://blog.jasonantman.com/tags/python/index.html">
+                                python
+                            </a>
+                        </span>
+                        <span class="tag-1">
+                            <a href="http://blog.jasonantman.com/tags/php/index.html">
+                                PHP
+                            </a>
+                        </span>
+                        <span class="tag-1">
+                            <a href="http://blog.jasonantman.com/tags/nagios/index.html">
+                                Nagios
+                            </a>
+                        </span>
+                        <span class="tag-1">
+                            <a href="http://blog.jasonantman.com/tags/sysadmin/index.html">
+                                sysadmin
+                            </a>
+                        </span>
+                        <span class="tag-1">
+                            <a href="http://blog.jasonantman.com/tags/wordpress/index.html">
+                                wordpress
+                            </a>
+                        </span>
+                        <span class="tag-2">
+                            <a href="http://blog.jasonantman.com/tags/droid/index.html">
+                                droid
+                            </a>
+                        </span>
+                        <span class="tag-2">
+                            <a href="http://blog.jasonantman.com/tags/dns/index.html">
+                                dns
+                            </a>
+                        </span>
+                        <span class="tag-2">
+                            <a href="http://blog.jasonantman.com/tags/firefox/index.html">
+                                firefox
+                            </a>
+                        </span>
+                        <span class="tag-2">
+                            <a href="http://blog.jasonantman.com/tags/rpm/index.html">
+                                rpm
+                            </a>
+                        </span>
+                        <span class="tag-2">
+                            <a href="http://blog.jasonantman.com/tags/apache/index.html">
+                                apache
+                            </a>
+                        </span>
+                        <span class="tag-2">
+                            <a href="http://blog.jasonantman.com/tags/syslog/index.html">
+                                syslog
+                            </a>
+                        </span>
+                </li>
+        </ul>
+    </section>
+    <section>
+    <ul class="list-group list-group-flush">
+    <li class="list-group-item" style="padding: 10px 15px 0px 15px;"><h4><i class="icon-twitter
+    icon-large"></i>Twitter <a href="https://twitter.com/j_antman"
+    class="twitter-follow-button" data-show-count="false"
+    data-dnt="true">Follow @j_antman</a></h4>
+<script>!function(d,s,id){var
+  js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document,
+  'script', 'twitter-wjs');</script></li>
+    </ul>
+    <a class="twitter-timeline" data-dnt="true"
+    href="https://twitter.com/j_antman"
+    data-chrome="transparent noheader" data-widget-id="429640274453594113">Tweets by @j_antman</a>
+    <script>!function(d,s,id){var
+    js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+"://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+    </section>
+    <section>
+    <ul class="list-group list-group-flush">
+    <li class="list-group-item"><h4><i class="icon-github icon-large"></i>GitHub Repos</h4></li>
+        <div id="gh_repos">
+            <p class="list-group-item">Status updating...</p>
+        </div>
+            <a href="https://github.com/jantman">@jantman</a> on GitHub
+    </ul>
+        <script type="text/javascript">
+            $(document).ready(function () {
+                if (!window.jXHR) {
+                    var jxhr = document.createElement('script');
+                    jxhr.type = 'text/javascript';
+                    jxhr.src = 'http://blog.jasonantman.com/theme/js/jXHR.js';
+                    var s = document.getElementsByTagName('script')[0];
+                    s.parentNode.insertBefore(jxhr, s);
+                }
+
+                github.showRepos({
+                    user: 'jantman',
+                    count: 5,
+                    skip_forks: false,
+                    target: '#gh_repos'
+                });
+            });
+        </script>
+        <script src="http://blog.jasonantman.com/theme/js/github.js" type="text/javascript"></script>
+    </section>
+</aside>        </div>
+    </div>
+</div>
+<footer>
+    <div class="container">
+        <hr>
+        <p class="pull-right"><i class="icon-arrow-up"></i> <a href="#">Back to top</a></p>
+
+
+        <p>&copy; 2016 Jason Antman &middot; Powered by <a href="https://github.com/DandyDev/pelican-bootstrap3" target="_blank">pelican-bootstrap3</a>,
+            <a href="http://docs.getpelican.com/" target="_blank">Pelican</a>,
+            <a href="http://getbootstrap.com" target="_blank">Bootstrap</a></p>
+    </div>
+</footer>
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="http://blog.jasonantman.com/theme/js/bootstrap.min.js"></script>
+
+<!-- Enable responsive features in IE8 with Respond.js (https://github.com/scottjehl/Respond) -->
+<script src="http://blog.jasonantman.com/theme/js/respond.min.js"></script>
+    <script type="text/javascript">
+        /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+        var disqus_shortname = 'jantman'; // required: replace example with your forum shortname
+
+        /* * * DON'T EDIT BELOW THIS LINE * * */
+        (function () {
+            var s = document.createElement('script');
+            s.async = true;
+            s.type = 'text/javascript';
+            s.src = '//' + disqus_shortname + '.disqus.com/count.js';
+            (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+        }());
+    </script>
+
+
+</body>
+</html>
