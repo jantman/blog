@@ -5,7 +5,6 @@ Category: Ideas and Rants
 Tags: wfh, remote, work, balance, work from home, culture
 Slug: the-psychological-side-of-remote-work
 Summary: Some thoughts on the psychological aspects of remote work
-Status: draft
 
 For most of my professional career, I've worked from home a few days a week - and a few times, for
 stretches of a few weeks - and that's been the norm on most of my teams, not counting full-time
