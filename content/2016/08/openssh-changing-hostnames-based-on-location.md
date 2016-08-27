@@ -5,7 +5,6 @@ Category: Tech HowTos
 Tags: openssh, ssh
 Slug: openssh-changing-hostnames-based-on-location
 Summary: How to change SSH hostnames based on guessed location
-Status: draft
 
 Yesterday I was doing some work on my laptop, SSHed in to my desktop ("phoenix"). As
 always happens when I'm using my laptop from home, I kept getting connection errors...
