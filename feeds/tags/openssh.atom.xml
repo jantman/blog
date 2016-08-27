@@ -1,5 +1,55 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Jason Antman's Blog</title><link href="http://blog.jasonantman.com/" rel="alternate"></link><link href="http://blog.jasonantman.com/feeds/tags/openssh.atom.xml" rel="self"></link><id>http://blog.jasonantman.com/</id><updated>2012-07-16T08:47:00-04:00</updated><entry><title>Logging OpenSSH SFTP Transactions</title><link href="http://blog.jasonantman.com/2012/07/logging-openssh-sftp-transactions/" rel="alternate"></link><updated>2012-07-16T08:47:00-04:00</updated><author><name>admin</name></author><id>tag:blog.jasonantman.com,2012-07-16:2012/07/logging-openssh-sftp-transactions/</id><summary type="html">&lt;p&gt;I just came across a really handy post on &lt;a href="https://plus.google.com/117561367404774597588/posts"&gt;David
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Jason Antman's Blog</title><link href="http://blog.jasonantman.com/" rel="alternate"></link><link href="http://blog.jasonantman.com/feeds/tags/openssh.atom.xml" rel="self"></link><id>http://blog.jasonantman.com/</id><updated>2016-08-27T11:22:00-04:00</updated><entry><title>OpenSSH changing hostnames based on location</title><link href="http://blog.jasonantman.com/2016/08/openssh-changing-hostnames-based-on-location/" rel="alternate"></link><updated>2016-08-27T11:22:00-04:00</updated><author><name>Jason Antman</name></author><id>tag:blog.jasonantman.com,2016-08-27:2016/08/openssh-changing-hostnames-based-on-location/</id><summary type="html">&lt;p&gt;Yesterday I was doing some work on my laptop, SSHed in to my desktop (&amp;#8220;phoenix&amp;#8221;). As
+always happens when I&amp;#8217;m using my laptop from home, I kept getting connection errors&amp;#8230;
+because my &lt;code&gt;~/.ssh/config&lt;/code&gt; on my laptop is setup with my dynamic &lt;span class="caps"&gt;DNS&lt;/span&gt; hostname and port
+to reach my desktop, for any time I&amp;#8217;m out of the house. But those don&amp;#8217;t work while
+on the home network, and I got really tired of having to &lt;code&gt;ssh 192.168.0.24&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;It turns out that, as long as your&amp;#8217;re using &lt;a href="http://www.openssh.com/txt/release-6.5"&gt;OpenSSH &amp;gt;= 6.5&lt;/a&gt;,
+the &lt;code&gt;ssh_config (5)&lt;/code&gt; file (typically &lt;code&gt;~/.ssh/config&lt;/code&gt;) supports a &lt;code&gt;Match&lt;/code&gt; directive
+that can execute system commands, and either match or not based on exit&amp;nbsp;code.&lt;/p&gt;
+&lt;p&gt;I came up with relatively naive script that tries to determine whether or not I&amp;#8217;m on my
+home network based on a combination of &lt;code&gt;resolv.conf&lt;/code&gt; settings, &lt;span class="caps"&gt;IP&lt;/span&gt; address and WiFi&amp;nbsp;&lt;span class="caps"&gt;SSID&lt;/span&gt;:&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="c"&gt;#!/bin/bash&lt;/span&gt;
+&lt;span class="c"&gt;# test if I&amp;#39;m on my home network,&lt;/span&gt;
+&lt;span class="c"&gt;# for &lt;span class="caps"&gt;SSH&lt;/span&gt; matching. Somewhat naive.&lt;/span&gt;
+&lt;span class="c"&gt;#&lt;/span&gt;
+&lt;span class="c"&gt;# For use in ~/.ssh/config Match directive;&lt;/span&gt;
+&lt;span class="c"&gt;# exit 0 if I&amp;#39;m at home, exit 1 otherwise&lt;/span&gt;
+&lt;span class="c"&gt;#&lt;/span&gt;
+&lt;span class="c"&gt;# To debug, run script directly as `bash -x am_i_am_home.sh`&lt;/span&gt;
+&lt;span class="c"&gt;########&lt;/span&gt;
+
+&lt;span class="c"&gt;# check that I&amp;#39;ve got the right nameserver and search domain; exit otherwise&lt;/span&gt;
+grep -q &lt;span class="s1"&gt;&amp;#39;jasonantman.com&amp;#39;&lt;/span&gt; /etc/resolv.conf &lt;span class="o"&gt;||&lt;/span&gt; &lt;span class="nb"&gt;exit &lt;/span&gt;1
+grep &lt;span class="s1"&gt;&amp;#39;^nameserver&amp;#39;&lt;/span&gt; /etc/resolv.conf | grep &lt;span class="s1"&gt;&amp;#39;192.168.0.1&amp;#39;&lt;/span&gt; &lt;span class="o"&gt;||&lt;/span&gt; &lt;span class="nb"&gt;exit &lt;/span&gt;1
+
+&lt;span class="c"&gt;# check that I&amp;#39;ve got a 192.168.0. address; exit otherwise&lt;/span&gt;
+ip addr | grep -q &lt;span class="s1"&gt;&amp;#39;192.168.0.&amp;#39;&lt;/span&gt; &lt;span class="o"&gt;||&lt;/span&gt; &lt;span class="nb"&gt;exit &lt;/span&gt;1
+
+&lt;span class="c"&gt;# check that I&amp;#39;m connected to one of my SSIDs; if so, exit 0 (match)&lt;/span&gt;
+nmcli -t -f active,ssid dev wifi | grep -q &lt;span class="s1"&gt;&amp;#39;^yes:ObiWAN&amp;#39;&lt;/span&gt; &lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class="nb"&gt;exit &lt;/span&gt;0
+nmcli -t -f active,ssid dev wifi | grep -q &lt;span class="s1"&gt;&amp;#39;^yes:&lt;span class="caps"&gt;WAP1&lt;/span&gt;&amp;#39;&lt;/span&gt; &lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class="nb"&gt;exit &lt;/span&gt;0
+
+&lt;span class="c"&gt;# assume not; no match&lt;/span&gt;
+&lt;span class="nb"&gt;exit &lt;/span&gt;1
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;This can be used in my &lt;code&gt;~/.ssh/config&lt;/code&gt; to trigger an initial (internal network)
+directive if it exits 0, and fall through to the external-network directive otherwise,
+as shown below. The &lt;code&gt;originalhost phoenix&lt;/code&gt; portion of the &lt;code&gt;Match&lt;/code&gt; line ensures
+that it&amp;#8217;s only executed if I &lt;code&gt;ssh phoenix&lt;/code&gt;, so it doesn&amp;#8217;t conflict with other
+host&amp;nbsp;directives.&lt;/p&gt;
+&lt;div class="codehilite"&gt;&lt;pre&gt;# phoenix when at home
+Match originalhost phoenix exec &amp;quot;/home/jantman/bin/am_i_at_home.sh&amp;quot;
+     HostName phoenix
+     Port 22
+
+# fall-through - phoenix when abroad
+Host phoenix
+     HostName my_dynamic_hostname
+     Port &amp;lt;something other than 22&amp;gt;
+&lt;/pre&gt;&lt;/div&gt;</summary><category term="openssh"></category><category term="ssh"></category></entry><entry><title>Logging OpenSSH SFTP Transactions</title><link href="http://blog.jasonantman.com/2012/07/logging-openssh-sftp-transactions/" rel="alternate"></link><updated>2012-07-16T08:47:00-04:00</updated><author><name>admin</name></author><id>tag:blog.jasonantman.com,2012-07-16:2012/07/logging-openssh-sftp-transactions/</id><summary type="html">&lt;p&gt;I just came across a really handy post on &lt;a href="https://plus.google.com/117561367404774597588/posts"&gt;David
 Busby&lt;/a&gt;&amp;#8216;s blog:
 &lt;a href="http://blog.oneiroi.co.uk/linux/enable-logging-in-the-sftp-subsystem/"&gt;Enable logging in the &lt;span class="caps"&gt;SFTP&lt;/span&gt; subsystem -
 Oneiroi&lt;/a&gt;.

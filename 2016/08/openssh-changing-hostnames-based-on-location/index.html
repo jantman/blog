@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:og="http://ogp.me/ns#"
+      xmlns:fb="https://www.facebook.com/2008/fbml">
+<head>
+    <title>OpenSSH changing hostnames based on location</title>
+    <!-- Using the latest rendering mode for IE -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Open Graph tags -->
+
+    <!-- Bootstrap -->
+        <link rel="stylesheet" href="http://blog.jasonantman.com/theme/css/bootstrap.flatly.min.css" type="text/css"/>
+    <link href="http://blog.jasonantman.com/theme/css/font-awesome.min.css" rel="stylesheet">
+    <link href="http://blog.jasonantman.com/theme/css/pygments.css" rel="stylesheet">
+        <link href="http://blog.jasonantman.com/theme/css/typogrify.css" rel="stylesheet">
+    <link rel="stylesheet" href="http://blog.jasonantman.com/theme/css/style.css" type="text/css"/>
+    <!-- JavaScript plugins (requires jQuery) -->
+    <script src="http://code.jquery.com/jquery.js"></script>
+
+    <link rel="stylesheet" href="http://blog.jasonantman.com/theme/css/forkongithub.min.css" type="text/css" />
+
+        <link href="http://blog.jasonantman.com/feeds/all.atom.xml" type="application/atom+xml" rel="alternate"
+              title="Jason Antman's Blog ATOM Feed"/>
+        <link href="http://blog.jasonantman.com/feeds/all.rss.xml" type="application/atom+xml" rel="alternate"
+              title="Jason Antman's Blog RSS Feed"/>
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-2718127-2', 'jasonantman.com');
+  ga('send', 'pageview');
+
+</script>
+</head>
+<body>
+<span id="forkongithub"><a href="https://github.com/jantman/blog">Fork me on GitHub</a></span><nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="http://blog.jasonantman.com" class="navbar-brand">Jason Antman's Blog</a>
+        </div>
+        <div class="collapse navbar-collapse navbar-ex1-collapse">
+            <ul class="nav navbar-nav">
+                         <li><a href="http://blog.jasonantman.com/pages/about.html">
+                             About
+                          </a></li>
+                        <li >
+                            <a href="http://blog.jasonantman.com/categories/ideas-and-rants/index.html">Ideas and rants</a>
+                        </li>
+                        <li >
+                            <a href="http://blog.jasonantman.com/categories/miscellaneous/index.html">Miscellaneous</a>
+                        </li>
+                        <li >
+                            <a href="http://blog.jasonantman.com/categories/monitoring/index.html">Monitoring</a>
+                        </li>
+                        <li >
+                            <a href="http://blog.jasonantman.com/categories/ops/index.html">Ops</a>
+                        </li>
+                        <li >
+                            <a href="http://blog.jasonantman.com/categories/projects/index.html">Projects</a>
+                        </li>
+                        <li >
+                            <a href="http://blog.jasonantman.com/categories/puppet/index.html">Puppet</a>
+                        </li>
+                        <li class="active">
+                            <a href="http://blog.jasonantman.com/categories/tech-howtos/index.html">Tech howtos</a>
+                        </li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="http://blog.jasonantman.com/archives.html"><i class="icon-th-list"></i>Archives</a></li>
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+</nav>
+<!-- /.navbar -->
+<div class="container">
+    <div class="row">
+        <div class="col-lg-9">
+    <section id="content">
+        <article>
+            <header class="page-header">
+                <h1>
+                    <a href="http://blog.jasonantman.com/2016/08/openssh-changing-hostnames-based-on-location/"
+                       rel="bookmark"
+                       title="Permalink to OpenSSH changing hostnames based on location">
+                        OpenSSH changing hostnames based on&nbsp;location
+                    </a>
+                </h1>
+<a href="http://twitter.com/share" class="twitter-share-button" data-count="horizontal" data-via="j_antman">Tweet</a><script type="text/javascript" src="http://platform.twitter.com/widgets.js"></script>
+            </header>
+            <div class="entry-content">
+                <div class="panel">
+                    <div class="panel-body">
+<footer class="post-info">
+    <span class="label label-default">Date</span>
+    <span class="published">
+        <i class="icon-calendar"></i>Sat 27 August 2016
+    </span>
+
+
+
+<span class="label label-default">Tags</span>
+	<a href="http://blog.jasonantman.com/tags/openssh/index.html">openssh</a>
+        /
+	<a href="http://blog.jasonantman.com/tags/ssh/index.html">ssh</a>
+</footer><!-- /.post-info -->                    </div>
+                </div>
+                <p>Yesterday I was doing some work on my laptop, SSHed in to my desktop (&#8220;phoenix&#8221;). As
+always happens when I&#8217;m using my laptop from home, I kept getting connection errors&#8230;
+because my <code>~/.ssh/config</code> on my laptop is setup with my dynamic <span class="caps">DNS</span> hostname and port
+to reach my desktop, for any time I&#8217;m out of the house. But those don&#8217;t work while
+on the home network, and I got really tired of having to <code>ssh 192.168.0.24</code>.</p>
+<p>It turns out that, as long as your&#8217;re using <a href="http://www.openssh.com/txt/release-6.5">OpenSSH &gt;= 6.5</a>,
+the <code>ssh_config (5)</code> file (typically <code>~/.ssh/config</code>) supports a <code>Match</code> directive
+that can execute system commands, and either match or not based on exit&nbsp;code.</p>
+<p>I came up with relatively naive script that tries to determine whether or not I&#8217;m on my
+home network based on a combination of <code>resolv.conf</code> settings, <span class="caps">IP</span> address and WiFi&nbsp;<span class="caps">SSID</span>:</p>
+<div class="codehilite"><pre><span class="c">#!/bin/bash</span>
+<span class="c"># test if I&#39;m on my home network,</span>
+<span class="c"># for <span class="caps">SSH</span> matching. Somewhat naive.</span>
+<span class="c">#</span>
+<span class="c"># For use in ~/.ssh/config Match directive;</span>
+<span class="c"># exit 0 if I&#39;m at home, exit 1 otherwise</span>
+<span class="c">#</span>
+<span class="c"># To debug, run script directly as `bash -x am_i_am_home.sh`</span>
+<span class="c">########</span>
+
+<span class="c"># check that I&#39;ve got the right nameserver and search domain; exit otherwise</span>
+grep -q <span class="s1">&#39;jasonantman.com&#39;</span> /etc/resolv.conf <span class="o">||</span> <span class="nb">exit </span>1
+grep <span class="s1">&#39;^nameserver&#39;</span> /etc/resolv.conf | grep <span class="s1">&#39;192.168.0.1&#39;</span> <span class="o">||</span> <span class="nb">exit </span>1
+
+<span class="c"># check that I&#39;ve got a 192.168.0. address; exit otherwise</span>
+ip addr | grep -q <span class="s1">&#39;192.168.0.&#39;</span> <span class="o">||</span> <span class="nb">exit </span>1
+
+<span class="c"># check that I&#39;m connected to one of my SSIDs; if so, exit 0 (match)</span>
+nmcli -t -f active,ssid dev wifi | grep -q <span class="s1">&#39;^yes:ObiWAN&#39;</span> <span class="o">&amp;&amp;</span> <span class="nb">exit </span>0
+nmcli -t -f active,ssid dev wifi | grep -q <span class="s1">&#39;^yes:<span class="caps">WAP1</span>&#39;</span> <span class="o">&amp;&amp;</span> <span class="nb">exit </span>0
+
+<span class="c"># assume not; no match</span>
+<span class="nb">exit </span>1
+</pre></div>
+
+
+<p>This can be used in my <code>~/.ssh/config</code> to trigger an initial (internal network)
+directive if it exits 0, and fall through to the external-network directive otherwise,
+as shown below. The <code>originalhost phoenix</code> portion of the <code>Match</code> line ensures
+that it&#8217;s only executed if I <code>ssh phoenix</code>, so it doesn&#8217;t conflict with other
+host&nbsp;directives.</p>
+<div class="codehilite"><pre># phoenix when at home
+Match originalhost phoenix exec &quot;/home/jantman/bin/am_i_at_home.sh&quot;
+     HostName phoenix
+     Port 22
+
+# fall-through - phoenix when abroad
+Host phoenix
+     HostName my_dynamic_hostname
+     Port &lt;something other than 22&gt;
+</pre></div>
+            </div>
+            <!-- /.entry-content -->
+    <hr />
+    <section class="comments" id="comments">
+        <h2>Comments</h2>
+        <div id="disqus_thread"></div>
+        <script type="text/javascript">
+            /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+            var disqus_shortname = 'jantman'; // required: replace example with your forum shortname
+            var disqus_identifier = 'openssh-changing-hostnames-based-on-location';
+            var disqus_url = 'http://blog.jasonantman.com/2016/08/openssh-changing-hostnames-based-on-location/';
+
+            /* * * DON'T EDIT BELOW THIS LINE * * */
+            (function () {
+                var dsq = document.createElement('script');
+                dsq.type = 'text/javascript';
+                dsq.async = true;
+                dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+                (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+            })();
+        </script>
+        <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by
+            Disqus.</a></noscript>
+        <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+
+    </section>
+        </article>
+    </section>
+
+        </div>
+        <div class="col-lg-3 well well-sm" id="sidebar">
+
+<aside>
+    <section>
+        <ul class="list-group list-group-flush">
+
+                <li class="list-group-item"><h4><i class="icon-home icon-large"></i>Recent Posts</h4></li>
+                        <li class="list-group-item">
+                            <a href="http://blog.jasonantman.com/2016/08/openssh-changing-hostnames-based-on-location/">
+                                OpenSSH changing hostnames based on&nbsp;location
+                            </a>
+                        </li>
+                        <li class="list-group-item">
+                            <a href="http://blog.jasonantman.com/2016/08/tooling-for-aws-webhooks-to-sqs-via-api-gateway-and-lambda/">
+                                Tooling for <span class="caps">AWS</span> - webhooks to <span class="caps">SQS</span> via <span class="caps">API</span> Gateway and&nbsp;Lambda
+                            </a>
+                        </li>
+                        <li class="list-group-item">
+                            <a href="http://blog.jasonantman.com/2016/06/a-short-comment-on-gun-rights-in-america/">
+                                A Short Comment on Gun Rights in&nbsp;America
+                            </a>
+                        </li>
+                        <li class="list-group-item">
+                            <a href="http://blog.jasonantman.com/2016/04/terraform-shortcomings-no-interpolated-default-values-no-functions/">
+                                Terraform Shortcomings - No Interpolated Default Values, No Functions, No Conditionals, Local State&nbsp;Storage
+                            </a>
+                        </li>
+                        <li class="list-group-item">
+                            <a href="http://blog.jasonantman.com/2016/01/raspberry-pi-security-system/">
+                                Raspberry Pi Security&nbsp;System
+                            </a>
+                        </li>
+
+
+                <li class="list-group-item"><a href="http://blog.jasonantman.com/tags.html"><h4><i class="icon-tags icon-large"></i>Tags</h4></a></li>
+                <li class="list-group-item">
+                        <span class="tag-1">
+                            <a href="http://blog.jasonantman.com/tags/php/index.html">
+                                PHP
+                            </a>
+                        </span>
+                        <span class="tag-1">
+                            <a href="http://blog.jasonantman.com/tags/monitoring/index.html">
+                                monitoring
+                            </a>
+                        </span>
+                        <span class="tag-1">
+                            <a href="http://blog.jasonantman.com/tags/puppet/index.html">
+                                puppet
+                            </a>
+                        </span>
+                        <span class="tag-1">
+                            <a href="http://blog.jasonantman.com/tags/microsoft/index.html">
+                                microsoft
+                            </a>
+                        </span>
+                        <span class="tag-1">
+                            <a href="http://blog.jasonantman.com/tags/security/index.html">
+                                security
+                            </a>
+                        </span>
+                        <span class="tag-1">
+                            <a href="http://blog.jasonantman.com/tags/python/index.html">
+                                python
+                            </a>
+                        </span>
+                        <span class="tag-1">
+                            <a href="http://blog.jasonantman.com/tags/blog/index.html">
+                                blog
+                            </a>
+                        </span>
+                        <span class="tag-1">
+                            <a href="http://blog.jasonantman.com/tags/google/index.html">
+                                google
+                            </a>
+                        </span>
+                        <span class="tag-1">
+                            <a href="http://blog.jasonantman.com/tags/sun/index.html">
+                                sun
+                            </a>
+                        </span>
+                        <span class="tag-1">
+                            <a href="http://blog.jasonantman.com/tags/android/index.html">
+                                android
+                            </a>
+                        </span>
+                        <span class="tag-1">
+                            <a href="http://blog.jasonantman.com/tags/nagios/index.html">
+                                Nagios
+                            </a>
+                        </span>
+                        <span class="tag-1">
+                            <a href="http://blog.jasonantman.com/tags/wordpress/index.html">
+                                wordpress
+                            </a>
+                        </span>
+                        <span class="tag-1">
+                            <a href="http://blog.jasonantman.com/tags/linux/index.html">
+                                linux
+                            </a>
+                        </span>
+                        <span class="tag-1">
+                            <a href="http://blog.jasonantman.com/tags/sysadmin/index.html">
+                                sysadmin
+                            </a>
+                        </span>
+                        <span class="tag-2">
+                            <a href="http://blog.jasonantman.com/tags/syslog/index.html">
+                                syslog
+                            </a>
+                        </span>
+                        <span class="tag-2">
+                            <a href="http://blog.jasonantman.com/tags/firefox/index.html">
+                                firefox
+                            </a>
+                        </span>
+                        <span class="tag-2">
+                            <a href="http://blog.jasonantman.com/tags/droid/index.html">
+                                droid
+                            </a>
+                        </span>
+                        <span class="tag-2">
+                            <a href="http://blog.jasonantman.com/tags/dns/index.html">
+                                dns
+                            </a>
+                        </span>
+                        <span class="tag-2">
+                            <a href="http://blog.jasonantman.com/tags/rpm/index.html">
+                                rpm
+                            </a>
+                        </span>
+                        <span class="tag-2">
+                            <a href="http://blog.jasonantman.com/tags/apache/index.html">
+                                apache
+                            </a>
+                        </span>
+                </li>
+        </ul>
+    </section>
+    <section>
+    <ul class="list-group list-group-flush">
+    <li class="list-group-item" style="padding: 10px 15px 0px 15px;"><h4><i class="icon-twitter
+    icon-large"></i>Twitter <a href="https://twitter.com/j_antman"
+    class="twitter-follow-button" data-show-count="false"
+    data-dnt="true">Follow @j_antman</a></h4>
+<script>!function(d,s,id){var
+  js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document,
+  'script', 'twitter-wjs');</script></li>
+    </ul>
+    <a class="twitter-timeline" data-dnt="true"
+    href="https://twitter.com/j_antman"
+    data-chrome="transparent noheader" data-widget-id="429640274453594113">Tweets by @j_antman</a>
+    <script>!function(d,s,id){var
+    js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+"://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+    </section>
+    <section>
+    <ul class="list-group list-group-flush">
+    <li class="list-group-item"><h4><i class="icon-github icon-large"></i>GitHub Repos</h4></li>
+        <div id="gh_repos">
+            <p class="list-group-item">Status updating...</p>
+        </div>
+            <a href="https://github.com/jantman">@jantman</a> on GitHub
+    </ul>
+        <script type="text/javascript">
+            $(document).ready(function () {
+                if (!window.jXHR) {
+                    var jxhr = document.createElement('script');
+                    jxhr.type = 'text/javascript';
+                    jxhr.src = 'http://blog.jasonantman.com/theme/js/jXHR.js';
+                    var s = document.getElementsByTagName('script')[0];
+                    s.parentNode.insertBefore(jxhr, s);
+                }
+
+                github.showRepos({
+                    user: 'jantman',
+                    count: 5,
+                    skip_forks: false,
+                    target: '#gh_repos'
+                });
+            });
+        </script>
+        <script src="http://blog.jasonantman.com/theme/js/github.js" type="text/javascript"></script>
+    </section>
+</aside>        </div>
+    </div>
+</div>
+<footer>
+    <div class="container">
+        <hr>
+        <p class="pull-right"><i class="icon-arrow-up"></i> <a href="#">Back to top</a></p>
+
+
+        <p>&copy; 2016 Jason Antman &middot; Powered by <a href="https://github.com/DandyDev/pelican-bootstrap3" target="_blank">pelican-bootstrap3</a>,
+            <a href="http://docs.getpelican.com/" target="_blank">Pelican</a>,
+            <a href="http://getbootstrap.com" target="_blank">Bootstrap</a></p>
+    </div>
+</footer>
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="http://blog.jasonantman.com/theme/js/bootstrap.min.js"></script>
+
+<!-- Enable responsive features in IE8 with Respond.js (https://github.com/scottjehl/Respond) -->
+<script src="http://blog.jasonantman.com/theme/js/respond.min.js"></script>
+    <script type="text/javascript">
+        /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+        var disqus_shortname = 'jantman'; // required: replace example with your forum shortname
+
+        /* * * DON'T EDIT BELOW THIS LINE * * */
+        (function () {
+            var s = document.createElement('script');
+            s.async = true;
+            s.type = 'text/javascript';
+            s.src = '//' + disqus_shortname + '.disqus.com/count.js';
+            (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+        }());
+    </script>
+
+
+</body>
+</html>
