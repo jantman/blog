@@ -5,7 +5,6 @@ Category: Miscellaneous
 Tags: Dyn, DNS, botnet, security, DDoS
 Slug: yesterdays-widespread-internet-outage-for-non-geeks
 Summary: An explanation of yesterday's widespread DNS outage and why it matters
-Status: draft
 
 Yesterday, Friday October 21st, 2016, Internet users in the US (initially the East Coast) experienced issues accessing many popular websites, including Twitter, Etsy, Spotify, CNN, Amazon and others. This also affected numerous companies and services used heavily in the technology industry for everything from storing and sharing source code to monitoring the health of services and alerting on-call technical staff.
 
