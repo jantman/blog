@@ -1,5 +1,94 @@
 <?xml version="1.0" encoding="utf-8"?>
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Jason Antman's Blog</title><link>http://blog.jasonantman.com/</link><description></description><atom:link href="http://blog.jasonantman.com/feeds/tags/linux.rss.xml" rel="self"></atom:link><lastBuildDate>Mon, 13 May 2013 05:00:00 -0400</lastBuildDate><item><title>Search for a small-scale but automated RPM build system</title><link>http://blog.jasonantman.com/2013/05/search-for-a-small-scale-but-automated-rpm-build-system/</link><description>&lt;p&gt;&lt;strong&gt;This post is part of a series of older draft posts from a few months
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Jason Antman's Blog</title><link>http://blog.jasonantman.com/</link><description></description><atom:link href="http://blog.jasonantman.com/feeds/tags/linux.rss.xml" rel="self"></atom:link><lastBuildDate>Sat, 04 Mar 2017 12:27:00 -0500</lastBuildDate><item><title>VyOS on Alix 2C1 Single Board Computer</title><link>http://blog.jasonantman.com/2017/03/vyos-on-alix-2c1-single-board-computer/</link><description>&lt;p&gt;Back in 2011 I &lt;a href="/2011/09/vyatta-networkos-routerfirewall-on-alix-board-compact-flash/"&gt;wrote a post&lt;/a&gt; on installing
+the formerly open-source &lt;a href="https://wiki.vyos.net/wiki/Vyatta"&gt;Vyatta&lt;/a&gt; router/firewall distribution on an Alix compact flash-based single board
+computer. I&amp;#8217;d been using it for many years, since Vyatta Community was a completely F/&lt;span class="caps"&gt;OSS&lt;/span&gt; project. I stopped updating regularly sometime around
+when Vyatta (now Vyatta Core, differentiated from their paid offering) began widening the gap between its F/&lt;span class="caps"&gt;OSS&lt;/span&gt; Core and paid versions.
+It got much worse when &lt;a href="http://newsroom.brocade.com/press-releases/brocade-acquires-vyatta-a-pioneer-and-leader-in-s-nasdaq-brcd-0949599#.WLr6DkArJhE"&gt;Brocade acquired Vyatta&lt;/a&gt;
+in 2012. Soon thereafter open source builds stopped, the forums were shut down, the source code was made much more difficult to find, and
+eventually vyatta.org itself was shut down. I won&amp;#8217;t go into further detail as there&amp;#8217;s been a lot written about this debacle and forcible destruction of a community,
+such as &lt;a href="http://dotbalm.org/brocade-missed-the-boat-with-vyatta/"&gt;Chris Wadge&amp;#8217;s post&lt;/a&gt; and
+&lt;a href="https://libertysys.com.au/2013/08/the-tragedy-of-vyatta-cores-demise/"&gt;this one&lt;/a&gt;, but I will say that the above made it increasingly difficult to plan
+an upgrade of my home&amp;nbsp;router.&lt;/p&gt;
+&lt;p&gt;On the positive side, however, the &lt;a href="https://vyos.io/"&gt;VyOS&lt;/a&gt; F/&lt;span class="caps"&gt;OSS&lt;/span&gt; fork has emerged, and seems to have quite a vibrant community
+at this point. A few weeks ago, I decided to finally take the time to upgrade to the latest VyOS 1.1.7 on my aged
+&lt;a href="https://www.pcengines.ch/alix2c1.htm"&gt;Alix 2c1&lt;/a&gt; single board router (purchased in 2008; 3 &lt;span class="caps"&gt;LAN&lt;/span&gt;, 433 MHz &lt;span class="caps"&gt;AMG&lt;/span&gt; Geode &lt;span class="caps"&gt;LX700&lt;/span&gt;, &lt;span class="caps"&gt;128MB&lt;/span&gt; &lt;span class="caps"&gt;RAM&lt;/span&gt;).
+VyOS is targeted at the cloud (virtualization) or &amp;#8220;real&amp;#8221; hardware, and doesn&amp;#8217;t seem to have anywhere near as many people
+installing on dedicated SBCs as the former Vyatta community (probably because of the astonishing drop in the price of small, fanless
+systems in recent years). I wasn&amp;#8217;t able to find much information about installing VyOS on such hardware, aside from
+&lt;a href="https://forum.vyos.net/showthread.php?tid=6045"&gt;a few&lt;/a&gt; &lt;a href="https://forum.vyos.net/showthread.php?tid=26029"&gt;forum&lt;/a&gt;
+&lt;a href="https://forum.vyos.net/showthread.php?tid=26881"&gt;threads&lt;/a&gt; and a &lt;a href="http://elderguerra.blogspot.com/2014/04/vyos-routerfirewall-on-alix-board.html"&gt;post on Elder Guerra&amp;#8217;s blog&lt;/a&gt;
+that actually makes reference to and is based on my original post from&amp;nbsp;2011.&lt;/p&gt;
+&lt;p&gt;So, for anyone who&amp;#8217;s interested, here&amp;#8217;s how I got VyOS 1.1.7 installed on my Alix&amp;nbsp;&lt;span class="caps"&gt;SBC&lt;/span&gt;:&lt;/p&gt;
+&lt;h2 id="prerequisites"&gt;Prerequisites&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;A Linux machine with VirtualBox. For posterity, I did this on a recently updated Arch Linux machine, using VirtualBox 5.1.12 from Arch&amp;#8217;s repos (running via &lt;span class="caps"&gt;DKMS&lt;/span&gt; and with the Oracle extensions&amp;nbsp;installed).&lt;/li&gt;
+&lt;li&gt;A Compact Flash card to perform the install on (I used &lt;a href="https://www.amazon.com/gp/product/B00PW1PH14/"&gt;this&lt;/a&gt; Wintec &amp;#8220;Industrial Grade&amp;#8221; &lt;span class="caps"&gt;SLC&lt;/span&gt; &lt;span class="caps"&gt;NAND&lt;/span&gt; &lt;span class="caps"&gt;4GB&lt;/span&gt; card from&amp;nbsp;amazon).&lt;/li&gt;
+&lt;li&gt;A reader/writer for the card (my previous one was throwing errors, so I got &lt;a href="https://www.amazon.com/gp/product/B0056TYRMW/"&gt;this&lt;/a&gt; &lt;span class="caps"&gt;USB&lt;/span&gt; one from&amp;nbsp;Amazon).&lt;/li&gt;
+&lt;li&gt;Ensure your user can read and write the raw disk devices. On Linux, this means your user must be in the &lt;code&gt;disk&lt;/code&gt; group. If it isn&amp;#8217;t, you&amp;#8217;ll need to log out and back in after making that&amp;nbsp;change.&lt;/li&gt;
+&lt;li&gt;Assuming you&amp;#8217;re installing onto a headless board like the Alix, you&amp;#8217;ll need a null modem cable to connect to the serial console port, and whatever you need (&lt;span class="caps"&gt;USB&lt;/span&gt; to serial adapter) to plug that in to your&amp;nbsp;computer.&lt;/li&gt;
+&lt;li&gt;A terminal emulator installed on your computer (I use &lt;a href="https://alioth.debian.org/projects/minicom"&gt;minicom&lt;/a&gt;).&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id="configuration-migration"&gt;Configuration&amp;nbsp;Migration&lt;/h2&gt;
+&lt;p&gt;I just wanted to upgrade from my existing &lt;span class="caps"&gt;VC&lt;/span&gt; 6.3 installation, and use a new &lt;span class="caps"&gt;CF&lt;/span&gt; card. If you are doing a fresh install
+and do not need to migrate the configuration, you can skip this&amp;nbsp;section.&lt;/p&gt;
+&lt;p&gt;To migrate the configuration, I first set up a VyOS 1.1.7 VirtualBox &lt;span class="caps"&gt;VM&lt;/span&gt;, using the &lt;a href="https://github.com/higebu/vagrant-vyos"&gt;vagrant-vyos&lt;/a&gt;
+plugin for &lt;a href="https://www.vagrantup.com/"&gt;Vagrant&lt;/a&gt; and the author&amp;#8217;s &lt;a href="https://atlas.hashicorp.com/higebu/boxes/vyos"&gt;vyos Vagrant box&lt;/a&gt;. I setup
+three network interfaces on the &lt;span class="caps"&gt;VM&lt;/span&gt; to match the three on my Alix board, and put the &lt;code&gt;Vagrantfile&lt;/code&gt; in the same directory as my config
+backups from the current&amp;nbsp;router.&lt;/p&gt;
+&lt;p&gt;Once I had the &lt;span class="caps"&gt;VM&lt;/span&gt; up and running with &lt;span class="caps"&gt;SSH&lt;/span&gt; access, I ran &lt;code&gt;load /vagrant/config.boot&lt;/code&gt; to load the configuration backup, and let the
+config migration tool do its work. This took a few iterations of modifying the old (&lt;span class="caps"&gt;VC&lt;/span&gt; 6.3) config until I got something that would
+load cleanly into VyOS 1.1.7; note that per the &lt;a href="https://wiki.vyos.net/wiki/Migrating_from_Vyatta"&gt;Migrating from Vyatta&lt;/a&gt; documentation,
+coming from &lt;span class="caps"&gt;VC&lt;/span&gt; 6.4 or earlier, there were some manual changes I had to make before the old configuration would load in VyOS.
+Once that was done, I committed and saved the config, then rebooted the &lt;span class="caps"&gt;VM&lt;/span&gt; and confirmed that it
+came up correctly configured. I run &lt;span class="caps"&gt;SSH&lt;/span&gt; on a non-default port, so before reloading the &lt;span class="caps"&gt;VM&lt;/span&gt; I needed to edit the &lt;code&gt;Vagrantfile&lt;/code&gt;
+to add &lt;code&gt;config.ssh.guest_port = SSH_PORT_NUMBER&lt;/code&gt; and &lt;code&gt;config.vm.network "forwarded_port", guest: SSH_PORT_NUMBER, host: SSH_PORT_NUMBER, id: "ssh"&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;Once finished, I copied &lt;code&gt;/config/config.boot&lt;/code&gt; from the &lt;span class="caps"&gt;VM&lt;/span&gt; to my host &lt;span class="caps"&gt;OS&lt;/span&gt;. I removed the &lt;span class="caps"&gt;MAC&lt;/span&gt; addresses for the interfaces
+and the &lt;code&gt;vagrant&lt;/code&gt; user, and then used that as the starting configuration for my new install on the Alix&amp;nbsp;board.&lt;/p&gt;
+&lt;h2 id="installation"&gt;Installation&lt;/h2&gt;
+&lt;ol&gt;
+&lt;li&gt;Put your new &lt;span class="caps"&gt;CF&lt;/span&gt; card in the &lt;span class="caps"&gt;USB&lt;/span&gt; adapter and plug it in. Watch &lt;code&gt;dmesg&lt;/code&gt; to see what device name it&amp;#8217;s assigned. &lt;strong&gt;In this example, we&amp;#8217;ll call it /dev/sdX. Make &lt;span class="caps"&gt;SURE&lt;/span&gt; you correct that path in the below instructions to be the correct one for your &lt;span class="caps"&gt;CF&lt;/span&gt;&amp;nbsp;card.&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;Create a raw &lt;span class="caps"&gt;VMDK&lt;/span&gt; so VirtualBox can use the raw disk: &lt;code&gt;VBoxManage internalcommands createrawvmdk -filename /home/$USER/vyos_cf.vmdk -rawdisk /dev/sdX&lt;/code&gt; (note that the filename must be an absolute&amp;nbsp;path).&lt;/li&gt;
+&lt;li&gt;Download the VyOS i586 &lt;span class="caps"&gt;ISO&lt;/span&gt; from &lt;a href="https://vyos.io/"&gt;vyos.net&lt;/a&gt;. Optionally verify the &lt;span class="caps"&gt;GPG&lt;/span&gt;&amp;nbsp;signature.&lt;/li&gt;
+&lt;li&gt;Manually create a new VirtualBox&amp;nbsp;&lt;span class="caps"&gt;VM&lt;/span&gt;.&lt;/li&gt;
+&lt;li&gt;Select &amp;#8220;Linux&amp;#8221; and then &amp;#8220;Other Linux (32-bit)&amp;#8221; for the &lt;span class="caps"&gt;OS&lt;/span&gt;&amp;nbsp;type.&lt;/li&gt;
+&lt;li&gt;Select the appropriate amount of &lt;span class="caps"&gt;RAM&lt;/span&gt; for your board (older Alix are 128 &lt;span class="caps"&gt;MB&lt;/span&gt; or 256&amp;nbsp;&lt;span class="caps"&gt;MB&lt;/span&gt;).&lt;/li&gt;
+&lt;li&gt;Select &amp;#8220;Use an existing virtual hard disk file&amp;#8221; and select the raw &lt;span class="caps"&gt;VMDK&lt;/span&gt; you created in Step 2. Uncheck &amp;#8220;use host I/O&amp;nbsp;cache&amp;#8221;.&lt;/li&gt;
+&lt;li&gt;Create the&amp;nbsp;&lt;span class="caps"&gt;VM&lt;/span&gt;.&lt;/li&gt;
+&lt;li&gt;Edit the &lt;span class="caps"&gt;VM&lt;/span&gt; settings to remove the floppy disk device, mount the &lt;span class="caps"&gt;ISO&lt;/span&gt; in the optical drive, disable audio, and disable all network&amp;nbsp;adapters.&lt;/li&gt;
+&lt;li&gt;Boot the &lt;span class="caps"&gt;VM&lt;/span&gt;. Wait for the VyOS &lt;span class="caps"&gt;ISO&lt;/span&gt; to boot and log in using the information provided in the&amp;nbsp;banner.&lt;/li&gt;
+&lt;li&gt;Run &lt;code&gt;install image&lt;/code&gt; and answer yes to the&amp;nbsp;prompt.&lt;/li&gt;
+&lt;li&gt;Select Auto partitioning and select the &lt;span class="caps"&gt;CF&lt;/span&gt; card (it should be &lt;code&gt;sda&lt;/code&gt;, the only&amp;nbsp;option).&lt;/li&gt;
+&lt;li&gt;Fill the whole device with the root&amp;nbsp;partition.&lt;/li&gt;
+&lt;li&gt;Use the default name for the image and copy &lt;code&gt;/config/config.boot&lt;/code&gt;.&lt;/li&gt;
+&lt;li&gt;Set a password for the vyos Administrator&amp;nbsp;account.&lt;/li&gt;
+&lt;li&gt;Setup grub on the one disk (&lt;code&gt;sda&lt;/code&gt;).&lt;/li&gt;
+&lt;li&gt;You should now be returned to the&amp;nbsp;prompt.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;reboot&lt;/code&gt; and shut down the &lt;span class="caps"&gt;VM&lt;/span&gt; once it gets back to the &lt;span class="caps"&gt;BIOS&lt;/span&gt; or bootloader; installation is&amp;nbsp;complete.&lt;/li&gt;
+&lt;li&gt;Delete the &lt;span class="caps"&gt;VM&lt;/span&gt; (don&amp;#8217;t delete files) and then remove the raw &lt;span class="caps"&gt;VMDK&lt;/span&gt; you created in Step&amp;nbsp;2.&lt;/li&gt;
+&lt;li&gt;Mount the &lt;span class="caps"&gt;CF&lt;/span&gt; card partition on your host &lt;span class="caps"&gt;OS&lt;/span&gt; (it&amp;#8217;s an ext4 partition). For the purposes of this example, we&amp;#8217;ll assume we&amp;#8217;re mounting it at &lt;code&gt;/mnt/tmp&lt;/code&gt;: &lt;code&gt;mount /dev/sdX1 /mnt/tmp&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;cd to the root of the partition: &lt;code&gt;cd /mnt/tmp&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;Find and &lt;code&gt;cd&lt;/code&gt; to the &lt;code&gt;live-rw&lt;/code&gt; directory for your image; for VyOS 1.1.7 installed with the default image name of &amp;#8220;1.1.7&amp;#8221;, this is &lt;code&gt;boot/1.1.7/live-rw&lt;/code&gt; on the&amp;nbsp;partition.&lt;/li&gt;
+&lt;li&gt;If you are migrating a configuration file (above section), copy your configuration file to &lt;code&gt;opt/vyatta/etc/config/config.new&lt;/code&gt; and chmod it&amp;nbsp;0755.&lt;/li&gt;
+&lt;li&gt;Unmount the &lt;span class="caps"&gt;CF&lt;/span&gt; card and remove it from your&amp;nbsp;system.&lt;/li&gt;
+&lt;li&gt;Find a &lt;span class="caps"&gt;DB9&lt;/span&gt; null modem cable and a &lt;span class="caps"&gt;USB&lt;/span&gt; to serial adapter. Plug the cable into the Alix board&amp;#8217;s serial port, and into your adapter, and plug it into the&amp;nbsp;system.&lt;/li&gt;
+&lt;li&gt;Fire up your favorite terminal emulator (I use minicom) and connect at 9600&amp;nbsp;8N1.&lt;/li&gt;
+&lt;li&gt;If you have the board running already (already being used for something), connect and make sure you get a prompt. It helps to know that the serial&amp;nbsp;works.&lt;/li&gt;
+&lt;li&gt;If the board is running, power it down and unplug all connections before proceeding to the next&amp;nbsp;step.&lt;/li&gt;
+&lt;li&gt;Open up the Alix enclosure, and swap in your new &lt;span class="caps"&gt;CF&lt;/span&gt;&amp;nbsp;card.&lt;/li&gt;
+&lt;li&gt;Close the board, plug in serial and network&amp;nbsp;cables.&lt;/li&gt;
+&lt;li&gt;Plug in the power cable, and watch your terminal emulator. If all went well, you&amp;#8217;ll get the board&amp;#8217;s &lt;span class="caps"&gt;BIOS&lt;/span&gt; and then the bootloader and kernel output. Eventually you should be dropped to a login&amp;nbsp;prompt.&lt;/li&gt;
+&lt;li&gt;Log in as the vyos&amp;nbsp;user.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;configure&lt;/code&gt; to enter configuration mode. Then:&lt;ul&gt;
+&lt;li&gt;If you are migrating a configuration as discussed above, &lt;code&gt;load /opt/vyatta/etc/config/config.new&lt;/code&gt;. It will take a while to load. Make any necessary changes, then run &lt;code&gt;commit&lt;/code&gt;.&lt;/li&gt;
+&lt;li&gt;If you are starting from scratch, follow the &lt;a href="https://wiki.vyos.net/wiki/User_Guide"&gt;User Guide&lt;/a&gt; to setup the&amp;nbsp;system.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;Once the commit is done (it will take a while), &lt;code&gt;save&lt;/code&gt;. The router should now be up and running with the desired&amp;nbsp;configuration.&lt;/li&gt;
+&lt;li&gt;Reboot the router to ensure it comes up&amp;nbsp;correctly.&lt;/li&gt;
+&lt;li&gt;Backup the running configuration somewhere&amp;nbsp;safe.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;If you&amp;#8217;re running the &lt;span class="caps"&gt;PC&lt;/span&gt; Engines Alix.2, update the serial settings on the board as described on &lt;a href="http://blog.jasonantman.com/2011/09/vyatta-networkos-routerfirewall-on-alix-board-compact-flash/"&gt;my blog&lt;/a&gt; or &lt;a href="http://elderguerra.blogspot.com/2014/04/vyos-routerfirewall-on-alix-board.html"&gt;this post&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;I hope this can be of use to&amp;nbsp;others.&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">Jason Antman</dc:creator><pubDate>Sat, 04 Mar 2017 12:27:00 -0500</pubDate><guid>tag:blog.jasonantman.com,2017-03-04:2017/03/vyos-on-alix-2c1-single-board-computer/</guid><category>vyos</category><category>vyatta</category><category>alix</category><category>virtualbox</category><category>network</category><category>router</category><category>firewall</category><category>linux</category><category>sbc</category></item><item><title>Search for a small-scale but automated RPM build system</title><link>http://blog.jasonantman.com/2013/05/search-for-a-small-scale-but-automated-rpm-build-system/</link><description>&lt;p&gt;&lt;strong&gt;This post is part of a series of older draft posts from a few months
 ago that I&amp;#8217;m just getting around to publishing. Unfortunately, I have
 yet to find a build system that meets my requirements (see the last&amp;nbsp;paragraph).&lt;/strong&gt;&lt;/p&gt;
 &lt;p&gt;At work, we have a handful - currently a really small number - of &lt;span class="caps"&gt;RPM&lt;/span&gt;

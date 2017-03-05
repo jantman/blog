@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:og="http://ogp.me/ns#"
+      xmlns:fb="https://www.facebook.com/2008/fbml">
+<head>
+    <title>VyOS on Alix 2C1 Single Board Computer</title>
+    <!-- Using the latest rendering mode for IE -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Open Graph tags -->
+
+    <!-- Bootstrap -->
+        <link rel="stylesheet" href="http://blog.jasonantman.com/theme/css/bootstrap.flatly.min.css" type="text/css"/>
+    <link href="http://blog.jasonantman.com/theme/css/font-awesome.min.css" rel="stylesheet">
+    <link href="http://blog.jasonantman.com/theme/css/pygments.css" rel="stylesheet">
+        <link href="http://blog.jasonantman.com/theme/css/typogrify.css" rel="stylesheet">
+    <link rel="stylesheet" href="http://blog.jasonantman.com/theme/css/style.css" type="text/css"/>
+    <!-- JavaScript plugins (requires jQuery) -->
+    <script src="http://code.jquery.com/jquery.js"></script>
+
+    <link rel="stylesheet" href="http://blog.jasonantman.com/theme/css/forkongithub.min.css" type="text/css" />
+
+        <link href="http://blog.jasonantman.com/feeds/all.atom.xml" type="application/atom+xml" rel="alternate"
+              title="Jason Antman's Blog ATOM Feed"/>
+        <link href="http://blog.jasonantman.com/feeds/all.rss.xml" type="application/atom+xml" rel="alternate"
+              title="Jason Antman's Blog RSS Feed"/>
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-2718127-2', 'jasonantman.com');
+  ga('send', 'pageview');
+
+</script>
+</head>
+<body>
+<span id="forkongithub"><a href="https://github.com/jantman/blog">Fork me on GitHub</a></span><nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="http://blog.jasonantman.com" class="navbar-brand">Jason Antman's Blog</a>
+        </div>
+        <div class="collapse navbar-collapse navbar-ex1-collapse">
+            <ul class="nav navbar-nav">
+                         <li><a href="http://blog.jasonantman.com/pages/about.html">
+                             About
+                          </a></li>
+                        <li >
+                            <a href="http://blog.jasonantman.com/categories/ideas-and-rants/index.html">Ideas and rants</a>
+                        </li>
+                        <li >
+                            <a href="http://blog.jasonantman.com/categories/miscellaneous/index.html">Miscellaneous</a>
+                        </li>
+                        <li >
+                            <a href="http://blog.jasonantman.com/categories/monitoring/index.html">Monitoring</a>
+                        </li>
+                        <li >
+                            <a href="http://blog.jasonantman.com/categories/ops/index.html">Ops</a>
+                        </li>
+                        <li >
+                            <a href="http://blog.jasonantman.com/categories/projects/index.html">Projects</a>
+                        </li>
+                        <li >
+                            <a href="http://blog.jasonantman.com/categories/puppet/index.html">Puppet</a>
+                        </li>
+                        <li class="active">
+                            <a href="http://blog.jasonantman.com/categories/tech-howtos/index.html">Tech howtos</a>
+                        </li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="http://blog.jasonantman.com/archives.html"><i class="icon-th-list"></i>Archives</a></li>
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+</nav>
+<!-- /.navbar -->
+<div class="container">
+    <div class="row">
+        <div class="col-lg-9">
+    <section id="content">
+        <article>
+            <header class="page-header">
+                <h1>
+                    <a href="http://blog.jasonantman.com/2017/03/vyos-on-alix-2c1-single-board-computer/"
+                       rel="bookmark"
+                       title="Permalink to VyOS on Alix 2C1 Single Board Computer">
+                        VyOS on Alix 2C1 Single Board&nbsp;Computer
+                    </a>
+                </h1>
+<a href="http://twitter.com/share" class="twitter-share-button" data-count="horizontal" data-via="j_antman">Tweet</a><script type="text/javascript" src="http://platform.twitter.com/widgets.js"></script>
+            </header>
+            <div class="entry-content">
+                <div class="panel">
+                    <div class="panel-body">
+<footer class="post-info">
+    <span class="label label-default">Date</span>
+    <span class="published">
+        <i class="icon-calendar"></i>Sat 04 March 2017
+    </span>
+
+
+
+<span class="label label-default">Tags</span>
+	<a href="http://blog.jasonantman.com/tags/vyos/index.html">vyos</a>
+        /
+	<a href="http://blog.jasonantman.com/tags/vyatta/index.html">vyatta</a>
+        /
+	<a href="http://blog.jasonantman.com/tags/alix/index.html">alix</a>
+        /
+	<a href="http://blog.jasonantman.com/tags/virtualbox/index.html">virtualbox</a>
+        /
+	<a href="http://blog.jasonantman.com/tags/network/index.html">network</a>
+        /
+	<a href="http://blog.jasonantman.com/tags/router/index.html">router</a>
+        /
+	<a href="http://blog.jasonantman.com/tags/firewall/index.html">firewall</a>
+        /
+	<a href="http://blog.jasonantman.com/tags/linux/index.html">linux</a>
+        /
+	<a href="http://blog.jasonantman.com/tags/sbc/index.html">sbc</a>
+</footer><!-- /.post-info -->                    </div>
+                </div>
+                <p>Back in 2011 I <a href="/2011/09/vyatta-networkos-routerfirewall-on-alix-board-compact-flash/">wrote a post</a> on installing
+the formerly open-source <a href="https://wiki.vyos.net/wiki/Vyatta">Vyatta</a> router/firewall distribution on an Alix compact flash-based single board
+computer. I&#8217;d been using it for many years, since Vyatta Community was a completely F/<span class="caps">OSS</span> project. I stopped updating regularly sometime around
+when Vyatta (now Vyatta Core, differentiated from their paid offering) began widening the gap between its F/<span class="caps">OSS</span> Core and paid versions.
+It got much worse when <a href="http://newsroom.brocade.com/press-releases/brocade-acquires-vyatta-a-pioneer-and-leader-in-s-nasdaq-brcd-0949599#.WLr6DkArJhE">Brocade acquired Vyatta</a>
+in 2012. Soon thereafter open source builds stopped, the forums were shut down, the source code was made much more difficult to find, and
+eventually vyatta.org itself was shut down. I won&#8217;t go into further detail as there&#8217;s been a lot written about this debacle and forcible destruction of a community,
+such as <a href="http://dotbalm.org/brocade-missed-the-boat-with-vyatta/">Chris Wadge&#8217;s post</a> and
+<a href="https://libertysys.com.au/2013/08/the-tragedy-of-vyatta-cores-demise/">this one</a>, but I will say that the above made it increasingly difficult to plan
+an upgrade of my home&nbsp;router.</p>
+<p>On the positive side, however, the <a href="https://vyos.io/">VyOS</a> F/<span class="caps">OSS</span> fork has emerged, and seems to have quite a vibrant community
+at this point. A few weeks ago, I decided to finally take the time to upgrade to the latest VyOS 1.1.7 on my aged
+<a href="https://www.pcengines.ch/alix2c1.htm">Alix 2c1</a> single board router (purchased in 2008; 3 <span class="caps">LAN</span>, 433 MHz <span class="caps">AMG</span> Geode <span class="caps">LX700</span>, <span class="caps">128MB</span> <span class="caps">RAM</span>).
+VyOS is targeted at the cloud (virtualization) or &#8220;real&#8221; hardware, and doesn&#8217;t seem to have anywhere near as many people
+installing on dedicated SBCs as the former Vyatta community (probably because of the astonishing drop in the price of small, fanless
+systems in recent years). I wasn&#8217;t able to find much information about installing VyOS on such hardware, aside from
+<a href="https://forum.vyos.net/showthread.php?tid=6045">a few</a> <a href="https://forum.vyos.net/showthread.php?tid=26029">forum</a>
+<a href="https://forum.vyos.net/showthread.php?tid=26881">threads</a> and a <a href="http://elderguerra.blogspot.com/2014/04/vyos-routerfirewall-on-alix-board.html">post on Elder Guerra&#8217;s blog</a>
+that actually makes reference to and is based on my original post from&nbsp;2011.</p>
+<p>So, for anyone who&#8217;s interested, here&#8217;s how I got VyOS 1.1.7 installed on my Alix&nbsp;<span class="caps">SBC</span>:</p>
+<h2 id="prerequisites">Prerequisites</h2>
+<ul>
+<li>A Linux machine with VirtualBox. For posterity, I did this on a recently updated Arch Linux machine, using VirtualBox 5.1.12 from Arch&#8217;s repos (running via <span class="caps">DKMS</span> and with the Oracle extensions&nbsp;installed).</li>
+<li>A Compact Flash card to perform the install on (I used <a href="https://www.amazon.com/gp/product/B00PW1PH14/">this</a> Wintec &#8220;Industrial Grade&#8221; <span class="caps">SLC</span> <span class="caps">NAND</span> <span class="caps">4GB</span> card from&nbsp;amazon).</li>
+<li>A reader/writer for the card (my previous one was throwing errors, so I got <a href="https://www.amazon.com/gp/product/B0056TYRMW/">this</a> <span class="caps">USB</span> one from&nbsp;Amazon).</li>
+<li>Ensure your user can read and write the raw disk devices. On Linux, this means your user must be in the <code>disk</code> group. If it isn&#8217;t, you&#8217;ll need to log out and back in after making that&nbsp;change.</li>
+<li>Assuming you&#8217;re installing onto a headless board like the Alix, you&#8217;ll need a null modem cable to connect to the serial console port, and whatever you need (<span class="caps">USB</span> to serial adapter) to plug that in to your&nbsp;computer.</li>
+<li>A terminal emulator installed on your computer (I use <a href="https://alioth.debian.org/projects/minicom">minicom</a>).</li>
+</ul>
+<h2 id="configuration-migration">Configuration&nbsp;Migration</h2>
+<p>I just wanted to upgrade from my existing <span class="caps">VC</span> 6.3 installation, and use a new <span class="caps">CF</span> card. If you are doing a fresh install
+and do not need to migrate the configuration, you can skip this&nbsp;section.</p>
+<p>To migrate the configuration, I first set up a VyOS 1.1.7 VirtualBox <span class="caps">VM</span>, using the <a href="https://github.com/higebu/vagrant-vyos">vagrant-vyos</a>
+plugin for <a href="https://www.vagrantup.com/">Vagrant</a> and the author&#8217;s <a href="https://atlas.hashicorp.com/higebu/boxes/vyos">vyos Vagrant box</a>. I setup
+three network interfaces on the <span class="caps">VM</span> to match the three on my Alix board, and put the <code>Vagrantfile</code> in the same directory as my config
+backups from the current&nbsp;router.</p>
+<p>Once I had the <span class="caps">VM</span> up and running with <span class="caps">SSH</span> access, I ran <code>load /vagrant/config.boot</code> to load the configuration backup, and let the
+config migration tool do its work. This took a few iterations of modifying the old (<span class="caps">VC</span> 6.3) config until I got something that would
+load cleanly into VyOS 1.1.7; note that per the <a href="https://wiki.vyos.net/wiki/Migrating_from_Vyatta">Migrating from Vyatta</a> documentation,
+coming from <span class="caps">VC</span> 6.4 or earlier, there were some manual changes I had to make before the old configuration would load in VyOS.
+Once that was done, I committed and saved the config, then rebooted the <span class="caps">VM</span> and confirmed that it
+came up correctly configured. I run <span class="caps">SSH</span> on a non-default port, so before reloading the <span class="caps">VM</span> I needed to edit the <code>Vagrantfile</code>
+to add <code>config.ssh.guest_port = SSH_PORT_NUMBER</code> and <code>config.vm.network "forwarded_port", guest: SSH_PORT_NUMBER, host: SSH_PORT_NUMBER, id: "ssh"</code>.</p>
+<p>Once finished, I copied <code>/config/config.boot</code> from the <span class="caps">VM</span> to my host <span class="caps">OS</span>. I removed the <span class="caps">MAC</span> addresses for the interfaces
+and the <code>vagrant</code> user, and then used that as the starting configuration for my new install on the Alix&nbsp;board.</p>
+<h2 id="installation">Installation</h2>
+<ol>
+<li>Put your new <span class="caps">CF</span> card in the <span class="caps">USB</span> adapter and plug it in. Watch <code>dmesg</code> to see what device name it&#8217;s assigned. <strong>In this example, we&#8217;ll call it /dev/sdX. Make <span class="caps">SURE</span> you correct that path in the below instructions to be the correct one for your <span class="caps">CF</span>&nbsp;card.</strong></li>
+<li>Create a raw <span class="caps">VMDK</span> so VirtualBox can use the raw disk: <code>VBoxManage internalcommands createrawvmdk -filename /home/$USER/vyos_cf.vmdk -rawdisk /dev/sdX</code> (note that the filename must be an absolute&nbsp;path).</li>
+<li>Download the VyOS i586 <span class="caps">ISO</span> from <a href="https://vyos.io/">vyos.net</a>. Optionally verify the <span class="caps">GPG</span>&nbsp;signature.</li>
+<li>Manually create a new VirtualBox&nbsp;<span class="caps">VM</span>.</li>
+<li>Select &#8220;Linux&#8221; and then &#8220;Other Linux (32-bit)&#8221; for the <span class="caps">OS</span>&nbsp;type.</li>
+<li>Select the appropriate amount of <span class="caps">RAM</span> for your board (older Alix are 128 <span class="caps">MB</span> or 256&nbsp;<span class="caps">MB</span>).</li>
+<li>Select &#8220;Use an existing virtual hard disk file&#8221; and select the raw <span class="caps">VMDK</span> you created in Step 2. Uncheck &#8220;use host I/O&nbsp;cache&#8221;.</li>
+<li>Create the&nbsp;<span class="caps">VM</span>.</li>
+<li>Edit the <span class="caps">VM</span> settings to remove the floppy disk device, mount the <span class="caps">ISO</span> in the optical drive, disable audio, and disable all network&nbsp;adapters.</li>
+<li>Boot the <span class="caps">VM</span>. Wait for the VyOS <span class="caps">ISO</span> to boot and log in using the information provided in the&nbsp;banner.</li>
+<li>Run <code>install image</code> and answer yes to the&nbsp;prompt.</li>
+<li>Select Auto partitioning and select the <span class="caps">CF</span> card (it should be <code>sda</code>, the only&nbsp;option).</li>
+<li>Fill the whole device with the root&nbsp;partition.</li>
+<li>Use the default name for the image and copy <code>/config/config.boot</code>.</li>
+<li>Set a password for the vyos Administrator&nbsp;account.</li>
+<li>Setup grub on the one disk (<code>sda</code>).</li>
+<li>You should now be returned to the&nbsp;prompt.</li>
+<li><code>reboot</code> and shut down the <span class="caps">VM</span> once it gets back to the <span class="caps">BIOS</span> or bootloader; installation is&nbsp;complete.</li>
+<li>Delete the <span class="caps">VM</span> (don&#8217;t delete files) and then remove the raw <span class="caps">VMDK</span> you created in Step&nbsp;2.</li>
+<li>Mount the <span class="caps">CF</span> card partition on your host <span class="caps">OS</span> (it&#8217;s an ext4 partition). For the purposes of this example, we&#8217;ll assume we&#8217;re mounting it at <code>/mnt/tmp</code>: <code>mount /dev/sdX1 /mnt/tmp</code></li>
+<li>cd to the root of the partition: <code>cd /mnt/tmp</code></li>
+<li>Find and <code>cd</code> to the <code>live-rw</code> directory for your image; for VyOS 1.1.7 installed with the default image name of &#8220;1.1.7&#8221;, this is <code>boot/1.1.7/live-rw</code> on the&nbsp;partition.</li>
+<li>If you are migrating a configuration file (above section), copy your configuration file to <code>opt/vyatta/etc/config/config.new</code> and chmod it&nbsp;0755.</li>
+<li>Unmount the <span class="caps">CF</span> card and remove it from your&nbsp;system.</li>
+<li>Find a <span class="caps">DB9</span> null modem cable and a <span class="caps">USB</span> to serial adapter. Plug the cable into the Alix board&#8217;s serial port, and into your adapter, and plug it into the&nbsp;system.</li>
+<li>Fire up your favorite terminal emulator (I use minicom) and connect at 9600&nbsp;8N1.</li>
+<li>If you have the board running already (already being used for something), connect and make sure you get a prompt. It helps to know that the serial&nbsp;works.</li>
+<li>If the board is running, power it down and unplug all connections before proceeding to the next&nbsp;step.</li>
+<li>Open up the Alix enclosure, and swap in your new <span class="caps">CF</span>&nbsp;card.</li>
+<li>Close the board, plug in serial and network&nbsp;cables.</li>
+<li>Plug in the power cable, and watch your terminal emulator. If all went well, you&#8217;ll get the board&#8217;s <span class="caps">BIOS</span> and then the bootloader and kernel output. Eventually you should be dropped to a login&nbsp;prompt.</li>
+<li>Log in as the vyos&nbsp;user.</li>
+<li><code>configure</code> to enter configuration mode. Then:<ul>
+<li>If you are migrating a configuration as discussed above, <code>load /opt/vyatta/etc/config/config.new</code>. It will take a while to load. Make any necessary changes, then run <code>commit</code>.</li>
+<li>If you are starting from scratch, follow the <a href="https://wiki.vyos.net/wiki/User_Guide">User Guide</a> to setup the&nbsp;system.</li>
+</ul>
+</li>
+<li>Once the commit is done (it will take a while), <code>save</code>. The router should now be up and running with the desired&nbsp;configuration.</li>
+<li>Reboot the router to ensure it comes up&nbsp;correctly.</li>
+<li>Backup the running configuration somewhere&nbsp;safe.</li>
+</ol>
+<p>If you&#8217;re running the <span class="caps">PC</span> Engines Alix.2, update the serial settings on the board as described on <a href="http://blog.jasonantman.com/2011/09/vyatta-networkos-routerfirewall-on-alix-board-compact-flash/">my blog</a> or <a href="http://elderguerra.blogspot.com/2014/04/vyos-routerfirewall-on-alix-board.html">this post</a>.</p>
+<p>I hope this can be of use to&nbsp;others.</p>
+            </div>
+            <!-- /.entry-content -->
+    <hr />
+    <section class="comments" id="comments">
+        <h2>Comments</h2>
+        <div id="disqus_thread"></div>
+        <script type="text/javascript">
+            /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+            var disqus_shortname = 'jantman'; // required: replace example with your forum shortname
+            var disqus_identifier = 'vyos-on-alix-2c1-single-board-computer';
+            var disqus_url = 'http://blog.jasonantman.com/2017/03/vyos-on-alix-2c1-single-board-computer/';
+
+            /* * * DON'T EDIT BELOW THIS LINE * * */
+            (function () {
+                var dsq = document.createElement('script');
+                dsq.type = 'text/javascript';
+                dsq.async = true;
+                dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+                (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+            })();
+        </script>
+        <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by
+            Disqus.</a></noscript>
+        <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+
+    </section>
+        </article>
+    </section>
+
+        </div>
+        <div class="col-lg-3 well well-sm" id="sidebar">
+
+<aside>
+    <section>
+        <ul class="list-group list-group-flush">
+
+                <li class="list-group-item"><h4><i class="icon-home icon-large"></i>Recent Posts</h4></li>
+                        <li class="list-group-item">
+                            <a href="http://blog.jasonantman.com/2017/03/vyos-on-alix-2c1-single-board-computer/">
+                                VyOS on Alix 2C1 Single Board&nbsp;Computer
+                            </a>
+                        </li>
+                        <li class="list-group-item">
+                            <a href="http://blog.jasonantman.com/2016/10/yesterdays-widespread-internet-outage-for-non-geeks/">
+                                Yesterday&#8217;s Widespread Internet Outage, for&nbsp;non-geeks
+                            </a>
+                        </li>
+                        <li class="list-group-item">
+                            <a href="http://blog.jasonantman.com/2016/08/openssh-changing-hostnames-based-on-location/">
+                                OpenSSH changing hostnames based on&nbsp;location
+                            </a>
+                        </li>
+                        <li class="list-group-item">
+                            <a href="http://blog.jasonantman.com/2016/08/the-psychological-side-of-remote-work/">
+                                The Psychological Side of Remote&nbsp;Work
+                            </a>
+                        </li>
+                        <li class="list-group-item">
+                            <a href="http://blog.jasonantman.com/2016/08/tooling-for-aws-webhooks-to-sqs-via-api-gateway-and-lambda/">
+                                Tooling for <span class="caps">AWS</span> - webhooks to <span class="caps">SQS</span> via <span class="caps">API</span> Gateway and&nbsp;Lambda
+                            </a>
+                        </li>
+
+
+                <li class="list-group-item"><a href="http://blog.jasonantman.com/tags.html"><h4><i class="icon-tags icon-large"></i>Tags</h4></a></li>
+                <li class="list-group-item">
+                        <span class="tag-0">
+                            <a href="http://blog.jasonantman.com/tags/linux/index.html">
+                                linux
+                            </a>
+                        </span>
+                        <span class="tag-1">
+                            <a href="http://blog.jasonantman.com/tags/monitoring/index.html">
+                                monitoring
+                            </a>
+                        </span>
+                        <span class="tag-1">
+                            <a href="http://blog.jasonantman.com/tags/python/index.html">
+                                python
+                            </a>
+                        </span>
+                        <span class="tag-1">
+                            <a href="http://blog.jasonantman.com/tags/android/index.html">
+                                android
+                            </a>
+                        </span>
+                        <span class="tag-1">
+                            <a href="http://blog.jasonantman.com/tags/puppet/index.html">
+                                puppet
+                            </a>
+                        </span>
+                        <span class="tag-1">
+                            <a href="http://blog.jasonantman.com/tags/google/index.html">
+                                google
+                            </a>
+                        </span>
+                        <span class="tag-1">
+                            <a href="http://blog.jasonantman.com/tags/nagios/index.html">
+                                Nagios
+                            </a>
+                        </span>
+                        <span class="tag-1">
+                            <a href="http://blog.jasonantman.com/tags/sun/index.html">
+                                sun
+                            </a>
+                        </span>
+                        <span class="tag-1">
+                            <a href="http://blog.jasonantman.com/tags/php/index.html">
+                                PHP
+                            </a>
+                        </span>
+                        <span class="tag-1">
+                            <a href="http://blog.jasonantman.com/tags/security/index.html">
+                                security
+                            </a>
+                        </span>
+                        <span class="tag-1">
+                            <a href="http://blog.jasonantman.com/tags/microsoft/index.html">
+                                microsoft
+                            </a>
+                        </span>
+                        <span class="tag-1">
+                            <a href="http://blog.jasonantman.com/tags/blog/index.html">
+                                blog
+                            </a>
+                        </span>
+                        <span class="tag-1">
+                            <a href="http://blog.jasonantman.com/tags/sysadmin/index.html">
+                                sysadmin
+                            </a>
+                        </span>
+                        <span class="tag-1">
+                            <a href="http://blog.jasonantman.com/tags/wordpress/index.html">
+                                wordpress
+                            </a>
+                        </span>
+                        <span class="tag-2">
+                            <a href="http://blog.jasonantman.com/tags/dns/index.html">
+                                DNS
+                            </a>
+                        </span>
+                        <span class="tag-2">
+                            <a href="http://blog.jasonantman.com/tags/syslog/index.html">
+                                syslog
+                            </a>
+                        </span>
+                        <span class="tag-2">
+                            <a href="http://blog.jasonantman.com/tags/apache/index.html">
+                                apache
+                            </a>
+                        </span>
+                        <span class="tag-2">
+                            <a href="http://blog.jasonantman.com/tags/droid/index.html">
+                                droid
+                            </a>
+                        </span>
+                        <span class="tag-2">
+                            <a href="http://blog.jasonantman.com/tags/rpm/index.html">
+                                rpm
+                            </a>
+                        </span>
+                        <span class="tag-2">
+                            <a href="http://blog.jasonantman.com/tags/firefox/index.html">
+                                firefox
+                            </a>
+                        </span>
+                </li>
+        </ul>
+    </section>
+    <section>
+    <ul class="list-group list-group-flush">
+    <li class="list-group-item" style="padding: 10px 15px 0px 15px;"><h4><i class="icon-twitter
+    icon-large"></i>Twitter <a href="https://twitter.com/j_antman"
+    class="twitter-follow-button" data-show-count="false"
+    data-dnt="true">Follow @j_antman</a></h4>
+<script>!function(d,s,id){var
+  js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document,
+  'script', 'twitter-wjs');</script></li>
+    </ul>
+    <a class="twitter-timeline" data-dnt="true"
+    href="https://twitter.com/j_antman"
+    data-chrome="transparent noheader" data-widget-id="429640274453594113">Tweets by @j_antman</a>
+    <script>!function(d,s,id){var
+    js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+"://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+    </section>
+    <section>
+    <ul class="list-group list-group-flush">
+    <li class="list-group-item"><h4><i class="icon-github icon-large"></i>GitHub Repos</h4></li>
+        <div id="gh_repos">
+            <p class="list-group-item">Status updating...</p>
+        </div>
+            <a href="https://github.com/jantman">@jantman</a> on GitHub
+    </ul>
+        <script type="text/javascript">
+            $(document).ready(function () {
+                if (!window.jXHR) {
+                    var jxhr = document.createElement('script');
+                    jxhr.type = 'text/javascript';
+                    jxhr.src = 'http://blog.jasonantman.com/theme/js/jXHR.js';
+                    var s = document.getElementsByTagName('script')[0];
+                    s.parentNode.insertBefore(jxhr, s);
+                }
+
+                github.showRepos({
+                    user: 'jantman',
+                    count: 5,
+                    skip_forks: false,
+                    target: '#gh_repos'
+                });
+            });
+        </script>
+        <script src="http://blog.jasonantman.com/theme/js/github.js" type="text/javascript"></script>
+    </section>
+</aside>        </div>
+    </div>
+</div>
+<footer>
+    <div class="container">
+        <hr>
+        <p class="pull-right"><i class="icon-arrow-up"></i> <a href="#">Back to top</a></p>
+
+
+        <p>&copy; 2017 Jason Antman &middot; Powered by <a href="https://github.com/DandyDev/pelican-bootstrap3" target="_blank">pelican-bootstrap3</a>,
+            <a href="http://docs.getpelican.com/" target="_blank">Pelican</a>,
+            <a href="http://getbootstrap.com" target="_blank">Bootstrap</a></p>
+    </div>
+</footer>
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="http://blog.jasonantman.com/theme/js/bootstrap.min.js"></script>
+
+<!-- Enable responsive features in IE8 with Respond.js (https://github.com/scottjehl/Respond) -->
+<script src="http://blog.jasonantman.com/theme/js/respond.min.js"></script>
+    <script type="text/javascript">
+        /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+        var disqus_shortname = 'jantman'; // required: replace example with your forum shortname
+
+        /* * * DON'T EDIT BELOW THIS LINE * * */
+        (function () {
+            var s = document.createElement('script');
+            s.async = true;
+            s.type = 'text/javascript';
+            s.src = '//' + disqus_shortname + '.disqus.com/count.js';
+            (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+        }());
+    </script>
+
+
+</body>
+</html>
