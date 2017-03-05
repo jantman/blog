@@ -5,6 +5,10 @@ Category: Projects
 Tags: alix, embedded, network, pcengines, router, vyatta
 Slug: vyatta-networkos-routerfirewall-on-alix-board-compact-flash
 
+__Update March 2017__: I have an updated version of this procedure for VyOS,
+the open source community fork of Vyatta, available in a new post:
+[VyOS on Alix 2C1 Single Board Computer](/2017/03/vyos-on-alix-2c1-single-board-computer/).
+
 With the impending move to an apartment in Georgia and the migration of
 my rack full of servers to a hosting provider, there's no longer a need
 for me to run my [Vyatta VC](http://www.vyatta.org/) router on a beefy
