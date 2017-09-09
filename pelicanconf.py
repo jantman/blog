@@ -11,7 +11,6 @@ SITENAME = u"Jason Antman's Blog"
 DISQUS_SITENAME = 'jantman'
 GOOGLE_ANALYTICS = 'UA-2718127-2'
 GA_DOMAIN = 'jasonantman.com'
-#SITEURL = 'http://blog.jasonantman.com' # TODO
 
 # Uncomment following line if you want document-relative URLs when developing
 RELATIVE_URLS = True
@@ -74,19 +73,6 @@ MD_EXTENSIONS = ['codehilite(guess_lang=False)', 'fenced_code', 'toc']
 #
 FEED_ALL_ATOM = None # TODO
 CATEGORY_FEED_ATOM = None # TODO
-"""
-# TODO - update feedburner? see http://docs.getpelican.com/en/3.3.0/settings.html#feedburner
-FEED_DOMAIN = None # TODO - should be SITEURL
-FEED_ATOM = None # TODO
-FEED_RSS = None # TODO
-FEED_ALL_ATOM = 'feeds/all.atom.xml'
-FEED_ALL_RSS = 'feeds/all.rss.xml'
-CATEGORY_FEED_ATOM = 'feeds/%s.atom.xml'
-CATEGORY_FEED_RSS = 'feeds/%s.rss.xml'
-TAG_FEED_ATOM = 'feeds/%s.atom.xml'
-TAG_FEED_RSS = 'feeds/%s.rss.xml'
-"""
-
 
 #
 # Theme and Display Settings
@@ -105,12 +91,6 @@ USE_OPEN_GRAPH = False # this adds non-standard tags; thats bad
 
 # disable tags, since it's a list not a "cloud"
 DISPLAY_TAGS_ON_SIDEBAR = False
-# TAG_CLOUD_STEPS = 4
-# TAG_CLOUD_MAX_ITEMS = 20
-# MENUITEMS = [('Tags', '/tags.html')]
-
-#MENUITEMS = None
-# list of tuples (Title, URL) to displat at beginning of main menu
 
 #
 # Links, Social, etc.
@@ -118,8 +98,6 @@ DISPLAY_TAGS_ON_SIDEBAR = False
 
 LINKS =  (('Homepage', 'http://www.jasonantman.com'),
           ('Resume', 'http://resume.jasonantman.com'),)
-
-#SOCIAL = (('@j_antman', 'http://twitter.com/j_antman'),)
 
 GITHUB_URL = 'https://github.com/jantman/blog'
 SHOW_GITHUB_RIBBON = True
@@ -130,8 +108,6 @@ GITHUB_SHOW_USER_LINK = True
 
 TWITTER_USERNAME = 'j_antman'
 TWITTER_WIDGET_ID = '429640274453594113'
-
-#ADDTHIS_PROFILE = ''
 
 #
 # Plugins
