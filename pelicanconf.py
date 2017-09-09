@@ -104,10 +104,10 @@ RECENT_POST_COUNT = 5
 USE_OPEN_GRAPH = False # this adds non-standard tags; thats bad
 
 # disable tags, since it's a list not a "cloud"
-DISPLAY_TAGS_ON_SIDEBAR = True
-TAG_CLOUD_STEPS = 4
-TAG_CLOUD_MAX_ITEMS = 20
-#MENUITEMS = [('Tags', '/tags.html')]
+DISPLAY_TAGS_ON_SIDEBAR = False
+# TAG_CLOUD_STEPS = 4
+# TAG_CLOUD_MAX_ITEMS = 20
+# MENUITEMS = [('Tags', '/tags.html')]
 
 #MENUITEMS = None
 # list of tuples (Title, URL) to displat at beginning of main menu
