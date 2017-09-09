@@ -9,8 +9,8 @@ AUTHOR = u'Jason Antman'
 SITENAME = u"Jason Antman's Blog"
 #SITESUBTITLE = u"Subtitle here"
 DISQUS_SITENAME = 'jantman'
-GOOGLE_ANALYTICS = 'UA-2718127-2'
-GA_DOMAIN = 'jasonantman.com'
+GOOGLE_ANALYTICS_UNIVERSAL = 'UA-2718127-2'
+GOOGLE_ANALYTICS_UNIVERSAL_PROPERTY = 'jasonantman.com'
 
 # Uncomment following line if you want document-relative URLs when developing
 RELATIVE_URLS = True
@@ -33,9 +33,9 @@ OUTPUT_PATH = 'output/'
 IGNORE_FILES = ['.#*']
 
 # PATH = 'content/'
-PAGE_DIR = 'pages'
+PAGE_PATHS = ['pages']
 PAGE_EXCLUDES = []
-ARTICLE_DIR = 'content'
+ARTICLE_PATHS = ['content']
 ARTICLE_EXCLUDES = ['pages',]
 
 STATIC_PATHS = [
@@ -66,7 +66,18 @@ TAGS_SAVE_AS = TAGS_URL
 WITH_FUTURE_DATES = True # draft status for anything with future date
 
 TYPOGRIFY = True
-MD_EXTENSIONS = ['codehilite(guess_lang=False)', 'fenced_code', 'toc']
+MARKDOWN = {
+    'extension_configs': {
+        'markdown.extensions.codehilite': {
+            'guess_lang': False,
+            'pygments_style': 'friendly',
+            'css_class': 'highlight'
+        },
+        'markdown.extensions.fenced_code': {},
+        'markdown.extensions.toc': {}
+    },
+    'output_format': 'html5'
+}
 
 #
 # Feeds
@@ -80,6 +91,7 @@ CATEGORY_FEED_ATOM = None # TODO
 THEME = '/home/jantman/GIT/pelican-themes/pelican-bootstrap3'
 BOOTSTRAP_THEME = 'flatly'
 THEME_BRANCH = 'jantman-bootstrap3'
+PYGMENTS_STYLE = 'default'
 
 DISPLAY_CATEGORIES_ON_MENU = True
 DISPLAY_CATEGORIES_ON_SIDEBAR = False
@@ -112,11 +124,16 @@ TWITTER_WIDGET_ID = '429640274453594113'
 #
 # Plugins
 #
-PLUGINS = ['sitemap', ]
-PLUGIN_PATH = '/home/jantman/GIT/pelican-plugins'
+PLUGINS = ['sitemap', 'i18n_subsites']
+PLUGIN_PATHS = ['/home/jantman/GIT/pelican-plugins']
 PLUGIN_BRANCH = 'jantman'
 #W3C_SLEEP = 0
 W3C_VALIDATOR_URL = 'http://localhost/w3c-validator/check'
+
+I18N_TEMPLATES_LANG = 'en'
+JINJA_ENVIRONMENT = {
+    'extensions': ['jinja2.ext.i18n']
+}
 
 SITEMAP = {
     'format': 'xml',

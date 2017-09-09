@@ -5,7 +5,7 @@ import re
 import sys
 import datetime
 
-from pelicanconf import ARTICLE_DIR, DEFAULT_CATEGORY, AUTHOR, OUTPUT_PATH, THEME, THEME_BRANCH, PLUGIN_PATH, PLUGIN_BRANCH
+from pelicanconf import ARTICLE_PATHS, DEFAULT_CATEGORY, AUTHOR, OUTPUT_PATH, THEME, THEME_BRANCH, PLUGIN_PATHS, PLUGIN_BRANCH
 
 # Local path configuration (can be absolute or relative to fabfile)
 env.deploy_path = 'output'
@@ -31,12 +31,12 @@ def prebuild():
         print("ERROR: %s is on wrong branch (%s not %s)" % (THEME, branch, THEME_BRANCH))
         sys.exit(1)
     # check for plugins
-    if not os.path.exists(os.path.join(PLUGIN_PATH, 'LICENSE')):
-        print("ERROR: plugin directory %s does not exist." % PLUGIN_PATH)
+    if not os.path.exists(os.path.join(PLUGIN_PATHS[0], 'LICENSE')):
+        print("ERROR: plugin directory %s does not exist." % PLUGIN_PATHS[0])
         sys.exit(1)
-    branch = local("cd %s && git rev-parse --abbrev-ref HEAD" % PLUGIN_PATH, capture=True).strip()
+    branch = local("cd %s && git rev-parse --abbrev-ref HEAD" % PLUGIN_PATHS[0], capture=True).strip()
     if branch != PLUGIN_BRANCH:
-        print("ERROR: %s is on wrong branch (%s not %s)" % (PLUGIN_PATH, branch, PLUGIN_BRANCH))
+        print("ERROR: %s is on wrong branch (%s not %s)" % (PLUGIN_PATHS[0], branch, PLUGIN_BRANCH))
         sys.exit(1)
 
 def clean():
@@ -135,7 +135,7 @@ def post():
     title = _prompt_title()
     category = _prompt_category(cats)
     dt = datetime.datetime.now()
-    dname = os.path.join(ARTICLE_DIR, dt.strftime('%Y'), dt.strftime('%m'))
+    dname = os.path.join(ARTICLE_PATHS[0], dt.strftime('%Y'), dt.strftime('%m'))
     if not os.path.exists(dname):
         os.makedirs(dname)
     slug = _make_slug(title)
@@ -146,7 +146,7 @@ def post():
 Date: {datestr}
 Author: {author}
 Category: {category}
-Tags: 
+Tags:
 Slug: {slug}
 Summary: <<<<< summary goes here >>>>>>>
 Status: draft
@@ -172,7 +172,7 @@ content (written in MarkDown - http://daringfireball.net/projects/markdown/synta
 
 def _get_categories():
     """ return a list of all categories in current posts """
-    lines = local('grep -rh "^Category: " %s/ | sort | uniq' % ARTICLE_DIR, capture=True)
+    lines = local('grep -rh "^Category: " %s/ | sort | uniq' % ARTICLE_PATHS[0], capture=True)
     cats = []
     cat_re = re.compile(r'^Category: (.+)$')
     for l in str(lines).split("\n"):
