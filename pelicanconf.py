@@ -87,7 +87,7 @@ DISPLAY_CATEGORIES_ON_SIDEBAR = False
 DISPLAY_RECENT_POSTS_ON_SIDEBAR = True
 RECENT_POST_COUNT = 5
 
-USE_OPEN_GRAPH = False # this adds non-standard tags; thats bad
+USE_OPEN_GRAPH = True
 
 # disable tags, since it's a list not a "cloud"
 DISPLAY_TAGS_ON_SIDEBAR = False
