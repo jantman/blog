@@ -1,11 +1,17 @@
 from fabric.api import *
 import fabric.contrib.project as project
 import os
+import stat
 import re
 import sys
 import datetime
+from bs4 import BeautifulSoup
+import requests
+import json
+import time
+from pprint import pformat
 
-from pelicanconf import ARTICLE_PATHS, DEFAULT_CATEGORY, AUTHOR, OUTPUT_PATH, THEME, THEME_BRANCH, PLUGIN_PATHS, PLUGIN_BRANCH
+from pelicanconf import ARTICLE_PATHS, DEFAULT_CATEGORY, AUTHOR, OUTPUT_PATH, THEME, THEME_BRANCH, PLUGIN_PATHS, PLUGIN_BRANCH, GITHUB_USER
 
 # Local path configuration (can be absolute or relative to fabfile)
 env.deploy_path = 'output'
@@ -38,6 +44,33 @@ def prebuild():
     if branch != PLUGIN_BRANCH:
         print("ERROR: %s is on wrong branch (%s not %s)" % (PLUGIN_PATHS[0], branch, PLUGIN_BRANCH))
         sys.exit(1)
+    update_pinned_repos()
+
+def update_pinned_repos():
+    """Update github_pinned_repos.json from user's GitHub profile"""
+    if not os.path.exists('github_pinned_repos.json'):
+        fage = 999999999
+    else:
+        fage = time.time() - os.stat('github_pinned_repos.json')[stat.ST_MTIME]
+    if fage < 86400:
+        print("GitHub Pinned Repos updated %d seconds ago; not regenerating" % fage)
+        return True
+    print("Updating GitHub Pinned Repos for user %s" % GITHUB_USER)
+    result = []
+    r = requests.get('https://github.com/%s' % GITHUB_USER)
+    soup = BeautifulSoup(r.text, 'html.parser')
+    for li in soup.select('li.pinned-repo-item.public'):
+        result.append({
+            'name': li.select('.repo')[0].string.strip(),
+            'html_url': 'https://github.com%s' % li.select('.repo')[0].parent.attrs['href'].strip(),
+            'description': li.select('.pinned-repo-desc')[0].string.strip()
+        })
+    res = json.dumps(result)
+    resp = prompt("New pinned repos:\n%s\nIs this right? [yes|No]" % pformat(result))
+    if not re.match(r'(y|Y|yes|Yes|YES)', resp):
+        return False
+    with open('github_pinned_repos.json', 'w') as fh:
+        fh.write(res)
 
 def clean():
     """ remove DEPLOY_PATH if it exists, then recreate """

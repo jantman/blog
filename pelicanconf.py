@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*- #
 from __future__ import unicode_literals
+import os
 
 #
 # Overall site-wide settings
@@ -114,9 +115,10 @@ LINKS =  (('Homepage', 'http://www.jasonantman.com'),
 GITHUB_URL = 'https://github.com/jantman/blog'
 SHOW_GITHUB_RIBBON = True
 GITHUB_USER = 'jantman'
-GITHUB_REPO_COUNT = 5
-GITHUB_SKIP_FORK = False
 GITHUB_SHOW_USER_LINK = True
+if os.path.exists('github_pinned_repos.json'):
+    with open('github_pinned_repos.json', 'r') as fh:
+        GITHUB_REPOS_JSON = fh.read().strip()
 
 TWITTER_USERNAME = 'j_antman'
 TWITTER_WIDGET_ID = '429640274453594113'
