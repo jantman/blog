@@ -137,6 +137,8 @@ JINJA_ENVIRONMENT = {
     'extensions': ['jinja2.ext.i18n']
 }
 
+ARCHIVES_SAVE_AS = 'archives.html'
+
 SITEMAP = {
     'format': 'xml',
     'priorities': {
