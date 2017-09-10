@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Jason Antman's Blog</title><link href="http://blog.jasonantman.com/" rel="alternate"></link><link href="http://blog.jasonantman.com/feeds/categories/projects.atom.xml" rel="self"></link><id>http://blog.jasonantman.com/</id><updated>2016-08-06T21:38:00-04:00</updated><entry><title>Tooling for AWS - webhooks to SQS via API Gateway and Lambda</title><link href="http://blog.jasonantman.com/2016/08/tooling-for-aws-webhooks-to-sqs-via-api-gateway-and-lambda/" rel="alternate"></link><updated>2016-08-06T21:38:00-04:00</updated><author><name>Jason Antman</name></author><id>tag:blog.jasonantman.com,2016-08-06:2016/08/tooling-for-aws-webhooks-to-sqs-via-api-gateway-and-lambda/</id><summary type="html">&lt;p&gt;A few weeks ago at work, I was party to two discussions about possible tooling needs, both very low-priority. One was the possible need to sync MarkDown documentation
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Jason Antman's Blog - Projects</title><link href="http://blog.jasonantman.com/" rel="alternate"></link><link href="http://blog.jasonantman.com/feeds/categories/projects.atom.xml" rel="self"></link><id>http://blog.jasonantman.com/</id><updated>2016-08-06T21:38:00-04:00</updated><entry><title>Tooling for AWS - webhooks to SQS via API Gateway and Lambda</title><link href="http://blog.jasonantman.com/2016/08/tooling-for-aws-webhooks-to-sqs-via-api-gateway-and-lambda/" rel="alternate"></link><published>2016-08-06T21:38:00-04:00</published><updated>2016-08-06T21:38:00-04:00</updated><author><name>Jason Antman</name></author><id>tag:blog.jasonantman.com,2016-08-06:/2016/08/tooling-for-aws-webhooks-to-sqs-via-api-gateway-and-lambda/</id><summary type="html">&lt;p&gt;Project I created that uses Python and Terraform to setup an &lt;span class="caps"&gt;AWS&lt;/span&gt; &lt;span class="caps"&gt;API&lt;/span&gt; Gateway instance to receive webhooks, and enqueue their content in &lt;span class="caps"&gt;SQS&lt;/span&gt; queues via&amp;nbsp;Lambda.&lt;/p&gt;</summary><content type="html">&lt;p&gt;A few weeks ago at work, I was party to two discussions about possible tooling needs, both very low-priority. One was the possible need to sync MarkDown documentation
 from GitHub repositories to&amp;#8230; another thing that can hold docs. The other was relating to the new Version 2 Docker Registry, &lt;a href="https://github.com/docker/distribution"&gt;distribution&lt;/a&gt;.
 We have some Jenkins jobs that dynamically populate dropdown fields for build parameters with Docker image names and tags, using the &lt;a href="https://wiki.jenkins-ci.org/display/JENKINS/Active+Choices+Plugin"&gt;Active Choices Plugin&lt;/a&gt;.
 Right now we&amp;#8217;re directly querying the Docker Registry &lt;span class="caps"&gt;API&lt;/span&gt; from Groovy, every time the Build With Parameters page is loaded. With the original version 1 Docker Registry,
@@ -19,10 +19,10 @@ and push the content of them into a queue. Ideally, it would also be something t
 &lt;/ul&gt;
 &lt;p&gt;The tooling is written in Python, but leverages &lt;a href="https://www.terraform.io/"&gt;HashiCorp&amp;#8217;s Terraform&lt;/a&gt; to actually manage the &lt;span class="caps"&gt;AWS&lt;/span&gt;&amp;nbsp;resources.&lt;/p&gt;
 &lt;p&gt;From a &lt;span class="caps"&gt;JSON&lt;/span&gt; configuration file as simple&amp;nbsp;as:&lt;/p&gt;
-&lt;div class="codehilite"&gt;&lt;pre&gt;{
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;{
   &amp;quot;endpoints&amp;quot;: {
     &amp;quot;some_resource_name&amp;quot;: {
-      &amp;quot;method&amp;quot;: &amp;quot;POST&amp;quot;,
+      &amp;quot;method&amp;quot;: &amp;quot;&lt;span class="caps"&gt;POST&lt;/span&gt;&amp;quot;,
       &amp;quot;queues&amp;quot;: [&amp;quot;myqueue&amp;quot;]
     },
   },
@@ -43,7 +43,7 @@ then generates a Terraform configuration to manage all required &lt;span class="
 also helper commands to view the Lambda Function and &lt;span class="caps"&gt;API&lt;/span&gt; Gateway logs from CloudWatch, view messages in the queue(s) and
 &lt;span class="caps"&gt;GET&lt;/span&gt; or &lt;span class="caps"&gt;POST&lt;/span&gt; a test message to one or all of the&amp;nbsp;endpoints.&lt;/p&gt;
 &lt;p&gt;Full documentation is available at &lt;a href="http://webhook2lambda2sqs.readthedocs.io/en/latest/"&gt;http://webhook2lambda2sqs.readthedocs.io/en/latest/&lt;/a&gt;
-and the package (Python 2.7, 3.3-3.5) can be downloaded &lt;a href="https://pypi.python.org/pypi/webhook2lambda2sqs"&gt;from PyPI&lt;/a&gt;.&lt;/p&gt;</summary><category term="aws"></category><category term="webhook"></category><category term="lambda"></category><category term="github"></category><category term="api-gateway"></category><category term="sqs"></category><category term="queue"></category><category term="python"></category><category term="terraform"></category></entry><entry><title>AwsLimitChecker - Check Your AWS Usage Against Service Limits</title><link href="http://blog.jasonantman.com/2015/07/awslimitchecker-check-your-aws-usage-against-service-limits/" rel="alternate"></link><updated>2015-07-25T08:35:00-04:00</updated><author><name>Jason Antman</name></author><id>tag:blog.jasonantman.com,2015-07-25:2015/07/awslimitchecker-check-your-aws-usage-against-service-limits/</id><summary type="html">&lt;p&gt;Over the past year or so, at my day job, we&amp;#8217;ve been leveraging &lt;span class="caps"&gt;AWS&lt;/span&gt; more and more, specifically
+and the package (Python 2.7, 3.3-3.5) can be downloaded &lt;a href="https://pypi.python.org/pypi/webhook2lambda2sqs"&gt;from PyPI&lt;/a&gt;.&lt;/p&gt;</content><category term="aws"></category><category term="webhook"></category><category term="lambda"></category><category term="github"></category><category term="api-gateway"></category><category term="sqs"></category><category term="queue"></category><category term="python"></category><category term="terraform"></category></entry><entry><title>AwsLimitChecker - Check Your AWS Usage Against Service Limits</title><link href="http://blog.jasonantman.com/2015/07/awslimitchecker-check-your-aws-usage-against-service-limits/" rel="alternate"></link><published>2015-07-25T08:35:00-04:00</published><updated>2015-07-25T08:35:00-04:00</updated><author><name>Jason Antman</name></author><id>tag:blog.jasonantman.com,2015-07-25:/2015/07/awslimitchecker-check-your-aws-usage-against-service-limits/</id><summary type="html">&lt;p&gt;Initial release of AwsLimitChecker, a tool to check your &lt;span class="caps"&gt;AWS&lt;/span&gt; usage against service limits and Trusted&amp;nbsp;Advisor.&lt;/p&gt;</summary><content type="html">&lt;p&gt;Over the past year or so, at my day job, we&amp;#8217;ve been leveraging &lt;span class="caps"&gt;AWS&lt;/span&gt; more and more, specifically
 &lt;a href="https://aws.amazon.com/cloudformation/"&gt;CloudFormation&lt;/a&gt; to manage complete application stacks. One
 side-effect of this is that we went through a few periods where we were constantly hitting various
 &lt;span class="caps"&gt;AWS&lt;/span&gt; Service Limits - subnet groups, ElastiCache clusters, security groups, and a whole slew of others.
@@ -81,7 +81,7 @@ awslimitchecker includes both a Python module with a &lt;a href="http://awslimit
 don&amp;#8217;t mind working with Python, and a command line script for those who&amp;nbsp;do.&lt;/p&gt;
 &lt;p&gt;The project is still very young, and only being used by one organization, but it&amp;#8217;s proven
 stable for us, and I&amp;#8217;m more than happy to accept questions, comments, criticisms,
-&lt;a href="https://github.com/jantman/awslimitchecker/issues"&gt;issues/feature requests&lt;/a&gt; and Pull&amp;nbsp;Requests.&lt;/p&gt;</summary><category term="aws"></category><category term="ec2"></category><category term="limits"></category><category term="python"></category><category term="awslimitchecker"></category><category term="cloud"></category></entry><entry><title>Some Additional Serverspec Types</title><link href="http://blog.jasonantman.com/2015/03/some-additional-serverspec-types/" rel="alternate"></link><updated>2015-03-14T11:58:00-04:00</updated><author><name>Jason Antman</name></author><id>tag:blog.jasonantman.com,2015-03-14:2015/03/some-additional-serverspec-types/</id><summary type="html">&lt;p&gt;&lt;a href="http://serverspec.org/"&gt;Serverspec&lt;/a&gt; is an rspec-based framework for testing live machines,
+&lt;a href="https://github.com/jantman/awslimitchecker/issues"&gt;issues/feature requests&lt;/a&gt; and Pull&amp;nbsp;Requests.&lt;/p&gt;</content><category term="aws"></category><category term="ec2"></category><category term="limits"></category><category term="python"></category><category term="awslimitchecker"></category><category term="cloud"></category></entry><entry><title>Some Additional Serverspec Types</title><link href="http://blog.jasonantman.com/2015/03/some-additional-serverspec-types/" rel="alternate"></link><published>2015-03-14T11:58:00-04:00</published><updated>2015-03-14T11:58:00-04:00</updated><author><name>Jason Antman</name></author><id>tag:blog.jasonantman.com,2015-03-14:/2015/03/some-additional-serverspec-types/</id><summary type="html">&lt;p&gt;Some additional types that I wrote for&amp;nbsp;Serverspec&lt;/p&gt;</summary><content type="html">&lt;p&gt;&lt;a href="http://serverspec.org/"&gt;Serverspec&lt;/a&gt; is an rspec-based framework for testing live machines,
 and making assertions about things like the output of commands, installed packages, running
 services, file content, etc. However, it has a relatively limited and basic set of
 &lt;a href="http://serverspec.org/resource_types.html"&gt;Resource Types&lt;/a&gt; that it can test&amp;nbsp;for.&lt;/p&gt;
@@ -128,7 +128,11 @@ adding to the&amp;nbsp;types.&lt;/p&gt;
 (pull requests and issues welcome) and it&amp;#8217;s packaged and hosted as a &lt;a href="https://rubygems.org/gems/serverspec-extended-types"&gt;ruby gem&lt;/a&gt;.
 &lt;a href="http://www.rubydoc.info/gems/serverspec-extended-types/0.0.2#Installation"&gt;Installation&lt;/a&gt; and usage is as simple
 as adding it to your Gemfile and &lt;a href="http://www.rubydoc.info/gems/serverspec-extended-types/0.0.2#Usage"&gt;spec_helper&lt;/a&gt;
-and then using the types and matchers in your&amp;nbsp;specs.&lt;/p&gt;</summary><category term="serverspec"></category><category term="specinfra"></category><category term="testing"></category><category term="beaker"></category><category term="ruby"></category><category term="rspec"></category><category term="gem"></category></entry><entry><title>Project - Storing and Analyzing Apache httpd Logs from Many Hosts</title><link href="http://blog.jasonantman.com/2012/09/project-storing-and-analyzing-apache-httpd-logs-from-many-hosts/" rel="alternate"></link><updated>2012-09-06T05:00:00-04:00</updated><author><name>admin</name></author><id>tag:blog.jasonantman.com,2012-09-06:2012/09/project-storing-and-analyzing-apache-httpd-logs-from-many-hosts/</id><summary type="html">&lt;p&gt;I&amp;#8217;ve recently started casual work on a side-project to collect, store,
+and then using the types and matchers in your&amp;nbsp;specs.&lt;/p&gt;</content><category term="serverspec"></category><category term="specinfra"></category><category term="testing"></category><category term="beaker"></category><category term="ruby"></category><category term="rspec"></category><category term="gem"></category></entry><entry><title>Project - Storing and Analyzing Apache httpd Logs from Many Hosts</title><link href="http://blog.jasonantman.com/2012/09/project-storing-and-analyzing-apache-httpd-logs-from-many-hosts/" rel="alternate"></link><published>2012-09-06T05:00:00-04:00</published><updated>2012-09-06T05:00:00-04:00</updated><author><name>admin</name></author><id>tag:blog.jasonantman.com,2012-09-06:/2012/09/project-storing-and-analyzing-apache-httpd-logs-from-many-hosts/</id><summary type="html">&lt;p&gt;I&amp;#8217;ve recently started casual work on a side-project to collect, store,
+and analyze apache logs from a bunch of servers - for the initial
+implementation, I&amp;#8217;m looking to handle about 15M access_log lines per
+day (that works out to 173 lines/second assuming an even distribution,
+which there certainly …&lt;/p&gt;</summary><content type="html">&lt;p&gt;I&amp;#8217;ve recently started casual work on a side-project to collect, store,
 and analyze apache logs from a bunch of servers - for the initial
 implementation, I&amp;#8217;m looking to handle about 15M access_log lines per
 day (that works out to 173 lines/second assuming an even distribution,
@@ -254,7 +258,11 @@ dashboards, and point-in-time snapshots of graphs. Lots of&amp;nbsp;functionalit
 &lt;li&gt;&lt;a href="https://github.com/etsy/logster"&gt;etsy/logster&lt;/a&gt; - etsy&amp;#8217;s Logster
     tool, which keeps a tail on log files, parses them, and ships
     metrics to Graphite or&amp;nbsp;Ganglia.&lt;/li&gt;
-&lt;/ul&gt;</summary></entry><entry><title>CVS to SVN to Git</title><link href="http://blog.jasonantman.com/2012/03/cvs-to-svn-to-git/" rel="alternate"></link><updated>2012-03-25T12:11:00-04:00</updated><author><name>admin</name></author><id>tag:blog.jasonantman.com,2012-03-25:2012/03/cvs-to-svn-to-git/</id><summary type="html">&lt;p&gt;Thanks to some new interest, I&amp;#8217;ve decided to resurrect an old project of
+&lt;/ul&gt;</content></entry><entry><title>CVS to SVN to Git</title><link href="http://blog.jasonantman.com/2012/03/cvs-to-svn-to-git/" rel="alternate"></link><published>2012-03-25T12:11:00-04:00</published><updated>2012-03-25T12:11:00-04:00</updated><author><name>admin</name></author><id>tag:blog.jasonantman.com,2012-03-25:/2012/03/cvs-to-svn-to-git/</id><summary type="html">&lt;p&gt;Thanks to some new interest, I&amp;#8217;ve decided to resurrect an old project of
+mine, &lt;a href="http://www.php-ems-tools.com"&gt;&lt;span class="caps"&gt;PHP&lt;/span&gt; &lt;span class="caps"&gt;EMS&lt;/span&gt; Tools&lt;/a&gt;. It&amp;#8217;s a web-based
+tool for small emergency services organizations, mainly aimed at
+volunteer &lt;span class="caps"&gt;EMS&lt;/span&gt;/ambulance providers. The tool handles roster tracking,
+scheduling, equipment maintenance and checks, and a bunch of other …&lt;/p&gt;</summary><content type="html">&lt;p&gt;Thanks to some new interest, I&amp;#8217;ve decided to resurrect an old project of
 mine, &lt;a href="http://www.php-ems-tools.com"&gt;&lt;span class="caps"&gt;PHP&lt;/span&gt; &lt;span class="caps"&gt;EMS&lt;/span&gt; Tools&lt;/a&gt;. It&amp;#8217;s a web-based
 tool for small emergency services organizations, mainly aimed at
 volunteer &lt;span class="caps"&gt;EMS&lt;/span&gt;/ambulance providers. The tool handles roster tracking,
@@ -323,7 +331,11 @@ titles, plus our very custom call report and telephone-based call-in
 software, which is pretty tightly linked with the &lt;span class="caps"&gt;PHP&lt;/span&gt; &lt;span class="caps"&gt;EMS&lt;/span&gt; Tools core),
 and how I balance abstracting things to be configurable for other users
 versus getting this all done in a reasonable amount of&amp;nbsp;time.&lt;/p&gt;
-&lt;p&gt;Stay&amp;nbsp;tuned&amp;#8230;&lt;/p&gt;</summary><category term="cvs"></category><category term="git"></category><category term="svn"></category><category term="version control"></category></entry><entry><title>Vyatta NetworkOS router/firewall on Alix board / Compact Flash</title><link href="http://blog.jasonantman.com/2011/09/vyatta-networkos-routerfirewall-on-alix-board-compact-flash/" rel="alternate"></link><updated>2011-09-30T14:16:00-04:00</updated><author><name>admin</name></author><id>tag:blog.jasonantman.com,2011-09-30:2011/09/vyatta-networkos-routerfirewall-on-alix-board-compact-flash/</id><summary type="html">&lt;p&gt;&lt;strong&gt;Update March 2017&lt;/strong&gt;: I have an updated version of this procedure for VyOS,
+&lt;p&gt;Stay&amp;nbsp;tuned&amp;#8230;&lt;/p&gt;</content><category term="cvs"></category><category term="git"></category><category term="svn"></category><category term="version control"></category></entry><entry><title>Vyatta NetworkOS router/firewall on Alix board / Compact Flash</title><link href="http://blog.jasonantman.com/2011/09/vyatta-networkos-routerfirewall-on-alix-board-compact-flash/" rel="alternate"></link><published>2011-09-30T14:16:00-04:00</published><updated>2011-09-30T14:16:00-04:00</updated><author><name>admin</name></author><id>tag:blog.jasonantman.com,2011-09-30:/2011/09/vyatta-networkos-routerfirewall-on-alix-board-compact-flash/</id><summary type="html">&lt;p&gt;&lt;strong&gt;Update March 2017&lt;/strong&gt;: I have an updated version of this procedure for VyOS,
+the open source community fork of Vyatta, available in a new post:
+&lt;a href="/2017/03/vyos-on-alix-2c1-single-board-computer/"&gt;VyOS on Alix 2C1 Single Board Computer&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;With the impending move to an apartment in Georgia and the migration of
+my rack full of servers …&lt;/p&gt;</summary><content type="html">&lt;p&gt;&lt;strong&gt;Update March 2017&lt;/strong&gt;: I have an updated version of this procedure for VyOS,
 the open source community fork of Vyatta, available in a new post:
 &lt;a href="/2017/03/vyos-on-alix-2c1-single-board-computer/"&gt;VyOS on Alix 2C1 Single Board Computer&lt;/a&gt;.&lt;/p&gt;
 &lt;p&gt;With the impending move to an apartment in Georgia and the migration of
@@ -454,7 +466,10 @@ configure right&amp;nbsp;away:&lt;/p&gt;
 &lt;/ol&gt;
 &lt;p&gt;And that&amp;#8217;s it - this should give you a working Vyatta system on &lt;span class="caps"&gt;CF&lt;/span&gt; on an
 Alix board. Stay tuned, hopefully in a month or so I&amp;#8217;ll get around to
-customizing it a bit more, based on the second blog entry linked&amp;nbsp;above.&lt;/p&gt;</summary><category term="alix"></category><category term="embedded"></category><category term="network"></category><category term="pcengines"></category><category term="router"></category><category term="vyatta"></category></entry><entry><title>Downtime Last Night; Coping with outages on a shoestring budget</title><link href="http://blog.jasonantman.com/2011/01/downtime-last-night-coping-with-outages-on-a-shoestring-budget/" rel="alternate"></link><updated>2011-01-10T09:22:00-05:00</updated><author><name>admin</name></author><id>tag:blog.jasonantman.com,2011-01-10:2011/01/downtime-last-night-coping-with-outages-on-a-shoestring-budget/</id><summary type="html">&lt;p&gt;Anyone who tried to visit any of my sites last night, or send me email,
+customizing it a bit more, based on the second blog entry linked&amp;nbsp;above.&lt;/p&gt;</content><category term="alix"></category><category term="embedded"></category><category term="network"></category><category term="pcengines"></category><category term="router"></category><category term="vyatta"></category></entry><entry><title>Downtime Last Night; Coping with outages on a shoestring budget</title><link href="http://blog.jasonantman.com/2011/01/downtime-last-night-coping-with-outages-on-a-shoestring-budget/" rel="alternate"></link><published>2011-01-10T09:22:00-05:00</published><updated>2011-01-10T09:22:00-05:00</updated><author><name>admin</name></author><id>tag:blog.jasonantman.com,2011-01-10:/2011/01/downtime-last-night-coping-with-outages-on-a-shoestring-budget/</id><summary type="html">&lt;p&gt;Anyone who tried to visit any of my sites last night, or send me email,
+probably noticed that I dropped off the face of the earth. I take my
+uptime pretty seriously - even with virtually no budget, about 10
+minutes of &lt;span class="caps"&gt;UPS&lt;/span&gt; time, and everything hosted out of my basement …&lt;/p&gt;</summary><content type="html">&lt;p&gt;Anyone who tried to visit any of my sites last night, or send me email,
 probably noticed that I dropped off the face of the earth. I take my
 uptime pretty seriously - even with virtually no budget, about 10
 minutes of &lt;span class="caps"&gt;UPS&lt;/span&gt; time, and everything hosted out of my basement. I&amp;#8217;ve only
@@ -544,7 +559,11 @@ it, we&amp;#8217;re coming back soon&amp;#8221; page, and hacked &lt;span class=
 everything at this one box (albeit with a low&amp;nbsp;&lt;span class="caps"&gt;TTL&lt;/span&gt;).&lt;/p&gt;
 &lt;p&gt;If anyone out there happens to read this, any comments on how to deal
 with a total loss of connectivity on a budget of, say, $15/month above
-the cost of my Optimum&amp;nbsp;connection??&lt;/p&gt;</summary><category term="disaster recovery"></category><category term="downtime"></category><category term="failover"></category><category term="redundancy"></category></entry><entry><title>Virtualization Options</title><link href="http://blog.jasonantman.com/2010/03/virtualization-options/" rel="alternate"></link><updated>2010-03-19T20:55:00-04:00</updated><author><name>admin</name></author><id>tag:blog.jasonantman.com,2010-03-19:2010/03/virtualization-options/</id><summary type="html">&lt;p&gt;As I mentioned in &lt;a href="/2010/03/downtime-past-few-days-coping-with-storms/"&gt;Downtime past few days, coping with
+the cost of my Optimum&amp;nbsp;connection??&lt;/p&gt;</content><category term="disaster recovery"></category><category term="downtime"></category><category term="failover"></category><category term="redundancy"></category></entry><entry><title>Virtualization Options</title><link href="http://blog.jasonantman.com/2010/03/virtualization-options/" rel="alternate"></link><published>2010-03-19T20:55:00-04:00</published><updated>2010-03-19T20:55:00-04:00</updated><author><name>admin</name></author><id>tag:blog.jasonantman.com,2010-03-19:/2010/03/virtualization-options/</id><summary type="html">&lt;p&gt;As I mentioned in &lt;a href="/2010/03/downtime-past-few-days-coping-with-storms/"&gt;Downtime past few days, coping with
+storms&lt;/a&gt;, as a
+result of some things I noticed with a recent power outage, I&amp;#8217;ve decided
+to take the leap to virtualization. Given the cost of current hardware
+that supports &lt;span class="caps"&gt;HVM&lt;/span&gt; (Intel &lt;span class="caps"&gt;VT&lt;/span&gt;-x or &lt;span class="caps"&gt;AMD&lt;/span&gt;-V ), I immediately …&lt;/p&gt;</summary><content type="html">&lt;p&gt;As I mentioned in &lt;a href="/2010/03/downtime-past-few-days-coping-with-storms/"&gt;Downtime past few days, coping with
 storms&lt;/a&gt;, as a
 result of some things I noticed with a recent power outage, I&amp;#8217;ve decided
 to take the leap to virtualization. Given the cost of current hardware
@@ -638,7 +657,10 @@ to be fixed? Nagios check scripts would need to be adjusted. Is there
 anything else that would come back and bite&amp;nbsp;me?&lt;/p&gt;
 &lt;p&gt;The bottom line is that (I guess this is logical) it seems that
 containers in OpenVZ will seem - and act - a lot less like a logical
-host than they would under&amp;nbsp;Xen.&lt;/p&gt;</summary><category term="OpenVZ"></category><category term="virtualization"></category><category term="xen"></category></entry><entry><title>New web server, WP optimization</title><link href="http://blog.jasonantman.com/2010/02/new-web-server-wp-optimization/" rel="alternate"></link><updated>2010-02-28T23:19:00-05:00</updated><author><name>admin</name></author><id>tag:blog.jasonantman.com,2010-02-28:2010/02/new-web-server-wp-optimization/</id><summary type="html">&lt;p&gt;Tonight, more or less on a whim, I moved my blog from my older (dual
+host than they would under&amp;nbsp;Xen.&lt;/p&gt;</content><category term="OpenVZ"></category><category term="virtualization"></category><category term="xen"></category></entry><entry><title>New web server, WP optimization</title><link href="http://blog.jasonantman.com/2010/02/new-web-server-wp-optimization/" rel="alternate"></link><published>2010-02-28T23:19:00-05:00</published><updated>2010-02-28T23:19:00-05:00</updated><author><name>admin</name></author><id>tag:blog.jasonantman.com,2010-02-28:/2010/02/new-web-server-wp-optimization/</id><summary type="html">&lt;p&gt;Tonight, more or less on a whim, I moved my blog from my older (dual
+1GHz Pentium &lt;span class="caps"&gt;III&lt;/span&gt; Coppermine, &lt;span class="caps"&gt;1GB&lt;/span&gt; &lt;span class="caps"&gt;RAM&lt;/span&gt;, 10k &lt;span class="caps"&gt;RPM&lt;/span&gt; &lt;span class="caps"&gt;SCSI&lt;/span&gt; disks, Compaq
+Proliant &lt;span class="caps"&gt;DL360&lt;/span&gt; G1, OpenSuSE 10.2 32-bit) web server to my newer one
+(dual 1.4GHz Pentium &lt;span class="caps"&gt;III&lt;/span&gt;, &lt;span class="caps"&gt;2GB&lt;/span&gt; &lt;span class="caps"&gt;RAM&lt;/span&gt;, 10k &lt;span class="caps"&gt;RPM&lt;/span&gt; &lt;span class="caps"&gt;SCSI&lt;/span&gt; disks …&lt;/p&gt;</summary><content type="html">&lt;p&gt;Tonight, more or less on a whim, I moved my blog from my older (dual
 1GHz Pentium &lt;span class="caps"&gt;III&lt;/span&gt; Coppermine, &lt;span class="caps"&gt;1GB&lt;/span&gt; &lt;span class="caps"&gt;RAM&lt;/span&gt;, 10k &lt;span class="caps"&gt;RPM&lt;/span&gt; &lt;span class="caps"&gt;SCSI&lt;/span&gt; disks, Compaq
 Proliant &lt;span class="caps"&gt;DL360&lt;/span&gt; G1, OpenSuSE 10.2 32-bit) web server to my newer one
 (dual 1.4GHz Pentium &lt;span class="caps"&gt;III&lt;/span&gt;, &lt;span class="caps"&gt;2GB&lt;/span&gt; &lt;span class="caps"&gt;RAM&lt;/span&gt;, 10k &lt;span class="caps"&gt;RPM&lt;/span&gt; &lt;span class="caps"&gt;SCSI&lt;/span&gt; disks, &lt;span class="caps"&gt;HP&lt;/span&gt; Proliant &lt;span class="caps"&gt;DL360&lt;/span&gt;
@@ -749,7 +771,10 @@ dual-core Xeons at 2.8 GHz, &lt;span class="caps"&gt;2GB&lt;/span&gt; &lt;span c
 This was on the same &lt;span class="caps"&gt;LAN&lt;/span&gt; and subnet as the servers, with the workstation
 connected via a 1Gbps copper Ethernet link and the web-serving
 interfaces of the servers connected via 100Mbps (There&amp;#8217;s a trunk in
-between, from the gigabit aggregation switch to the 100Mbps distribution&amp;nbsp;switch).&lt;/p&gt;</summary><category term="apache"></category><category term="optimization"></category><category term="performance"></category><category term="wordpress"></category></entry><entry><title>Project Announcement - PHPsa</title><link href="http://blog.jasonantman.com/2009/09/project-announcement-phpsa/" rel="alternate"></link><updated>2009-09-29T15:36:00-04:00</updated><author><name>admin</name></author><id>tag:blog.jasonantman.com,2009-09-29:2009/09/project-announcement-phpsa/</id><summary type="html">&lt;p&gt;So, here&amp;#8217;s the &amp;#8220;official&amp;#8221; scoop on the new project that I&amp;#8217;m
+between, from the gigabit aggregation switch to the 100Mbps distribution&amp;nbsp;switch).&lt;/p&gt;</content><category term="apache"></category><category term="optimization"></category><category term="performance"></category><category term="wordpress"></category></entry><entry><title>Project Announcement - PHPsa</title><link href="http://blog.jasonantman.com/2009/09/project-announcement-phpsa/" rel="alternate"></link><published>2009-09-29T15:36:00-04:00</published><updated>2009-09-29T15:36:00-04:00</updated><author><name>admin</name></author><id>tag:blog.jasonantman.com,2009-09-29:/2009/09/project-announcement-phpsa/</id><summary type="html">&lt;p&gt;So, here&amp;#8217;s the &amp;#8220;official&amp;#8221; scoop on the new project that I&amp;#8217;m
+planning/starting to work on. I&amp;#8217;m calling it PHPsa for now, and it&amp;#8217;s
+going to (hopefully) be an integrated dashboard/portal for SysAdmins.
+While there are a number of tools that fit into this general …&lt;/p&gt;</summary><content type="html">&lt;p&gt;So, here&amp;#8217;s the &amp;#8220;official&amp;#8221; scoop on the new project that I&amp;#8217;m
 planning/starting to work on. I&amp;#8217;m calling it PHPsa for now, and it&amp;#8217;s
 going to (hopefully) be an integrated dashboard/portal for SysAdmins.
 While there are a number of tools that fit into this general category
@@ -825,7 +850,11 @@ more time to it. Unfortunately, it also means that I will, most likely,
 have to give up Nathan Hubbard&amp;#8217;s &lt;a href="http://www.machdb.org/"&gt;MachDB&lt;/a&gt; in
 favor of &lt;a href="http://www.ocsinventory-ng.org/"&gt;&lt;span class="caps"&gt;OCS&lt;/span&gt; Inventory &lt;span class="caps"&gt;NG&lt;/span&gt;&lt;/a&gt;, a more
 mature project that already includes inventory support for Linux,
-Windows and&amp;nbsp;Mac.&lt;/p&gt;</summary><category term="bind"></category><category term="cacti"></category><category term="dns"></category><category term="Nagios"></category><category term="PHPsa"></category><category term="Projects"></category><category term="puppet"></category><category term="rsyslog"></category><category term="sysadmin"></category><category term="syslog"></category></entry><entry><title>DNS Move</title><link href="http://blog.jasonantman.com/2009/09/dns-move/" rel="alternate"></link><updated>2009-09-17T13:07:00-04:00</updated><author><name>admin</name></author><id>tag:blog.jasonantman.com,2009-09-17:2009/09/dns-move/</id><summary type="html">&lt;p&gt;Yesterday I finally began moving &lt;span class="caps"&gt;DNS&lt;/span&gt; for my sites from GoDaddy to my own
+Windows and&amp;nbsp;Mac.&lt;/p&gt;</content><category term="bind"></category><category term="cacti"></category><category term="dns"></category><category term="Nagios"></category><category term="PHPsa"></category><category term="Projects"></category><category term="puppet"></category><category term="rsyslog"></category><category term="sysadmin"></category><category term="syslog"></category></entry><entry><title>DNS Move</title><link href="http://blog.jasonantman.com/2009/09/dns-move/" rel="alternate"></link><published>2009-09-17T13:07:00-04:00</published><updated>2009-09-17T13:07:00-04:00</updated><author><name>admin</name></author><id>tag:blog.jasonantman.com,2009-09-17:/2009/09/dns-move/</id><summary type="html">&lt;p&gt;Yesterday I finally began moving &lt;span class="caps"&gt;DNS&lt;/span&gt; for my sites from GoDaddy to my own
+in-house system of master/slave
+&lt;a href="https://www.isc.org/software/bind"&gt;&lt;span class="caps"&gt;BIND9&lt;/span&gt;&lt;/a&gt;. While both &lt;span class="caps"&gt;DNS&lt;/span&gt; servers are
+currently at the same location and on the same &lt;span class="caps"&gt;WAN&lt;/span&gt; connection (heck,
+they&amp;#8217;re beind the same router, too), so is all of the rest …&lt;/p&gt;</summary><content type="html">&lt;p&gt;Yesterday I finally began moving &lt;span class="caps"&gt;DNS&lt;/span&gt; for my sites from GoDaddy to my own
 in-house system of master/slave
 &lt;a href="https://www.isc.org/software/bind"&gt;&lt;span class="caps"&gt;BIND9&lt;/span&gt;&lt;/a&gt;. While both &lt;span class="caps"&gt;DNS&lt;/span&gt; servers are
 currently at the same location and on the same &lt;span class="caps"&gt;WAN&lt;/span&gt; connection (heck,
@@ -843,7 +872,12 @@ yet moved over some of my older less used&amp;nbsp;domains.&lt;/p&gt;
 &lt;p&gt;The next part of my project, when I move the ambulance corps hosted
 services in-house, will be trying to find a decently-priced &lt;span class="caps"&gt;DNS&lt;/span&gt; hosting
 company that will just act as a slave, to keep &lt;span class="caps"&gt;DNS&lt;/span&gt; up if my &lt;span class="caps"&gt;WAN&lt;/span&gt;
-connection goes&amp;nbsp;down.&lt;/p&gt;</summary><category term="bind"></category><category term="dns"></category><category term="multibindadmin"></category></entry><entry><title>September 2009 Project Updates</title><link href="http://blog.jasonantman.com/2009/09/september-2009-project-updates/" rel="alternate"></link><updated>2009-09-17T13:00:00-04:00</updated><author><name>admin</name></author><id>tag:blog.jasonantman.com,2009-09-17:2009/09/september-2009-project-updates/</id><summary type="html">&lt;p&gt;I know I haven&amp;#8217;t been posting a lot, but here&amp;#8217;s an update on some of my&amp;nbsp;projects:&lt;/p&gt;
+connection goes&amp;nbsp;down.&lt;/p&gt;</content><category term="bind"></category><category term="dns"></category><category term="multibindadmin"></category></entry><entry><title>September 2009 Project Updates</title><link href="http://blog.jasonantman.com/2009/09/september-2009-project-updates/" rel="alternate"></link><published>2009-09-17T13:00:00-04:00</published><updated>2009-09-17T13:00:00-04:00</updated><author><name>admin</name></author><id>tag:blog.jasonantman.com,2009-09-17:/2009/09/september-2009-project-updates/</id><summary type="html">&lt;p&gt;I know I haven&amp;#8217;t been posting a lot, but here&amp;#8217;s an update on some of my&amp;nbsp;projects:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href="http://www.php-ems-tools.com"&gt;&lt;span class="caps"&gt;PHP&lt;/span&gt; &lt;span class="caps"&gt;EMS&lt;/span&gt; Tools&lt;/a&gt; - I&amp;#8217;ve done quite a
+    bit of work for the &lt;a href="http://www.midlandparkambulance.com"&gt;ambulance
+    corps&lt;/a&gt;, and intend on rolling
+    this into the main distribution. I&amp;#8217;ve also added an Asterisk/&lt;span class="caps"&gt;AGI …&lt;/span&gt;&lt;/li&gt;&lt;/ul&gt;</summary><content type="html">&lt;p&gt;I know I haven&amp;#8217;t been posting a lot, but here&amp;#8217;s an update on some of my&amp;nbsp;projects:&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;&lt;a href="http://www.php-ems-tools.com"&gt;&lt;span class="caps"&gt;PHP&lt;/span&gt; &lt;span class="caps"&gt;EMS&lt;/span&gt; Tools&lt;/a&gt; - I&amp;#8217;ve done quite a
     bit of work for the &lt;a href="http://www.midlandparkambulance.com"&gt;ambulance
@@ -871,7 +905,11 @@ Nathan Hubbard&amp;#8217;s &lt;a href="http://www.machdb.org/"&gt;MachDB&lt;/a&g
 network interface information, information on expansion slots, and some
 extra details for the system and storage. I plan on developing a patch
 and contacting Nathan once I get a chance. It also includes a Python
-collector script that I&amp;nbsp;developed.&lt;/p&gt;</summary><category term="machdb"></category><category term="php ems tools"></category><category term="PHPsa"></category><category term="Projects"></category><category term="rackman"></category></entry><entry><title>New Projects</title><link href="http://blog.jasonantman.com/2009/07/new-projects/" rel="alternate"></link><updated>2009-07-16T14:05:00-04:00</updated><author><name>admin</name></author><id>tag:blog.jasonantman.com,2009-07-16:2009/07/new-projects/</id><summary type="html">&lt;p&gt;In terms of ongoing projects, I should be updating RackMan sometime
+collector script that I&amp;nbsp;developed.&lt;/p&gt;</content><category term="machdb"></category><category term="php ems tools"></category><category term="PHPsa"></category><category term="Projects"></category><category term="rackman"></category></entry><entry><title>New Projects</title><link href="http://blog.jasonantman.com/2009/07/new-projects/" rel="alternate"></link><published>2009-07-16T14:05:00-04:00</published><updated>2009-07-16T14:05:00-04:00</updated><author><name>admin</name></author><id>tag:blog.jasonantman.com,2009-07-16:/2009/07/new-projects/</id><summary type="html">&lt;p&gt;In terms of ongoing projects, I should be updating RackMan sometime
+soon, and also adding the demo&amp;nbsp;site.&lt;/p&gt;
+&lt;p&gt;I&amp;#8217;ve begun to move &lt;span class="caps"&gt;DNS&lt;/span&gt; for all of my domains in-house, mostly because
+since everything is behind &lt;span class="caps"&gt;NAT&lt;/span&gt;, it&amp;#8217;s a real pain to manage &lt;span class="caps"&gt;DNS&lt;/span&gt; entries
+in two places (one …&lt;/p&gt;</summary><content type="html">&lt;p&gt;In terms of ongoing projects, I should be updating RackMan sometime
 soon, and also adding the demo&amp;nbsp;site.&lt;/p&gt;
 &lt;p&gt;I&amp;#8217;ve begun to move &lt;span class="caps"&gt;DNS&lt;/span&gt; for all of my domains in-house, mostly because
 since everything is behind &lt;span class="caps"&gt;NAT&lt;/span&gt;, it&amp;#8217;s a real pain to manage &lt;span class="caps"&gt;DNS&lt;/span&gt; entries
@@ -887,7 +925,13 @@ downloaded (for uploading to a &lt;span class="caps"&gt;DNS&lt;/span&gt; hosting
 &lt;p&gt;For my final project for my &lt;span class="caps"&gt;XML&lt;/span&gt; web design class, I&amp;#8217;m going to be making
 some &amp;#8220;mashup&amp;#8221; with RackMan, Google Maps, Google Visualizer, Nagios, and
 a few other&amp;nbsp;tools&amp;#8230;&lt;/p&gt;
-&lt;p&gt;Stay&amp;nbsp;tuned&amp;#8230;&lt;/p&gt;</summary><category term="bind"></category><category term="dns"></category><category term="google"></category><category term="PHPsa"></category><category term="rackman"></category></entry><entry><title>Blinkenlights (blinkenlichten)</title><link href="http://blog.jasonantman.com/2009/06/blinkenlights-blinkenlichten/" rel="alternate"></link><updated>2009-06-23T10:54:00-04:00</updated><author><name>admin</name></author><id>tag:blog.jasonantman.com,2009-06-23:2009/06/blinkenlights-blinkenlichten/</id><summary type="html">&lt;p&gt;I&amp;#8217;ll be posting more on this in the next few days, but I did a few more
+&lt;p&gt;Stay&amp;nbsp;tuned&amp;#8230;&lt;/p&gt;</content><category term="bind"></category><category term="dns"></category><category term="google"></category><category term="PHPsa"></category><category term="rackman"></category></entry><entry><title>Blinkenlights (blinkenlichten)</title><link href="http://blog.jasonantman.com/2009/06/blinkenlights-blinkenlichten/" rel="alternate"></link><published>2009-06-23T10:54:00-04:00</published><updated>2009-06-23T10:54:00-04:00</updated><author><name>admin</name></author><id>tag:blog.jasonantman.com,2009-06-23:/2009/06/blinkenlights-blinkenlichten/</id><summary type="html">&lt;p&gt;I&amp;#8217;ll be posting more on this in the next few days, but I did a few more
+upgrades at home, including a Proliant
+&lt;a href="http://h18000.www1.hp.com/products/quickspecs/10902_na/10902_na.html"&gt;&lt;span class="caps"&gt;DL380G2&lt;/span&gt;&lt;/a&gt;
+to replace my aged &lt;span class="caps"&gt;ML370&lt;/span&gt; (G1) storage box (array is failing badly) and a
+Proliant &lt;a href="http://h18000.www1.hp.com/products/quickspecs/11049_na/11049_na.HTML"&gt;&lt;span class="caps"&gt;DL360&lt;/span&gt;
+G2&lt;/a&gt;
+as a second web server (and possibly moving …&lt;/p&gt;</summary><content type="html">&lt;p&gt;I&amp;#8217;ll be posting more on this in the next few days, but I did a few more
 upgrades at home, including a Proliant
 &lt;a href="http://h18000.www1.hp.com/products/quickspecs/10902_na/10902_na.html"&gt;&lt;span class="caps"&gt;DL380G2&lt;/span&gt;&lt;/a&gt;
 to replace my aged &lt;span class="caps"&gt;ML370&lt;/span&gt; (G1) storage box (array is failing badly) and a
@@ -898,7 +942,7 @@ as a second web server (and possibly moving Nagios over to that&amp;nbsp;box).&l
 Tripp Lite &lt;span class="caps"&gt;UPS&lt;/span&gt;, and I have a few other issues to sort out, but here&amp;#8217;s a
 photo that I took this weekend after the upgrades (yes, it&amp;#8217;s a bit
 blurry - that happens handheld at 1/10&amp;nbsp;sec).&lt;/p&gt;
-&lt;p&gt;&lt;img alt="blinkenlights" src="/GFX/Das_Blinkenlights.gif" /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img alt="blinkenlights" src="/GFX/Das_Blinkenlights.gif"&gt;&lt;/p&gt;
 &lt;blockquote&gt;
 &lt;p&gt;&lt;span class="caps"&gt;ACHTUNG&lt;/span&gt;! &lt;span class="caps"&gt;ALLES&lt;/span&gt; &lt;span class="caps"&gt;LOOKENSPEEPERS&lt;/span&gt;!
  Alles touristen und non-technischen looken peepers! Das
@@ -909,7 +953,10 @@ rubbernecken sichtseeren keepen das cotten-pickenen hans in das
 pockets muss; relaxen und watchen das&amp;nbsp;blinkenlichten.&lt;/p&gt;
 &lt;/blockquote&gt;
 &lt;p&gt;(For those of you who aren&amp;#8217;t familiar with it,
-&lt;a href="http://www.catb.org/jargon/html/B/blinkenlights.html"&gt;blinkenlights&lt;/a&gt;).&lt;/p&gt;</summary></entry><entry><title>Many Many Changes; Downtime</title><link href="http://blog.jasonantman.com/2009/03/many-many-changes/" rel="alternate"></link><updated>2009-03-07T19:05:00-05:00</updated><author><name>admin</name></author><id>tag:blog.jasonantman.com,2009-03-07:2009/03/many-many-changes/</id><summary type="html">&lt;p&gt;Well, I don&amp;#8217;t have time to go into a lot of detail, but I thought I&amp;#8217;d
+&lt;a href="http://www.catb.org/jargon/html/B/blinkenlights.html"&gt;blinkenlights&lt;/a&gt;).&lt;/p&gt;</content></entry><entry><title>Many Many Changes; Downtime</title><link href="http://blog.jasonantman.com/2009/03/many-many-changes/" rel="alternate"></link><published>2009-03-07T19:05:00-05:00</published><updated>2009-03-07T19:05:00-05:00</updated><author><name>admin</name></author><id>tag:blog.jasonantman.com,2009-03-07:/2009/03/many-many-changes/</id><summary type="html">&lt;p&gt;Well, I don&amp;#8217;t have time to go into a lot of detail, but I thought I&amp;#8217;d
+give a recap of what&amp;#8217;s going on. I went down to Mount Holly, &lt;span class="caps"&gt;NJ&lt;/span&gt;
+yestserday morning - about a 2-/12 hour drive each way, and picked up a
+41U rack for …&lt;/p&gt;</summary><content type="html">&lt;p&gt;Well, I don&amp;#8217;t have time to go into a lot of detail, but I thought I&amp;#8217;d
 give a recap of what&amp;#8217;s going on. I went down to Mount Holly, &lt;span class="caps"&gt;NJ&lt;/span&gt;
 yestserday morning - about a 2-/12 hour drive each way, and picked up a
 41U rack for the basement. Pretty damn heavy, took me two hours to
@@ -953,7 +1000,10 @@ working - arguably the most important - for jasonantman.com only, though
 I have yet to setup any&amp;nbsp;aliases.&lt;/p&gt;
 &lt;p&gt;On the web side, I&amp;#8217;m working to setup name-based vhosts for all of the
 subdomains, but for some reason, blog is showing up for everything.
-Luckily it works right. So we&amp;#8217;ll&amp;nbsp;see&amp;#8230;.&lt;/p&gt;</summary><category term="firewall"></category><category term="optimum"></category><category term="rack"></category><category term="router"></category><category term="wan"></category></entry><entry><title>Big Changes to JasonAntman.com</title><link href="http://blog.jasonantman.com/2009/03/big-changes-to-jasonantmancom/" rel="alternate"></link><updated>2009-03-05T10:22:00-05:00</updated><author><name>admin</name></author><id>tag:blog.jasonantman.com,2009-03-05:2009/03/big-changes-to-jasonantmancom/</id><summary type="html">&lt;p&gt;Well, I finally broke down and ordered Optimum Business. Come tomorrow,
+Luckily it works right. So we&amp;#8217;ll&amp;nbsp;see&amp;#8230;.&lt;/p&gt;</content><category term="firewall"></category><category term="optimum"></category><category term="rack"></category><category term="router"></category><category term="wan"></category></entry><entry><title>Big Changes to JasonAntman.com</title><link href="http://blog.jasonantman.com/2009/03/big-changes-to-jasonantmancom/" rel="alternate"></link><published>2009-03-05T10:22:00-05:00</published><updated>2009-03-05T10:22:00-05:00</updated><author><name>admin</name></author><id>tag:blog.jasonantman.com,2009-03-05:/2009/03/big-changes-to-jasonantmancom/</id><summary type="html">&lt;p&gt;Well, I finally broke down and ordered Optimum Business. Come tomorrow,
+I&amp;#8217;ll be moving from Verizon FiOS residential with a dynamic &lt;span class="caps"&gt;IP&lt;/span&gt;, much
+blocked (hence jantman.dyndns.org:10011) and 10Mbps down/2Mbps up to
+Optimum Business with 30 down/5 up, a block of 5 static IPs, and …&lt;/p&gt;</summary><content type="html">&lt;p&gt;Well, I finally broke down and ordered Optimum Business. Come tomorrow,
 I&amp;#8217;ll be moving from Verizon FiOS residential with a dynamic &lt;span class="caps"&gt;IP&lt;/span&gt;, much
 blocked (hence jantman.dyndns.org:10011) and 10Mbps down/2Mbps up to
 Optimum Business with 30 down/5 up, a block of 5 static IPs, and no
@@ -1009,7 +1059,11 @@ test on my management&amp;nbsp;&lt;span class="caps"&gt;VLAN&lt;/span&gt;).&lt;/
     when the verizon.net email goes&amp;nbsp;away.&lt;/li&gt;
 &lt;/ol&gt;
 &lt;p&gt;So I might have some downtime this weekend, but when things come back
-up, I&amp;#8217;ll be done with this DynDNS and Port 10011&amp;nbsp;crap.&lt;/p&gt;</summary><category term="fios"></category><category term="optimum"></category><category term="vyatta"></category></entry><entry><title>Vyatta Initial Impressions</title><link href="http://blog.jasonantman.com/2009/02/vyatta-initial-impressions/" rel="alternate"></link><updated>2009-02-26T10:06:00-05:00</updated><author><name>admin</name></author><id>tag:blog.jasonantman.com,2009-02-26:2009/02/vyatta-initial-impressions/</id><summary type="html">&lt;p&gt;I&amp;#8217;m part-way through the major overhaul of my home network (hosting this
+up, I&amp;#8217;ll be done with this DynDNS and Port 10011&amp;nbsp;crap.&lt;/p&gt;</content><category term="fios"></category><category term="optimum"></category><category term="vyatta"></category></entry><entry><title>Vyatta Initial Impressions</title><link href="http://blog.jasonantman.com/2009/02/vyatta-initial-impressions/" rel="alternate"></link><published>2009-02-26T10:06:00-05:00</published><updated>2009-02-26T10:06:00-05:00</updated><author><name>admin</name></author><id>tag:blog.jasonantman.com,2009-02-26:/2009/02/vyatta-initial-impressions/</id><summary type="html">&lt;p&gt;I&amp;#8217;m part-way through the major overhaul of my home network (hosting this
+blog and everything else jasonantman.com) that I&amp;#8217;ve been planning for
+quite some time. The current hardware is&amp;#8230; uh&amp;#8230; currently&amp;#8230; described
+on my Hardware
+page, but I soon plan on ditching the wiki and moving to …&lt;/p&gt;</summary><content type="html">&lt;p&gt;I&amp;#8217;m part-way through the major overhaul of my home network (hosting this
 blog and everything else jasonantman.com) that I&amp;#8217;ve been planning for
 quite some time. The current hardware is&amp;#8230; uh&amp;#8230; currently&amp;#8230; described
 on my Hardware
@@ -1081,7 +1135,11 @@ work, but I&amp;#8217;m sure there are still plenty of links out there that will
 need dealing with (maybe keep port 10011 serving &lt;span class="caps"&gt;HTTP&lt;/span&gt; with a massive
 mod_rewrite script to redirect to the right place???), as well as
 checking everything on the web server to make sure there aren&amp;#8217;t any
-absolute URLs (like&amp;nbsp;WordPress).&lt;/p&gt;</summary><category term="cisco"></category><category term="networking"></category><category term="router"></category><category term="vyatta"></category></entry><entry><title>Wordpress Installation, Finished</title><link href="http://blog.jasonantman.com/2009/02/wordpress-installation-finished/" rel="alternate"></link><updated>2009-02-03T10:13:00-05:00</updated><author><name>admin</name></author><id>tag:blog.jasonantman.com,2009-02-03:2009/02/wordpress-installation-finished/</id><summary type="html">&lt;p&gt;Found this from a month and a half ago, waiting as a&amp;nbsp;draft:&lt;/p&gt;
+absolute URLs (like&amp;nbsp;WordPress).&lt;/p&gt;</content><category term="cisco"></category><category term="networking"></category><category term="router"></category><category term="vyatta"></category></entry><entry><title>Wordpress Installation, Finished</title><link href="http://blog.jasonantman.com/2009/02/wordpress-installation-finished/" rel="alternate"></link><published>2009-02-03T10:13:00-05:00</published><updated>2009-02-03T10:13:00-05:00</updated><author><name>admin</name></author><id>tag:blog.jasonantman.com,2009-02-03:/2009/02/wordpress-installation-finished/</id><summary type="html">&lt;p&gt;Found this from a month and a half ago, waiting as a&amp;nbsp;draft:&lt;/p&gt;
+&lt;p&gt;So, I mostly finished the WordPress installation. I got everything for
+WordPress up and running, tested my Blogger &lt;span class="caps"&gt;URL&lt;/span&gt; redirection script and
+then switched over my subdomain&amp;nbsp;redirection.&lt;/p&gt;
+&lt;p&gt;The blogger redirection takes two parts, but is in …&lt;/p&gt;</summary><content type="html">&lt;p&gt;Found this from a month and a half ago, waiting as a&amp;nbsp;draft:&lt;/p&gt;
 &lt;p&gt;So, I mostly finished the WordPress installation. I got everything for
 WordPress up and running, tested my Blogger &lt;span class="caps"&gt;URL&lt;/span&gt; redirection script and
 then switched over my subdomain&amp;nbsp;redirection.&lt;/p&gt;
@@ -1089,7 +1147,7 @@ then switched over my subdomain&amp;nbsp;redirection.&lt;/p&gt;
 First, I went into the directory where the Blogger content had lived -
 &lt;code&gt;/srv/www/htdocs/blog&lt;/code&gt; and moved everything in there into another
 directory, out of the way. I then created a .htaccess in the directory&amp;nbsp;like:&lt;/p&gt;
-&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="nt"&gt;&amp;lt;IfModule&lt;/span&gt; &lt;span class="s"&gt;mod_rewrite.c&lt;/span&gt;&lt;span class="nt"&gt;&amp;gt;&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="nt"&gt;&amp;lt;IfModule&lt;/span&gt; &lt;span class="s"&gt;mod_rewrite.c&lt;/span&gt;&lt;span class="nt"&gt;&amp;gt;&lt;/span&gt;
 &lt;span class="nb"&gt;RewriteEngine&lt;/span&gt; &lt;span class="k"&gt;On&lt;/span&gt;
 &lt;span class="nb"&gt;RewriteBase&lt;/span&gt; &lt;span class="sx"&gt;/blog/&lt;/span&gt;
 &lt;span class="nb"&gt;RewriteCond&lt;/span&gt; %{REQUEST_FILENAME} !-f
@@ -1114,7 +1172,7 @@ table with a &lt;code&gt;meta_key&lt;/code&gt; of &amp;#8220;blogger_permalink&a
 Blogger permalink matching the title from the Blogger &lt;span class="caps"&gt;URL&lt;/span&gt;, found the
 corresponding post &lt;span class="caps"&gt;ID&lt;/span&gt; and redirected to the proper new &lt;span class="caps"&gt;WP&lt;/span&gt;&amp;nbsp;&lt;span class="caps"&gt;URL&lt;/span&gt;.&lt;/p&gt;
 &lt;p&gt;The code for index.php, for me, looks something&amp;nbsp;like:&lt;/p&gt;
-&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="cp"&gt;&amp;lt;?php&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="cp"&gt;&amp;lt;?php&lt;/span&gt;
 &lt;span class="c1"&gt;// redirect old Blogger URLs in /blog to new WordPress in /wp&lt;/span&gt;
 &lt;span class="nv"&gt;$request&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nb"&gt;mysql_real_escape_string&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;str_replace&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;/blog&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nv"&gt;$_SERVER&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;REQUEST_URI&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;]));&lt;/span&gt;
 
@@ -1123,33 +1181,33 @@ corresponding post &lt;span class="caps"&gt;ID&lt;/span&gt; and redirected to th
 &lt;span class="k"&gt;if&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;strpos&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;$request&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;_archive.html&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
 &lt;span class="p"&gt;{&lt;/span&gt;
     &lt;span class="c1"&gt;// redirect to an archive&lt;/span&gt;
-    &lt;span class="nv"&gt;$request&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nx"&gt;substr&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;$request&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nb"&gt;strpos&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;$request&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;/&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="o"&gt;+&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+    &lt;span class="nv"&gt;$request&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nb"&gt;substr&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;$request&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nb"&gt;strpos&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;$request&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;/&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="o"&gt;+&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
     &lt;span class="nv"&gt;$ary&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nb"&gt;explode&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;_&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nv"&gt;$request&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
     &lt;span class="nv"&gt;$redirect_to&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;http://blog.jasonantman.com/&amp;quot;&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="nv"&gt;$ary&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;/&amp;quot;&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="nv"&gt;$ary&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;/&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
-    &lt;span class="nx"&gt;header&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;Location: &amp;quot;&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="nv"&gt;$redirect_to&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+    &lt;span class="nb"&gt;header&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;Location: &amp;quot;&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="nv"&gt;$redirect_to&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
     &lt;span class="k"&gt;die&lt;/span&gt;&lt;span class="p"&gt;();&lt;/span&gt;
 &lt;span class="p"&gt;}&lt;/span&gt;
 &lt;span class="k"&gt;elseif&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;strpos&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;$request&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;labels/&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
 &lt;span class="p"&gt;{&lt;/span&gt;
     &lt;span class="c1"&gt;// redirect to a tag page&lt;/span&gt;
-    &lt;span class="nv"&gt;$redirect_to&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nx"&gt;substr&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;$request&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nb"&gt;strpos&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;$request&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;labels/&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="o"&gt;+&lt;/span&gt;&lt;span class="mi"&gt;7&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+    &lt;span class="nv"&gt;$redirect_to&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nb"&gt;substr&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;$request&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nb"&gt;strpos&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;$request&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;labels/&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="o"&gt;+&lt;/span&gt;&lt;span class="mi"&gt;7&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
     &lt;span class="nv"&gt;$redirect_to&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nb"&gt;str_replace&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;.html&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nv"&gt;$redirect_to&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
     &lt;span class="nv"&gt;$redirect_to&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nb"&gt;urldecode&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;$redirect_to&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
     &lt;span class="nv"&gt;$redirect_to&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nb"&gt;str_replace&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot; &amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;-&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nv"&gt;$redirect_to&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
-    &lt;span class="nv"&gt;$redirect_to&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;http://blog.jasonantman.com/tags/&amp;quot;&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;strtolower&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;$redirect_to&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;/&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
-    &lt;span class="nx"&gt;header&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;Location: &amp;quot;&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="nv"&gt;$redirect_to&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+    &lt;span class="nv"&gt;$redirect_to&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;http://blog.jasonantman.com/tags/&amp;quot;&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="nb"&gt;strtolower&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;$redirect_to&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;/&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+    &lt;span class="nb"&gt;header&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;Location: &amp;quot;&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="nv"&gt;$redirect_to&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
     &lt;span class="k"&gt;die&lt;/span&gt;&lt;span class="p"&gt;();&lt;/span&gt;
 &lt;span class="p"&gt;}&lt;/span&gt;
 &lt;span class="k"&gt;elseif&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;strpos&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;$request&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;/blogger.html&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
 &lt;span class="p"&gt;{&lt;/span&gt;
     &lt;span class="c1"&gt;// redirect to main blog&lt;/span&gt;
-    &lt;span class="nx"&gt;header&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;Location: http://blog.jasonantman.com/&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+    &lt;span class="nb"&gt;header&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;Location: http://blog.jasonantman.com/&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
     &lt;span class="k"&gt;die&lt;/span&gt;&lt;span class="p"&gt;();&lt;/span&gt;
 &lt;span class="p"&gt;}&lt;/span&gt;
 &lt;span class="k"&gt;elseif&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;strpos&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;$request&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;/atom.xml&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
 &lt;span class="p"&gt;{&lt;/span&gt;
     &lt;span class="c1"&gt;// redirect to new feed&lt;/span&gt;
-    &lt;span class="nx"&gt;header&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;Location: http://blog.jasonantman.com/feed/&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+    &lt;span class="nb"&gt;header&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;Location: http://blog.jasonantman.com/feed/&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
     &lt;span class="k"&gt;die&lt;/span&gt;&lt;span class="p"&gt;();&lt;/span&gt;
 &lt;span class="p"&gt;}&lt;/span&gt;
 
@@ -1230,7 +1288,10 @@ RewriteRules or redirect rules to replace
 &lt;code&gt;http://jantman.dyndns.org:10011/wp/&lt;/code&gt; with
 &lt;code&gt;http://blog.jasonantman.com/&lt;/code&gt;, update DynDNS with my new static &lt;span class="caps"&gt;IP&lt;/span&gt;, and
 keep a default vhost listening on 10011 to provide rule-based
-redirection to the new subdomain.&amp;nbsp;Eek.&lt;/p&gt;</summary><category term="apache"></category><category term="blogger"></category><category term="dynamic IP"></category><category term="wordpress"></category></entry><entry><title>WordPress… Finally!</title><link href="http://blog.jasonantman.com/2008/12/wordpress-finally/" rel="alternate"></link><updated>2008-12-17T15:58:00-05:00</updated><author><name>admin</name></author><id>tag:blog.jasonantman.com,2008-12-17:2008/12/wordpress-finally/</id><summary type="html">&lt;p&gt;Well, I finally bit the bullet. I woke up this morning, got in to work
+redirection to the new subdomain.&amp;nbsp;Eek.&lt;/p&gt;</content><category term="apache"></category><category term="blogger"></category><category term="dynamic IP"></category><category term="wordpress"></category></entry><entry><title>WordPress… Finally!</title><link href="http://blog.jasonantman.com/2008/12/wordpress-finally/" rel="alternate"></link><published>2008-12-17T15:58:00-05:00</published><updated>2008-12-17T15:58:00-05:00</updated><author><name>admin</name></author><id>tag:blog.jasonantman.com,2008-12-17:/2008/12/wordpress-finally/</id><summary type="html">&lt;p&gt;Well, I finally bit the bullet. I woke up this morning, got in to work
+(slow day) and said to myself, &amp;#8220;My blog&amp;#8217;s finally moving to WordPress.
+Today.&amp;#8221; So, I read through the docs (really psyched about the Blogger
+import feature), downloaded 2.7 (latest), setup the &lt;span class="caps"&gt;DB&lt;/span&gt; and …&lt;/p&gt;</summary><content type="html">&lt;p&gt;Well, I finally bit the bullet. I woke up this morning, got in to work
 (slow day) and said to myself, &amp;#8220;My blog&amp;#8217;s finally moving to WordPress.
 Today.&amp;#8221; So, I read through the docs (really psyched about the Blogger
 import feature), downloaded 2.7 (latest), setup the &lt;span class="caps"&gt;DB&lt;/span&gt; and installed
@@ -1318,7 +1379,10 @@ WordPress and running, and have a theme. The action plan for tonight&amp;nbsp;in
 &lt;li&gt;Adding the buttons/plugins for del.icio.us, Digg, Slashdot, reddit,&amp;nbsp;etc.&lt;/li&gt;
 &lt;li&gt;Redirecting my main blog page to&amp;nbsp;WordPress.&lt;/li&gt;
 &lt;li&gt;Redirecting or linking my old feed locations to&amp;nbsp;WordPress.&lt;/li&gt;
-&lt;/ul&gt;</summary><category term="blogger"></category><category term="blogging"></category><category term="PHP"></category><category term="wordpress"></category></entry><entry><title>Update</title><link href="http://blog.jasonantman.com/2008/10/update-3/" rel="alternate"></link><updated>2008-10-24T12:50:00-04:00</updated><author><name>admin</name></author><id>tag:blog.jasonantman.com,2008-10-24:2008/10/update-3/</id><summary type="html">&lt;p&gt;It&amp;#8217;s been a long month and a half or so. A bunch of new projects at work
+&lt;/ul&gt;</content><category term="blogger"></category><category term="blogging"></category><category term="PHP"></category><category term="wordpress"></category></entry><entry><title>Update</title><link href="http://blog.jasonantman.com/2008/10/update-3/" rel="alternate"></link><published>2008-10-24T12:50:00-04:00</published><updated>2008-10-24T12:50:00-04:00</updated><author><name>admin</name></author><id>tag:blog.jasonantman.com,2008-10-24:/2008/10/update-3/</id><summary type="html">&lt;p&gt;It&amp;#8217;s been a long month and a half or so. A bunch of new projects at work
+(and interviewing for a full-time position) and lots of school stuff,
+all on top of having my truck stolen, dealing with insurance and the
+police, and then recovering it, and dealing with …&lt;/p&gt;</summary><content type="html">&lt;p&gt;It&amp;#8217;s been a long month and a half or so. A bunch of new projects at work
 (and interviewing for a full-time position) and lots of school stuff,
 all on top of having my truck stolen, dealing with insurance and the
 police, and then recovering it, and dealing with insurance again. It&amp;#8217;s a
@@ -1365,7 +1429,11 @@ web-based forms and data to the desktop of my phone. It&amp;#8217;s the simplici
 that is my biggest interest - even for simple purposes, like converting
 the web-based fuel log I keep for my car(s) to a dedicated Java-based
 form on my&amp;nbsp;phone.&lt;/p&gt;
-&lt;p&gt;Stay&amp;nbsp;tuned&amp;#8230;&lt;/p&gt;</summary><category term="android"></category><category term="g1"></category><category term="google"></category></entry><entry><title>New Project - Blog Migration to WordPress</title><link href="http://blog.jasonantman.com/2008/09/new-project-blog-migration-to-wordpress/" rel="alternate"></link><updated>2008-09-18T12:49:00-04:00</updated><author><name>admin</name></author><id>tag:blog.jasonantman.com,2008-09-18:2008/09/new-project-blog-migration-to-wordpress/</id><summary type="html">&lt;p&gt;For quite some time, I&amp;#8217;ve been frustrated with Blogger. First of all,
+&lt;p&gt;Stay&amp;nbsp;tuned&amp;#8230;&lt;/p&gt;</content><category term="android"></category><category term="g1"></category><category term="google"></category></entry><entry><title>New Project - Blog Migration to WordPress</title><link href="http://blog.jasonantman.com/2008/09/new-project-blog-migration-to-wordpress/" rel="alternate"></link><published>2008-09-18T12:49:00-04:00</published><updated>2008-09-18T12:49:00-04:00</updated><author><name>admin</name></author><id>tag:blog.jasonantman.com,2008-09-18:/2008/09/new-project-blog-migration-to-wordpress/</id><summary type="html">&lt;p&gt;For quite some time, I&amp;#8217;ve been frustrated with Blogger. First of all,
+its&amp;#8217; publishing system is horribly inefficient. As everything is static
+&lt;span class="caps"&gt;HTML&lt;/span&gt;, at this point, writing this blog entry alone will require it to
+re-publish approximately &lt;strong&gt;6 &lt;span class="caps"&gt;MB&lt;/span&gt;&lt;/strong&gt; to my server. Seems sort&amp;#8217;a pointless.
+Not to mention …&lt;/p&gt;</summary><content type="html">&lt;p&gt;For quite some time, I&amp;#8217;ve been frustrated with Blogger. First of all,
 its&amp;#8217; publishing system is horribly inefficient. As everything is static
 &lt;span class="caps"&gt;HTML&lt;/span&gt;, at this point, writing this blog entry alone will require it to
 re-publish approximately &lt;strong&gt;6 &lt;span class="caps"&gt;MB&lt;/span&gt;&lt;/strong&gt; to my server. Seems sort&amp;#8217;a pointless.
@@ -1386,7 +1454,10 @@ get my multiple static &lt;span class="caps"&gt;IP&lt;/span&gt; service from &lt
 Online&lt;/a&gt;, as the new blog (and the rest of my
 subdomains) will be moved from GoDaddy forwarding to their own
 subdomains setup as Apache name-based&amp;nbsp;VHosts.&lt;/p&gt;
-&lt;p&gt;Stay tuned for progress&amp;nbsp;updates&amp;#8230;&lt;/p&gt;</summary><category term="blog"></category><category term="wordpress"></category></entry><entry><title>Hardware Inventory System</title><link href="http://blog.jasonantman.com/2008/09/hardware-inventory-system/" rel="alternate"></link><updated>2008-09-12T13:01:00-04:00</updated><author><name>admin</name></author><id>tag:blog.jasonantman.com,2008-09-12:2008/09/hardware-inventory-system/</id><summary type="html">&lt;p&gt;After a few crazy weeks at work, the pay check is finally here, and I&amp;#8217;ve
+&lt;p&gt;Stay tuned for progress&amp;nbsp;updates&amp;#8230;&lt;/p&gt;</content><category term="blog"></category><category term="wordpress"></category></entry><entry><title>Hardware Inventory System</title><link href="http://blog.jasonantman.com/2008/09/hardware-inventory-system/" rel="alternate"></link><published>2008-09-12T13:01:00-04:00</published><updated>2008-09-12T13:01:00-04:00</updated><author><name>admin</name></author><id>tag:blog.jasonantman.com,2008-09-12:/2008/09/hardware-inventory-system/</id><summary type="html">&lt;p&gt;After a few crazy weeks at work, the pay check is finally here, and I&amp;#8217;ve
+decided to allocate some of the money to hardware upgrades of my
+personal machines. While &lt;a href="http://www.nagios.org"&gt;Nagios&lt;/a&gt; gives me a good
+idea of where performance is a problem, I&amp;#8217;m still running a large amount …&lt;/p&gt;</summary><content type="html">&lt;p&gt;After a few crazy weeks at work, the pay check is finally here, and I&amp;#8217;ve
 decided to allocate some of the money to hardware upgrades of my
 personal machines. While &lt;a href="http://www.nagios.org"&gt;Nagios&lt;/a&gt; gives me a good
 idea of where performance is a problem, I&amp;#8217;m still running a large amount
@@ -1444,7 +1515,11 @@ machines that may be running &amp;#8220;forgotten&amp;#8221;&amp;nbsp;services:&
 &lt;/ul&gt;
 &lt;p&gt;I&amp;#8217;ll be checking out some options today. Unfortunately, I have a feeling
 that there&amp;#8217;s most likely nothing that supports my requirements, and I&amp;#8217;ll
-probably end up implementing a lot of this&amp;nbsp;myself.&lt;/p&gt;</summary><category term="configuration"></category><category term="inventory"></category></entry><entry><title>Possible Downtime this weekend</title><link href="http://blog.jasonantman.com/2008/09/possible-downtime-this-weekend/" rel="alternate"></link><updated>2008-09-04T23:03:00-04:00</updated><author><name>admin</name></author><id>tag:blog.jasonantman.com,2008-09-04:2008/09/possible-downtime-this-weekend/</id><summary type="html">&lt;p&gt;Tropical Storm &lt;a href="http://www.nhc.noaa.gov/#HANNA"&gt;Hanna&lt;/a&gt; is expected to
+probably end up implementing a lot of this&amp;nbsp;myself.&lt;/p&gt;</content><category term="configuration"></category><category term="inventory"></category></entry><entry><title>Possible Downtime this weekend</title><link href="http://blog.jasonantman.com/2008/09/possible-downtime-this-weekend/" rel="alternate"></link><published>2008-09-04T23:03:00-04:00</published><updated>2008-09-04T23:03:00-04:00</updated><author><name>admin</name></author><id>tag:blog.jasonantman.com,2008-09-04:/2008/09/possible-downtime-this-weekend/</id><summary type="html">&lt;p&gt;Tropical Storm &lt;a href="http://www.nhc.noaa.gov/#HANNA"&gt;Hanna&lt;/a&gt; is expected to
+reach the New Jersey area on Saturday, September 6, 2008. The latest
+predictions as of 20:00 September 4&lt;sup&gt;th&lt;/sup&gt; call for winds from 30-60 &lt;span class="caps"&gt;MPH&lt;/span&gt;
+and rainfall possibly in excess of 5 inches, at a rate of 1-1.5 inches
+per hour (as …&lt;/p&gt;</summary><content type="html">&lt;p&gt;Tropical Storm &lt;a href="http://www.nhc.noaa.gov/#HANNA"&gt;Hanna&lt;/a&gt; is expected to
 reach the New Jersey area on Saturday, September 6, 2008. The latest
 predictions as of 20:00 September 4&lt;sup&gt;th&lt;/sup&gt; call for winds from 30-60 &lt;span class="caps"&gt;MPH&lt;/span&gt;
 and rainfall possibly in excess of 5 inches, at a rate of 1-1.5 inches
@@ -1455,7 +1530,12 @@ Management&lt;/a&gt;).&lt;/p&gt;
 unscheduled downtime - mainly due to the fact that my internet
 connection (Verizon FiOS fiber, right now) is run with suspended
 pole-to-pole cables. If this does happen (and power is still available)
-I&amp;#8217;ll make an effort to use the downtime as best as&amp;nbsp;possible.&lt;/p&gt;</summary><category term="downtime"></category><category term="emergency"></category><category term="hanna"></category></entry><entry><title>Massive Updates</title><link href="http://blog.jasonantman.com/2008/07/massive-updates/" rel="alternate"></link><updated>2008-07-17T12:28:00-04:00</updated><author><name>admin</name></author><id>tag:blog.jasonantman.com,2008-07-17:2008/07/massive-updates/</id><summary type="html">&lt;p&gt;I know I&amp;#8217;ve been quite for a while. I&amp;#8217;ve been quite busy. Unfortunately,
+I&amp;#8217;ll make an effort to use the downtime as best as&amp;nbsp;possible.&lt;/p&gt;</content><category term="downtime"></category><category term="emergency"></category><category term="hanna"></category></entry><entry><title>Massive Updates</title><link href="http://blog.jasonantman.com/2008/07/massive-updates/" rel="alternate"></link><published>2008-07-17T12:28:00-04:00</published><updated>2008-07-17T12:28:00-04:00</updated><author><name>admin</name></author><id>tag:blog.jasonantman.com,2008-07-17:/2008/07/massive-updates/</id><summary type="html">&lt;p&gt;I know I&amp;#8217;ve been quite for a while. I&amp;#8217;ve been quite busy. Unfortunately,
+due to changing priorities, there are a lot of projects I&amp;#8217;ve been
+working on, but few of them have gotten finished. A sampling, in no
+specific&amp;nbsp;order:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Migrating my network/service monitoring to Nagios …&lt;/li&gt;&lt;/ul&gt;</summary><content type="html">&lt;p&gt;I know I&amp;#8217;ve been quite for a while. I&amp;#8217;ve been quite busy. Unfortunately,
 due to changing priorities, there are a lot of projects I&amp;#8217;ve been
 working on, but few of them have gotten finished. A sampling, in no
 specific&amp;nbsp;order:&lt;/p&gt;
@@ -1530,7 +1610,12 @@ specific&amp;nbsp;order:&lt;/p&gt;
 &lt;p&gt;I&amp;#8217;m sure I missed something big, but I&amp;#8217;ll update as needed, and attempt
 to make it a daily habit to post something interesting or, at the very
 least, hard-to-find. After all, I&amp;#8217;m sure that I use this blog and my
-wiki as an informational resource (my bad memory) more than anyone else&amp;nbsp;would&amp;#8230;&lt;/p&gt;</summary><category term="access point"></category><category term="alix"></category><category term="BlackLabAuth"></category><category term="mythtv"></category><category term="Nagios"></category><category term="pc engines"></category><category term="soekris"></category><category term="tuxostat"></category><category term="WifiDog"></category><category term="wireless"></category></entry><entry><title>JavaScript and Emacs, and updates</title><link href="http://blog.jasonantman.com/2008/07/javascript-and-emacs-and-updates/" rel="alternate"></link><updated>2008-07-01T11:09:00-04:00</updated><author><name>admin</name></author><id>tag:blog.jasonantman.com,2008-07-01:2008/07/javascript-and-emacs-and-updates/</id><summary type="html">&lt;p&gt;Well, thankfully, summer classes are almost over (tomorrow is the last
+wiki as an informational resource (my bad memory) more than anyone else&amp;nbsp;would&amp;#8230;&lt;/p&gt;</content><category term="access point"></category><category term="alix"></category><category term="BlackLabAuth"></category><category term="mythtv"></category><category term="Nagios"></category><category term="pc engines"></category><category term="soekris"></category><category term="tuxostat"></category><category term="WifiDog"></category><category term="wireless"></category></entry><entry><title>JavaScript and Emacs, and updates</title><link href="http://blog.jasonantman.com/2008/07/javascript-and-emacs-and-updates/" rel="alternate"></link><published>2008-07-01T11:09:00-04:00</published><updated>2008-07-01T11:09:00-04:00</updated><author><name>admin</name></author><id>tag:blog.jasonantman.com,2008-07-01:/2008/07/javascript-and-emacs-and-updates/</id><summary type="html">&lt;p&gt;Well, thankfully, summer classes are almost over (tomorrow is the last
+class). I have a big paper to write for one of them, due at the worst
+time possible - July 5th. The day after what is, probably, one of the
+busiest days of the year for the &lt;a href="http://www.midlandparkambulance.com"&gt;ambulance
+corps&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;In …&lt;/strong&gt;&lt;/p&gt;</summary><content type="html">&lt;p&gt;Well, thankfully, summer classes are almost over (tomorrow is the last
 class). I have a big paper to write for one of them, due at the worst
 time possible - July 5th. The day after what is, probably, one of the
 busiest days of the year for the &lt;a href="http://www.midlandparkambulance.com"&gt;ambulance
@@ -1566,7 +1651,14 @@ Emacs&lt;/a&gt;.
 Not only does it seem cool, but it was also the only one I could find
 that does syntax highlighting and sane indentation (important for copied
 code snippets). So, I grabbed it from &lt;a href="http://code.google.com/p/js2-mode/"&gt;Google
-Code&lt;/a&gt; and -&amp;nbsp;viola!&lt;/p&gt;</summary><category term="ajax"></category><category term="call report"></category><category term="dhtml"></category><category term="javascript"></category><category term="pcr"></category><category term="tuxostat"></category><category term="tuxtruck"></category></entry><entry><title>Custom MediaWiki Sidebar; New Blog?</title><link href="http://blog.jasonantman.com/2008/06/custom-mediawiki-sidebar-new-blog/" rel="alternate"></link><updated>2008-06-18T22:26:00-04:00</updated><author><name>admin</name></author><id>tag:blog.jasonantman.com,2008-06-18:2008/06/custom-mediawiki-sidebar-new-blog/</id><summary type="html">&lt;p&gt;As you may have noticed, some &lt;a href="http://www.spreadfirefox.com/node&amp;amp;id=238326&amp;amp;t=305"&gt;Firefox
+Code&lt;/a&gt; and -&amp;nbsp;viola!&lt;/p&gt;</content><category term="ajax"></category><category term="call report"></category><category term="dhtml"></category><category term="javascript"></category><category term="pcr"></category><category term="tuxostat"></category><category term="tuxtruck"></category></entry><entry><title>Custom MediaWiki Sidebar; New Blog?</title><link href="http://blog.jasonantman.com/2008/06/custom-mediawiki-sidebar-new-blog/" rel="alternate"></link><published>2008-06-18T22:26:00-04:00</published><updated>2008-06-18T22:26:00-04:00</updated><author><name>admin</name></author><id>tag:blog.jasonantman.com,2008-06-18:/2008/06/custom-mediawiki-sidebar-new-blog/</id><summary type="html">&lt;p&gt;As you may have noticed, some &lt;a href="http://www.spreadfirefox.com/node&amp;amp;id=238326&amp;amp;t=305"&gt;Firefox
+3&lt;/a&gt;
+&lt;a href="http://www.spreadfirefox.com/?q=affiliates/homepage"&gt;buttons&lt;/a&gt; have
+popped up not only here on my blog, but also on my
+&lt;a href="http://www.jasonantman.com/"&gt;wiki&lt;/a&gt;. While adding the buttons to
+&lt;a href="http://www.blogger.com/"&gt;Blogger&lt;/a&gt; was a simple addition to the
+template, getting them in the sidebar of MediaWiki wasn&amp;#8217;t exactly as
+easy (yeah, I …&lt;/p&gt;</summary><content type="html">&lt;p&gt;As you may have noticed, some &lt;a href="http://www.spreadfirefox.com/node&amp;amp;id=238326&amp;amp;t=305"&gt;Firefox
 3&lt;/a&gt;
 &lt;a href="http://www.spreadfirefox.com/?q=affiliates/homepage"&gt;buttons&lt;/a&gt; have
 popped up not only here on my blog, but also on my
@@ -1587,21 +1679,21 @@ of the &lt;code&gt;foreach ($this-&amp;gt;data['sidebar'] as $bar =&amp;gt; $con
 threw the button in a box directly above the search box, and below all
 of my sidebar&amp;nbsp;links.&lt;/p&gt;
 &lt;p&gt;The code looked something&amp;nbsp;like:&lt;/p&gt;
-&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="cp"&gt;&amp;lt;?php } ?&amp;gt;&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="cp"&gt;&amp;lt;?php } ?&amp;gt;&lt;/span&gt;
 &lt;span class="c"&gt;&amp;lt;!-- firefox link added to MonoBook.php by jantman 2008-06-18 --&amp;gt;&lt;/span&gt;
-&lt;span class="nt"&gt;&amp;lt;div&lt;/span&gt; &lt;span class="na"&gt;class=&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;portlet&amp;#39;&lt;/span&gt; &lt;span class="na"&gt;id=&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;p-logos&amp;#39;&lt;/span&gt;&lt;span class="nt"&gt;&amp;gt;&lt;/span&gt;
-&lt;span class="nt"&gt;&amp;lt;h5&amp;gt;&lt;/span&gt;Cool Stuff&lt;span class="nt"&gt;&amp;lt;/h5&amp;gt;&lt;/span&gt;
-&lt;span class="nt"&gt;&amp;lt;div&lt;/span&gt; &lt;span class="na"&gt;class=&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;pBody&amp;#39;&lt;/span&gt;&lt;span class="nt"&gt;&amp;gt;&lt;/span&gt;
-&lt;span class="nt"&gt;&amp;lt;ul&amp;gt;&lt;/span&gt;
-&lt;span class="nt"&gt;&amp;lt;li&amp;gt;&amp;lt;a&lt;/span&gt; &lt;span class="na"&gt;href=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;http://www.spreadfirefox.com/node&amp;amp;id=238326&amp;amp;t=305&amp;quot;&lt;/span&gt; &lt;span class="na"&gt;target=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;_blank&amp;quot;&lt;/span&gt;&lt;span class="nt"&gt;&amp;gt;&lt;/span&gt;
-&lt;span class="nt"&gt;&amp;lt;img&lt;/span&gt; &lt;span class="na"&gt;border=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;0&amp;quot;&lt;/span&gt; &lt;span class="na"&gt;alt=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;Firefox 3&amp;quot;&lt;/span&gt; &lt;span class="na"&gt;title=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;Firefox 3&amp;quot;&lt;/span&gt; &lt;span class="na"&gt;src=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;http://sfx-images.mozilla.org/affiliates/Buttons/firefox3/110x32_best-yet.png&amp;quot;&lt;/span&gt;&lt;span class="nt"&gt;/&amp;gt;&lt;/span&gt;
-&lt;span class="nt"&gt;&amp;lt;/a&amp;gt;&lt;/span&gt;
-&lt;span class="nt"&gt;&amp;lt;/li&amp;gt;&lt;/span&gt;
-&lt;span class="nt"&gt;&amp;lt;/ul&amp;gt;&lt;/span&gt;
-&lt;span class="nt"&gt;&amp;lt;/div&amp;gt;&lt;/span&gt;
-&lt;span class="nt"&gt;&amp;lt;/div&amp;gt;&lt;/span&gt;
+&lt;span class="p"&gt;&amp;lt;&lt;/span&gt;&lt;span class="nt"&gt;div&lt;/span&gt; &lt;span class="na"&gt;class&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;portlet&amp;#39;&lt;/span&gt; &lt;span class="na"&gt;id&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;p-logos&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;&amp;gt;&lt;/span&gt;
+&lt;span class="p"&gt;&amp;lt;&lt;/span&gt;&lt;span class="nt"&gt;h5&lt;/span&gt;&lt;span class="p"&gt;&amp;gt;&lt;/span&gt;Cool Stuff&lt;span class="p"&gt;&amp;lt;/&lt;/span&gt;&lt;span class="nt"&gt;h5&lt;/span&gt;&lt;span class="p"&gt;&amp;gt;&lt;/span&gt;
+&lt;span class="p"&gt;&amp;lt;&lt;/span&gt;&lt;span class="nt"&gt;div&lt;/span&gt; &lt;span class="na"&gt;class&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;pBody&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;&amp;gt;&lt;/span&gt;
+&lt;span class="p"&gt;&amp;lt;&lt;/span&gt;&lt;span class="nt"&gt;ul&lt;/span&gt;&lt;span class="p"&gt;&amp;gt;&lt;/span&gt;
+&lt;span class="p"&gt;&amp;lt;&lt;/span&gt;&lt;span class="nt"&gt;li&lt;/span&gt;&lt;span class="p"&gt;&amp;gt;&amp;lt;&lt;/span&gt;&lt;span class="nt"&gt;a&lt;/span&gt; &lt;span class="na"&gt;href&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;http://www.spreadfirefox.com/node&amp;amp;id=238326&amp;amp;t=305&amp;quot;&lt;/span&gt; &lt;span class="na"&gt;target&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;_blank&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;&amp;gt;&lt;/span&gt;
+&lt;span class="p"&gt;&amp;lt;&lt;/span&gt;&lt;span class="nt"&gt;img&lt;/span&gt; &lt;span class="na"&gt;border&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;0&amp;quot;&lt;/span&gt; &lt;span class="na"&gt;alt&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;Firefox 3&amp;quot;&lt;/span&gt; &lt;span class="na"&gt;title&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;Firefox 3&amp;quot;&lt;/span&gt; &lt;span class="na"&gt;src&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;http://sfx-images.mozilla.org/affiliates/Buttons/firefox3/110x32_best-yet.png&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;/&amp;gt;&lt;/span&gt;
+&lt;span class="p"&gt;&amp;lt;/&lt;/span&gt;&lt;span class="nt"&gt;a&lt;/span&gt;&lt;span class="p"&gt;&amp;gt;&lt;/span&gt;
+&lt;span class="p"&gt;&amp;lt;/&lt;/span&gt;&lt;span class="nt"&gt;li&lt;/span&gt;&lt;span class="p"&gt;&amp;gt;&lt;/span&gt;
+&lt;span class="p"&gt;&amp;lt;/&lt;/span&gt;&lt;span class="nt"&gt;ul&lt;/span&gt;&lt;span class="p"&gt;&amp;gt;&lt;/span&gt;
+&lt;span class="p"&gt;&amp;lt;/&lt;/span&gt;&lt;span class="nt"&gt;div&lt;/span&gt;&lt;span class="p"&gt;&amp;gt;&lt;/span&gt;
+&lt;span class="p"&gt;&amp;lt;/&lt;/span&gt;&lt;span class="nt"&gt;div&lt;/span&gt;&lt;span class="p"&gt;&amp;gt;&lt;/span&gt;
 &lt;span class="c"&gt;&amp;lt;!-- end firefox link --&amp;gt;&lt;/span&gt;
-&lt;span class="nt"&gt;&amp;lt;div&lt;/span&gt; &lt;span class="na"&gt;id=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;p-search&amp;quot;&lt;/span&gt; &lt;span class="na"&gt;class=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;portlet&amp;quot;&lt;/span&gt;&lt;span class="nt"&gt;&amp;gt;&lt;/span&gt;
+&lt;span class="p"&gt;&amp;lt;&lt;/span&gt;&lt;span class="nt"&gt;div&lt;/span&gt; &lt;span class="na"&gt;id&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;p-search&amp;quot;&lt;/span&gt; &lt;span class="na"&gt;class&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;portlet&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;&amp;gt;&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 
 
@@ -1619,7 +1711,10 @@ over all of my current posts, which Blogger chose to store in raw &lt;span class
 So there&amp;#8217;s going to be a lot of parsing on my&amp;nbsp;future&amp;#8230;&lt;/p&gt;
 &lt;p&gt;&lt;span class="caps"&gt;PS&lt;/span&gt; - When I get a new blog engine, I&amp;#8217;m also going to go for a slightly
 modified template that uses relative widths and placement - so that
-code, like the snippet here, fits the screen&amp;nbsp;correctly.&lt;/p&gt;</summary><category term="blog"></category><category term="firefox"></category><category term="mediawiki"></category><category term="PHP"></category></entry><entry><title>New Project</title><link href="http://blog.jasonantman.com/2008/06/new-project/" rel="alternate"></link><updated>2008-06-04T10:34:00-04:00</updated><author><name>admin</name></author><id>tag:blog.jasonantman.com,2008-06-04:2008/06/new-project/</id><summary type="html">&lt;p&gt;Well, TuxTruck has been temporarily put on the back burner. I priced out
+code, like the snippet here, fits the screen&amp;nbsp;correctly.&lt;/p&gt;</content><category term="blog"></category><category term="firefox"></category><category term="mediawiki"></category><category term="PHP"></category></entry><entry><title>New Project</title><link href="http://blog.jasonantman.com/2008/06/new-project/" rel="alternate"></link><published>2008-06-04T10:34:00-04:00</published><updated>2008-06-04T10:34:00-04:00</updated><author><name>admin</name></author><id>tag:blog.jasonantman.com,2008-06-04:/2008/06/new-project/</id><summary type="html">&lt;p&gt;Well, TuxTruck has been temporarily put on the back burner. I priced out
+the hardware, and it looks like a minimum of $1000, more like $1000 if I
+get what I had originally wanted. This is complicated by the fact that
+my roommates and I were just hit with a …&lt;/p&gt;</summary><content type="html">&lt;p&gt;Well, TuxTruck has been temporarily put on the back burner. I priced out
 the hardware, and it looks like a minimum of $1000, more like $1000 if I
 get what I had originally wanted. This is complicated by the fact that
 my roommates and I were just hit with a $220 electric bill. Mostly,
@@ -1686,7 +1781,11 @@ Thursday, version 1 should be up and running next&amp;nbsp;week.&lt;/p&gt;
 &lt;li&gt;A method of providing overrides of the programmed schedule on a
     single-instance basis, i.e. &amp;#8220;system completely off from 2008-06-06
     18:00 to 2008-06-08&amp;nbsp;15:00&amp;#8221;.&lt;/li&gt;
-&lt;/ol&gt;</summary><category term="1wire"></category><category term="automation"></category><category term="home control"></category><category term="linux"></category><category term="thermostat"></category></entry><entry><title>SunSPOT; CarPC; MediaWiki Logging</title><link href="http://blog.jasonantman.com/2008/05/sunspot-carpc-mediawiki-logging/" rel="alternate"></link><updated>2008-05-07T10:03:00-04:00</updated><author><name>admin</name></author><id>tag:blog.jasonantman.com,2008-05-07:2008/05/sunspot-carpc-mediawiki-logging/</id><summary type="html">&lt;p&gt;Well, finals season is upon me. That&amp;#8217;s probably why I haven&amp;#8217;t been
+&lt;/ol&gt;</content><category term="1wire"></category><category term="automation"></category><category term="home control"></category><category term="linux"></category><category term="thermostat"></category></entry><entry><title>SunSPOT; CarPC; MediaWiki Logging</title><link href="http://blog.jasonantman.com/2008/05/sunspot-carpc-mediawiki-logging/" rel="alternate"></link><published>2008-05-07T10:03:00-04:00</published><updated>2008-05-07T10:03:00-04:00</updated><author><name>admin</name></author><id>tag:blog.jasonantman.com,2008-05-07:/2008/05/sunspot-carpc-mediawiki-logging/</id><summary type="html">&lt;p&gt;Well, finals season is upon me. That&amp;#8217;s probably why I haven&amp;#8217;t been
+posting much lately (I haven&amp;#8217;t even been checking &lt;a href="http://reader.google.com/"&gt;Google
+Reader&lt;/a&gt; - I&amp;#8217;ll have to delete a few thousand
+entries when I get back into the swing of things). I&amp;#8217;ve been pretty
+busy, between studying …&lt;/p&gt;</summary><content type="html">&lt;p&gt;Well, finals season is upon me. That&amp;#8217;s probably why I haven&amp;#8217;t been
 posting much lately (I haven&amp;#8217;t even been checking &lt;a href="http://reader.google.com/"&gt;Google
 Reader&lt;/a&gt; - I&amp;#8217;ll have to delete a few thousand
 entries when I get back into the swing of things). I&amp;#8217;ve been pretty
@@ -1719,7 +1818,7 @@ the solution is obvious: a Linux-based
 &lt;a href="http://en.wikipedia.org/wiki/Carpc"&gt;CarPC&lt;/a&gt;. A nice little Mini-&lt;span class="caps"&gt;ATX&lt;/span&gt; box
 under a seat, with a 7&amp;#8221; pull-out touchscreen in the dash (replacing the
 factory radio). It&amp;#8217;s a big, complicated, and expensive project - but I
-want one, and I could use some experience with smaller systems.&lt;br /&gt;
+want one, and I could use some experience with smaller systems.&lt;br&gt;
 The major features I have&amp;nbsp;planned:&lt;/p&gt;
 &lt;ol&gt;
 &lt;li&gt;Realtime &lt;span class="caps"&gt;GPS&lt;/span&gt;&amp;nbsp;navigation&lt;/li&gt;
@@ -1770,7 +1869,11 @@ looking around in the database a bit, I found a few tables of&amp;nbsp;interest:
 &lt;p&gt;Table &amp;#8220;recentchanges&amp;#8221; holds a lot of data&amp;#8230; seemingly the entire
     life of the&amp;nbsp;wiki&lt;/p&gt;
 &lt;/li&gt;
-&lt;/ul&gt;</summary><category term="bluetooth"></category><category term="car"></category><category term="carpc"></category><category term="conres"></category><category term="gps"></category><category term="linux"></category><category term="mediawiki"></category><category term="novell"></category><category term="obd"></category><category term="rutgers"></category><category term="sun"></category><category term="sunspot"></category><category term="suse"></category><category term="tuxtruck"></category></entry><entry><title>Web Traffic for JasonAntman.com - Webalizer, Site Maps</title><link href="http://blog.jasonantman.com/2008/04/web-traffic-for-jasonantmancom-webalizer-site-maps/" rel="alternate"></link><updated>2008-04-22T15:52:00-04:00</updated><author><name>admin</name></author><id>tag:blog.jasonantman.com,2008-04-22:2008/04/web-traffic-for-jasonantmancom-webalizer-site-maps/</id><summary type="html">&lt;p&gt;I&amp;#8217;ve been working on the design of a town council campaign site for a
+&lt;/ul&gt;</content><category term="bluetooth"></category><category term="car"></category><category term="carpc"></category><category term="conres"></category><category term="gps"></category><category term="linux"></category><category term="mediawiki"></category><category term="novell"></category><category term="obd"></category><category term="rutgers"></category><category term="sun"></category><category term="sunspot"></category><category term="suse"></category><category term="tuxtruck"></category></entry><entry><title>Web Traffic for JasonAntman.com - Webalizer, Site Maps</title><link href="http://blog.jasonantman.com/2008/04/web-traffic-for-jasonantmancom-webalizer-site-maps/" rel="alternate"></link><published>2008-04-22T15:52:00-04:00</published><updated>2008-04-22T15:52:00-04:00</updated><author><name>admin</name></author><id>tag:blog.jasonantman.com,2008-04-22:/2008/04/web-traffic-for-jasonantmancom-webalizer-site-maps/</id><summary type="html">&lt;p&gt;I&amp;#8217;ve been working on the design of a town council campaign site for a
+friend - &lt;a href="http://www.mikennick08.com/"&gt;www.mikennick08.com&lt;/a&gt;. It&amp;#8217;s hosted
+by an additional Apache vhost on my personal server (and running off of
+port 10015 - ugh). I setup &lt;a href="http://www.mrunix.net/webalizer/"&gt;Webalizer&lt;/a&gt;
+for him, so I figured I&amp;#8217;d give my …&lt;/p&gt;</summary><content type="html">&lt;p&gt;I&amp;#8217;ve been working on the design of a town council campaign site for a
 friend - &lt;a href="http://www.mikennick08.com/"&gt;www.mikennick08.com&lt;/a&gt;. It&amp;#8217;s hosted
 by an additional Apache vhost on my personal server (and running off of
 port 10015 - ugh). I setup &lt;a href="http://www.mrunix.net/webalizer/"&gt;Webalizer&lt;/a&gt;
@@ -1812,7 +1915,10 @@ down / 5 Mbps&amp;nbsp;up!&lt;/p&gt;
 &lt;p&gt;Most of the previous projects have been put on hold for the time being
 (mainly because of impending final exams at school) - the new Gigabit
 Ethernet switch for backups, testing Zenoss and upgrading monitoring (to
-a new product or Nagios 3),&amp;nbsp;etc.&lt;/p&gt;</summary><category term="bacula"></category><category term="bandwidth"></category><category term="connectivity"></category><category term="ISP"></category><category term="Nagios"></category><category term="webalizer"></category></entry><entry><title>Where have I gone?</title><link href="http://blog.jasonantman.com/2008/03/where-have-i-gone/" rel="alternate"></link><updated>2008-03-25T09:07:00-04:00</updated><author><name>admin</name></author><id>tag:blog.jasonantman.com,2008-03-25:2008/03/where-have-i-gone/</id><summary type="html">&lt;p&gt;Well, it&amp;#8217;s been a while since I posted. Things have been horribly busy
+a new product or Nagios 3),&amp;nbsp;etc.&lt;/p&gt;</content><category term="bacula"></category><category term="bandwidth"></category><category term="connectivity"></category><category term="ISP"></category><category term="Nagios"></category><category term="webalizer"></category></entry><entry><title>Where have I gone?</title><link href="http://blog.jasonantman.com/2008/03/where-have-i-gone/" rel="alternate"></link><published>2008-03-25T09:07:00-04:00</published><updated>2008-03-25T09:07:00-04:00</updated><author><name>admin</name></author><id>tag:blog.jasonantman.com,2008-03-25:/2008/03/where-have-i-gone/</id><summary type="html">&lt;p&gt;Well, it&amp;#8217;s been a while since I posted. Things have been horribly busy
+in the school world, and I have some new projects I&amp;#8217;m working on as
+well. Unfortunately, due to limited resources at the moment, I haven&amp;#8217;t
+been able to give Zenoss a try. If I …&lt;/p&gt;</summary><content type="html">&lt;p&gt;Well, it&amp;#8217;s been a while since I posted. Things have been horribly busy
 in the school world, and I have some new projects I&amp;#8217;m working on as
 well. Unfortunately, due to limited resources at the moment, I haven&amp;#8217;t
 been able to give Zenoss a try. If I eventually find a nice 25-30U rack
@@ -1822,7 +1928,7 @@ JasonAntman.com&lt;/a&gt;
 six feet), I&amp;#8217;ll probably move one or two machines from my apartment back
 there, reorganize things, and setup a Zenoss test (*if* I can get Xen
 to play well with some &lt;span class="caps"&gt;OS&lt;/span&gt; that has Zenoss RPMs, or give up and compile
-from source).&lt;br /&gt;
+from source).&lt;br&gt;
 A few of my new&amp;nbsp;projects:&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;Some embedded Linux&amp;nbsp;work&lt;/li&gt;
@@ -1846,7 +1952,11 @@ all of the Google results, and figure out how old they are based on
 version numbers and which Palm devices are&amp;nbsp;listed.&lt;/p&gt;
 &lt;p&gt;And, from Rutgers Telecommunications, this is what RUwireless looked
 like over spring break, and the Monday that everyone came&amp;nbsp;back:&lt;/p&gt;
-&lt;p&gt;&lt;img alt="Rutgers daily traffic graph of sr02-hill012-svcs_vlan1000 on 2008-03-25" src="/GFX/blog/sr02-hill012-svcs_vlan1000-daily-2008-03-25-scaled.png" /&gt;&lt;/p&gt;</summary><category term="calendar"></category><category term="gps"></category><category term="kpilot"></category><category term="mdc1200"></category><category term="palm"></category><category term="rutgers"></category><category term="ruwireless"></category></entry><entry><title>Cable Management, Power Measurements, Major Outage, Cacti</title><link href="http://blog.jasonantman.com/2008/03/cable-management-power-measurements-major-outage-cacti/" rel="alternate"></link><updated>2008-03-06T01:02:00-05:00</updated><author><name>admin</name></author><id>tag:blog.jasonantman.com,2008-03-06:2008/03/cable-management-power-measurements-major-outage-cacti/</id><summary type="html">&lt;p&gt;So, once again, still really busy. But a few new&amp;nbsp;things.&lt;/p&gt;
+&lt;p&gt;&lt;img alt="Rutgers daily traffic graph of sr02-hill012-svcs_vlan1000 on 2008-03-25" src="/GFX/blog/sr02-hill012-svcs_vlan1000-daily-2008-03-25-scaled.png"&gt;&lt;/p&gt;</content><category term="calendar"></category><category term="gps"></category><category term="kpilot"></category><category term="mdc1200"></category><category term="palm"></category><category term="rutgers"></category><category term="ruwireless"></category></entry><entry><title>Cable Management, Power Measurements, Major Outage, Cacti</title><link href="http://blog.jasonantman.com/2008/03/cable-management-power-measurements-major-outage-cacti/" rel="alternate"></link><published>2008-03-06T01:02:00-05:00</published><updated>2008-03-06T01:02:00-05:00</updated><author><name>admin</name></author><id>tag:blog.jasonantman.com,2008-03-06:/2008/03/cable-management-power-measurements-major-outage-cacti/</id><summary type="html">&lt;p&gt;So, once again, still really busy. But a few new&amp;nbsp;things.&lt;/p&gt;
+&lt;p&gt;First, my racks both at home and at the apartment are atrocious. They
+have no cable management at all. Both started with 1-3 machines, and no
+real plans for upgrades (since they&amp;#8217;re just my personal/development
+machines). Unfortunately …&lt;/p&gt;</summary><content type="html">&lt;p&gt;So, once again, still really busy. But a few new&amp;nbsp;things.&lt;/p&gt;
 &lt;p&gt;First, my racks both at home and at the apartment are atrocious. They
 have no cable management at all. Both started with 1-3 machines, and no
 real plans for upgrades (since they&amp;#8217;re just my personal/development
@@ -1926,7 +2036,10 @@ gotten around to setting up &lt;a href="http://www.zenoss.com/"&gt;Zenoss&lt;/a&
 a quick (well, 4 hours later I&amp;#8217;m done configuring it)
 &lt;a href="http://www.cacti.net/"&gt;Cacti&lt;/a&gt;installation on my web server (I should
 already have it running on the monitoring box, but who knows what that
-will look like when I get&amp;nbsp;home).&lt;/p&gt;</summary><category term="apc"></category><category term="cable management"></category><category term="cacti"></category><category term="disaster"></category><category term="monitoring"></category><category term="power distribution"></category><category term="power failure"></category><category term="rack"></category><category term="UPS"></category></entry><entry><title>February 26, 2008</title><link href="http://blog.jasonantman.com/2008/02/february-26-2008/" rel="alternate"></link><updated>2008-02-26T11:32:00-05:00</updated><author><name>admin</name></author><id>tag:blog.jasonantman.com,2008-02-26:2008/02/february-26-2008/</id><summary type="html">&lt;p&gt;Well, while I haven&amp;#8217;t made much progress on anything interesting -
+will look like when I get&amp;nbsp;home).&lt;/p&gt;</content><category term="apc"></category><category term="cable management"></category><category term="cacti"></category><category term="disaster"></category><category term="monitoring"></category><category term="power distribution"></category><category term="power failure"></category><category term="rack"></category><category term="UPS"></category></entry><entry><title>February 26, 2008</title><link href="http://blog.jasonantman.com/2008/02/february-26-2008/" rel="alternate"></link><published>2008-02-26T11:32:00-05:00</published><updated>2008-02-26T11:32:00-05:00</updated><author><name>admin</name></author><id>tag:blog.jasonantman.com,2008-02-26:/2008/02/february-26-2008/</id><summary type="html">&lt;p&gt;Well, while I haven&amp;#8217;t made much progress on anything interesting -
+mainly my &lt;span class="caps"&gt;NMS&lt;/span&gt; comparison or any of my other projects - due to my busy
+schedule, I did get an hour or two to clean up my network at the
+apartment, swapping out my 24-port Linksys switch in my room …&lt;/p&gt;</summary><content type="html">&lt;p&gt;Well, while I haven&amp;#8217;t made much progress on anything interesting -
 mainly my &lt;span class="caps"&gt;NMS&lt;/span&gt; comparison or any of my other projects - due to my busy
 schedule, I did get an hour or two to clean up my network at the
 apartment, swapping out my 24-port Linksys switch in my room for the
@@ -2036,7 +2149,11 @@ means what it is announcing&amp;nbsp;today:&lt;/p&gt;
     software&amp;nbsp;products.&lt;/li&gt;
 &lt;/ul&gt;
 &lt;/blockquote&gt;
-&lt;p&gt;Amen!!!&lt;/p&gt;</summary><category term="GigE"></category><category term="microsoft"></category><category term="mythtv"></category><category term="sata"></category><category term="storage"></category></entry><entry><title>F/OSS Monitoring Comparison - Hyperic Part I</title><link href="http://blog.jasonantman.com/2008/02/foss-monitoring-comparison-hyperic-part-i/" rel="alternate"></link><updated>2008-02-08T16:54:00-05:00</updated><author><name>admin</name></author><id>tag:blog.jasonantman.com,2008-02-08:2008/02/foss-monitoring-comparison-hyperic-part-i/</id><summary type="html">&lt;p&gt;So, I&amp;#8217;ve made some headway on the comparison. I have Hyperic installed
+&lt;p&gt;Amen!!!&lt;/p&gt;</content><category term="GigE"></category><category term="microsoft"></category><category term="mythtv"></category><category term="sata"></category><category term="storage"></category></entry><entry><title>F/OSS Monitoring Comparison - Hyperic Part I</title><link href="http://blog.jasonantman.com/2008/02/foss-monitoring-comparison-hyperic-part-i/" rel="alternate"></link><published>2008-02-08T16:54:00-05:00</published><updated>2008-02-08T16:54:00-05:00</updated><author><name>admin</name></author><id>tag:blog.jasonantman.com,2008-02-08:/2008/02/foss-monitoring-comparison-hyperic-part-i/</id><summary type="html">&lt;p&gt;So, I&amp;#8217;ve made some headway on the comparison. I have Hyperic installed
+and partly configured, albeit without email alerts yet. I&amp;#8217;ve found some
+serious features that I need missing, but I&amp;#8217;m going to give it a full
+run before I move on to&amp;nbsp;another.&lt;/p&gt;
+&lt;p&gt;The full text …&lt;/p&gt;</summary><content type="html">&lt;p&gt;So, I&amp;#8217;ve made some headway on the comparison. I have Hyperic installed
 and partly configured, albeit without email alerts yet. I&amp;#8217;ve found some
 serious features that I need missing, but I&amp;#8217;m going to give it a full
 run before I move on to&amp;nbsp;another.&lt;/p&gt;
@@ -2156,82 +2273,82 @@ Here&amp;#8217;s a bit of an&amp;nbsp;excerpt:  &lt;/p&gt;
     out&amp;nbsp;agian.&lt;/li&gt;
 &lt;/ol&gt;
 &lt;p&gt;More to come in Part &lt;span class="caps"&gt;II&lt;/span&gt; tomorrow - actually doing something with
-Hyperic. For&lt;br /&gt;
+Hyperic. For&lt;br&gt;
 now (04:08), time to&amp;nbsp;sleep.&lt;/p&gt;
 &lt;h3 id="part-ii-configuration"&gt;Part &lt;span class="caps"&gt;II&lt;/span&gt; -&amp;nbsp;Configuration&lt;/h3&gt;
 &lt;p&gt;Unfortunately, I haven&amp;#8217;t had much time to play with Hyperic in the two
-days&lt;br /&gt;
+days&lt;br&gt;
 since installation. The most I&amp;#8217;ve really done is setup Agents on my
-laptop,&lt;br /&gt;
+laptop,&lt;br&gt;
 desktop, and the host machine (both dom0 and domU for Hyperic), so that
-they&lt;br /&gt;
+they&lt;br&gt;
 start to collect&amp;nbsp;data.&lt;/p&gt;
 &lt;p&gt;While I found a lot of upsetting stuff in the features list (see below),
-I&lt;br /&gt;
-decided to go ahead and add some other devices. On the network at the&lt;br /&gt;
+I&lt;br&gt;
+decided to go ahead and add some other devices. On the network at the&lt;br&gt;
 apartment, I have two manageable switches (a Linksys and a 3Com) - which
-pretty&lt;br /&gt;
+pretty&lt;br&gt;
 much make up the sum of non-host equipment. I also have an IPcop box,
-though I&lt;br /&gt;
+though I&lt;br&gt;
 assume the standard Linux Agent will handle that. The one item missing
-that I&lt;br /&gt;
+that I&lt;br&gt;
 have at home is my set of &lt;span class="caps"&gt;APC&lt;/span&gt; SmartUPS UPSs with &lt;span class="caps"&gt;SNMP&lt;/span&gt; cards, but I guess
-I&amp;#8217;ll&lt;br /&gt;
+I&amp;#8217;ll&lt;br&gt;
 just have to skip them for this&amp;nbsp;review.&lt;/p&gt;
 &lt;p&gt;First, I went in and added a platform (Resources-&gt;Browse, Tools
-Menu-&gt;Add&lt;br /&gt;
-Platform) for the 3Com switch (a SuperStack &lt;span class="caps"&gt;II&lt;/span&gt; Switch 3300). It showed&lt;br /&gt;
-successful creation - but nothing else. I went in and entered the &lt;span class="caps"&gt;SNMP&lt;/span&gt;&lt;br /&gt;
+Menu-&gt;Add&lt;br&gt;
+Platform) for the 3Com switch (a SuperStack &lt;span class="caps"&gt;II&lt;/span&gt; Switch 3300). It showed&lt;br&gt;
+successful creation - but nothing else. I went in and entered the &lt;span class="caps"&gt;SNMP&lt;/span&gt;&lt;br&gt;
 community string, &lt;span class="caps"&gt;IP&lt;/span&gt;, and version (1). In about a minute or so, I
-started to&lt;br /&gt;
+started to&lt;br&gt;
 see metrics - Availability, &lt;span class="caps"&gt;IP&lt;/span&gt; Forwards, &lt;span class="caps"&gt;IP&lt;/span&gt; In Receives, an &lt;span class="caps"&gt;IP&lt;/span&gt; In
-Received per&lt;br /&gt;
+Received per&lt;br&gt;
 Second. While it&amp;#8217;s quite basic, that&amp;#8217;s good for a starting point. While
-the&lt;br /&gt;
-[&lt;a href="http://support.hyperic.com/confluence/display/DOCSHQ30/Network+Device+platform" title="http://support.hyperic.com/confluence/display/DOCSHQ30/Network+Device+platform"&gt;http://support.hyperic.com/confluence/display/&lt;span class="caps"&gt;DOCSHQ30&lt;/span&gt;/Network+Device+platform&lt;/a&gt;&lt;br /&gt;
+the&lt;br&gt;
+[&lt;a href="http://support.hyperic.com/confluence/display/DOCSHQ30/Network+Device+platform" title="http://support.hyperic.com/confluence/display/DOCSHQ30/Network+Device+platform"&gt;http://support.hyperic.com/confluence/display/&lt;span class="caps"&gt;DOCSHQ30&lt;/span&gt;/Network+Device+platform&lt;/a&gt;&lt;br&gt;
 Network Device Platform] documentation lists lots of metrics that can
-be&lt;br /&gt;
+be&lt;br&gt;
 enabled, I&amp;#8217;d also like telnet availability and - my big one since I use
-a&lt;br /&gt;
+a&lt;br&gt;
 &amp;#8220;cute&amp;#8221; (crappy) IPcop installation for local &lt;span class="caps"&gt;DNS&lt;/span&gt;, a dig on &lt;span class="caps"&gt;DNS&lt;/span&gt; to make
-sure&lt;br /&gt;
+sure&lt;br&gt;
 the entry is there. In the Monitor screen, I was able to enable a bunch
-of&lt;br /&gt;
-additional metrics (by clicking on the &amp;#8220;Show All Metrics&amp;#8221; link), though&lt;br /&gt;
+of&lt;br&gt;
+additional metrics (by clicking on the &amp;#8220;Show All Metrics&amp;#8221; link), though&lt;br&gt;
 there&amp;#8217;s also no way (that I can find) to monitor the status of
-individual&lt;br /&gt;&amp;nbsp;ports.&lt;/p&gt;
+individual&lt;br&gt;&amp;nbsp;ports.&lt;/p&gt;
 &lt;p&gt;Next, I browsed through the &amp;#8220;Administration&amp;#8221; pages, setup a few users,
-and&lt;br /&gt;
+and&lt;br&gt;
 started setting *way* more default metrics for various platforms,
-services,&lt;br /&gt;
-and servers. While I don&amp;#8217;t have mail running yet, that will come this&lt;br /&gt;
+services,&lt;br&gt;
+and servers. While I don&amp;#8217;t have mail running yet, that will come this&lt;br&gt;
 weekend. While I added a lot of things as &amp;#8220;Default On&amp;#8221;, I still need to
-go&lt;br /&gt;
+go&lt;br&gt;
 back and add more things in the templates as&amp;nbsp;Indicators.&lt;/p&gt;
 &lt;p&gt;I also added some escalations, though they&amp;#8217;re quite simple - you can
-notify &lt;span class="caps"&gt;HQ&lt;/span&gt;&lt;br /&gt;
+notify &lt;span class="caps"&gt;HQ&lt;/span&gt;&lt;br&gt;
 users or &amp;#8220;other users&amp;#8221; by email or &lt;span class="caps"&gt;SMS&lt;/span&gt;, write to SysLog, or suppress
-alerts&lt;br /&gt;
+alerts&lt;br&gt;
 for 0 minutes to 24 hours. Hopefully I&amp;#8217;ll also find a plugin for
-Asterisk&lt;br /&gt;
-integration. One striking omission is user groups. Also, the concept of&lt;br /&gt;
+Asterisk&lt;br&gt;
+integration. One striking omission is user groups. Also, the concept of&lt;br&gt;
 &amp;#8220;Roles&amp;#8221; (maybe their idea of groups?) is only available in the
-Enterprise&lt;br /&gt;&amp;nbsp;version.&lt;/p&gt;
+Enterprise&lt;br&gt;&amp;nbsp;version.&lt;/p&gt;
 &lt;p&gt;At this point, I also notice one other majoe issue, though perhaps I&amp;#8217;ll
-find a&lt;br /&gt;
+find a&lt;br&gt;
 solution in my experimentation - there doesn&amp;#8217;t be a way to setup
-default&lt;br /&gt;
+default&lt;br&gt;
 alerts for metrics. If they have all of this platform, server, and
-service&lt;br /&gt;
+service&lt;br&gt;
 information defined as default templates, why not just have a way to
-assign&lt;br /&gt;
-default users (and groups) to these objects, and have default alerts&lt;br /&gt;&amp;nbsp;generated?&lt;/p&gt;
+assign&lt;br&gt;
+default users (and groups) to these objects, and have default alerts&lt;br&gt;&amp;nbsp;generated?&lt;/p&gt;
 &lt;p&gt;In terms of Apache 2.2 monitoring, out-of-the-box, nothing worked. No
-metrics&lt;br /&gt;
+metrics&lt;br&gt;
 at all. Firstly, Hyperic requires the mod_status module. Persoanlly,
-I&amp;#8217;d&lt;br /&gt;
+I&amp;#8217;d&lt;br&gt;
 rather handle all of that through a backend, like Nagios. Secondly, it
-got the&lt;br /&gt;
+got the&lt;br&gt;
 pidfile and apache2ctl paths wrong. Furthermore, it has no &amp;#8220;smart&amp;#8221;
 checking for resources - while my Apache 2.2 resource config was clearly
 wrong (wrong &lt;span class="caps"&gt;PID&lt;/span&gt; file path, no mod_status), Hyperic didn&amp;#8217;t detect this
@@ -2266,7 +2383,10 @@ Hyperic
 Forums&lt;/a&gt;,
 I was able to find out that a Xen plugin is in the works, but for the
 Open Source version, the only way to trigger a script is to send an
-email and have it handled by a filter such as&amp;nbsp;Procmail.&lt;/p&gt;</summary><category term="hyperic"></category><category term="monitoring"></category><category term="open source"></category></entry><entry><title>Network Monitoring (lack of) Progress</title><link href="http://blog.jasonantman.com/2008/02/network-monitoring-lack-of-progress/" rel="alternate"></link><updated>2008-02-06T00:07:00-05:00</updated><author><name>admin</name></author><id>tag:blog.jasonantman.com,2008-02-06:2008/02/network-monitoring-lack-of-progress/</id><summary type="html">&lt;p&gt;So, I&amp;#8217;ve been plodding along after troubleshooting some &lt;span class="caps"&gt;VPN&lt;/span&gt; issues with
+email and have it handled by a filter such as&amp;nbsp;Procmail.&lt;/p&gt;</content><category term="hyperic"></category><category term="monitoring"></category><category term="open source"></category></entry><entry><title>Network Monitoring (lack of) Progress</title><link href="http://blog.jasonantman.com/2008/02/network-monitoring-lack-of-progress/" rel="alternate"></link><published>2008-02-06T00:07:00-05:00</published><updated>2008-02-06T00:07:00-05:00</updated><author><name>admin</name></author><id>tag:blog.jasonantman.com,2008-02-06:/2008/02/network-monitoring-lack-of-progress/</id><summary type="html">&lt;p&gt;So, I&amp;#8217;ve been plodding along after troubleshooting some &lt;span class="caps"&gt;VPN&lt;/span&gt; issues with
+my Solaris workstation that I use for Sun work. After that, I started
+work on the Xen box. Big surprise - none of the &lt;span class="caps"&gt;PS&lt;/span&gt;/2 inputs are working.
+I knew that the &lt;span class="caps"&gt;PS&lt;/span&gt;/2 riser card was loose …&lt;/p&gt;</summary><content type="html">&lt;p&gt;So, I&amp;#8217;ve been plodding along after troubleshooting some &lt;span class="caps"&gt;VPN&lt;/span&gt; issues with
 my Solaris workstation that I use for Sun work. After that, I started
 work on the Xen box. Big surprise - none of the &lt;span class="caps"&gt;PS&lt;/span&gt;/2 inputs are working.
 I knew that the &lt;span class="caps"&gt;PS&lt;/span&gt;/2 riser card was loose, but now I can&amp;#8217;t get any
@@ -2280,7 +2400,12 @@ find /tmp/{random string}/suse/i586/install-initrd-1.0-72.i586.rpm. This
 is most troubling because I have 2 VMs setup on the machine, and
 installed them both without a&amp;nbsp;problem.&lt;/p&gt;
 &lt;p&gt;By now a new OpenSuSE 10.3-&lt;span class="caps"&gt;KDE&lt;/span&gt; .iso should be done downloading (thank
-God for a 1.5Mbps download rate at home), so I&amp;#8217;ll keep hacking away at&amp;nbsp;it&amp;#8230;&lt;/p&gt;</summary></entry><entry><title>Network Monitoring Trials - Part I</title><link href="http://blog.jasonantman.com/2008/02/network-monitoring-trials-part-i/" rel="alternate"></link><updated>2008-02-05T20:26:00-05:00</updated><author><name>admin</name></author><id>tag:blog.jasonantman.com,2008-02-05:2008/02/network-monitoring-trials-part-i/</id><summary type="html">&lt;p&gt;After dinner tonight, I&amp;#8217;m going to start setting up my Xen VMs and
+God for a 1.5Mbps download rate at home), so I&amp;#8217;ll keep hacking away at&amp;nbsp;it&amp;#8230;&lt;/p&gt;</content></entry><entry><title>Network Monitoring Trials - Part I</title><link href="http://blog.jasonantman.com/2008/02/network-monitoring-trials-part-i/" rel="alternate"></link><published>2008-02-05T20:26:00-05:00</published><updated>2008-02-05T20:26:00-05:00</updated><author><name>admin</name></author><id>tag:blog.jasonantman.com,2008-02-05:/2008/02/network-monitoring-trials-part-i/</id><summary type="html">&lt;p&gt;After dinner tonight, I&amp;#8217;m going to start setting up my Xen VMs and
+installing some monitoring software. I&amp;#8217;ve decided that
+&lt;a href="http://www.hyperic.com/"&gt;Hyperic&lt;/a&gt; and &lt;a href="http://www.opennms.org"&gt;OpenNMS&lt;/a&gt;
+will be the first round - mainly because their free versions seem to be
+the most heavy-weight, and will probably take more installation time.
+&lt;a href="http://www.groundworkopensource.com/"&gt;GroundWork Open …&lt;/a&gt;&lt;/p&gt;</summary><content type="html">&lt;p&gt;After dinner tonight, I&amp;#8217;m going to start setting up my Xen VMs and
 installing some monitoring software. I&amp;#8217;ve decided that
 &lt;a href="http://www.hyperic.com/"&gt;Hyperic&lt;/a&gt; and &lt;a href="http://www.opennms.org"&gt;OpenNMS&lt;/a&gt;
 will be the first round - mainly because their free versions seem to be
@@ -2289,7 +2414,14 @@ the most heavy-weight, and will probably take more installation time.
 sometime later this&amp;nbsp;week.&lt;/p&gt;
 &lt;p&gt;While the research that I did today has led me to start formulating some
 opinions on each of the contestants, I&amp;#8217;m going to withhold comment until
-I get all three up and running, and have done some real work with&amp;nbsp;them.&lt;/p&gt;</summary><category term="groundwork"></category><category term="hyperic"></category><category term="monitoring"></category><category term="opennms"></category></entry><entry><title>Google Loves Me! and Monitoring System Testing</title><link href="http://blog.jasonantman.com/2008/02/google-loves-me-and-monitoring-system-testing/" rel="alternate"></link><updated>2008-02-05T03:15:00-05:00</updated><author><name>admin</name></author><id>tag:blog.jasonantman.com,2008-02-05:2008/02/google-loves-me-and-monitoring-system-testing/</id><summary type="html">&lt;p&gt;I happened to visit Google Webmaster Tools tonight. On the down side, a
+I get all three up and running, and have done some real work with&amp;nbsp;them.&lt;/p&gt;</content><category term="groundwork"></category><category term="hyperic"></category><category term="monitoring"></category><category term="opennms"></category></entry><entry><title>Google Loves Me! and Monitoring System Testing</title><link href="http://blog.jasonantman.com/2008/02/google-loves-me-and-monitoring-system-testing/" rel="alternate"></link><published>2008-02-05T03:15:00-05:00</published><updated>2008-02-05T03:15:00-05:00</updated><author><name>admin</name></author><id>tag:blog.jasonantman.com,2008-02-05:/2008/02/google-loves-me-and-monitoring-system-testing/</id><summary type="html">&lt;p&gt;I happened to visit Google Webmaster Tools tonight. On the down side, a
+lot more of my redirected pages
+(&lt;a href="http://jantman.dyndns.org:10011/"&gt;jantman.dyndns.org:10011&lt;/a&gt;) are
+indexed than those from the domain
+(&lt;a href="http://www.jasonantman.com"&gt;jasonantman.com&lt;/a&gt;). On the positive side,
+my search stats are quite impressive - for example, &lt;a href="http://www.google.com/search?num=50&amp;amp;hl=en&amp;amp;safe=off&amp;amp;q=hpadu&amp;amp;btnG=Search"&gt;searching
+&amp;#8220;hpadu&amp;#8221;&lt;/a&gt;
+(the &lt;span class="caps"&gt;HP&lt;/span&gt; Proliant Array …&lt;/p&gt;</summary><content type="html">&lt;p&gt;I happened to visit Google Webmaster Tools tonight. On the down side, a
 lot more of my redirected pages
 (&lt;a href="http://jantman.dyndns.org:10011/"&gt;jantman.dyndns.org:10011&lt;/a&gt;) are
 indexed than those from the domain
@@ -2325,7 +2457,12 @@ to manually keep up-to-date. On another side-note, the web site for
 Source&lt;/a&gt;
 leaves a sour taste in my mouth, as it&amp;#8217;s pretty sparse - there&amp;#8217;s a lot
 of space given to the Enterprise edition, but not much text about the
-Open Source&amp;nbsp;version.&lt;/p&gt;</summary><category term="google"></category><category term="groundwork"></category><category term="hyperic"></category><category term="montoring"></category><category term="opennms"></category></entry><entry><title>Big Plans - Major Infrastructure Upgrades</title><link href="http://blog.jasonantman.com/2008/02/big-plans-major-infrastructure-upgrades/" rel="alternate"></link><updated>2008-02-05T01:36:00-05:00</updated><author><name>admin</name></author><id>tag:blog.jasonantman.com,2008-02-05:2008/02/big-plans-major-infrastructure-upgrades/</id><summary type="html">&lt;p&gt;Well, some more news. I&amp;#8217;ve got some pay coming to me, and I also
+Open Source&amp;nbsp;version.&lt;/p&gt;</content><category term="google"></category><category term="groundwork"></category><category term="hyperic"></category><category term="montoring"></category><category term="opennms"></category></entry><entry><title>Big Plans - Major Infrastructure Upgrades</title><link href="http://blog.jasonantman.com/2008/02/big-plans-major-infrastructure-upgrades/" rel="alternate"></link><published>2008-02-05T01:36:00-05:00</published><updated>2008-02-05T01:36:00-05:00</updated><author><name>admin</name></author><id>tag:blog.jasonantman.com,2008-02-05:/2008/02/big-plans-major-infrastructure-upgrades/</id><summary type="html">&lt;p&gt;Well, some more news. I&amp;#8217;ve got some pay coming to me, and I also
+realized that I have literally a &lt;em&gt;pile&lt;/em&gt; of Dell server rack rails, cable
+management parts, and front bezels/panels (that I got from &lt;a href="http://www.material.rutgers.edu/surplussales.shtml"&gt;Rutgers
+Unversity Surplus&lt;/a&gt;)
+to sell on &lt;a href="http://myworld.ebay.com/jason-antman/"&gt;EBay&lt;/a&gt;. So, aside from
+expenses (like …&lt;/p&gt;</summary><content type="html">&lt;p&gt;Well, some more news. I&amp;#8217;ve got some pay coming to me, and I also
 realized that I have literally a &lt;em&gt;pile&lt;/em&gt; of Dell server rack rails, cable
 management parts, and front bezels/panels (that I got from &lt;a href="http://www.material.rutgers.edu/surplussales.shtml"&gt;Rutgers
 Unversity Surplus&lt;/a&gt;)
@@ -2461,7 +2598,10 @@ functional names. It would also help with&amp;nbsp;&lt;span class="caps"&gt;VPN&
 month, so I&amp;#8217;ll probably have to have everything shipped here (to the
 apartment at school), do the installation and configuration here, and
 then bring it home and drop it in place (and perform final&amp;nbsp;configuration).&lt;/p&gt;
-&lt;p&gt;I&amp;#8217;ll keep everyone posted as work&amp;nbsp;progresses.&lt;/p&gt;</summary></entry><entry><title>eeePC, Solaris, other updates</title><link href="http://blog.jasonantman.com/2008/01/eeepc-solaris-other-updates/" rel="alternate"></link><updated>2008-01-27T02:18:00-05:00</updated><author><name>admin</name></author><id>tag:blog.jasonantman.com,2008-01-27:2008/01/eeepc-solaris-other-updates/</id><summary type="html">&lt;p&gt;I&amp;#8217;m trying to get around to updating my blog on a regular basis. I have
+&lt;p&gt;I&amp;#8217;ll keep everyone posted as work&amp;nbsp;progresses.&lt;/p&gt;</content></entry><entry><title>eeePC, Solaris, other updates</title><link href="http://blog.jasonantman.com/2008/01/eeepc-solaris-other-updates/" rel="alternate"></link><published>2008-01-27T02:18:00-05:00</published><updated>2008-01-27T02:18:00-05:00</updated><author><name>admin</name></author><id>tag:blog.jasonantman.com,2008-01-27:/2008/01/eeepc-solaris-other-updates/</id><summary type="html">&lt;p&gt;I&amp;#8217;m trying to get around to updating my blog on a regular basis. I have
+a lot of links that I wanted to mention, but I might just post a list of
+them with short&amp;nbsp;descriptions.&lt;/p&gt;
+&lt;p&gt;I&amp;#8217;ve finished most of my &lt;span class="caps"&gt;HOWTO&lt;/span&gt; on &lt;a href="http://www.jasonantman.com/wiki/index.php/OpenSuSE_10.3_on_eeePC_External_SDHC"&gt;installing OpenSuSE on an external …&lt;/a&gt;&lt;/p&gt;</summary><content type="html">&lt;p&gt;I&amp;#8217;m trying to get around to updating my blog on a regular basis. I have
 a lot of links that I wanted to mention, but I might just post a list of
 them with short&amp;nbsp;descriptions.&lt;/p&gt;
 &lt;p&gt;I&amp;#8217;ve finished most of my &lt;span class="caps"&gt;HOWTO&lt;/span&gt; on &lt;a href="http://www.jasonantman.com/wiki/index.php/OpenSuSE_10.3_on_eeePC_External_SDHC"&gt;installing OpenSuSE on an external
@@ -2559,13 +2699,17 @@ default document format in the Windows world. More importantly&amp;#8230; do
 these people know nothing about standards and best practices and
 cross-platform usability? If I were distributing a static document, &lt;span class="caps"&gt;PDF&lt;/span&gt;
 is the first thing that would pop into my&amp;nbsp;mind&amp;#8230;&lt;/p&gt;
-&lt;p&gt;On a side note, a few links for the day:&lt;br /&gt;
+&lt;p&gt;On a side note, a few links for the day:&lt;br&gt;
 &lt;a href="http://royal.pingdom.com/?p=240"&gt;Photos of great data center cabling, almost
-art&lt;/a&gt;.&lt;br /&gt;
+art&lt;/a&gt;.&lt;br&gt;
 &lt;a href="http://wiki.scribus.net/index.php/Your_first_PDF_form_with_Scribus"&gt;Designing &lt;span class="caps"&gt;PDF&lt;/span&gt; forms with
-Scribus&lt;/a&gt;.&lt;br /&gt;
+Scribus&lt;/a&gt;.&lt;br&gt;
 A wonderful Craigslist ad: &lt;a href="http://www.craigslist.org/about/best/nyc/485967082.html"&gt;Help me keep
-the shell people&amp;nbsp;alive.&lt;/a&gt;&lt;/p&gt;</summary></entry><entry><title>Solaris Update, Hardware Photos, SMF Manifests, Nagios Plugins</title><link href="http://blog.jasonantman.com/2008/01/solaris-update-hardware-photos-smf-manifests-nagios-plugins/" rel="alternate"></link><updated>2008-01-02T02:06:00-05:00</updated><author><name>admin</name></author><id>tag:blog.jasonantman.com,2008-01-02:2008/01/solaris-update-hardware-photos-smf-manifests-nagios-plugins/</id><summary type="html">&lt;p&gt;So in the past weekend, I had my first real experience with Solaris in
+the shell people&amp;nbsp;alive.&lt;/a&gt;&lt;/p&gt;</content></entry><entry><title>Solaris Update, Hardware Photos, SMF Manifests, Nagios Plugins</title><link href="http://blog.jasonantman.com/2008/01/solaris-update-hardware-photos-smf-manifests-nagios-plugins/" rel="alternate"></link><published>2008-01-02T02:06:00-05:00</published><updated>2008-01-02T02:06:00-05:00</updated><author><name>admin</name></author><id>tag:blog.jasonantman.com,2008-01-02:/2008/01/solaris-update-hardware-photos-smf-manifests-nagios-plugins/</id><summary type="html">&lt;p&gt;So in the past weekend, I had my first real experience with Solaris in
+production. I finally setup my Sun Blade 150 running Solaris 10 as my
+new mailserver, replacing a (!!!) vintage 1998 Gateway Pentium &lt;span class="caps"&gt;II&lt;/span&gt; 350MHz
+desktop. Quite an upgrade, even to the still-not-new Sun workstation.
+Maybe sometime in …&lt;/p&gt;</summary><content type="html">&lt;p&gt;So in the past weekend, I had my first real experience with Solaris in
 production. I finally setup my Sun Blade 150 running Solaris 10 as my
 new mailserver, replacing a (!!!) vintage 1998 Gateway Pentium &lt;span class="caps"&gt;II&lt;/span&gt; 350MHz
 desktop. Quite an upgrade, even to the still-not-new Sun workstation.
@@ -2611,10 +2755,13 @@ basement. Nothing wonderful, but it gets the job done. I&amp;#8217;ll admit that
 could have done a better job stitching the photos together, but the
 space is so tight that I can&amp;#8217;t get a wide shot of the whole&amp;nbsp;rack.&lt;/p&gt;
 &lt;p&gt;The rack, in all its glory:
-&lt;a href="/GFX/Tall1.jpg"&gt;&lt;img alt="image" src="/GFX/Tall1_sm.jpg" /&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;a href="/GFX/Tall1.jpg"&gt;&lt;img alt="image" src="/GFX/Tall1_sm.jpg"&gt;&lt;/a&gt;&lt;/p&gt;
 &lt;p&gt;A closer view of (most of) the hardware:
-&lt;a href="/GFX/Tall3.jpg"&gt;&lt;img alt="image" src="/GFX/Tall3_sm.jpg" /&gt;&lt;/a&gt;&lt;/p&gt;
-&lt;p&gt;Happy New&amp;nbsp;Year!&lt;/p&gt;</summary></entry><entry><title>SunBlade Workstations</title><link href="http://blog.jasonantman.com/2007/12/sunblade-workstations/" rel="alternate"></link><updated>2007-12-12T22:51:00-05:00</updated><author><name>admin</name></author><id>tag:blog.jasonantman.com,2007-12-12:2007/12/sunblade-workstations/</id><summary type="html">&lt;p&gt;So today I picked up two surplus SunBlade 150 workstations. The price
+&lt;a href="/GFX/Tall3.jpg"&gt;&lt;img alt="image" src="/GFX/Tall3_sm.jpg"&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;Happy New&amp;nbsp;Year!&lt;/p&gt;</content></entry><entry><title>SunBlade Workstations</title><link href="http://blog.jasonantman.com/2007/12/sunblade-workstations/" rel="alternate"></link><published>2007-12-12T22:51:00-05:00</published><updated>2007-12-12T22:51:00-05:00</updated><author><name>admin</name></author><id>tag:blog.jasonantman.com,2007-12-12:/2007/12/sunblade-workstations/</id><summary type="html">&lt;p&gt;So today I picked up two surplus SunBlade 150 workstations. The price
+seemed right, and I figure that at the very least, they&amp;#8217;d give me some
+Sparc machines to play around with. The two seem slightly different.
+Externally, one has a &lt;span class="caps"&gt;CD&lt;/span&gt;-&lt;span class="caps"&gt;RW&lt;/span&gt; and one has a &lt;span class="caps"&gt;DVD&lt;/span&gt;-&lt;span class="caps"&gt;ROM …&lt;/span&gt;&lt;/p&gt;</summary><content type="html">&lt;p&gt;So today I picked up two surplus SunBlade 150 workstations. The price
 seemed right, and I figure that at the very least, they&amp;#8217;d give me some
 Sparc machines to play around with. The two seem slightly different.
 Externally, one has a &lt;span class="caps"&gt;CD&lt;/span&gt;-&lt;span class="caps"&gt;RW&lt;/span&gt; and one has a &lt;span class="caps"&gt;DVD&lt;/span&gt;-&lt;span class="caps"&gt;ROM&lt;/span&gt;. The one with the &lt;span class="caps"&gt;DVD&lt;/span&gt;,
@@ -2641,7 +2788,11 @@ worked. So, at this point, I have a few options to&amp;nbsp;consider:&lt;/p&gt;
 &lt;li&gt;Break down and pay $40 each for *new* &lt;span class="caps"&gt;NVRAM&lt;/span&gt;&amp;nbsp;chips.&lt;/li&gt;
 &lt;/ol&gt;
 &lt;p&gt;We&amp;#8217;ll see what the next few days brings. Hopefully not resorting to a
-solution that costs more than I paid for the&amp;nbsp;machines.&lt;/p&gt;</summary><category term="sunblade sun solaris opensolaris install firmware boot"></category></entry><entry><title>Tech - Updates</title><link href="http://blog.jasonantman.com/2007/12/tech-updates/" rel="alternate"></link><updated>2007-12-11T15:54:00-05:00</updated><author><name>admin</name></author><id>tag:blog.jasonantman.com,2007-12-11:2007/12/tech-updates/</id><summary type="html">&lt;p&gt;First of all, until I decide on either splitting my blog, or setting up
+solution that costs more than I paid for the&amp;nbsp;machines.&lt;/p&gt;</content><category term="sunblade sun solaris opensolaris install firmware boot"></category></entry><entry><title>Tech - Updates</title><link href="http://blog.jasonantman.com/2007/12/tech-updates/" rel="alternate"></link><published>2007-12-11T15:54:00-05:00</published><updated>2007-12-11T15:54:00-05:00</updated><author><name>admin</name></author><id>tag:blog.jasonantman.com,2007-12-11:/2007/12/tech-updates/</id><summary type="html">&lt;p&gt;First of all, until I decide on either splitting my blog, or setting up
+separate &amp;#8216;channels&amp;#8217; for personal and technical stuff, I&amp;#8217;ll annotate the
+difference in post&amp;nbsp;titles.&lt;/p&gt;
+&lt;p&gt;So I have a few days of sanity - the last week of classes - before exam
+time. Hopefully I&amp;#8217;ll wrap some …&lt;/p&gt;</summary><content type="html">&lt;p&gt;First of all, until I decide on either splitting my blog, or setting up
 separate &amp;#8216;channels&amp;#8217; for personal and technical stuff, I&amp;#8217;ll annotate the
 difference in post&amp;nbsp;titles.&lt;/p&gt;
 &lt;p&gt;So I have a few days of sanity - the last week of classes - before exam
@@ -2710,7 +2861,11 @@ easy enough to just find the newest file and copy it, or manually
 decrypt, diff, and then encrypt. I don&amp;#8217;t know how I&amp;#8217;d do it on the
 phones, the only thing I can think of right now is to pay for data
 usage, and then manually copy over to the phone (either via &lt;span class="caps"&gt;SFTP&lt;/span&gt;, &lt;span class="caps"&gt;SCP&lt;/span&gt;,
-or a &lt;span class="caps"&gt;HTTPS&lt;/span&gt;&amp;nbsp;connection).&lt;/p&gt;</summary><category term="passwords"></category></entry><entry><title>Print Accounting</title><link href="http://blog.jasonantman.com/2007/11/print-accounting/" rel="alternate"></link><updated>2007-11-27T00:51:00-05:00</updated><author><name>admin</name></author><id>tag:blog.jasonantman.com,2007-11-27:2007/11/print-accounting/</id><summary type="html">&lt;p&gt;Since we moved into our apartment at the end of last summer, my
+or a &lt;span class="caps"&gt;HTTPS&lt;/span&gt;&amp;nbsp;connection).&lt;/p&gt;</content><category term="passwords"></category></entry><entry><title>Print Accounting</title><link href="http://blog.jasonantman.com/2007/11/print-accounting/" rel="alternate"></link><published>2007-11-27T00:51:00-05:00</published><updated>2007-11-27T00:51:00-05:00</updated><author><name>admin</name></author><id>tag:blog.jasonantman.com,2007-11-27:/2007/11/print-accounting/</id><summary type="html">&lt;p&gt;Since we moved into our apartment at the end of last summer, my
+roommates and I have had a Brother &lt;span class="caps"&gt;5170DN&lt;/span&gt; monochrome laser in the
+hallway as a communal printer. Last weekend, two new printers arrived -
+I got a Xerox DocuPrint N4525 - a big surplus student lab printer that
+handles …&lt;/p&gt;</summary><content type="html">&lt;p&gt;Since we moved into our apartment at the end of last summer, my
 roommates and I have had a Brother &lt;span class="caps"&gt;5170DN&lt;/span&gt; monochrome laser in the
 hallway as a communal printer. Last weekend, two new printers arrived -
 I got a Xerox DocuPrint N4525 - a big surplus student lab printer that
@@ -2768,7 +2923,10 @@ I have no idea what versions of packages this was written for, but assume
 they could have been &amp;#8220;old&amp;#8221; versions in 2007. All that being said, assuming
 that tea4cups hasn&amp;#8217;t changed too much since then, this should give you
 at least a general idea of how this all fit together and is&amp;nbsp;possible.&lt;/p&gt;
-&lt;p&gt;The code that I have is available as a 35K .tar.gz archive &lt;a href="/GFX/printAccounting.tar.gz"&gt;here&lt;/a&gt;.&lt;/p&gt;</summary></entry><entry><title>New Project, Thoughts on Development</title><link href="http://blog.jasonantman.com/2007/11/new-project-thoughts-on-development/" rel="alternate"></link><updated>2007-11-19T23:49:00-05:00</updated><author><name>admin</name></author><id>tag:blog.jasonantman.com,2007-11-19:2007/11/new-project-thoughts-on-development/</id><summary type="html">&lt;p&gt;I know I don&amp;#8217;t update anywhere near often enough - then again, I update
+&lt;p&gt;The code that I have is available as a 35K .tar.gz archive &lt;a href="/GFX/printAccounting.tar.gz"&gt;here&lt;/a&gt;.&lt;/p&gt;</content></entry><entry><title>New Project, Thoughts on Development</title><link href="http://blog.jasonantman.com/2007/11/new-project-thoughts-on-development/" rel="alternate"></link><published>2007-11-19T23:49:00-05:00</published><updated>2007-11-19T23:49:00-05:00</updated><author><name>admin</name></author><id>tag:blog.jasonantman.com,2007-11-19:/2007/11/new-project-thoughts-on-development/</id><summary type="html">&lt;p&gt;I know I don&amp;#8217;t update anywhere near often enough - then again, I update
+a lot more here than I do on my Sun blog. But I&amp;#8217;ll do better, I promise
+- and I&amp;#8217;ll setup a new template, too. Maybe&amp;nbsp;tonight.&lt;/p&gt;
+&lt;p&gt;So I was just thinking about my software …&lt;/p&gt;</summary><content type="html">&lt;p&gt;I know I don&amp;#8217;t update anywhere near often enough - then again, I update
 a lot more here than I do on my Sun blog. But I&amp;#8217;ll do better, I promise
 - and I&amp;#8217;ll setup a new template, too. Maybe&amp;nbsp;tonight.&lt;/p&gt;
 &lt;p&gt;So I was just thinking about my software development - about how many
@@ -2833,7 +2991,13 @@ It&amp;#8217;s not an official release so the docs aren&amp;#8217;t complete, bu
 ample comments in the code and sample config files. Most importantly,
 it&amp;#8217;s all wraped up in one &lt;span class="caps"&gt;PHP&lt;/span&gt; function, so generating a map (once you&amp;#8217;ve
 generated &lt;span class="caps"&gt;XML&lt;/span&gt; config files) is as simple as including a &lt;span class="caps"&gt;PHP&lt;/span&gt; file and
-calling one&amp;nbsp;function.&lt;/p&gt;</summary></entry><entry><title>Blacklists, Network Performance, New Project, XKCD</title><link href="http://blog.jasonantman.com/2007/10/blacklists-network-performance-new-project-xkcd/" rel="alternate"></link><updated>2007-10-10T14:03:00-04:00</updated><author><name>admin</name></author><id>tag:blog.jasonantman.com,2007-10-10:2007/10/blacklists-network-performance-new-project-xkcd/</id><summary type="html">&lt;p&gt;Part 2 of today&amp;#8217;s&amp;nbsp;thoughts&amp;#8230;&lt;/p&gt;
+calling one&amp;nbsp;function.&lt;/p&gt;</content></entry><entry><title>Blacklists, Network Performance, New Project, XKCD</title><link href="http://blog.jasonantman.com/2007/10/blacklists-network-performance-new-project-xkcd/" rel="alternate"></link><published>2007-10-10T14:03:00-04:00</published><updated>2007-10-10T14:03:00-04:00</updated><author><name>admin</name></author><id>tag:blog.jasonantman.com,2007-10-10:/2007/10/blacklists-network-performance-new-project-xkcd/</id><summary type="html">&lt;p&gt;Part 2 of today&amp;#8217;s&amp;nbsp;thoughts&amp;#8230;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Blacklists, Blocking, Reverse-Validation&lt;/strong&gt; - Yes, they have some uses.
+I use Daemon Synchronization in
+&lt;a href="http://www.jasonantman.com/wiki/index.php/DenyHosts"&gt;DenyHosts&lt;/a&gt; and
+plug-ins like Pyzor in SpamAssassin. However, I&amp;#8217;ve also been the victim
+of blacklists, and the new Internet order, many times. There&amp;#8217;s a
+conspiracy between ISPs - simply put …&lt;/p&gt;</summary><content type="html">&lt;p&gt;Part 2 of today&amp;#8217;s&amp;nbsp;thoughts&amp;#8230;&lt;/p&gt;
 &lt;p&gt;&lt;strong&gt;Blacklists, Blocking, Reverse-Validation&lt;/strong&gt; - Yes, they have some uses.
 I use Daemon Synchronization in
 &lt;a href="http://www.jasonantman.com/wiki/index.php/DenyHosts"&gt;DenyHosts&lt;/a&gt; and
@@ -2884,7 +3048,12 @@ project myself, so I&amp;#8217;m looking for developers to help&amp;nbsp;out.&lt
 account is &lt;a href="http://xkcd.com"&gt;&lt;span class="caps"&gt;XKCD&lt;/span&gt;.com&lt;/a&gt;. It&amp;#8217;s a great comic with
 wonderful technical and geek humor. Today&amp;#8217;s
 &lt;a href="http://xkcd.com/327/"&gt;comic&lt;/a&gt; was so good that I just had to include&amp;nbsp;it&amp;#8230;&lt;/p&gt;
-&lt;p&gt;&lt;a href="http://xkcd.com/327/"&gt;&lt;img alt="image" src="http://imgs.xkcd.com/comics/exploits_of_a_mom.png" /&gt;&lt;/a&gt;&lt;/p&gt;</summary><category term="bandwidth"></category><category term="blacklist"></category><category term="comic"></category><category term="epcr"></category><category term="firefox"></category><category term="java"></category><category term="openepcr"></category><category term="patient care report"></category><category term="pcr"></category><category term="php ems tools"></category><category term="reverse-validation"></category><category term="XKCD"></category></entry><entry><title>Website, Blog, Bacula</title><link href="http://blog.jasonantman.com/2007/10/website-blog-bacula/" rel="alternate"></link><updated>2007-10-10T13:35:00-04:00</updated><author><name>admin</name></author><id>tag:blog.jasonantman.com,2007-10-10:2007/10/website-blog-bacula/</id><summary type="html">&lt;p&gt;&lt;strong&gt;Website&lt;/strong&gt; - In personal news, I&amp;#8217;ve finished migrating all of the
+&lt;p&gt;&lt;a href="http://xkcd.com/327/"&gt;&lt;img alt="image" src="http://imgs.xkcd.com/comics/exploits_of_a_mom.png"&gt;&lt;/a&gt;&lt;/p&gt;</content><category term="bandwidth"></category><category term="blacklist"></category><category term="comic"></category><category term="epcr"></category><category term="firefox"></category><category term="java"></category><category term="openepcr"></category><category term="patient care report"></category><category term="pcr"></category><category term="php ems tools"></category><category term="reverse-validation"></category><category term="XKCD"></category></entry><entry><title>Website, Blog, Bacula</title><link href="http://blog.jasonantman.com/2007/10/website-blog-bacula/" rel="alternate"></link><published>2007-10-10T13:35:00-04:00</published><updated>2007-10-10T13:35:00-04:00</updated><author><name>admin</name></author><id>tag:blog.jasonantman.com,2007-10-10:/2007/10/website-blog-bacula/</id><summary type="html">&lt;p&gt;&lt;strong&gt;Website&lt;/strong&gt; - In personal news, I&amp;#8217;ve finished migrating all of the
+information content of &lt;a href="http://www.jasonantman.com"&gt;JasonAntman.com&lt;/a&gt; to
+a wiki, based on &lt;a href="http://www.mediawiki.org"&gt;MediaWiki&lt;/a&gt;. I&amp;#8217;m still
+getting some kinks ironed out, and working on customization, but it
+seems to be coming along very well. It&amp;#8217;s wonderfully easy to update
+information …&lt;/p&gt;</summary><content type="html">&lt;p&gt;&lt;strong&gt;Website&lt;/strong&gt; - In personal news, I&amp;#8217;ve finished migrating all of the
 information content of &lt;a href="http://www.jasonantman.com"&gt;JasonAntman.com&lt;/a&gt; to
 a wiki, based on &lt;a href="http://www.mediawiki.org"&gt;MediaWiki&lt;/a&gt;. I&amp;#8217;m still
 getting some kinks ironed out, and working on customization, but it
@@ -2960,7 +3129,11 @@ openSuSE 10.x, with Bacula 2.x. I gave it a shot but, sure enough, a
 Bacula 2.x director won&amp;#8217;t jive with a 1.x storage daemon. And I&amp;#8217;m in
 dependency hell - Bacula 2.x requires upgrades of everything from the C
 libs all the way up. So, I&amp;#8217;m going to give a shot at an upgrade of the
-storage machine via YaST, and see where I&amp;nbsp;get.&lt;/p&gt;</summary><category term="bacula"></category><category term="blog"></category><category term="jasonantman"></category><category term="mediawiki"></category><category term="wiki"></category></entry><entry><title>Bug/Issue Tracking - Update / Review of Eventum</title><link href="http://blog.jasonantman.com/2007/09/bugissue-tracking-update-review-of-eventum/" rel="alternate"></link><updated>2007-09-17T14:47:00-04:00</updated><author><name>admin</name></author><id>tag:blog.jasonantman.com,2007-09-17:2007/09/bugissue-tracking-update-review-of-eventum/</id><summary type="html">&lt;p&gt;So, after many hours of investigating potential bug/issue tracking
+storage machine via YaST, and see where I&amp;nbsp;get.&lt;/p&gt;</content><category term="bacula"></category><category term="blog"></category><category term="jasonantman"></category><category term="mediawiki"></category><category term="wiki"></category></entry><entry><title>Bug/Issue Tracking - Update / Review of Eventum</title><link href="http://blog.jasonantman.com/2007/09/bugissue-tracking-update-review-of-eventum/" rel="alternate"></link><published>2007-09-17T14:47:00-04:00</published><updated>2007-09-17T14:47:00-04:00</updated><author><name>admin</name></author><id>tag:blog.jasonantman.com,2007-09-17:/2007/09/bugissue-tracking-update-review-of-eventum/</id><summary type="html">&lt;p&gt;So, after many hours of investigating potential bug/issue tracking
+packages, I have chosen one. And gone live with it, all in one weekend.
+After much evaluation, my final choice was
+&lt;a href="http://eventum.mysql.com/"&gt;Eventum&lt;/a&gt; from MySQL (I&amp;#8217;m using the current
+version, 2.0.1). I will admit that it is not …&lt;/p&gt;</summary><content type="html">&lt;p&gt;So, after many hours of investigating potential bug/issue tracking
 packages, I have chosen one. And gone live with it, all in one weekend.
 After much evaluation, my final choice was
 &lt;a href="http://eventum.mysql.com/"&gt;Eventum&lt;/a&gt; from MySQL (I&amp;#8217;m using the current
@@ -3039,7 +3212,12 @@ surveyed, which are probably most of the ones out there. It&amp;#8217;s a great
 project which I&amp;#8217;d recommend to anyone, though if you want more advanced
 features (like integration with &lt;span class="caps"&gt;CVS&lt;/span&gt;, or things not offered such as
 anonymous issue viewing) you should be comfortable with coding in &lt;span class="caps"&gt;PHP&lt;/span&gt;
-until someone makes patches&amp;nbsp;available.&lt;/p&gt;</summary><category term="bug tracking"></category><category term="eventum"></category><category term="PHP"></category><category term="review"></category><category term="ticketing"></category></entry><entry><title>Bug / Issue Tracking Software</title><link href="http://blog.jasonantman.com/2007/09/bug-issue-tracking-software/" rel="alternate"></link><updated>2007-09-07T11:44:00-04:00</updated><author><name>admin</name></author><id>tag:blog.jasonantman.com,2007-09-07:2007/09/bug-issue-tracking-software/</id><summary type="html">&lt;p&gt;I recently posted the following to the DevShed forum in hope of an&amp;nbsp;answer:&lt;/p&gt;
+until someone makes patches&amp;nbsp;available.&lt;/p&gt;</content><category term="bug tracking"></category><category term="eventum"></category><category term="PHP"></category><category term="review"></category><category term="ticketing"></category></entry><entry><title>Bug / Issue Tracking Software</title><link href="http://blog.jasonantman.com/2007/09/bug-issue-tracking-software/" rel="alternate"></link><published>2007-09-07T11:44:00-04:00</published><updated>2007-09-07T11:44:00-04:00</updated><author><name>admin</name></author><id>tag:blog.jasonantman.com,2007-09-07:/2007/09/bug-issue-tracking-software/</id><summary type="html">&lt;p&gt;I recently posted the following to the DevShed forum in hope of an&amp;nbsp;answer:&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;I&amp;#8217;ve spent the last 48 hours reading up on bug
+tracking software. At the moment, I&amp;#8217;m using the SourceForge tracker for
+my public projects and a custom (lightweight kludge) system for internal
+and customer-specific …&lt;/p&gt;&lt;/blockquote&gt;</summary><content type="html">&lt;p&gt;I recently posted the following to the DevShed forum in hope of an&amp;nbsp;answer:&lt;/p&gt;
 &lt;blockquote&gt;
 &lt;p&gt;I&amp;#8217;ve spent the last 48 hours reading up on bug
 tracking software. At the moment, I&amp;#8217;m using the SourceForge tracker for
@@ -3130,4 +3308,4 @@ Eventum, Codetrac, and BugZero. I&amp;#8217;m interested in &lt;span class="caps
 good things about it, but I can&amp;#8217;t seem to find a web-based demo. Most
 likely, I&amp;#8217;ll probably give two or three of them a whirl, and then add in
 the custom code to do what I need. Of course, none of this will happen
-until I either get &lt;span class="caps"&gt;CVS&lt;/span&gt; back up or migrate to&amp;nbsp;&lt;span class="caps"&gt;SVN&lt;/span&gt;.&lt;/p&gt;</summary><category term="bug tracking"></category><category term="bugs"></category><category term="bugzero"></category><category term="eventum"></category><category term="flyspray"></category><category term="otrs"></category><category term="rt"></category><category term="ticketing"></category><category term="trac"></category></entry></feed>
+until I either get &lt;span class="caps"&gt;CVS&lt;/span&gt; back up or migrate to&amp;nbsp;&lt;span class="caps"&gt;SVN&lt;/span&gt;.&lt;/p&gt;</content><category term="bug tracking"></category><category term="bugs"></category><category term="bugzero"></category><category term="eventum"></category><category term="flyspray"></category><category term="otrs"></category><category term="rt"></category><category term="ticketing"></category><category term="trac"></category></entry></feed>

@@ -1,62 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Jason Antman's Blog</title><link>http://blog.jasonantman.com/</link><description></description><atom:link href="http://blog.jasonantman.com/feeds/tags/etherboot.rss.xml" rel="self"></atom:link><lastBuildDate>Tue, 20 Apr 2010 10:46:00 -0400</lastBuildDate><item><title>Xen/Etherboot and DHCP Problems</title><link>http://blog.jasonantman.com/2010/04/xenetherboot-and-dhcp-problems/</link><description>&lt;p&gt;Well, I&amp;#8217;ve spend the better part of the last week or so debugging a
+<rss version="2.0"><channel><title>Jason Antman's Blog - etherboot</title><link>http://blog.jasonantman.com/</link><description></description><lastBuildDate>Tue, 20 Apr 2010 10:46:00 -0400</lastBuildDate><item><title>Xen/Etherboot and DHCP Problems</title><link>http://blog.jasonantman.com/2010/04/xenetherboot-and-dhcp-problems/</link><description>&lt;p&gt;Well, I&amp;#8217;ve spend the better part of the last week or so debugging a
 problem with out new Xen VMs (on one host) not getting &lt;span class="caps"&gt;DHCP&lt;/span&gt; leases.
 Since our &lt;span class="caps"&gt;DHCP&lt;/span&gt; servers (&lt;span class="caps"&gt;ISC&lt;/span&gt; DHCPd 3.0.6) are using Brian Masney&amp;#8217;s &lt;a href="http://personal.cfw.com/~masneyb/"&gt;&lt;span class="caps"&gt;LDAP&lt;/span&gt;
 patch&lt;/a&gt; (which has recently been
-included in &lt;a href="http://www.isc.org/files/release-notes/42b2_0.html"&gt;mainline
-DHCPd&lt;/a&gt;), I assumed
-that this might be the source of some of the&amp;nbsp;problems.&lt;/p&gt;
-&lt;p&gt;The Xen client booting process uses &lt;a href="http://etherboot.org/"&gt;Etherboot&lt;/a&gt;
-(specifically 5.4.2 on my machines) to get &lt;span class="caps"&gt;DHCP&lt;/span&gt; and &lt;span class="caps"&gt;PXE&lt;/span&gt; for the client.
-The Etherboot &lt;span class="caps"&gt;ROM&lt;/span&gt; is generated online with
-&lt;a href="http://rom-o-matic.net/"&gt;&lt;span class="caps"&gt;ROM&lt;/span&gt;-o-Matic&lt;/a&gt; (by the Xen devs) and is then
-packaged into &lt;code&gt;hvmloader&lt;/code&gt; (though I would not find this out until much
-later in my investigation, given the piss-poor documentation about it).
-So, aside from pulling the &lt;span class="caps"&gt;SRPM&lt;/span&gt; for Xen and looking around, I decided I
-couldn&amp;#8217;t really debug much on the client end (I wasn&amp;#8217;t getting any
-&lt;span class="caps"&gt;BIOS&lt;/span&gt;-like messages from Xen, so the client end seemed to be pretty much
-a black&amp;nbsp;box).&lt;/p&gt;
-&lt;p&gt;After a week of re-examining our &lt;span class="caps"&gt;DHCP&lt;/span&gt; servers, moving the client between
-pieces of hardware and different networks, tracing out the &lt;span class="caps"&gt;DHCP&lt;/span&gt; logs,
-and debugging everything in-between, I finally resorted to doing packet
-captures and analyzing them. Last Thursday (my last work day of the
-week), I popped my laptop on the same network, set it up in &lt;span class="caps"&gt;DHCP&lt;/span&gt;, and
-did some captures of the laptop (which worked correctly) and the problem&amp;nbsp;&lt;span class="caps"&gt;VM&lt;/span&gt;.&lt;/p&gt;
-&lt;p&gt;Sometime around 10:00 &lt;span class="caps"&gt;PM&lt;/span&gt;, long after I&amp;#8217;d gotten home, I had opened
-captures of both the good and bad hosts in separate
-&lt;a href="http://www.wireshark.org/"&gt;Wireshark&lt;/a&gt; windows, and was going through
-them line-by-line. I&amp;#8217;d also written a nifty little &lt;a href="/GFX/dhcptest.pl"&gt;Perl
-script&lt;/a&gt; (my weakest language) using
-&lt;a href="http://search.cpan.org/~fvandun/Net-DHCP-0.11/lib/Net/DHCP/Packet.pm"&gt;Net::&lt;span class="caps"&gt;DHCP&lt;/span&gt;::Packet&lt;/a&gt;
-to craft packets identical to the ones from the working and &lt;span class="caps"&gt;FUBAR&lt;/span&gt; hosts,
-and inject them into the network. The only thing I could find different
-was the value of the &amp;#8220;secs&amp;#8221; field of the &lt;span class="caps"&gt;DHCPDISCOVER&lt;/span&gt; packets (octets 9
-and 10), which are supposed to contain the number of seconds that have
-passed since the host started booting (&lt;a href="http://www.faqs.org/rfcs/rfc1541.html"&gt;&lt;span class="caps"&gt;RFC&lt;/span&gt;
-1541&lt;/a&gt;). My laptop (the working
-host) started getting replies from the server at 21 seconds. I took my
-Perl packet-injecting script, and started adjusting the &amp;#8220;secs&amp;#8221; values of
-both the working and bad packets. Sure enough, with identical packets
-from each host, the values converged. Anything with &amp;#8220;secs&amp;#8221; below 2 got
-no response from the &lt;span class="caps"&gt;DHCP&lt;/span&gt; server, anything with 2 or greater got a
-correct&amp;nbsp;lease.&lt;/p&gt;
-&lt;p&gt;Then it hit me. When we used to have a primary/secondary &lt;span class="caps"&gt;DHCP&lt;/span&gt; server
-setup (with manual failover), we&amp;#8217;d configured the secondary server with
-&lt;code&gt;min-secs: 2&lt;/code&gt;, instructing it to not give out any leases to clients with
-a &amp;#8220;secs&amp;#8221; value of under 2, to prevent the secondary server from
-answering if, for some reason, the primary was still online.&amp;nbsp;Bingo.&lt;/p&gt;
-&lt;p&gt;At this point, I&amp;#8217;m waiting to have a meeting of the binds before I add a
-network-level override of &amp;#8220;min-secs: 0&amp;#8221; for the networks in question.
-But I&amp;#8217;m relatively confident that everything will go smoothly from there&amp;nbsp;on.&lt;/p&gt;
-&lt;p&gt;This experience highlighted that one small &amp;#8220;bug&amp;#8221; can confuse 3 people
-for the better part of a&amp;nbsp;week:&lt;/p&gt;
-&lt;p&gt;&lt;a href="http://etherboot.org/"&gt;Etherboot&lt;/a&gt; (at least 5.4.2) doesn&amp;#8217;t increment
-the &amp;#8220;secs&amp;#8221; field in its &lt;span class="caps"&gt;DISCOVER&lt;/span&gt; packets as &lt;span class="caps"&gt;RFC&lt;/span&gt; 1541 suggests. Therefore
-anyone with &amp;#8220;min-secs&amp;#8221; in their dhcpd configuration won&amp;#8217;t ever give out
-a&amp;nbsp;lease.&lt;/p&gt;
-&lt;p&gt;In hindsight, it really was a brain-dead moment. There was a little note
-in the dhcpd logs that I, and the others, totally overlooked:
-&amp;#8220;&lt;span class="caps"&gt;DHCPDISCOVER&lt;/span&gt; (&amp;#8230;) 0 secs &amp;lt; 2&amp;#8221;. I guess I should have turned my brain
-on and realized that those few characters were probably important, and
-there for a reason, no matter how unassuming (and un-error-like) they
-may&amp;nbsp;be&amp;#8230;&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Tue, 20 Apr 2010 10:46:00 -0400</pubDate><guid>tag:blog.jasonantman.com,2010-04-20:2010/04/xenetherboot-and-dhcp-problems/</guid><category>dhcp</category><category>dhcpd</category><category>etherboot</category><category>ldap</category><category>pxe</category><category>xen</category></item></channel></rss>
+included in …&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Tue, 20 Apr 2010 10:46:00 -0400</pubDate><guid isPermaLink="false">tag:blog.jasonantman.com,2010-04-20:/2010/04/xenetherboot-and-dhcp-problems/</guid><category>dhcp</category><category>dhcpd</category><category>etherboot</category><category>ldap</category><category>pxe</category><category>xen</category></item></channel></rss>

@@ -1,7 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Jason Antman's Blog</title><link href="http://blog.jasonantman.com/" rel="alternate"></link><link href="http://blog.jasonantman.com/feeds/tags/hostname.atom.xml" rel="self"></link><id>http://blog.jasonantman.com/</id><updated>2009-10-14T14:45:00-04:00</updated><entry><title>Puppet problems with hostname in autosign.conf - Invalid pattern</title><link href="http://blog.jasonantman.com/2009/10/puppet-problems-with-hostname-in-autosignconf-invalid-pattern/" rel="alternate"></link><updated>2009-10-14T14:45:00-04:00</updated><author><name>admin</name></author><id>tag:blog.jasonantman.com,2009-10-14:2009/10/puppet-problems-with-hostname-in-autosignconf-invalid-pattern/</id><summary type="html">&lt;p&gt;In playing with Puppet (0.24.8 on clients and server) today (well,
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Jason Antman's Blog - hostname</title><link href="http://blog.jasonantman.com/" rel="alternate"></link><link href="http://blog.jasonantman.com/feeds/tags/hostname.atom.xml" rel="self"></link><id>http://blog.jasonantman.com/</id><updated>2009-10-14T14:45:00-04:00</updated><entry><title>Puppet problems with hostname in autosign.conf - Invalid pattern</title><link href="http://blog.jasonantman.com/2009/10/puppet-problems-with-hostname-in-autosignconf-invalid-pattern/" rel="alternate"></link><published>2009-10-14T14:45:00-04:00</published><updated>2009-10-14T14:45:00-04:00</updated><author><name>admin</name></author><id>tag:blog.jasonantman.com,2009-10-14:/2009/10/puppet-problems-with-hostname-in-autosignconf-invalid-pattern/</id><summary type="html">&lt;p&gt;In playing with Puppet (0.24.8 on clients and server) today (well,
 building a new host) I came by a strange error when I ran puppet on the&amp;nbsp;client:&lt;/p&gt;
-&lt;div class="codehilite"&gt;&lt;pre&gt;err: Could not request certificate: Certificate retrieval failed: Invalid pattern css-storemanager
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;err: Could not request certificate: Certificate retrieval failed: Invalid pattern css-storemanager
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;The thing that was so strange is that &amp;#8220;css-storemanager …&lt;/p&gt;</summary><content type="html">&lt;p&gt;In playing with Puppet (0.24.8 on clients and server) today (well,
+building a new host) I came by a strange error when I ran puppet on the&amp;nbsp;client:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;err: Could not request certificate: Certificate retrieval failed: Invalid pattern css-storemanager
 &lt;/pre&gt;&lt;/div&gt;
 
 
@@ -11,7 +17,7 @@ the host I was building. They&amp;#8217;re different boxes, on different subnets
 in different rooms. One is a SunFire and the other is an &lt;span class="caps"&gt;HP&lt;/span&gt;&amp;nbsp;desktop.&lt;/p&gt;
 &lt;p&gt;Google turned up nothing. Running puppetmasterd with &lt;code&gt;--debug --trace&lt;/code&gt;
 yielded:&lt;/p&gt;
-&lt;div class="codehilite"&gt;&lt;pre&gt;info: Listening on port 8140
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;info: Listening on port 8140
 notice: Starting Puppet server version 0.24.8
 notice: Allowing unauthenticated client ccf-hill019-12.example.edu(172.x.x.x) access to puppetca.getcert
 /usr/lib/ruby/site_ruby/1.8/puppet/network/authstore.rb:289:in `parse&amp;#39;
@@ -64,7 +70,7 @@ err: Invalid pattern css-storemanager
 &lt;p&gt;After a bit of investigation into that trace, I found the following code
 in &lt;code&gt;/usr/lib/ruby/site_ruby/1.8/puppet/network/authstore.rb&lt;/code&gt; starting on
 line&amp;nbsp;242:&lt;/p&gt;
-&lt;div class="codehilite"&gt;&lt;pre&gt;            &lt;span class="c1"&gt;# Parse our input pattern and figure out what kind of allowal&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;            &lt;span class="c1"&gt;# Parse our input pattern and figure out what kind of allowal&lt;/span&gt;
             &lt;span class="c1"&gt;# statement it is.  The output of this is used for later matching.&lt;/span&gt;
             &lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;parse&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;value&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
                 &lt;span class="k"&gt;case&lt;/span&gt; &lt;span class="n"&gt;value&lt;/span&gt;
@@ -121,7 +127,7 @@ line&amp;nbsp;242:&lt;/p&gt;
 &lt;p&gt;Following the trace back, I took a look at
 &lt;code&gt;/usr/lib/ruby/site_ruby/1.8/puppet/network/handler/ca.rb&lt;/code&gt; starting at
 line&amp;nbsp;50:&lt;/p&gt;
-&lt;div class="codehilite"&gt;&lt;pre&gt;            &lt;span class="n"&gt;auth&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="ss"&gt;Puppet&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="ss"&gt;:Network&lt;/span&gt;&lt;span class="o"&gt;::&lt;/span&gt;&lt;span class="no"&gt;AuthStore&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;new&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;            &lt;span class="n"&gt;auth&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="no"&gt;Puppet&lt;/span&gt;&lt;span class="o"&gt;::&lt;/span&gt;&lt;span class="no"&gt;Network&lt;/span&gt;&lt;span class="o"&gt;::&lt;/span&gt;&lt;span class="no"&gt;AuthStore&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;new&lt;/span&gt;
             &lt;span class="no"&gt;File&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;open&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;autosign&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt; &lt;span class="o"&gt;|&lt;/span&gt;&lt;span class="n"&gt;f&lt;/span&gt;&lt;span class="o"&gt;|&lt;/span&gt;
                 &lt;span class="n"&gt;f&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;each&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt; &lt;span class="o"&gt;|&lt;/span&gt;&lt;span class="n"&gt;line&lt;/span&gt;&lt;span class="o"&gt;|&lt;/span&gt;
                     &lt;span class="k"&gt;next&lt;/span&gt; &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="n"&gt;line&lt;/span&gt; &lt;span class="o"&gt;=~&lt;/span&gt; &lt;span class="sr"&gt;/^\s*#/&lt;/span&gt;
@@ -144,4 +150,4 @@ and left autosign turned on for all of your hosts, you wouldn&amp;#8217;t notice
 this until you try and build a new&amp;nbsp;box.&lt;/p&gt;
 &lt;p&gt;To solve this, just remove any offending lines from&amp;nbsp;autosign.conf.&lt;/p&gt;
 &lt;p&gt;I&amp;#8217;ve filed a bug report on the Puppet Trac: &lt;a href="http://projects.reductivelabs.com/issues/2723"&gt;Issue
-2723&lt;/a&gt;.&lt;/p&gt;</summary><category term="autosign.conf"></category><category term="hostname"></category><category term="puppet"></category></entry></feed>
+2723&lt;/a&gt;.&lt;/p&gt;</content><category term="autosign.conf"></category><category term="hostname"></category><category term="puppet"></category></entry></feed>

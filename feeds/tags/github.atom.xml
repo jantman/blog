@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Jason Antman's Blog</title><link href="http://blog.jasonantman.com/" rel="alternate"></link><link href="http://blog.jasonantman.com/feeds/tags/github.atom.xml" rel="self"></link><id>http://blog.jasonantman.com/</id><updated>2016-08-06T21:38:00-04:00</updated><entry><title>Tooling for AWS - webhooks to SQS via API Gateway and Lambda</title><link href="http://blog.jasonantman.com/2016/08/tooling-for-aws-webhooks-to-sqs-via-api-gateway-and-lambda/" rel="alternate"></link><updated>2016-08-06T21:38:00-04:00</updated><author><name>Jason Antman</name></author><id>tag:blog.jasonantman.com,2016-08-06:2016/08/tooling-for-aws-webhooks-to-sqs-via-api-gateway-and-lambda/</id><summary type="html">&lt;p&gt;A few weeks ago at work, I was party to two discussions about possible tooling needs, both very low-priority. One was the possible need to sync MarkDown documentation
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Jason Antman's Blog - github</title><link href="http://blog.jasonantman.com/" rel="alternate"></link><link href="http://blog.jasonantman.com/feeds/tags/github.atom.xml" rel="self"></link><id>http://blog.jasonantman.com/</id><updated>2016-08-06T21:38:00-04:00</updated><entry><title>Tooling for AWS - webhooks to SQS via API Gateway and Lambda</title><link href="http://blog.jasonantman.com/2016/08/tooling-for-aws-webhooks-to-sqs-via-api-gateway-and-lambda/" rel="alternate"></link><published>2016-08-06T21:38:00-04:00</published><updated>2016-08-06T21:38:00-04:00</updated><author><name>Jason Antman</name></author><id>tag:blog.jasonantman.com,2016-08-06:/2016/08/tooling-for-aws-webhooks-to-sqs-via-api-gateway-and-lambda/</id><summary type="html">&lt;p&gt;Project I created that uses Python and Terraform to setup an &lt;span class="caps"&gt;AWS&lt;/span&gt; &lt;span class="caps"&gt;API&lt;/span&gt; Gateway instance to receive webhooks, and enqueue their content in &lt;span class="caps"&gt;SQS&lt;/span&gt; queues via&amp;nbsp;Lambda.&lt;/p&gt;</summary><content type="html">&lt;p&gt;A few weeks ago at work, I was party to two discussions about possible tooling needs, both very low-priority. One was the possible need to sync MarkDown documentation
 from GitHub repositories to&amp;#8230; another thing that can hold docs. The other was relating to the new Version 2 Docker Registry, &lt;a href="https://github.com/docker/distribution"&gt;distribution&lt;/a&gt;.
 We have some Jenkins jobs that dynamically populate dropdown fields for build parameters with Docker image names and tags, using the &lt;a href="https://wiki.jenkins-ci.org/display/JENKINS/Active+Choices+Plugin"&gt;Active Choices Plugin&lt;/a&gt;.
 Right now we&amp;#8217;re directly querying the Docker Registry &lt;span class="caps"&gt;API&lt;/span&gt; from Groovy, every time the Build With Parameters page is loaded. With the original version 1 Docker Registry,
@@ -19,10 +19,10 @@ and push the content of them into a queue. Ideally, it would also be something t
 &lt;/ul&gt;
 &lt;p&gt;The tooling is written in Python, but leverages &lt;a href="https://www.terraform.io/"&gt;HashiCorp&amp;#8217;s Terraform&lt;/a&gt; to actually manage the &lt;span class="caps"&gt;AWS&lt;/span&gt;&amp;nbsp;resources.&lt;/p&gt;
 &lt;p&gt;From a &lt;span class="caps"&gt;JSON&lt;/span&gt; configuration file as simple&amp;nbsp;as:&lt;/p&gt;
-&lt;div class="codehilite"&gt;&lt;pre&gt;{
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;{
   &amp;quot;endpoints&amp;quot;: {
     &amp;quot;some_resource_name&amp;quot;: {
-      &amp;quot;method&amp;quot;: &amp;quot;POST&amp;quot;,
+      &amp;quot;method&amp;quot;: &amp;quot;&lt;span class="caps"&gt;POST&lt;/span&gt;&amp;quot;,
       &amp;quot;queues&amp;quot;: [&amp;quot;myqueue&amp;quot;]
     },
   },
@@ -43,9 +43,9 @@ then generates a Terraform configuration to manage all required &lt;span class="
 also helper commands to view the Lambda Function and &lt;span class="caps"&gt;API&lt;/span&gt; Gateway logs from CloudWatch, view messages in the queue(s) and
 &lt;span class="caps"&gt;GET&lt;/span&gt; or &lt;span class="caps"&gt;POST&lt;/span&gt; a test message to one or all of the&amp;nbsp;endpoints.&lt;/p&gt;
 &lt;p&gt;Full documentation is available at &lt;a href="http://webhook2lambda2sqs.readthedocs.io/en/latest/"&gt;http://webhook2lambda2sqs.readthedocs.io/en/latest/&lt;/a&gt;
-and the package (Python 2.7, 3.3-3.5) can be downloaded &lt;a href="https://pypi.python.org/pypi/webhook2lambda2sqs"&gt;from PyPI&lt;/a&gt;.&lt;/p&gt;</summary><category term="aws"></category><category term="webhook"></category><category term="lambda"></category><category term="github"></category><category term="api-gateway"></category><category term="sqs"></category><category term="queue"></category><category term="python"></category><category term="terraform"></category></entry><entry><title>Idea for a Generic Method to Communicate Repository/Project Status</title><link href="http://blog.jasonantman.com/2014/12/idea-for-a-generic-method-to-communicate-repositoryproject-status/" rel="alternate"></link><updated>2014-12-07T18:24:00-05:00</updated><author><name>Jason Antman</name></author><id>tag:blog.jasonantman.com,2014-12-07:2014/12/idea-for-a-generic-method-to-communicate-repositoryproject-status/</id><summary type="html">&lt;p&gt;Update 2014-12-24: I actually did something with this. See &lt;a href="http://www.repostatus.org"&gt;repostatus.org&lt;/a&gt;.&lt;/p&gt;
+and the package (Python 2.7, 3.3-3.5) can be downloaded &lt;a href="https://pypi.python.org/pypi/webhook2lambda2sqs"&gt;from PyPI&lt;/a&gt;.&lt;/p&gt;</content><category term="aws"></category><category term="webhook"></category><category term="lambda"></category><category term="github"></category><category term="api-gateway"></category><category term="sqs"></category><category term="queue"></category><category term="python"></category><category term="terraform"></category></entry><entry><title>Idea for a Generic Method to Communicate Repository/Project Status</title><link href="http://blog.jasonantman.com/2014/12/idea-for-a-generic-method-to-communicate-repositoryproject-status/" rel="alternate"></link><published>2014-12-07T18:24:00-05:00</published><updated>2014-12-07T18:24:00-05:00</updated><author><name>Jason Antman</name></author><id>tag:blog.jasonantman.com,2014-12-07:/2014/12/idea-for-a-generic-method-to-communicate-repositoryproject-status/</id><summary type="html">&lt;p&gt;Some ideas for generic methods of communicating the status of a project / source code repository to humans and&amp;nbsp;machines.&lt;/p&gt;</summary><content type="html">&lt;p&gt;Update 2014-12-24: I actually did something with this. See &lt;a href="http://www.repostatus.org"&gt;repostatus.org&lt;/a&gt;.&lt;/p&gt;
 &lt;p&gt;First, something funny, before my possibly-hair-brained&amp;nbsp;scheme:&lt;/p&gt;
-&lt;p&gt;&lt;a href="http://www.commitstrip.com/en/2014/11/25/west-side-project-story/"&gt;&lt;img alt="commitstrip.com &amp;quot;side project&amp;quot; comic strip" src="http://www.commitstrip.com/wp-content/uploads/2014/11/Strip-Side-project-650-finalenglish.jpg" /&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://www.commitstrip.com/en/2014/11/25/west-side-project-story/"&gt;&lt;img alt="commitstrip.com &amp;quot;side project&amp;quot; comic strip" src="http://www.commitstrip.com/wp-content/uploads/2014/11/Strip-Side-project-650-finalenglish.jpg"&gt;&lt;/a&gt;&lt;/p&gt;
 &lt;p&gt;I know I&amp;#8217;m not alone in having a mess of &lt;a href="https://github.com/jantman?tab=repositories"&gt;repositories on GitHub&lt;/a&gt;; I personally have over 90, and they&amp;#8217;re
 all in various states of &amp;#8220;doneness.&amp;#8221; Some are working and undergoing active development. Some should be
 working, but I no longer use them (and sometimes lack &amp;#8220;things&amp;#8221; needed to use them, especially the case
@@ -136,20 +136,20 @@ set of possible readme file names, and the need for machine identification to be
 a first set of badges, along with the alt text set on them (which could be changed by the user, or also included
 in plain text next to the&amp;nbsp;badge).&lt;/p&gt;
 &lt;ul&gt;
-&lt;li&gt;&lt;img alt="Repo Status: Concept - Minimal or no implementation has been done yet." src="http://img.shields.io/badge/repo%20status-Concept-ffffff.svg" /&gt; Repo Status: Concept - Minimal or no implementation has been done&amp;nbsp;yet.&lt;/li&gt;
-&lt;li&gt;&lt;img alt="Repo Status: WIP - Initial development is in progress, but there has not yet been a stable, usable release suitable for the public." src="http://img.shields.io/badge/repo%20status-WIP-yellow.svg" /&gt; Repo Status: &lt;span class="caps"&gt;WIP&lt;/span&gt; - Initial development is in progress, but there has not yet been a stable, usable release suitable for the&amp;nbsp;public.&lt;/li&gt;
-&lt;li&gt;&lt;img alt="Repo Status: Suspended - A WIP project that has had work stopped for the time being; the author(s) intend on resuming work." src="http://img.shields.io/badge/repo%20status-Suspended-orange.svg" /&gt; Repo Status: Suspended - A &lt;span class="caps"&gt;WIP&lt;/span&gt; project that has had work stopped for the time being; the author(s) intend on resuming&amp;nbsp;work.&lt;/li&gt;
-&lt;li&gt;&lt;img alt="Repo Status: Abandoned - A WIP project that has been abandoned; the author(s) do not intend on continuing development." src="http://img.shields.io/badge/repo%20status-Abandoned-000000.svg" /&gt; Repo Status: Abandoned - A &lt;span class="caps"&gt;WIP&lt;/span&gt; project that has been abandoned; the author(s) do not intend on continuing&amp;nbsp;development.&lt;/li&gt;
-&lt;li&gt;&lt;img alt="Repo Status: Active - The project has reached a stable, usable state and is being actively developed." src="http://img.shields.io/badge/repo%20status-Active-brightgreen.svg" /&gt; Repo Status: Active - The project has reached a stable, usable state and is being actively&amp;nbsp;developed.&lt;/li&gt;
-&lt;li&gt;&lt;img alt="Repo Status: Inactive - The project has reached a stable, usable state and is no longer being actively developed; support/maintenance will be done as time allows." src="http://img.shields.io/badge/repo%20status-Inactive-yellowgreen.svg" /&gt; Repo Status: Inactive - The project has reached a stable, usable state and is no longer being actively developed; support/maintenance will be done as time&amp;nbsp;allows.&lt;/li&gt;
-&lt;li&gt;&lt;img alt="Repo Status: Unsupported - The project has reached a stable, usable state but the author(s) have ceased all work on it. A new maintainer may be desired." src="http://img.shields.io/badge/repo%20status-Unsupported-lightgrey.svg" /&gt; Repo Status: Unsupported - The project has reached a stable, usable state but the author(s) have ceased all work on it. A new maintainer may be&amp;nbsp;desired.&lt;/li&gt;
+&lt;li&gt;&lt;img alt="Repo Status: Concept - Minimal or no implementation has been done yet." src="http://img.shields.io/badge/repo%20status-Concept-ffffff.svg"&gt; Repo Status: Concept - Minimal or no implementation has been done&amp;nbsp;yet.&lt;/li&gt;
+&lt;li&gt;&lt;img alt="Repo Status: WIP - Initial development is in progress, but there has not yet been a stable, usable release suitable for the public." src="http://img.shields.io/badge/repo%20status-WIP-yellow.svg"&gt; Repo Status: &lt;span class="caps"&gt;WIP&lt;/span&gt; - Initial development is in progress, but there has not yet been a stable, usable release suitable for the&amp;nbsp;public.&lt;/li&gt;
+&lt;li&gt;&lt;img alt="Repo Status: Suspended - A WIP project that has had work stopped for the time being; the author(s) intend on resuming work." src="http://img.shields.io/badge/repo%20status-Suspended-orange.svg"&gt; Repo Status: Suspended - A &lt;span class="caps"&gt;WIP&lt;/span&gt; project that has had work stopped for the time being; the author(s) intend on resuming&amp;nbsp;work.&lt;/li&gt;
+&lt;li&gt;&lt;img alt="Repo Status: Abandoned - A WIP project that has been abandoned; the author(s) do not intend on continuing development." src="http://img.shields.io/badge/repo%20status-Abandoned-000000.svg"&gt; Repo Status: Abandoned - A &lt;span class="caps"&gt;WIP&lt;/span&gt; project that has been abandoned; the author(s) do not intend on continuing&amp;nbsp;development.&lt;/li&gt;
+&lt;li&gt;&lt;img alt="Repo Status: Active - The project has reached a stable, usable state and is being actively developed." src="http://img.shields.io/badge/repo%20status-Active-brightgreen.svg"&gt; Repo Status: Active - The project has reached a stable, usable state and is being actively&amp;nbsp;developed.&lt;/li&gt;
+&lt;li&gt;&lt;img alt="Repo Status: Inactive - The project has reached a stable, usable state and is no longer being actively developed; support/maintenance will be done as time allows." src="http://img.shields.io/badge/repo%20status-Inactive-yellowgreen.svg"&gt; Repo Status: Inactive - The project has reached a stable, usable state and is no longer being actively developed; support/maintenance will be done as time&amp;nbsp;allows.&lt;/li&gt;
+&lt;li&gt;&lt;img alt="Repo Status: Unsupported - The project has reached a stable, usable state but the author(s) have ceased all work on it. A new maintainer may be desired." src="http://img.shields.io/badge/repo%20status-Unsupported-lightgrey.svg"&gt; Repo Status: Unsupported - The project has reached a stable, usable state but the author(s) have ceased all work on it. A new maintainer may be&amp;nbsp;desired.&lt;/li&gt;
 &lt;/ul&gt;
 &lt;p&gt;If the readme is (for some strange reason) primarily intended for a non-rendered view, it would be acceptable to
 include just the &lt;span class="caps"&gt;URL&lt;/span&gt; to the status description, optionally with some human-readable&amp;nbsp;text.&lt;/p&gt;
 &lt;p&gt;I&amp;#8217;ll probably start using something like this for my personal projects. I intend on even writing up a spec
 for the &lt;span class="caps"&gt;README&lt;/span&gt;-based variant, along with some formatting and parsing/machine identification rules. Any and
 all comments are welcome. This is the result of a few hours&amp;#8217; sporadic thought one afternoon, so I&amp;#8217;m sure there
-are some major issues I haven&amp;#8217;t realized yet. Please pass them along, or tell me if this is of any interest to&amp;nbsp;you.&lt;/p&gt;</summary><category term="repository"></category><category term="project"></category><category term="git"></category><category term="github"></category></entry><entry><title>Blog Moved from Self-hosted WordPress to Pelican on GitHub Pages</title><link href="http://blog.jasonantman.com/2014/03/blog-moved-from-self-hosted-wordpress-to-pelican-on-github-pages/" rel="alternate"></link><updated>2014-03-01T14:14:00-05:00</updated><author><name>Jason Antman</name></author><id>tag:blog.jasonantman.com,2014-03-01:2014/03/blog-moved-from-self-hosted-wordpress-to-pelican-on-github-pages/</id><summary type="html">&lt;p&gt;I just finally finished my migration from self-hosted WordPress to &lt;a href="http://getpelican.com"&gt;Pelican&lt;/a&gt;, a Python-based
+are some major issues I haven&amp;#8217;t realized yet. Please pass them along, or tell me if this is of any interest to&amp;nbsp;you.&lt;/p&gt;</content><category term="repository"></category><category term="project"></category><category term="git"></category><category term="github"></category></entry><entry><title>Blog Moved from Self-hosted WordPress to Pelican on GitHub Pages</title><link href="http://blog.jasonantman.com/2014/03/blog-moved-from-self-hosted-wordpress-to-pelican-on-github-pages/" rel="alternate"></link><published>2014-03-01T14:14:00-05:00</published><updated>2014-03-01T14:14:00-05:00</updated><author><name>Jason Antman</name></author><id>tag:blog.jasonantman.com,2014-03-01:/2014/03/blog-moved-from-self-hosted-wordpress-to-pelican-on-github-pages/</id><summary type="html">&lt;p&gt;My blog is finally migrated from self-hosted WordPress to Pelican on GitHub Pages. Quite an&amp;nbsp;ordeal.&lt;/p&gt;</summary><content type="html">&lt;p&gt;I just finally finished my migration from self-hosted WordPress to &lt;a href="http://getpelican.com"&gt;Pelican&lt;/a&gt;, a Python-based
 static site generator, hosted on &lt;a href="http://pages.github.com/"&gt;GitHub Pages&lt;/a&gt;. It&amp;#8217;s not only easier and free, but also the
 first step in my plan to migrate off of my &lt;a href="http://linode.com"&gt;Linode&lt;/a&gt; &lt;span class="caps"&gt;VM&lt;/span&gt; and onto a mix of &lt;span class="caps"&gt;EC2&lt;/span&gt; and free&amp;nbsp;services.&lt;/p&gt;
 &lt;p&gt;I&amp;#8217;m sure this post will be &lt;a href="/2009/02/wordpress-installation-finished/"&gt;around in five years&lt;/a&gt; when there&amp;#8217;s a smarter way
@@ -163,7 +163,12 @@ seems to be working. Hopefully someone will find this and save a few hours or da
 &lt;/blockquote&gt;
 &lt;p&gt;on all posts created after the WordPress migration, and FeedBurner rejected my attempts to change the &lt;span class="caps"&gt;RSS&lt;/span&gt; feed &lt;span class="caps"&gt;URL&lt;/span&gt; to
 its new value (though I&amp;#8217;m pretty sure that&amp;#8217;s because I neglected to drop the &lt;span class="caps"&gt;TTL&lt;/span&gt; on the &lt;span class="caps"&gt;DNS&lt;/span&gt; record, and I can&amp;#8217;t
-find a way to tell Feedburner to purge it from&amp;nbsp;cache).&lt;/p&gt;</summary><category term="blog"></category><category term="wordpress"></category><category term="pelican"></category><category term="github"></category></entry><entry><title>Workflow for contributing to GitHub projects</title><link href="http://blog.jasonantman.com/2012/08/workflow-for-contributing-to-github-projects/" rel="alternate"></link><updated>2012-08-11T09:35:00-04:00</updated><author><name>admin</name></author><id>tag:blog.jasonantman.com,2012-08-11:2012/08/workflow-for-contributing-to-github-projects/</id><summary type="html">&lt;p&gt;Lately I&amp;#8217;ve been contributing to some open source projects hosted on
+find a way to tell Feedburner to purge it from&amp;nbsp;cache).&lt;/p&gt;</content><category term="blog"></category><category term="wordpress"></category><category term="pelican"></category><category term="github"></category></entry><entry><title>Workflow for contributing to GitHub projects</title><link href="http://blog.jasonantman.com/2012/08/workflow-for-contributing-to-github-projects/" rel="alternate"></link><published>2012-08-11T09:35:00-04:00</published><updated>2012-08-11T09:35:00-04:00</updated><author><name>admin</name></author><id>tag:blog.jasonantman.com,2012-08-11:/2012/08/workflow-for-contributing-to-github-projects/</id><summary type="html">&lt;p&gt;Lately I&amp;#8217;ve been contributing to some open source projects hosted on
+&lt;a href="http://github.com"&gt;github&lt;/a&gt;. I&amp;#8217;m pretty new to git, and the process is a
+bit confusing for beginners. So, here&amp;#8217;s a sample workflow, based on the
+&lt;a href="http://theforeman.org"&gt;The Foreman&lt;/a&gt;&amp;#8216;s &lt;a href="https://github.com/theforeman/foreman"&gt;foreman github
+repository&lt;/a&gt;. Note that I&amp;#8217;m
+developing against the …&lt;/p&gt;</summary><content type="html">&lt;p&gt;Lately I&amp;#8217;ve been contributing to some open source projects hosted on
 &lt;a href="http://github.com"&gt;github&lt;/a&gt;. I&amp;#8217;m pretty new to git, and the process is a
 bit confusing for beginners. So, here&amp;#8217;s a sample workflow, based on the
 &lt;a href="http://theforeman.org"&gt;The Foreman&lt;/a&gt;&amp;#8216;s &lt;a href="https://github.com/theforeman/foreman"&gt;foreman github
@@ -183,28 +188,28 @@ tutorial that covers all&amp;nbsp;this&amp;#8230;&lt;/p&gt;
 &lt;li&gt;Fork the original repository through the GitHub&amp;nbsp;interface.&lt;/li&gt;
 &lt;li&gt;
 &lt;p&gt;On your machine, clone your&amp;nbsp;fork:&lt;/p&gt;
-&lt;div class="codehilite"&gt;&lt;pre&gt;git clone git@github.com:username/reponame.git &amp;amp;&amp;amp; cd reponame
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;git clone git@github.com:username/reponame.git &amp;amp;&amp;amp; cd reponame
 &lt;/pre&gt;&lt;/div&gt;
 
 
 &lt;/li&gt;
 &lt;li&gt;
 &lt;p&gt;Make sure you&amp;#8217;ve&amp;nbsp;setup&lt;/p&gt;
-&lt;div class="codehilite"&gt;&lt;pre&gt;git config --global branch.autosetupmerge true
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;git config --global branch.autosetupmerge true
 &lt;/pre&gt;&lt;/div&gt;
 
 
 &lt;/li&gt;
 &lt;li&gt;
 &lt;p&gt;Add your upstream&amp;nbsp;repo:&lt;/p&gt;
-&lt;div class="codehilite"&gt;&lt;pre&gt;git remote add upstream git://github.com/upstream_user/upstream_repo.git
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;git remote add upstream git://github.com/upstream_user/upstream_repo.git
 &lt;/pre&gt;&lt;/div&gt;
 
 
 &lt;/li&gt;
 &lt;li&gt;
 &lt;p&gt;Fetch it and initialize any&amp;nbsp;submodules:&lt;/p&gt;
-&lt;div class="codehilite"&gt;&lt;pre&gt;git fetch upstream &amp;amp;&amp;amp; git submodule update --init
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;git fetch upstream &amp;amp;&amp;amp; git submodule update --init
 &lt;/pre&gt;&lt;/div&gt;
 
 
@@ -212,7 +217,7 @@ tutorial that covers all&amp;nbsp;this&amp;#8230;&lt;/p&gt;
 &lt;li&gt;
 &lt;p&gt;Check the current branch (&lt;code&gt;git branch&lt;/code&gt;, let&amp;#8217;s assume it&amp;#8217;s called
     &amp;#8220;develop&amp;#8221;) and rebase to its&amp;nbsp;upstream:&lt;/p&gt;
-&lt;div class="codehilite"&gt;&lt;pre&gt;git rebase upstream/develop develop
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;git rebase upstream/develop develop
 &lt;/pre&gt;&lt;/div&gt;
 
 
@@ -220,21 +225,21 @@ tutorial that covers all&amp;nbsp;this&amp;#8230;&lt;/p&gt;
 &lt;li&gt;
 &lt;p&gt;Create my &amp;#8220;jantman&amp;#8221; branch, which will be the upstream &amp;#8220;develop&amp;#8221;,
     plus my finished work merged into&amp;nbsp;it:&lt;/p&gt;
-&lt;div class="codehilite"&gt;&lt;pre&gt;git checkout -b jantman origin/develop
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;git checkout -b jantman origin/develop
 &lt;/pre&gt;&lt;/div&gt;
 
 
 &lt;/li&gt;
 &lt;li&gt;
 &lt;p&gt;Create a topic branch to do some&amp;nbsp;work:&lt;/p&gt;
-&lt;div class="codehilite"&gt;&lt;pre&gt;git checkout -b NewBranchName jantman
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;git checkout -b NewBranchName jantman
 &lt;/pre&gt;&lt;/div&gt;
 
 
 &lt;/li&gt;
 &lt;li&gt;
 &lt;p&gt;Periodically, push the topic branch to&amp;nbsp;github:&lt;/p&gt;
-&lt;div class="codehilite"&gt;&lt;pre&gt;git push origin NewBranchName
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;git push origin NewBranchName
 &lt;/pre&gt;&lt;/div&gt;
 
 
@@ -242,7 +247,7 @@ tutorial that covers all&amp;nbsp;this&amp;#8230;&lt;/p&gt;
 &lt;li&gt;
 &lt;p&gt;If you commit to this branch from another computer (or someone else
     commits to it), periodically update your local tracking&amp;nbsp;branch:&lt;/p&gt;
-&lt;div class="codehilite"&gt;&lt;pre&gt;git pull origin NewBranchName
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;git pull origin NewBranchName
 &lt;/pre&gt;&lt;/div&gt;
 
 
@@ -252,28 +257,28 @@ tutorial that covers all&amp;nbsp;this&amp;#8230;&lt;/p&gt;
 &lt;ol&gt;
 &lt;li&gt;
 &lt;p&gt;switch to the develop&amp;nbsp;branch:&lt;/p&gt;
-&lt;div class="codehilite"&gt;&lt;pre&gt;git checkout develop
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;git checkout develop
 &lt;/pre&gt;&lt;/div&gt;
 
 
 &lt;/li&gt;
 &lt;li&gt;
 &lt;p&gt;grab the latest version of the upstream git&amp;nbsp;repo:&lt;/p&gt;
-&lt;div class="codehilite"&gt;&lt;pre&gt;git fetch upstream
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;git fetch upstream
 &lt;/pre&gt;&lt;/div&gt;
 
 
 &lt;/li&gt;
 &lt;li&gt;
 &lt;p&gt;rebase develop to mirror the upstream develop&amp;nbsp;branch:&lt;/p&gt;
-&lt;div class="codehilite"&gt;&lt;pre&gt;git rebase upstream/develop develop
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;git rebase upstream/develop develop
 &lt;/pre&gt;&lt;/div&gt;
 
 
 &lt;/li&gt;
 &lt;li&gt;
 &lt;p&gt;switch to our personal&amp;nbsp;branch:&lt;/p&gt;
-&lt;div class="codehilite"&gt;&lt;pre&gt;git checkout jantman
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;git checkout jantman
 &lt;/pre&gt;&lt;/div&gt;
 
 
@@ -281,7 +286,7 @@ tutorial that covers all&amp;nbsp;this&amp;#8230;&lt;/p&gt;
 &lt;li&gt;
 &lt;p&gt;rebase our personal branch onto develop (pull all the new
     commits from develop into our personal&amp;nbsp;branch):&lt;/p&gt;
-&lt;div class="codehilite"&gt;&lt;pre&gt;git rebase develop jantman
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;git rebase develop jantman
 &lt;/pre&gt;&lt;/div&gt;
 
 
@@ -289,7 +294,7 @@ tutorial that covers all&amp;nbsp;this&amp;#8230;&lt;/p&gt;
 &lt;li&gt;
 &lt;p&gt;If we want those new upstream changes to continue down to our
     topic&amp;nbsp;branches:&lt;/p&gt;
-&lt;div class="codehilite"&gt;&lt;pre&gt;git rebase develop topicBranchName
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;git rebase develop topicBranchName
 &lt;/pre&gt;&lt;/div&gt;
 
 
@@ -299,12 +304,12 @@ tutorial that covers all&amp;nbsp;this&amp;#8230;&lt;/p&gt;
 &lt;li&gt;
 &lt;p&gt;When we&amp;#8217;re done with a topic branch, we want to merge it into our
     &amp;#8220;personal&amp;#8221;&amp;nbsp;branch:&lt;/p&gt;
-&lt;div class="codehilite"&gt;&lt;pre&gt;    git checkout jantman; git merge --squash node-table-facts
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;    git checkout jantman; git merge --squash node-table-facts
 &lt;/pre&gt;&lt;/div&gt;
 
 
 &lt;p&gt;and then&amp;nbsp;commit:&lt;/p&gt;
-&lt;div class="codehilite"&gt;&lt;pre&gt;    git commit
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;    git commit
 &lt;/pre&gt;&lt;/div&gt;
 
 
@@ -316,19 +321,19 @@ bug, should be&amp;nbsp;logical.&lt;/p&gt;
 &lt;li&gt;
 &lt;p&gt;If we&amp;#8217;re sure we don&amp;#8217;t need it anymore, delete the topic branch from
     our local&amp;nbsp;machine:&lt;/p&gt;
-&lt;div class="codehilite"&gt;&lt;pre&gt;git branch -d topicBranchName
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;git branch -d topicBranchName
 &lt;/pre&gt;&lt;/div&gt;
 
 
 &lt;p&gt;and from&amp;nbsp;github:&lt;/p&gt;
-&lt;div class="codehilite"&gt;&lt;pre&gt;git push origin --delete topicBranchName
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;git push origin --delete topicBranchName
 &lt;/pre&gt;&lt;/div&gt;
 
 
 &lt;/li&gt;
 &lt;li&gt;
 &lt;p&gt;Finally, make sure we push our &amp;#8220;personal&amp;#8221; branch back to&amp;nbsp;origin:&lt;/p&gt;
-&lt;div class="codehilite"&gt;&lt;pre&gt;git push origin jantman
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;git push origin jantman
 &lt;/pre&gt;&lt;/div&gt;
 
 
@@ -344,7 +349,13 @@ bug, should be&amp;nbsp;logical.&lt;/p&gt;
 &lt;li&gt;&lt;a href="http://qsapp.com/wiki/Github"&gt;Github - Quicksilver&amp;nbsp;Wiki&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a href="https://github.com/carmaa/inception/wiki/Contributor-Workflow-with-Github"&gt;Contributor Workflow with Github · carmaa/inception&amp;nbsp;Wiki&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a href="http://help.github.com/fork-a-repo/"&gt;Help.GitHub - Fork A&amp;nbsp;Repo&lt;/a&gt;&lt;/li&gt;
-&lt;/ol&gt;</summary><category term="foreman"></category><category term="git"></category><category term="github"></category><category term="workflow"></category></entry><entry><title>Github as a repository in Redmine</title><link href="http://blog.jasonantman.com/2012/03/github-as-a-repository-in-redmine/" rel="alternate"></link><updated>2012-03-27T21:36:00-04:00</updated><author><name>admin</name></author><id>tag:blog.jasonantman.com,2012-03-27:2012/03/github-as-a-repository-in-redmine/</id><summary type="html">&lt;p&gt;As a follow-up to my &lt;a href="/2012/03/cvs-to-svn-to-git/"&gt;&lt;span class="caps"&gt;CVS&lt;/span&gt; to &lt;span class="caps"&gt;SVN&lt;/span&gt; to Git&lt;/a&gt;
+&lt;/ol&gt;</content><category term="foreman"></category><category term="git"></category><category term="github"></category><category term="workflow"></category></entry><entry><title>Github as a repository in Redmine</title><link href="http://blog.jasonantman.com/2012/03/github-as-a-repository-in-redmine/" rel="alternate"></link><published>2012-03-27T21:36:00-04:00</published><updated>2012-03-27T21:36:00-04:00</updated><author><name>admin</name></author><id>tag:blog.jasonantman.com,2012-03-27:/2012/03/github-as-a-repository-in-redmine/</id><summary type="html">&lt;p&gt;As a follow-up to my &lt;a href="/2012/03/cvs-to-svn-to-git/"&gt;&lt;span class="caps"&gt;CVS&lt;/span&gt; to &lt;span class="caps"&gt;SVN&lt;/span&gt; to Git&lt;/a&gt;
+post, I have the &lt;a href="http://www.php-ems-tools.com"&gt;&lt;span class="caps"&gt;PHP&lt;/span&gt; &lt;span class="caps"&gt;EMS&lt;/span&gt; Tools&lt;/a&gt;
+repository migrated from my &lt;span class="caps"&gt;SVN&lt;/span&gt; to
+&lt;a href="https://github.com/jantman/php-ems-tools"&gt;github&lt;/a&gt;. Since I&amp;#8217;m moving the
+website and all development to a &lt;a href="http://www.redmine.org/"&gt;Redmine&lt;/a&gt;
+instance, the next step is setting up Github to work as a revision
+control …&lt;/p&gt;</summary><content type="html">&lt;p&gt;As a follow-up to my &lt;a href="/2012/03/cvs-to-svn-to-git/"&gt;&lt;span class="caps"&gt;CVS&lt;/span&gt; to &lt;span class="caps"&gt;SVN&lt;/span&gt; to Git&lt;/a&gt;
 post, I have the &lt;a href="http://www.php-ems-tools.com"&gt;&lt;span class="caps"&gt;PHP&lt;/span&gt; &lt;span class="caps"&gt;EMS&lt;/span&gt; Tools&lt;/a&gt;
 repository migrated from my &lt;span class="caps"&gt;SVN&lt;/span&gt; to
 &lt;a href="https://github.com/jantman/php-ems-tools"&gt;github&lt;/a&gt;. Since I&amp;#8217;m moving the
@@ -357,4 +368,4 @@ hook&lt;/a&gt;
 setting up the repository
 clone&lt;/a&gt;
 instead of Step #2 in the plugin instructions. All worked well, though
-I&amp;#8217;ll admit I only tried it talking to redmine over plain &lt;span class="caps"&gt;HTTP&lt;/span&gt;, not&amp;nbsp;&lt;span class="caps"&gt;HTTPS&lt;/span&gt;.&lt;/p&gt;</summary><category term="git"></category><category term="github"></category><category term="redmine"></category></entry></feed>
+I&amp;#8217;ll admit I only tried it talking to redmine over plain &lt;span class="caps"&gt;HTTP&lt;/span&gt;, not&amp;nbsp;&lt;span class="caps"&gt;HTTPS&lt;/span&gt;.&lt;/p&gt;</content><category term="git"></category><category term="github"></category><category term="redmine"></category></entry></feed>

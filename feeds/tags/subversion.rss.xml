@@ -1,216 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Jason Antman's Blog</title><link>http://blog.jasonantman.com/</link><description></description><atom:link href="http://blog.jasonantman.com/feeds/tags/subversion.rss.xml" rel="self"></atom:link><lastBuildDate>Fri, 23 Mar 2012 21:15:00 -0400</lastBuildDate><item><title>Adding Piwik Web Analytics Integration to ViewVC</title><link>http://blog.jasonantman.com/2012/03/adding-piwik-web-analytics-integration-to-viewvc/</link><description>&lt;p&gt;&lt;strong&gt;Update February 2014:&lt;/strong&gt; Give up the analytics, and just host your code
+<rss version="2.0"><channel><title>Jason Antman's Blog - subversion</title><link>http://blog.jasonantman.com/</link><description></description><lastBuildDate>Fri, 23 Mar 2012 21:15:00 -0400</lastBuildDate><item><title>Adding Piwik Web Analytics Integration to ViewVC</title><link>http://blog.jasonantman.com/2012/03/adding-piwik-web-analytics-integration-to-viewvc/</link><description>&lt;p&gt;&lt;strong&gt;Update February 2014:&lt;/strong&gt; Give up the analytics, and just host your code
 on &lt;a href="https://github.com"&gt;GitHub&lt;/a&gt;.&lt;/p&gt;
 &lt;p&gt;All of my public &lt;a href="http://viewvc.jasonantman.com"&gt;subversion
 repositories&lt;/a&gt; and &lt;a href="http://cvs.jasonantman.com"&gt;&lt;span class="caps"&gt;CVS&lt;/span&gt;
 repositories&lt;/a&gt; are available online through a
 great Python application called &lt;a href="http://viewvc.org/"&gt;ViewVC&lt;/a&gt;, which
 provides a web-based interface to &lt;span class="caps"&gt;CVS&lt;/span&gt; and &lt;span class="caps"&gt;SVN&lt;/span&gt; repositories, as well as
-history browsing, graphical diffs, etc. An amazingly large amount of the
-traffic to my web server is for the vhosts that serve this, so I decided
-that I should add some analytics to it. I&amp;#8217;m in the process of trying out
-&lt;a href="http://piwik.org"&gt;Piwik&lt;/a&gt;, a full-featured, &lt;span class="caps"&gt;GPL&lt;/span&gt;-licensed, self-hosted
-alternative to &lt;a href="http://www.google.com/analytics/"&gt;Google Analytics&lt;/a&gt;. It
-gives lots of useful information like number of visits and unique visits
-per page, search engine keywords, referrers, average time on page,
-bounce rate (number of one-page visits),&amp;nbsp;etc.&lt;/p&gt;
-&lt;p&gt;I have ViewVC installed from the &lt;a href="http://pkgs.repoforge.org/viewvc/"&gt;RPMforge
-packages&lt;/a&gt;, so there&amp;#8217;s one code base
-for both of my vhosts. This means that I can&amp;#8217;t simply slap the tracking
-code at the bottom of the templates and call it a day. I opted to go for
-a nicer solution, and what follows is a patch (diff -u) to the current
-(1.1.13) version of ViewVC that adds a &amp;#8220;piwik&amp;#8221; section to viewvc.conf,
-and adds the piwik tracking code with the specified base &lt;span class="caps"&gt;URL&lt;/span&gt; and site &lt;span class="caps"&gt;ID&lt;/span&gt;
-into all ViewVC pages.&amp;nbsp;Enjoy.&lt;/p&gt;
-&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="gh"&gt;diff -ru viewvc-&lt;span class="caps"&gt;ORIG&lt;/span&gt;/lib/config.py viewvc/lib/config.py&lt;/span&gt;
-&lt;span class="gd"&gt;--- viewvc-&lt;span class="caps"&gt;ORIG&lt;/span&gt;/lib/config.py   2012-01-25 08:31:52.000000000 -0500&lt;/span&gt;
-&lt;span class="gi"&gt;+++ viewvc/lib/config.py    2012-03-23 21:57:08.000000000 -0400&lt;/span&gt;
-&lt;span class="gu"&gt;@@ -108,6 +108,7 @@&lt;/span&gt;
-     &amp;#39;query&amp;#39;,
-     &amp;#39;templates&amp;#39;,
-     &amp;#39;utilities&amp;#39;,
-&lt;span class="gi"&gt;+    &amp;#39;piwik&amp;#39;,&lt;/span&gt;
-     )
-   _force_multi_value = (
-     # Configuration values with multiple, comma-separated values.
-&lt;span class="gu"&gt;@@ -127,6 +128,7 @@&lt;/span&gt;
-                &amp;#39;options&amp;#39;,
-                &amp;#39;templates&amp;#39;,
-                &amp;#39;utilities&amp;#39;,
-&lt;span class="gi"&gt;+               &amp;#39;piwik&amp;#39;,&lt;/span&gt;
-                ),
-     &amp;#39;root&amp;#39;  : (&amp;#39;authz-*&amp;#39;,
-                &amp;#39;options&amp;#39;,
-&lt;span class="gu"&gt;@@ -461,7 +463,14 @@&lt;/span&gt;
-     self.cvsdb.check_database_for_root = 0
-
-     self.query.viewvc_base_url = None
-&lt;span class="gd"&gt;-    &lt;/span&gt;
-&lt;span class="gi"&gt;+&lt;/span&gt;
-&lt;span class="gi"&gt;+    # begin  patch for piwik integration&lt;/span&gt;
-&lt;span class="gi"&gt;+    self.piwik.use_piwik = 0&lt;/span&gt;
-&lt;span class="gi"&gt;+    self.piwik.base_url = &amp;#39;&amp;#39;&lt;/span&gt;
-&lt;span class="gi"&gt;+    self.piwik.site_id = &amp;#39;&amp;#39;&lt;/span&gt;
-&lt;span class="gi"&gt;+    self.piwik.use_jsindex = 0&lt;/span&gt;
-&lt;span class="gi"&gt;+    # end  patch for piwik integration&lt;/span&gt;
-&lt;span class="gi"&gt;+   &lt;/span&gt;
- def _startswith(somestr, substr):
-   return somestr[:len(substr)] == substr
-
-&lt;span class="gh"&gt;diff -ru viewvc-&lt;span class="caps"&gt;ORIG&lt;/span&gt;/templates/include/footer.ezt viewvc/templates/include/footer.ezt&lt;/span&gt;
-&lt;span class="gd"&gt;--- viewvc-&lt;span class="caps"&gt;ORIG&lt;/span&gt;/templates/include/footer.ezt    2012-01-25 08:31:52.000000000 -0500&lt;/span&gt;
-&lt;span class="gi"&gt;+++ viewvc/templates/include/footer.ezt 2012-03-23 22:03:04.000000000 -0400&lt;/span&gt;
-&lt;span class="gu"&gt;@@ -13,5 +13,17 @@&lt;/span&gt;
-
-
-
-&lt;span class="gi"&gt;+[is cfg.piwik.use_piwik &amp;quot;1&amp;quot;]&lt;/span&gt;
-&lt;span class="gi"&gt;+&lt;/span&gt;
-&lt;span class="gi"&gt;+var pkBaseURL = ((&amp;quot;https:&amp;quot; == document.location.protocol) ? &amp;quot;https://[cfg.piwik.base_url]/&amp;quot; : &amp;quot;http://[cfg.piwik.base_url]/&amp;quot;);&lt;/span&gt;
-&lt;span class="gi"&gt;+document.write(unescape(&amp;quot;%3Cscript src=&amp;#39;&amp;quot; + pkBaseURL + &amp;quot;[is cfg.piwik.use_jsindex &amp;quot;1&amp;quot;]js/[else]piwik.js[end]&amp;#39; type=&amp;#39;text/javascript&amp;#39;%3E%3C/script%3E&amp;quot;));&lt;/span&gt;
-&lt;span class="gi"&gt;+&lt;/span&gt;
-&lt;span class="gi"&gt;+try {&lt;/span&gt;
-&lt;span class="gi"&gt;+var piwikTracker = Piwik.getTracker(pkBaseURL + &amp;quot;piwik.php&amp;quot;, [cfg.piwik.site_id]);&lt;/span&gt;
-&lt;span class="gi"&gt;+piwikTracker.trackPageView();&lt;/span&gt;
-&lt;span class="gi"&gt;+piwikTracker.enableLinkTracking();&lt;/span&gt;
-&lt;span class="gi"&gt;+} catch( err ) {}&lt;/span&gt;
-&lt;span class="gi"&gt;+&lt;/span&gt;
-&lt;span class="gi"&gt;+[else][end]&lt;/span&gt;
-
-
-Only in viewvc-&lt;span class="caps"&gt;ORIG&lt;/span&gt;/templates/include: header.ezt~
-&lt;span class="gh"&gt;diff -ru viewvc-&lt;span class="caps"&gt;ORIG&lt;/span&gt;/viewvc.conf.dist viewvc/viewvc.conf.dist&lt;/span&gt;
-&lt;span class="gd"&gt;--- viewvc-&lt;span class="caps"&gt;ORIG&lt;/span&gt;/viewvc.conf.dist    2012-01-25 08:31:52.000000000 -0500&lt;/span&gt;
-&lt;span class="gi"&gt;+++ viewvc/viewvc.conf.dist 2012-03-23 21:44:02.000000000 -0400&lt;/span&gt;
-&lt;span class="gu"&gt;@@ -1131,3 +1131,29 @@&lt;/span&gt;
- #viewvc_base_url =
-
- ##---------------------------------------------------------------------------
-&lt;span class="gi"&gt;+[piwik]&lt;/span&gt;
-&lt;span class="gi"&gt;+&lt;/span&gt;
-&lt;span class="gi"&gt;+## This section enables Piwik  web analytics tracking.&lt;/span&gt;
-&lt;span class="gi"&gt;+## If piwik is enabled (use_piwik = 1) all other options must be specified.&lt;/span&gt;
-&lt;span class="gi"&gt;+##&lt;/span&gt;
-&lt;span class="gi"&gt;+## This is based on a patch by Jason Antman  &lt;/span&gt;
-&lt;span class="gi"&gt;+## to ViewVC 1.1.13, written 2012-03-23.&lt;/span&gt;
-&lt;span class="gi"&gt;+## The latest version of the patch, and information on it, can always be found at:&lt;/span&gt;
-&lt;span class="gi"&gt;+## &lt;/span&gt;
-&lt;span class="gi"&gt;+##&lt;/span&gt;
-&lt;span class="gi"&gt;+##&lt;/span&gt;
-&lt;span class="gi"&gt;+## To enable piwik, change use_piwik to 1. Set to 0 to disable&lt;/span&gt;
-&lt;span class="gi"&gt;+use_piwik = 1&lt;/span&gt;
-&lt;span class="gi"&gt;+##&lt;/span&gt;
-&lt;span class="gi"&gt;+## Set base_url to the hostname and path to your piwik installation, with no trailing slash.&lt;/span&gt;
-&lt;span class="gi"&gt;+## i.e. piwik.example.com or www.example.com/piwik&lt;/span&gt;
-&lt;span class="gi"&gt;+base_url = piwik.example.com&lt;/span&gt;
-&lt;span class="gi"&gt;+##&lt;/span&gt;
-&lt;span class="gi"&gt;+## Set to the numeric id of your website in Piwik&lt;/span&gt;
-&lt;span class="gi"&gt;+site_id = 5&lt;/span&gt;
-&lt;span class="gi"&gt;+##&lt;/span&gt;
-&lt;span class="gi"&gt;+## Set to 1 if you want to use js/index.php to serve the tracking code, &lt;/span&gt;
-&lt;span class="gi"&gt;+## or leave at 0 if you want to call piwik.js directly&lt;/span&gt;
-&lt;span class="gi"&gt;+use_jsindex = 0&lt;/span&gt;
-&lt;span class="gi"&gt;+&lt;/span&gt;
-&lt;span class="gi"&gt;+##---------------------------------------------------------------------------&lt;/span&gt;
-\ No newline at end of file
-&lt;/pre&gt;&lt;/div&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Fri, 23 Mar 2012 21:15:00 -0400</pubDate><guid>tag:blog.jasonantman.com,2012-03-23:2012/03/adding-piwik-web-analytics-integration-to-viewvc/</guid><category>analytics</category><category>piwik</category><category>python</category><category>subversion</category><category>svn</category><category>tracking</category><category>viewvc</category></item><item><title>Meld - Graphical Diff Tool for SVN Directories</title><link>http://blog.jasonantman.com/2012/03/meld-graphical-diff-tool-for-svn-directories/</link><description>&lt;p&gt;I&amp;#8217;ve been in the process of manually merging two directories in a
+history browsing, graphical diffs …&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Fri, 23 Mar 2012 21:15:00 -0400</pubDate><guid isPermaLink="false">tag:blog.jasonantman.com,2012-03-23:/2012/03/adding-piwik-web-analytics-integration-to-viewvc/</guid><category>analytics</category><category>piwik</category><category>python</category><category>subversion</category><category>svn</category><category>tracking</category><category>viewvc</category></item><item><title>Meld - Graphical Diff Tool for SVN Directories</title><link>http://blog.jasonantman.com/2012/03/meld-graphical-diff-tool-for-svn-directories/</link><description>&lt;p&gt;I&amp;#8217;ve been in the process of manually merging two directories in a
 subversion repo. The second started out as a &amp;#8220;development&amp;#8221; copy of the
 first (without branching, unfortunately). Since there&amp;#8217;s quite a few
 files, I decided that a graphical diff program is a must. I usually use
-&lt;a href="http://kdiff3.sourceforge.net"&gt;kdiff3&lt;/a&gt;, but my requirements for this
-are a bit more stringent than usual: it has to handle recursive diffs on
-two directories, and it has to be able to ignore &lt;span class="caps"&gt;SVN&lt;/span&gt; keywords (or an
-arbitrary regex) since all of the files have keyword substitution on
-LastChangedRevision and HeadURL. Kdiff3 supports &lt;a href="http://kdiff3.sourceforge.net/doc/preprocessors.html"&gt;preprocessor
-commands&lt;/a&gt; which
-can include filtering the text through sed before performing the diff
-(so I modified their regex to ignore version control keywords), but for
-some reason (perhaps either bimary differences, or metadata differences)
-I couldn&amp;#8217;t get the file difference indicator in the diretory tree view
-to reflect this; even when ignoring keyword lines and whitespace, it
-still showed every pair of files as&amp;nbsp;different.&lt;/p&gt;
-&lt;p&gt;Enter &lt;a href="http://meldmerge.org/"&gt;Meld&lt;/a&gt;, a graphical diff project. I&amp;#8217;ve only
-used it for half an hour or so, but it seems wonderful. It&amp;#8217;s easy to
-use, has a pleasing interface similar to
-&lt;a href="http://www.caffeinated.me.uk/kompare/"&gt;Kompare&lt;/a&gt;, and even has simple
-check boxes in the options menu to ignore whitespace and &lt;span class="caps"&gt;SVN&lt;/span&gt; keywords -
-and they work! So far, I&amp;#8217;m about half way through my 300+ file tree, and
-the merge is going&amp;nbsp;wonderfully.&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Mon, 12 Mar 2012 09:48:00 -0400</pubDate><guid>tag:blog.jasonantman.com,2012-03-12:2012/03/meld-graphical-diff-tool-for-svn-directories/</guid><category>diff</category><category>kde</category><category>kdiff</category><category>meld</category><category>merge</category><category>subversion</category><category>svn</category></item><item><title>Client-side subversion commit message hooks</title><link>http://blog.jasonantman.com/2011/01/client-side-subversion-commit-message-hooks/</link><description>&lt;p&gt;While I know this isn&amp;#8217;t best practice, since we use &lt;span class="caps"&gt;LDAP&lt;/span&gt;-based auth for
+&lt;a href="http://kdiff3.sourceforge.net"&gt;kdiff3 …&lt;/a&gt;&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Mon, 12 Mar 2012 09:48:00 -0400</pubDate><guid isPermaLink="false">tag:blog.jasonantman.com,2012-03-12:/2012/03/meld-graphical-diff-tool-for-svn-directories/</guid><category>diff</category><category>kde</category><category>kdiff</category><category>meld</category><category>merge</category><category>subversion</category><category>svn</category></item><item><title>Client-side subversion commit message hooks</title><link>http://blog.jasonantman.com/2011/01/client-side-subversion-commit-message-hooks/</link><description>&lt;p&gt;While I know this isn&amp;#8217;t best practice, since we use &lt;span class="caps"&gt;LDAP&lt;/span&gt;-based auth for
 our Linux boxes (including a sudoers file based on &lt;span class="caps"&gt;LDAP&lt;/span&gt; group
 membership), we usually do work on some boxes as root (&lt;code&gt;sudo su -&lt;/code&gt;).
 This includes our &lt;a href="http://www.puppetlabs.com/"&gt;puppetmaster&lt;/a&gt;, where
-configs are kept in subversion and edited as root. The one problem with
-this is how to get the username of the actual committer, not root, in
-subversion&amp;nbsp;messages.&lt;/p&gt;
-&lt;p&gt;The theory that I came up with is a &lt;a href="/2011/01/how-to-get-actual-login-username-when-using-sudo-su/"&gt;shell script that finds out who the
-actual user
-is&lt;/a&gt;, and
-then tacking this onto the beginning of the subversion commit message
-(since there&amp;#8217;s no real way to do client-side hooks in subversion). While
-I struggled with subversion&amp;#8217;s lack of good client hooks, I came up with
-a theory based on a script that preloads svn-commit.tmp and then calls
-the text editor. It&amp;#8217;s actually quite&amp;nbsp;simple.&lt;/p&gt;
-&lt;p&gt;First, in your .bashrc or wherever you setup environment variables,
-&lt;code&gt;export SVN_EDITOR=/usr/local/bin/svnPreCommitClientHook.sh&lt;/code&gt;. This way,
-every time you run &lt;code&gt;svn commit&lt;/code&gt;, instead of calling your text editor
-with &lt;code&gt;svn-commit.tmp&lt;/code&gt; as an argument, the bash script will do what it
-needs to (commit message preloading) with svn-commit.tmp and &lt;em&gt;then&lt;/em&gt; call
-your editor to finish the&amp;nbsp;message.&lt;/p&gt;
-&lt;p&gt;&lt;code&gt;/usr/local/bin/svnPreCommitClientHook.sh&lt;/code&gt;:&lt;/p&gt;
-&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="c"&gt;#!/bin/bash&lt;/span&gt;
-&lt;span class="nv"&gt;&lt;span class="caps"&gt;LOGNAME&lt;/span&gt;&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="sb"&gt;`&lt;/span&gt;/usr/local/bin/getLogname.py&lt;span class="sb"&gt;`&lt;/span&gt; &lt;span class="c"&gt;# script to get user&amp;#39;s actual login name, even if using sudo su&lt;/span&gt;
-&lt;span class="nb"&gt;echo&lt;/span&gt; -e &lt;span class="s2"&gt;&amp;quot;\nBY: $&lt;span class="caps"&gt;LOGNAME&lt;/span&gt;&amp;quot;&lt;/span&gt; &amp;gt; svn-commit.foo
-cat svn-commit.tmp &amp;gt;&amp;gt; svn-commit.foo
-mv svn-commit.foo svn-commit.tmp
-&lt;span class="s2"&gt;&amp;quot;$&lt;span class="caps"&gt;EDITOR&lt;/span&gt;&amp;quot;&lt;/span&gt; svn-commit.tmp
-&lt;/pre&gt;&lt;/div&gt;
-
-
-&lt;p&gt;Using this method, running &lt;code&gt;svn commit&lt;/code&gt; will pull up your text editor
-with &amp;#8220;&lt;span class="caps"&gt;BY&lt;/span&gt;: username&amp;#8221; already inserted in the commit&amp;nbsp;message.&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Wed, 05 Jan 2011 11:23:00 -0500</pubDate><guid>tag:blog.jasonantman.com,2011-01-05:2011/01/client-side-subversion-commit-message-hooks/</guid><category>linux</category><category>puppet</category><category>subversion</category><category>svn</category></item><item><title>Subversion ‘is missing or not locked’ error</title><link>http://blog.jasonantman.com/2010/01/subversion-is-missing-or-not-locked-error/</link><description>&lt;p&gt;Recently I was doing some work on a few &lt;span class="caps"&gt;PHP&lt;/span&gt; scripts, and came by a
+configs are kept in subversion and edited …&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Wed, 05 Jan 2011 11:23:00 -0500</pubDate><guid isPermaLink="false">tag:blog.jasonantman.com,2011-01-05:/2011/01/client-side-subversion-commit-message-hooks/</guid><category>linux</category><category>puppet</category><category>subversion</category><category>svn</category></item><item><title>Subversion ‘is missing or not locked’ error</title><link>http://blog.jasonantman.com/2010/01/subversion-is-missing-or-not-locked-error/</link><description>&lt;p&gt;Recently I was doing some work on a few &lt;span class="caps"&gt;PHP&lt;/span&gt; scripts, and came by a
 rather annoying error while trying to commit to&amp;nbsp;subversion:&lt;/p&gt;
-&lt;div class="codehilite"&gt;&lt;pre&gt;svn: Commit failed (details follow):
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;svn: Commit failed (details follow):
 svn: Working copy &amp;#39;/srv/www/htdocs/newcall/stats/generated&amp;#39; is missing or not locked
 &lt;/pre&gt;&lt;/div&gt;
 
 
-&lt;p&gt;The problem was a directory, &amp;#8220;generated&amp;#8221;. This particular app makes use
-of &lt;a href="http://naku.dohcrew.com/libchart"&gt;libchart&lt;/a&gt; to draw simple charts in
-&lt;span class="caps"&gt;PHP&lt;/span&gt;. Libchart writes the charts to files, and therefore needs a
-directory writable by the Apache user. So, I created the &lt;code&gt;generated/&lt;/code&gt;
-directory for these output files, and &lt;code&gt;chown&lt;/code&gt;ed &lt;code&gt;wwwrun:www&lt;/code&gt;. Now,
-apparently, the subversion &lt;code&gt;svn add&lt;/code&gt; command doesn&amp;#8217;t check
-ownership/writable permissions before adding a directory. So, it added
-&lt;code&gt;generated/&lt;/code&gt; to the main list of files, but couldn&amp;#8217;t write the &lt;code&gt;.svn&lt;/code&gt;
-directory and add a lock. &lt;span class="caps"&gt;IMHO&lt;/span&gt;, this is an error in the svn&amp;nbsp;client.&lt;/p&gt;
-&lt;p&gt;I couldn&amp;#8217;t find any solutions to the problem online. Essentially, I have
-an empty directory (or at least nothing useful in it) that got partially
-added to svn - it was added to the &lt;code&gt;.svn/entries&lt;/code&gt; file in the parent
-directory, but never had its own &lt;code&gt;.svn&lt;/code&gt; directory&amp;nbsp;created.&lt;/p&gt;
-&lt;p&gt;The only solution that I found is to manually edit the &lt;code&gt;.svn/entries&lt;/code&gt;
-file in the parent directory. &lt;strong&gt;&lt;span class="caps"&gt;WARNING&lt;/span&gt;:&lt;/strong&gt; this isn&amp;#8217;t for the faint of
-heart. Be sure you don&amp;#8217;t screw anything&amp;nbsp;up.&lt;/p&gt;
-&lt;ol&gt;
-&lt;li&gt;Open the &lt;code&gt;.svn/entries&lt;/code&gt; file in the parent directory in a text
-    editor (i.e. if the problem directory is &lt;code&gt;stats/generated&lt;/code&gt;, edit
-    &lt;code&gt;stats/.svn/entries&lt;/code&gt;&lt;/li&gt;
-&lt;li&gt;Find the &lt;code&gt;entry&lt;/code&gt; node with the correct &amp;#8220;name&amp;#8221; attribute for the
-    directory in question. For stats/generated, in the
-    &lt;code&gt;stats/.svn/entries&lt;/code&gt; file, it should look&amp;nbsp;like:&lt;/li&gt;
-&lt;/ol&gt;
-&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="nt"&gt;&amp;lt;entry&lt;/span&gt;
-   &lt;span class="na"&gt;name=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;generated&amp;quot;&lt;/span&gt;
-   &lt;span class="na"&gt;kind=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;dir&amp;quot;&lt;/span&gt;
-   &lt;span class="na"&gt;schedule=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;add&amp;quot;&lt;/span&gt;&lt;span class="nt"&gt;/&amp;gt;&lt;/span&gt;
-&lt;/pre&gt;&lt;/div&gt;
-
-
-&lt;ol&gt;
-&lt;li&gt;Make the entries file writable (&lt;code&gt;chmod u+w entries&lt;/code&gt;)&lt;/li&gt;
-&lt;li&gt;Remove the entry from the&amp;nbsp;file.&lt;/li&gt;
-&lt;li&gt;Set the entries file back to non-writable (&lt;code&gt;chmod u-w entries&lt;/code&gt;)&lt;/li&gt;
-&lt;li&gt;Remove any save files if they were created (i.e. &lt;code&gt;entries~&lt;/code&gt; for&amp;nbsp;emacs)&lt;/li&gt;
-&lt;li&gt;Remove the directory itself and re-create it, this time adding to
-    svn before setting the&amp;nbsp;ownership.&lt;/li&gt;
-&lt;li&gt;Commit. It should now&amp;nbsp;work.&lt;/li&gt;
-&lt;/ol&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Fri, 29 Jan 2010 15:58:00 -0500</pubDate><guid>tag:blog.jasonantman.com,2010-01-29:2010/01/subversion-is-missing-or-not-locked-error/</guid><category>subversion</category><category>svn</category><category>version control</category></item></channel></rss>
+&lt;p&gt;The problem was a directory, &amp;#8220;generated&amp;#8221;. This …&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Fri, 29 Jan 2010 15:58:00 -0500</pubDate><guid isPermaLink="false">tag:blog.jasonantman.com,2010-01-29:/2010/01/subversion-is-missing-or-not-locked-error/</guid><category>subversion</category><category>svn</category><category>version control</category></item></channel></rss>

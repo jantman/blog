@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Jason Antman's Blog</title><link href="http://blog.jasonantman.com/" rel="alternate"></link><link href="http://blog.jasonantman.com/feeds/tags/wrapper.atom.xml" rel="self"></link><id>http://blog.jasonantman.com/</id><updated>2012-01-15T17:26:00-05:00</updated><entry><title>Secure rsnapshot backups over the WAN via SSH</title><link href="http://blog.jasonantman.com/2012/01/secure-rsnapshot-backups-over-the-wan-via-ssh/" rel="alternate"></link><updated>2012-01-15T17:26:00-05:00</updated><author><name>admin</name></author><id>tag:blog.jasonantman.com,2012-01-15:2012/01/secure-rsnapshot-backups-over-the-wan-via-ssh/</id><summary type="html">&lt;p&gt;Since I moved all of my &lt;span class="caps"&gt;WAN&lt;/span&gt;-facing stuff (mail, web, this blog, svn
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Jason Antman's Blog - wrapper</title><link href="http://blog.jasonantman.com/" rel="alternate"></link><link href="http://blog.jasonantman.com/feeds/tags/wrapper.atom.xml" rel="self"></link><id>http://blog.jasonantman.com/</id><updated>2012-01-15T17:26:00-05:00</updated><entry><title>Secure rsnapshot backups over the WAN via SSH</title><link href="http://blog.jasonantman.com/2012/01/secure-rsnapshot-backups-over-the-wan-via-ssh/" rel="alternate"></link><published>2012-01-15T17:26:00-05:00</published><updated>2012-01-15T17:26:00-05:00</updated><author><name>admin</name></author><id>tag:blog.jasonantman.com,2012-01-15:/2012/01/secure-rsnapshot-backups-over-the-wan-via-ssh/</id><summary type="html">&lt;p&gt;Since I moved all of my &lt;span class="caps"&gt;WAN&lt;/span&gt;-facing stuff (mail, web, this blog, svn
+etc.) to a virtual server with &lt;a href="http://www.linode.com"&gt;Linode&lt;/a&gt;, and just
+have a desktop at home, it&amp;#8217;s no longer practical to use
+&lt;a href="http://www.bacula.org/"&gt;Bacula&lt;/a&gt; for backups. Linode manages daily and
+weekly backups through their backup service, but they …&lt;/p&gt;</summary><content type="html">&lt;p&gt;Since I moved all of my &lt;span class="caps"&gt;WAN&lt;/span&gt;-facing stuff (mail, web, this blog, svn
 etc.) to a virtual server with &lt;a href="http://www.linode.com"&gt;Linode&lt;/a&gt;, and just
 have a desktop at home, it&amp;#8217;s no longer practical to use
 &lt;a href="http://www.bacula.org/"&gt;Bacula&lt;/a&gt; for backups. Linode manages daily and
@@ -109,17 +113,17 @@ without affecting the&amp;nbsp;others.&lt;/p&gt;
 &lt;p&gt;Create host-specific pre- and post-backup scripts. I put them in
     &lt;code&gt;/etc/rsnapshot.d/&lt;/code&gt;.
     &lt;code&gt;/etc/rsnapshot.d/pre-remoteHostName.sh&lt;/code&gt;:&lt;/p&gt;
-&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="c"&gt;#!/bin/bash&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="ch"&gt;#!/bin/bash&lt;/span&gt;
 
-&lt;span class="c"&gt;# do anything else needed on the local system before a backup&lt;/span&gt;
+&lt;span class="c1"&gt;# do anything else needed on the local system before a backup&lt;/span&gt;
 ssh -i /path/to/remoteHostname_remoteBackupUsername_cmd rsyncuser@remoteHost pre
 &lt;/pre&gt;&lt;/div&gt;
 
 
 &lt;p&gt;&lt;code&gt;/etc/rsnapshot.d/post-remoteHostName.sh&lt;/code&gt;:&lt;/p&gt;
-&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="c"&gt;#!/bin/bash&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="ch"&gt;#!/bin/bash&lt;/span&gt;
 
-&lt;span class="c"&gt;# do anything else needed on the local system after a backup&lt;/span&gt;
+&lt;span class="c1"&gt;# do anything else needed on the local system after a backup&lt;/span&gt;
 ssh -i /path/to/remoteHostname_remoteBackupUsername_cmd rsyncuser@remoteHost post
 &lt;/pre&gt;&lt;/div&gt;
 
@@ -139,7 +143,7 @@ ssh -i /path/to/remoteHostname_remoteBackupUsername_cmd rsyncuser@remoteHost pos
     &lt;code&gt;rsync_short_args&lt;/code&gt;, &lt;code&gt;rsync_long_args&lt;/code&gt;, &lt;code&gt;ssh_args&lt;/code&gt;, &lt;code&gt;cmd_preexec&lt;/code&gt;,
     &lt;code&gt;cmd_postexec&lt;/code&gt; and &lt;code&gt;backup&lt;/code&gt;. Here&amp;#8217;s an example of my config file,
     with comments and blank lines&amp;nbsp;removed:&lt;/p&gt;
-&lt;div class="codehilite"&gt;&lt;pre&gt;config_version  1.2
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;config_version  1.2
 snapshot_root   /mnt/backup/rsnapshot/
 cmd_cp          /bin/cp
 cmd_rm          /bin/rm
@@ -174,18 +178,18 @@ remoteHostName, logging in as rsyncuser), and where to back up to&amp;nbsp;(snap
 &lt;p&gt;Create two scripts that will actually trigger the backups, which
     I&amp;#8217;ll call &lt;code&gt;/root/bin/rsnapshot-daily.sh&lt;/code&gt; and &lt;code&gt;/root/bin/rsnapshot-weekly.sh&lt;/code&gt;:&lt;/p&gt;
 &lt;p&gt;&lt;code&gt;/root/bin/rsnapshot-daily.sh&lt;/code&gt;:&lt;/p&gt;
-&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="c"&gt;#!/bin/bash&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="ch"&gt;#!/bin/bash&lt;/span&gt;
 
 /usr/bin/rsnapshot -c /etc/rsnapshot-remoteHostName.conf daily
-&lt;span class="c"&gt;# add other hosts here; note, they&amp;#39;ll run in series&lt;/span&gt;
+&lt;span class="c1"&gt;# add other hosts here; note, they&amp;#39;ll run in series&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 
 
 &lt;p&gt;&lt;code&gt;/root/bin/rsnapshot-weekly.sh&lt;/code&gt;:&lt;/p&gt;
-&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="c"&gt;#!/bin/bash&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="ch"&gt;#!/bin/bash&lt;/span&gt;
 
 /usr/bin/rsnapshot -c /etc/rsnapshot-remoteHostName.conf weekly
-&lt;span class="c"&gt;# add other hosts here; note, they&amp;#39;ll run in series&lt;/span&gt;
+&lt;span class="c1"&gt;# add other hosts here; note, they&amp;#39;ll run in series&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 
 
@@ -193,7 +197,7 @@ remoteHostName, logging in as rsyncuser), and where to back up to&amp;nbsp;(snap
 &lt;li&gt;
 &lt;p&gt;Add two entries to root&amp;#8217;s croontab to run the rsnapshot backups.
     Adjust the following days and times to your&amp;nbsp;liking:&lt;/p&gt;
-&lt;div class="codehilite"&gt;&lt;pre&gt;0 1 * * Mon /root/bin/rsnapshot-weekly.sh # run the weekly backups every Monday at 01:00
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;0 1 * * Mon /root/bin/rsnapshot-weekly.sh # run the weekly backups every Monday at 01:00
 30 2 * * * /root/bin/rsnapshot-daily.sh # run the daily backups every day at 02:30, which *should* be after the weekly finished on Monday morning
 &lt;/pre&gt;&lt;/div&gt;
 
@@ -219,12 +223,12 @@ provide my &lt;a href="/2012/02/nagios-check-plugin-for-rsnapshot-backups/"&gt;N
 Backups&lt;/a&gt;.&lt;/p&gt;
 &lt;p&gt;The referenced scripts, config files, etc. are&amp;nbsp;below:&lt;/p&gt;
 &lt;p&gt;&lt;code&gt;cmd-wrapper.c&lt;/code&gt;:&lt;/p&gt;
-&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="cp"&gt;#include &lt;/span&gt;
-&lt;span class="cp"&gt;#include &lt;/span&gt;
-&lt;span class="cp"&gt;#include &lt;/span&gt;
-&lt;span class="cp"&gt;#include &lt;/span&gt;
-&lt;span class="cp"&gt;#include &lt;/span&gt;
-&lt;span class="cp"&gt;#include &lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="cp"&gt;#include&lt;/span&gt; 
+&lt;span class="cpf"&gt;#include &lt;/span&gt;&lt;span class="cp"&gt;&lt;/span&gt;
+&lt;span class="cp"&gt;#include&lt;/span&gt; 
+&lt;span class="cpf"&gt;#include &lt;/span&gt;&lt;span class="cp"&gt;&lt;/span&gt;
+&lt;span class="cp"&gt;#include&lt;/span&gt; 
+&lt;span class="cpf"&gt;#include &lt;/span&gt;&lt;span class="cp"&gt;&lt;/span&gt;
 
 &lt;span class="cm"&gt;/********************************************&lt;/span&gt;
 &lt;span class="cm"&gt; * Wrapper - Secure Yourself                &lt;/span&gt;
@@ -306,23 +310,23 @@ Backups&lt;/a&gt;.&lt;/p&gt;
 
 
 &lt;p&gt;&lt;code&gt;rsync-wrapper.c&lt;/code&gt;:&lt;/p&gt;
-&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="cp"&gt;#include &lt;/span&gt;
-&lt;span class="cp"&gt;#include &lt;/span&gt;
-&lt;span class="cp"&gt;#include &lt;/span&gt;
-&lt;span class="cp"&gt;#include &lt;/span&gt;
-&lt;span class="cp"&gt;#include &lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="cp"&gt;#include&lt;/span&gt; 
+&lt;span class="cpf"&gt;#include &lt;/span&gt;&lt;span class="cp"&gt;&lt;/span&gt;
+&lt;span class="cp"&gt;#include&lt;/span&gt; 
+&lt;span class="cpf"&gt;#include &lt;/span&gt;&lt;span class="cp"&gt;&lt;/span&gt;
+&lt;span class="cp"&gt;#include&lt;/span&gt; 
 
-&lt;span class="cm"&gt;/********************************************&lt;/span&gt;
-&lt;span class="cm"&gt; * Wrapper - Secure Yourself                &lt;/span&gt;
-&lt;span class="cm"&gt; *                                          &lt;/span&gt;
-&lt;span class="cm"&gt; * 2007 - Mike Golvach - eggi@comcast.net   &lt;/span&gt;
-&lt;span class="cm"&gt; * Modified 2012 by Jason Antman  &lt;/span&gt;
-&lt;span class="cm"&gt; *  - configured for use as rsync wrapper&lt;/span&gt;
-&lt;span class="cm"&gt; *                                          &lt;/span&gt;
-&lt;span class="cm"&gt; * $HeadURL: http://svn.jasonantman.com/misc-scripts/rsync-wrapper.c $&lt;/span&gt;
-&lt;span class="cm"&gt; * $LastChangedRevision: 26 $&lt;/span&gt;
-&lt;span class="cm"&gt; *                                          &lt;/span&gt;
-&lt;span class="cm"&gt; ********************************************/&lt;/span&gt;
+&lt;span class="cpf"&gt;/********************************************&lt;/span&gt;&lt;span class="cp"&gt;&lt;/span&gt;
+ &lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="n"&gt;Wrapper&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt; &lt;span class="n"&gt;Secure&lt;/span&gt; &lt;span class="n"&gt;Yourself&lt;/span&gt;                
+ &lt;span class="o"&gt;*&lt;/span&gt;                                          
+ &lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="mi"&gt;2007&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt; &lt;span class="n"&gt;Mike&lt;/span&gt; &lt;span class="n"&gt;Golvach&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt; &lt;span class="n"&gt;eggi&lt;/span&gt;&lt;span class="err"&gt;@&lt;/span&gt;&lt;span class="n"&gt;comcast&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;net&lt;/span&gt;   
+ &lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="n"&gt;Modified&lt;/span&gt; &lt;span class="mi"&gt;2012&lt;/span&gt; &lt;span class="n"&gt;by&lt;/span&gt; &lt;span class="n"&gt;Jason&lt;/span&gt; &lt;span class="n"&gt;Antman&lt;/span&gt;  
+ &lt;span class="o"&gt;*&lt;/span&gt;  &lt;span class="o"&gt;-&lt;/span&gt; &lt;span class="n"&gt;configured&lt;/span&gt; &lt;span class="k"&gt;for&lt;/span&gt; &lt;span class="n"&gt;use&lt;/span&gt; &lt;span class="n"&gt;as&lt;/span&gt; &lt;span class="n"&gt;rsync&lt;/span&gt; &lt;span class="n"&gt;wrapper&lt;/span&gt;
+ &lt;span class="o"&gt;*&lt;/span&gt;                                          
+ &lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="nl"&gt;HeadURL&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="nl"&gt;http&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="c1"&gt;//svn.jasonantman.com/misc-scripts/rsync-wrapper.c $&lt;/span&gt;
+ &lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="nl"&gt;LastChangedRevision&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="mi"&gt;26&lt;/span&gt; &lt;span class="err"&gt;$&lt;/span&gt;
+ &lt;span class="o"&gt;*&lt;/span&gt;                                          
+ &lt;span class="o"&gt;*******************************************&lt;/span&gt;&lt;span class="err"&gt;*/&lt;/span&gt;
 
 &lt;span class="cm"&gt;/* Creative Commons Attribution-Noncommercial-Share Alike 3.0 United States License */&lt;/span&gt;
 
@@ -374,7 +378,7 @@ Backups&lt;/a&gt;.&lt;/p&gt;
 
 
 &lt;p&gt;&lt;code&gt;/etc/rsnapshot.d/rsync-include-remoteHostName.txt&lt;/code&gt;:&lt;/p&gt;
-&lt;div class="codehilite"&gt;&lt;pre&gt;# Include
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;# Include
 + /dev/console
 + /dev/initctl
 + /dev/null
@@ -384,7 +388,7 @@ Backups&lt;/a&gt;.&lt;/p&gt;
 
 
 &lt;p&gt;&lt;code&gt;/etc/rsnapshot.d/rsync-exclude-remoteHostName.txt&lt;/code&gt;:&lt;/p&gt;
-&lt;div class="codehilite"&gt;&lt;pre&gt;# Exclude
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;# Exclude
 - /cgroup/*
 - /dev/*
 - /lib/*
@@ -393,4 +397,4 @@ Backups&lt;/a&gt;.&lt;/p&gt;
 - /sys/
 - /tmp/
 - /var/log/*
-&lt;/pre&gt;&lt;/div&gt;</summary><category term="backups"></category><category term="linode"></category><category term="rsnapshot"></category><category term="rsync"></category><category term="security"></category><category term="ssh"></category><category term="wrapper"></category></entry></feed>
+&lt;/pre&gt;&lt;/div&gt;</content><category term="backups"></category><category term="linode"></category><category term="rsnapshot"></category><category term="rsync"></category><category term="security"></category><category term="ssh"></category><category term="wrapper"></category></entry></feed>

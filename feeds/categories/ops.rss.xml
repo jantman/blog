@@ -1,275 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Jason Antman's Blog</title><link>http://blog.jasonantman.com/</link><description></description><atom:link href="http://blog.jasonantman.com/feeds/categories/ops.rss.xml" rel="self"></atom:link><lastBuildDate>Mon, 10 Jun 2013 06:00:00 -0400</lastBuildDate><item><title>Python script to check a list of URLs for return code, and final return code if redirected</title><link>http://blog.jasonantman.com/2013/06/python-script-to-check-a-list-of-urls-for-return-code-and-final-return-code-if-redirected/</link><description>&lt;p&gt;Every once in a while I need to add a bunch of redirects in Apache.
+<rss version="2.0"><channel><title>Jason Antman's Blog - Ops</title><link>http://blog.jasonantman.com/</link><description></description><lastBuildDate>Mon, 10 Jun 2013 06:00:00 -0400</lastBuildDate><item><title>Python script to check a list of URLs for return code, and final return code if redirected</title><link>http://blog.jasonantman.com/2013/06/python-script-to-check-a-list-of-urls-for-return-code-and-final-return-code-if-redirected/</link><description>&lt;p&gt;Every once in a while I need to add a bunch of redirects in Apache.
 Here&amp;#8217;s a handy, dead simple Python script which takes a list of URLs on
 &lt;span class="caps"&gt;STDIN&lt;/span&gt;, and for each one prints out either the response code, or, if the
-response is a redirect, the response code of what is redirected to.
-Pretty useful when you&amp;#8217;ve just added a bunch of redirects and want to
-make sure none of them&amp;nbsp;404.&lt;/p&gt;
-&lt;p&gt;The latest source of this script lives at
-&lt;a href="https://github.com/jantman/misc-scripts/blob/master/check_url_list.py"&gt;https://github.com/jantman/misc-scripts/blob/master/check_url_list.py&lt;/a&gt;.&lt;/p&gt;
-&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="c"&gt;#!/usr/bin/env python&lt;/span&gt;
-&lt;span class="sd"&gt;&amp;quot;&amp;quot;&amp;quot;&lt;/span&gt;
-&lt;span class="sd"&gt;Script to check a list of URLs (passed on stdin) for response code, and for response code of the final path in a series of redirects.&lt;/span&gt;
-&lt;span class="sd"&gt;Outputs (to stdout) a list of count of a given &lt;span class="caps"&gt;URL&lt;/span&gt;, response code, and if redirected, the final &lt;span class="caps"&gt;URL&lt;/span&gt; and its response code&lt;/span&gt;
-
-&lt;span class="sd"&gt;Optionally, with verbose flag, report on all &lt;span class="caps"&gt;URL&lt;/span&gt; checks on &lt;span class="caps"&gt;STDERR&lt;/span&gt;&lt;/span&gt;
-
-&lt;span class="sd"&gt;Copyright 2013 Jason Antman  all rights reserved&lt;/span&gt;
-&lt;span class="sd"&gt;This script is distributed under the terms of the GPLv3, as per the&lt;/span&gt;
-&lt;span class="sd"&gt;&lt;span class="caps"&gt;LICENSE&lt;/span&gt; file in this repository.&lt;/span&gt;
-
-&lt;span class="sd"&gt;The canonical version of this script can be found at:&lt;/span&gt;
-
-&lt;span class="sd"&gt;&amp;quot;&amp;quot;&amp;quot;&lt;/span&gt;
-
-&lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="nn"&gt;sys&lt;/span&gt;
-&lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="nn"&gt;urllib2&lt;/span&gt;
-
-&lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;get_url_nofollow&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;url&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
-    &lt;span class="k"&gt;try&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
-        &lt;span class="n"&gt;response&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;urllib2&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;urlopen&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;url&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
-        &lt;span class="n"&gt;code&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;response&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;getcode&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
-        &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="n"&gt;code&lt;/span&gt;
-    &lt;span class="k"&gt;except&lt;/span&gt; &lt;span class="n"&gt;urllib2&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;HTTPError&lt;/span&gt; &lt;span class="k"&gt;as&lt;/span&gt; &lt;span class="n"&gt;e&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
-        &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="n"&gt;e&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;code&lt;/span&gt;
-    &lt;span class="k"&gt;except&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
-        &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt;
-
-&lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;main&lt;/span&gt;&lt;span class="p"&gt;():&lt;/span&gt;
-    &lt;span class="n"&gt;urls&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;{}&lt;/span&gt;
-
-    &lt;span class="k"&gt;for&lt;/span&gt; &lt;span class="n"&gt;line&lt;/span&gt; &lt;span class="ow"&gt;in&lt;/span&gt; &lt;span class="n"&gt;sys&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;stdin&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;readlines&lt;/span&gt;&lt;span class="p"&gt;():&lt;/span&gt;
-        &lt;span class="n"&gt;line&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;line&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;strip&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
-        &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="n"&gt;line&lt;/span&gt; &lt;span class="ow"&gt;not&lt;/span&gt; &lt;span class="ow"&gt;in&lt;/span&gt; &lt;span class="n"&gt;urls&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
-            &lt;span class="n"&gt;sys&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;stderr&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;write&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;+ checking &lt;span class="caps"&gt;URL&lt;/span&gt;: &lt;/span&gt;&lt;span class="si"&gt;%s&lt;/span&gt;&lt;span class="se"&gt;\n&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;&lt;/span&gt; &lt;span class="o"&gt;%&lt;/span&gt; &lt;span class="n"&gt;line&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
-            &lt;span class="n"&gt;urls&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;line&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;code&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="n"&gt;get_url_nofollow&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;line&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;count&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;
-            &lt;span class="n"&gt;sys&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;stderr&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;write&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;++ &lt;/span&gt;&lt;span class="si"&gt;%s&lt;/span&gt;&lt;span class="se"&gt;\n&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;&lt;/span&gt; &lt;span class="o"&gt;%&lt;/span&gt; &lt;span class="nb"&gt;str&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;urls&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;line&lt;/span&gt;&lt;span class="p"&gt;]))&lt;/span&gt;
-        &lt;span class="k"&gt;else&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
-            &lt;span class="n"&gt;urls&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;line&lt;/span&gt;&lt;span class="p"&gt;][&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;count&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;urls&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;line&lt;/span&gt;&lt;span class="p"&gt;][&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;count&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt;
-
-    &lt;span class="k"&gt;for&lt;/span&gt; &lt;span class="n"&gt;url&lt;/span&gt; &lt;span class="ow"&gt;in&lt;/span&gt; &lt;span class="n"&gt;urls&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
-        &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="n"&gt;urls&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;url&lt;/span&gt;&lt;span class="p"&gt;][&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;code&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="o"&gt;!=&lt;/span&gt; &lt;span class="mi"&gt;200&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
-            &lt;span class="k"&gt;print&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;&lt;/span&gt;&lt;span class="si"&gt;%d&lt;/span&gt;&lt;span class="se"&gt;\t&lt;/span&gt;&lt;span class="si"&gt;%d&lt;/span&gt;&lt;span class="se"&gt;\t&lt;/span&gt;&lt;span class="si"&gt;%s&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;&lt;/span&gt; &lt;span class="o"&gt;%&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;urls&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;url&lt;/span&gt;&lt;span class="p"&gt;][&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;count&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;],&lt;/span&gt; &lt;span class="n"&gt;urls&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;url&lt;/span&gt;&lt;span class="p"&gt;][&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;code&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;],&lt;/span&gt; &lt;span class="n"&gt;url&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
-
-&lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="n"&gt;__name__&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;__main__&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
-    &lt;span class="n"&gt;main&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
-&lt;/pre&gt;&lt;/div&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Mon, 10 Jun 2013 06:00:00 -0400</pubDate><guid>tag:blog.jasonantman.com,2013-06-10:2013/06/python-script-to-check-a-list-of-urls-for-return-code-and-final-return-code-if-redirected/</guid><category>http</category><category>python</category><category>redirect</category><category>urllib</category></item><item><title>Fedora Init Script Specification Summary</title><link>http://blog.jasonantman.com/2013/01/fedora-init-script-specification-summary/</link><description>&lt;p&gt;&lt;strong&gt;Note&lt;/strong&gt; 2014-12-16: I&amp;#8217;m leaving this here for historical reasons, and since
+response is a redirect, the response …&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Mon, 10 Jun 2013 06:00:00 -0400</pubDate><guid isPermaLink="false">tag:blog.jasonantman.com,2013-06-10:/2013/06/python-script-to-check-a-list-of-urls-for-return-code-and-final-return-code-if-redirected/</guid><category>http</category><category>python</category><category>redirect</category><category>urllib</category></item><item><title>Fedora Init Script Specification Summary</title><link>http://blog.jasonantman.com/2013/01/fedora-init-script-specification-summary/</link><description>&lt;p&gt;&lt;strong&gt;Note&lt;/strong&gt; 2014-12-16: I&amp;#8217;m leaving this here for historical reasons, and since
 some older &lt;span class="caps"&gt;OS&lt;/span&gt; versions still need properly-written init scripts. Since starting
 to use &lt;a href="https://www.archlinux.org/"&gt;Arch Linux&lt;/a&gt; on my laptop, I&amp;#8217;ve become a
 convert to the &lt;a href="http://www.freedesktop.org/wiki/Software/systemd/"&gt;systemd&lt;/a&gt;
 world. I know this is a &lt;a href="http://en.wikipedia.org/wiki/Systemd#Criticism"&gt;hot topic&lt;/a&gt;
-and has sparked a lot of controversy. While I agree with some of the arguments
-in principal, I strongly feel that systemd provides the interface that
-Linux needs in modern times, and provides a unified solution to many problems
-that were previously solved in myriad ways inside init scripts. In short,
-if your distro supports systemd, I&amp;#8217;d recommend to skip past this page
-and go ahead and write a &lt;a href="http://www.freedesktop.org/software/systemd/man/systemd.unit.html"&gt;unit file&lt;/a&gt;.&lt;/p&gt;
-&lt;p&gt;I&amp;#8217;ve been deploying some new software lately (specifically
-&lt;a href="https://github.com/marisaseal/selenesse"&gt;selenesse&lt;/a&gt;, which combines
-&lt;a href="http://seleniumhq.org/"&gt;Selenium&lt;/a&gt; and &lt;a href="http://fitnesse.org/"&gt;fitnesse&lt;/a&gt;,
-&lt;a href="http://en.wikipedia.org/wiki/Xvfb"&gt;xvfb&lt;/a&gt;). None of these seem to come
-with init scripts to run as daemons, and the quality of the few
-Fedora/RedHat/CentOS init scripts I was able to find was quite poor. The
-Fedora project has a &lt;a href="http://fedoraproject.org/wiki/Packaging:SysVInitScript"&gt;Specification for SysV-style Init Scripts in their
-Packaging wiki&lt;/a&gt;,
-which specifies what a Fedora/RedHat/CentOS init script should look
-like, in excruciating detail. What follows is an overview of the more
-important points, which I&amp;#8217;m using to develop or modify the scripts I&amp;#8217;m
-currently working&amp;nbsp;on.&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;Scripts must be put in &lt;code&gt;/etc/rc.d/init.d&lt;/code&gt;, not in the &lt;code&gt;/etc/init.d&lt;/code&gt;
-    symlink. They should have 0755&amp;nbsp;permissions.&lt;/li&gt;
-&lt;li&gt;Scripts must have a Fedora-style &lt;a href="http://fedoraproject.org/wiki/Packaging:SysVInitScript#Chkconfig_Header"&gt;chkconfig
-    header&lt;/a&gt;
-    (&amp;#8220;chkconfig:&amp;#8221;, &amp;#8220;description:&amp;#8221; lines), and may have an &lt;a href="http://fedoraproject.org/wiki/Packaging:SysVInitScript#LSB_Header"&gt;&lt;span class="caps"&gt;LSB&lt;/span&gt;-style
-    header&lt;/a&gt;
-    (&lt;span class="caps"&gt;BEGIN&lt;/span&gt; &lt;span class="caps"&gt;INIT&lt;/span&gt; &lt;span class="caps"&gt;INFO&lt;/span&gt;/&lt;span class="caps"&gt;END&lt;/span&gt; &lt;span class="caps"&gt;INIT&lt;/span&gt; &lt;span class="caps"&gt;INFO&lt;/span&gt;). See &lt;a href="http://fedoraproject.org/wiki/Packaging:SysVInitScript#Initscript_template"&gt;Initscript
-    template&lt;/a&gt;.&lt;/li&gt;
-&lt;li&gt;Scripts &lt;strong&gt;must&lt;/strong&gt; make use of a lockfile in &lt;code&gt;/var/lock/subsys/&lt;/code&gt;, and
-    the name of the lockfile must be the same as the name of the init
-    script. (There is a technical reason for this relating to how sysv
-    init terminates daemons at shutdown). The lockfile should be touched
-    when the daemon successfully starts, and removed when it
-    successfully&amp;nbsp;stops.&lt;/li&gt;
-&lt;li&gt;Init scripts should not depend on any environment variables set
-    outside the script. They should operate gracefully with an
-    empty/uninitialized environment (or only &lt;span class="caps"&gt;LANG&lt;/span&gt; and &lt;span class="caps"&gt;TERM&lt;/span&gt; set and a &lt;span class="caps"&gt;CWD&lt;/span&gt;
-    of &lt;code&gt;/&lt;/code&gt;, as enforced by &lt;code&gt;service(8)&lt;/code&gt;, or with a full environment if
-    they are called directly by a&amp;nbsp;user.&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;&lt;a href="http://fedoraproject.org/wiki/Packaging:SysVInitScript#Required_Actions"&gt;Required&amp;nbsp;actions&lt;/a&gt;&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;all of the following actions are required, and have specific&amp;nbsp;definitions:&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;start&lt;/strong&gt;: starts the&amp;nbsp;service&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;stop&lt;/strong&gt;: stops the&amp;nbsp;service&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;restart&lt;/strong&gt;: stop and restart the service if the service is
-    already running, otherwise just start the&amp;nbsp;service&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;condrestart (and try-restart)&lt;/strong&gt;: restart the service if the
-    service is already running, if not, do&amp;nbsp;nothing&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;reload&lt;/strong&gt;: reload the configuration of the service without
-    actually stopping and restarting the service (if the service
-    does not support this, do&amp;nbsp;nothing)&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;force-reload&lt;/strong&gt;: reload the configuration of the service and
-    restart it so that it takes&amp;nbsp;effect&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;status&lt;/strong&gt;: print the current status of the&amp;nbsp;service&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;usage&lt;/strong&gt;: by default, if the initscript is run without any
-    action, it should list a &amp;#8220;usage message&amp;#8221; that has all actions
-    (intended for&amp;nbsp;use)&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;There are specified exit codes for &lt;a href="http://fedoraproject.org/wiki/Packaging:SysVInitScript#Exit_Codes_for_the_Status_Action"&gt;status
-    actions&lt;/a&gt;
-    and &lt;a href="http://fedoraproject.org/wiki/Packaging:SysVInitScript#Exit_Codes_for_non-Status_Actions"&gt;non-status
-    actions&lt;/a&gt;.&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;They must &amp;#8220;behave sensibly&amp;#8221;. I&amp;#8217;ve found this to be one of the
-    biggest problems with homegrown init scripts. If &lt;code&gt;servicename start&lt;/code&gt;
-    is called while the service is already running, it should simply
-    exit 0. Likewise if the service is already stopped. Init scripts
-    &lt;strong&gt;must not kill unrelated processes&lt;/strong&gt;. I don&amp;#8217;t know how many times
-    I&amp;#8217;ve seen scripts that kill every java or python process on a&amp;nbsp;machine.&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;I intend to use this as a quick checklist when developing or evaluating
-init scripts for RedHat/Fedora based systems. In my experience, the
-biggest problems with most init scripts revolve around poor handling of
-&lt;span class="caps"&gt;PID&lt;/span&gt; files and lockfiles,&amp;nbsp;mainly:&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;Killing processes other than the one that the script started (i.e.
-    killing all java or python processes), usually because the &lt;span class="caps"&gt;PID&lt;/span&gt; isn&amp;#8217;t
-    tracked at&amp;nbsp;start&lt;/li&gt;
-&lt;li&gt;Starting a second instance of the subsystem because lockfiles aren&amp;#8217;t
-    used, or the status function is&amp;nbsp;broken.&lt;/li&gt;
-&lt;li&gt;improper exit&amp;nbsp;codes&lt;/li&gt;
-&lt;li&gt;either explicitly relying on environment variables (and therefore
-    breaking when called through &lt;code&gt;service(8)&lt;/code&gt;), or conversely, not
-    cleaning/resetting environment variables that are used by dependent
-    code or&amp;nbsp;processes.&lt;/li&gt;
-&lt;/ul&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Thu, 03 Jan 2013 11:30:00 -0500</pubDate><guid>tag:blog.jasonantman.com,2013-01-03:2013/01/fedora-init-script-specification-summary/</guid><category>centos</category><category>fedora</category><category>init</category><category>redhat</category><category>startup</category></item><item><title>Readable Nagios Log Timestamps</title><link>http://blog.jasonantman.com/2012/10/readable-nagios-log-timestamps/</link><description>&lt;p&gt;If you&amp;#8217;re like me and most humans, the Nagios logfile timestamp (a unix
+and has sparked a …&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Thu, 03 Jan 2013 11:30:00 -0500</pubDate><guid isPermaLink="false">tag:blog.jasonantman.com,2013-01-03:/2013/01/fedora-init-script-specification-summary/</guid><category>centos</category><category>fedora</category><category>init</category><category>redhat</category><category>startup</category></item><item><title>Readable Nagios Log Timestamps</title><link>http://blog.jasonantman.com/2012/10/readable-nagios-log-timestamps/</link><description>&lt;p&gt;If you&amp;#8217;re like me and most humans, the Nagios logfile timestamp (a unix
 timestamp) isn&amp;#8217;t terribly useful when trying to grep through the logs
 and correlate&amp;nbsp;events:  &lt;/p&gt;
-&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="gp"&gt;#&lt;/span&gt; head -2 nagios.log
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="gp"&gt;#&lt;/span&gt; head -2 nagios.log
 &lt;span class="go"&gt;[1350360000] &lt;span class="caps"&gt;LOG&lt;/span&gt; &lt;span class="caps"&gt;ROTATION&lt;/span&gt;: &lt;span class="caps"&gt;DAILY&lt;/span&gt;&lt;/span&gt;
 &lt;span class="go"&gt;[1350360000] &lt;span class="caps"&gt;LOG&lt;/span&gt; &lt;span class="caps"&gt;VERSION&lt;/span&gt;: 2.0&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 
 
-&lt;p&gt;Here&amp;#8217;s a nifty Perl one-liner that you can pipe your logs&amp;nbsp;through:  &lt;/p&gt;
-&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="n"&gt;perl&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;pe&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;s/(\\d+)/localtime($1)/e&amp;#39;&lt;/span&gt;  
-&lt;/pre&gt;&lt;/div&gt;
-
-
-&lt;p&gt;to get nicer output&amp;nbsp;like:  &lt;/p&gt;
-&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="c1"&gt;# head -2 nagios.log&lt;/span&gt;
-&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;Tue&lt;/span&gt; &lt;span class="n"&gt;Oct&lt;/span&gt; &lt;span class="mi"&gt;16&lt;/span&gt; &lt;span class="mo"&gt;00&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="mo"&gt;00&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="mo"&gt;00&lt;/span&gt; &lt;span class="mi"&gt;2012&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="n"&gt;&lt;span class="caps"&gt;LOG&lt;/span&gt;&lt;/span&gt; &lt;span class="n"&gt;&lt;span class="caps"&gt;ROTATION&lt;/span&gt;:&lt;/span&gt; &lt;span class="n"&gt;&lt;span class="caps"&gt;DAILY&lt;/span&gt;&lt;/span&gt;
-&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;Tue&lt;/span&gt; &lt;span class="n"&gt;Oct&lt;/span&gt; &lt;span class="mi"&gt;16&lt;/span&gt; &lt;span class="mo"&gt;00&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="mo"&gt;00&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="mo"&gt;00&lt;/span&gt; &lt;span class="mi"&gt;2012&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="n"&gt;&lt;span class="caps"&gt;LOG&lt;/span&gt;&lt;/span&gt; &lt;span class="n"&gt;&lt;span class="caps"&gt;VERSION&lt;/span&gt;:&lt;/span&gt; &lt;span class="mf"&gt;2.0&lt;/span&gt;
-&lt;/pre&gt;&lt;/div&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Wed, 17 Oct 2012 05:00:00 -0400</pubDate><guid>tag:blog.jasonantman.com,2012-10-17:2012/10/readable-nagios-log-timestamps/</guid><category>icinga</category><category>Nagios</category><category>perl</category><category>timestamp</category></item><item><title>Some questions from a tech interview with a big Internet company</title><link>http://blog.jasonantman.com/2012/09/some-questions-from-a-tech-interview-with-a-big-internet-company/</link><description>&lt;p&gt;A while back, I did a technical phone screen with a big online &amp;#8220;social&amp;#8221;
+&lt;p&gt;Here&amp;#8217;s a nifty Perl one-liner that you …&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Wed, 17 Oct 2012 05:00:00 -0400</pubDate><guid isPermaLink="false">tag:blog.jasonantman.com,2012-10-17:/2012/10/readable-nagios-log-timestamps/</guid><category>icinga</category><category>Nagios</category><category>perl</category><category>timestamp</category></item><item><title>Some questions from a tech interview with a big Internet company</title><link>http://blog.jasonantman.com/2012/09/some-questions-from-a-tech-interview-with-a-big-internet-company/</link><description>&lt;p&gt;A while back, I did a technical phone screen with a big online &amp;#8220;social&amp;#8221;
 company (I won&amp;#8217;t say who, but they&amp;#8217;re a household name, growing fast,
 and doing cool things; that doesn&amp;#8217;t leave &lt;em&gt;too&lt;/em&gt; many options). I rarely
-remember to write down interview questions, but I was cleaning out my
-desk this morning and came by a ripped-out sheet of notebook paper with
-a handful of the interview questions written on it. Most of them weren&amp;#8217;t
-terribly difficult, or terribly unusual for competent technical
-interviewers, but since I happen to actually have the list written down,
-I though I&amp;#8217;d share it. I don&amp;#8217;t remember why the programming questions
-are all Python; likely, I was asked to choose between Python (which I&amp;#8217;ve
-used, though not lately), Ruby (which I can barely muddle my way through
-reading on a good day), and something else I don&amp;#8217;t know. Here are some
-of&amp;nbsp;them&amp;#8230;&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;What is an inode? What does it&amp;nbsp;store?&lt;/li&gt;
-&lt;li&gt;What is a hard&amp;nbsp;link?&lt;/li&gt;
-&lt;li&gt;What is the difference between a hard link and a soft&amp;nbsp;link?&lt;/li&gt;
-&lt;li&gt;What is a list in&amp;nbsp;Python?&lt;/li&gt;
-&lt;li&gt;Name some data structures that you&amp;#8217;d use in Python. Describe them,
-    and tell me why you would use&amp;nbsp;them.&lt;/li&gt;
-&lt;li&gt;How would you list all the man pages containing the keyword&amp;nbsp;&amp;#8220;date&amp;#8221;?&lt;/li&gt;
-&lt;li&gt;If the &lt;code&gt;chmod&lt;/code&gt; binary had its permissions set to &lt;code&gt;000&lt;/code&gt;, how would
-    you fix&amp;nbsp;it?&lt;/li&gt;
-&lt;/ul&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Wed, 12 Sep 2012 05:00:00 -0400</pubDate><guid>tag:blog.jasonantman.com,2012-09-12:2012/09/some-questions-from-a-tech-interview-with-a-big-internet-company/</guid><category>hiring</category><category>interview</category><category>questions</category><category>sysadmin</category></item><item><title>Dumping all Macros from an RPM Spec File</title><link>http://blog.jasonantman.com/2012/09/dumping-all-macros-from-an-rpm-spec-file/</link><description>&lt;p&gt;I&amp;#8217;ve been doing a lot of &lt;span class="caps"&gt;RPM&lt;/span&gt; packaging lately, and on different (and
+remember to write down interview questions, but I was …&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Wed, 12 Sep 2012 05:00:00 -0400</pubDate><guid isPermaLink="false">tag:blog.jasonantman.com,2012-09-12:/2012/09/some-questions-from-a-tech-interview-with-a-big-internet-company/</guid><category>hiring</category><category>interview</category><category>questions</category><category>sysadmin</category></item><item><title>Dumping all Macros from an RPM Spec File</title><link>http://blog.jasonantman.com/2012/09/dumping-all-macros-from-an-rpm-spec-file/</link><description>&lt;p&gt;I&amp;#8217;ve been doing a lot of &lt;span class="caps"&gt;RPM&lt;/span&gt; packaging lately, and on different (and
 very old) distros and versions. Sometimes I lose track of all of the
 macros used in specfiles (&lt;code&gt;_bindir _sbindir dist _localstatedir&lt;/code&gt;, etc).
-There&amp;#8217;s no terribly easy way to dump a list of all of the available
-macros. There is, however, a bit of a kludge. Insert the following code
-in your specfile before the &lt;code&gt;%prep&lt;/code&gt; or &lt;code&gt;%setup&lt;/code&gt; lines:&lt;/p&gt;
-&lt;div class="codehilite"&gt;&lt;pre&gt;%dump
-exit 1
-&lt;/pre&gt;&lt;/div&gt;
-
-
-&lt;p&gt;The &lt;code&gt;%dump&lt;/code&gt; macro will dump all defined macros to &lt;span class="caps"&gt;STDERR&lt;/span&gt;. The &lt;code&gt;exit 1&lt;/code&gt;
-will prevent rpmbuild from going on and trying to build the package. If
-you want to view the output nicely, you can pipe it through a pager like
-less: &lt;code&gt;rpmbuild -ba filename.spec 2&amp;gt;&amp;amp;1 | less&lt;/code&gt;.&lt;/p&gt;
-&lt;p&gt;Just make sure to remove those two lines when you want to actually build
-the&amp;nbsp;package.&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Mon, 10 Sep 2012 10:00:00 -0400</pubDate><guid>tag:blog.jasonantman.com,2012-09-10:2012/09/dumping-all-macros-from-an-rpm-spec-file/</guid><category>packaging</category><category>rpm</category><category>rpmbuild</category></item><item><title>Some PowerDNS Links and Interesting Features</title><link>http://blog.jasonantman.com/2012/09/some-powerdns-links-and-interesting-features/</link><description>&lt;p&gt;At $&lt;span class="caps"&gt;WORK&lt;/span&gt; we lost a disk in the &lt;span class="caps"&gt;RAID1&lt;/span&gt; of one of our external nameservers,
+There&amp;#8217;s no terribly easy way to dump a list of all of the …&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Mon, 10 Sep 2012 10:00:00 -0400</pubDate><guid isPermaLink="false">tag:blog.jasonantman.com,2012-09-10:/2012/09/dumping-all-macros-from-an-rpm-spec-file/</guid><category>packaging</category><category>rpm</category><category>rpmbuild</category></item><item><title>Some PowerDNS Links and Interesting Features</title><link>http://blog.jasonantman.com/2012/09/some-powerdns-links-and-interesting-features/</link><description>&lt;p&gt;At $&lt;span class="caps"&gt;WORK&lt;/span&gt; we lost a disk in the &lt;span class="caps"&gt;RAID1&lt;/span&gt; of one of our external nameservers,
 and it rekindled an occasional discussion of migration from &lt;a&gt;&lt;span class="caps"&gt;ISC&lt;/span&gt;
 &lt;span class="caps"&gt;BIND&lt;/span&gt;&lt;/a&gt; to &lt;a href="http://powerdns.com/content/products.html"&gt;PowerDNS&lt;/a&gt;.
 PowerDNS has separate authoritative and recursive servers, and doesn&amp;#8217;t
-seem to natively support views or split-horizon the way &lt;span class="caps"&gt;BIND&lt;/span&gt; does, but
-it has some really cool features including very mature database
-backends, load balancing, Lua scripting support to modify how recursive
-queries are answered, and geolocation or &lt;span class="caps"&gt;IP&lt;/span&gt;-range based query&amp;nbsp;results.&lt;/p&gt;
-&lt;p&gt;While this project is still just casual research, I thought I&amp;#8217;d share
-some of the useful links and information I&amp;#8217;ve&amp;nbsp;found:&lt;/p&gt;
-&lt;p&gt;PowerDNS&amp;nbsp;Front-ends:&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;&lt;a href="http://www.nicmus.com/community.html"&gt;JPowerAdmin&lt;/a&gt; - One of the two
-    most popular, a GPLv3 Java (JBoss &lt;span class="caps"&gt;SEAM&lt;/span&gt;) based web &lt;span class="caps"&gt;UI&lt;/span&gt; with a RESTful
-    &lt;span class="caps"&gt;API&lt;/span&gt;, with support for &amp;#8220;multiple&amp;#8221; database backends. Sponsored by
-    Nicmus, Inc. &lt;a href="http://www.nicmus.com/JPowerAdmin"&gt;Online demo&lt;/a&gt;
-    (demo:demo). Looks nice, simple &lt;span class="caps"&gt;UI&lt;/span&gt;, but no support for&amp;nbsp;split-horizon.&lt;/li&gt;
-&lt;li&gt;&lt;a href="https://www.poweradmin.org"&gt;PowerAdmin&lt;/a&gt; - the other most popular,
-    though it seems to be undergoing a large overhaul at the moment. Has
-    full support for most of PowerDNS&amp;#8217;s features, written in &lt;span class="caps"&gt;PHP&lt;/span&gt;,
-    supports &amp;#8220;large&amp;#8221; databases, fine-grained user permissions, &lt;span class="caps"&gt;RFC&lt;/span&gt;
-    validation, zone templates. &lt;a href="http://demo.poweradmin.org/"&gt;Online
-    demo&lt;/a&gt; (demo:demo). I don&amp;#8217;t really like
-    that it manages the SOAs as full text (without any templating,
-    dropdowns or default values), and that it doesn&amp;#8217;t prepopulate
-    default values for &lt;span class="caps"&gt;TTL&lt;/span&gt; in the new record form, but it looks like a
-    good starting place for someone (like me) who&amp;#8217;s handy with&amp;nbsp;&lt;span class="caps"&gt;PHP&lt;/span&gt;.&lt;/li&gt;
-&lt;li&gt;&lt;a href="http://code.google.com/p/pdns-gui/"&gt;pdns-gui - PowerDNS &lt;span class="caps"&gt;GUI&lt;/span&gt; - Google Project
-    Hosting&lt;/a&gt; - &lt;span class="caps"&gt;PHP&lt;/span&gt;/MySQL &lt;span class="caps"&gt;GUI&lt;/span&gt;.
-    &lt;a href="http://www.powerdns-gui.org/"&gt;Online demo&lt;/a&gt;. Handles templates
-    nicely but won&amp;#8217;t scale to too many of them. Window-based &lt;span class="caps"&gt;UI&lt;/span&gt; is
-    visually pleasing but will probably be a problem for big&amp;nbsp;zones.&lt;/li&gt;
-&lt;li&gt;&lt;a href="http://code.google.com/p/powerdns-webinterface/"&gt;powerdns-webinterface - PowerDNS Webinterface - Google Project
-    Hosting&lt;/a&gt; - A nice
-    but relatively simplistic &lt;span class="caps"&gt;UI&lt;/span&gt; written in &lt;span class="caps"&gt;PHP&lt;/span&gt;. It has some nice
-    features like multi-user authentication (and logging, though I
-    haven&amp;#8217;t looked into how detailed it is), automatic &lt;span class="caps"&gt;SOA&lt;/span&gt; serial
-    update, automatic &lt;span class="caps"&gt;PTR&lt;/span&gt; creation, etc. Unfortunately not geared
-    towards people with lots of domains and multiple records; it has
-    only one template for new domains (and no way to update domains
-    created from a template), no easy filtering, and still treats &lt;span class="caps"&gt;SOA&lt;/span&gt;
-    like a single text&amp;nbsp;record.&lt;/li&gt;
-&lt;li&gt;&lt;a href="http://sourceforge.net/projects/zoneadmin/"&gt;ZoneAdmin |
-    SourceForge.net&lt;/a&gt; and
-    &lt;a&gt;Project website&lt;/a&gt; - Maybe not the fastest tool to use in bulk,
-    but a nice, relatively intuitive and full-featured admin tool.
-    &lt;a href="http://open.megabit.net/demos/ZoneAdmin/"&gt;Online demo&lt;/a&gt;&amp;nbsp;(demo:demo).&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;Some links on PowerDNS&amp;nbsp;split-horizon&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;&lt;a href="http://old.nabble.com/Split-Horizon-Scripts-td32843045.html"&gt;Old Nabble - PowerDNS - Split Horizon&amp;nbsp;Scripts&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;It looks to me that split-horizon is going to be the hardest part for
-us, at least to also have a web &lt;span class="caps"&gt;UI&lt;/span&gt; to manage it. It looks like with
-PowerDNS, the most common way to run split horizon &lt;span class="caps"&gt;DNS&lt;/span&gt; (views) is to run
-two separate sets of servers or instances, either on different boxes or
-multi-homed; one for internal and one for external. While that sounds
-like quite a bit of overhead beyond what &lt;span class="caps"&gt;BIND&lt;/span&gt; does, the real problem is
-finding a web &lt;span class="caps"&gt;UI&lt;/span&gt; that supports it; I don&amp;#8217;t care if it&amp;#8217;s in two separate
-databases, but what I want is a logical (web &lt;span class="caps"&gt;UI&lt;/span&gt;) view that has zones
-made up of resource names (i.e. the leftmost column in a zone file) with
-one or two RRs (type, ttl, priority, value) - one for each view. That&amp;#8217;s
-the real catch - all of our machines are in private &lt;span class="caps"&gt;IP&lt;/span&gt; space behind a
-firewall, so I need to be able to manage the internal and external
-records on one screen. While it&amp;#8217;s not exactly scalable, and the code
-stagnated quite a bit once I got it to a point that was usable for me,
-this was the main goal of my &lt;a href="http://multibindadmin.jasonantman.com/"&gt;MultiBIND
-Admin&lt;/a&gt;&amp;nbsp;project.&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Wed, 05 Sep 2012 05:00:00 -0400</pubDate><guid>tag:blog.jasonantman.com,2012-09-05:2012/09/some-powerdns-links-and-interesting-features/</guid><category>bind</category><category>dns</category><category>multibindadmin</category><category>powerdns</category></item><item><title>Interesting Systems Links for September 3, 2012</title><link>http://blog.jasonantman.com/2012/09/interesting-systems-links-for-september-3-2012/</link><description>&lt;p&gt;Here is a small selection of sysadmin links that I recently found, and
+seem to natively support views or split-horizon the way &lt;span class="caps"&gt;BIND&lt;/span&gt; does, but …&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Wed, 05 Sep 2012 05:00:00 -0400</pubDate><guid isPermaLink="false">tag:blog.jasonantman.com,2012-09-05:/2012/09/some-powerdns-links-and-interesting-features/</guid><category>bind</category><category>dns</category><category>multibindadmin</category><category>powerdns</category></item><item><title>Interesting Systems Links for September 3, 2012</title><link>http://blog.jasonantman.com/2012/09/interesting-systems-links-for-september-3-2012/</link><description>&lt;p&gt;Here is a small selection of sysadmin links that I recently found, and
 wanted to&amp;nbsp;share:&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;&lt;a href="http://codeascraft.etsy.com/2012/05/22/blameless-postmortems/"&gt;Blameless PostMortems and a Just Culture - Code as
@@ -278,326 +35,39 @@ wanted to&amp;nbsp;share:&lt;/p&gt;
 to remedy human errors, rather than punishing and generating&amp;nbsp;fear.&lt;/li&gt;
 &lt;/ul&gt;
 &lt;/li&gt;
-&lt;li&gt;&lt;a href="http://agilesysadmin.net/pillar-one"&gt;The first pillar: We alert on what we draw - Agile&amp;nbsp;Sysadmin&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href="http://www.masterzen.fr/2010/11/14/puppet-ssl-explained/"&gt;Puppet &lt;span class="caps"&gt;SSL&lt;/span&gt; explained - Masterzen&amp;#8217;s&amp;nbsp;Blog&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href="http://www.infoq.com/news/2011/05/unix-orchestration"&gt;Unix Orchestration Roundup: Tools for Programmatic Systems&amp;nbsp;Administration&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Mon, 03 Sep 2012 09:42:00 -0400</pubDate><guid>tag:blog.jasonantman.com,2012-09-03:2012/09/interesting-systems-links-for-september-3-2012/</guid><category>devops</category><category>links</category><category>portmortem</category><category>sysadmin</category></item><item><title>Dear Mom and Dad - or, a book about what I actually do</title><link>http://blog.jasonantman.com/2012/08/dear-mom-and-dad-or-a-book-about-what-i-actually-do/</link><description>&lt;p&gt;I&amp;#8217;ve followed &lt;a href="http://everythingsysadmin.com/"&gt;Tom Limoncelli&amp;#8217;s blog&lt;/a&gt;
+&lt;li&gt;&lt;a href="http://agilesysadmin.net/pillar-one"&gt;The first pillar: We …&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Mon, 03 Sep 2012 09:42:00 -0400</pubDate><guid isPermaLink="false">tag:blog.jasonantman.com,2012-09-03:/2012/09/interesting-systems-links-for-september-3-2012/</guid><category>devops</category><category>links</category><category>portmortem</category><category>sysadmin</category></item><item><title>Dear Mom and Dad - or, a book about what I actually do</title><link>http://blog.jasonantman.com/2012/08/dear-mom-and-dad-or-a-book-about-what-i-actually-do/</link><description>&lt;p&gt;I&amp;#8217;ve followed &lt;a href="http://everythingsysadmin.com/"&gt;Tom Limoncelli&amp;#8217;s blog&lt;/a&gt;
 for quite a while; his books &lt;a href="http://everythingsysadmin.com/aboutbook.html"&gt;The Practice of System and Network
 Administration&lt;/a&gt; and &lt;a href="http://www.tomontime.com/"&gt;Time
 Management for System Administrators&lt;/a&gt; were
 infinitely helpful in the early days of my professional life, and are
-among the few (literally, 4 or 5) books that live on my desk. His
-insight and information into the soft skills of &lt;span class="caps"&gt;SA&lt;/span&gt; work - time
-management, hiring, working in teams, etc. - is not only excellent, but
-also all too rare in a largely technical&amp;nbsp;field.&lt;/p&gt;
-&lt;p&gt;Anyway, Tom posted the below article to his blog about a book that
-recently came out, &lt;a href="http://www.amazon.com/dp/0195374126/tomontime-20"&gt;&amp;#8220;Taming Information Technology: Lessons from Studies
-of System Administrators&amp;#8221; by Eser Kandogan, Paul Maglio, Eben Haber and
-John Bailey&lt;/a&gt;. I
-haven&amp;#8217;t read the book yet, and at $56, it&amp;#8217;s going to be a while before
-my book budget recovers enough to justify it. But going on what I&amp;#8217;ve
-read from Tom and others, I want it. Not only do I want to read it, but
-I want to pass it around to my parents and in-laws and everyone else who
-has asked what I do for a living, and I found myself at a loss for a
-less-than-6-hour-long explanation. So, here&amp;#8217;s what Tom wrote on&amp;nbsp;it:&lt;/p&gt;
-&lt;blockquote&gt;
-&lt;p&gt;Dear Mom And&amp;nbsp;Dad,&lt;/p&gt;
-&lt;p&gt;Many times I&amp;#8217;ve tried to explain to you what I do for a living.
-&amp;#8220;Computer system administrator&amp;#8221; or &amp;#8220;sysadmin&amp;#8221; is a career that is
-difficult to explain and I&amp;#8217;m sure my attempts have left you even more
-confused. I have good news. Oxford University Press has just published
-a book by 4 scientists who video taped sysadmins doing their job,
-analysed what they do, and explains it to the non-computer person.
-They do it by telling compelling stories of sysadmins at work plus
-they give interesting analysis with great&amp;nbsp;insight.&lt;/p&gt;
-&lt;p&gt;Why did they do this? Because businesses depend on technology more and
-more and that means they depend on sysadmins more and more. Yet most
-CEOs don&amp;#8217;t understand what we do. The scientists made some interesting
-discoveries: that our jobs are high-stress, high-risk, and highly
-collaborative. We invent our own tools, often on the spot, to solve
-complex problems. We are men and women of every age group. It is a
-career unlike any other. These are things that most people don&amp;#8217;t know
-about our profession. The book is very engaging: Some of the chapters
-read like the opening scene of &amp;#8220;Indiana Jones&amp;#8221;; others like &amp;#8220;Gorillas
-in the Mist.&amp;#8221; Kandogan, Maglio, Haber and Bailey have put together a
-very serious, scientific book with care and&amp;nbsp;compassion.&lt;/p&gt;
-&lt;p&gt;I&amp;#8217;m not one of the sysadmins they studied but every story they tell
-reminds me of real experiences I have&amp;nbsp;had.&lt;/p&gt;
-&lt;p&gt;I hope you enjoy reading this book. I know I&amp;nbsp;did.&lt;/p&gt;
-&lt;p&gt;Pre-order it here:
-&lt;a href="http://www.amazon.com/dp/0195374126/tomontime-20"&gt;http://www.amazon.com/dp/0195374126/tomontime-20&lt;/a&gt;&lt;/p&gt;
-&lt;p&gt;Sincerely your son,&lt;br /&gt;&amp;nbsp;Tom&lt;/p&gt;
-&lt;p&gt;&lt;span class="caps"&gt;P.S.&lt;/span&gt; In all seriousness, I read a preview copy of this book and highly
-recommend it to others. You may have seen the authors speak at Usenix
-&lt;span class="caps"&gt;LISA&lt;/span&gt; or &lt;span class="caps"&gt;LOPSA&lt;/span&gt; &lt;span class="caps"&gt;PICC&lt;/span&gt; conferences where they showed clips of the video
-tapes they made. The book conveys the same stories, plus many more,
-with interesting analysis. If you think that the profession of system
-administration would benefit from non-sysadmins better understanding
-what we do, I highly recommend you pre-order this book and share it.
-You can pre-order it here: &lt;a href="http://www.amazon.com/dp/0195374126/tomontime-20"&gt;&amp;#8220;Taming Information Technology: Lessons
-from Studies of System Administrators&amp;#8221; by Eser Kandogan, Paul Maglio,
-Eben Haber and John&amp;nbsp;Bailey&lt;/a&gt;&lt;/p&gt;
-&lt;p&gt;More about the book here:
-&lt;a href="http://everythingsysadmin.com/2012/07/kandogan.html"&gt;http://everythingsysadmin.com/2012/07/kandogan.html&lt;/a&gt;&lt;/p&gt;
-&lt;/blockquote&gt;
-&lt;p&gt;If you have any interest, I encourage you to go out and buy the book. If
-you know someone who&amp;#8217;s an &lt;span class="caps"&gt;SA&lt;/span&gt;, you should buy them the book. If you can
-justify any sort of book budget at work, you should buy the book. And
-while you&amp;#8217;re at it, if you haven&amp;#8217;t read Tom&amp;#8217;s other books, you should
-buy those too. You might be in the unfortunate position - like I am - of
-probably never being able to implement most of his suggestions at work,
-but at least you&amp;#8217;ll be aware of&amp;nbsp;them&amp;#8230;&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Sun, 05 Aug 2012 08:52:00 -0400</pubDate><guid>tag:blog.jasonantman.com,2012-08-05:2012/08/dear-mom-and-dad-or-a-book-about-what-i-actually-do/</guid><category>books</category><category>limoncelli</category><category>sysadmin</category></item><item><title>What I Look For When Interviwing SysAdmin Candidates</title><link>http://blog.jasonantman.com/2012/07/what-i-look-for-when-interviwing-sysadmin-candidates/</link><description>&lt;p&gt;I recently came by a question on ServerFault, &lt;a href="http://serverfault.com/questions/210218/listing-side-projects-in-a-jr-sysadmin-resume/405054#405054"&gt;Listing side projects in
+among the few (literally, 4 or 5) books that live on …&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Sun, 05 Aug 2012 08:52:00 -0400</pubDate><guid isPermaLink="false">tag:blog.jasonantman.com,2012-08-05:/2012/08/dear-mom-and-dad-or-a-book-about-what-i-actually-do/</guid><category>books</category><category>limoncelli</category><category>sysadmin</category></item><item><title>What I Look For When Interviwing SysAdmin Candidates</title><link>http://blog.jasonantman.com/2012/07/what-i-look-for-when-interviwing-sysadmin-candidates/</link><description>&lt;p&gt;I recently came by a question on ServerFault, &lt;a href="http://serverfault.com/questions/210218/listing-side-projects-in-a-jr-sysadmin-resume/405054#405054"&gt;Listing side projects in
 a jr. sysadmin
 resume&lt;/a&gt;
 asking whether people (hiring managers) think it&amp;#8217;s appropriate to put
 &amp;#8220;side projects&amp;#8221; (running your own web and mail servers, freelance web
-work, etc.) on your resume. Since I&amp;#8217;ve been interviewing candidates for
-a few SysAdmin positions lately, I thought I&amp;#8217;d take the time to write
-down a few of my ideas on this. Two disclaimers first, though. (1) I tend
-to be pretty geeky, progressive, and very open source/DevOps focused at
-heart. Not everyone I work with will agree with what I say here. As a
-candidate, remember that you&amp;#8217;ll probably interview with all types, and
-what I say here won&amp;#8217;t be the best advice with Enterprise types. I&amp;#8217;m very
-open source centric, and have always held &lt;span class="caps"&gt;SA&lt;/span&gt; jobs where the majority of
-the software I run is open source and not vendor supported. (2) If you
-happen to actually interview with me, don&amp;#8217;t make the mistake of reading
-this and tailoring your resume/responses to fit if that&amp;#8217;s not accurate.
-I&amp;#8217;m not a manager, I&amp;#8217;m a line&amp;nbsp;&lt;span class="caps"&gt;SA&lt;/span&gt;.&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;First, my response to the ServerFault&amp;nbsp;question:&lt;/strong&gt;&lt;/p&gt;
-&lt;blockquote&gt;
-&lt;p&gt;Not a hiring manager, but an &lt;span class="caps"&gt;SA&lt;/span&gt; doing technical interviews and hiring
-recommendations, and also have only been with my current employer for
-7 months (so I&amp;#8217;ve been on both sides of the table recently). My
-current employer is a pretty big company and pays well, so we&amp;#8217;re quite&amp;nbsp;selective.&lt;/p&gt;
-&lt;p&gt;&lt;span class="caps"&gt;SA&lt;/span&gt; candidates with 5-10 years experience and a laundry list of
-certifications, software and hardware names, protocols, etc. are a
-dime a dozen. I&amp;#8217;m looking for people who really love what they do. I
-have an instant bias against resumes that don&amp;#8217;t have either a personal
-website/&lt;span class="caps"&gt;URL&lt;/span&gt;, or some personal projects/experience other than 9-5 job
-on them. There are lots of people who meet the technical
-qualifications. I want someone truly passionate, and that means
-learning and experimenting outside of&amp;nbsp;work.&lt;/p&gt;
-&lt;p&gt;Personally, on my resume, I have a few personal projects listed
-(mainly programming projects and volunteer &lt;span class="caps"&gt;IT&lt;/span&gt; work I did for
-non-profits), and I also have a link to my personal resume site that
-has links to my &lt;span class="caps"&gt;SVN&lt;/span&gt; repo, and a bunch of other&amp;nbsp;projects.&lt;/p&gt;
-&lt;/blockquote&gt;
-&lt;p&gt;&lt;strong&gt;Some things I look&amp;nbsp;for:&lt;/strong&gt;&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;Not in all cases, but I like to see a website or blog listed on a
-    resume. It&amp;#8217;s a big plus. I have
-    &lt;a href="http://resume.jasonantman.com"&gt;resume.jasonantman.com&lt;/a&gt; with copies
-    of my resume in various formats, as well as a bunch of links I&amp;#8217;d
-    like employers to&amp;nbsp;see.&lt;/li&gt;
-&lt;li&gt;If you&amp;#8217;re a working &lt;span class="caps"&gt;SA&lt;/span&gt;, I should be able to find you on Google.
-    Either by name or email address, I expect to google the contact
-    information I find on your resume and find at least some mailing
-    list/forum posts, bug reports, or software&amp;nbsp;projects.&lt;/li&gt;
-&lt;li&gt;I can&amp;#8217;t stress this enough, &lt;strong&gt;do not overstate your experience&lt;/strong&gt;.
-    I&amp;#8217;ve been an &lt;span class="caps"&gt;SA&lt;/span&gt; for 5 years, a hobbyist for much longer, and I&amp;#8217;ve
-    never used the word &amp;#8220;expert&amp;#8221;. I list software, protocols, languages
-    on my resume as beginner/basic, intermediate, and &amp;#8220;strongest&amp;#8221;. If
-    you list something as &amp;#8220;advanced&amp;#8221; or &amp;#8220;expert&amp;#8221;, be prepared to answer
-    expert-level questions. If you can&amp;#8217;t explain a 3-way handshake,
-    don&amp;#8217;t list &lt;span class="caps"&gt;TCP&lt;/span&gt;/&lt;span class="caps"&gt;IP&lt;/span&gt; on your resume. If you list &amp;#8220;strong knowledge of
-    Linux internals&amp;#8221;, you should be able to at least explain &lt;code&gt;open()&lt;/code&gt;
-    and &lt;code&gt;close()&lt;/code&gt;. If you list advanced &lt;span class="caps"&gt;RADIUS&lt;/span&gt; experience, I &lt;em&gt;will&lt;/em&gt; ask
-    you to explain &lt;span class="caps"&gt;CSID&lt;/span&gt;, &lt;span class="caps"&gt;WPA&lt;/span&gt; key exchange, and what attributes are valid
-    in an Access-Reject. In short, don&amp;#8217;t say you&amp;#8217;re a genius in
-    something unless you are; you never know when your interviewer may
-    have spent the last 6 months immersed in&amp;nbsp;it.&lt;/li&gt;
-&lt;li&gt;All SAs should have some programming skills. If you&amp;#8217;re a recent
-    graduate (let&amp;#8217;s say any time in the last 5-8 years) I&amp;#8217;d expect at
-    the very least a vague memory of C++, &lt;span class="caps"&gt;VB&lt;/span&gt; or Java. If you&amp;#8217;re a
-    working &lt;span class="caps"&gt;SA&lt;/span&gt;, I expect to see either strong Bash skills, or at least a
-    functional knowledge of Perl. Python, &lt;span class="caps"&gt;PHP&lt;/span&gt; or Ruby; preferably both.
-    If you&amp;#8217;re a &amp;#8220;senior&amp;#8221; Linux &lt;span class="caps"&gt;SA&lt;/span&gt;, you should know enough C to be able
-    to make sense of &lt;code&gt;strace&lt;/code&gt; output.&lt;/li&gt;
-&lt;li&gt;As stated above, non-full-time-job projects are a big plus. When I
-    took my first &lt;span class="caps"&gt;SA&lt;/span&gt; job, the majority of my experience had been doing
-    volunteer work for a non-profit ambulance corps (which I was also a
-    volunteer &lt;span class="caps"&gt;EMT&lt;/span&gt; on). If I said that I did 40 hours a week for them, it
-    would be an understatement. I wrote a few 10,000+ line &lt;span class="caps"&gt;PHP&lt;/span&gt;
-    applications for them, and designed the infrastructure to run them
-    24x7x365. Small shop? Sure. But I learned a &lt;span class="caps"&gt;LOT&lt;/span&gt;, especially about
-    how to make things resilient enough that I didn&amp;#8217;t get paged&amp;nbsp;often.&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;I&amp;#8217;m sure I&amp;#8217;ll update this over time as I distill more of my&amp;nbsp;ideas.&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Thu, 05 Jul 2012 11:07:00 -0400</pubDate><guid>tag:blog.jasonantman.com,2012-07-05:2012/07/what-i-look-for-when-interviwing-sysadmin-candidates/</guid></item><item><title>Script to Chart Intervals Between Problem and Recovery from Nagios/Icinga Log Files</title><link>http://blog.jasonantman.com/2012/05/script-to-chart-intervals-between-problem-and-recovery-from-nagiosicinga-log-files/</link><description>&lt;p&gt;At work, we use &lt;a href="http://www.icinga.org"&gt;Icinga&lt;/a&gt; (a fork of
+work, etc.) on your resume. Since I&amp;#8217;ve been interviewing candidates for …&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Thu, 05 Jul 2012 11:07:00 -0400</pubDate><guid isPermaLink="false">tag:blog.jasonantman.com,2012-07-05:/2012/07/what-i-look-for-when-interviwing-sysadmin-candidates/</guid></item><item><title>Script to Chart Intervals Between Problem and Recovery from Nagios/Icinga Log Files</title><link>http://blog.jasonantman.com/2012/05/script-to-chart-intervals-between-problem-and-recovery-from-nagiosicinga-log-files/</link><description>&lt;p&gt;At work, we use &lt;a href="http://www.icinga.org"&gt;Icinga&lt;/a&gt; (a fork of
 &lt;a href="http://nagios.org/"&gt;Nagios&lt;/a&gt;) for monitoring. We have a few services
 which are restarted or otherwise poked by event handlers, but the
 recovery takes a while - so we often get paged for problems which
-recover in a few minutes. I wrote a small perl script that greps through
-the archived log files for a given regex (service and/or host name) and
-then calculates the time from problem to recovery and graphs those&amp;nbsp;times.&lt;/p&gt;
-&lt;p&gt;The script is called &lt;code&gt;nagios_log_problem_interval.pl&lt;/code&gt; and can be
-downloaded from &lt;a href="https://github.com/jantman/nagios-scripts/blob/master/nagios_log_problem_interval.pl"&gt;my
-github&lt;/a&gt;.
-Below is some sample output, the number of minutes from problem to
-recovery are along the Y axis and the count is along the X&amp;nbsp;axis:&lt;/p&gt;
-&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="gp"&gt;&amp;gt;&lt;/span&gt; nagios_log_problem_interval.pl --archivedir&lt;span class="o"&gt;=&lt;/span&gt;/var/icinga/archive --match&lt;span class="o"&gt;=&lt;/span&gt;myhost --backtrack&lt;span class="o"&gt;=&lt;/span&gt;10 myhost;&lt;span class="caps"&gt;HTTP&lt;/span&gt;
-&lt;span class="go"&gt;Count&lt;/span&gt;
-&lt;span class="go"&gt;1:########(8)&lt;/span&gt;
-&lt;span class="go"&gt;2:##(2)&lt;/span&gt;
-&lt;span class="go"&gt;3:#(1)&lt;/span&gt;
-&lt;span class="go"&gt;4:##(2)&lt;/span&gt;
-&lt;span class="go"&gt;5:#######(7)&lt;/span&gt;
-&lt;span class="go"&gt;6:(0)&lt;/span&gt;
-&lt;span class="go"&gt;7:(0)&lt;/span&gt;
-&lt;span class="go"&gt;8:#(1)&lt;/span&gt;
-&lt;span class="go"&gt;9:(0)&lt;/span&gt;
-&lt;span class="go"&gt;10:(0)&lt;/span&gt;
-&lt;span class="go"&gt;11:#(1)&lt;/span&gt;
-&lt;span class="go"&gt;12:(0)&lt;/span&gt;
-&lt;span class="go"&gt;13:#(1)&lt;/span&gt;
-&lt;span class="go"&gt;14:(0)&lt;/span&gt;
-&lt;span class="go"&gt;15:(0)&lt;/span&gt;
-&lt;span class="go"&gt;16-29:(0)&lt;/span&gt;
-&lt;span class="go"&gt;30-59:(0)&lt;/span&gt;
-&lt;span class="go"&gt;60+:(0)&lt;/span&gt;
-&lt;/pre&gt;&lt;/div&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Thu, 31 May 2012 13:54:00 -0400</pubDate><guid>tag:blog.jasonantman.com,2012-05-31:2012/05/script-to-chart-intervals-between-problem-and-recovery-from-nagiosicinga-log-files/</guid><category>chart</category><category>icinga</category><category>monitoring</category><category>Nagios</category><category>perl</category></item><item><title>Perl script to convert F5 BigIp VIP address to list of internal pool member addresses</title><link>http://blog.jasonantman.com/2012/04/perl-script-to-convert-f5-bigip-vip-address-to-list-of-internal-pool-member-addresses/</link><description>&lt;p&gt;I often find myself logging in to the web &lt;span class="caps"&gt;UI&lt;/span&gt; of &lt;a href="http://www.f5.com/products/big-ip/"&gt;F5
+recover in a few minutes. I wrote a small perl script …&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Thu, 31 May 2012 13:54:00 -0400</pubDate><guid isPermaLink="false">tag:blog.jasonantman.com,2012-05-31:/2012/05/script-to-chart-intervals-between-problem-and-recovery-from-nagiosicinga-log-files/</guid><category>chart</category><category>icinga</category><category>monitoring</category><category>Nagios</category><category>perl</category></item><item><title>Perl script to convert F5 BigIp VIP address to list of internal pool member addresses</title><link>http://blog.jasonantman.com/2012/04/perl-script-to-convert-f5-bigip-vip-address-to-list-of-internal-pool-member-addresses/</link><description>&lt;p&gt;I often find myself logging in to the web &lt;span class="caps"&gt;UI&lt;/span&gt; of &lt;a href="http://www.f5.com/products/big-ip/"&gt;F5
 BigIp&lt;/a&gt; load balancers and tracing
 down a &lt;span class="caps"&gt;VIP&lt;/span&gt; address to the servers that actually back it. This is an
 arduous, repetitive task of tracing from the &lt;span class="caps"&gt;VIP&lt;/span&gt; list to the &lt;span class="caps"&gt;VIP&lt;/span&gt; details
-page to find the default pool, then matching up that in the pool list
-and checking the pool members page. Luckily, the F5 boxes have a &lt;a href="https://devcentral.f5.com/"&gt;web
-service &lt;span class="caps"&gt;API&lt;/span&gt;&lt;/a&gt; that can be used for tasks like
-this. They have &lt;span class="caps"&gt;GPL&lt;/span&gt; sample code in Perl that uses only
-&lt;a href="http://search.cpan.org/~mkutter/SOAP-Lite-0.714/lib/SOAP/Lite.pm"&gt;&lt;span class="caps"&gt;SOAP&lt;/span&gt;::Lite&lt;/a&gt;
-(as well as Getopt::Long and Pod::Usage) to interact with an F5 BigIp. I
-wrote a simple script to trace a &lt;span class="caps"&gt;VIP&lt;/span&gt; to the appropriate internal pool
-member addresses, assuming you have a simple configuration of &lt;span class="caps"&gt;VIP&lt;/span&gt; -&gt;
-Single default pool -&amp;gt; pool&amp;nbsp;members.&lt;/p&gt;
-&lt;p&gt;Usage is quite&amp;nbsp;simple:&lt;/p&gt;
-&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="gp"&gt;&amp;gt;&lt;/span&gt; ./VipToInternalHosts.pl --host&lt;span class="o"&gt;=&lt;/span&gt;prod-lb1.example.com --user&lt;span class="o"&gt;=&lt;/span&gt;myname --pass&lt;span class="o"&gt;=&lt;/span&gt;mypassword --vip&lt;span class="o"&gt;=&lt;/span&gt;128.6.30.130:80
-&lt;span class="go"&gt;&lt;span class="caps"&gt;VIP&lt;/span&gt; 128.6.30.130:80 (f5_vip_name) -&amp;gt; Pool &amp;#39;pool_name&amp;#39;&lt;/span&gt;
-&lt;span class="go"&gt;Members of Pool &amp;#39;pool_name&amp;#39;:&lt;/span&gt;
-&lt;span class="go"&gt;    10.145.15.10:80&lt;/span&gt;
-&lt;span class="go"&gt;    10.145.15.11:80&lt;/span&gt;
-&lt;/pre&gt;&lt;/div&gt;
-
-
-&lt;p&gt;The code can be found at
-&lt;a href="https://github.com/jantman/misc-scripts/blob/master/VipToInternalHosts.pl"&gt;https://github.com/jantman/misc-scripts/blob/master/VipToInternalHosts.pl&lt;/a&gt;. I hope it&amp;#8217;s of use to someone else as&amp;nbsp;well.&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Tue, 24 Apr 2012 22:04:00 -0400</pubDate><guid>tag:blog.jasonantman.com,2012-04-24:2012/04/perl-script-to-convert-f5-bigip-vip-address-to-list-of-internal-pool-member-addresses/</guid><category>bigip</category><category>f5</category><category>load balancer</category><category>perl</category></item><item><title>What Does a Sysadmin Look Like in 10 Years?</title><link>http://blog.jasonantman.com/2012/04/what-does-a-sysadmin-look-like-in-10-years/</link><description>&lt;p&gt;I just read a wondeful blog post by Adam Fletcher, &lt;a href="http://www.thesimplelogic.com/2011/03/22/what-does-a-sysadmin-look-like-in-10-years/"&gt;What Does A Sysadmin
+page to find the default pool …&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Tue, 24 Apr 2012 22:04:00 -0400</pubDate><guid isPermaLink="false">tag:blog.jasonantman.com,2012-04-24:/2012/04/perl-script-to-convert-f5-bigip-vip-address-to-list-of-internal-pool-member-addresses/</guid><category>bigip</category><category>f5</category><category>load balancer</category><category>perl</category></item><item><title>What Does a Sysadmin Look Like in 10 Years?</title><link>http://blog.jasonantman.com/2012/04/what-does-a-sysadmin-look-like-in-10-years/</link><description>&lt;p&gt;I just read a wondeful blog post by Adam Fletcher, &lt;a href="http://www.thesimplelogic.com/2011/03/22/what-does-a-sysadmin-look-like-in-10-years/"&gt;What Does A Sysadmin
 Look Like In 10
 Years?&lt;/a&gt;.
 This almost totally describes what I see as the future of system
 administors/engineers/architects, and DevOps. And what I try, or want,
-to do. It&amp;#8217;s the most accurate and succinct description I&amp;#8217;ve ever&amp;nbsp;read.&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Sun, 15 Apr 2012 22:29:00 -0400</pubDate><guid>tag:blog.jasonantman.com,2012-04-15:2012/04/what-does-a-sysadmin-look-like-in-10-years/</guid><category>engineer</category><category>sysadmin</category></item><item><title>CentOS/Fedora Install on SuperMicro Servers via IPMI Card KVM Over IP</title><link>http://blog.jasonantman.com/2012/04/centosfedora-install-on-supermicro-servers-via-ipmi-card-kvm-over-ip/</link><description>&lt;p&gt;I recently had to setup Fedora 16 to test something on a &lt;a href="http://www.supermicro.com/products/system/1U/6015/SYS-6015T-T.cfm"&gt;SuperMicro
+to do. It&amp;#8217;s the most accurate and …&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Sun, 15 Apr 2012 22:29:00 -0400</pubDate><guid isPermaLink="false">tag:blog.jasonantman.com,2012-04-15:/2012/04/what-does-a-sysadmin-look-like-in-10-years/</guid><category>engineer</category><category>sysadmin</category></item><item><title>CentOS/Fedora Install on SuperMicro Servers via IPMI Card KVM Over IP</title><link>http://blog.jasonantman.com/2012/04/centosfedora-install-on-supermicro-servers-via-ipmi-card-kvm-over-ip/</link><description>&lt;p&gt;I recently had to setup Fedora 16 to test something on a &lt;a href="http://www.supermicro.com/products/system/1U/6015/SYS-6015T-T.cfm"&gt;SuperMicro
 6015T-&lt;span class="caps"&gt;TV&lt;/span&gt;&lt;/a&gt;
 1U &amp;#8220;dual&amp;#8221; server. This is a 1U enclosure with two separate servers in it
 - based on the &lt;a href="http://www.supermicro.com/products/motherboard/Xeon1333/5000P/X7DBT.cfm"&gt;SuperMicro
 &lt;span class="caps"&gt;X7DBT&lt;/span&gt;&lt;/a&gt;
 motherboards - each with an
 &lt;a href="http://www.supermicro.com/products/accessories/addon/SIM.cfm"&gt;&lt;span class="caps"&gt;AOC&lt;/span&gt;-&lt;span class="caps"&gt;SIMSO&lt;/span&gt;+&lt;/a&gt;
-&lt;span class="caps"&gt;IPMI&lt;/span&gt; and &lt;span class="caps"&gt;KVM&lt;/span&gt;-over-&lt;span class="caps"&gt;IP&lt;/span&gt; management card. Every time I tried different
-options for the kernel parameters (I was using Cobbler), I could get the
-&lt;span class="caps"&gt;OS&lt;/span&gt; to boot, but once Anaconda started, I&amp;#8217;d lose image (&amp;#8220;No Signal&amp;#8221;) on
-the &lt;span class="caps"&gt;IP&lt;/span&gt; &lt;span class="caps"&gt;KVM&lt;/span&gt;, and the serial console would go quiet. It took me about a
-dozen tries before I found a mailing list reference to the &amp;#8220;nomodeset&amp;#8221;
-option. This did the trick perfectly, and kept Anaconda&amp;nbsp;working.&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Fri, 13 Apr 2012 15:19:00 -0400</pubDate><guid>tag:blog.jasonantman.com,2012-04-13:2012/04/centosfedora-install-on-supermicro-servers-via-ipmi-card-kvm-over-ip/</guid><category>anaconda</category><category>centos</category><category>fedora</category><category>ipmi</category><category>kvm</category><category>linux</category><category>raritan</category><category>supermicro</category></item><item><title>Leap Year Windows Azure Cloud Outage</title><link>http://blog.jasonantman.com/2012/03/leap-year-windows-azure-cloud-outage/</link><description>&lt;p&gt;I haven&amp;#8217;t talked about Microsoft in quite a while (mainly because I
+&lt;span class="caps"&gt;IPMI&lt;/span&gt; and &lt;span class="caps"&gt;KVM&lt;/span&gt;-over-&lt;span class="caps"&gt;IP&lt;/span&gt; management card. Every time I …&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Fri, 13 Apr 2012 15:19:00 -0400</pubDate><guid isPermaLink="false">tag:blog.jasonantman.com,2012-04-13:/2012/04/centosfedora-install-on-supermicro-servers-via-ipmi-card-kvm-over-ip/</guid><category>anaconda</category><category>centos</category><category>fedora</category><category>ipmi</category><category>kvm</category><category>linux</category><category>raritan</category><category>supermicro</category></item><item><title>Leap Year Windows Azure Cloud Outage</title><link>http://blog.jasonantman.com/2012/03/leap-year-windows-azure-cloud-outage/</link><description>&lt;p&gt;I haven&amp;#8217;t talked about Microsoft in quite a while (mainly because I
 don&amp;#8217;t follow mainstream tech news as much anymore), but I happened by a
 very interesting &lt;a href="http://blogs.msdn.com/b/windowsazure/archive/2012/03/09/summary-of-windows-azure-service-disruption-on-feb-29th-2012.aspx"&gt;post on the Windows Azure
 blog&lt;/a&gt;
 the other day. It&amp;#8217;s a very detailed postmortem of the major outage of
-the Windows Azure cloud service which occurred from 4:00 &lt;span class="caps"&gt;PM&lt;/span&gt; &lt;span class="caps"&gt;PST&lt;/span&gt; on
-February 28&lt;sup&gt;th&lt;/sup&gt; through 2:15 &lt;span class="caps"&gt;AM&lt;/span&gt; on March 1&lt;sup&gt;st&lt;/sup&gt;. Before I get into any of
-the details, I should say that it really is a nice, well-done post. And
-the fact that they&amp;#8217;re willing to do such a detailed, public postmortem -
-and admit the failures that they did - is a step in the right direction
-for Microsoft (a company that I don&amp;#8217;t particularly care for, to put it&amp;nbsp;lightly).&lt;/p&gt;
-&lt;p&gt;I&amp;#8217;m going to glance over the majority of the post, though I highly
-recommend that anyone interested in running web-scale services,
-specifically highly available ones, read it. The general overview
-(really just the points that are germane to my discussion) is as
-follows: An agent running inside the guest &lt;span class="caps"&gt;VM&lt;/span&gt; instances (i.e. domU)
-communicates with a counterpart on the host &lt;span class="caps"&gt;OS&lt;/span&gt; (i.e. dom0) over an
-encrypted channel, authenticated by certificate. The certs are generated
-and passed from the guest to the host when the guest instance is first
-initialized, which means when an app is first deployed, scaled out, &lt;span class="caps"&gt;OS&lt;/span&gt;
-updated, or when an app is reinitialized on a new host. This cert was
-generated for a 1-year validity period, by adding 1 to the integer year
-- hence, the generation process failed on February 29th of a leap year,
-as the cert end date wasn&amp;#8217;t valid. When the cert generation failed, the
-guest agent essentially stopped cold. The host agent waited for a 25
-minute timeout, then re-initialized the guest and started over. After
-three of these failures, the host assumes there&amp;#8217;s a hardware error
-(since the guest would have reported a more specific error otherwise),
-declares itself in an error state, and tries to move its current
-workload over to another host. Which re-initializes the guests on that
-host, thereby causing a chain-reaction of failures in this case. Skip
-forward the 2-1/2 hours it took them to identify the problem, and
-further 2-1/2 hours to get a fix ready. They fast-tracked their fix to 7
-clusters that had already been in the process of a software update, but
-ended up with those clusters in an inconsistent state with
-incompatibilities between the guest and host networking subsystems,
-bringing down previously-unaffected instances on these&amp;nbsp;clusters.&lt;/p&gt;
-&lt;p&gt;This whole scenario offers a few important points on both the
-development and operations&amp;nbsp;sides:&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;Inputs need error checking, and errors need to be raised.&lt;/strong&gt; So the
-first problem here was the failed cert generation. I&amp;#8217;ll leave alone the
-fact that, in my opinion, doing math on a the integer year of a date is
-a high school or college programming mistake, and never should have been
-made by someone doing platform coding for a major company (believe it or
-not, 25% of years are leap years &amp;lt;/sarcasm&gt;). If whatever code was
-generating the cert was smart enough to check the cert end date validity
-and error out, that error should have been pushed up the stack to
-somewhere where it could be handled - or, at least, sent to a central
-log server that does error&amp;nbsp;trending.&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;Secure communications when provisioning need an insecure error path.&lt;/strong&gt;
-This is somewhat connected to the previous point. If the normal process
-of creating a new instance and communicating errors up the stack relies
-on certs and authentication or encryption, there should be some method
-of communicating errors with &lt;em&gt;that&lt;/em&gt; process either up the stack, or to a
-separate event correlation/trending system. Errors with a
-certificate-based system are not unusual, and even something as simple
-as a vastly incorrect time set on the guests could have caused this same
-problem. In environments where management/control communication between
-levels of a system are encrypted or authenticated, there should be some
-way for lower levels of the system to deliver a meaningful error message
-&amp;#8220;somewhere&amp;#8221;. Even if this is just a syslog server or web service that
-listens for errors and can escalate a warning when the numbers spike,
-it&amp;#8217;s a useful alarm and debugging&amp;nbsp;tool.&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;Autonomous systems shouldn&amp;#8217;t lightly assume hardware failures.&lt;/strong&gt; It&amp;#8217;s
-arrogance for a host system to assume that just because it can&amp;#8217;t
-instantiate new guests, a hardware failure exists. This entire incident
-is a perfect example that, at least if hardware error indicators are
-properly monitored, it&amp;#8217;s more likely for a software problem to be
-falsely identified as a hardware problem than the other way around. All
-of my points are somewhat related, but I can think of many more reasons
-why a new guest can&amp;#8217;t be instantiated that are software-related rather
-than&amp;nbsp;hardware-related.&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;Autonomous control mechanisms need historical trending, and need to
-call for help if this looks wrong.&lt;/strong&gt; These host systems tried to
-instantiate new guests three times, waiting 25 minutes in between, and
-then declared themselves bad and tried to migrate guests to other hosts.
-From what I understand, Microsoft got it right in having a &amp;#8220;kill switch&amp;#8221;
-that prevented further migration of guests. What they didn&amp;#8217;t have right
-was reporting of autonomous actions (guest migration) to a central
-location that performs trending. The 25 minute timeout with three
-attempts is a great safety feature, but if the status of guest creation
-actions was reported to a central server, it would have been much more
-quickly apparent that 100% of guest creations in the past, say, 10
-minutes, had failed - across all clusters. I know plenty of shops that
-do little, if any, real-time analysis and historical comparisons of
-their log data. But when systems are designed to perform self-healing
-and autonomous actions, it&amp;#8217;s imperative that these actions are tracked
-in near-real-time, compared to historical averages, and that deviation
-from a baseline is identified and escalated to&amp;nbsp;humans.&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;Release procedures are more, not less, important when the sky is
-falling.&lt;/strong&gt; The extended downtime of the last seven clusters was because
-of an improperly &lt;span class="caps"&gt;QA&lt;/span&gt;&amp;#8217;ed update that was pushed out bypassing the normal
-release and testing procedures. As a matter of fact, it was so poorly
-&lt;span class="caps"&gt;QA&lt;/span&gt;&amp;#8217;ed that the update totally broke networking for the guest VMs, and
-was still pushed out. I&amp;#8217;m sure this was more of a management/executive
-decision than one made by the actual engineers, but organizations (even
-management) need to understand that when the sky is falling, services
-are down, and everybody is stressed, it&amp;#8217;s &lt;em&gt;more&lt;/em&gt; likely for mistakes and
-oversights to happen, and this is when a proper, well-documented &lt;span class="caps"&gt;QA&lt;/span&gt; and
-release procedure (including phased rollout) is &lt;em&gt;most&lt;/em&gt; important.
-Failure to follow these procedures results in exactly what happened in
-this case - making an already bad problem much&amp;nbsp;worse.&lt;/p&gt;
-&lt;p&gt;Even &lt;em&gt;I&lt;/em&gt; can&amp;#8217;t blame Microsoft specifically for all this (though the
-whole thing would have been avoided if they just represented timestamps
-as integers like the rest of us&amp;#8230;), but it is a good opportunity for us
-all to learn from a major incident at a &amp;#8220;pretty well known&amp;#8221;&amp;nbsp;company.&lt;/p&gt;
-&lt;p&gt;release procedures are most important when things are already going&amp;nbsp;wrong&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Tue, 20 Mar 2012 18:12:00 -0400</pubDate><guid>tag:blog.jasonantman.com,2012-03-20:2012/03/leap-year-windows-azure-cloud-outage/</guid><category>azure</category><category>microsoft</category><category>outage</category><category>release</category><category>testing</category><category>windows</category></item></channel></rss>
+the …&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Tue, 20 Mar 2012 18:12:00 -0400</pubDate><guid isPermaLink="false">tag:blog.jasonantman.com,2012-03-20:/2012/03/leap-year-windows-azure-cloud-outage/</guid><category>azure</category><category>microsoft</category><category>outage</category><category>release</category><category>testing</category><category>windows</category></item></channel></rss>

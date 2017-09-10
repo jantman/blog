@@ -1,117 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Jason Antman's Blog</title><link>http://blog.jasonantman.com/</link><description></description><atom:link href="http://blog.jasonantman.com/feeds/tags/version-control.rss.xml" rel="self"></atom:link><lastBuildDate>Sun, 25 Mar 2012 12:11:00 -0400</lastBuildDate><item><title>CVS to SVN to Git</title><link>http://blog.jasonantman.com/2012/03/cvs-to-svn-to-git/</link><description>&lt;p&gt;Thanks to some new interest, I&amp;#8217;ve decided to resurrect an old project of
+<rss version="2.0"><channel><title>Jason Antman's Blog - version control</title><link>http://blog.jasonantman.com/</link><description></description><lastBuildDate>Sun, 25 Mar 2012 12:11:00 -0400</lastBuildDate><item><title>CVS to SVN to Git</title><link>http://blog.jasonantman.com/2012/03/cvs-to-svn-to-git/</link><description>&lt;p&gt;Thanks to some new interest, I&amp;#8217;ve decided to resurrect an old project of
 mine, &lt;a href="http://www.php-ems-tools.com"&gt;&lt;span class="caps"&gt;PHP&lt;/span&gt; &lt;span class="caps"&gt;EMS&lt;/span&gt; Tools&lt;/a&gt;. It&amp;#8217;s a web-based
 tool for small emergency services organizations, mainly aimed at
 volunteer &lt;span class="caps"&gt;EMS&lt;/span&gt;/ambulance providers. The tool handles roster tracking,
-scheduling, equipment maintenance and checks, and a bunch of other
-administrative tasks. I first started it in 2007 for the &lt;a href="http://www.midlandparkambulance.com"&gt;Midland Park
-Ambulance Corps&lt;/a&gt; (&lt;span class="caps"&gt;MPAC&lt;/span&gt;), which I
-was a volunteer &lt;span class="caps"&gt;EMT&lt;/span&gt; with from 2005 through 2011. I&amp;#8217;ll admit that it&amp;#8217;s a
-perfect model of how not to run a software project. The first few
-releases are plain awful code. I was keeping the project in &lt;span class="caps"&gt;CVS&lt;/span&gt; at the
-time, and posted some early releases on
-&lt;a href="http://sourceforge.net/projects/php-ems-tools/"&gt;sourceforge&lt;/a&gt; and
-FreshMeat, now &lt;a href="http://freecode.com/projects/php-ems-tools"&gt;FreeCode&lt;/a&gt;.
-Sometime in 2009, I migrated the contents of the trunk of the &lt;span class="caps"&gt;CVS&lt;/span&gt; module
-to a &lt;a href="http://svn.jasonantman.com/php-ems-tools/"&gt;&lt;span class="caps"&gt;SVN&lt;/span&gt; repository&lt;/a&gt;, but
-discarded the history. I also setup a MediaWiki-based website for the
-project, giving some information and mainly asking for feedback. Around
-that time I started working on a new and heavily updated (fixed) version
-for &lt;span class="caps"&gt;MPAC&lt;/span&gt;, but since it appeared that there was no interest in the
-project, and there were many many local customizations and
-organization-specific features, I let their codebase diverge from what
-was released, and as a result, stopped keeping it in version control.
-Until now, when they need to migrate to a new server, and I&amp;#8217;ve also
-gotten some outside interest in the&amp;nbsp;project.&lt;/p&gt;
-&lt;p&gt;So, as of this morning, I was left with at least four code&amp;nbsp;bases:&lt;/p&gt;
-&lt;ol&gt;
-&lt;li&gt;the original &lt;a href="http://cvs.jasonantman.com/cgi-bin/viewvc.cgi/cvs/php-ems-tools-trunk/"&gt;&lt;span class="caps"&gt;CVS&lt;/span&gt;
-    repository&lt;/a&gt;
-    with branches and tags and some history, untouched since&amp;nbsp;2007&lt;/li&gt;
-&lt;li&gt;the &lt;a href="http://svn.jasonantman.com/php-ems-tools/"&gt;&lt;span class="caps"&gt;SVN&lt;/span&gt; repository&lt;/a&gt;
-    circa 2009, with only 3 commits, all related to the migration from
-    &lt;span class="caps"&gt;CVS&lt;/span&gt; to&amp;nbsp;&lt;span class="caps"&gt;SVN&lt;/span&gt;&lt;/li&gt;
-&lt;li&gt;a &amp;#8220;release&amp;#8221; tarball that at least one outside organization is
-    actually&amp;nbsp;using.&lt;/li&gt;
-&lt;li&gt;the code that &lt;span class="caps"&gt;MPAC&lt;/span&gt; is running, which has been largely rewritten
-    since 2009, but also contains a lot of organization-specific&amp;nbsp;customizations.&lt;/li&gt;
-&lt;/ol&gt;
-&lt;p&gt;As a first step, I created a new &lt;span class="caps"&gt;SVN&lt;/span&gt; repository and migrated the
-original &lt;span class="caps"&gt;CVS&lt;/span&gt; repo, complete with history, branches, and tags, to it
-using &lt;a href="http://cvs2svn.tigris.org/"&gt;cvs2svn&lt;/a&gt;, and then removed write
-permissions on the actual module in the repository. This gave me a &lt;span class="caps"&gt;SVN&lt;/span&gt;
-repository with all of the history of previous so-called releases, with
-a trunk matching r1 of the &amp;#8220;current&amp;#8221; &lt;span class="caps"&gt;SVN&lt;/span&gt; repository. I then manually
-applied patches to trunk/ for the two commits in the current &lt;span class="caps"&gt;SVN&lt;/span&gt;
-repository, and set the svn:date revision property to the correct 2009
-date for those commits. I also confirmed that the correct tag matches up
-to the &amp;#8220;release&amp;#8221; tarball mentioned above. So, I&amp;#8217;m down to a &amp;#8220;current&amp;#8221;
-trunk, plus the locally modified code running on &lt;span class="caps"&gt;MPAC&lt;/span&gt;&amp;#8217;s current server.
-My plan of action from this point is as&amp;nbsp;follows:&lt;/p&gt;
-&lt;ol&gt;
-&lt;li&gt;Move the &lt;span class="caps"&gt;PHP&lt;/span&gt; &lt;span class="caps"&gt;EMS&lt;/span&gt; Tools website from Mediawiki to my local redmine
-    installation, and update the news with a link to this&amp;nbsp;post.&lt;/li&gt;
-&lt;li&gt;Migrate the &lt;span class="caps"&gt;SVN&lt;/span&gt; repository, which now contains full history, to Git
-    hosted at Github. Add Github integration to&amp;nbsp;Redmine.&lt;/li&gt;
-&lt;li&gt;Update freshmeat, sourceforge, and anywhere else online that knows
-    about the&amp;nbsp;project.&lt;/li&gt;
-&lt;li&gt;Working in a git branch, begin converging the code &lt;span class="caps"&gt;MPAC&lt;/span&gt; is currently
-    running with the latest (now git) trunk, trying to provide
-    configuration options for anything organization specific, and
-    testing as I&amp;nbsp;go.&lt;/li&gt;
-&lt;/ol&gt;
-&lt;p&gt;If all works well, I&amp;#8217;ll end up with &lt;span class="caps"&gt;MPAC&lt;/span&gt; running the current trunk, just
-some different configuration options, and a working, up-to-date release.
-The biggest issues are going to be how I handle the &lt;span class="caps"&gt;MPAC&lt;/span&gt;-specific
-additions and customizations (a lot of stuff hard-coded for our position
-titles, plus our very custom call report and telephone-based call-in
-software, which is pretty tightly linked with the &lt;span class="caps"&gt;PHP&lt;/span&gt; &lt;span class="caps"&gt;EMS&lt;/span&gt; Tools core),
-and how I balance abstracting things to be configurable for other users
-versus getting this all done in a reasonable amount of&amp;nbsp;time.&lt;/p&gt;
-&lt;p&gt;Stay&amp;nbsp;tuned&amp;#8230;&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Sun, 25 Mar 2012 12:11:00 -0400</pubDate><guid>tag:blog.jasonantman.com,2012-03-25:2012/03/cvs-to-svn-to-git/</guid><category>cvs</category><category>git</category><category>svn</category><category>version control</category></item><item><title>Subversion ‘is missing or not locked’ error</title><link>http://blog.jasonantman.com/2010/01/subversion-is-missing-or-not-locked-error/</link><description>&lt;p&gt;Recently I was doing some work on a few &lt;span class="caps"&gt;PHP&lt;/span&gt; scripts, and came by a
+scheduling, equipment maintenance and checks, and a bunch of other …&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Sun, 25 Mar 2012 12:11:00 -0400</pubDate><guid isPermaLink="false">tag:blog.jasonantman.com,2012-03-25:/2012/03/cvs-to-svn-to-git/</guid><category>cvs</category><category>git</category><category>svn</category><category>version control</category></item><item><title>Subversion ‘is missing or not locked’ error</title><link>http://blog.jasonantman.com/2010/01/subversion-is-missing-or-not-locked-error/</link><description>&lt;p&gt;Recently I was doing some work on a few &lt;span class="caps"&gt;PHP&lt;/span&gt; scripts, and came by a
 rather annoying error while trying to commit to&amp;nbsp;subversion:&lt;/p&gt;
-&lt;div class="codehilite"&gt;&lt;pre&gt;svn: Commit failed (details follow):
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;svn: Commit failed (details follow):
 svn: Working copy &amp;#39;/srv/www/htdocs/newcall/stats/generated&amp;#39; is missing or not locked
 &lt;/pre&gt;&lt;/div&gt;
 
 
-&lt;p&gt;The problem was a directory, &amp;#8220;generated&amp;#8221;. This particular app makes use
-of &lt;a href="http://naku.dohcrew.com/libchart"&gt;libchart&lt;/a&gt; to draw simple charts in
-&lt;span class="caps"&gt;PHP&lt;/span&gt;. Libchart writes the charts to files, and therefore needs a
-directory writable by the Apache user. So, I created the &lt;code&gt;generated/&lt;/code&gt;
-directory for these output files, and &lt;code&gt;chown&lt;/code&gt;ed &lt;code&gt;wwwrun:www&lt;/code&gt;. Now,
-apparently, the subversion &lt;code&gt;svn add&lt;/code&gt; command doesn&amp;#8217;t check
-ownership/writable permissions before adding a directory. So, it added
-&lt;code&gt;generated/&lt;/code&gt; to the main list of files, but couldn&amp;#8217;t write the &lt;code&gt;.svn&lt;/code&gt;
-directory and add a lock. &lt;span class="caps"&gt;IMHO&lt;/span&gt;, this is an error in the svn&amp;nbsp;client.&lt;/p&gt;
-&lt;p&gt;I couldn&amp;#8217;t find any solutions to the problem online. Essentially, I have
-an empty directory (or at least nothing useful in it) that got partially
-added to svn - it was added to the &lt;code&gt;.svn/entries&lt;/code&gt; file in the parent
-directory, but never had its own &lt;code&gt;.svn&lt;/code&gt; directory&amp;nbsp;created.&lt;/p&gt;
-&lt;p&gt;The only solution that I found is to manually edit the &lt;code&gt;.svn/entries&lt;/code&gt;
-file in the parent directory. &lt;strong&gt;&lt;span class="caps"&gt;WARNING&lt;/span&gt;:&lt;/strong&gt; this isn&amp;#8217;t for the faint of
-heart. Be sure you don&amp;#8217;t screw anything&amp;nbsp;up.&lt;/p&gt;
-&lt;ol&gt;
-&lt;li&gt;Open the &lt;code&gt;.svn/entries&lt;/code&gt; file in the parent directory in a text
-    editor (i.e. if the problem directory is &lt;code&gt;stats/generated&lt;/code&gt;, edit
-    &lt;code&gt;stats/.svn/entries&lt;/code&gt;&lt;/li&gt;
-&lt;li&gt;Find the &lt;code&gt;entry&lt;/code&gt; node with the correct &amp;#8220;name&amp;#8221; attribute for the
-    directory in question. For stats/generated, in the
-    &lt;code&gt;stats/.svn/entries&lt;/code&gt; file, it should look&amp;nbsp;like:&lt;/li&gt;
-&lt;/ol&gt;
-&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="nt"&gt;&amp;lt;entry&lt;/span&gt;
-   &lt;span class="na"&gt;name=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;generated&amp;quot;&lt;/span&gt;
-   &lt;span class="na"&gt;kind=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;dir&amp;quot;&lt;/span&gt;
-   &lt;span class="na"&gt;schedule=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;add&amp;quot;&lt;/span&gt;&lt;span class="nt"&gt;/&amp;gt;&lt;/span&gt;
-&lt;/pre&gt;&lt;/div&gt;
-
-
-&lt;ol&gt;
-&lt;li&gt;Make the entries file writable (&lt;code&gt;chmod u+w entries&lt;/code&gt;)&lt;/li&gt;
-&lt;li&gt;Remove the entry from the&amp;nbsp;file.&lt;/li&gt;
-&lt;li&gt;Set the entries file back to non-writable (&lt;code&gt;chmod u-w entries&lt;/code&gt;)&lt;/li&gt;
-&lt;li&gt;Remove any save files if they were created (i.e. &lt;code&gt;entries~&lt;/code&gt; for&amp;nbsp;emacs)&lt;/li&gt;
-&lt;li&gt;Remove the directory itself and re-create it, this time adding to
-    svn before setting the&amp;nbsp;ownership.&lt;/li&gt;
-&lt;li&gt;Commit. It should now&amp;nbsp;work.&lt;/li&gt;
-&lt;/ol&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Fri, 29 Jan 2010 15:58:00 -0500</pubDate><guid>tag:blog.jasonantman.com,2010-01-29:2010/01/subversion-is-missing-or-not-locked-error/</guid><category>subversion</category><category>svn</category><category>version control</category></item></channel></rss>
+&lt;p&gt;The problem was a directory, &amp;#8220;generated&amp;#8221;. This …&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Fri, 29 Jan 2010 15:58:00 -0500</pubDate><guid isPermaLink="false">tag:blog.jasonantman.com,2010-01-29:/2010/01/subversion-is-missing-or-not-locked-error/</guid><category>subversion</category><category>svn</category><category>version control</category></item></channel></rss>

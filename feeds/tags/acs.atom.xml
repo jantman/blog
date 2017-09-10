@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Jason Antman's Blog</title><link href="http://blog.jasonantman.com/" rel="alternate"></link><link href="http://blog.jasonantman.com/feeds/tags/acs.atom.xml" rel="self"></link><id>http://blog.jasonantman.com/</id><updated>2009-11-18T16:21:00-05:00</updated><entry><title>root on a Cyclades ACS console server</title><link href="http://blog.jasonantman.com/2009/11/root-on-a-cyclades-acs-console-server/" rel="alternate"></link><updated>2009-11-18T16:21:00-05:00</updated><author><name>admin</name></author><id>tag:blog.jasonantman.com,2009-11-18:2009/11/root-on-a-cyclades-acs-console-server/</id><summary type="html">&lt;p&gt;At work we have a Cyclades &lt;span class="caps"&gt;ACS16&lt;/span&gt; console server (running
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Jason Antman's Blog - acs</title><link href="http://blog.jasonantman.com/" rel="alternate"></link><link href="http://blog.jasonantman.com/feeds/tags/acs.atom.xml" rel="self"></link><id>http://blog.jasonantman.com/</id><updated>2009-11-18T16:21:00-05:00</updated><entry><title>root on a Cyclades ACS console server</title><link href="http://blog.jasonantman.com/2009/11/root-on-a-cyclades-acs-console-server/" rel="alternate"></link><published>2009-11-18T16:21:00-05:00</published><updated>2009-11-18T16:21:00-05:00</updated><author><name>admin</name></author><id>tag:blog.jasonantman.com,2009-11-18:/2009/11/root-on-a-cyclades-acs-console-server/</id><summary type="html">&lt;p&gt;At work we have a Cyclades &lt;span class="caps"&gt;ACS16&lt;/span&gt; console server (running
+Cyclades-&lt;span class="caps"&gt;ACS16&lt;/span&gt;-Linux V_3.2.0 (Jan/04/08)). While the docs claim all
+sorts of &lt;span class="caps"&gt;LDAP&lt;/span&gt; features, there&amp;#8217;s nothing (either in the web &lt;span class="caps"&gt;GUI&lt;/span&gt; or the
+&lt;span class="caps"&gt;CLI&lt;/span&gt; configuration tool) to setup &lt;span class="caps"&gt;LDAP&lt;/span&gt; with &lt;span class="caps"&gt;TLS&lt;/span&gt; or required group
+membership …&lt;/p&gt;</summary><content type="html">&lt;p&gt;At work we have a Cyclades &lt;span class="caps"&gt;ACS16&lt;/span&gt; console server (running
 Cyclades-&lt;span class="caps"&gt;ACS16&lt;/span&gt;-Linux V_3.2.0 (Jan/04/08)). While the docs claim all
 sorts of &lt;span class="caps"&gt;LDAP&lt;/span&gt; features, there&amp;#8217;s nothing (either in the web &lt;span class="caps"&gt;GUI&lt;/span&gt; or the
 &lt;span class="caps"&gt;CLI&lt;/span&gt; configuration tool) to setup &lt;span class="caps"&gt;LDAP&lt;/span&gt; with &lt;span class="caps"&gt;TLS&lt;/span&gt; or required group
@@ -12,9 +16,9 @@ switch out the ldap.conf and nsswitch.conf files), root should be pretty&amp;nbs
 &lt;p&gt;The failing of Cyclades&amp;#8217; sudo lockdown is that it allows sudo execution
 of a few random shell scripts, and also allows&amp;nbsp;`mv`.&lt;/p&gt;
 &lt;p&gt;The &lt;code&gt;/etc/sudoers&lt;/code&gt;:&lt;/p&gt;
-&lt;div class="codehilite"&gt;&lt;pre&gt;# sudoers file.
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;# sudoers file.
 #
-# This file MUST be edited with the &amp;#39;visudo&amp;#39; command as root.
+# This file &lt;span class="caps"&gt;MUST&lt;/span&gt; be edited with the &amp;#39;visudo&amp;#39; command as root.
 #
 # See the sudoers man page for the details on how to write a sudoers file.
 #
@@ -50,7 +54,7 @@ Cmnd_Alias     CONF_FILES = /bin/vi /etc/network/st_routes,
                            /bin/vi /etc/portslave/pslave.conf,  
                            /bin/vi /etc/resolv.conf
 
-Cmnd_Alias     APPLICATIONS = /bin/pmCommand,  
+Cmnd_Alias     &lt;span class="caps"&gt;APPLICATIONS&lt;/span&gt; = /bin/pmCommand,  
                              /bin/saveconf,  
                              /bin/restoreconf,  
                              /bin/runconf,  
@@ -64,27 +68,27 @@ Cmnd_Alias     APPLICATIONS = /bin/pmCommand,
 
 # User privilege specification
 # root can run any command on any host as any user.
-root    ALL = (ALL) ALL
+root    &lt;span class="caps"&gt;ALL&lt;/span&gt; = (&lt;span class="caps"&gt;ALL&lt;/span&gt;) &lt;span class="caps"&gt;ALL&lt;/span&gt;
 
 # admin user group command specification.
-%admin      ALL = NOPASSWD: SH_CMDS, CONF_FILES, APPLICATIONS
+%admin      &lt;span class="caps"&gt;ALL&lt;/span&gt; = &lt;span class="caps"&gt;NOPASSWD&lt;/span&gt;: SH_CMDS, CONF_FILES, &lt;span class="caps"&gt;APPLICATIONS&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 
 
 &lt;p&gt;So, /bin/upgrade_power.sh doesn&amp;#8217;t look like we&amp;#8217;re using it too much.
 Here&amp;#8217;s our root procedure. Before doing this, create the
 &lt;code&gt;/home/admin/foo.sh&lt;/code&gt; script.&lt;/p&gt;
-&lt;div class="codehilite"&gt;&lt;pre&gt;sudo cp /bin/upgrade_power.sh /bin/upgrade_power.sh.SAVE
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;sudo cp /bin/upgrade_power.sh /bin/upgrade_power.sh.&lt;span class="caps"&gt;SAVE&lt;/span&gt;
 sudo chown root:root /home/admin/foo.sh
 sudo mv /home/admin/foo.sh /bin/upgrade_power.sh
 sudo /bin/upgrade_power.sh
-sudo cat /etc/sudoers &lt;span class="c"&gt;# just to verify that it worked&lt;/span&gt;
-sudo mv /bin/upgrade_power.sh.&lt;span class="caps"&gt;SAVE&lt;/span&gt; /bin/upgrade_power.sh &lt;span class="c"&gt;# set things back to the way they were&lt;/span&gt;
+sudo cat /etc/sudoers &lt;span class="c1"&gt;# just to verify that it worked&lt;/span&gt;
+sudo mv /bin/upgrade_power.sh.&lt;span class="caps"&gt;SAVE&lt;/span&gt; /bin/upgrade_power.sh &lt;span class="c1"&gt;# set things back to the way they were&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 
 
 &lt;p&gt;And the key to all of it is the simple &lt;code&gt;/home/admin/foo.sh&lt;/code&gt; script:&lt;/p&gt;
-&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="c"&gt;#!/bin/bash&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="ch"&gt;#!/bin/bash&lt;/span&gt;
 
 chmod u+w /etc/sudoers
 &lt;span class="nb"&gt;echo&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;%admin      &lt;span class="caps"&gt;ALL&lt;/span&gt; = &lt;span class="caps"&gt;NOPASSWD&lt;/span&gt;: &lt;span class="caps"&gt;ALL&lt;/span&gt;&amp;quot;&lt;/span&gt; &amp;gt;&amp;gt; /etc/sudoers
@@ -92,4 +96,4 @@ chmod u-w /etc/sudoers
 &lt;/pre&gt;&lt;/div&gt;
 
 
-&lt;p&gt;That&amp;#8217;s&amp;nbsp;it!&lt;/p&gt;</summary><category term="acs"></category><category term="cyclades"></category><category term="gettingroot"></category></entry></feed>
+&lt;p&gt;That&amp;#8217;s&amp;nbsp;it!&lt;/p&gt;</content><category term="acs"></category><category term="cyclades"></category><category term="gettingroot"></category></entry></feed>

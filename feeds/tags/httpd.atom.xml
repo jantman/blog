@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Jason Antman's Blog</title><link href="http://blog.jasonantman.com/" rel="alternate"></link><link href="http://blog.jasonantman.com/feeds/tags/httpd.atom.xml" rel="self"></link><id>http://blog.jasonantman.com/</id><updated>2013-05-11T12:01:00-04:00</updated><entry><title>Environment Variable Substitution in Apache httpd Configs</title><link href="http://blog.jasonantman.com/2013/05/environment-variable-substitution-in-apache-httpd-configs/" rel="alternate"></link><updated>2013-05-11T12:01:00-04:00</updated><author><name>admin</name></author><id>tag:blog.jasonantman.com,2013-05-11:2013/05/environment-variable-substitution-in-apache-httpd-configs/</id><summary type="html">&lt;p&gt;I&amp;#8217;ve been configuring Apache httpd for over a decade, from a single
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Jason Antman's Blog - httpd</title><link href="http://blog.jasonantman.com/" rel="alternate"></link><link href="http://blog.jasonantman.com/feeds/tags/httpd.atom.xml" rel="self"></link><id>http://blog.jasonantman.com/</id><updated>2013-05-11T12:01:00-04:00</updated><entry><title>Environment Variable Substitution in Apache httpd Configs</title><link href="http://blog.jasonantman.com/2013/05/environment-variable-substitution-in-apache-httpd-configs/" rel="alternate"></link><published>2013-05-11T12:01:00-04:00</published><updated>2013-05-11T12:01:00-04:00</updated><author><name>admin</name></author><id>tag:blog.jasonantman.com,2013-05-11:/2013/05/environment-variable-substitution-in-apache-httpd-configs/</id><summary type="html">&lt;p&gt;I&amp;#8217;ve been configuring Apache httpd for over a decade, from a single
+personal web server to web farms running thousands of vhosts. In most of
+the &amp;#8220;real&amp;#8221; environments I&amp;#8217;ve worked in, we&amp;#8217;ve had some variation of
+production, stage/test/&lt;span class="caps"&gt;QA&lt;/span&gt; and development hosts; and usually some method …&lt;/p&gt;</summary><content type="html">&lt;p&gt;I&amp;#8217;ve been configuring Apache httpd for over a decade, from a single
 personal web server to web farms running thousands of vhosts. In most of
 the &amp;#8220;real&amp;#8221; environments I&amp;#8217;ve worked in, we&amp;#8217;ve had some variation of
 production, stage/test/&lt;span class="caps"&gt;QA&lt;/span&gt; and development hosts; and usually some method
@@ -46,14 +49,14 @@ this should work for N environments) and that domains are prefixed with
 environment variables before httpd is started, on a per-host basis,
 depending on what environment that host is in. On RedHat based systems,
 we&amp;#8217;d add the variables to &lt;code&gt;/etc/sysconfig/httpd&lt;/code&gt; for&amp;nbsp;production:&lt;/p&gt;
-&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="nb"&gt;export &lt;/span&gt;&lt;span class="nv"&gt;HTTPD_ENV_NAME&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;prod&amp;quot;&lt;/span&gt;
-&lt;span class="nb"&gt;export &lt;/span&gt;&lt;span class="nv"&gt;HTTPD_ENV_URL_PART&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&amp;quot;&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="nb"&gt;export&lt;/span&gt; &lt;span class="nv"&gt;HTTPD_ENV_NAME&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;prod&amp;quot;&lt;/span&gt;
+&lt;span class="nb"&gt;export&lt;/span&gt; &lt;span class="nv"&gt;HTTPD_ENV_URL_PART&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&amp;quot;&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 
 
 &lt;p&gt;or for&amp;nbsp;&lt;span class="caps"&gt;QA&lt;/span&gt;:&lt;/p&gt;
-&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="nb"&gt;export &lt;/span&gt;&lt;span class="nv"&gt;HTTPD_ENV_NAME&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;qa&amp;quot;&lt;/span&gt;
-&lt;span class="nb"&gt;export &lt;/span&gt;&lt;span class="nv"&gt;HTTPD_ENV_URL_PART&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;qa.&amp;quot;&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="nb"&gt;export&lt;/span&gt; &lt;span class="nv"&gt;HTTPD_ENV_NAME&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;qa&amp;quot;&lt;/span&gt;
+&lt;span class="nb"&gt;export&lt;/span&gt; &lt;span class="nv"&gt;HTTPD_ENV_URL_PART&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;qa.&amp;quot;&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 
 
@@ -62,7 +65,7 @@ we&amp;#8217;d add the variables to &lt;code&gt;/etc/sysconfig/httpd&lt;/code&gt
 server&amp;#8217;s environment&amp;nbsp;variables).&lt;/p&gt;
 &lt;p&gt;Now let&amp;#8217;s look at an example vhost configuration file that uses the
 environment&amp;nbsp;variables:&lt;/p&gt;
-&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="nb"&gt;ServerName&lt;/span&gt; example.com
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="nb"&gt;ServerName&lt;/span&gt; example.com
 &lt;span class="nb"&gt;ServerAlias&lt;/span&gt; www.example.com
 &lt;span class="c"&gt;# Aliases including proper environment name&lt;/span&gt;
 &lt;span class="nb"&gt;ServerAlias&lt;/span&gt; www.${HTTPD_ENV_NAME}.example.com ${HTTPD_ENV_NAME}.example.com
@@ -98,7 +101,10 @@ in your init script which should be overridden by the sysconfig&amp;nbsp;file).&
 &lt;p&gt;If you&amp;#8217;re running httpd 2.4+, you can turn on
 &lt;a href="http://httpd.apache.org/docs/2.4/mod/mod_info.html"&gt;mod_info&lt;/a&gt; and
 browse to &lt;code&gt;http://servername/server-info?config&lt;/code&gt; to dump the current
-configuration, which will show the variable&amp;nbsp;substitution.&lt;/p&gt;</summary><category term="apache"></category><category term="environment"></category><category term="httpd"></category><category term="variable"></category></entry><entry><title>Apache httpd - logging for sites with and without load balancing</title><link href="http://blog.jasonantman.com/2012/05/apache-httpd-logging-for-sites-with-and-without-load-balancing/" rel="alternate"></link><updated>2012-05-30T09:46:00-04:00</updated><author><name>admin</name></author><id>tag:blog.jasonantman.com,2012-05-30:2012/05/apache-httpd-logging-for-sites-with-and-without-load-balancing/</id><summary type="html">&lt;p&gt;There are a few unfortunate places where I have an Apache httpd server
+configuration, which will show the variable&amp;nbsp;substitution.&lt;/p&gt;</content><category term="apache"></category><category term="environment"></category><category term="httpd"></category><category term="variable"></category></entry><entry><title>Apache httpd - logging for sites with and without load balancing</title><link href="http://blog.jasonantman.com/2012/05/apache-httpd-logging-for-sites-with-and-without-load-balancing/" rel="alternate"></link><published>2012-05-30T09:46:00-04:00</published><updated>2012-05-30T09:46:00-04:00</updated><author><name>admin</name></author><id>tag:blog.jasonantman.com,2012-05-30:/2012/05/apache-httpd-logging-for-sites-with-and-without-load-balancing/</id><summary type="html">&lt;p&gt;There are a few unfortunate places where I have an Apache httpd server
+serving multiple vhosts, some behind a F5 BigIp load balancer and some
+with direct traffic. For sites behind the &lt;span class="caps"&gt;LB&lt;/span&gt;, the remote &lt;span class="caps"&gt;IP&lt;/span&gt;/host will
+always show up as the &lt;span class="caps"&gt;LB&lt;/span&gt;&amp;#8217;s &lt;span class="caps"&gt;IP&lt;/span&gt;/host, not that of …&lt;/p&gt;</summary><content type="html">&lt;p&gt;There are a few unfortunate places where I have an Apache httpd server
 serving multiple vhosts, some behind a F5 BigIp load balancer and some
 with direct traffic. For sites behind the &lt;span class="caps"&gt;LB&lt;/span&gt;, the remote &lt;span class="caps"&gt;IP&lt;/span&gt;/host will
 always show up as the &lt;span class="caps"&gt;LB&lt;/span&gt;&amp;#8217;s &lt;span class="caps"&gt;IP&lt;/span&gt;/host, not that of the actual client. Using
@@ -115,7 +121,7 @@ standard header in the following snippet) and then sets the &amp;#8220;combined&
 LogFormat based on that variable - a version using BIOrigClientAddr if
 it is set, and a version using the normal &amp;#8220;%h&amp;#8221; remote host&amp;nbsp;otherwise.&lt;/p&gt;
 &lt;p&gt;In&amp;nbsp;httpd.conf:&lt;/p&gt;
-&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="c"&gt;# set the &amp;quot;bigip-request&amp;quot; env variable to &amp;quot;1&amp;quot; if there is a BIOrigClientAddr header in the request                                                                                                   &lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="c"&gt;# set the &amp;quot;bigip-request&amp;quot; env variable to &amp;quot;1&amp;quot; if there is a BIOrigClientAddr header in the request                                                                                                   &lt;/span&gt;
 &lt;span class="nb"&gt;SetEnvIf&lt;/span&gt; BIOrigClientAddr . bigip-request
 &lt;span class="c"&gt;# we&amp;#39;ll use this following LogFormat (BIOrigClientAddr in place of remote host) as &amp;quot;combined&amp;quot; &lt;span class="caps"&gt;IF&lt;/span&gt; the bigip-request env variable is set                                                                     &lt;/span&gt;
 &lt;span class="nb"&gt;LogFormat&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;%{BIOrigClientAddr}i %l %u %t %v \&amp;quot;%r\&amp;quot; %&amp;gt;s %b \&amp;quot;%{Referer}i\&amp;quot; \&amp;quot;%{User-Agent}i\&amp;quot;&amp;quot;&lt;/span&gt; combined_lb
@@ -125,8 +131,8 @@ it is set, and a version using the normal &amp;#8220;%h&amp;#8221; remote host&a
 
 
 &lt;p&gt;And then in our vhost&amp;nbsp;configuration:&lt;/p&gt;
-&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="c"&gt;# use this log format if we&amp;#39;re behind an &lt;span class="caps"&gt;LB&lt;/span&gt;&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="c"&gt;# use this log format if we&amp;#39;re behind an &lt;span class="caps"&gt;LB&lt;/span&gt;&lt;/span&gt;
 &lt;span class="nb"&gt;CustomLog&lt;/span&gt; logs/&amp;lt;%= domain %&amp;gt;_access_log combined env=!bigip-request
 &lt;span class="c"&gt;# or this format if we&amp;#39;re not&lt;/span&gt;
 &lt;span class="nb"&gt;CustomLog&lt;/span&gt; logs/&amp;lt;%= domain %&amp;gt;_access_log combined_lb env=bigip-request
-&lt;/pre&gt;&lt;/div&gt;</summary><category term="apache"></category><category term="bigip"></category><category term="f5"></category><category term="httpd"></category><category term="load balancer"></category><category term="logging"></category></entry></feed>
+&lt;/pre&gt;&lt;/div&gt;</content><category term="apache"></category><category term="bigip"></category><category term="f5"></category><category term="httpd"></category><category term="load balancer"></category><category term="logging"></category></entry></feed>

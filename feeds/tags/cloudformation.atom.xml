@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Jason Antman's Blog</title><link href="http://blog.jasonantman.com/" rel="alternate"></link><link href="http://blog.jasonantman.com/feeds/tags/cloudformation.atom.xml" rel="self"></link><id>http://blog.jasonantman.com/</id><updated>2014-12-15T09:29:00-05:00</updated><entry><title>AWS CloudFormation and RDS Snapshots</title><link href="http://blog.jasonantman.com/2014/12/aws-cloudformation-and-rds-snapshots/" rel="alternate"></link><updated>2014-12-15T09:29:00-05:00</updated><author><name>Jason Antman</name></author><id>tag:blog.jasonantman.com,2014-12-15:2014/12/aws-cloudformation-and-rds-snapshots/</id><summary type="html">&lt;p&gt;For the past few weeks, I&amp;#8217;ve been working on spinning up a WordPress stack on Amazon &lt;span class="caps"&gt;AWS&lt;/span&gt;. It&amp;#8217;s intended to be a production application,
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Jason Antman's Blog - cloudformation</title><link href="http://blog.jasonantman.com/" rel="alternate"></link><link href="http://blog.jasonantman.com/feeds/tags/cloudformation.atom.xml" rel="self"></link><id>http://blog.jasonantman.com/</id><updated>2014-12-15T09:29:00-05:00</updated><entry><title>AWS CloudFormation and RDS Snapshots</title><link href="http://blog.jasonantman.com/2014/12/aws-cloudformation-and-rds-snapshots/" rel="alternate"></link><published>2014-12-15T09:29:00-05:00</published><updated>2014-12-15T09:29:00-05:00</updated><author><name>Jason Antman</name></author><id>tag:blog.jasonantman.com,2014-12-15:/2014/12/aws-cloudformation-and-rds-snapshots/</id><summary type="html">&lt;p&gt;Some tips, tricks and non-intuitive information about working with &lt;span class="caps"&gt;AWS&lt;/span&gt; CloudFormation and &lt;span class="caps"&gt;RDS&lt;/span&gt;&amp;nbsp;snapshots.&lt;/p&gt;</summary><content type="html">&lt;p&gt;For the past few weeks, I&amp;#8217;ve been working on spinning up a WordPress stack on Amazon &lt;span class="caps"&gt;AWS&lt;/span&gt;. It&amp;#8217;s intended to be a production application,
 so it uses Multi-&lt;span class="caps"&gt;AZ&lt;/span&gt; and a few other tricks to try to achieve relatively high fault tolerance (nothing insane, still in one region). It uses
 &lt;span class="caps"&gt;AWS&lt;/span&gt;&amp;#8217;s &lt;a href="https://aws.amazon.com/rds/"&gt;&lt;span class="caps"&gt;RDS&lt;/span&gt;&lt;/a&gt; hosted MySQL service for the database, and the stacks are created with &lt;a href="https://aws.amazon.com/cloudformation/"&gt;CloudFormation&lt;/a&gt;.
 Using CloudFormation has been an utterly wonderful experience and being able to spin up an entire stack - multiple autoscaling web server
@@ -110,7 +110,7 @@ on how to accomplish various &lt;span class="caps"&gt;RDS&lt;/span&gt;-related t
 &lt;ul&gt;
 &lt;li&gt;
 &lt;p&gt;&lt;strong&gt;Build a new stack using a &lt;span class="caps"&gt;RDS&lt;/span&gt; snapshot and a stack policy to prevent updates&lt;/strong&gt;:&lt;/p&gt;
-&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="nv"&gt;$ &lt;/span&gt;cat /tmp/stack_policy.json
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ cat /tmp/stack_policy.json
 &lt;span class="o"&gt;{&lt;/span&gt;
   &lt;span class="s2"&gt;&amp;quot;Statement&amp;quot;&lt;/span&gt; : &lt;span class="o"&gt;[&lt;/span&gt;
     &lt;span class="o"&gt;{&lt;/span&gt;
@@ -127,7 +127,7 @@ on how to accomplish various &lt;span class="caps"&gt;RDS&lt;/span&gt;-related t
     &lt;span class="o"&gt;}&lt;/span&gt;
   &lt;span class="o"&gt;]&lt;/span&gt;
 &lt;span class="o"&gt;}&lt;/span&gt;
-&lt;span class="nv"&gt;$ &lt;/span&gt;aws cloudformation create-stack --stack-name mystack --stack-policy-body file:///tmp/stack_policy.json --template-body file:///home/myuser/cloudformation_template.json --parameters &lt;span class="nv"&gt;ParameterKey&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;DBSnapshotIdentifier,ParameterValue&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;my-snapshot-identifier&amp;#39;&lt;/span&gt;
+$ aws cloudformation create-stack --stack-name mystack --stack-policy-body file:///tmp/stack_policy.json --template-body file:///home/myuser/cloudformation_template.json --parameters &lt;span class="nv"&gt;ParameterKey&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;DBSnapshotIdentifier,ParameterValue&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;my-snapshot-identifier&amp;#39;&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 
 
@@ -137,7 +137,7 @@ on how to accomplish various &lt;span class="caps"&gt;RDS&lt;/span&gt;-related t
 &lt;ol&gt;
 &lt;li&gt;
 &lt;p&gt;Create a file with the following contents (we&amp;#8217;ll assume it&amp;#8217;s at &lt;code&gt;/home/myuser/allow_all_updates.json&lt;/code&gt;):&lt;/p&gt;
-&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="p"&gt;{&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;
   &lt;span class="nt"&gt;&amp;quot;Statement&amp;quot;&lt;/span&gt; &lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;
     &lt;span class="p"&gt;{&lt;/span&gt;
       &lt;span class="nt"&gt;&amp;quot;Effect&amp;quot;&lt;/span&gt; &lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;Allow&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
@@ -158,24 +158,24 @@ on how to accomplish various &lt;span class="caps"&gt;RDS&lt;/span&gt;-related t
 &lt;/li&gt;
 &lt;li&gt;
 &lt;p&gt;&lt;strong&gt;Update a stack (built using a &lt;span class="caps"&gt;RDS&lt;/span&gt; snapshot), without losing data&lt;/strong&gt;:&lt;/p&gt;
-&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="nv"&gt;$ &lt;/span&gt;aws cloudformation update-stack --stack-name mystack --template-body file:///home/myuser/cloudformation_template.json --parameters &lt;span class="nv"&gt;ParameterKey&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;DBSnapshotIdentifier,UsePreviousValue&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nb"&gt;true&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ aws cloudformation update-stack --stack-name mystack --template-body file:///home/myuser/cloudformation_template.json --parameters &lt;span class="nv"&gt;ParameterKey&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;DBSnapshotIdentifier,UsePreviousValue&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nb"&gt;true&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 
 
 &lt;/li&gt;
 &lt;li&gt;
 &lt;p&gt;&lt;strong&gt;Load a &lt;span class="caps"&gt;RDS&lt;/span&gt; snapshot into an existing stack&lt;/strong&gt; (that isn&amp;#8217;t already using this&amp;nbsp;snapshot):&lt;/p&gt;
-&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="nv"&gt;$ &lt;/span&gt;aws cloudformation update-stack --stack-name mystack --template-body file:///home/myuser/cloudformation_template.json --parameters &lt;span class="nv"&gt;ParameterKey&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;DBSnapshotIdentifier,ParameterValue&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;my-snapshot-identifier&amp;#39;&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ aws cloudformation update-stack --stack-name mystack --template-body file:///home/myuser/cloudformation_template.json --parameters &lt;span class="nv"&gt;ParameterKey&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;DBSnapshotIdentifier,ParameterValue&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;my-snapshot-identifier&amp;#39;&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 
 
 &lt;/li&gt;
 &lt;li&gt;
 &lt;p&gt;&lt;strong&gt;Load a &lt;span class="caps"&gt;RDS&lt;/span&gt; snapshot into an existing stack again&lt;/strong&gt; (i.e. restore from the same snapshot a second time; this one is a&amp;nbsp;kludge):&lt;/p&gt;
-&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="nv"&gt;$ &lt;/span&gt;&lt;span class="c"&gt;# re-create the &lt;span class="caps"&gt;RDS&lt;/span&gt; instance with a blank &lt;span class="caps"&gt;DB&lt;/span&gt; (DBName)&lt;/span&gt;
-&lt;span class="nv"&gt;$ &lt;/span&gt;aws cloudformation update-stack --stack-name mystack --template-body file:///home/myuser/cloudformation_template.json --parameters &lt;span class="nv"&gt;ParameterKey&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;DBSnapshotIdentifier,ParameterValue&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;&amp;#39;&lt;/span&gt;
-&lt;span class="nv"&gt;$ &lt;/span&gt;&lt;span class="c"&gt;# then load the snapshot again&lt;/span&gt;
-&lt;span class="nv"&gt;$ &lt;/span&gt;aws cloudformation update-stack --stack-name mystack --template-body file:///home/myuser/cloudformation_template.json --parameters &lt;span class="nv"&gt;ParameterKey&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;DBSnapshotIdentifier,ParameterValue&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;my-snapshot-identifier&amp;#39;&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ &lt;span class="c1"&gt;# re-create the &lt;span class="caps"&gt;RDS&lt;/span&gt; instance with a blank &lt;span class="caps"&gt;DB&lt;/span&gt; (DBName)&lt;/span&gt;
+$ aws cloudformation update-stack --stack-name mystack --template-body file:///home/myuser/cloudformation_template.json --parameters &lt;span class="nv"&gt;ParameterKey&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;DBSnapshotIdentifier,ParameterValue&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;&amp;#39;&lt;/span&gt;
+$ &lt;span class="c1"&gt;# then load the snapshot again&lt;/span&gt;
+$ aws cloudformation update-stack --stack-name mystack --template-body file:///home/myuser/cloudformation_template.json --parameters &lt;span class="nv"&gt;ParameterKey&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;DBSnapshotIdentifier,ParameterValue&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;my-snapshot-identifier&amp;#39;&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 
 
@@ -183,7 +183,7 @@ on how to accomplish various &lt;span class="caps"&gt;RDS&lt;/span&gt;-related t
 &lt;/ul&gt;
 &lt;h2 id="cloudformation-template-snippet"&gt;CloudFormation Template&amp;nbsp;Snippet&lt;/h2&gt;
 &lt;p&gt;This is by no means complete, but just includes the parameters, conditions, and resources which I make reference&amp;nbsp;to.&lt;/p&gt;
-&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="p"&gt;{&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;
   &lt;span class="nt"&gt;&amp;quot;Parameters&amp;quot;&lt;/span&gt; &lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
     &lt;span class="nt"&gt;&amp;quot;DBName&amp;quot;&lt;/span&gt; &lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
       &lt;span class="nt"&gt;&amp;quot;Default&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;wordpress&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
@@ -286,7 +286,7 @@ on how to accomplish various &lt;span class="caps"&gt;RDS&lt;/span&gt;-related t
     &lt;span class="p"&gt;}&lt;/span&gt;
   &lt;span class="p"&gt;}&lt;/span&gt;
 &lt;span class="p"&gt;}&lt;/span&gt;
-&lt;/pre&gt;&lt;/div&gt;</summary><category term="aws"></category><category term="cloudformation"></category><category term="rds"></category><category term="mysql"></category><category term="snapshot"></category></entry><entry><title>Watching Jenkins Jobs and CloudFormation Updates with Pushover Notification</title><link href="http://blog.jasonantman.com/2014/12/watching-jenkins-jobs-and-cloudformation-updates-with-pushover-notification/" rel="alternate"></link><updated>2014-12-14T19:22:00-05:00</updated><author><name>Jason Antman</name></author><id>tag:blog.jasonantman.com,2014-12-14:2014/12/watching-jenkins-jobs-and-cloudformation-updates-with-pushover-notification/</id><summary type="html">&lt;p&gt;A few months ago I &lt;a href="http://blog.jasonantman.com/2014/09/pushover-notifications-for-shell-command-completion-and-status/"&gt;posted&lt;/a&gt;
+&lt;/pre&gt;&lt;/div&gt;</content><category term="aws"></category><category term="cloudformation"></category><category term="rds"></category><category term="mysql"></category><category term="snapshot"></category></entry><entry><title>Watching Jenkins Jobs and CloudFormation Updates with Pushover Notification</title><link href="http://blog.jasonantman.com/2014/12/watching-jenkins-jobs-and-cloudformation-updates-with-pushover-notification/" rel="alternate"></link><published>2014-12-14T19:22:00-05:00</published><updated>2014-12-14T19:22:00-05:00</updated><author><name>Jason Antman</name></author><id>tag:blog.jasonantman.com,2014-12-14:/2014/12/watching-jenkins-jobs-and-cloudformation-updates-with-pushover-notification/</id><summary type="html">&lt;p&gt;Some scripts to watch the status of Jenkins jobs and CloudFormation updates, and send Pushover&amp;nbsp;notifications.&lt;/p&gt;</summary><content type="html">&lt;p&gt;A few months ago I &lt;a href="http://blog.jasonantman.com/2014/09/pushover-notifications-for-shell-command-completion-and-status/"&gt;posted&lt;/a&gt;
 about a script I wrote to send &lt;a href="https://pushover.net/"&gt;Pushover&lt;/a&gt; notifications for shell command&amp;nbsp;completion.&lt;/p&gt;
 &lt;p&gt;I&amp;#8217;ve been doing quite a bit of work lately both with testing some &lt;a href="http://jenkins-ci.org/"&gt;Jenkins&lt;/a&gt; jobs, and spinning up
 &lt;span class="caps"&gt;AWS&lt;/span&gt; stacks using &lt;a href="https://aws.amazon.com/cloudformation/"&gt;CloudFormation&lt;/a&gt;. Last week I wrote two python scripts to aid in&amp;nbsp;this.&lt;/p&gt;
@@ -297,4 +297,4 @@ It also optionally uses &lt;a href="https://pypi.python.org/pypi/python-pushover
 &lt;a href="https://pypi.python.org/pypi/python-jenkins"&gt;python-jenkins&lt;/a&gt; to poll the status of the build (or the latest build, if given a Job url)
 and display the result when the build finishes, also optionally using python-pushover to send notifications to your&amp;nbsp;device.&lt;/p&gt;
 &lt;p&gt;They&amp;#8217;re really quick-and-dirty scripts and might not be suitable for everyone&amp;#8217;s use case, but I took the time to write them,
-so hopefully they&amp;#8217;ll be useful to someone&amp;nbsp;else.&lt;/p&gt;</summary><category term="script"></category><category term="pushover"></category><category term="jenkins"></category><category term="hudson"></category><category term="aws"></category><category term="cloudformation"></category></entry></feed>
+so hopefully they&amp;#8217;ll be useful to someone&amp;nbsp;else.&lt;/p&gt;</content><category term="script"></category><category term="pushover"></category><category term="jenkins"></category><category term="hudson"></category><category term="aws"></category><category term="cloudformation"></category></entry></feed>

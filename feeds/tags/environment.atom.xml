@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Jason Antman's Blog</title><link href="http://blog.jasonantman.com/" rel="alternate"></link><link href="http://blog.jasonantman.com/feeds/tags/environment.atom.xml" rel="self"></link><id>http://blog.jasonantman.com/</id><updated>2013-05-11T12:01:00-04:00</updated><entry><title>Environment Variable Substitution in Apache httpd Configs</title><link href="http://blog.jasonantman.com/2013/05/environment-variable-substitution-in-apache-httpd-configs/" rel="alternate"></link><updated>2013-05-11T12:01:00-04:00</updated><author><name>admin</name></author><id>tag:blog.jasonantman.com,2013-05-11:2013/05/environment-variable-substitution-in-apache-httpd-configs/</id><summary type="html">&lt;p&gt;I&amp;#8217;ve been configuring Apache httpd for over a decade, from a single
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Jason Antman's Blog - environment</title><link href="http://blog.jasonantman.com/" rel="alternate"></link><link href="http://blog.jasonantman.com/feeds/tags/environment.atom.xml" rel="self"></link><id>http://blog.jasonantman.com/</id><updated>2013-05-11T12:01:00-04:00</updated><entry><title>Environment Variable Substitution in Apache httpd Configs</title><link href="http://blog.jasonantman.com/2013/05/environment-variable-substitution-in-apache-httpd-configs/" rel="alternate"></link><published>2013-05-11T12:01:00-04:00</published><updated>2013-05-11T12:01:00-04:00</updated><author><name>admin</name></author><id>tag:blog.jasonantman.com,2013-05-11:/2013/05/environment-variable-substitution-in-apache-httpd-configs/</id><summary type="html">&lt;p&gt;I&amp;#8217;ve been configuring Apache httpd for over a decade, from a single
+personal web server to web farms running thousands of vhosts. In most of
+the &amp;#8220;real&amp;#8221; environments I&amp;#8217;ve worked in, we&amp;#8217;ve had some variation of
+production, stage/test/&lt;span class="caps"&gt;QA&lt;/span&gt; and development hosts; and usually some method …&lt;/p&gt;</summary><content type="html">&lt;p&gt;I&amp;#8217;ve been configuring Apache httpd for over a decade, from a single
 personal web server to web farms running thousands of vhosts. In most of
 the &amp;#8220;real&amp;#8221; environments I&amp;#8217;ve worked in, we&amp;#8217;ve had some variation of
 production, stage/test/&lt;span class="caps"&gt;QA&lt;/span&gt; and development hosts; and usually some method
@@ -46,14 +49,14 @@ this should work for N environments) and that domains are prefixed with
 environment variables before httpd is started, on a per-host basis,
 depending on what environment that host is in. On RedHat based systems,
 we&amp;#8217;d add the variables to &lt;code&gt;/etc/sysconfig/httpd&lt;/code&gt; for&amp;nbsp;production:&lt;/p&gt;
-&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="nb"&gt;export &lt;/span&gt;&lt;span class="nv"&gt;HTTPD_ENV_NAME&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;prod&amp;quot;&lt;/span&gt;
-&lt;span class="nb"&gt;export &lt;/span&gt;&lt;span class="nv"&gt;HTTPD_ENV_URL_PART&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&amp;quot;&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="nb"&gt;export&lt;/span&gt; &lt;span class="nv"&gt;HTTPD_ENV_NAME&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;prod&amp;quot;&lt;/span&gt;
+&lt;span class="nb"&gt;export&lt;/span&gt; &lt;span class="nv"&gt;HTTPD_ENV_URL_PART&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&amp;quot;&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 
 
 &lt;p&gt;or for&amp;nbsp;&lt;span class="caps"&gt;QA&lt;/span&gt;:&lt;/p&gt;
-&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="nb"&gt;export &lt;/span&gt;&lt;span class="nv"&gt;HTTPD_ENV_NAME&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;qa&amp;quot;&lt;/span&gt;
-&lt;span class="nb"&gt;export &lt;/span&gt;&lt;span class="nv"&gt;HTTPD_ENV_URL_PART&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;qa.&amp;quot;&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="nb"&gt;export&lt;/span&gt; &lt;span class="nv"&gt;HTTPD_ENV_NAME&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;qa&amp;quot;&lt;/span&gt;
+&lt;span class="nb"&gt;export&lt;/span&gt; &lt;span class="nv"&gt;HTTPD_ENV_URL_PART&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;qa.&amp;quot;&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 
 
@@ -62,7 +65,7 @@ we&amp;#8217;d add the variables to &lt;code&gt;/etc/sysconfig/httpd&lt;/code&gt
 server&amp;#8217;s environment&amp;nbsp;variables).&lt;/p&gt;
 &lt;p&gt;Now let&amp;#8217;s look at an example vhost configuration file that uses the
 environment&amp;nbsp;variables:&lt;/p&gt;
-&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="nb"&gt;ServerName&lt;/span&gt; example.com
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="nb"&gt;ServerName&lt;/span&gt; example.com
 &lt;span class="nb"&gt;ServerAlias&lt;/span&gt; www.example.com
 &lt;span class="c"&gt;# Aliases including proper environment name&lt;/span&gt;
 &lt;span class="nb"&gt;ServerAlias&lt;/span&gt; www.${HTTPD_ENV_NAME}.example.com ${HTTPD_ENV_NAME}.example.com
@@ -98,4 +101,4 @@ in your init script which should be overridden by the sysconfig&amp;nbsp;file).&
 &lt;p&gt;If you&amp;#8217;re running httpd 2.4+, you can turn on
 &lt;a href="http://httpd.apache.org/docs/2.4/mod/mod_info.html"&gt;mod_info&lt;/a&gt; and
 browse to &lt;code&gt;http://servername/server-info?config&lt;/code&gt; to dump the current
-configuration, which will show the variable&amp;nbsp;substitution.&lt;/p&gt;</summary><category term="apache"></category><category term="environment"></category><category term="httpd"></category><category term="variable"></category></entry></feed>
+configuration, which will show the variable&amp;nbsp;substitution.&lt;/p&gt;</content><category term="apache"></category><category term="environment"></category><category term="httpd"></category><category term="variable"></category></entry></feed>

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Jason Antman's Blog</title><link href="http://blog.jasonantman.com/" rel="alternate"></link><link href="http://blog.jasonantman.com/feeds/tags/mysql.atom.xml" rel="self"></link><id>http://blog.jasonantman.com/</id><updated>2014-12-15T09:29:00-05:00</updated><entry><title>AWS CloudFormation and RDS Snapshots</title><link href="http://blog.jasonantman.com/2014/12/aws-cloudformation-and-rds-snapshots/" rel="alternate"></link><updated>2014-12-15T09:29:00-05:00</updated><author><name>Jason Antman</name></author><id>tag:blog.jasonantman.com,2014-12-15:2014/12/aws-cloudformation-and-rds-snapshots/</id><summary type="html">&lt;p&gt;For the past few weeks, I&amp;#8217;ve been working on spinning up a WordPress stack on Amazon &lt;span class="caps"&gt;AWS&lt;/span&gt;. It&amp;#8217;s intended to be a production application,
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Jason Antman's Blog - mysql</title><link href="http://blog.jasonantman.com/" rel="alternate"></link><link href="http://blog.jasonantman.com/feeds/tags/mysql.atom.xml" rel="self"></link><id>http://blog.jasonantman.com/</id><updated>2014-12-15T09:29:00-05:00</updated><entry><title>AWS CloudFormation and RDS Snapshots</title><link href="http://blog.jasonantman.com/2014/12/aws-cloudformation-and-rds-snapshots/" rel="alternate"></link><published>2014-12-15T09:29:00-05:00</published><updated>2014-12-15T09:29:00-05:00</updated><author><name>Jason Antman</name></author><id>tag:blog.jasonantman.com,2014-12-15:/2014/12/aws-cloudformation-and-rds-snapshots/</id><summary type="html">&lt;p&gt;Some tips, tricks and non-intuitive information about working with &lt;span class="caps"&gt;AWS&lt;/span&gt; CloudFormation and &lt;span class="caps"&gt;RDS&lt;/span&gt;&amp;nbsp;snapshots.&lt;/p&gt;</summary><content type="html">&lt;p&gt;For the past few weeks, I&amp;#8217;ve been working on spinning up a WordPress stack on Amazon &lt;span class="caps"&gt;AWS&lt;/span&gt;. It&amp;#8217;s intended to be a production application,
 so it uses Multi-&lt;span class="caps"&gt;AZ&lt;/span&gt; and a few other tricks to try to achieve relatively high fault tolerance (nothing insane, still in one region). It uses
 &lt;span class="caps"&gt;AWS&lt;/span&gt;&amp;#8217;s &lt;a href="https://aws.amazon.com/rds/"&gt;&lt;span class="caps"&gt;RDS&lt;/span&gt;&lt;/a&gt; hosted MySQL service for the database, and the stacks are created with &lt;a href="https://aws.amazon.com/cloudformation/"&gt;CloudFormation&lt;/a&gt;.
 Using CloudFormation has been an utterly wonderful experience and being able to spin up an entire stack - multiple autoscaling web server
@@ -110,7 +110,7 @@ on how to accomplish various &lt;span class="caps"&gt;RDS&lt;/span&gt;-related t
 &lt;ul&gt;
 &lt;li&gt;
 &lt;p&gt;&lt;strong&gt;Build a new stack using a &lt;span class="caps"&gt;RDS&lt;/span&gt; snapshot and a stack policy to prevent updates&lt;/strong&gt;:&lt;/p&gt;
-&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="nv"&gt;$ &lt;/span&gt;cat /tmp/stack_policy.json
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ cat /tmp/stack_policy.json
 &lt;span class="o"&gt;{&lt;/span&gt;
   &lt;span class="s2"&gt;&amp;quot;Statement&amp;quot;&lt;/span&gt; : &lt;span class="o"&gt;[&lt;/span&gt;
     &lt;span class="o"&gt;{&lt;/span&gt;
@@ -127,7 +127,7 @@ on how to accomplish various &lt;span class="caps"&gt;RDS&lt;/span&gt;-related t
     &lt;span class="o"&gt;}&lt;/span&gt;
   &lt;span class="o"&gt;]&lt;/span&gt;
 &lt;span class="o"&gt;}&lt;/span&gt;
-&lt;span class="nv"&gt;$ &lt;/span&gt;aws cloudformation create-stack --stack-name mystack --stack-policy-body file:///tmp/stack_policy.json --template-body file:///home/myuser/cloudformation_template.json --parameters &lt;span class="nv"&gt;ParameterKey&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;DBSnapshotIdentifier,ParameterValue&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;my-snapshot-identifier&amp;#39;&lt;/span&gt;
+$ aws cloudformation create-stack --stack-name mystack --stack-policy-body file:///tmp/stack_policy.json --template-body file:///home/myuser/cloudformation_template.json --parameters &lt;span class="nv"&gt;ParameterKey&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;DBSnapshotIdentifier,ParameterValue&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;my-snapshot-identifier&amp;#39;&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 
 
@@ -137,7 +137,7 @@ on how to accomplish various &lt;span class="caps"&gt;RDS&lt;/span&gt;-related t
 &lt;ol&gt;
 &lt;li&gt;
 &lt;p&gt;Create a file with the following contents (we&amp;#8217;ll assume it&amp;#8217;s at &lt;code&gt;/home/myuser/allow_all_updates.json&lt;/code&gt;):&lt;/p&gt;
-&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="p"&gt;{&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;
   &lt;span class="nt"&gt;&amp;quot;Statement&amp;quot;&lt;/span&gt; &lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;
     &lt;span class="p"&gt;{&lt;/span&gt;
       &lt;span class="nt"&gt;&amp;quot;Effect&amp;quot;&lt;/span&gt; &lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;Allow&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
@@ -158,24 +158,24 @@ on how to accomplish various &lt;span class="caps"&gt;RDS&lt;/span&gt;-related t
 &lt;/li&gt;
 &lt;li&gt;
 &lt;p&gt;&lt;strong&gt;Update a stack (built using a &lt;span class="caps"&gt;RDS&lt;/span&gt; snapshot), without losing data&lt;/strong&gt;:&lt;/p&gt;
-&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="nv"&gt;$ &lt;/span&gt;aws cloudformation update-stack --stack-name mystack --template-body file:///home/myuser/cloudformation_template.json --parameters &lt;span class="nv"&gt;ParameterKey&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;DBSnapshotIdentifier,UsePreviousValue&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nb"&gt;true&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ aws cloudformation update-stack --stack-name mystack --template-body file:///home/myuser/cloudformation_template.json --parameters &lt;span class="nv"&gt;ParameterKey&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;DBSnapshotIdentifier,UsePreviousValue&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nb"&gt;true&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 
 
 &lt;/li&gt;
 &lt;li&gt;
 &lt;p&gt;&lt;strong&gt;Load a &lt;span class="caps"&gt;RDS&lt;/span&gt; snapshot into an existing stack&lt;/strong&gt; (that isn&amp;#8217;t already using this&amp;nbsp;snapshot):&lt;/p&gt;
-&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="nv"&gt;$ &lt;/span&gt;aws cloudformation update-stack --stack-name mystack --template-body file:///home/myuser/cloudformation_template.json --parameters &lt;span class="nv"&gt;ParameterKey&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;DBSnapshotIdentifier,ParameterValue&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;my-snapshot-identifier&amp;#39;&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ aws cloudformation update-stack --stack-name mystack --template-body file:///home/myuser/cloudformation_template.json --parameters &lt;span class="nv"&gt;ParameterKey&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;DBSnapshotIdentifier,ParameterValue&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;my-snapshot-identifier&amp;#39;&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 
 
 &lt;/li&gt;
 &lt;li&gt;
 &lt;p&gt;&lt;strong&gt;Load a &lt;span class="caps"&gt;RDS&lt;/span&gt; snapshot into an existing stack again&lt;/strong&gt; (i.e. restore from the same snapshot a second time; this one is a&amp;nbsp;kludge):&lt;/p&gt;
-&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="nv"&gt;$ &lt;/span&gt;&lt;span class="c"&gt;# re-create the &lt;span class="caps"&gt;RDS&lt;/span&gt; instance with a blank &lt;span class="caps"&gt;DB&lt;/span&gt; (DBName)&lt;/span&gt;
-&lt;span class="nv"&gt;$ &lt;/span&gt;aws cloudformation update-stack --stack-name mystack --template-body file:///home/myuser/cloudformation_template.json --parameters &lt;span class="nv"&gt;ParameterKey&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;DBSnapshotIdentifier,ParameterValue&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;&amp;#39;&lt;/span&gt;
-&lt;span class="nv"&gt;$ &lt;/span&gt;&lt;span class="c"&gt;# then load the snapshot again&lt;/span&gt;
-&lt;span class="nv"&gt;$ &lt;/span&gt;aws cloudformation update-stack --stack-name mystack --template-body file:///home/myuser/cloudformation_template.json --parameters &lt;span class="nv"&gt;ParameterKey&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;DBSnapshotIdentifier,ParameterValue&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;my-snapshot-identifier&amp;#39;&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ &lt;span class="c1"&gt;# re-create the &lt;span class="caps"&gt;RDS&lt;/span&gt; instance with a blank &lt;span class="caps"&gt;DB&lt;/span&gt; (DBName)&lt;/span&gt;
+$ aws cloudformation update-stack --stack-name mystack --template-body file:///home/myuser/cloudformation_template.json --parameters &lt;span class="nv"&gt;ParameterKey&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;DBSnapshotIdentifier,ParameterValue&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;&amp;#39;&lt;/span&gt;
+$ &lt;span class="c1"&gt;# then load the snapshot again&lt;/span&gt;
+$ aws cloudformation update-stack --stack-name mystack --template-body file:///home/myuser/cloudformation_template.json --parameters &lt;span class="nv"&gt;ParameterKey&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;DBSnapshotIdentifier,ParameterValue&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;my-snapshot-identifier&amp;#39;&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 
 
@@ -183,7 +183,7 @@ on how to accomplish various &lt;span class="caps"&gt;RDS&lt;/span&gt;-related t
 &lt;/ul&gt;
 &lt;h2 id="cloudformation-template-snippet"&gt;CloudFormation Template&amp;nbsp;Snippet&lt;/h2&gt;
 &lt;p&gt;This is by no means complete, but just includes the parameters, conditions, and resources which I make reference&amp;nbsp;to.&lt;/p&gt;
-&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="p"&gt;{&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;
   &lt;span class="nt"&gt;&amp;quot;Parameters&amp;quot;&lt;/span&gt; &lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
     &lt;span class="nt"&gt;&amp;quot;DBName&amp;quot;&lt;/span&gt; &lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
       &lt;span class="nt"&gt;&amp;quot;Default&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;wordpress&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
@@ -286,7 +286,14 @@ on how to accomplish various &lt;span class="caps"&gt;RDS&lt;/span&gt;-related t
     &lt;span class="p"&gt;}&lt;/span&gt;
   &lt;span class="p"&gt;}&lt;/span&gt;
 &lt;span class="p"&gt;}&lt;/span&gt;
-&lt;/pre&gt;&lt;/div&gt;</summary><category term="aws"></category><category term="cloudformation"></category><category term="rds"></category><category term="mysql"></category><category term="snapshot"></category></entry><entry><title>Simple Diagrams of MySQL Schema</title><link href="http://blog.jasonantman.com/2011/05/simple-diagrams-of-mysql-schema/" rel="alternate"></link><updated>2011-05-04T08:47:00-04:00</updated><author><name>admin</name></author><id>tag:blog.jasonantman.com,2011-05-04:2011/05/simple-diagrams-of-mysql-schema/</id><summary type="html">&lt;p&gt;Jess Robinson&amp;#8217;s
+&lt;/pre&gt;&lt;/div&gt;</content><category term="aws"></category><category term="cloudformation"></category><category term="rds"></category><category term="mysql"></category><category term="snapshot"></category></entry><entry><title>Simple Diagrams of MySQL Schema</title><link href="http://blog.jasonantman.com/2011/05/simple-diagrams-of-mysql-schema/" rel="alternate"></link><published>2011-05-04T08:47:00-04:00</published><updated>2011-05-04T08:47:00-04:00</updated><author><name>admin</name></author><id>tag:blog.jasonantman.com,2011-05-04:/2011/05/simple-diagrams-of-mysql-schema/</id><summary type="html">&lt;p&gt;Jess Robinson&amp;#8217;s
+&lt;a href="http://search.cpan.org/~jrobinson/SQL-Translator/"&gt;&lt;span class="caps"&gt;SQL&lt;/span&gt;-Translator&lt;/a&gt; &lt;span class="caps"&gt;CPAN&lt;/span&gt;
+module translates and parses &lt;span class="caps"&gt;SQL&lt;/span&gt; statements. The
+&lt;a href="http://sqlfairy.sourceforge.net/"&gt;SQLfairy&lt;/a&gt; project has some nice
+binaries that, among other things, use GraphViz or &lt;span class="caps"&gt;GD&lt;/span&gt; to draw pseudo-&lt;span class="caps"&gt;ER&lt;/span&gt;
+diagrams from &lt;span class="caps"&gt;SQL&lt;/span&gt; &lt;span class="caps"&gt;CREATE&lt;/span&gt; statements. Drawing a diagram of an &lt;span class="caps"&gt;SQL&lt;/span&gt; schema
+is as easy as
+&lt;code&gt;sqlt-diagram --db=MySQL …&lt;/code&gt;&lt;/p&gt;</summary><content type="html">&lt;p&gt;Jess Robinson&amp;#8217;s
 &lt;a href="http://search.cpan.org/~jrobinson/SQL-Translator/"&gt;&lt;span class="caps"&gt;SQL&lt;/span&gt;-Translator&lt;/a&gt; &lt;span class="caps"&gt;CPAN&lt;/span&gt;
 module translates and parses &lt;span class="caps"&gt;SQL&lt;/span&gt; statements. The
 &lt;a href="http://sqlfairy.sourceforge.net/"&gt;SQLfairy&lt;/a&gt; project has some nice
@@ -301,7 +308,11 @@ mysqldump output and generate a diagram like the one below, including
 foreign key constraints. I also found a simple intro and example in a
 post on &lt;a href="http://nsaunders.wordpress.com/2009/01/11/easy-visualisation-of-database-schemas-using-sqlfairy/"&gt;Neil
 Saunders&lt;/a&gt;&amp;#8216;&amp;nbsp;blog.&lt;/p&gt;
-&lt;p&gt;&lt;img alt="sqlfairy output" src="/GFX/sqlfairy.png" /&gt;&lt;/p&gt;</summary><category term="database"></category><category term="db"></category><category term="diagram"></category><category term="mysql"></category><category term="sql"></category></entry><entry><title>MySQL General Query Log and Awk Trimming Columns</title><link href="http://blog.jasonantman.com/2010/12/mysql-general-query-log-and-awk-trimming-columns/" rel="alternate"></link><updated>2010-12-21T11:45:00-05:00</updated><author><name>admin</name></author><id>tag:blog.jasonantman.com,2010-12-21:2010/12/mysql-general-query-log-and-awk-trimming-columns/</id><summary type="html">&lt;p&gt;So today I started to implement a number of complex regex-based rules
+&lt;p&gt;&lt;img alt="sqlfairy output" src="/GFX/sqlfairy.png"&gt;&lt;/p&gt;</content><category term="database"></category><category term="db"></category><category term="diagram"></category><category term="mysql"></category><category term="sql"></category></entry><entry><title>MySQL General Query Log and Awk Trimming Columns</title><link href="http://blog.jasonantman.com/2010/12/mysql-general-query-log-and-awk-trimming-columns/" rel="alternate"></link><published>2010-12-21T11:45:00-05:00</published><updated>2010-12-21T11:45:00-05:00</updated><author><name>admin</name></author><id>tag:blog.jasonantman.com,2010-12-21:/2010/12/mysql-general-query-log-and-awk-trimming-columns/</id><summary type="html">&lt;p&gt;So today I started to implement a number of complex regex-based rules
+and templates to get &lt;a href="http://www.rsyslog.com"&gt;rsyslog&lt;/a&gt; to parse &lt;span class="caps"&gt;ISC&lt;/span&gt;
+DHCPd logs in realtime. Unfortunately one of my templates must have been
+wrong, because I started seeing some errors about a field that cannot be
+blank in &lt;code&gt;/var/log/messages …&lt;/code&gt;&lt;/p&gt;</summary><content type="html">&lt;p&gt;So today I started to implement a number of complex regex-based rules
 and templates to get &lt;a href="http://www.rsyslog.com"&gt;rsyslog&lt;/a&gt; to parse &lt;span class="caps"&gt;ISC&lt;/span&gt;
 DHCPd logs in realtime. Unfortunately one of my templates must have been
 wrong, because I started seeing some errors about a field that cannot be
@@ -312,7 +323,7 @@ new templates, this didn&amp;#8217;t help much. But the following technique&amp;
 &lt;p&gt;MySQLd has a &lt;a href="http://dev.mysql.com/doc/refman/5.1/en/query-log.html"&gt;General Query
 Log&lt;/a&gt; that can be
 activated by addling a line&amp;nbsp;like:  &lt;/p&gt;
-&lt;div class="codehilite"&gt;&lt;pre&gt;log=/tmp/query.log`
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;log=/tmp/query.log`
 &lt;/pre&gt;&lt;/div&gt;
 
 
@@ -325,12 +336,16 @@ that each line appeared to begin with some whitespace, then a number
 ordering number), then the word &amp;#8220;Query&amp;#8221;, then the query. The following
 awk expression prints everything from the third column on, dropping the
 first two columns (the number and&amp;nbsp;&amp;#8220;Query&amp;#8221;):  &lt;/p&gt;
-&lt;div class="codehilite"&gt;&lt;pre&gt;awk &lt;span class="s1"&gt;&amp;#39;{ for (i=2; i&amp;lt;=&lt;span class="caps"&gt;NF&lt;/span&gt;; i++) printf &amp;quot;%s &amp;quot;, $i; printf &amp;quot;\n&amp;quot;; }&amp;#39;&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;awk &lt;span class="s1"&gt;&amp;#39;{ for (i=2; i&amp;lt;=&lt;span class="caps"&gt;NF&lt;/span&gt;; i++) printf &amp;quot;%s &amp;quot;, $i; printf &amp;quot;\n&amp;quot;; }&amp;#39;&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 
 
 &lt;p&gt;For easy analysis, the output of that can be piped into &lt;code&gt;sort&lt;/code&gt; and then
-&lt;code&gt;uniq&lt;/code&gt;.&lt;/p&gt;</summary><category term="awk"></category><category term="database"></category><category term="logging"></category><category term="mysql"></category></entry><entry><title>Update, Eventum/MySQLTicketing Integration</title><link href="http://blog.jasonantman.com/2008/02/update-eventummysqlticketing-integration/" rel="alternate"></link><updated>2008-02-21T14:53:00-05:00</updated><author><name>admin</name></author><id>tag:blog.jasonantman.com,2008-02-21:2008/02/update-eventummysqlticketing-integration/</id><summary type="html">&lt;p&gt;Well I know I haven&amp;#8217;t updated in a while. I have a whole bunch of links
+&lt;code&gt;uniq&lt;/code&gt;.&lt;/p&gt;</content><category term="awk"></category><category term="database"></category><category term="logging"></category><category term="mysql"></category></entry><entry><title>Update, Eventum/MySQLTicketing Integration</title><link href="http://blog.jasonantman.com/2008/02/update-eventummysqlticketing-integration/" rel="alternate"></link><published>2008-02-21T14:53:00-05:00</published><updated>2008-02-21T14:53:00-05:00</updated><author><name>admin</name></author><id>tag:blog.jasonantman.com,2008-02-21:/2008/02/update-eventummysqlticketing-integration/</id><summary type="html">&lt;p&gt;Well I know I haven&amp;#8217;t updated in a while. I have a whole bunch of links
+that I&amp;#8217;d like to comment on, but things have been horribly busy. You can
+find the links in my &lt;a href="http://del.icio.us/jantman/1-toblog"&gt;&amp;#8220;1-toblog&amp;#8221; folder on
+del.icio.us&lt;/a&gt; (prefixed with &amp;#8220;1-&amp;#8221; so
+it shows up …&lt;/p&gt;</summary><content type="html">&lt;p&gt;Well I know I haven&amp;#8217;t updated in a while. I have a whole bunch of links
 that I&amp;#8217;d like to comment on, but things have been horribly busy. You can
 find the links in my &lt;a href="http://del.icio.us/jantman/1-toblog"&gt;&amp;#8220;1-toblog&amp;#8221; folder on
 del.icio.us&lt;/a&gt; (prefixed with &amp;#8220;1-&amp;#8221; so
@@ -374,7 +389,10 @@ wiki&lt;/a&gt;,
 and the current (development, so could be broken) source code in &lt;span class="caps"&gt;CVS&lt;/span&gt;,
 which can be &lt;a href="http://cvs.jasonantman.com/cvs/Eventum-Nagios/"&gt;seen through ViewVC on my
 site&lt;/a&gt;.&lt;/p&gt;
-&lt;p&gt;Stay&amp;nbsp;Tuned!&lt;/p&gt;</summary><category term="eventum"></category><category term="monitoring"></category><category term="mysql"></category><category term="programming"></category><category term="ticketing"></category></entry><entry><title>Sun and MySQL</title><link href="http://blog.jasonantman.com/2008/01/sun-and-mysql/" rel="alternate"></link><updated>2008-01-20T02:00:00-05:00</updated><author><name>admin</name></author><id>tag:blog.jasonantman.com,2008-01-20:2008/01/sun-and-mysql/</id><summary type="html">&lt;p&gt;I&amp;#8217;ve got a lot to update about in the next few days. I&amp;#8217;m back in my
+&lt;p&gt;Stay&amp;nbsp;Tuned!&lt;/p&gt;</content><category term="eventum"></category><category term="monitoring"></category><category term="mysql"></category><category term="programming"></category><category term="ticketing"></category></entry><entry><title>Sun and MySQL</title><link href="http://blog.jasonantman.com/2008/01/sun-and-mysql/" rel="alternate"></link><published>2008-01-20T02:00:00-05:00</published><updated>2008-01-20T02:00:00-05:00</updated><author><name>admin</name></author><id>tag:blog.jasonantman.com,2008-01-20:/2008/01/sun-and-mysql/</id><summary type="html">&lt;p&gt;I&amp;#8217;ve got a lot to update about in the next few days. I&amp;#8217;m back in my
+apartment for the new semester of school, I&amp;#8217;ve got a lot of
+infrastructure work to do here (most importantly getting net-to-net &lt;span class="caps"&gt;VPN&lt;/span&gt;
+with &lt;a href="http://www.dyndns.org"&gt;DynDNS&lt;/a&gt; at both ends working from here to …&lt;/p&gt;</summary><content type="html">&lt;p&gt;I&amp;#8217;ve got a lot to update about in the next few days. I&amp;#8217;m back in my
 apartment for the new semester of school, I&amp;#8217;ve got a lot of
 infrastructure work to do here (most importantly getting net-to-net &lt;span class="caps"&gt;VPN&lt;/span&gt;
 with &lt;a href="http://www.dyndns.org"&gt;DynDNS&lt;/a&gt; at both ends working from here to
@@ -448,4 +466,4 @@ Solaris&lt;/a&gt; and giant
 Oracle databases to Intel-based 1U or 2U &lt;span class="caps"&gt;LAMP&lt;/span&gt; servers - or even, now,
 &lt;span class="caps"&gt;LAMP&lt;/span&gt; servers on non-Sun hardware. (Though why anyone with the money to
 do so wouldn&amp;#8217;t buy Sun hardware, I have no&amp;nbsp;idea).&lt;/p&gt;
-&lt;p&gt;Stay tuned for&amp;nbsp;more.&lt;/p&gt;</summary><category term="mysql"></category><category term="sun"></category></entry></feed>
+&lt;p&gt;Stay tuned for&amp;nbsp;more.&lt;/p&gt;</content><category term="mysql"></category><category term="sun"></category></entry></feed>

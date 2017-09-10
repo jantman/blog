@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Jason Antman's Blog</title><link href="http://blog.jasonantman.com/" rel="alternate"></link><link href="http://blog.jasonantman.com/feeds/tags/linode.atom.xml" rel="self"></link><id>http://blog.jasonantman.com/</id><updated>2012-02-29T20:32:00-05:00</updated><entry><title>Nagios Check Plugin for Linode Monthly Bandwidth Usage</title><link href="http://blog.jasonantman.com/2012/02/nagios-check-plugin-for-linode-monthly-bandwidth-usage/" rel="alternate"></link><updated>2012-02-29T20:32:00-05:00</updated><author><name>admin</name></author><id>tag:blog.jasonantman.com,2012-02-29:2012/02/nagios-check-plugin-for-linode-monthly-bandwidth-usage/</id><summary type="html">&lt;p&gt;Since I have most of my public-facing stuff hosted with
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Jason Antman's Blog - linode</title><link href="http://blog.jasonantman.com/" rel="alternate"></link><link href="http://blog.jasonantman.com/feeds/tags/linode.atom.xml" rel="self"></link><id>http://blog.jasonantman.com/</id><updated>2012-02-29T20:32:00-05:00</updated><entry><title>Nagios Check Plugin for Linode Monthly Bandwidth Usage</title><link href="http://blog.jasonantman.com/2012/02/nagios-check-plugin-for-linode-monthly-bandwidth-usage/" rel="alternate"></link><published>2012-02-29T20:32:00-05:00</published><updated>2012-02-29T20:32:00-05:00</updated><author><name>admin</name></author><id>tag:blog.jasonantman.com,2012-02-29:/2012/02/nagios-check-plugin-for-linode-monthly-bandwidth-usage/</id><summary type="html">&lt;p&gt;Since I have most of my public-facing stuff hosted with
+&lt;a href="http://www.linode.com/?r=5c8ad2931b410b55455aadbcf0a8d86d6f698a91"&gt;Linode&lt;/a&gt;,
+and I have a monthly bandwidth cap (albeit one that I&amp;#8217;ll probably never
+come close to), I decided that it would be a good idea to add my monthly
+bandwidth usage to my monitoring system. Luckily, Linode offers …&lt;/p&gt;</summary><content type="html">&lt;p&gt;Since I have most of my public-facing stuff hosted with
 &lt;a href="http://www.linode.com/?r=5c8ad2931b410b55455aadbcf0a8d86d6f698a91"&gt;Linode&lt;/a&gt;,
 and I have a monthly bandwidth cap (albeit one that I&amp;#8217;ll probably never
 come close to), I decided that it would be a good idea to add my monthly
@@ -19,9 +23,9 @@ instead of
 About the only thing unusual is that I store my &lt;span class="caps"&gt;API&lt;/span&gt; keys in a perl
 module, so you&amp;#8217;ll need to create something like this in your plugin
 directory (usually &lt;code&gt;/usr/lib/nagios/plugins&lt;/code&gt;:&lt;/p&gt;
-&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="nb"&gt;package&lt;/span&gt; &lt;span class="n"&gt;api_keys&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="k"&gt;package&lt;/span&gt; &lt;span class="nn"&gt;api_keys&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
 
-&lt;span class="nb"&gt;require&lt;/span&gt; &lt;span class="n"&gt;Exporter&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="k"&gt;require&lt;/span&gt; &lt;span class="nn"&gt;Exporter&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
 &lt;span class="nv"&gt;@&lt;span class="caps"&gt;ISA&lt;/span&gt;&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="sx"&gt;qw(Exporter)&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
 &lt;span class="nv"&gt;@EXPORT_OK&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="sx"&gt;qw($API_KEY_LINODE)&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
 
@@ -37,7 +41,7 @@ The current version is also below. It&amp;#8217;s free for anyone to use under t
 terms of &lt;a href="http://www.gnu.org/licenses/gpl.html"&gt;&lt;span class="caps"&gt;GNU&lt;/span&gt; GPLv3&lt;/a&gt;, though I
 would really like it if any changes/patches/updates are sent back to me
 for inclusion in the latest&amp;nbsp;version.&lt;/p&gt;
-&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="c1"&gt;#! /usr/bin/perl -w&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="ch"&gt;#! /usr/bin/perl -w&lt;/span&gt;
 
 &lt;span class="c1"&gt;# check_linode_transfer.pl Copyright (C) 2012 Jason Antman &lt;/span&gt;
 &lt;span class="c1"&gt;#&lt;/span&gt;
@@ -75,37 +79,37 @@ for inclusion in the latest&amp;nbsp;version.&lt;/p&gt;
 &lt;span class="c1"&gt;#  $LastChangedRevision$&lt;/span&gt;
 &lt;span class="c1"&gt;#&lt;/span&gt;
 
-&lt;span class="k"&gt;use&lt;/span&gt; &lt;span class="n"&gt;strict&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
-&lt;span class="k"&gt;use&lt;/span&gt; &lt;span class="n"&gt;English&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
-&lt;span class="k"&gt;use&lt;/span&gt; &lt;span class="nn"&gt;Getopt::&lt;/span&gt;&lt;span class="n"&gt;Long&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
-&lt;span class="k"&gt;use&lt;/span&gt; &lt;span class="n"&gt;vars&lt;/span&gt; &lt;span class="sx"&gt;qw($&lt;span class="caps"&gt;PROGNAME&lt;/span&gt; $&lt;span class="caps"&gt;REVISION&lt;/span&gt;)&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
-&lt;span class="k"&gt;use&lt;/span&gt; &lt;span class="n"&gt;lib&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;/usr/lib/nagios/plugins&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
-&lt;span class="k"&gt;use&lt;/span&gt; &lt;span class="n"&gt;utils&lt;/span&gt; &lt;span class="sx"&gt;qw (%&lt;span class="caps"&gt;ERRORS&lt;/span&gt; &lt;/span&gt;&lt;span class="o"&gt;&amp;amp;&lt;/span&gt;&lt;span class="n"&gt;print_revision&lt;/span&gt; &lt;span class="o"&gt;&amp;amp;&lt;/span&gt;&lt;span class="n"&gt;support&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
-&lt;span class="k"&gt;use&lt;/span&gt; &lt;span class="n"&gt;api_keys&lt;/span&gt; &lt;span class="sx"&gt;qw($API_KEY_LINODE)&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
-&lt;span class="k"&gt;use&lt;/span&gt; &lt;span class="nn"&gt;WebService::&lt;/span&gt;&lt;span class="n"&gt;Linode&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
-&lt;span class="k"&gt;use&lt;/span&gt; &lt;span class="nn"&gt;Data::&lt;/span&gt;&lt;span class="n"&gt;Dumper&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="k"&gt;use&lt;/span&gt; &lt;span class="nn"&gt;strict&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="k"&gt;use&lt;/span&gt; &lt;span class="nn"&gt;English&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="k"&gt;use&lt;/span&gt; &lt;span class="nn"&gt;Getopt::Long&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="k"&gt;use&lt;/span&gt; &lt;span class="nn"&gt;vars&lt;/span&gt; &lt;span class="sx"&gt;qw($&lt;span class="caps"&gt;PROGNAME&lt;/span&gt; $&lt;span class="caps"&gt;REVISION&lt;/span&gt;)&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="k"&gt;use&lt;/span&gt; &lt;span class="nn"&gt;lib&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;/usr/lib/nagios/plugins&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="k"&gt;use&lt;/span&gt; &lt;span class="nn"&gt;utils&lt;/span&gt; &lt;span class="sx"&gt;qw (%&lt;span class="caps"&gt;ERRORS&lt;/span&gt; &lt;/span&gt;&lt;span class="o"&gt;&amp;amp;&lt;/span&gt;&lt;span class="n"&gt;print_revision&lt;/span&gt; &lt;span class="o"&gt;&amp;amp;&lt;/span&gt;&lt;span class="n"&gt;support&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;span class="k"&gt;use&lt;/span&gt; &lt;span class="nn"&gt;api_keys&lt;/span&gt; &lt;span class="sx"&gt;qw($API_KEY_LINODE)&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="k"&gt;use&lt;/span&gt; &lt;span class="nn"&gt;WebService::Linode&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="k"&gt;use&lt;/span&gt; &lt;span class="nn"&gt;Data::Dumper&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
 
-&lt;span class="k"&gt;sub &lt;/span&gt;&lt;span class="nf"&gt;print_help&lt;/span&gt; &lt;span class="p"&gt;();&lt;/span&gt;
-&lt;span class="p"&gt;sub print_usage ();&lt;/span&gt;
+&lt;span class="k"&gt;sub&lt;/span&gt; &lt;span class="nf"&gt;print_help&lt;/span&gt; &lt;span class="p"&gt;();&lt;/span&gt;
+&lt;span class="k"&gt;sub&lt;/span&gt; &lt;span class="nf"&gt;print_usage&lt;/span&gt; &lt;span class="p"&gt;();&lt;/span&gt;
 
-&lt;span class="p"&gt;my ($opt_c, $opt_w, $opt_h, $opt_V, $opt_s, $opt_S, $opt_l, $opt_H);&lt;/span&gt;
-&lt;span class="p"&gt;my ($result, $message);&lt;/span&gt;
+&lt;span class="k"&gt;my&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;$opt_c&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nv"&gt;$opt_w&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nv"&gt;$opt_h&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nv"&gt;$opt_V&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nv"&gt;$opt_s&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nv"&gt;$opt_S&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nv"&gt;$opt_l&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nv"&gt;$opt_H&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;span class="k"&gt;my&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;$result&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nv"&gt;$message&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
 
-&lt;span class="p"&gt;$&lt;span class="caps"&gt;PROGNAME&lt;/span&gt;=&amp;quot;check_linode_transfer.pl&amp;quot;;&lt;/span&gt;
-&lt;span class="p"&gt;$&lt;span class="caps"&gt;REVISION&lt;/span&gt;=&amp;#39;1.0&amp;#39;;&lt;/span&gt;
+&lt;span class="nv"&gt;$&lt;span class="caps"&gt;PROGNAME&lt;/span&gt;&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;check_linode_transfer.pl&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="nv"&gt;$&lt;span class="caps"&gt;REVISION&lt;/span&gt;&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;1.0&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
 
-&lt;span class="p"&gt;$opt_w = 60;&lt;/span&gt;
-&lt;span class="p"&gt;$opt_c = 80;&lt;/span&gt;
+&lt;span class="nv"&gt;$opt_w&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;60&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="nv"&gt;$opt_c&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;80&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
 
-&lt;span class="p"&gt;Getopt::Long::Configure(&amp;#39;bundling&amp;#39;);&lt;/span&gt;
-&lt;span class="p"&gt;GetOptions(&lt;/span&gt;
-&lt;span class="p"&gt;    &amp;quot;V&amp;quot;   =&amp;gt; \$opt_V, &amp;quot;version&amp;quot; =&amp;gt; \$opt_V,&lt;/span&gt;
-&lt;span class="p"&gt;    &amp;quot;h&amp;quot;   =&amp;gt; \$opt_h, &amp;quot;help&amp;quot;    =&amp;gt; \$opt_h,&lt;/span&gt;
-&lt;span class="p"&gt;    &amp;quot;w=f&amp;quot; =&amp;gt; \$opt_w, &amp;quot;warning=f&amp;quot; =&amp;gt; \$opt_w,&lt;/span&gt;
-&lt;span class="p"&gt;    &amp;quot;c=f&amp;quot; =&amp;gt; \$opt_c, &amp;quot;critical=f&amp;quot; =&amp;gt; \$opt_c&lt;/span&gt;
+&lt;span class="nn"&gt;Getopt::Long::&lt;/span&gt;&lt;span class="n"&gt;Configure&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;bundling&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;span class="n"&gt;GetOptions&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;
+    &lt;span class="s"&gt;&amp;quot;V&amp;quot;&lt;/span&gt;   &lt;span class="o"&gt;=&amp;gt;&lt;/span&gt; &lt;span class="o"&gt;\&lt;/span&gt;&lt;span class="nv"&gt;$opt_V&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;version&amp;quot;&lt;/span&gt; &lt;span class="o"&gt;=&amp;gt;&lt;/span&gt; &lt;span class="o"&gt;\&lt;/span&gt;&lt;span class="nv"&gt;$opt_V&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="s"&gt;&amp;quot;h&amp;quot;&lt;/span&gt;   &lt;span class="o"&gt;=&amp;gt;&lt;/span&gt; &lt;span class="o"&gt;\&lt;/span&gt;&lt;span class="nv"&gt;$opt_h&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;help&amp;quot;&lt;/span&gt;    &lt;span class="o"&gt;=&amp;gt;&lt;/span&gt; &lt;span class="o"&gt;\&lt;/span&gt;&lt;span class="nv"&gt;$opt_h&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="s"&gt;&amp;quot;w=f&amp;quot;&lt;/span&gt; &lt;span class="o"&gt;=&amp;gt;&lt;/span&gt; &lt;span class="o"&gt;\&lt;/span&gt;&lt;span class="nv"&gt;$opt_w&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;warning=f&amp;quot;&lt;/span&gt; &lt;span class="o"&gt;=&amp;gt;&lt;/span&gt; &lt;span class="o"&gt;\&lt;/span&gt;&lt;span class="nv"&gt;$opt_w&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="s"&gt;&amp;quot;c=f&amp;quot;&lt;/span&gt; &lt;span class="o"&gt;=&amp;gt;&lt;/span&gt; &lt;span class="o"&gt;\&lt;/span&gt;&lt;span class="nv"&gt;$opt_c&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;critical=f&amp;quot;&lt;/span&gt; &lt;span class="o"&gt;=&amp;gt;&lt;/span&gt; &lt;span class="o"&gt;\&lt;/span&gt;&lt;span class="nv"&gt;$opt_c&lt;/span&gt;
 &lt;span class="p"&gt;);&lt;/span&gt;
 
-&lt;span class="p"&gt;if ($opt_V) {&lt;/span&gt;
+&lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;$opt_V&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
     &lt;span class="n"&gt;print_revision&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;$&lt;span class="caps"&gt;PROGNAME&lt;/span&gt;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nv"&gt;$&lt;span class="caps"&gt;REVISION&lt;/span&gt;&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
     &lt;span class="nb"&gt;exit&lt;/span&gt; &lt;span class="nv"&gt;$&lt;span class="caps"&gt;ERRORS&lt;/span&gt;&lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;&lt;span class="caps"&gt;OK&lt;/span&gt;&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;};&lt;/span&gt;
 &lt;span class="p"&gt;}&lt;/span&gt;
@@ -139,14 +143,14 @@ for inclusion in the latest&amp;nbsp;version.&lt;/p&gt;
 &lt;span class="k"&gt;print&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;&lt;span class="caps"&gt;LINODE&lt;/span&gt; &lt;span class="caps"&gt;TRANSFER&lt;/span&gt; $result: $pct&amp;quot;&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;%&amp;quot;&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="s"&gt;&amp;quot; of monthly bandwidth used ($used / $pool &lt;span class="caps"&gt;GB&lt;/span&gt;)|usedBW=$used; totalBW=$pool\n&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
 &lt;span class="nb"&gt;exit&lt;/span&gt; &lt;span class="nv"&gt;$&lt;span class="caps"&gt;ERRORS&lt;/span&gt;&lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="nv"&gt;$result&lt;/span&gt;&lt;span class="p"&gt;};&lt;/span&gt;
 
-&lt;span class="k"&gt;sub &lt;/span&gt;&lt;span class="nf"&gt;print_usage&lt;/span&gt; &lt;span class="p"&gt;()&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+&lt;span class="k"&gt;sub&lt;/span&gt; &lt;span class="nf"&gt;print_usage&lt;/span&gt; &lt;span class="p"&gt;()&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
     &lt;span class="k"&gt;print&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;Usage:\n&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
     &lt;span class="k"&gt;print&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;  $&lt;span class="caps"&gt;PROGNAME&lt;/span&gt; [-w ] [-c ]\n&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
     &lt;span class="k"&gt;print&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;  $&lt;span class="caps"&gt;PROGNAME&lt;/span&gt; [-h | --help]\n&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
     &lt;span class="k"&gt;print&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;  $&lt;span class="caps"&gt;PROGNAME&lt;/span&gt; [-V | --version]\n&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
 &lt;span class="p"&gt;}&lt;/span&gt;
 
-&lt;span class="k"&gt;sub &lt;/span&gt;&lt;span class="nf"&gt;print_help&lt;/span&gt; &lt;span class="p"&gt;()&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+&lt;span class="k"&gt;sub&lt;/span&gt; &lt;span class="nf"&gt;print_help&lt;/span&gt; &lt;span class="p"&gt;()&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
     &lt;span class="n"&gt;print_revision&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;$&lt;span class="caps"&gt;PROGNAME&lt;/span&gt;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nv"&gt;$&lt;span class="caps"&gt;REVISION&lt;/span&gt;&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
     &lt;span class="k"&gt;print&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;Copyright (c) 2012 Jason Antman\n\n&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
     &lt;span class="n"&gt;print_usage&lt;/span&gt;&lt;span class="p"&gt;();&lt;/span&gt;
@@ -155,7 +159,12 @@ for inclusion in the latest&amp;nbsp;version.&lt;/p&gt;
     &lt;span class="k"&gt;print&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;\n&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
     &lt;span class="n"&gt;support&lt;/span&gt;&lt;span class="p"&gt;();&lt;/span&gt;
 &lt;span class="p"&gt;}&lt;/span&gt;
-&lt;/pre&gt;&lt;/div&gt;</summary><category term="linode"></category><category term="monitoring"></category><category term="Nagios"></category><category term="plugin"></category></entry><entry><title>PHP Script to Query Linode DNS Manager API</title><link href="http://blog.jasonantman.com/2012/01/php-script-to-query-linode-dns-manager-api/" rel="alternate"></link><updated>2012-01-20T22:49:00-05:00</updated><author><name>admin</name></author><id>tag:blog.jasonantman.com,2012-01-20:2012/01/php-script-to-query-linode-dns-manager-api/</id><summary type="html">&lt;p&gt;I&amp;#8217;m in the process of moving all of my public-facing services, currently
+&lt;/pre&gt;&lt;/div&gt;</content><category term="linode"></category><category term="monitoring"></category><category term="Nagios"></category><category term="plugin"></category></entry><entry><title>PHP Script to Query Linode DNS Manager API</title><link href="http://blog.jasonantman.com/2012/01/php-script-to-query-linode-dns-manager-api/" rel="alternate"></link><published>2012-01-20T22:49:00-05:00</published><updated>2012-01-20T22:49:00-05:00</updated><author><name>admin</name></author><id>tag:blog.jasonantman.com,2012-01-20:/2012/01/php-script-to-query-linode-dns-manager-api/</id><summary type="html">&lt;p&gt;I&amp;#8217;m in the process of moving all of my public-facing services, currently
+hosted on a single
+&lt;a href="http://www.linode.com/?r=5c8ad2931b410b55455aadbcf0a8d86d6f698a91"&gt;Linode&lt;/a&gt;,
+to a new virtual machine (still with Linode, of course, just a new
+CentOS 6 &lt;span class="caps"&gt;VM&lt;/span&gt;). Of course, I&amp;#8217;ve got a &lt;em&gt;lot&lt;/em&gt; (about 60) of &lt;span class="caps"&gt;DNS&lt;/span&gt; records,
+spread across 8 domains …&lt;/p&gt;</summary><content type="html">&lt;p&gt;I&amp;#8217;m in the process of moving all of my public-facing services, currently
 hosted on a single
 &lt;a href="http://www.linode.com/?r=5c8ad2931b410b55455aadbcf0a8d86d6f698a91"&gt;Linode&lt;/a&gt;,
 to a new virtual machine (still with Linode, of course, just a new
@@ -181,7 +190,7 @@ Durmus&amp;#8217; Linode &lt;span class="caps"&gt;API&lt;/span&gt; &lt;span clas
 (installation instructions and info at that Github link). The script
 simply writes all Linode &lt;span class="caps"&gt;DNS&lt;/span&gt; records for all zones to a &lt;span class="caps"&gt;CSV&lt;/span&gt; file (this
 could take a while if you have a lot of&amp;nbsp;records&amp;#8230;).&lt;/p&gt;
-&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="x"&gt;   *&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="x"&gt;   *&lt;/span&gt;
 &lt;span class="x"&gt;   * &lt;span class="caps"&gt;INSTALLATION&lt;/span&gt; (as per krmdrms &lt;span class="caps"&gt;README&lt;/span&gt;):&lt;/span&gt;
 &lt;span class="x"&gt;   *  pear install Net_URL2-0.3.1&lt;/span&gt;
 &lt;span class="x"&gt;   *  pear install HTTP_Request2-0.5.2&lt;/span&gt;
@@ -270,21 +279,25 @@ could take a while if you have a lot of&amp;nbsp;records&amp;#8230;).&lt;/p&gt;
 
 &lt;p&gt;That will print out a list containing the Linode &lt;span class="caps"&gt;DNS&lt;/span&gt; record id (recid),
 domain, record name, type and&amp;nbsp;target:&lt;/p&gt;
-&lt;div class="codehilite"&gt;&lt;pre&gt;&amp;quot;recid&amp;quot;,&amp;quot;domain&amp;quot;,&amp;quot;name&amp;quot;,&amp;quot;type&amp;quot;,&amp;quot;target&amp;quot;
-&amp;quot;137423&amp;quot;,&amp;quot;jasonantman.com&amp;quot;,&amp;quot;&amp;quot;,&amp;quot;TXT&amp;quot;,&amp;quot;v=spf1 mx:jasonantman.com -all&amp;quot;
-&amp;quot;3597859&amp;quot;,&amp;quot;jasonantman.com&amp;quot;,&amp;quot;&amp;quot;,&amp;quot;MX&amp;quot;,&amp;quot;linode1.jasonantman.com&amp;quot;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&amp;quot;recid&amp;quot;,&amp;quot;domain&amp;quot;,&amp;quot;name&amp;quot;,&amp;quot;type&amp;quot;,&amp;quot;target&amp;quot;
+&amp;quot;137423&amp;quot;,&amp;quot;jasonantman.com&amp;quot;,&amp;quot;&amp;quot;,&amp;quot;&lt;span class="caps"&gt;TXT&lt;/span&gt;&amp;quot;,&amp;quot;v=spf1 mx:jasonantman.com -all&amp;quot;
+&amp;quot;3597859&amp;quot;,&amp;quot;jasonantman.com&amp;quot;,&amp;quot;&amp;quot;,&amp;quot;&lt;span class="caps"&gt;MX&lt;/span&gt;&amp;quot;,&amp;quot;linode1.jasonantman.com&amp;quot;
 &amp;quot;3488952&amp;quot;,&amp;quot;jasonantman.com&amp;quot;,&amp;quot;&amp;quot;,&amp;quot;mx&amp;quot;,&amp;quot;linode2.jasonantman.com&amp;quot;
-&amp;quot;3472952&amp;quot;,&amp;quot;jasonantman.com&amp;quot;,&amp;quot;blog&amp;quot;,&amp;quot;CNAME&amp;quot;,&amp;quot;linode1.jasonantman.com&amp;quot;
+&amp;quot;3472952&amp;quot;,&amp;quot;jasonantman.com&amp;quot;,&amp;quot;blog&amp;quot;,&amp;quot;&lt;span class="caps"&gt;CNAME&lt;/span&gt;&amp;quot;,&amp;quot;linode1.jasonantman.com&amp;quot;
 &lt;/pre&gt;&lt;/div&gt;
 
 
 &lt;p&gt;If you want to, say, search for only records that include host
 &amp;#8220;example&amp;#8221;, you could use grep and awk&amp;nbsp;like:&lt;/p&gt;
-&lt;div class="codehilite"&gt;&lt;pre&gt;php linodeDnsToCsv.php | grep linode1 | grep -v &lt;span class="s1"&gt;&amp;#39;&amp;quot;linode1&amp;quot;,&amp;quot;a&amp;quot;&amp;#39;&lt;/span&gt; | awk -F , &lt;span class="s1"&gt;&amp;#39;{printf &amp;quot;%-27s %-20s %-7s %s\n&amp;quot;, $2, $3, $4, $5}&amp;#39;&lt;/span&gt; | sed &lt;span class="s1"&gt;&amp;#39;s/&amp;quot;//g&amp;#39;&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;php linodeDnsToCsv.php &lt;span class="p"&gt;|&lt;/span&gt; grep linode1 &lt;span class="p"&gt;|&lt;/span&gt; grep -v &lt;span class="s1"&gt;&amp;#39;&amp;quot;linode1&amp;quot;,&amp;quot;a&amp;quot;&amp;#39;&lt;/span&gt; &lt;span class="p"&gt;|&lt;/span&gt; awk -F , &lt;span class="s1"&gt;&amp;#39;{printf &amp;quot;%-27s %-20s %-7s %s\n&amp;quot;, $2, $3, $4, $5}&amp;#39;&lt;/span&gt; &lt;span class="p"&gt;|&lt;/span&gt; sed &lt;span class="s1"&gt;&amp;#39;s/&amp;quot;//g&amp;#39;&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 
 
-&lt;p&gt;I hope this helps someone else out, and saves them a few minutes of&amp;nbsp;coding&amp;#8230;&lt;/p&gt;</summary><category term="api"></category><category term="dns"></category><category term="linode"></category><category term="PHP"></category><category term="sysadmin"></category></entry><entry><title>Secure rsnapshot backups over the WAN via SSH</title><link href="http://blog.jasonantman.com/2012/01/secure-rsnapshot-backups-over-the-wan-via-ssh/" rel="alternate"></link><updated>2012-01-15T17:26:00-05:00</updated><author><name>admin</name></author><id>tag:blog.jasonantman.com,2012-01-15:2012/01/secure-rsnapshot-backups-over-the-wan-via-ssh/</id><summary type="html">&lt;p&gt;Since I moved all of my &lt;span class="caps"&gt;WAN&lt;/span&gt;-facing stuff (mail, web, this blog, svn
+&lt;p&gt;I hope this helps someone else out, and saves them a few minutes of&amp;nbsp;coding&amp;#8230;&lt;/p&gt;</content><category term="api"></category><category term="dns"></category><category term="linode"></category><category term="PHP"></category><category term="sysadmin"></category></entry><entry><title>Secure rsnapshot backups over the WAN via SSH</title><link href="http://blog.jasonantman.com/2012/01/secure-rsnapshot-backups-over-the-wan-via-ssh/" rel="alternate"></link><published>2012-01-15T17:26:00-05:00</published><updated>2012-01-15T17:26:00-05:00</updated><author><name>admin</name></author><id>tag:blog.jasonantman.com,2012-01-15:/2012/01/secure-rsnapshot-backups-over-the-wan-via-ssh/</id><summary type="html">&lt;p&gt;Since I moved all of my &lt;span class="caps"&gt;WAN&lt;/span&gt;-facing stuff (mail, web, this blog, svn
+etc.) to a virtual server with &lt;a href="http://www.linode.com"&gt;Linode&lt;/a&gt;, and just
+have a desktop at home, it&amp;#8217;s no longer practical to use
+&lt;a href="http://www.bacula.org/"&gt;Bacula&lt;/a&gt; for backups. Linode manages daily and
+weekly backups through their backup service, but they …&lt;/p&gt;</summary><content type="html">&lt;p&gt;Since I moved all of my &lt;span class="caps"&gt;WAN&lt;/span&gt;-facing stuff (mail, web, this blog, svn
 etc.) to a virtual server with &lt;a href="http://www.linode.com"&gt;Linode&lt;/a&gt;, and just
 have a desktop at home, it&amp;#8217;s no longer practical to use
 &lt;a href="http://www.bacula.org/"&gt;Bacula&lt;/a&gt; for backups. Linode manages daily and
@@ -394,17 +407,17 @@ without affecting the&amp;nbsp;others.&lt;/p&gt;
 &lt;p&gt;Create host-specific pre- and post-backup scripts. I put them in
     &lt;code&gt;/etc/rsnapshot.d/&lt;/code&gt;.
     &lt;code&gt;/etc/rsnapshot.d/pre-remoteHostName.sh&lt;/code&gt;:&lt;/p&gt;
-&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="c"&gt;#!/bin/bash&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="ch"&gt;#!/bin/bash&lt;/span&gt;
 
-&lt;span class="c"&gt;# do anything else needed on the local system before a backup&lt;/span&gt;
+&lt;span class="c1"&gt;# do anything else needed on the local system before a backup&lt;/span&gt;
 ssh -i /path/to/remoteHostname_remoteBackupUsername_cmd rsyncuser@remoteHost pre
 &lt;/pre&gt;&lt;/div&gt;
 
 
 &lt;p&gt;&lt;code&gt;/etc/rsnapshot.d/post-remoteHostName.sh&lt;/code&gt;:&lt;/p&gt;
-&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="c"&gt;#!/bin/bash&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="ch"&gt;#!/bin/bash&lt;/span&gt;
 
-&lt;span class="c"&gt;# do anything else needed on the local system after a backup&lt;/span&gt;
+&lt;span class="c1"&gt;# do anything else needed on the local system after a backup&lt;/span&gt;
 ssh -i /path/to/remoteHostname_remoteBackupUsername_cmd rsyncuser@remoteHost post
 &lt;/pre&gt;&lt;/div&gt;
 
@@ -424,7 +437,7 @@ ssh -i /path/to/remoteHostname_remoteBackupUsername_cmd rsyncuser@remoteHost pos
     &lt;code&gt;rsync_short_args&lt;/code&gt;, &lt;code&gt;rsync_long_args&lt;/code&gt;, &lt;code&gt;ssh_args&lt;/code&gt;, &lt;code&gt;cmd_preexec&lt;/code&gt;,
     &lt;code&gt;cmd_postexec&lt;/code&gt; and &lt;code&gt;backup&lt;/code&gt;. Here&amp;#8217;s an example of my config file,
     with comments and blank lines&amp;nbsp;removed:&lt;/p&gt;
-&lt;div class="codehilite"&gt;&lt;pre&gt;config_version  1.2
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;config_version  1.2
 snapshot_root   /mnt/backup/rsnapshot/
 cmd_cp          /bin/cp
 cmd_rm          /bin/rm
@@ -459,18 +472,18 @@ remoteHostName, logging in as rsyncuser), and where to back up to&amp;nbsp;(snap
 &lt;p&gt;Create two scripts that will actually trigger the backups, which
     I&amp;#8217;ll call &lt;code&gt;/root/bin/rsnapshot-daily.sh&lt;/code&gt; and &lt;code&gt;/root/bin/rsnapshot-weekly.sh&lt;/code&gt;:&lt;/p&gt;
 &lt;p&gt;&lt;code&gt;/root/bin/rsnapshot-daily.sh&lt;/code&gt;:&lt;/p&gt;
-&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="c"&gt;#!/bin/bash&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="ch"&gt;#!/bin/bash&lt;/span&gt;
 
 /usr/bin/rsnapshot -c /etc/rsnapshot-remoteHostName.conf daily
-&lt;span class="c"&gt;# add other hosts here; note, they&amp;#39;ll run in series&lt;/span&gt;
+&lt;span class="c1"&gt;# add other hosts here; note, they&amp;#39;ll run in series&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 
 
 &lt;p&gt;&lt;code&gt;/root/bin/rsnapshot-weekly.sh&lt;/code&gt;:&lt;/p&gt;
-&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="c"&gt;#!/bin/bash&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="ch"&gt;#!/bin/bash&lt;/span&gt;
 
 /usr/bin/rsnapshot -c /etc/rsnapshot-remoteHostName.conf weekly
-&lt;span class="c"&gt;# add other hosts here; note, they&amp;#39;ll run in series&lt;/span&gt;
+&lt;span class="c1"&gt;# add other hosts here; note, they&amp;#39;ll run in series&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 
 
@@ -478,7 +491,7 @@ remoteHostName, logging in as rsyncuser), and where to back up to&amp;nbsp;(snap
 &lt;li&gt;
 &lt;p&gt;Add two entries to root&amp;#8217;s croontab to run the rsnapshot backups.
     Adjust the following days and times to your&amp;nbsp;liking:&lt;/p&gt;
-&lt;div class="codehilite"&gt;&lt;pre&gt;0 1 * * Mon /root/bin/rsnapshot-weekly.sh # run the weekly backups every Monday at 01:00
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;0 1 * * Mon /root/bin/rsnapshot-weekly.sh # run the weekly backups every Monday at 01:00
 30 2 * * * /root/bin/rsnapshot-daily.sh # run the daily backups every day at 02:30, which *should* be after the weekly finished on Monday morning
 &lt;/pre&gt;&lt;/div&gt;
 
@@ -504,12 +517,12 @@ provide my &lt;a href="/2012/02/nagios-check-plugin-for-rsnapshot-backups/"&gt;N
 Backups&lt;/a&gt;.&lt;/p&gt;
 &lt;p&gt;The referenced scripts, config files, etc. are&amp;nbsp;below:&lt;/p&gt;
 &lt;p&gt;&lt;code&gt;cmd-wrapper.c&lt;/code&gt;:&lt;/p&gt;
-&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="cp"&gt;#include &lt;/span&gt;
-&lt;span class="cp"&gt;#include &lt;/span&gt;
-&lt;span class="cp"&gt;#include &lt;/span&gt;
-&lt;span class="cp"&gt;#include &lt;/span&gt;
-&lt;span class="cp"&gt;#include &lt;/span&gt;
-&lt;span class="cp"&gt;#include &lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="cp"&gt;#include&lt;/span&gt; 
+&lt;span class="cpf"&gt;#include &lt;/span&gt;&lt;span class="cp"&gt;&lt;/span&gt;
+&lt;span class="cp"&gt;#include&lt;/span&gt; 
+&lt;span class="cpf"&gt;#include &lt;/span&gt;&lt;span class="cp"&gt;&lt;/span&gt;
+&lt;span class="cp"&gt;#include&lt;/span&gt; 
+&lt;span class="cpf"&gt;#include &lt;/span&gt;&lt;span class="cp"&gt;&lt;/span&gt;
 
 &lt;span class="cm"&gt;/********************************************&lt;/span&gt;
 &lt;span class="cm"&gt; * Wrapper - Secure Yourself                &lt;/span&gt;
@@ -591,23 +604,23 @@ Backups&lt;/a&gt;.&lt;/p&gt;
 
 
 &lt;p&gt;&lt;code&gt;rsync-wrapper.c&lt;/code&gt;:&lt;/p&gt;
-&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="cp"&gt;#include &lt;/span&gt;
-&lt;span class="cp"&gt;#include &lt;/span&gt;
-&lt;span class="cp"&gt;#include &lt;/span&gt;
-&lt;span class="cp"&gt;#include &lt;/span&gt;
-&lt;span class="cp"&gt;#include &lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="cp"&gt;#include&lt;/span&gt; 
+&lt;span class="cpf"&gt;#include &lt;/span&gt;&lt;span class="cp"&gt;&lt;/span&gt;
+&lt;span class="cp"&gt;#include&lt;/span&gt; 
+&lt;span class="cpf"&gt;#include &lt;/span&gt;&lt;span class="cp"&gt;&lt;/span&gt;
+&lt;span class="cp"&gt;#include&lt;/span&gt; 
 
-&lt;span class="cm"&gt;/********************************************&lt;/span&gt;
-&lt;span class="cm"&gt; * Wrapper - Secure Yourself                &lt;/span&gt;
-&lt;span class="cm"&gt; *                                          &lt;/span&gt;
-&lt;span class="cm"&gt; * 2007 - Mike Golvach - eggi@comcast.net   &lt;/span&gt;
-&lt;span class="cm"&gt; * Modified 2012 by Jason Antman  &lt;/span&gt;
-&lt;span class="cm"&gt; *  - configured for use as rsync wrapper&lt;/span&gt;
-&lt;span class="cm"&gt; *                                          &lt;/span&gt;
-&lt;span class="cm"&gt; * $HeadURL: http://svn.jasonantman.com/misc-scripts/rsync-wrapper.c $&lt;/span&gt;
-&lt;span class="cm"&gt; * $LastChangedRevision: 26 $&lt;/span&gt;
-&lt;span class="cm"&gt; *                                          &lt;/span&gt;
-&lt;span class="cm"&gt; ********************************************/&lt;/span&gt;
+&lt;span class="cpf"&gt;/********************************************&lt;/span&gt;&lt;span class="cp"&gt;&lt;/span&gt;
+ &lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="n"&gt;Wrapper&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt; &lt;span class="n"&gt;Secure&lt;/span&gt; &lt;span class="n"&gt;Yourself&lt;/span&gt;                
+ &lt;span class="o"&gt;*&lt;/span&gt;                                          
+ &lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="mi"&gt;2007&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt; &lt;span class="n"&gt;Mike&lt;/span&gt; &lt;span class="n"&gt;Golvach&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt; &lt;span class="n"&gt;eggi&lt;/span&gt;&lt;span class="err"&gt;@&lt;/span&gt;&lt;span class="n"&gt;comcast&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;net&lt;/span&gt;   
+ &lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="n"&gt;Modified&lt;/span&gt; &lt;span class="mi"&gt;2012&lt;/span&gt; &lt;span class="n"&gt;by&lt;/span&gt; &lt;span class="n"&gt;Jason&lt;/span&gt; &lt;span class="n"&gt;Antman&lt;/span&gt;  
+ &lt;span class="o"&gt;*&lt;/span&gt;  &lt;span class="o"&gt;-&lt;/span&gt; &lt;span class="n"&gt;configured&lt;/span&gt; &lt;span class="k"&gt;for&lt;/span&gt; &lt;span class="n"&gt;use&lt;/span&gt; &lt;span class="n"&gt;as&lt;/span&gt; &lt;span class="n"&gt;rsync&lt;/span&gt; &lt;span class="n"&gt;wrapper&lt;/span&gt;
+ &lt;span class="o"&gt;*&lt;/span&gt;                                          
+ &lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="nl"&gt;HeadURL&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="nl"&gt;http&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="c1"&gt;//svn.jasonantman.com/misc-scripts/rsync-wrapper.c $&lt;/span&gt;
+ &lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="nl"&gt;LastChangedRevision&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="mi"&gt;26&lt;/span&gt; &lt;span class="err"&gt;$&lt;/span&gt;
+ &lt;span class="o"&gt;*&lt;/span&gt;                                          
+ &lt;span class="o"&gt;*******************************************&lt;/span&gt;&lt;span class="err"&gt;*/&lt;/span&gt;
 
 &lt;span class="cm"&gt;/* Creative Commons Attribution-Noncommercial-Share Alike 3.0 United States License */&lt;/span&gt;
 
@@ -659,7 +672,7 @@ Backups&lt;/a&gt;.&lt;/p&gt;
 
 
 &lt;p&gt;&lt;code&gt;/etc/rsnapshot.d/rsync-include-remoteHostName.txt&lt;/code&gt;:&lt;/p&gt;
-&lt;div class="codehilite"&gt;&lt;pre&gt;# Include
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;# Include
 + /dev/console
 + /dev/initctl
 + /dev/null
@@ -669,7 +682,7 @@ Backups&lt;/a&gt;.&lt;/p&gt;
 
 
 &lt;p&gt;&lt;code&gt;/etc/rsnapshot.d/rsync-exclude-remoteHostName.txt&lt;/code&gt;:&lt;/p&gt;
-&lt;div class="codehilite"&gt;&lt;pre&gt;# Exclude
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;# Exclude
 - /cgroup/*
 - /dev/*
 - /lib/*
@@ -678,7 +691,10 @@ Backups&lt;/a&gt;.&lt;/p&gt;
 - /sys/
 - /tmp/
 - /var/log/*
-&lt;/pre&gt;&lt;/div&gt;</summary><category term="backups"></category><category term="linode"></category><category term="rsnapshot"></category><category term="rsync"></category><category term="security"></category><category term="ssh"></category><category term="wrapper"></category></entry><entry><title>New server, and looking for work</title><link href="http://blog.jasonantman.com/2011/09/new-server-and-looking-for-work/" rel="alternate"></link><updated>2011-09-27T19:35:00-04:00</updated><author><name>admin</name></author><id>tag:blog.jasonantman.com,2011-09-27:2011/09/new-server-and-looking-for-work/</id><summary type="html">&lt;p&gt;First off, I&amp;#8217;ve moved this blog from a server in my basement to
+&lt;/pre&gt;&lt;/div&gt;</content><category term="backups"></category><category term="linode"></category><category term="rsnapshot"></category><category term="rsync"></category><category term="security"></category><category term="ssh"></category><category term="wrapper"></category></entry><entry><title>New server, and looking for work</title><link href="http://blog.jasonantman.com/2011/09/new-server-and-looking-for-work/" rel="alternate"></link><published>2011-09-27T19:35:00-04:00</published><updated>2011-09-27T19:35:00-04:00</updated><author><name>admin</name></author><id>tag:blog.jasonantman.com,2011-09-27:/2011/09/new-server-and-looking-for-work/</id><summary type="html">&lt;p&gt;First off, I&amp;#8217;ve moved this blog from a server in my basement to
+&lt;a href="http://www.linode.com"&gt;Linode&lt;/a&gt; virtual hosting, in preparation for my
+move from New Jersey to an apartment in Georgia. This will mark the
+first time since 2001 (when I was 14) that I didn&amp;#8217;t have at least a …&lt;/p&gt;</summary><content type="html">&lt;p&gt;First off, I&amp;#8217;ve moved this blog from a server in my basement to
 &lt;a href="http://www.linode.com"&gt;Linode&lt;/a&gt; virtual hosting, in preparation for my
 move from New Jersey to an apartment in Georgia. This will mark the
 first time since 2001 (when I was 14) that I didn&amp;#8217;t have at least a
@@ -686,7 +702,7 @@ publicly-accessible Linux server in my home. It also means that, as sad
 as it is, the rack will probably all be either going in Ebay or to scrap
 (after a good &lt;a href="http://en.wikipedia.org/wiki/Gutmann_method"&gt;Guttmann
 wipe&lt;/a&gt;, of&amp;nbsp;course).&lt;/p&gt;
-&lt;p&gt;&lt;img alt="server rack" src="/GFX/rack_2011-09-27_small.jpg" /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img alt="server rack" src="/GFX/rack_2011-09-27_small.jpg"&gt;&lt;/p&gt;
 &lt;p&gt;I&amp;#8217;m a bit sad to give up hosting &lt;span class="caps"&gt;DNS&lt;/span&gt; myself and having my beautiful
 per-zone, per-domain, hourly &lt;span class="caps"&gt;DNS&lt;/span&gt; statistics, but that was my first move,
 and Linode&amp;#8217;s web-based &lt;span class="caps"&gt;DNS&lt;/span&gt; manager is much nicer than my collection of
@@ -715,4 +731,4 @@ infrastructure and occasionally working with my hands is fun too. So, if
 you know anyone who&amp;#8217;s hiring a Linux/open source dude in the general
 vicinity of Athens, &lt;span class="caps"&gt;GA&lt;/span&gt; (including Atlanta and the surrounding area),
 please give me a heads-up, or pass them along to
-&lt;a href="http://resume.jasonantman.com"&gt;resume.jasonantman.com&lt;/a&gt;.&lt;/p&gt;</summary><category term="linode"></category><category term="move"></category><category term="rack"></category><category term="servers"></category></entry></feed>
+&lt;a href="http://resume.jasonantman.com"&gt;resume.jasonantman.com&lt;/a&gt;.&lt;/p&gt;</content><category term="linode"></category><category term="move"></category><category term="rack"></category><category term="servers"></category></entry></feed>

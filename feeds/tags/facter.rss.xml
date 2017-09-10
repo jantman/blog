@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Jason Antman's Blog</title><link>http://blog.jasonantman.com/</link><description></description><atom:link href="http://blog.jasonantman.com/feeds/tags/facter.rss.xml" rel="self"></atom:link><lastBuildDate>Sat, 25 Aug 2012 11:33:00 -0400</lastBuildDate><item><title>Puppet facter facts for syslog daemon type and version, symantec netbackup</title><link>http://blog.jasonantman.com/2012/08/puppet-facter-facts-for-syslog-daemon-type-and-version-symantec-netbackup/</link><description>&lt;p&gt;I have a few more custom facts that I&amp;#8217;ve added to my
+<rss version="2.0"><channel><title>Jason Antman's Blog - facter</title><link>http://blog.jasonantman.com/</link><description></description><lastBuildDate>Sat, 25 Aug 2012 11:33:00 -0400</lastBuildDate><item><title>Puppet facter facts for syslog daemon type and version, symantec netbackup</title><link>http://blog.jasonantman.com/2012/08/puppet-facter-facts-for-syslog-daemon-type-and-version-symantec-netbackup/</link><description>&lt;p&gt;I have a few more custom facts that I&amp;#8217;ve added to my
 &lt;a href="https://github.com/jantman/puppet-facter-facts"&gt;puppet-facter-facts&lt;/a&gt;
 github&amp;nbsp;repository:&lt;/p&gt;
 &lt;ul&gt;
@@ -13,117 +13,11 @@ about &lt;code&gt;/sbin/syslogd&lt;/code&gt; and &lt;code&gt;/sbin/rsyslogd&lt;/
 &lt;/ul&gt;
 &lt;/li&gt;
 &lt;li&gt;&lt;a href="https://github.com/jantman/puppet-facter-facts/blob/master/has_netbackup.rb"&gt;has_netbackup&lt;/a&gt;&lt;ul&gt;
-&lt;li&gt;tests for presence of the &lt;code&gt;/usr/openv/netbackup/bin&lt;/code&gt; directory,
-created by installation of &lt;a href="http://www.symantec.com/netbackup"&gt;Symantec
-Netbackup&lt;/a&gt;. Useful for making
-generation of include/exclude files conditional on having NetBackup&amp;nbsp;installed.&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;Hopefully some of these will be of use to someone else as&amp;nbsp;well.&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Sat, 25 Aug 2012 11:33:00 -0400</pubDate><guid>tag:blog.jasonantman.com,2012-08-25:2012/08/puppet-facter-facts-for-syslog-daemon-type-and-version-symantec-netbackup/</guid><category>facter</category><category>nbu</category><category>netbackup</category><category>puppet</category><category>rsyslog</category><category>syslog</category></item><item><title>Puppet facter fact for all applied classes, returned as a CSV list</title><link>http://blog.jasonantman.com/2012/08/puppet-facter-fact-for-all-applied-classes-returned-as-a-csv-list/</link><description>&lt;p&gt;I&amp;#8217;m unfortunatey stuck, at least for the time being, using flat-file
+&lt;li&gt;tests …&lt;/li&gt;&lt;/ul&gt;&lt;/li&gt;&lt;/ul&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Sat, 25 Aug 2012 11:33:00 -0400</pubDate><guid isPermaLink="false">tag:blog.jasonantman.com,2012-08-25:/2012/08/puppet-facter-facts-for-syslog-daemon-type-and-version-symantec-netbackup/</guid><category>facter</category><category>nbu</category><category>netbackup</category><category>puppet</category><category>rsyslog</category><category>syslog</category></item><item><title>Puppet facter fact for all applied classes, returned as a CSV list</title><link>http://blog.jasonantman.com/2012/08/puppet-facter-fact-for-all-applied-classes-returned-as-a-csv-list/</link><description>&lt;p&gt;I&amp;#8217;m unfortunatey stuck, at least for the time being, using flat-file
 manifests to configure my puppet nodes. Without an &lt;span class="caps"&gt;ENC&lt;/span&gt;, it&amp;#8217;s pretty
 difficult to get a good ovewview of what classes are used on each node,
-and what nodes use a given class. I know I could write up a simple web
-tool to do this (unfortunately, given my limited Ruby knowledge, it
-would have to be in &lt;span class="caps"&gt;PHP&lt;/span&gt; or Perl, not a real modification to Dashboard in
-Ruby). But where to get the data&amp;nbsp;from?&lt;/p&gt;
-&lt;p&gt;After some research, I found a &lt;a href="http://sjoeboo.github.com/blog/2012/07/31/updated-puppet-facts-for-puppet-classes/"&gt;puppet fact for puppet
-classes&lt;/a&gt;
-on &lt;a href="http://sjoeboo.github.com/"&gt;Matthew Nicholson&amp;#8217;s Coffee &lt;span class="amp"&gt;&amp;amp;&lt;/span&gt; Beer blog&lt;/a&gt;.
-It parses &lt;code&gt;/var/lib/puppet/classes.txt&lt;/code&gt; and returns the list of classes
-found as a &lt;span class="caps"&gt;JSON&lt;/span&gt; array. Great base, but I wanted something easier, that
-would be more easily parsed from its direct storage in MySQL. My
-modification to his code is onlty a few characters; I dropped out the
-&lt;span class="caps"&gt;JSON&lt;/span&gt; require, and return the classes as a &lt;span class="caps"&gt;CSV&lt;/span&gt; list. This lets me to easy
-&lt;code&gt;LIKE '%,classname,%'&lt;/code&gt; SELECTs in MySQL, and also gives me the fact
-value stored in the puppet &lt;span class="caps"&gt;DB&lt;/span&gt;, so I can build a separate tool around
-that data. Thanks,&amp;nbsp;Matt.&lt;/p&gt;
-&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="c1"&gt;#&lt;/span&gt;
-&lt;span class="c1"&gt;# facter fact for puppet classes on node, pulled from /var/lib/puppet/classes.txt&lt;/span&gt;
-&lt;span class="c1"&gt;# from &lt;/span&gt;
-&lt;span class="c1"&gt;#&lt;/span&gt;
-
-&lt;span class="nb"&gt;require&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;facter&amp;#39;&lt;/span&gt;
-&lt;span class="k"&gt;begin&lt;/span&gt;
-        &lt;span class="no"&gt;Facter&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;hostname&lt;/span&gt;
-        &lt;span class="no"&gt;Facter&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;fqdn&lt;/span&gt;
-&lt;span class="k"&gt;rescue&lt;/span&gt;
-        &lt;span class="no"&gt;Facter&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;loadfacts&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
-&lt;span class="k"&gt;end&lt;/span&gt;
-&lt;span class="n"&gt;hostname&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="no"&gt;Facter&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;value&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;hostname&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
-&lt;span class="n"&gt;fqdn&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="no"&gt;Facter&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;value&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;fqdn&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
-
-&lt;span class="n"&gt;classes_txt&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;/var/lib/puppet/classes.txt&amp;quot;&lt;/span&gt;
-
-&lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="no"&gt;File&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;exists?&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;classes_txt&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="k"&gt;then&lt;/span&gt;
-        &lt;span class="n"&gt;f&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="no"&gt;File&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;new&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;classes_txt&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
-        &lt;span class="n"&gt;classes&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nb"&gt;Array&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;new&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
-        &lt;span class="n"&gt;f&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;readlines&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;each&lt;/span&gt; &lt;span class="k"&gt;do&lt;/span&gt; &lt;span class="o"&gt;|&lt;/span&gt;&lt;span class="n"&gt;line&lt;/span&gt;&lt;span class="o"&gt;|&lt;/span&gt;
-                &lt;span class="n"&gt;line&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;line&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;chomp&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;to_s&lt;/span&gt;
-                &lt;span class="n"&gt;line&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;line&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;sub&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot; &amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;_&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
-                &lt;span class="n"&gt;classes&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;push&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;line&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
-        &lt;span class="k"&gt;end&lt;/span&gt;
-        &lt;span class="n"&gt;classes&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;delete&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;settings&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
-        &lt;span class="n"&gt;classes&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;delete&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="si"&gt;#{&lt;/span&gt;&lt;span class="n"&gt;hostname&lt;/span&gt;&lt;span class="si"&gt;}&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
-        &lt;span class="n"&gt;classes&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;delete&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="si"&gt;#{&lt;/span&gt;&lt;span class="n"&gt;fqdn&lt;/span&gt;&lt;span class="si"&gt;}&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
-        &lt;span class="no"&gt;Facter&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;add&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;puppet_classes_csv&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="k"&gt;do&lt;/span&gt;
-                &lt;span class="n"&gt;setcode&lt;/span&gt; &lt;span class="k"&gt;do&lt;/span&gt;
-                        &lt;span class="n"&gt;classes&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;join&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;,&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
-                &lt;span class="k"&gt;end&lt;/span&gt;
-        &lt;span class="k"&gt;end&lt;/span&gt;
-&lt;span class="k"&gt;end&lt;/span&gt;
-&lt;/pre&gt;&lt;/div&gt;
-
-
-&lt;p&gt;All of my facts are now available in a GitHub repository:
-&lt;a href="https://github.com/jantman/puppet-facter-facts"&gt;https://github.com/jantman/puppet-facter-facts&lt;/a&gt;.&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Wed, 22 Aug 2012 07:05:00 -0400</pubDate><guid>tag:blog.jasonantman.com,2012-08-22:2012/08/puppet-facter-fact-for-all-applied-classes-returned-as-a-csv-list/</guid><category>classes</category><category>csv</category><category>fact</category><category>facter</category><category>node</category><category>puppet</category></item><item><title>Puppet facter fact for last applied configuration version</title><link>http://blog.jasonantman.com/2012/08/puppet-facter-fact-for-last-applied-configuration-version/</link><description>&lt;p&gt;For anyone else who sets the Puppet &lt;code&gt;config_version&lt;/code&gt; paramater to return
+and what nodes use a given class. I know I could write …&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Wed, 22 Aug 2012 07:05:00 -0400</pubDate><guid isPermaLink="false">tag:blog.jasonantman.com,2012-08-22:/2012/08/puppet-facter-fact-for-all-applied-classes-returned-as-a-csv-list/</guid><category>classes</category><category>csv</category><category>fact</category><category>facter</category><category>node</category><category>puppet</category></item><item><title>Puppet facter fact for last applied configuration version</title><link>http://blog.jasonantman.com/2012/08/puppet-facter-fact-for-last-applied-configuration-version/</link><description>&lt;p&gt;For anyone else who sets the Puppet &lt;code&gt;config_version&lt;/code&gt; paramater to return
 the current &lt;span class="caps"&gt;SVN&lt;/span&gt; or Git version of your configuration, here&amp;#8217;s a fact that
 grabs that version (by parsing the cached &lt;span class="caps"&gt;YAML&lt;/span&gt; catalog) and sets it as a
 fact called &amp;#8220;catalog_config_version&amp;#8221;. It can then be used for
-sanity-checking your nodes, looking up via the Inventory Service, or you
-can display it in the Dashboard using my patch: &lt;a href="http://blog.jasonantman.com/2012/08/patch-to-puppet-dashboard-1-2-10-to-show-arbitrary-facts-in-the-main-node-table/"&gt;Patch to Puppet
-Dashboard 1.2.10 to show arbitrary facts in the main node
-table&lt;/a&gt;.&lt;/p&gt;
-&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="c1"&gt;#&lt;/span&gt;
-&lt;span class="c1"&gt;# facter fact for last applied config version, skeleton from /var/lib/puppet/client_yaml/catalog/fqdn.yaml&lt;/span&gt;
-&lt;span class="c1"&gt;#&lt;/span&gt;
-
-&lt;span class="nb"&gt;require&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;puppet&amp;#39;&lt;/span&gt;
-&lt;span class="nb"&gt;require&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;yaml&amp;#39;&lt;/span&gt;
-&lt;span class="nb"&gt;require&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;facter&amp;#39;&lt;/span&gt;
-
-&lt;span class="n"&gt;localconfig&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="no"&gt;&lt;span class="caps"&gt;ARGV&lt;/span&gt;&lt;/span&gt;&lt;span class="o"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="o"&gt;]&lt;/span&gt; &lt;span class="o"&gt;||&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="si"&gt;#{&lt;/span&gt;&lt;span class="no"&gt;Puppet&lt;/span&gt;&lt;span class="o"&gt;[&lt;/span&gt;&lt;span class="ss"&gt;:clientyamldir&lt;/span&gt;&lt;span class="o"&gt;]&lt;/span&gt;&lt;span class="si"&gt;}&lt;/span&gt;&lt;span class="s2"&gt;/catalog/&lt;/span&gt;&lt;span class="si"&gt;#{&lt;/span&gt; &lt;span class="no"&gt;Facter&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;fqdn&lt;/span&gt; &lt;span class="si"&gt;}&lt;/span&gt;&lt;span class="s2"&gt;.yaml&amp;quot;&lt;/span&gt;
-
-&lt;span class="k"&gt;unless&lt;/span&gt; &lt;span class="no"&gt;File&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;exist?&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;localconfig&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
-  &lt;span class="nb"&gt;puts&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;Can&amp;#39;t find &lt;/span&gt;&lt;span class="si"&gt;#{&lt;/span&gt; &lt;span class="no"&gt;Facter&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;fqdn&lt;/span&gt; &lt;span class="si"&gt;}&lt;/span&gt;&lt;span class="s2"&gt;.yaml&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
-  &lt;span class="nb"&gt;exit&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt;
-&lt;span class="k"&gt;end&lt;/span&gt;
-
-&lt;span class="n"&gt;lc&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="no"&gt;File&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;read&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;localconfig&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
-
-&lt;span class="k"&gt;begin&lt;/span&gt;
-  &lt;span class="n"&gt;pup&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="no"&gt;Marshal&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;load&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;lc&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
-&lt;span class="k"&gt;rescue&lt;/span&gt; &lt;span class="no"&gt;TypeError&lt;/span&gt;
-  &lt;span class="n"&gt;pup&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="no"&gt;&lt;span class="caps"&gt;YAML&lt;/span&gt;&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;load&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;lc&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
-&lt;span class="k"&gt;rescue&lt;/span&gt; &lt;span class="no"&gt;Exception&lt;/span&gt; &lt;span class="o"&gt;=&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;e&lt;/span&gt;
-  &lt;span class="k"&gt;raise&lt;/span&gt;
-&lt;span class="k"&gt;end&lt;/span&gt;
-
-&lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="n"&gt;pup&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;class&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="ss"&gt;Puppet&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="ss"&gt;:Resource&lt;/span&gt;&lt;span class="o"&gt;::&lt;/span&gt;&lt;span class="no"&gt;Catalog&lt;/span&gt;
-        &lt;span class="no"&gt;Facter&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;add&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;catalog_config_version&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="k"&gt;do&lt;/span&gt;
-                &lt;span class="n"&gt;setcode&lt;/span&gt; &lt;span class="k"&gt;do&lt;/span&gt;
-                        &lt;span class="n"&gt;pup&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;version&lt;/span&gt;
-                &lt;span class="k"&gt;end&lt;/span&gt;
-        &lt;span class="k"&gt;end&lt;/span&gt;
-&lt;span class="k"&gt;else&lt;/span&gt;
-        &lt;span class="no"&gt;Facter&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;add&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;catalog_config_version&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="k"&gt;do&lt;/span&gt;
-                &lt;span class="n"&gt;setcode&lt;/span&gt; &lt;span class="k"&gt;do&lt;/span&gt;
-                        &lt;span class="s2"&gt;&amp;quot;unknown&amp;quot;&lt;/span&gt;
-                &lt;span class="k"&gt;end&lt;/span&gt;
-        &lt;span class="k"&gt;end&lt;/span&gt;
-&lt;span class="k"&gt;end&lt;/span&gt;
-&lt;/pre&gt;&lt;/div&gt;
-
-
-&lt;p&gt;All of my facts are now available in a GitHub repository:
-&lt;a href="https://github.com/jantman/puppet-facter-facts"&gt;https://github.com/jantman/puppet-facter-facts&lt;/a&gt;.&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Tue, 21 Aug 2012 08:55:00 -0400</pubDate><guid>tag:blog.jasonantman.com,2012-08-21:2012/08/puppet-facter-fact-for-last-applied-configuration-version/</guid><category>config_version</category><category>fact</category><category>facter</category><category>puppet</category></item></channel></rss>
+sanity-checking your …&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Tue, 21 Aug 2012 08:55:00 -0400</pubDate><guid isPermaLink="false">tag:blog.jasonantman.com,2012-08-21:/2012/08/puppet-facter-fact-for-last-applied-configuration-version/</guid><category>config_version</category><category>fact</category><category>facter</category><category>puppet</category></item></channel></rss>

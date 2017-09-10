@@ -1,45 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Jason Antman's Blog</title><link>http://blog.jasonantman.com/</link><description></description><atom:link href="http://blog.jasonantman.com/feeds/tags/hauppauge.rss.xml" rel="self"></atom:link><lastBuildDate>Mon, 01 Sep 2008 10:37:00 -0400</lastBuildDate><item><title>LIRC and Hauppauge PVR-150 on OpenSuSE 11.0</title><link>http://blog.jasonantman.com/2008/09/lirc-and-hauppauge-pvr-150-on-opensuse-110/</link><description>&lt;p&gt;Well, despite what&amp;#8217;s been said elsewhere, it &lt;em&gt;&lt;span class="caps"&gt;IS&lt;/span&gt;&lt;/em&gt; possible! It&amp;#8217;s a bit
+<rss version="2.0"><channel><title>Jason Antman's Blog - hauppauge</title><link>http://blog.jasonantman.com/</link><description></description><lastBuildDate>Mon, 01 Sep 2008 10:37:00 -0400</lastBuildDate><item><title>LIRC and Hauppauge PVR-150 on OpenSuSE 11.0</title><link>http://blog.jasonantman.com/2008/09/lirc-and-hauppauge-pvr-150-on-opensuse-110/</link><description>&lt;p&gt;Well, despite what&amp;#8217;s been said elsewhere, it &lt;em&gt;&lt;span class="caps"&gt;IS&lt;/span&gt;&lt;/em&gt; possible! It&amp;#8217;s a bit
 error-ridden at first, but here is the procedure that I used to compile
 and install the &lt;span class="caps"&gt;PVR&lt;/span&gt;-150 patched &lt;span class="caps"&gt;LIRC&lt;/span&gt;&amp;nbsp;0.8.3-&lt;span class="caps"&gt;CVS&lt;/span&gt;.&lt;/p&gt;
 &lt;p&gt;First, Download the tarball mentioned in the &lt;a href="http://www.blushingpenguin.com/mark/blog/?p=24"&gt;Version 3 blog
-post&lt;/a&gt; at &lt;a href="http://www.blushingpenguin.com/mark/blog/"&gt;Marks
-Braindump&lt;/a&gt;. You can pretty
-much follow his instructions on the installation in the blog post, with
-some changes that are specific to getting it to compile on OpenSuSE&amp;nbsp;11.&lt;/p&gt;
-&lt;ol&gt;
-&lt;li&gt;First, remove all traces of the OpenSuSE &lt;span class="caps"&gt;LIRC&lt;/span&gt; from you system.
-    Uninstall the &lt;span class="caps"&gt;RPMS&lt;/span&gt; and everything else that goes with them. Then
-    unload all of the kernel modules, especially lirc_i2c (if you have
-    it&amp;nbsp;loaded).&lt;/li&gt;
-&lt;li&gt;In your kernel source directory, run
-    &lt;code&gt;make oldconfig &amp;amp;&amp;amp; make prepare.&lt;/code&gt;&lt;/li&gt;
-&lt;li&gt;In your kernel source directory, run &lt;code&gt;make prepare scripts&lt;/code&gt; which,
-    among other things, compiles the required &lt;code&gt;genksyms&lt;/code&gt; scurript.&lt;/li&gt;
-&lt;li&gt;I was getting a compile error like &amp;#8220;&lt;span class="caps"&gt;WARNING&lt;/span&gt;: Symbol version dump
-    /usr/src/`uname -r`/Module.symvers is missing&amp;#8221;. Find out which
-    kernel you&amp;#8217;re running (&lt;code&gt;uname -r&lt;/code&gt;). In yout kernel source directory,
-    copy your Module.symvers file from /usr/src/linux-obj. I was running
-    i386 architecture with the &amp;#8220;default&amp;#8221; kernel, so mine was located at
-    &lt;code&gt;/usr/src/linux-obj/i386/debug/Module.symvers&lt;/code&gt;. Copy that into
-    &lt;code&gt;/usr/src/linux&lt;/code&gt;.&lt;/li&gt;
-&lt;li&gt;In the lirc (patched) directory, run &lt;code&gt;setup.sh&lt;/code&gt; as instructed. &lt;span class="caps"&gt;DO&lt;/span&gt;
-    &lt;span class="caps"&gt;NOT&lt;/span&gt; tell it to run configure - just save settings and&amp;nbsp;exit.&lt;/li&gt;
-&lt;li&gt;Edit the generated &lt;code&gt;configure.sh&lt;/code&gt; file, adding a
-    &lt;code&gt;--with-kerneldir=/usr/src/KERNELDIR&lt;/code&gt;, replacing &lt;span class="caps"&gt;KERNELDIR&lt;/span&gt; with the
-    actual path to your kernel soruce (i.e. /usr/src/`uname&amp;nbsp;-r`).&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;make&lt;/code&gt;. If no errors, &lt;code&gt;make install&lt;/code&gt;.&lt;/li&gt;
-&lt;li&gt;I decided to reboot at this point, and when I did, everything worked&amp;nbsp;perfectly.&lt;/li&gt;
-&lt;/ol&gt;
-&lt;p&gt;Also, I found that I needed to explicitly specify &lt;code&gt;--device=/dev/lirc0&lt;/code&gt;
-when starting &lt;span class="caps"&gt;LIRC&lt;/span&gt;, as well as not specifying a driver. I just took the
-&lt;code&gt;/etc/init.d/lirc&lt;/code&gt; from the official OpenSuSE 11.0 package, commented
-out line 108 in &lt;code&gt;makeargs()&lt;/code&gt; that adds the &lt;code&gt;-H $LIRC_DRIVER&lt;/code&gt; to the
-args, and added &lt;code&gt;LIRC_DEVICE="/dev/lirc0"&lt;/code&gt; to the top after the &lt;span class="caps"&gt;INIT&lt;/span&gt;&amp;nbsp;info.&lt;/p&gt;
-&lt;p&gt;Unfortunately, figuring out this process took me a long time. I&amp;#8217;ve
-reconstructed these instructions from various post-it notes, the
-whiteboard next to my desk, and some bash history files and terminal
-dumps. If this doesn&amp;#8217;t seem to work for you, please drop an email to
-jason &lt;span class="caps"&gt;AT&lt;/span&gt; jason antman &lt;span class="caps"&gt;DOT&lt;/span&gt; com, with as much information as you have, and
-I&amp;#8217;ll figure it out and update the&amp;nbsp;instructions.&lt;/p&gt;
-&lt;p&gt;Now, finally, an up-to-date system &lt;span class="caps"&gt;AND&lt;/span&gt; &lt;a href="http://www.mythtv.org"&gt;MythTV&lt;/a&gt;.&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Mon, 01 Sep 2008 10:37:00 -0400</pubDate><guid>tag:blog.jasonantman.com,2008-09-01:2008/09/lirc-and-hauppauge-pvr-150-on-opensuse-110/</guid><category>hauppauge</category><category>linux</category><category>lirc</category><category>mythtv</category><category>opensuse</category><category>pvr-150</category><category>suse</category></item></channel></rss>
+post&lt;/a&gt; at …&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Mon, 01 Sep 2008 10:37:00 -0400</pubDate><guid isPermaLink="false">tag:blog.jasonantman.com,2008-09-01:/2008/09/lirc-and-hauppauge-pvr-150-on-opensuse-110/</guid><category>hauppauge</category><category>linux</category><category>lirc</category><category>mythtv</category><category>opensuse</category><category>pvr-150</category><category>suse</category></item></channel></rss>

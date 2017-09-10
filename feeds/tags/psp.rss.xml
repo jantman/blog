@@ -1,52 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Jason Antman's Blog</title><link>http://blog.jasonantman.com/</link><description></description><atom:link href="http://blog.jasonantman.com/feeds/tags/psp.rss.xml" rel="self"></atom:link><lastBuildDate>Thu, 01 Mar 2007 16:27:00 -0500</lastBuildDate><item><title>Managing G1 Proliant Servers with modern Linux</title><link>http://blog.jasonantman.com/2007/03/managing-g1-proliant-servers-with-modern-linux/</link><description>&lt;p&gt;Not much of an &amp;#8220;upgrade&amp;#8221; for anyone who&amp;#8217;s in &lt;span class="caps"&gt;IT&lt;/span&gt;, but jasonantman.com is
+<rss version="2.0"><channel><title>Jason Antman's Blog - psp</title><link>http://blog.jasonantman.com/</link><description></description><lastBuildDate>Thu, 01 Mar 2007 16:27:00 -0500</lastBuildDate><item><title>Managing G1 Proliant Servers with modern Linux</title><link>http://blog.jasonantman.com/2007/03/managing-g1-proliant-servers-with-modern-linux/</link><description>&lt;p&gt;Not much of an &amp;#8220;upgrade&amp;#8221; for anyone who&amp;#8217;s in &lt;span class="caps"&gt;IT&lt;/span&gt;, but jasonantman.com is
 currently being upgraded from old desktops used as servers to a pile of
 generation-1 (G1) &lt;span class="caps"&gt;HP&lt;/span&gt;/Compaq Proliants. I know that there are utilities
-for Linux to manage the servers, specifically control fan speed and
-monitor hardware-level health for Linux. However, the most recent
-download on &lt;span class="caps"&gt;HP&lt;/span&gt;&amp;#8217;s site is for &lt;span class="caps"&gt;SLES9&lt;/span&gt;. All of my boxes will be running
-openSuSE 10.2, and the &lt;span class="caps"&gt;SLES9&lt;/span&gt; version wouldn&amp;#8217;t install on&amp;nbsp;them.&lt;/p&gt;
-&lt;p&gt;After an hour long phone call to &lt;span class="caps"&gt;HP&lt;/span&gt; support, I ended up speaking with
-Paulo, the third support person I was transferred to. #1 read off the
-web site, #2 knew what Linux was, but Paulo (#3) actually told me that
-he was experimenting with installing &lt;span class="caps"&gt;HPASM&lt;/span&gt; (&lt;span class="caps"&gt;HP&lt;/span&gt;&amp;#8217;s server
-administration/management utility) on an older Proliant as well. He
-spent about half an hour walking me through it. Here&amp;#8217;s what I&amp;nbsp;found:&lt;/p&gt;
-&lt;p&gt;The most compatible version of &lt;span class="caps"&gt;HPASM&lt;/span&gt; (I guess it&amp;#8217;s some hidden feature
-for people who know it) is the version for the &lt;span class="caps"&gt;DL380&lt;/span&gt; G4. Paulo
-instructed me to download this &lt;span class="caps"&gt;RPM&lt;/span&gt; from their site. I did, choosing the
-&lt;span class="caps"&gt;SLES10&lt;/span&gt; (x86) download (hpasm-7.7.0-115.sles10.i586.rpm). This installed
-fine. Running &lt;code&gt;hpasm status&lt;/code&gt; from the command line asks us to activate
-it first. Do the activation. Now, running &lt;code&gt;hpasm status&lt;/code&gt; still asks us
-to activate. Paulo confirmed this as happening on his machine too. Try
-&lt;code&gt;/etc/init.d/hpasm status&lt;/code&gt; and you should see that all of the modules
-are&amp;nbsp;working.&lt;/p&gt;
-&lt;p&gt;Now, the install is complete. I&amp;#8217;m not sure if the &lt;span class="caps"&gt;SNMP&lt;/span&gt; works, but it
-should as long as your snmpd is running. The &lt;code&gt;hpasm activate&lt;/code&gt; command
-modifies snmpd.conf appropriately. and you will be queried for the
-currect configuration&amp;nbsp;information.&lt;/p&gt;
-&lt;p&gt;To give it a test, run &lt;code&gt;hplog -f&lt;/code&gt; or &lt;code&gt;hplog -p&lt;/code&gt; and you should see fan
-and power status,&amp;nbsp;respectively.&lt;/p&gt;
-&lt;p&gt;Paulo also told me that I could download the hpadu package (also &lt;span class="caps"&gt;DL380&lt;/span&gt;
-G4 / &lt;span class="caps"&gt;SLES10&lt;/span&gt;) to get array diagnostics, He warned me that some of the
-install scripts in &lt;span class="caps"&gt;HPADU&lt;/span&gt; look for the web management homepage, which we
-haven&amp;#8217;t installed. To get around this, install the &lt;span class="caps"&gt;HPADU&lt;/span&gt; &lt;span class="caps"&gt;RPM&lt;/span&gt; file
-(hpadu-7.70-12.linux.rpm)
-&lt;code&gt;rpm -ivh --force --nodeps --noscripts hpadu-7.70-12.linux.rpm&lt;/code&gt;. Be
-aware, though, that this package is supposed to be web-based. It
-installs to&amp;nbsp;/opt/hp/hpadu.&lt;/p&gt;
-&lt;p&gt;The web interface, luckily for me, is written in &lt;span class="caps"&gt;PHP&lt;/span&gt;. It is pretty
-complex so it might take me a while to figure out the workings, but when
-I do, I&amp;#8217;ll post as much info as I can on how to make a &lt;span class="caps"&gt;CLI&lt;/span&gt; interface, or
-where one exists if I can find&amp;nbsp;it.&lt;/p&gt;
-&lt;p&gt;Also, I&amp;#8217;ll most likely develop a Python check script to use with
-&lt;a href="http://www.nagios.org"&gt;Nagios&lt;/a&gt; to monitor most of the hpasm-enabled&amp;nbsp;components.&lt;/p&gt;
-&lt;p&gt;For the use of anyone else, here are some of the links that &lt;span class="caps"&gt;HP&lt;/span&gt; Support
-sent me after the&amp;nbsp;call:&lt;/p&gt;
-&lt;p&gt;Link for users guide for Proliant Support Pack, which includes
-documentation on &lt;span class="caps"&gt;HPASM&lt;/span&gt; from the&amp;nbsp;&lt;span class="caps"&gt;CLI&lt;/span&gt;:&lt;/p&gt;
-&lt;p&gt;&lt;a href="http://h18000.www1.hp.com/support/files/server/us/WebDoc/720/psp-users-guide.pdf"&gt;http://h18000.www1.hp.com/support/files/server/us/WebDoc/720/psp-users-guide.pdf&lt;/a&gt;&lt;/p&gt;
-&lt;p&gt;Product&amp;nbsp;manuals:&lt;/p&gt;
-&lt;p&gt;&lt;a href="http://h20180.www2.hp.com/apps/Nav?h_pagetype=s-003&amp;amp;h_lang=en&amp;amp;h_cc=us&amp;amp;h_product=241435&amp;amp;h_page=hpcom&amp;amp;h_client=z-a-r1002-3&amp;amp;cc=us〈=en"&gt;http://h20180.www2.hp.com/apps/Nav?h_pagetype=s-003&amp;amp;h_lang=en&amp;amp;h_cc=us&amp;amp;h_product=241435&amp;amp;h_page=hpcom&amp;amp;h_client=z-a-r1002-3&amp;amp;cc=us〈=en&lt;/a&gt;&lt;/p&gt;
-&lt;p&gt;&lt;span class="caps"&gt;ML370&lt;/span&gt;&amp;nbsp;G1&lt;/p&gt;
-&lt;p&gt;&lt;a href="http://h20000.www2.hp.com/bc/docs/support/UCR/SupportManual/TPM_143091-004/TPM_143091-004.pdf"&gt;http://h20000.www2.hp.com/bc/docs/support/&lt;span class="caps"&gt;UCR&lt;/span&gt;/SupportManual/TPM_143091-004/TPM_143091-004.pdf&lt;/a&gt;&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Thu, 01 Mar 2007 16:27:00 -0500</pubDate><guid>tag:blog.jasonantman.com,2007-03-01:2007/03/managing-g1-proliant-servers-with-modern-linux/</guid><category>compaq</category><category>hp</category><category>hpadu</category><category>hpasm</category><category>linux</category><category>management</category><category>proliant</category><category>psp</category></item></channel></rss>
+for Linux to manage the servers, specifically control fan speed and …&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Thu, 01 Mar 2007 16:27:00 -0500</pubDate><guid isPermaLink="false">tag:blog.jasonantman.com,2007-03-01:/2007/03/managing-g1-proliant-servers-with-modern-linux/</guid><category>compaq</category><category>hp</category><category>hpadu</category><category>hpasm</category><category>linux</category><category>management</category><category>proliant</category><category>psp</category></item></channel></rss>

@@ -1,50 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Jason Antman's Blog</title><link>http://blog.jasonantman.com/</link><description></description><atom:link href="http://blog.jasonantman.com/feeds/tags/epel.rss.xml" rel="self"></atom:link><lastBuildDate>Thu, 06 Jun 2013 20:47:00 -0400</lastBuildDate><item><title>Modern (0.10.x+) NodeJS RPMs on CentOS/REHL 5 and 6</title><link>http://blog.jasonantman.com/2013/06/modern-0-10-x-nodejs-rpms-on-centosrehl-5-and-6/</link><description>&lt;p&gt;I posted back in January about &lt;a href="/2013/01/rpm-spec-files-for-nodejs-0-9-5-and-v8-on-centos-5/"&gt;&lt;span class="caps"&gt;RPM&lt;/span&gt; Spec Files for nodejs 0.9.5 and v8
+<rss version="2.0"><channel><title>Jason Antman's Blog - EPEL</title><link>http://blog.jasonantman.com/</link><description></description><lastBuildDate>Thu, 06 Jun 2013 20:47:00 -0400</lastBuildDate><item><title>Modern (0.10.x+) NodeJS RPMs on CentOS/REHL 5 and 6</title><link>http://blog.jasonantman.com/2013/06/modern-0-10-x-nodejs-rpms-on-centosrehl-5-and-6/</link><description>&lt;p&gt;I posted back in January about &lt;a href="/2013/01/rpm-spec-files-for-nodejs-0-9-5-and-v8-on-centos-5/"&gt;&lt;span class="caps"&gt;RPM&lt;/span&gt; Spec Files for nodejs 0.9.5 and v8
 on CentOS
 6&lt;/a&gt;. In
 that post I also said that I was unable to get recent NodeJS to build on
 CentOS 5 because of a long chain of dependencies including node-gyp, v8,
-http-parser, glibc, etc. I said I couldn&amp;#8217;t get it to build. Well, I have
-good news for both distro&amp;nbsp;versions.&lt;/p&gt;
-&lt;p&gt;On the CentOS/&lt;span class="caps"&gt;RHEL&lt;/span&gt; 6 side, thanks to a lot of work by &lt;span class="caps"&gt;T. C.
-&lt;/span&gt;Hollingsworth and others, NodeJS 0.10.5 is currently in the official
-&lt;a href="http://fedoraproject.org/wiki/EPEL"&gt;&lt;span class="caps"&gt;EPEL&lt;/span&gt;&lt;/a&gt; repositories. They seem to be
-keeping the packages pretty current, but if you need newer, you can
-always grab the SRPMs from &lt;span class="caps"&gt;EPEL&lt;/span&gt; and build the newer versions. This is
-great, because it means I no longer need to maintain the spec files and
-do my own builds. I don&amp;#8217;t think I really did anything to help get this
-package in &lt;span class="caps"&gt;EPEL&lt;/span&gt;, other than ping a few people and comment on a few&amp;nbsp;tickets.&lt;/p&gt;
-&lt;p&gt;For CentOS/&lt;span class="caps"&gt;RHEL&lt;/span&gt; 5, I finally have packages, but they&amp;#8217;re not exactly
-pretty. The dependency solving issues still stand; they&amp;#8217;re rooted at the
-dependency of node-gyp which requires the v8 C++ JavaScript library, and
-is required to compile shared object addons. The best solution that I
-(and a few others) could find is simply not to build node-gyp, and not
-to have support for addons or package any addons; we just have the
-binaries that NodeJS&amp;#8217;s Makefile creates, and everything else is
-interpreted. A &lt;a href="https://twitter.com/toxigenicpoem"&gt;coworker&lt;/a&gt; found
-&lt;a href="https://github.com/kazuhisya/nodejs-rpm"&gt;https://github.com/kazuhisya/nodejs-rpm&lt;/a&gt;
-which contains a configure patch and specfile for a dead-simple CentOS
-5/6 &lt;span class="caps"&gt;RPM&lt;/span&gt; of NodeJS 0.10.9, which essentially just uses &lt;span class="caps"&gt;EPEL&lt;/span&gt;&amp;#8217;s python26
-packages to power the NodeJS build process, configures and uses the
-Makefile&amp;#8217;s &lt;code&gt;make binary&lt;/code&gt; command to spit out a NodeJS binary tarball,
-and then packages that. That whole process way out of line from the
-&lt;a href="http://fedoraproject.org/wiki/Packaging:Guidelines"&gt;Fedora Packaging
-Guidelines&lt;/a&gt;, and
-also only dumps out nodejs, nodejs-binary and nodejs-debuginfo packages,
-so I also can&amp;#8217;t just substitute in a different package name in my puppet
-manifests (which install nodejs, nodejs-devel and npm packages). So I
-&lt;a href="https://github.com/jantman/nodejs-rpm-centos5"&gt;forked that repository&lt;/a&gt;
-and made some changes to the specfile: I gave the package name a prefix
-(&amp;#8220;cmgd_&amp;#8221;, since that&amp;#8217;s where I work these days) and some warnings in
-the description, to make it abundantly clear that these packages are
-very far from what you find in &lt;span class="caps"&gt;EPEL&lt;/span&gt; and other repositories, and broke
-npm and the devel files out into their own subpackages. Hopefully this
-spec file will be of use to someone else who also has the unfortunate
-need of supporting recent NodeJS on CentOS 5. If there&amp;#8217;s enough
-interest, I&amp;#8217;ll consider building the packages and putting them in a
-repository&amp;nbsp;somewhere.&lt;/p&gt;
-&lt;p&gt;You can see the NodeJS 0.10.9 on CentOS 5 spec file, a patch, and the
-READMEs at
-&lt;a href="https://github.com/jantman/nodejs-rpm-centos5"&gt;https://github.com/jantman/nodejs-rpm-centos5&lt;/a&gt;.
-Patches and/or pull requests are greatly appreciated, especially from
-anyone who wants to make the spec file more Fedora guidelines&amp;nbsp;compliant.&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Thu, 06 Jun 2013 20:47:00 -0400</pubDate><guid>tag:blog.jasonantman.com,2013-06-06:2013/06/modern-0-10-x-nodejs-rpms-on-centosrehl-5-and-6/</guid><category>build</category><category>centos</category><category>EPEL</category><category>node</category><category>nodejs</category><category>package</category><category>packaging</category><category>redhat</category><category>RHEL</category><category>rpm</category><category>specfile</category></item></channel></rss>
+http-parser, glibc …&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Thu, 06 Jun 2013 20:47:00 -0400</pubDate><guid isPermaLink="false">tag:blog.jasonantman.com,2013-06-06:/2013/06/modern-0-10-x-nodejs-rpms-on-centosrehl-5-and-6/</guid><category>build</category><category>centos</category><category>EPEL</category><category>node</category><category>nodejs</category><category>package</category><category>packaging</category><category>redhat</category><category>RHEL</category><category>rpm</category><category>specfile</category></item></channel></rss>

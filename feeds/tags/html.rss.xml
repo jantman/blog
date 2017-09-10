@@ -1,51 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Jason Antman's Blog</title><link>http://blog.jasonantman.com/</link><description></description><atom:link href="http://blog.jasonantman.com/feeds/tags/html.rss.xml" rel="self"></atom:link><lastBuildDate>Sun, 22 Nov 2009 10:25:00 -0500</lastBuildDate><item><title>Android links - maps, dial a phone number</title><link>http://blog.jasonantman.com/2009/11/android-links-maps-dial-a-phone-number/</link><description>&lt;p&gt;If you&amp;#8217;ve used Google search from an Android device to search for a
+<rss version="2.0"><channel><title>Jason Antman's Blog - html</title><link>http://blog.jasonantman.com/</link><description></description><lastBuildDate>Sun, 22 Nov 2009 10:25:00 -0500</lastBuildDate><item><title>Android links - maps, dial a phone number</title><link>http://blog.jasonantman.com/2009/11/android-links-maps-dial-a-phone-number/</link><description>&lt;p&gt;If you&amp;#8217;ve used Google search from an Android device to search for a
 business, you&amp;#8217;ve probably noticed the two interesting &amp;#8220;buttons&amp;#8221; to the
 right of the search listing - &amp;#8220;Get Directions&amp;#8221; and a button for the
 phone number. It turns out, these are pretty easy to&amp;nbsp;implement.&lt;/p&gt;
-&lt;p&gt;The &amp;#8220;Get Directions&amp;#8221; link is a simple link to &lt;a href="http://maps.google.com"&gt;Google
-Maps&lt;/a&gt; like &lt;a href="http://maps.google.com/maps?daddr=42+Pierce+Ave,+Midland+Park,+NJ+07432"&gt;This
-One&lt;/a&gt;.
-The links are actually pretty&amp;nbsp;simple:&lt;/p&gt;
-&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="nt"&gt;&amp;lt;a&lt;/span&gt; &lt;span class="na"&gt;href=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;http://maps.google.com/maps?daddr=42+Pierce+Ave%2C+Midland+Park%2C+&lt;span class="caps"&gt;NJ&lt;/span&gt;+07432&amp;quot;&lt;/span&gt;&lt;span class="nt"&gt;&amp;gt;&lt;/span&gt;Get Directions&lt;span class="nt"&gt;&amp;lt;/a&amp;gt;&lt;/span&gt;
-&lt;/pre&gt;&lt;/div&gt;
-
-
-&lt;p&gt;It just uses a regular Google Maps &lt;span class="caps"&gt;URL&lt;/span&gt;, with the destination address
-encoded. When the link is clicked in the Android browser, a dialog pops
-up asking the user whether he wants to open it with the browser or the
-Maps application. If Maps is selected, it automatically opens with the
-address from the &lt;span class="caps"&gt;URL&lt;/span&gt; in the destination input box, the phone&amp;#8217;s current
-location as the start input, and gives easy access to directions and&amp;nbsp;navigation.&lt;/p&gt;
-&lt;p&gt;The telephone links are a bit more interesting. Apparently, the Android
-browser uses the Phone app to handle the &amp;#8220;tel&amp;#8221; scheme, as defined by
-&lt;a href="http://tools.ietf.org/html/rfc3966"&gt;&lt;span class="caps"&gt;RFC&lt;/span&gt; 3966&lt;/a&gt;.Therefore, clicking a
-link&amp;nbsp;like:&lt;/p&gt;
-&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="nt"&gt;&amp;lt;a&lt;/span&gt; &lt;span class="na"&gt;href=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;tel:2015555555&amp;quot;&lt;/span&gt;&lt;span class="nt"&gt;&amp;gt;&lt;/span&gt;201-555-5555&lt;span class="nt"&gt;&amp;lt;/a&amp;gt;&lt;/span&gt;
-&lt;/pre&gt;&lt;/div&gt;
-
-
-&lt;p&gt;on Android will bring up the Phone app and pre-enter the digits for
-2015555555. Luckily, it doesn&amp;#8217;t automatically dial the number. If you
-want to give it a try and are using Android:
-&lt;a href="tel:2015555555"&gt;201-555-5555&lt;/a&gt;.&lt;/p&gt;
-&lt;p&gt;The final step is how to implement this. I don&amp;#8217;t know if most mobile
-browsers (Blackberry? iPhone?) also support the &amp;#8220;tel&amp;#8221; &lt;span class="caps"&gt;URI&lt;/span&gt; scheme, or how
-they&amp;#8217;ll handle Google Maps links. But if you&amp;#8217;re looking to include
-Android-specific content, the user agent string from my Motorola Droid
-(Android 2.0) looks&amp;nbsp;like:&lt;/p&gt;
-&lt;div class="codehilite"&gt;&lt;pre&gt;Mozilla/5.0 (Linux; U;Android 2.0; en-us; Droid Build/ESD20) AppleWebKit/530.17 (KHTML, like Gecko) Version/4.0 Mobile Safari/530.17
-&lt;/pre&gt;&lt;/div&gt;
-
-
-&lt;p&gt;I know that there are a number of &lt;span class="caps"&gt;PHP&lt;/span&gt; classes out there to detect
-browsers (like &lt;a href="http://chrisschuld.com/projects/browser-php-detecting-a-users-browser-from-php/"&gt;Chris Schuld&amp;#8217;s
-browser.php&lt;/a&gt;)
-and some things to detect mobile device capabilities (like
-&lt;a href="http://wurfl.sourceforge.net/nphp/"&gt;&lt;span class="caps"&gt;WURFL&lt;/span&gt;&lt;/a&gt; or &lt;a href="http://freshmeat.net/projects/tera_wurfl/"&gt;Tera
-&lt;span class="caps"&gt;WURFL&lt;/span&gt;&lt;/a&gt;, both using the
-&lt;a href="http://en.wikipedia.org/wiki/Wurfl"&gt;&lt;span class="caps"&gt;WURFL&lt;/span&gt;&lt;/a&gt; data). However, if you just
-need to know whether your user is on Android or not, I&amp;#8217;d personally
-recommend just checking the user agent string for &amp;#8220;Linux&amp;#8221;, &amp;#8220;Android&amp;#8221; and
-&amp;#8220;WebKit&amp;#8221; until a better browser identification system is found, as these
-are not likely to change in the near&amp;nbsp;future.&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Sun, 22 Nov 2009 10:25:00 -0500</pubDate><guid>tag:blog.jasonantman.com,2009-11-22:2009/11/android-links-maps-dial-a-phone-number/</guid><category>android</category><category>google</category><category>html</category></item></channel></rss>
+&lt;p&gt;The &amp;#8220;Get …&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Sun, 22 Nov 2009 10:25:00 -0500</pubDate><guid isPermaLink="false">tag:blog.jasonantman.com,2009-11-22:/2009/11/android-links-maps-dial-a-phone-number/</guid><category>android</category><category>google</category><category>html</category></item></channel></rss>

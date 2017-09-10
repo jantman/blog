@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Jason Antman's Blog</title><link href="http://blog.jasonantman.com/" rel="alternate"></link><link href="http://blog.jasonantman.com/feeds/tags/restore.atom.xml" rel="self"></link><id>http://blog.jasonantman.com/</id><updated>2014-07-25T10:09:00-04:00</updated><entry><title>Session Save and Restore with Bash and GNU Screen</title><link href="http://blog.jasonantman.com/2014/07/session-save-and-restore-with-bash-and-gnu-screen/" rel="alternate"></link><updated>2014-07-25T10:09:00-04:00</updated><author><name>Jason Antman</name></author><id>tag:blog.jasonantman.com,2014-07-25:2014/07/session-save-and-restore-with-bash-and-gnu-screen/</id><summary type="html">&lt;p&gt;I&amp;#8217;ve been using &lt;a href="http://www.gnu.org/software/screen/"&gt;&lt;span class="caps"&gt;GNU&lt;/span&gt; Screen&lt;/a&gt; for a very long time; I pretty much do &lt;em&gt;all&lt;/em&gt; of my
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Jason Antman's Blog - restore</title><link href="http://blog.jasonantman.com/" rel="alternate"></link><link href="http://blog.jasonantman.com/feeds/tags/restore.atom.xml" rel="self"></link><id>http://blog.jasonantman.com/</id><updated>2014-07-25T10:09:00-04:00</updated><entry><title>Session Save and Restore with Bash and GNU Screen</title><link href="http://blog.jasonantman.com/2014/07/session-save-and-restore-with-bash-and-gnu-screen/" rel="alternate"></link><published>2014-07-25T10:09:00-04:00</published><updated>2014-07-25T10:09:00-04:00</updated><author><name>Jason Antman</name></author><id>tag:blog.jasonantman.com,2014-07-25:/2014/07/session-save-and-restore-with-bash-and-gnu-screen/</id><summary type="html">&lt;p&gt;How to automatically save and restore &lt;span class="caps"&gt;GNU&lt;/span&gt; screen sessions including windows, pwd and&amp;nbsp;history&lt;/p&gt;</summary><content type="html">&lt;p&gt;I&amp;#8217;ve been using &lt;a href="http://www.gnu.org/software/screen/"&gt;&lt;span class="caps"&gt;GNU&lt;/span&gt; Screen&lt;/a&gt; for a very long time; I pretty much do &lt;em&gt;all&lt;/em&gt; of my
 daily work in it. I have long-lived screen sessions pretty much everywhere; at any given time, I&amp;#8217;ve got a session running
 on my desktop (that probably has 19 windows open and active) and a few on various remote hosts. I also have a really
 bad habit of using screen windows to hold work in progress, things that I need to revisit, and what I want to do
@@ -20,52 +20,52 @@ However, this still really isn&amp;#8217;t what I&amp;#8217;d call &amp;#8220;se
 but everything else was left to my&amp;nbsp;memory.&lt;/p&gt;
 &lt;p&gt;Enter some awful &lt;code&gt;bashrc&lt;/code&gt; hackery. Please note that my bashrc is a bit complicated, mainly due to git completion
 and getting a proper prompt for python virtualenvs, but here&amp;#8217;s the magic&amp;nbsp;portion:&lt;/p&gt;
-&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="c"&gt;# git prompt - make it work everywhere&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="c1"&gt;# git prompt - make it work everywhere&lt;/span&gt;
 &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="o"&gt;[[&lt;/span&gt; -e /usr/share/git/completion/git-prompt.sh &lt;span class="o"&gt;]]&lt;/span&gt;
 &lt;span class="k"&gt;then&lt;/span&gt;
-&lt;span class="k"&gt;    &lt;/span&gt;&lt;span class="nb"&gt;source&lt;/span&gt; /usr/share/git/completion/git-prompt.sh
+    &lt;span class="nb"&gt;source&lt;/span&gt; /usr/share/git/completion/git-prompt.sh
 &lt;span class="k"&gt;elif&lt;/span&gt; &lt;span class="o"&gt;[[&lt;/span&gt; -e /usr/share/git-core/contrib/completion/git-prompt.sh &lt;span class="o"&gt;]]&lt;/span&gt;
 &lt;span class="k"&gt;then&lt;/span&gt;
-&lt;span class="k"&gt;    &lt;/span&gt;&lt;span class="nb"&gt;source&lt;/span&gt; /usr/share/git-core/contrib/completion/git-prompt.sh
+    &lt;span class="nb"&gt;source&lt;/span&gt; /usr/share/git-core/contrib/completion/git-prompt.sh
 &lt;span class="k"&gt;elif&lt;/span&gt; &lt;span class="o"&gt;[[&lt;/span&gt; -e ~/bin/git-prompt.sh &lt;span class="o"&gt;]]&lt;/span&gt;
 &lt;span class="k"&gt;then&lt;/span&gt;
-&lt;span class="k"&gt;    &lt;/span&gt;&lt;span class="nb"&gt;source&lt;/span&gt; ~/bin/git-prompt.sh
+    &lt;span class="nb"&gt;source&lt;/span&gt; ~/bin/git-prompt.sh
 &lt;span class="k"&gt;fi&lt;/span&gt;
 
-&lt;span class="c"&gt;#set the &lt;span class="caps"&gt;PROMPT&lt;/span&gt;&lt;/span&gt;
-&lt;span class="nv"&gt;cur_tty&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="k"&gt;$(&lt;/span&gt;&lt;span class="nv"&gt;temp&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="k"&gt;$(&lt;/span&gt;tty&lt;span class="k"&gt;)&lt;/span&gt; ; &lt;span class="nb"&gt;echo&lt;/span&gt; &lt;span class="k"&gt;${&lt;/span&gt;&lt;span class="nv"&gt;temp&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="nv"&gt;5&lt;/span&gt;&lt;span class="k"&gt;})&lt;/span&gt;;
-&lt;span class="c"&gt;# git prompt configutation&lt;/span&gt;
-&lt;span class="nv"&gt;GIT_PS1_SHOWDIRTYSTATE&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;1
-&lt;span class="nv"&gt;GIT_PS1_SHOWUNTRACKEDFILES&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;1
+&lt;span class="c1"&gt;#set the &lt;span class="caps"&gt;PROMPT&lt;/span&gt;&lt;/span&gt;
+&lt;span class="nv"&gt;cur_tty&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="k"&gt;$(&lt;/span&gt;&lt;span class="nv"&gt;temp&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="k"&gt;$(&lt;/span&gt;tty&lt;span class="k"&gt;)&lt;/span&gt; &lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="nb"&gt;echo&lt;/span&gt; &lt;span class="si"&gt;${&lt;/span&gt;&lt;span class="nv"&gt;temp&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="nv"&gt;5&lt;/span&gt;&lt;span class="si"&gt;}&lt;/span&gt;&lt;span class="k"&gt;)&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="c1"&gt;# git prompt configutation&lt;/span&gt;
+&lt;span class="nv"&gt;GIT_PS1_SHOWDIRTYSTATE&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="m"&gt;1&lt;/span&gt;
+&lt;span class="nv"&gt;GIT_PS1_SHOWUNTRACKEDFILES&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="m"&gt;1&lt;/span&gt;
 &lt;span class="nv"&gt;GIT_PS1_SHOWUPSTREAM&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;auto&amp;quot;&lt;/span&gt;
-&lt;span class="nv"&gt;GIT_PS1_SHOWCOLORHINTS&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;1
+&lt;span class="nv"&gt;GIT_PS1_SHOWCOLORHINTS&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="m"&gt;1&lt;/span&gt;
 
-&lt;span class="c"&gt;# for screen session-saving hack, set per-window history file if in screen&lt;/span&gt;
-&lt;span class="o"&gt;[[&lt;/span&gt; -n &lt;span class="s2"&gt;&amp;quot;$&lt;span class="caps"&gt;STY&lt;/span&gt;&amp;quot;&lt;/span&gt; &lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt; -n &lt;span class="s2"&gt;&amp;quot;$&lt;span class="caps"&gt;WINDOW&lt;/span&gt;&amp;quot;&lt;/span&gt; &lt;span class="o"&gt;]]&lt;/span&gt; &lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class="nb"&gt;export &lt;/span&gt;&lt;span class="nv"&gt;&lt;span class="caps"&gt;HISTFILE&lt;/span&gt;&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="k"&gt;$(&lt;/span&gt;readlink -f ~/.screenhist/&lt;span class="nv"&gt;$&lt;span class="caps"&gt;WINDOW&lt;/span&gt;&lt;/span&gt;&lt;span class="k"&gt;)&lt;/span&gt;
+&lt;span class="c1"&gt;# for screen session-saving hack, set per-window history file if in screen&lt;/span&gt;
+&lt;span class="o"&gt;[[&lt;/span&gt; -n &lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="nv"&gt;$&lt;span class="caps"&gt;STY&lt;/span&gt;&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt; &lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt; -n &lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="nv"&gt;$&lt;span class="caps"&gt;WINDOW&lt;/span&gt;&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt; &lt;span class="o"&gt;]]&lt;/span&gt; &lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class="nb"&gt;export&lt;/span&gt; &lt;span class="nv"&gt;&lt;span class="caps"&gt;HISTFILE&lt;/span&gt;&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="k"&gt;$(&lt;/span&gt;readlink -f ~/.screenhist/&lt;span class="nv"&gt;$&lt;span class="caps"&gt;WINDOW&lt;/span&gt;&lt;/span&gt;&lt;span class="k"&gt;)&lt;/span&gt;
 &lt;span class="nb"&gt;shopt&lt;/span&gt; -s histappend
 
-&lt;span class="c"&gt;# make sure our screen session-saving hack directories exist&lt;/span&gt;
+&lt;span class="c1"&gt;# make sure our screen session-saving hack directories exist&lt;/span&gt;
 &lt;span class="o"&gt;[[&lt;/span&gt; -d ~/.screenhist &lt;span class="o"&gt;]]&lt;/span&gt; &lt;span class="o"&gt;||&lt;/span&gt; mkdir ~/.screenhist
 &lt;span class="o"&gt;[[&lt;/span&gt; -d ~/.screendirs &lt;span class="o"&gt;]]&lt;/span&gt; &lt;span class="o"&gt;||&lt;/span&gt; mkdir ~/.screendirs
 
 __wrap_git_ps1 &lt;span class="o"&gt;()&lt;/span&gt;
 &lt;span class="o"&gt;{&lt;/span&gt;
-    &lt;span class="c"&gt;# commands here now get executed every time bash constructs a prompt&lt;/span&gt;
-    &lt;span class="c"&gt;# for screen pwd saving&lt;/span&gt;
-    &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="o"&gt;[[&lt;/span&gt; -n &lt;span class="s2"&gt;&amp;quot;$&lt;span class="caps"&gt;STY&lt;/span&gt;&amp;quot;&lt;/span&gt; &lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt; -n &lt;span class="s2"&gt;&amp;quot;$&lt;span class="caps"&gt;WINDOW&lt;/span&gt;&amp;quot;&lt;/span&gt; &lt;span class="o"&gt;]]&lt;/span&gt;
+    &lt;span class="c1"&gt;# commands here now get executed every time bash constructs a prompt&lt;/span&gt;
+    &lt;span class="c1"&gt;# for screen pwd saving&lt;/span&gt;
+    &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="o"&gt;[[&lt;/span&gt; -n &lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="nv"&gt;$&lt;span class="caps"&gt;STY&lt;/span&gt;&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt; &lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt; -n &lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="nv"&gt;$&lt;span class="caps"&gt;WINDOW&lt;/span&gt;&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt; &lt;span class="o"&gt;]]&lt;/span&gt;
     &lt;span class="k"&gt;then&lt;/span&gt;
-&lt;span class="k"&gt;        &lt;/span&gt;&lt;span class="nv"&gt;&lt;span class="caps"&gt;SCREENLINKDIR&lt;/span&gt;&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="k"&gt;$(&lt;/span&gt;readlink -f ~/.screendirs&lt;span class="k"&gt;)&lt;/span&gt;
+        &lt;span class="nv"&gt;&lt;span class="caps"&gt;SCREENLINKDIR&lt;/span&gt;&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="k"&gt;$(&lt;/span&gt;readlink -f ~/.screendirs&lt;span class="k"&gt;)&lt;/span&gt;
         rm -f &lt;span class="nv"&gt;$&lt;span class="caps"&gt;SCREENLINKDIR&lt;/span&gt;&lt;/span&gt;/&lt;span class="nv"&gt;$&lt;span class="caps"&gt;WINDOW&lt;/span&gt;&lt;/span&gt;
         ln -sf &lt;span class="k"&gt;$(&lt;/span&gt;&lt;span class="nb"&gt;pwd&lt;/span&gt;&lt;span class="k"&gt;)&lt;/span&gt;/ &lt;span class="nv"&gt;$&lt;span class="caps"&gt;SCREENLINKDIR&lt;/span&gt;&lt;/span&gt;/&lt;span class="nv"&gt;$&lt;span class="caps"&gt;WINDOW&lt;/span&gt;&lt;/span&gt;
     &lt;span class="k"&gt;fi&lt;/span&gt;
-    &lt;span class="c"&gt;# virtualenv stuff for prompt&lt;/span&gt;
+    &lt;span class="c1"&gt;# virtualenv stuff for prompt&lt;/span&gt;
     &lt;span class="nv"&gt;venv&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;&amp;#39;&lt;/span&gt;
-    &lt;span class="o"&gt;[[&lt;/span&gt; &lt;span class="nv"&gt;$VIRTUAL_ENV&lt;/span&gt; !&lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;&amp;quot;&lt;/span&gt; &lt;span class="o"&gt;]]&lt;/span&gt; &lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class="nv"&gt;venv&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;\[\033[31m\](${VIRTUAL_ENV##*/})\e[0m&amp;quot;&lt;/span&gt;
-    __git_ps1 &lt;span class="s2"&gt;&amp;quot;$venv\u@\h:$cur_tty:\w&amp;quot;&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;\\\$ &amp;quot;&lt;/span&gt;
+    &lt;span class="o"&gt;[[&lt;/span&gt; &lt;span class="nv"&gt;$VIRTUAL_ENV&lt;/span&gt; !&lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;&amp;quot;&lt;/span&gt; &lt;span class="o"&gt;]]&lt;/span&gt; &lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class="nv"&gt;venv&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;\[\033[31m\](&lt;/span&gt;&lt;span class="si"&gt;${&lt;/span&gt;&lt;span class="nv"&gt;VIRTUAL_ENV&lt;/span&gt;&lt;span class="p"&gt;##*/&lt;/span&gt;&lt;span class="si"&gt;}&lt;/span&gt;&lt;span class="s2"&gt;)\e[0m&amp;quot;&lt;/span&gt;
+    __git_ps1 &lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="nv"&gt;$venv&lt;/span&gt;&lt;span class="s2"&gt;\u@\h:&lt;/span&gt;&lt;span class="nv"&gt;$cur_tty&lt;/span&gt;&lt;span class="s2"&gt;:\w&amp;quot;&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;\\\$ &amp;quot;&lt;/span&gt;
     &lt;span class="nb"&gt;history&lt;/span&gt; -a
 &lt;span class="o"&gt;}&lt;/span&gt;
 &lt;span class="nv"&gt;PROMPT_COMMAND&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;__wrap_git_ps1&amp;#39;&lt;/span&gt;
-&lt;span class="nb"&gt;export &lt;/span&gt;&lt;span class="nv"&gt;&lt;span class="caps"&gt;PS2&lt;/span&gt;&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&amp;gt; &amp;quot;&lt;/span&gt;
+&lt;span class="nb"&gt;export&lt;/span&gt; &lt;span class="nv"&gt;&lt;span class="caps"&gt;PS2&lt;/span&gt;&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&amp;gt; &amp;quot;&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 
 
@@ -88,12 +88,12 @@ git-specific information, and then sets &lt;code&gt;PS1&lt;/code&gt; correctly. 
 current history, to make sure the history on disk is always accurate and&amp;nbsp;up-to-date.&lt;/p&gt;
 &lt;p&gt;This works in combination with the &lt;a href="https://github.com/jantman/misc-scripts/blob/master/savescreen.py"&gt;latest version&lt;/a&gt;
 of savescreen.py, which has some minor changes. The line to create each window,&amp;nbsp;formerly:&lt;/p&gt;
-&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="n"&gt;fh&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;write&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;screen -t &lt;/span&gt;&lt;span class="se"&gt;\&amp;quot;&lt;/span&gt;&lt;span class="s"&gt;{name}&lt;/span&gt;&lt;span class="se"&gt;\&amp;quot;&lt;/span&gt;&lt;span class="s"&gt; {num}&lt;/span&gt;&lt;span class="se"&gt;\n&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;format&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;name&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="n"&gt;windows&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;n&lt;/span&gt;&lt;span class="p"&gt;],&lt;/span&gt; &lt;span class="n"&gt;num&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="n"&gt;n&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;fh&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;write&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;screen -t &lt;/span&gt;&lt;span class="se"&gt;\&amp;quot;&lt;/span&gt;&lt;span class="s2"&gt;{name}&lt;/span&gt;&lt;span class="se"&gt;\&amp;quot;&lt;/span&gt;&lt;span class="s2"&gt; {num}&lt;/span&gt;&lt;span class="se"&gt;\n&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;format&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;name&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="n"&gt;windows&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;n&lt;/span&gt;&lt;span class="p"&gt;],&lt;/span&gt; &lt;span class="n"&gt;num&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="n"&gt;n&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 
 
 &lt;p&gt;becomes:&lt;/p&gt;
-&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="n"&gt;fh&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;write&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;screen -t &lt;/span&gt;&lt;span class="se"&gt;\&amp;quot;&lt;/span&gt;&lt;span class="s"&gt;{name}&lt;/span&gt;&lt;span class="se"&gt;\&amp;quot;&lt;/span&gt;&lt;span class="s"&gt; {num} sh -c &lt;/span&gt;&lt;span class="se"&gt;\&amp;quot;&lt;/span&gt;&lt;span class="s"&gt;cd $(readlink -fn {dirpath}/{num}); bash&lt;/span&gt;&lt;span class="se"&gt;\&amp;quot;\n&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;format&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;name&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="n"&gt;windows&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;n&lt;/span&gt;&lt;span class="p"&gt;],&lt;/span&gt; &lt;span class="n"&gt;num&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="n"&gt;n&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;dirpath&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="n"&gt;dirpath&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;fh&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;write&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;screen -t &lt;/span&gt;&lt;span class="se"&gt;\&amp;quot;&lt;/span&gt;&lt;span class="s2"&gt;{name}&lt;/span&gt;&lt;span class="se"&gt;\&amp;quot;&lt;/span&gt;&lt;span class="s2"&gt; {num} sh -c &lt;/span&gt;&lt;span class="se"&gt;\&amp;quot;&lt;/span&gt;&lt;span class="s2"&gt;cd $(readlink -fn {dirpath}/{num}); bash&lt;/span&gt;&lt;span class="se"&gt;\&amp;quot;\n&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;format&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;name&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="n"&gt;windows&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;n&lt;/span&gt;&lt;span class="p"&gt;],&lt;/span&gt; &lt;span class="n"&gt;num&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="n"&gt;n&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;dirpath&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="n"&gt;dirpath&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 
 
@@ -112,4 +112,4 @@ working directory, and that window&amp;#8217;s&amp;nbsp;history.&lt;/p&gt;
    as a different&amp;nbsp;user.&lt;/li&gt;
 &lt;li&gt;I&amp;#8217;m thinking about rolling in some method of automatic &lt;code&gt;virtualenv&lt;/code&gt; activation (since it,
    unfortunately, doesn&amp;#8217;t have anything like &lt;code&gt;.rvmrc&lt;/code&gt;). Maybe in the next&amp;nbsp;version.&lt;/li&gt;
-&lt;/ol&gt;</summary><category term="bash"></category><category term="screen"></category><category term="restore"></category><category term="bashrc"></category></entry></feed>
+&lt;/ol&gt;</content><category term="bash"></category><category term="screen"></category><category term="restore"></category><category term="bashrc"></category></entry></feed>

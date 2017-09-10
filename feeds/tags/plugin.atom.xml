@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Jason Antman's Blog</title><link href="http://blog.jasonantman.com/" rel="alternate"></link><link href="http://blog.jasonantman.com/feeds/tags/plugin.atom.xml" rel="self"></link><id>http://blog.jasonantman.com/</id><updated>2012-02-29T20:32:00-05:00</updated><entry><title>Nagios Check Plugin for Linode Monthly Bandwidth Usage</title><link href="http://blog.jasonantman.com/2012/02/nagios-check-plugin-for-linode-monthly-bandwidth-usage/" rel="alternate"></link><updated>2012-02-29T20:32:00-05:00</updated><author><name>admin</name></author><id>tag:blog.jasonantman.com,2012-02-29:2012/02/nagios-check-plugin-for-linode-monthly-bandwidth-usage/</id><summary type="html">&lt;p&gt;Since I have most of my public-facing stuff hosted with
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Jason Antman's Blog - plugin</title><link href="http://blog.jasonantman.com/" rel="alternate"></link><link href="http://blog.jasonantman.com/feeds/tags/plugin.atom.xml" rel="self"></link><id>http://blog.jasonantman.com/</id><updated>2012-02-29T20:32:00-05:00</updated><entry><title>Nagios Check Plugin for Linode Monthly Bandwidth Usage</title><link href="http://blog.jasonantman.com/2012/02/nagios-check-plugin-for-linode-monthly-bandwidth-usage/" rel="alternate"></link><published>2012-02-29T20:32:00-05:00</published><updated>2012-02-29T20:32:00-05:00</updated><author><name>admin</name></author><id>tag:blog.jasonantman.com,2012-02-29:/2012/02/nagios-check-plugin-for-linode-monthly-bandwidth-usage/</id><summary type="html">&lt;p&gt;Since I have most of my public-facing stuff hosted with
+&lt;a href="http://www.linode.com/?r=5c8ad2931b410b55455aadbcf0a8d86d6f698a91"&gt;Linode&lt;/a&gt;,
+and I have a monthly bandwidth cap (albeit one that I&amp;#8217;ll probably never
+come close to), I decided that it would be a good idea to add my monthly
+bandwidth usage to my monitoring system. Luckily, Linode offers …&lt;/p&gt;</summary><content type="html">&lt;p&gt;Since I have most of my public-facing stuff hosted with
 &lt;a href="http://www.linode.com/?r=5c8ad2931b410b55455aadbcf0a8d86d6f698a91"&gt;Linode&lt;/a&gt;,
 and I have a monthly bandwidth cap (albeit one that I&amp;#8217;ll probably never
 come close to), I decided that it would be a good idea to add my monthly
@@ -19,9 +23,9 @@ instead of
 About the only thing unusual is that I store my &lt;span class="caps"&gt;API&lt;/span&gt; keys in a perl
 module, so you&amp;#8217;ll need to create something like this in your plugin
 directory (usually &lt;code&gt;/usr/lib/nagios/plugins&lt;/code&gt;:&lt;/p&gt;
-&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="nb"&gt;package&lt;/span&gt; &lt;span class="n"&gt;api_keys&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="k"&gt;package&lt;/span&gt; &lt;span class="nn"&gt;api_keys&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
 
-&lt;span class="nb"&gt;require&lt;/span&gt; &lt;span class="n"&gt;Exporter&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="k"&gt;require&lt;/span&gt; &lt;span class="nn"&gt;Exporter&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
 &lt;span class="nv"&gt;@&lt;span class="caps"&gt;ISA&lt;/span&gt;&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="sx"&gt;qw(Exporter)&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
 &lt;span class="nv"&gt;@EXPORT_OK&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="sx"&gt;qw($API_KEY_LINODE)&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
 
@@ -37,7 +41,7 @@ The current version is also below. It&amp;#8217;s free for anyone to use under t
 terms of &lt;a href="http://www.gnu.org/licenses/gpl.html"&gt;&lt;span class="caps"&gt;GNU&lt;/span&gt; GPLv3&lt;/a&gt;, though I
 would really like it if any changes/patches/updates are sent back to me
 for inclusion in the latest&amp;nbsp;version.&lt;/p&gt;
-&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="c1"&gt;#! /usr/bin/perl -w&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="ch"&gt;#! /usr/bin/perl -w&lt;/span&gt;
 
 &lt;span class="c1"&gt;# check_linode_transfer.pl Copyright (C) 2012 Jason Antman &lt;/span&gt;
 &lt;span class="c1"&gt;#&lt;/span&gt;
@@ -75,37 +79,37 @@ for inclusion in the latest&amp;nbsp;version.&lt;/p&gt;
 &lt;span class="c1"&gt;#  $LastChangedRevision$&lt;/span&gt;
 &lt;span class="c1"&gt;#&lt;/span&gt;
 
-&lt;span class="k"&gt;use&lt;/span&gt; &lt;span class="n"&gt;strict&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
-&lt;span class="k"&gt;use&lt;/span&gt; &lt;span class="n"&gt;English&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
-&lt;span class="k"&gt;use&lt;/span&gt; &lt;span class="nn"&gt;Getopt::&lt;/span&gt;&lt;span class="n"&gt;Long&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
-&lt;span class="k"&gt;use&lt;/span&gt; &lt;span class="n"&gt;vars&lt;/span&gt; &lt;span class="sx"&gt;qw($&lt;span class="caps"&gt;PROGNAME&lt;/span&gt; $&lt;span class="caps"&gt;REVISION&lt;/span&gt;)&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
-&lt;span class="k"&gt;use&lt;/span&gt; &lt;span class="n"&gt;lib&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;/usr/lib/nagios/plugins&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
-&lt;span class="k"&gt;use&lt;/span&gt; &lt;span class="n"&gt;utils&lt;/span&gt; &lt;span class="sx"&gt;qw (%&lt;span class="caps"&gt;ERRORS&lt;/span&gt; &lt;/span&gt;&lt;span class="o"&gt;&amp;amp;&lt;/span&gt;&lt;span class="n"&gt;print_revision&lt;/span&gt; &lt;span class="o"&gt;&amp;amp;&lt;/span&gt;&lt;span class="n"&gt;support&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
-&lt;span class="k"&gt;use&lt;/span&gt; &lt;span class="n"&gt;api_keys&lt;/span&gt; &lt;span class="sx"&gt;qw($API_KEY_LINODE)&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
-&lt;span class="k"&gt;use&lt;/span&gt; &lt;span class="nn"&gt;WebService::&lt;/span&gt;&lt;span class="n"&gt;Linode&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
-&lt;span class="k"&gt;use&lt;/span&gt; &lt;span class="nn"&gt;Data::&lt;/span&gt;&lt;span class="n"&gt;Dumper&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="k"&gt;use&lt;/span&gt; &lt;span class="nn"&gt;strict&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="k"&gt;use&lt;/span&gt; &lt;span class="nn"&gt;English&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="k"&gt;use&lt;/span&gt; &lt;span class="nn"&gt;Getopt::Long&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="k"&gt;use&lt;/span&gt; &lt;span class="nn"&gt;vars&lt;/span&gt; &lt;span class="sx"&gt;qw($&lt;span class="caps"&gt;PROGNAME&lt;/span&gt; $&lt;span class="caps"&gt;REVISION&lt;/span&gt;)&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="k"&gt;use&lt;/span&gt; &lt;span class="nn"&gt;lib&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;/usr/lib/nagios/plugins&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="k"&gt;use&lt;/span&gt; &lt;span class="nn"&gt;utils&lt;/span&gt; &lt;span class="sx"&gt;qw (%&lt;span class="caps"&gt;ERRORS&lt;/span&gt; &lt;/span&gt;&lt;span class="o"&gt;&amp;amp;&lt;/span&gt;&lt;span class="n"&gt;print_revision&lt;/span&gt; &lt;span class="o"&gt;&amp;amp;&lt;/span&gt;&lt;span class="n"&gt;support&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;span class="k"&gt;use&lt;/span&gt; &lt;span class="nn"&gt;api_keys&lt;/span&gt; &lt;span class="sx"&gt;qw($API_KEY_LINODE)&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="k"&gt;use&lt;/span&gt; &lt;span class="nn"&gt;WebService::Linode&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="k"&gt;use&lt;/span&gt; &lt;span class="nn"&gt;Data::Dumper&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
 
-&lt;span class="k"&gt;sub &lt;/span&gt;&lt;span class="nf"&gt;print_help&lt;/span&gt; &lt;span class="p"&gt;();&lt;/span&gt;
-&lt;span class="p"&gt;sub print_usage ();&lt;/span&gt;
+&lt;span class="k"&gt;sub&lt;/span&gt; &lt;span class="nf"&gt;print_help&lt;/span&gt; &lt;span class="p"&gt;();&lt;/span&gt;
+&lt;span class="k"&gt;sub&lt;/span&gt; &lt;span class="nf"&gt;print_usage&lt;/span&gt; &lt;span class="p"&gt;();&lt;/span&gt;
 
-&lt;span class="p"&gt;my ($opt_c, $opt_w, $opt_h, $opt_V, $opt_s, $opt_S, $opt_l, $opt_H);&lt;/span&gt;
-&lt;span class="p"&gt;my ($result, $message);&lt;/span&gt;
+&lt;span class="k"&gt;my&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;$opt_c&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nv"&gt;$opt_w&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nv"&gt;$opt_h&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nv"&gt;$opt_V&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nv"&gt;$opt_s&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nv"&gt;$opt_S&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nv"&gt;$opt_l&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nv"&gt;$opt_H&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;span class="k"&gt;my&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;$result&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nv"&gt;$message&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
 
-&lt;span class="p"&gt;$&lt;span class="caps"&gt;PROGNAME&lt;/span&gt;=&amp;quot;check_linode_transfer.pl&amp;quot;;&lt;/span&gt;
-&lt;span class="p"&gt;$&lt;span class="caps"&gt;REVISION&lt;/span&gt;=&amp;#39;1.0&amp;#39;;&lt;/span&gt;
+&lt;span class="nv"&gt;$&lt;span class="caps"&gt;PROGNAME&lt;/span&gt;&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;check_linode_transfer.pl&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="nv"&gt;$&lt;span class="caps"&gt;REVISION&lt;/span&gt;&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;1.0&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
 
-&lt;span class="p"&gt;$opt_w = 60;&lt;/span&gt;
-&lt;span class="p"&gt;$opt_c = 80;&lt;/span&gt;
+&lt;span class="nv"&gt;$opt_w&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;60&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="nv"&gt;$opt_c&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;80&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
 
-&lt;span class="p"&gt;Getopt::Long::Configure(&amp;#39;bundling&amp;#39;);&lt;/span&gt;
-&lt;span class="p"&gt;GetOptions(&lt;/span&gt;
-&lt;span class="p"&gt;    &amp;quot;V&amp;quot;   =&amp;gt; \$opt_V, &amp;quot;version&amp;quot; =&amp;gt; \$opt_V,&lt;/span&gt;
-&lt;span class="p"&gt;    &amp;quot;h&amp;quot;   =&amp;gt; \$opt_h, &amp;quot;help&amp;quot;    =&amp;gt; \$opt_h,&lt;/span&gt;
-&lt;span class="p"&gt;    &amp;quot;w=f&amp;quot; =&amp;gt; \$opt_w, &amp;quot;warning=f&amp;quot; =&amp;gt; \$opt_w,&lt;/span&gt;
-&lt;span class="p"&gt;    &amp;quot;c=f&amp;quot; =&amp;gt; \$opt_c, &amp;quot;critical=f&amp;quot; =&amp;gt; \$opt_c&lt;/span&gt;
+&lt;span class="nn"&gt;Getopt::Long::&lt;/span&gt;&lt;span class="n"&gt;Configure&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;bundling&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;span class="n"&gt;GetOptions&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;
+    &lt;span class="s"&gt;&amp;quot;V&amp;quot;&lt;/span&gt;   &lt;span class="o"&gt;=&amp;gt;&lt;/span&gt; &lt;span class="o"&gt;\&lt;/span&gt;&lt;span class="nv"&gt;$opt_V&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;version&amp;quot;&lt;/span&gt; &lt;span class="o"&gt;=&amp;gt;&lt;/span&gt; &lt;span class="o"&gt;\&lt;/span&gt;&lt;span class="nv"&gt;$opt_V&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="s"&gt;&amp;quot;h&amp;quot;&lt;/span&gt;   &lt;span class="o"&gt;=&amp;gt;&lt;/span&gt; &lt;span class="o"&gt;\&lt;/span&gt;&lt;span class="nv"&gt;$opt_h&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;help&amp;quot;&lt;/span&gt;    &lt;span class="o"&gt;=&amp;gt;&lt;/span&gt; &lt;span class="o"&gt;\&lt;/span&gt;&lt;span class="nv"&gt;$opt_h&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="s"&gt;&amp;quot;w=f&amp;quot;&lt;/span&gt; &lt;span class="o"&gt;=&amp;gt;&lt;/span&gt; &lt;span class="o"&gt;\&lt;/span&gt;&lt;span class="nv"&gt;$opt_w&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;warning=f&amp;quot;&lt;/span&gt; &lt;span class="o"&gt;=&amp;gt;&lt;/span&gt; &lt;span class="o"&gt;\&lt;/span&gt;&lt;span class="nv"&gt;$opt_w&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="s"&gt;&amp;quot;c=f&amp;quot;&lt;/span&gt; &lt;span class="o"&gt;=&amp;gt;&lt;/span&gt; &lt;span class="o"&gt;\&lt;/span&gt;&lt;span class="nv"&gt;$opt_c&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;critical=f&amp;quot;&lt;/span&gt; &lt;span class="o"&gt;=&amp;gt;&lt;/span&gt; &lt;span class="o"&gt;\&lt;/span&gt;&lt;span class="nv"&gt;$opt_c&lt;/span&gt;
 &lt;span class="p"&gt;);&lt;/span&gt;
 
-&lt;span class="p"&gt;if ($opt_V) {&lt;/span&gt;
+&lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;$opt_V&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
     &lt;span class="n"&gt;print_revision&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;$&lt;span class="caps"&gt;PROGNAME&lt;/span&gt;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nv"&gt;$&lt;span class="caps"&gt;REVISION&lt;/span&gt;&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
     &lt;span class="nb"&gt;exit&lt;/span&gt; &lt;span class="nv"&gt;$&lt;span class="caps"&gt;ERRORS&lt;/span&gt;&lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;&lt;span class="caps"&gt;OK&lt;/span&gt;&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;};&lt;/span&gt;
 &lt;span class="p"&gt;}&lt;/span&gt;
@@ -139,14 +143,14 @@ for inclusion in the latest&amp;nbsp;version.&lt;/p&gt;
 &lt;span class="k"&gt;print&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;&lt;span class="caps"&gt;LINODE&lt;/span&gt; &lt;span class="caps"&gt;TRANSFER&lt;/span&gt; $result: $pct&amp;quot;&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;%&amp;quot;&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="s"&gt;&amp;quot; of monthly bandwidth used ($used / $pool &lt;span class="caps"&gt;GB&lt;/span&gt;)|usedBW=$used; totalBW=$pool\n&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
 &lt;span class="nb"&gt;exit&lt;/span&gt; &lt;span class="nv"&gt;$&lt;span class="caps"&gt;ERRORS&lt;/span&gt;&lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="nv"&gt;$result&lt;/span&gt;&lt;span class="p"&gt;};&lt;/span&gt;
 
-&lt;span class="k"&gt;sub &lt;/span&gt;&lt;span class="nf"&gt;print_usage&lt;/span&gt; &lt;span class="p"&gt;()&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+&lt;span class="k"&gt;sub&lt;/span&gt; &lt;span class="nf"&gt;print_usage&lt;/span&gt; &lt;span class="p"&gt;()&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
     &lt;span class="k"&gt;print&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;Usage:\n&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
     &lt;span class="k"&gt;print&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;  $&lt;span class="caps"&gt;PROGNAME&lt;/span&gt; [-w ] [-c ]\n&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
     &lt;span class="k"&gt;print&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;  $&lt;span class="caps"&gt;PROGNAME&lt;/span&gt; [-h | --help]\n&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
     &lt;span class="k"&gt;print&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;  $&lt;span class="caps"&gt;PROGNAME&lt;/span&gt; [-V | --version]\n&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
 &lt;span class="p"&gt;}&lt;/span&gt;
 
-&lt;span class="k"&gt;sub &lt;/span&gt;&lt;span class="nf"&gt;print_help&lt;/span&gt; &lt;span class="p"&gt;()&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+&lt;span class="k"&gt;sub&lt;/span&gt; &lt;span class="nf"&gt;print_help&lt;/span&gt; &lt;span class="p"&gt;()&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
     &lt;span class="n"&gt;print_revision&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;$&lt;span class="caps"&gt;PROGNAME&lt;/span&gt;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nv"&gt;$&lt;span class="caps"&gt;REVISION&lt;/span&gt;&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
     &lt;span class="k"&gt;print&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;Copyright (c) 2012 Jason Antman\n\n&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
     &lt;span class="n"&gt;print_usage&lt;/span&gt;&lt;span class="p"&gt;();&lt;/span&gt;
@@ -155,4 +159,4 @@ for inclusion in the latest&amp;nbsp;version.&lt;/p&gt;
     &lt;span class="k"&gt;print&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;\n&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
     &lt;span class="n"&gt;support&lt;/span&gt;&lt;span class="p"&gt;();&lt;/span&gt;
 &lt;span class="p"&gt;}&lt;/span&gt;
-&lt;/pre&gt;&lt;/div&gt;</summary><category term="linode"></category><category term="monitoring"></category><category term="Nagios"></category><category term="plugin"></category></entry></feed>
+&lt;/pre&gt;&lt;/div&gt;</content><category term="linode"></category><category term="monitoring"></category><category term="Nagios"></category><category term="plugin"></category></entry></feed>

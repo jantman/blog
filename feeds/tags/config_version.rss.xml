@@ -1,52 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Jason Antman's Blog</title><link>http://blog.jasonantman.com/</link><description></description><atom:link href="http://blog.jasonantman.com/feeds/tags/config_version.rss.xml" rel="self"></atom:link><lastBuildDate>Tue, 21 Aug 2012 08:55:00 -0400</lastBuildDate><item><title>Puppet facter fact for last applied configuration version</title><link>http://blog.jasonantman.com/2012/08/puppet-facter-fact-for-last-applied-configuration-version/</link><description>&lt;p&gt;For anyone else who sets the Puppet &lt;code&gt;config_version&lt;/code&gt; paramater to return
+<rss version="2.0"><channel><title>Jason Antman's Blog - config_version</title><link>http://blog.jasonantman.com/</link><description></description><lastBuildDate>Tue, 21 Aug 2012 08:55:00 -0400</lastBuildDate><item><title>Puppet facter fact for last applied configuration version</title><link>http://blog.jasonantman.com/2012/08/puppet-facter-fact-for-last-applied-configuration-version/</link><description>&lt;p&gt;For anyone else who sets the Puppet &lt;code&gt;config_version&lt;/code&gt; paramater to return
 the current &lt;span class="caps"&gt;SVN&lt;/span&gt; or Git version of your configuration, here&amp;#8217;s a fact that
 grabs that version (by parsing the cached &lt;span class="caps"&gt;YAML&lt;/span&gt; catalog) and sets it as a
 fact called &amp;#8220;catalog_config_version&amp;#8221;. It can then be used for
-sanity-checking your nodes, looking up via the Inventory Service, or you
-can display it in the Dashboard using my patch: &lt;a href="http://blog.jasonantman.com/2012/08/patch-to-puppet-dashboard-1-2-10-to-show-arbitrary-facts-in-the-main-node-table/"&gt;Patch to Puppet
-Dashboard 1.2.10 to show arbitrary facts in the main node
-table&lt;/a&gt;.&lt;/p&gt;
-&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="c1"&gt;#&lt;/span&gt;
-&lt;span class="c1"&gt;# facter fact for last applied config version, skeleton from /var/lib/puppet/client_yaml/catalog/fqdn.yaml&lt;/span&gt;
-&lt;span class="c1"&gt;#&lt;/span&gt;
-
-&lt;span class="nb"&gt;require&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;puppet&amp;#39;&lt;/span&gt;
-&lt;span class="nb"&gt;require&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;yaml&amp;#39;&lt;/span&gt;
-&lt;span class="nb"&gt;require&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;facter&amp;#39;&lt;/span&gt;
-
-&lt;span class="n"&gt;localconfig&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="no"&gt;&lt;span class="caps"&gt;ARGV&lt;/span&gt;&lt;/span&gt;&lt;span class="o"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="o"&gt;]&lt;/span&gt; &lt;span class="o"&gt;||&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="si"&gt;#{&lt;/span&gt;&lt;span class="no"&gt;Puppet&lt;/span&gt;&lt;span class="o"&gt;[&lt;/span&gt;&lt;span class="ss"&gt;:clientyamldir&lt;/span&gt;&lt;span class="o"&gt;]&lt;/span&gt;&lt;span class="si"&gt;}&lt;/span&gt;&lt;span class="s2"&gt;/catalog/&lt;/span&gt;&lt;span class="si"&gt;#{&lt;/span&gt; &lt;span class="no"&gt;Facter&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;fqdn&lt;/span&gt; &lt;span class="si"&gt;}&lt;/span&gt;&lt;span class="s2"&gt;.yaml&amp;quot;&lt;/span&gt;
-
-&lt;span class="k"&gt;unless&lt;/span&gt; &lt;span class="no"&gt;File&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;exist?&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;localconfig&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
-  &lt;span class="nb"&gt;puts&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;Can&amp;#39;t find &lt;/span&gt;&lt;span class="si"&gt;#{&lt;/span&gt; &lt;span class="no"&gt;Facter&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;fqdn&lt;/span&gt; &lt;span class="si"&gt;}&lt;/span&gt;&lt;span class="s2"&gt;.yaml&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
-  &lt;span class="nb"&gt;exit&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt;
-&lt;span class="k"&gt;end&lt;/span&gt;
-
-&lt;span class="n"&gt;lc&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="no"&gt;File&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;read&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;localconfig&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
-
-&lt;span class="k"&gt;begin&lt;/span&gt;
-  &lt;span class="n"&gt;pup&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="no"&gt;Marshal&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;load&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;lc&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
-&lt;span class="k"&gt;rescue&lt;/span&gt; &lt;span class="no"&gt;TypeError&lt;/span&gt;
-  &lt;span class="n"&gt;pup&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="no"&gt;&lt;span class="caps"&gt;YAML&lt;/span&gt;&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;load&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;lc&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
-&lt;span class="k"&gt;rescue&lt;/span&gt; &lt;span class="no"&gt;Exception&lt;/span&gt; &lt;span class="o"&gt;=&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;e&lt;/span&gt;
-  &lt;span class="k"&gt;raise&lt;/span&gt;
-&lt;span class="k"&gt;end&lt;/span&gt;
-
-&lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="n"&gt;pup&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;class&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="ss"&gt;Puppet&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="ss"&gt;:Resource&lt;/span&gt;&lt;span class="o"&gt;::&lt;/span&gt;&lt;span class="no"&gt;Catalog&lt;/span&gt;
-        &lt;span class="no"&gt;Facter&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;add&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;catalog_config_version&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="k"&gt;do&lt;/span&gt;
-                &lt;span class="n"&gt;setcode&lt;/span&gt; &lt;span class="k"&gt;do&lt;/span&gt;
-                        &lt;span class="n"&gt;pup&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;version&lt;/span&gt;
-                &lt;span class="k"&gt;end&lt;/span&gt;
-        &lt;span class="k"&gt;end&lt;/span&gt;
-&lt;span class="k"&gt;else&lt;/span&gt;
-        &lt;span class="no"&gt;Facter&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;add&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;catalog_config_version&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="k"&gt;do&lt;/span&gt;
-                &lt;span class="n"&gt;setcode&lt;/span&gt; &lt;span class="k"&gt;do&lt;/span&gt;
-                        &lt;span class="s2"&gt;&amp;quot;unknown&amp;quot;&lt;/span&gt;
-                &lt;span class="k"&gt;end&lt;/span&gt;
-        &lt;span class="k"&gt;end&lt;/span&gt;
-&lt;span class="k"&gt;end&lt;/span&gt;
-&lt;/pre&gt;&lt;/div&gt;
-
-
-&lt;p&gt;All of my facts are now available in a GitHub repository:
-&lt;a href="https://github.com/jantman/puppet-facter-facts"&gt;https://github.com/jantman/puppet-facter-facts&lt;/a&gt;.&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Tue, 21 Aug 2012 08:55:00 -0400</pubDate><guid>tag:blog.jasonantman.com,2012-08-21:2012/08/puppet-facter-fact-for-last-applied-configuration-version/</guid><category>config_version</category><category>fact</category><category>facter</category><category>puppet</category></item></channel></rss>
+sanity-checking your …&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">admin</dc:creator><pubDate>Tue, 21 Aug 2012 08:55:00 -0400</pubDate><guid isPermaLink="false">tag:blog.jasonantman.com,2012-08-21:/2012/08/puppet-facter-fact-for-last-applied-configuration-version/</guid><category>config_version</category><category>fact</category><category>facter</category><category>puppet</category></item></channel></rss>

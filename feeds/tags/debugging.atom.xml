@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Jason Antman's Blog</title><link href="http://blog.jasonantman.com/" rel="alternate"></link><link href="http://blog.jasonantman.com/feeds/tags/debugging.atom.xml" rel="self"></link><id>http://blog.jasonantman.com/</id><updated>2012-02-03T13:32:00-05:00</updated><entry><title>F5 BigIp - Manually Changing Session Persistence Cookies on the Client Side</title><link href="http://blog.jasonantman.com/2012/02/f5-bigip-manually-changing-session-persistence-cookies-on-the-client-side/" rel="alternate"></link><updated>2012-02-03T13:32:00-05:00</updated><author><name>admin</name></author><id>tag:blog.jasonantman.com,2012-02-03:2012/02/f5-bigip-manually-changing-session-persistence-cookies-on-the-client-side/</id><summary type="html">&lt;p&gt;Yesterday I was asked to help out a bit debugging issues with a site
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Jason Antman's Blog - debugging</title><link href="http://blog.jasonantman.com/" rel="alternate"></link><link href="http://blog.jasonantman.com/feeds/tags/debugging.atom.xml" rel="self"></link><id>http://blog.jasonantman.com/</id><updated>2012-02-03T13:32:00-05:00</updated><entry><title>F5 BigIp - Manually Changing Session Persistence Cookies on the Client Side</title><link href="http://blog.jasonantman.com/2012/02/f5-bigip-manually-changing-session-persistence-cookies-on-the-client-side/" rel="alternate"></link><published>2012-02-03T13:32:00-05:00</published><updated>2012-02-03T13:32:00-05:00</updated><author><name>admin</name></author><id>tag:blog.jasonantman.com,2012-02-03:/2012/02/f5-bigip-manually-changing-session-persistence-cookies-on-the-client-side/</id><summary type="html">&lt;p&gt;Yesterday I was asked to help out a bit debugging issues with a site
+that sits behind a &lt;a href="http://www.f5.com/products/big-ip/"&gt;F5 &lt;span class="caps"&gt;BIG&lt;/span&gt;-&lt;span class="caps"&gt;IP&lt;/span&gt;&lt;/a&gt; load
+balancer (&lt;span class="caps"&gt;LB&lt;/span&gt;). It&amp;#8217;s a pretty simple site, load balanced between two web
+servers. The developers were complaining about intermittent page load
+issues, so I immediately considered a …&lt;/p&gt;</summary><content type="html">&lt;p&gt;Yesterday I was asked to help out a bit debugging issues with a site
 that sits behind a &lt;a href="http://www.f5.com/products/big-ip/"&gt;F5 &lt;span class="caps"&gt;BIG&lt;/span&gt;-&lt;span class="caps"&gt;IP&lt;/span&gt;&lt;/a&gt; load
 balancer (&lt;span class="caps"&gt;LB&lt;/span&gt;). It&amp;#8217;s a pretty simple site, load balanced between two web
 servers. The developers were complaining about intermittent page load
@@ -25,7 +29,7 @@ blog&lt;/a&gt;.
 I built on that work to develop the following perl script, which can
 both encode and decode BigIP cookie &lt;span class="caps"&gt;IP&lt;/span&gt;/port values. The latest version lives
 on my &lt;a href="https://github.com/jantman/misc-scripts/blob/master/bigipcookie.pl"&gt;GitHub misc-scripts repository&lt;/a&gt;.&lt;/p&gt;
-&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="c1"&gt;#!/usr/bin/perl&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="ch"&gt;#!/usr/bin/perl&lt;/span&gt;
 
 &lt;span class="c1"&gt;#&lt;/span&gt;
 &lt;span class="c1"&gt;# Perl script to de/encode F5 BigIp persistence cookies.&lt;/span&gt;
@@ -74,8 +78,8 @@ on my &lt;a href="https://github.com/jantman/misc-scripts/blob/master/bigipcooki
 &lt;span class="c1"&gt;#   - initial version&lt;/span&gt;
 &lt;span class="c1"&gt;#&lt;/span&gt;
 
-&lt;span class="k"&gt;use&lt;/span&gt; &lt;span class="n"&gt;strict&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
-&lt;span class="k"&gt;use&lt;/span&gt; &lt;span class="n"&gt;warnings&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="k"&gt;use&lt;/span&gt; &lt;span class="nn"&gt;strict&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="k"&gt;use&lt;/span&gt; &lt;span class="nn"&gt;warnings&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
 
 &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt; &lt;span class="nv"&gt;$#&lt;span class="caps"&gt;ARGV&lt;/span&gt;&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt; &lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
     &lt;span class="k"&gt;print&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;&lt;span class="caps"&gt;USAGE&lt;/span&gt;: bigipcookie.pl \n&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
@@ -103,7 +107,7 @@ on my &lt;a href="https://github.com/jantman/misc-scripts/blob/master/bigipcooki
 
 
 &lt;p&gt;An example of the&amp;nbsp;usage:&lt;/p&gt;
-&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="go"&gt;jantman@palantir:pts/8:~/bin/misc-scripts &amp;gt; ./bigipcookie.pl 192.168.23.50:80&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="go"&gt;jantman@palantir:pts/8:~/bin/misc-scripts &amp;gt; ./bigipcookie.pl 192.168.23.50:80&lt;/span&gt;
 &lt;span class="go"&gt;840411328.20480.0000&lt;/span&gt;
 &lt;span class="go"&gt;jantman@palantir:pts/8:~/bin/misc-scripts &amp;gt; ./bigipcookie.pl 840411328.20480.0000&lt;/span&gt;
 &lt;span class="go"&gt;192.168.23.50:80&lt;/span&gt;
@@ -112,22 +116,26 @@ on my &lt;a href="https://github.com/jantman/misc-scripts/blob/master/bigipcooki
 
 &lt;p&gt;On a side note for those of your who are security-conscious: yes, of
 course, this means that if you&amp;#8217;re using BigIp with cookie persistence,
-it is disclosing the internal &lt;span class="caps"&gt;IP&lt;/span&gt; and port of your server to your end&amp;nbsp;users.&lt;/p&gt;</summary><category term="bigip"></category><category term="cookies"></category><category term="debugging"></category><category term="f5"></category><category term="load balancer"></category><category term="perl"></category><category term="persistence"></category><category term="web app"></category></entry><entry><title>Quick and Simple Timestamping of Debug Logs</title><link href="http://blog.jasonantman.com/2011/09/quick-and-simple-timestamping-of-debug-logs/" rel="alternate"></link><updated>2011-09-08T07:06:00-04:00</updated><author><name>admin</name></author><id>tag:blog.jasonantman.com,2011-09-08:2011/09/quick-and-simple-timestamping-of-debug-logs/</id><summary type="html">&lt;p&gt;I&amp;#8217;ve been having some issues that may be
+it is disclosing the internal &lt;span class="caps"&gt;IP&lt;/span&gt; and port of your server to your end&amp;nbsp;users.&lt;/p&gt;</content><category term="bigip"></category><category term="cookies"></category><category term="debugging"></category><category term="f5"></category><category term="load balancer"></category><category term="perl"></category><category term="persistence"></category><category term="web app"></category></entry><entry><title>Quick and Simple Timestamping of Debug Logs</title><link href="http://blog.jasonantman.com/2011/09/quick-and-simple-timestamping-of-debug-logs/" rel="alternate"></link><published>2011-09-08T07:06:00-04:00</published><updated>2011-09-08T07:06:00-04:00</updated><author><name>admin</name></author><id>tag:blog.jasonantman.com,2011-09-08:/2011/09/quick-and-simple-timestamping-of-debug-logs/</id><summary type="html">&lt;p&gt;I&amp;#8217;ve been having some issues that may be
+&lt;a href="http://puppetlabs.com/"&gt;Puppet&lt;/a&gt;-related. Unfortunately, Puppet (at
+least the old 0.25.4 client that I&amp;#8217;m running) doesn&amp;#8217;t timestamp the
+debug logs sent to stdout. I know it&amp;#8217;s hanging somewhere, but I need
+concrete numbers to look at. Here&amp;#8217;s …&lt;/p&gt;</summary><content type="html">&lt;p&gt;I&amp;#8217;ve been having some issues that may be
 &lt;a href="http://puppetlabs.com/"&gt;Puppet&lt;/a&gt;-related. Unfortunately, Puppet (at
 least the old 0.25.4 client that I&amp;#8217;m running) doesn&amp;#8217;t timestamp the
 debug logs sent to stdout. I know it&amp;#8217;s hanging somewhere, but I need
 concrete numbers to look at. Here&amp;#8217;s a wonderfully simple bash script
 that timestamps everything sent to it on stdin, and echoes it back to&amp;nbsp;stdout:&lt;/p&gt;
-&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="c"&gt;#!/bin/bash&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="ch"&gt;#!/bin/bash&lt;/span&gt;
 
 &lt;span class="nv"&gt;&lt;span class="caps"&gt;DATECMD&lt;/span&gt;&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;date +%H:%M:%S&amp;#39;&lt;/span&gt;
 
-&lt;span class="k"&gt;while &lt;/span&gt;&lt;span class="nb"&gt;read &lt;/span&gt;line; &lt;span class="k"&gt;do&lt;/span&gt;
-&lt;span class="k"&gt;    &lt;/span&gt;&lt;span class="nb"&gt;echo&lt;/span&gt; -e &lt;span class="s2"&gt;&amp;quot;$($&lt;span class="caps"&gt;DATECMD&lt;/span&gt;) $line&amp;quot;&lt;/span&gt;
+&lt;span class="k"&gt;while&lt;/span&gt; &lt;span class="nb"&gt;read&lt;/span&gt; line&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="k"&gt;do&lt;/span&gt;
+    &lt;span class="nb"&gt;echo&lt;/span&gt; -e &lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="k"&gt;$(&lt;/span&gt;&lt;span class="nv"&gt;$&lt;span class="caps"&gt;DATECMD&lt;/span&gt;&lt;/span&gt;&lt;span class="k"&gt;)&lt;/span&gt;&lt;span class="s2"&gt; &lt;/span&gt;&lt;span class="nv"&gt;$line&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;
 &lt;span class="k"&gt;done&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 
 
 &lt;p&gt;Call it as simply as: &lt;code&gt;command | ~/bin/ts&lt;/code&gt;, or maybe like
 &lt;code&gt;command 2&amp;gt;&amp;amp;1 | ~/bin/ts | tee foo.log&lt;/code&gt;. Dead simple, but very helpful
-when the developers didn&amp;#8217;t think to timestamp debug log&amp;nbsp;output.&lt;/p&gt;</summary><category term="debugging"></category><category term="logs"></category><category term="puppet"></category><category term="sysadmin"></category><category term="timestamp"></category></entry></feed>
+when the developers didn&amp;#8217;t think to timestamp debug log&amp;nbsp;output.&lt;/p&gt;</content><category term="debugging"></category><category term="logs"></category><category term="puppet"></category><category term="sysadmin"></category><category term="timestamp"></category></entry></feed>

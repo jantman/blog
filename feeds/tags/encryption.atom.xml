@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Jason Antman's Blog</title><link href="http://blog.jasonantman.com/" rel="alternate"></link><link href="http://blog.jasonantman.com/feeds/tags/encryption.atom.xml" rel="self"></link><id>http://blog.jasonantman.com/</id><updated>2013-08-26T06:00:00-04:00</updated><entry><title>Testing GPG Key Passphrases</title><link href="http://blog.jasonantman.com/2013/08/testing-gpg-key-passphrases/" rel="alternate"></link><updated>2013-08-26T06:00:00-04:00</updated><author><name>admin</name></author><id>tag:blog.jasonantman.com,2013-08-26:2013/08/testing-gpg-key-passphrases/</id><summary type="html">&lt;p&gt;So hypothetically, you have a &lt;span class="caps"&gt;GPG&lt;/span&gt; public/private keypair (from a backup
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Jason Antman's Blog - encryption</title><link href="http://blog.jasonantman.com/" rel="alternate"></link><link href="http://blog.jasonantman.com/feeds/tags/encryption.atom.xml" rel="self"></link><id>http://blog.jasonantman.com/</id><updated>2013-08-26T06:00:00-04:00</updated><entry><title>Testing GPG Key Passphrases</title><link href="http://blog.jasonantman.com/2013/08/testing-gpg-key-passphrases/" rel="alternate"></link><published>2013-08-26T06:00:00-04:00</published><updated>2013-08-26T06:00:00-04:00</updated><author><name>admin</name></author><id>tag:blog.jasonantman.com,2013-08-26:/2013/08/testing-gpg-key-passphrases/</id><summary type="html">&lt;p&gt;So hypothetically, you have a &lt;span class="caps"&gt;GPG&lt;/span&gt; public/private keypair (from a backup
+or old computer), but you don&amp;#8217;t remember the passphrase. Here&amp;#8217;s a
+relatively simple way to find it from a number of possible options. This
+&lt;em&gt;requires&lt;/em&gt; that you have a computer secure enough to store the possible …&lt;/p&gt;</summary><content type="html">&lt;p&gt;So hypothetically, you have a &lt;span class="caps"&gt;GPG&lt;/span&gt; public/private keypair (from a backup
 or old computer), but you don&amp;#8217;t remember the passphrase. Here&amp;#8217;s a
 relatively simple way to find it from a number of possible options. This
 &lt;em&gt;requires&lt;/em&gt; that you have a computer secure enough to store the possible
@@ -21,7 +24,7 @@ when you&amp;#8217;re&amp;nbsp;done.&lt;/p&gt;
     your keys,&amp;nbsp;etc.).&lt;/li&gt;
 &lt;li&gt;
 &lt;p&gt;First, we import the public and private keys to&amp;nbsp;&lt;span class="caps"&gt;GPG&lt;/span&gt;:&lt;/p&gt;
-&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="gp"&gt;testuser:~$&lt;/span&gt; &lt;span class="nb"&gt;cd&lt;/span&gt; .gnupg
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="gp"&gt;testuser:~$&lt;/span&gt; &lt;span class="nb"&gt;cd&lt;/span&gt; .gnupg
 &lt;span class="gp"&gt;testuser:~/.gnupg$&lt;/span&gt; gpg --import TestUser_public.key 
 &lt;span class="go"&gt;gpg: keyring `/home/testuser/.gnupg/secring.gpg` created&lt;/span&gt;
 &lt;span class="go"&gt;gpg: key &lt;span class="caps"&gt;17AD8D3D&lt;/span&gt;: public key &amp;quot;Test User (Test User) &amp;quot; imported&lt;/span&gt;
@@ -41,7 +44,7 @@ when you&amp;#8217;re&amp;nbsp;done.&lt;/p&gt;
 &lt;/li&gt;
 &lt;li&gt;
 &lt;p&gt;Check that the keys are&amp;nbsp;there:&lt;/p&gt;
-&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="gp"&gt;testuser:~/.gnupg$&lt;/span&gt; gpg --list-keys
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="gp"&gt;testuser:~/.gnupg$&lt;/span&gt; gpg --list-keys
 &lt;span class="go"&gt;/home/testuser/.gnupg/pubring.gpg&lt;/span&gt;
 &lt;span class="go"&gt;--------------------------------&lt;/span&gt;
 &lt;span class="go"&gt;pub   2048R/&lt;span class="caps"&gt;17AD8D3D&lt;/span&gt; 2013-08-24&lt;/span&gt;
@@ -74,7 +77,7 @@ when you&amp;#8217;re&amp;nbsp;done.&lt;/p&gt;
     will be destroyed when we&amp;#8217;re done. For added security, I&amp;#8217;d put this
     file on a ramdisk. In this example, the actual passphrase for the
     key is &amp;#8220;test&amp;#8221;. Here&amp;#8217;s our text&amp;nbsp;file:&lt;/p&gt;
-&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="gp"&gt;testuser:~/.gnupg$&lt;/span&gt; cat /tmp/passphrases 
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="gp"&gt;testuser:~/.gnupg$&lt;/span&gt; cat /tmp/passphrases 
 &lt;span class="go"&gt;bad&lt;/span&gt;
 &lt;span class="go"&gt;notgood&lt;/span&gt;
 &lt;span class="go"&gt;notright&lt;/span&gt;
@@ -85,14 +88,14 @@ when you&amp;#8217;re&amp;nbsp;done.&lt;/p&gt;
 &lt;/li&gt;
 &lt;li&gt;
 &lt;p&gt;Next, create a test data file to try to&amp;nbsp;sign/encrypt:&lt;/p&gt;
-&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="gp"&gt;testuser:~/.gnupg$&lt;/span&gt; &lt;span class="nb"&gt;echo&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;test input&amp;quot;&lt;/span&gt; &amp;gt; /tmp/test.in
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="gp"&gt;testuser:~/.gnupg$&lt;/span&gt; &lt;span class="nb"&gt;echo&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;test input&amp;quot;&lt;/span&gt; &amp;gt; /tmp/test.in
 &lt;/pre&gt;&lt;/div&gt;
 
 
 &lt;/li&gt;
 &lt;li&gt;
 &lt;p&gt;Now we run the actual test (see below for more&amp;nbsp;information&amp;#8230;)&lt;/p&gt;
-&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="gp"&gt;testuser:~/.gnupg$&lt;/span&gt; &lt;span class="k"&gt;for &lt;/span&gt;p in &lt;span class="sb"&gt;`&lt;/span&gt;cat /tmp/passphrases&lt;span class="sb"&gt;`&lt;/span&gt;; &lt;span class="k"&gt;do &lt;/span&gt;&lt;span class="nb"&gt;echo&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;$p&amp;quot;&lt;/span&gt; | gpg -q --sign --local-user &lt;span class="caps"&gt;17AD8D3D&lt;/span&gt; --passphrase-fd 0 --output /dev/null --yes /tmp/test.in &lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;echo&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;&lt;span class="caps"&gt;CORRECT&lt;/span&gt; passphrase: $p&amp;quot;&lt;/span&gt; &lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class="nb"&gt;break&lt;/span&gt;&lt;span class="o"&gt;)&lt;/span&gt;; &lt;span class="k"&gt;done&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="gp"&gt;testuser:~/.gnupg$&lt;/span&gt; &lt;span class="k"&gt;for&lt;/span&gt; p in &lt;span class="sb"&gt;`&lt;/span&gt;cat /tmp/passphrases&lt;span class="sb"&gt;`&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="k"&gt;do&lt;/span&gt; &lt;span class="nb"&gt;echo&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="nv"&gt;$p&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt; &lt;span class="p"&gt;|&lt;/span&gt; gpg -q --sign --local-user &lt;span class="caps"&gt;17AD8D3D&lt;/span&gt; --passphrase-fd &lt;span class="m"&gt;0&lt;/span&gt; --output /dev/null --yes /tmp/test.in &lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;echo&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;&lt;span class="caps"&gt;CORRECT&lt;/span&gt; passphrase: &lt;/span&gt;&lt;span class="nv"&gt;$p&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt; &lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class="nb"&gt;break&lt;/span&gt;&lt;span class="o"&gt;)&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="k"&gt;done&lt;/span&gt;
 &lt;span class="go"&gt;Reading passphrase from file descriptor 0&lt;/span&gt;
 
 &lt;span class="go"&gt;You need a passphrase to unlock the secret key for&lt;/span&gt;
@@ -139,9 +142,9 @@ when you&amp;#8217;re&amp;nbsp;done.&lt;/p&gt;
 &lt;/ol&gt;
 &lt;p&gt;The actual command that we ran, rewritten with some linebreaks for
 legibility,&amp;nbsp;is:&lt;/p&gt;
-&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="k"&gt;for &lt;/span&gt;p in &lt;span class="sb"&gt;`&lt;/span&gt;cat /tmp/passphrases&lt;span class="sb"&gt;`&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="k"&gt;for&lt;/span&gt; p in &lt;span class="sb"&gt;`&lt;/span&gt;cat /tmp/passphrases&lt;span class="sb"&gt;`&lt;/span&gt;
 &lt;span class="k"&gt;do&lt;/span&gt;
-&lt;span class="k"&gt;    &lt;/span&gt;&lt;span class="nb"&gt;echo&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;$p&amp;quot;&lt;/span&gt; | gpg -q --sign --local-user &lt;span class="caps"&gt;17AD8D3D&lt;/span&gt; --passphrase-fd 0 --output /dev/null --yes /tmp/test.in &lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;echo&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;&lt;span class="caps"&gt;CORRECT&lt;/span&gt; passphrase: $p&amp;quot;&lt;/span&gt; &lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class="nb"&gt;break&lt;/span&gt;&lt;span class="o"&gt;)&lt;/span&gt;
+    &lt;span class="nb"&gt;echo&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="nv"&gt;$p&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt; &lt;span class="p"&gt;|&lt;/span&gt; gpg -q --sign --local-user &lt;span class="caps"&gt;17AD8D3D&lt;/span&gt; --passphrase-fd &lt;span class="m"&gt;0&lt;/span&gt; --output /dev/null --yes /tmp/test.in &lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;echo&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;&lt;span class="caps"&gt;CORRECT&lt;/span&gt; passphrase: &lt;/span&gt;&lt;span class="nv"&gt;$p&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt; &lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class="nb"&gt;break&lt;/span&gt;&lt;span class="o"&gt;)&lt;/span&gt;
 &lt;span class="k"&gt;done&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 
@@ -155,4 +158,4 @@ command succeeds, we echo the passphrase and stop looping through the
 passphrases&amp;nbsp;file.&lt;/p&gt;
 &lt;p&gt;I hope I wouldn&amp;#8217;t have to say this for anyone who&amp;#8217;s reading my blog, but
 this information (as easy as it is to be figured out), is not to be used
-for unethical&amp;nbsp;purposes.&lt;/p&gt;</summary><category term="encryption"></category><category term="gnupg"></category><category term="gpg"></category><category term="key"></category><category term="passphrase"></category><category term="pgp"></category></entry></feed>
+for unethical&amp;nbsp;purposes.&lt;/p&gt;</content><category term="encryption"></category><category term="gnupg"></category><category term="gpg"></category><category term="key"></category><category term="passphrase"></category><category term="pgp"></category></entry></feed>

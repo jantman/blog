@@ -1,5 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Jason Antman's Blog</title><link href="http://blog.jasonantman.com/" rel="alternate"></link><link href="http://blog.jasonantman.com/feeds/tags/check-plugin.atom.xml" rel="self"></link><id>http://blog.jasonantman.com/</id><updated>2012-03-16T07:40:00-04:00</updated><entry><title>World of Warcraft Realm Status Check Plugin for Nagios</title><link href="http://blog.jasonantman.com/2012/03/world-of-warcraft-realm-status-check-plugin-for-nagios/" rel="alternate"></link><updated>2012-03-16T07:40:00-04:00</updated><author><name>admin</name></author><id>tag:blog.jasonantman.com,2012-03-16:2012/03/world-of-warcraft-realm-status-check-plugin-for-nagios/</id><summary type="html">&lt;p&gt;My wife &lt;a href="http://www.jackieantman.com/"&gt;Jackie&lt;/a&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Jason Antman's Blog - check plugin</title><link href="http://blog.jasonantman.com/" rel="alternate"></link><link href="http://blog.jasonantman.com/feeds/tags/check-plugin.atom.xml" rel="self"></link><id>http://blog.jasonantman.com/</id><updated>2012-03-16T07:40:00-04:00</updated><entry><title>World of Warcraft Realm Status Check Plugin for Nagios</title><link href="http://blog.jasonantman.com/2012/03/world-of-warcraft-realm-status-check-plugin-for-nagios/" rel="alternate"></link><published>2012-03-16T07:40:00-04:00</published><updated>2012-03-16T07:40:00-04:00</updated><author><name>admin</name></author><id>tag:blog.jasonantman.com,2012-03-16:/2012/03/world-of-warcraft-realm-status-check-plugin-for-nagios/</id><summary type="html">&lt;p&gt;My wife &lt;a href="http://www.jackieantman.com/"&gt;Jackie&lt;/a&gt;
+(&lt;a href="http://us.battle.net/wow/en/character/Arthas/Syrilia/simple"&gt;Syrilia&lt;/a&gt;)
+is an avid &lt;a href="http://en.wikipedia.org/wiki/World_of_Warcraft"&gt;World of
+Warcraft&lt;/a&gt; player (it&amp;#8217;s a
+&lt;a href="http://en.wikipedia.org/wiki/Massively_multiplayer_online_role-playing_game"&gt;&lt;span class="caps"&gt;MMORPG&lt;/span&gt;&lt;/a&gt;
+with over 10 million players). They have weekly server
+maintenance/update windows every Tuesday morning - total downtime. The
+length is never really fixed, so I looked around to see if there was a
+logical way …&lt;/p&gt;</summary><content type="html">&lt;p&gt;My wife &lt;a href="http://www.jackieantman.com/"&gt;Jackie&lt;/a&gt;
 (&lt;a href="http://us.battle.net/wow/en/character/Arthas/Syrilia/simple"&gt;Syrilia&lt;/a&gt;)
 is an avid &lt;a href="http://en.wikipedia.org/wiki/World_of_Warcraft"&gt;World of
 Warcraft&lt;/a&gt; player (it&amp;#8217;s a
@@ -30,7 +38,7 @@ live&amp;nbsp;at  &lt;/p&gt;
 If you want, you can also see a diff of my changes to Scott&amp;#8217;s original
 version on
 &lt;a href="https://github.com/jantman/nagios-scripts/commit/f84eede5256aa6621812e91f0b3b73e91f3b11e8#check_wow.pl"&gt;github&lt;/a&gt;.&lt;/p&gt;
-&lt;div class="codehilite"&gt;&lt;pre&gt;&lt;span class="c1"&gt;#!/usr/bin/perl -w&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="ch"&gt;#!/usr/bin/perl -w&lt;/span&gt;
 &lt;span class="c1"&gt;#&lt;/span&gt;
 &lt;span class="c1"&gt;# World of Warcraft Realm detector plugin for Nagios&lt;/span&gt;
 &lt;span class="c1"&gt;#&lt;/span&gt;
@@ -76,33 +84,33 @@ version on
 &lt;span class="c1"&gt;#&lt;/span&gt;
 
 &lt;span class="c1"&gt;# use modules&lt;/span&gt;
-&lt;span class="k"&gt;use&lt;/span&gt; &lt;span class="n"&gt;strict&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;             &lt;span class="c1"&gt;# good coding practices&lt;/span&gt;
-&lt;span class="k"&gt;use&lt;/span&gt; &lt;span class="nn"&gt;Getopt::&lt;/span&gt;&lt;span class="n"&gt;Long&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;           &lt;span class="c1"&gt;# command-line option parsing&lt;/span&gt;
-&lt;span class="k"&gt;use&lt;/span&gt; &lt;span class="n"&gt;&lt;span class="caps"&gt;LWP&lt;/span&gt;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;                &lt;span class="c1"&gt;# external content retrieval&lt;/span&gt;
-&lt;span class="k"&gt;use&lt;/span&gt; &lt;span class="n"&gt;&lt;span class="caps"&gt;JSON&lt;/span&gt;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;                               &lt;span class="c1"&gt;# &lt;span class="caps"&gt;JSON&lt;/span&gt; for &lt;span class="caps"&gt;API&lt;/span&gt; reply&lt;/span&gt;
-&lt;span class="k"&gt;use&lt;/span&gt; &lt;span class="n"&gt;lib&lt;/span&gt;  &lt;span class="s"&gt;&amp;quot;/usr/lib/nagios/plugins&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="c1"&gt;# nagios plugins&lt;/span&gt;
-&lt;span class="k"&gt;use&lt;/span&gt; &lt;span class="n"&gt;utils&lt;/span&gt; &lt;span class="sx"&gt;qw(%&lt;span class="caps"&gt;ERRORS&lt;/span&gt; &amp;amp;print_revision &amp;amp;support &amp;amp;usage )&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="c1"&gt;# nagios error and message libraries&lt;/span&gt;
-&lt;span class="k"&gt;use&lt;/span&gt; &lt;span class="nn"&gt;Data::&lt;/span&gt;&lt;span class="n"&gt;Dumper&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;                       &lt;span class="c1"&gt;# debugging&lt;/span&gt;
+&lt;span class="k"&gt;use&lt;/span&gt; &lt;span class="nn"&gt;strict&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;             &lt;span class="c1"&gt;# good coding practices&lt;/span&gt;
+&lt;span class="k"&gt;use&lt;/span&gt; &lt;span class="nn"&gt;Getopt::Long&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;           &lt;span class="c1"&gt;# command-line option parsing&lt;/span&gt;
+&lt;span class="k"&gt;use&lt;/span&gt; &lt;span class="nn"&gt;&lt;span class="caps"&gt;LWP&lt;/span&gt;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;                &lt;span class="c1"&gt;# external content retrieval&lt;/span&gt;
+&lt;span class="k"&gt;use&lt;/span&gt; &lt;span class="nn"&gt;&lt;span class="caps"&gt;JSON&lt;/span&gt;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;                               &lt;span class="c1"&gt;# &lt;span class="caps"&gt;JSON&lt;/span&gt; for &lt;span class="caps"&gt;API&lt;/span&gt; reply&lt;/span&gt;
+&lt;span class="k"&gt;use&lt;/span&gt; &lt;span class="nn"&gt;lib&lt;/span&gt;  &lt;span class="s"&gt;&amp;quot;/usr/lib/nagios/plugins&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="c1"&gt;# nagios plugins&lt;/span&gt;
+&lt;span class="k"&gt;use&lt;/span&gt; &lt;span class="nn"&gt;utils&lt;/span&gt; &lt;span class="sx"&gt;qw(%&lt;span class="caps"&gt;ERRORS&lt;/span&gt; &amp;amp;print_revision &amp;amp;support &amp;amp;usage )&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="c1"&gt;# nagios error and message libraries&lt;/span&gt;
+&lt;span class="k"&gt;use&lt;/span&gt; &lt;span class="nn"&gt;Data::Dumper&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;                       &lt;span class="c1"&gt;# debugging&lt;/span&gt;
 
 &lt;span class="c1"&gt;# init global vars&lt;/span&gt;
-&lt;span class="k"&gt;use&lt;/span&gt; &lt;span class="n"&gt;vars&lt;/span&gt; &lt;span class="sx"&gt;qw($&lt;span class="caps"&gt;PROGNAME&lt;/span&gt;)&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="nv"&gt;$&lt;span class="caps"&gt;PROGNAME&lt;/span&gt;&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;check_wow&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="k"&gt;use&lt;/span&gt; &lt;span class="nn"&gt;vars&lt;/span&gt; &lt;span class="sx"&gt;qw($&lt;span class="caps"&gt;PROGNAME&lt;/span&gt;)&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="nv"&gt;$&lt;span class="caps"&gt;PROGNAME&lt;/span&gt;&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;check_wow&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
 &lt;span class="k"&gt;my&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;$ver_string&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nv"&gt;$browser&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nv"&gt;$jsonurl&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nv"&gt;$raw_json&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nv"&gt;$opt_V&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nv"&gt;$opt_h&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nv"&gt;$opt_r&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nv"&gt;$decoded&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;undef&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nb"&gt;undef&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nb"&gt;undef&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nb"&gt;undef&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nb"&gt;undef&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nb"&gt;undef&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nb"&gt;undef&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nb"&gt;undef&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
 &lt;span class="nv"&gt;$jsonurl&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;http://us.battle.net/api/wow/realm/status?realm=&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
 &lt;span class="nv"&gt;$ver_string&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;1.3&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
 
 &lt;span class="c1"&gt;# init subs&lt;/span&gt;
-&lt;span class="k"&gt;sub &lt;/span&gt;&lt;span class="nf"&gt;print_help&lt;/span&gt; &lt;span class="p"&gt;($$);&lt;/span&gt;
-&lt;span class="p"&gt;sub print_usage ($);&lt;/span&gt;
+&lt;span class="k"&gt;sub&lt;/span&gt; &lt;span class="nf"&gt;print_help&lt;/span&gt; &lt;span class="p"&gt;($$);&lt;/span&gt;
+&lt;span class="k"&gt;sub&lt;/span&gt; &lt;span class="nf"&gt;print_usage&lt;/span&gt; &lt;span class="p"&gt;($);&lt;/span&gt;
 
-&lt;span class="p"&gt;# define command-line option handling&lt;/span&gt;
-&lt;span class="p"&gt;Getopt::Long::Configure(&amp;#39;bundling&amp;#39;);&lt;/span&gt;
-&lt;span class="p"&gt;GetOptions(&lt;/span&gt;
-&lt;span class="p"&gt;    &amp;quot;V&amp;quot;   =&amp;gt; \$opt_V, &amp;quot;version&amp;quot; =&amp;gt; \$opt_V,&lt;/span&gt;
-&lt;span class="p"&gt;    &amp;quot;h&amp;quot;   =&amp;gt; \$opt_h, &amp;quot;help&amp;quot;    =&amp;gt; \$opt_h,&lt;/span&gt;
-&lt;span class="p"&gt;    &amp;quot;r=s&amp;quot; =&amp;gt; \$opt_r, &amp;quot;realm=s&amp;quot; =&amp;gt; \$opt_r);&lt;/span&gt;
+&lt;span class="c1"&gt;# define command-line option handling&lt;/span&gt;
+&lt;span class="nn"&gt;Getopt::Long::&lt;/span&gt;&lt;span class="n"&gt;Configure&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;bundling&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;span class="n"&gt;GetOptions&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;
+    &lt;span class="s"&gt;&amp;quot;V&amp;quot;&lt;/span&gt;   &lt;span class="o"&gt;=&amp;gt;&lt;/span&gt; &lt;span class="o"&gt;\&lt;/span&gt;&lt;span class="nv"&gt;$opt_V&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;version&amp;quot;&lt;/span&gt; &lt;span class="o"&gt;=&amp;gt;&lt;/span&gt; &lt;span class="o"&gt;\&lt;/span&gt;&lt;span class="nv"&gt;$opt_V&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="s"&gt;&amp;quot;h&amp;quot;&lt;/span&gt;   &lt;span class="o"&gt;=&amp;gt;&lt;/span&gt; &lt;span class="o"&gt;\&lt;/span&gt;&lt;span class="nv"&gt;$opt_h&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;help&amp;quot;&lt;/span&gt;    &lt;span class="o"&gt;=&amp;gt;&lt;/span&gt; &lt;span class="o"&gt;\&lt;/span&gt;&lt;span class="nv"&gt;$opt_h&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="s"&gt;&amp;quot;r=s&amp;quot;&lt;/span&gt; &lt;span class="o"&gt;=&amp;gt;&lt;/span&gt; &lt;span class="o"&gt;\&lt;/span&gt;&lt;span class="nv"&gt;$opt_r&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;realm=s&amp;quot;&lt;/span&gt; &lt;span class="o"&gt;=&amp;gt;&lt;/span&gt; &lt;span class="o"&gt;\&lt;/span&gt;&lt;span class="nv"&gt;$opt_r&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
 
-&lt;span class="p"&gt;# show version info, exit&lt;/span&gt;
-&lt;span class="p"&gt;if ($opt_V) {&lt;/span&gt;
+&lt;span class="c1"&gt;# show version info, exit&lt;/span&gt;
+&lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;$opt_V&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
     &lt;span class="n"&gt;print_revision&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;$&lt;span class="caps"&gt;PROGNAME&lt;/span&gt;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nv"&gt;$ver_string&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
     &lt;span class="nb"&gt;exit&lt;/span&gt; &lt;span class="nv"&gt;$&lt;span class="caps"&gt;ERRORS&lt;/span&gt;&lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;&lt;span class="caps"&gt;OK&lt;/span&gt;&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;};&lt;/span&gt;
 &lt;span class="p"&gt;}&lt;/span&gt;
@@ -123,12 +131,12 @@ version on
 &lt;span class="p"&gt;}&lt;/span&gt;
 
 &lt;span class="c1"&gt;# new browser object, with agent&lt;/span&gt;
-&lt;span class="nv"&gt;$browser&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nn"&gt;&lt;span class="caps"&gt;LWP&lt;/span&gt;::&lt;/span&gt;&lt;span class="n"&gt;UserAgent&lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="k"&gt;new&lt;/span&gt;&lt;span class="p"&gt;();&lt;/span&gt;
+&lt;span class="nv"&gt;$browser&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nn"&gt;&lt;span class="caps"&gt;LWP&lt;/span&gt;::UserAgent&lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="k"&gt;new&lt;/span&gt;&lt;span class="p"&gt;();&lt;/span&gt;
 &lt;span class="nv"&gt;$browser&lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="n"&gt;agent&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;check_wow/$ver_string&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
 
 &lt;span class="c1"&gt;# retrieve &lt;span class="caps"&gt;JSON&lt;/span&gt; from WoW site&lt;/span&gt;
 &lt;span class="nv"&gt;$jsonurl&lt;/span&gt; &lt;span class="o"&gt;.=&lt;/span&gt; &lt;span class="nv"&gt;$opt_r&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
-&lt;span class="nv"&gt;$raw_json&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nv"&gt;$browser&lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="n"&gt;request&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nn"&gt;&lt;span class="caps"&gt;HTTP&lt;/span&gt;::&lt;/span&gt;&lt;span class="n"&gt;Request&lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="k"&gt;new&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;&lt;span class="caps"&gt;GET&lt;/span&gt;&lt;/span&gt; &lt;span class="o"&gt;=&amp;gt;&lt;/span&gt; &lt;span class="nv"&gt;$jsonurl&lt;/span&gt;&lt;span class="p"&gt;));&lt;/span&gt;
+&lt;span class="nv"&gt;$raw_json&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nv"&gt;$browser&lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="n"&gt;request&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nn"&gt;&lt;span class="caps"&gt;HTTP&lt;/span&gt;::Request&lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="k"&gt;new&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;&lt;span class="caps"&gt;GET&lt;/span&gt;&lt;/span&gt; &lt;span class="o"&gt;=&amp;gt;&lt;/span&gt; &lt;span class="nv"&gt;$jsonurl&lt;/span&gt;&lt;span class="p"&gt;));&lt;/span&gt;
 
 &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;$raw_json&lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="n"&gt;is_success&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
     &lt;span class="c1"&gt;# if success, process&lt;/span&gt;
@@ -153,7 +161,7 @@ version on
 &lt;span class="p"&gt;}&lt;/span&gt;
 
 &lt;span class="c1"&gt;# usage function&lt;/span&gt;
-&lt;span class="k"&gt;sub &lt;/span&gt;&lt;span class="nf"&gt;print_usage&lt;/span&gt; &lt;span class="p"&gt;($)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+&lt;span class="k"&gt;sub&lt;/span&gt; &lt;span class="nf"&gt;print_usage&lt;/span&gt; &lt;span class="p"&gt;($)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
         &lt;span class="k"&gt;my&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;$&lt;span class="caps"&gt;PROGNAME&lt;/span&gt;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nv"&gt;@_&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
     &lt;span class="k"&gt;print&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;Usage:\n&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
     &lt;span class="k"&gt;print&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;  $&lt;span class="caps"&gt;PROGNAME&lt;/span&gt; [-r | --realm ]\n&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
@@ -162,7 +170,7 @@ version on
 &lt;span class="p"&gt;}&lt;/span&gt;
 
 &lt;span class="c1"&gt;# help function&lt;/span&gt;
-&lt;span class="k"&gt;sub &lt;/span&gt;&lt;span class="nf"&gt;print_help&lt;/span&gt; &lt;span class="p"&gt;($$)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+&lt;span class="k"&gt;sub&lt;/span&gt; &lt;span class="nf"&gt;print_help&lt;/span&gt; &lt;span class="p"&gt;($$)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
         &lt;span class="k"&gt;my&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;$&lt;span class="caps"&gt;PROGNAME&lt;/span&gt;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nv"&gt;$ver_string&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nv"&gt;@_&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
     &lt;span class="n"&gt;print_revision&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;$&lt;span class="caps"&gt;PROGNAME&lt;/span&gt;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nv"&gt;$ver_string&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
     &lt;span class="k"&gt;print&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;Copyright (c) 2008 Scott A&amp;#39;Hearn, 2012 Jason Antman\n\n&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
@@ -174,4 +182,4 @@ version on
 &lt;span class="p"&gt;}&lt;/span&gt;
 
 &lt;span class="c1"&gt;# end&lt;/span&gt;
-&lt;/pre&gt;&lt;/div&gt;</summary><category term="blizzard"></category><category term="check plugin"></category><category term="monitoring"></category><category term="Nagios"></category><category term="warcraft"></category><category term="wow"></category></entry></feed>
+&lt;/pre&gt;&lt;/div&gt;</content><category term="blizzard"></category><category term="check plugin"></category><category term="monitoring"></category><category term="Nagios"></category><category term="warcraft"></category><category term="wow"></category></entry></feed>
