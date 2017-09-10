@@ -177,6 +177,7 @@ def post():
     datestr = dt.strftime('%Y-%m-%d %H:%M')
     metadata = """Title: {title}
 Date: {datestr}
+Modified: {datestr}
 Author: {author}
 Category: {category}
 Tags:

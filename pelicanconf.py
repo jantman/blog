@@ -99,8 +99,22 @@ DISPLAY_CATEGORIES_ON_SIDEBAR = False
 
 DISPLAY_RECENT_POSTS_ON_SIDEBAR = True
 RECENT_POST_COUNT = 5
+DISPLAY_ARTICLE_INFO_ON_INDEX = True
 
 USE_OPEN_GRAPH = True
+
+SHARIFF = True
+SHARIFF_LANG = 'en'
+SHARIFF_ORIENTATION = 'horizontal'
+_shariff_svcs = [
+    'facebook',
+    'googleplus',
+    'twitter',
+    'linkedin',
+    'diaspora'
+]
+SHARIFF_SERVICES = '[' + ','.join(['&quot;%s&quot;' % x for x in _shariff_svcs]) + ']'
+SHARIFF_THEME = 'standard'
 
 # disable tags, since it's a list not a "cloud"
 DISPLAY_TAGS_ON_SIDEBAR = False
