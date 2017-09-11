@@ -3,62 +3,10 @@ Date: 2008-12-17 09:17
 Author: admin
 Slug: about
 
-I was born in February, 1987 in New Jersey, USA, and graduated from
-Rutgers University in New Brunswick, NJ, USA in October, 2009 with a
-bachelor's degree Information Technology and Informatics. In 2011 my
-now-wife and I moved from New Jersey to Georgia, USA, and we currently
-reside in Conyers, GA with a wonderful dog and four cats. I'm a geek,
-and proud of it. I'm currently employed at [Cox Media
-Group](http://www.coxmediagroup.com/)'s digital/technology department in
-Atlanta, GA; we develop and run an in-house CMS written in Python (quite
-possibly the biggest [Django](https://www.djangoproject.com/) app out
-there) that hosts the web sites of our 150+ newspaper, TV and radio
-properties (and some other associated technologies and systems). I'm a
-(linux) systems engineer on the Operations Engineering team,
-specializing in monitoring and automation. Before coming to CMG in
-October 2012, I worked for a year or so as a linux sysadmin at a
-publicly traded company.
+Originally from suburban New Jersey and residing in the Atlanta area since 2012, I'm a proud geek and love what I do for work. I've had many job titles over the years; I started as a part-time software developer in college, worked for a while as a system administrator, and then found my strongest passion in tooling/automation development and developer productivity. In the current market I'd probably describe myself as a "DevOps Engineer" (a title I loathe) or a full-stack developer. I'm currently immersed in all things AWS, reliability, security, continuous integration/delivery, and developer enablement; right now, this is mainly focused on providing shared services and common tooling, patterns and documentation for a large and growing AWS infrastructure. In the past my major focuses have included large-scale Puppet configuration management deployments and redesigns, monitoring (metrics, logs, and some big Nagios/Icinga installs), web application development, wireless network architecture and deployment, and datacenter operations.
 
-Before moving down to Georgia in October 2011, I worked as a Systems
-Administrator for Rutgers University's Central Systems and Services
-group, mainly doing Linux admin/architecture work and a bit of PHP and
-other assorted programming. I also provided engineering and development
-support for our group's largest service, RUwireless, the university's
-wireless network (at the time it supported \~50,000 users and covered
-over large portion of the University's 711 buildings). My big projects
-at RU included designing and implementing a comprehensive monitoring,
-backup and automation solution for the group's production systems
-(Nagios, Bacula, [Puppet](http://reductivelabs.com/products/puppet/)
-back in the 0.24.8 days), a ground-up redesign of the DHCP
-infrastructure supporting all computer lab machines, and all dorm and
-wireless users, and implementation of a custom Puppet-managed FreeRADIUS
-authentication and authorization system for the university-wide wireless
-network (still in production and expanding).
+I'm currently employed by Cox Automotive/Manheim as a Senior Software Developer on their Release Engineering Tooling team, a wonderful group of brilliant, passionate, innovative engineers. The majority of my - and the team's - work is focused on developer productivity and enabling fast, secure, reliable application deployment in AWS. I've been involved in a wide variety of projects from assisting teams with application deployment and monitoring to architecting our Hashicorp Vault implementation and integrating it with applications and infrastructure. Jenkins is also one of our main products, and I've done quite a bit of work on the Jenkins-as-a-service product we offer to internal development teams.
 
-I'm a [Free
-Software](http://www.fsf.org/about/what-is-free-software "Free Software")
-advocate, and use Free software (aka "open source") almost exclusively
-both at work and at home. Linux is my operating system of choice; at the
-moment I'm running [Arch Linux](https://www.archlinux.org/) on my
-work-provided MacBook Pro Retina, Fedora (soon to be Arch as well) on my
-desktop at home, and CentOS on most servers I control. I've been Linux
-exclusively since December 2006, started my life on the OS with SuSE 7.3
-in October, 2001. This site, and all my others, used to be hosted from a
-[rack](http://blog.jasonantman.com/GFX/rack_2011-09-27_small.jpg) of
-servers in my basement, which was collapsed down to a *single* VM hosted
-by
-[Linode](http://www.linode.com/?r=5c8ad2931b410b55455aadbcf0a8d86d6f698a91).
-I'm also a bit of a hardware tinkerer, though since moving to an
-apartment, that's mainly been of the
-[RaspberryPi](http://www.raspberrypi.org/) variety, instead of the
-previous collection of random rack mount gear and homebrew devices.
+I'm passionate about doing things right, especially when that comes to the non-functional requirements that all too often get ignored, such as monitoring (ubiquitous observability), reliability (resilience and designing for failure) and security. I've never really understood the gap between ops and dev, and consider myself to mostly be a developer who automates what were traditionally ops tasks. I'm a Free Software fan and advocate, though in my work all I ask is for an honest and unbiased comparison of all options, and to consider giving back to the community. I'm a complete data geek and collect metrics on everything I can, whether it's the apps I'm running in production or the health of my car's engine.
 
-In my life in NJ, I spent 7 years volunteering with the [Midland Park
-Ambulance
-Corps](http://www.midlandparkambulance.com "Midland Park Ambulance Corps");
-I was both a NJ certified Emergency Medical Technician (active duty
-March 2005-October 2011) and also handled their tech needs, including
-development of a custom electronic Patient Care Report (ePCR) and crew
-scheduling solution, and an Asterisk-based system to receive, log and
-display analog phone-based dispatch confirmations from responding crew
-members.
+Outside of work and my personal software projects, my main passions are cooking (generally Chinese, Thai, Cajun/Creole, Mexican and Tex-Mex, but pizza is my latest endeavor), hiking, camping, and spending time with my dogs and cats (two of each, all rescues). I also love traveling though I haven't done much lately (one of my long-time dreams is to spend a few years traveling the US and Canada in an RV) and occasionally try to reignite my passion for photography (I spent a short time in college as a fine art photo major). When I was living in New Jersey, I was a volunteer EMT for seven years with a 501(c)(3) non-profit town ambulance provider.
