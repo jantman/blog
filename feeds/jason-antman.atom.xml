@@ -1,5 +1,113 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Jason Antman's Blog - Jason Antman</title><link href="http://blog.jasonantman.com/" rel="alternate"></link><link href="http://blog.jasonantman.com/feeds/jason-antman.atom.xml" rel="self"></link><id>http://blog.jasonantman.com/</id><updated>2017-04-17T16:11:00-04:00</updated><entry><title>Python script to check xfinity data usage</title><link href="http://blog.jasonantman.com/2017/04/python-script-to-check-xfinity-data-usage/" rel="alternate"></link><published>2017-04-17T16:11:00-04:00</published><updated>2017-04-17T16:11:00-04:00</updated><author><name>Jason Antman</name></author><id>tag:blog.jasonantman.com,2017-04-17:/2017/04/python-script-to-check-xfinity-data-usage/</id><summary type="html">&lt;p&gt;Python/selenium script to check your Xfinity data&amp;nbsp;usage&lt;/p&gt;</summary><content type="html">&lt;p&gt;Yesterday I got one of those invasive, abusive, utterly awful (and idiotic) &lt;a href="https://www.techdirt.com/articles/20161123/10554936126/comcast-takes-heat-injecting-messages-into-internet-traffic.shtml"&gt;injected popups from Xfinity&lt;/a&gt; that I&amp;#8217;m at 75% of my monthly bandwidth allocation. Nevermind the fact that I have a bunch of automated scripts running on my computer and injected &lt;span class="caps"&gt;HTML&lt;/span&gt; might never be seen by a human, or that I work from home and every once in a while I&amp;#8217;ll find myself pulling and pushing multi-&lt;span class="caps"&gt;GB&lt;/span&gt; Docker images, which completely kills my &lt;span class="caps"&gt;1TB&lt;/span&gt; bandwidth limit. But it&amp;#8217;s only half way through the month and, frankly, I&amp;#8217;m pretty mystified how I could have used so much data this quickly. I went to Xfinity&amp;#8217;s site to check my usage meter - after rummaging around in my password manager to find my credentials - and realized that while it shows a graph of the past three months and a progress bar for the current month, it doesn&amp;#8217;t show me any detailed (i.e. daily or hourly) data that would help me figure out the&amp;nbsp;cause.&lt;/p&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Jason Antman's Blog - Jason Antman</title><link href="http://blog.jasonantman.com/" rel="alternate"></link><link href="http://blog.jasonantman.com/feeds/jason-antman.atom.xml" rel="self"></link><id>http://blog.jasonantman.com/</id><updated>2017-10-08T19:14:00-04:00</updated><entry><title>Pre-Authorized AWS Console URLs for Notifications</title><link href="http://blog.jasonantman.com/2017/10/pre-authorized-aws-console-urls-for-notifications/" rel="alternate"></link><published>2017-10-08T19:14:00-04:00</published><updated>2017-10-08T19:14:00-04:00</updated><author><name>Jason Antman</name></author><id>tag:blog.jasonantman.com,2017-10-08:/2017/10/pre-authorized-aws-console-urls-for-notifications/</id><summary type="html">&lt;p&gt;Pre-authorized &lt;span class="caps"&gt;AWS&lt;/span&gt; Console login URLs with limited permissions allow immediate investigation from&amp;nbsp;notifications.&lt;/p&gt;</summary><content type="html">&lt;h2 id="background"&gt;Background&lt;/h2&gt;
+&lt;p&gt;Almost all of my work for the past two and a half years has revolved around Amazon Web Services,
+but my personal &lt;span class="caps"&gt;AWS&lt;/span&gt; account (mostly a single tiny t2.micro instance that handles a tiny amount
+of &lt;span class="caps"&gt;HTTP&lt;/span&gt; traffic and some cron jobs) has languished. Recently I&amp;#8217;ve undertaken a project to modernize
+it, moving from an &lt;span class="caps"&gt;EC2&lt;/span&gt; instance using an &lt;span class="caps"&gt;AMI&lt;/span&gt; baked by &lt;a href="https://www.packer.io/"&gt;Packer&lt;/a&gt; and some
+custom Ruby code to manage it, to a barebones instance acting as an
+&lt;a href="https://aws.amazon.com/ecs/"&gt;Elastic Container Service (&lt;span class="caps"&gt;ECS&lt;/span&gt;)&lt;/a&gt; Docker host, and all of my applications
+running in containers. This makes for much easier testing and deployment, and is a lot lower effort than
+baking and testing a new &lt;span class="caps"&gt;AMI&lt;/span&gt; every time I want to change an nginx config file (yes, everything is&amp;nbsp;immutable).&lt;/p&gt;
+&lt;p&gt;I&amp;#8217;ve got most of the basic work done and every resource in the account imported into
+&lt;a href="https://www.terraform.io/"&gt;terraform&lt;/a&gt;, containers created and tested to replace what my old &lt;span class="caps"&gt;EC2&lt;/span&gt;
+instance is doing, and terraform management of the &lt;span class="caps"&gt;ECS&lt;/span&gt; tasks and services too. So, I decided that
+I&amp;#8217;d better setup some monitoring of all this before I forget about it. I try my best to keep my account
+in the free tier for &lt;span class="caps"&gt;AWS&lt;/span&gt;; my bills have usually been about $15 &lt;span class="caps"&gt;USD&lt;/span&gt;/month in the past (mostly the t2.micro
+instance and Route53) and I&amp;#8217;m expecting to go up to about $20/month with the new&amp;nbsp;infrastructure.&lt;/p&gt;
+&lt;p&gt;I&amp;#8217;ve gotten some basic monitoring in place - 7 CloudWatch Alarms for the important things, and a
+Lambda function running every 30 minutes that does some more complicated and non-metric checks (and
+sends to the same &lt;span class="caps"&gt;SNS&lt;/span&gt; topic as the alarms if it finds a problem). However, I realized how spoiled
+I&amp;#8217;ve been at my day job, where a lot of our &lt;span class="caps"&gt;AWS&lt;/span&gt; monitoring infrastructure relies on
+&lt;a href="https://www.datadoghq.com/"&gt;Datadog&lt;/a&gt; and &lt;a href="https://www.pagerduty.com/"&gt;PagerDuty&lt;/a&gt; (both
+of which I love not only for their functionality but also for their APIs). While the new
+&lt;a href="https://aws.amazon.com/blogs/aws/cloudwatch-dashboards-create-use-customized-metrics-views/"&gt;CloudWatch Dashboards&lt;/a&gt;
+feature is pretty cool for a tiny infrastructure with no other monitoring tools
+(and they can finally be managed via &lt;span class="caps"&gt;API&lt;/span&gt;), CloudWatch still had two big pain points for me
+(aside from &lt;a href="https://aws.amazon.com/cloudwatch/pricing/"&gt;cost past the free tier&lt;/a&gt;):&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;There&amp;#8217;s no option for re-notification from Alarms; if you set an &lt;span class="caps"&gt;SNS&lt;/span&gt; Topic target for a
+  CloudWatch Metric Alarm, the notification is sent &lt;em&gt;once&lt;/em&gt; when the Alarm changes state.
+  And that&amp;#8217;s&amp;nbsp;it.&lt;/li&gt;
+&lt;li&gt;The notification messages are horribly&amp;nbsp;plain.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;To solve the first problem, I just have my custom monitoring Lambda function also check
+for any CloudWatch Alarms in a non-&lt;span class="caps"&gt;OK&lt;/span&gt; state for longer than 30 minutes (how often the
+function runs) and re-notify for them. The second solution is a bit more&amp;nbsp;involved&amp;#8230;&lt;/p&gt;
+&lt;h2 id="the-problem"&gt;The&amp;nbsp;Problem&lt;/h2&gt;
+&lt;p&gt;The Lambda function that I put in place to do some monitoring sends alerts to a &lt;span class="caps"&gt;SNS&lt;/span&gt; Topic
+that delivers them to my phone via &lt;span class="caps"&gt;SMS&lt;/span&gt; and to my personal email account. While I&amp;#8217;ve made use
+of the ability to &lt;a href="http://docs.aws.amazon.com/sns/latest/dg/PublishTopic.html#sns-message-formatting-by-protocol"&gt;send different messages per protocol&lt;/a&gt;
+to send a short notification to &lt;span class="caps"&gt;SMS&lt;/span&gt; and a longer email, I still really miss the rich context
+of notifications from real monitoring systems that include graph images and other useful
+information. This becomes an even bigger inconvenience since I&amp;#8217;m rarely logged in to the
+&lt;span class="caps"&gt;AWS&lt;/span&gt; Console for my personal account, and doing so involves a dance with several long passwords
+and &lt;span class="caps"&gt;MFA&lt;/span&gt;&amp;nbsp;tokens.&lt;/p&gt;
+&lt;p&gt;So, I wanted a way to be able to receive an &lt;span class="caps"&gt;SNS&lt;/span&gt; monitoring notification and actually &lt;em&gt;see&lt;/em&gt;
+the metric graphs or events that generated it, rather than getting a plaintext (yeah, the
+Simple &lt;em&gt;Notification&lt;/em&gt; Service is clearly designed for &lt;span class="caps"&gt;SMS&lt;/span&gt; and mobile push, and can&amp;#8217;t even
+send &lt;span class="caps"&gt;HTML&lt;/span&gt; email) description of the triggered alarm. My first thought had been a Lambda
+function triggered by the &lt;span class="caps"&gt;SNS&lt;/span&gt; topic, that would identify the alarm(s) in question, render
+a graph of them, and then send that in a &lt;span class="caps"&gt;HTML&lt;/span&gt; email via &lt;span class="caps"&gt;SES&lt;/span&gt;. But that seemed like much more
+work than I was interested in; all I &lt;em&gt;really&lt;/em&gt; needed to make this workable was a way to quickly
+view alarms, metrics and events in&amp;nbsp;CloudWatch.&lt;/p&gt;
+&lt;h2 id="solution"&gt;Solution&lt;/h2&gt;
+&lt;p&gt;&lt;em&gt;Disclaimer: This is a bit of a kludge. It was designed for a tiny personal account with one human user, no monitoring other than CloudWatch, and for minimal&amp;nbsp;cost.&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;For integration with non-&lt;span class="caps"&gt;SAML&lt;/span&gt; identity providers (&amp;#8220;custom federation brokers&amp;#8221;), &lt;span class="caps"&gt;AWS&lt;/span&gt; &lt;span class="caps"&gt;IAM&lt;/span&gt;
+provides a way to
+&lt;a href="http://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_providers_enable-console-custom-url.html"&gt;create a &lt;span class="caps"&gt;URL&lt;/span&gt; that enables federated users to access the &lt;span class="caps"&gt;AWS&lt;/span&gt; Console&lt;/a&gt;.
+In short, an &lt;span class="caps"&gt;IAM&lt;/span&gt; user with the required permissions can call &lt;a href="http://docs.aws.amazon.com/STS/latest/APIReference/API_AssumeRole.html"&gt;AssumeRole&lt;/a&gt;
+to generate temporary credentials for a specified &lt;span class="caps"&gt;IAM&lt;/span&gt; Role, and then pass those credentials in
+a &lt;span class="caps"&gt;HTTP&lt;/span&gt; request to &lt;code&gt;https://signin.aws.amazon.com/federation&lt;/code&gt; and get back a temporary &lt;code&gt;SigninToken&lt;/code&gt; granting
+access to the &lt;span class="caps"&gt;AWS&lt;/span&gt; Console with the assumed role. This token can be used to construct a single &lt;span class="caps"&gt;URL&lt;/span&gt; that signs in
+to the Console under the assumed role and brings the user to a specified destination &lt;span class="caps"&gt;URL&lt;/span&gt; in the &lt;span class="caps"&gt;AWS&lt;/span&gt;&amp;nbsp;Console.&lt;/p&gt;
+&lt;p&gt;The one catch to this process (documented on the link above) is the user that makes the &lt;code&gt;AssumeRole&lt;/code&gt; &lt;span class="caps"&gt;API&lt;/span&gt; call must have
+long-term credentials (i.e. a real &lt;span class="caps"&gt;IAM&lt;/span&gt; User). The call to the &lt;code&gt;/federation&lt;/code&gt; endpoint will fail if &lt;code&gt;AssumeRole&lt;/code&gt; was called
+by another assumed role&amp;#8217;s temporary credentials, such as a Lambda function or Instance Profile. That tripped me up at first,
+but I ended up figuring out a workable&amp;nbsp;solution.&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Create a new &lt;span class="caps"&gt;IAM&lt;/span&gt; Role for read-only cloudwatch access and attach the &lt;span class="caps"&gt;AWS&lt;/span&gt;-managed CloudWatch Read Only
+  policy to it (&lt;code&gt;arn:aws:iam::aws:policy/CloudWatchReadOnlyAccess&lt;/code&gt;). This is the role that our pre-authorized
+  (federated) console login will&amp;nbsp;use.&lt;/li&gt;
+&lt;li&gt;Create a new &lt;span class="caps"&gt;IAM&lt;/span&gt; User that we&amp;#8217;ll use to make the AssumeRole call from our Lambda function. This user should have
+  a policy with only &lt;em&gt;one&lt;/em&gt; permission: calling &lt;code&gt;sts:AssumeRole&lt;/code&gt; on the &lt;span class="caps"&gt;IAM&lt;/span&gt; Role we created in the previous&amp;nbsp;step.&lt;/li&gt;
+&lt;li&gt;Deploy our Lambda function, and pass the Access Key &lt;span class="caps"&gt;ID&lt;/span&gt; and Secret Access Key to it as environment variables.
+  This is terrifyingly insecure (see note below), but little risk read-only credentials and an account that
+  only has one other&amp;nbsp;user.&lt;/li&gt;
+&lt;li&gt;Add code to our Lambda function to call AssumeRole for the cloudwatch read-only role, and then create the
+  &lt;a href="http://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_providers_enable-console-custom-url.html"&gt;federated login &lt;span class="caps"&gt;URL&lt;/span&gt;&lt;/a&gt;
+  for the Console. For this part, I found a really helpful
+  &lt;a href="https://gist.github.com/weavenet/d21b288327bcc4947e690be13e19c79c"&gt;gist with the Python/boto3 implementation already done&lt;/a&gt;.
+  For the &lt;code&gt;Destination&lt;/code&gt; parameter on the signin &lt;span class="caps"&gt;URL&lt;/span&gt;, I specified the full &lt;span class="caps"&gt;URL&lt;/span&gt; to the relevant
+  CloudWatch Dashboard with my&amp;nbsp;metrics.&lt;/li&gt;
+&lt;li&gt;Embed this &lt;span class="caps"&gt;URL&lt;/span&gt; in your &lt;span class="caps"&gt;SNS&lt;/span&gt; notification text. Most email clients should auto-link the &lt;span class="caps"&gt;URL&lt;/span&gt;, so you&amp;#8217;ll end up with an email
+  notification that&amp;#8217;s still plaintext, but includes a clickable link for a read-only CloudWatch view with no
+  additional authentication required. This provides a much quicker &amp;#8220;ok, what does this problem look like?&amp;#8221;&amp;nbsp;workflow.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&lt;em&gt;Longer note on security:&lt;/em&gt; This isn&amp;#8217;t terribly secure. I wouldn&amp;#8217;t implement anything like this at my day job.
+But I&amp;#8217;m the only user that has access to both my &lt;span class="caps"&gt;AWS&lt;/span&gt; account and my email. If someone gets access to my email,
+the fact that they can also view my CloudWatch metrics is likely the least of my worries. Similarly, putting
+actual &lt;span class="caps"&gt;IAM&lt;/span&gt; User credentials in Lambda environment variables is horribly, painfully, terrifyingly insecure. But
+the credentials are read-only and only for CloudWatch, and in order to them, someone would need to have access
+to one of &lt;em&gt;my&lt;/em&gt; Users in the account, all of which are much more privileged. So, I decided that it&amp;#8217;s an acceptably
+small risk. I also wouldn&amp;#8217;t be handing out pre-signed URLs, even with a very limited read-only role, in a
+multi-user context. But once again, for a single-user low-value account, it&amp;#8217;s a workable&amp;nbsp;solution.&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;Short note on cost:&lt;/em&gt; If I were setting up even a similarly minuscule infrastructure for any organization that
+relied on it, I&amp;#8217;d certainly invest in real monitoring solutions. &lt;a href="https://www.datadoghq.com/pricing/"&gt;Datadog&amp;#8217;s pricing&lt;/a&gt;
+isn&amp;#8217;t bad at all, with a $15 &lt;span class="caps"&gt;USD&lt;/span&gt; per month per host plan (their free plan has 1-day data retention, so it&amp;#8217;s
+really just a demo) and &lt;a href="https://www.pagerduty.com/pricing/"&gt;PagerDuty starts at&lt;/a&gt; $9 &lt;span class="caps"&gt;USD&lt;/span&gt;/user/month. But the
+combination of those two is more than my entire monthly infrastructure bill right now, so&amp;#8230; not really worth it for&amp;nbsp;me.&lt;/p&gt;
+&lt;h2 id="next-steps"&gt;Next&amp;nbsp;Steps&lt;/h2&gt;
+&lt;p&gt;If I get around to it, I&amp;#8217;d like to stop sending email and &lt;span class="caps"&gt;SNS&lt;/span&gt; notifications directly from CloudWatch alarms,
+and instead pass them through a Lambda function first. This would provide a means to include the pre-authorized
+Dashboard &lt;span class="caps"&gt;URL&lt;/span&gt; described above, as well as some additional context (such as the last N metrics for the alarm
+and the alarm&amp;nbsp;history).&lt;/p&gt;
+&lt;p&gt;Ideally, though this is quite a bit more work, I&amp;#8217;d figure out a simple way of rendering a graph of the
+CloudWatch metric in question, and move email notifications from &lt;span class="caps"&gt;SNS&lt;/span&gt; to &lt;span class="caps"&gt;SES&lt;/span&gt;, sending &lt;span class="caps"&gt;HTML&lt;/span&gt; emails with
+a bit more detail and some useful graphs. Another option would be to continue with &lt;span class="caps"&gt;SNS&lt;/span&gt;, but (assuming I
+consider my email to be relatively secure and my notifications to be not-too-sensitive, both of which are
+true) generate graphs and decently-useful &lt;span class="caps"&gt;HTML&lt;/span&gt; pages for each alert, upload them (at pseudo-random paths,
+for some level of security from casual onlookers) to a public S3 bucket with website access enabled,
+and include &lt;em&gt;that&lt;/em&gt; &lt;span class="caps"&gt;URL&lt;/span&gt; in the &lt;span class="caps"&gt;SNS&lt;/span&gt;&amp;nbsp;notification.&lt;/p&gt;</content><category term="aws"></category><category term="iam"></category><category term="monitoring"></category><category term="notifications"></category></entry><entry><title>Python script to check xfinity data usage</title><link href="http://blog.jasonantman.com/2017/04/python-script-to-check-xfinity-data-usage/" rel="alternate"></link><published>2017-04-17T16:11:00-04:00</published><updated>2017-04-17T16:11:00-04:00</updated><author><name>Jason Antman</name></author><id>tag:blog.jasonantman.com,2017-04-17:/2017/04/python-script-to-check-xfinity-data-usage/</id><summary type="html">&lt;p&gt;Python/selenium script to check your Xfinity data&amp;nbsp;usage&lt;/p&gt;</summary><content type="html">&lt;p&gt;Yesterday I got one of those invasive, abusive, utterly awful (and idiotic) &lt;a href="https://www.techdirt.com/articles/20161123/10554936126/comcast-takes-heat-injecting-messages-into-internet-traffic.shtml"&gt;injected popups from Xfinity&lt;/a&gt; that I&amp;#8217;m at 75% of my monthly bandwidth allocation. Nevermind the fact that I have a bunch of automated scripts running on my computer and injected &lt;span class="caps"&gt;HTML&lt;/span&gt; might never be seen by a human, or that I work from home and every once in a while I&amp;#8217;ll find myself pulling and pushing multi-&lt;span class="caps"&gt;GB&lt;/span&gt; Docker images, which completely kills my &lt;span class="caps"&gt;1TB&lt;/span&gt; bandwidth limit. But it&amp;#8217;s only half way through the month and, frankly, I&amp;#8217;m pretty mystified how I could have used so much data this quickly. I went to Xfinity&amp;#8217;s site to check my usage meter - after rummaging around in my password manager to find my credentials - and realized that while it shows a graph of the past three months and a progress bar for the current month, it doesn&amp;#8217;t show me any detailed (i.e. daily or hourly) data that would help me figure out the&amp;nbsp;cause.&lt;/p&gt;
 &lt;p&gt;So, I wrote a little &lt;a href="https://github.com/jantman/xfinity-usage"&gt;script&lt;/a&gt; using Python and Selenium to log in to their My Account site and screen-scrape the &lt;a href="http://www.xfinity.com/usagemeter"&gt;usage meter&lt;/a&gt;. Why Comcast would require me to log in to view my usage when I&amp;#8217;m accessing their site from the &lt;span class="caps"&gt;IP&lt;/span&gt; address &lt;em&gt;they&lt;/em&gt; gave me, on &lt;em&gt;their&lt;/em&gt; network, I have no idea&amp;#8230; unless it&amp;#8217;s to provide a disincentive for customers to be aware of their usage. But I wrote the script, and it seems to be working. For the time being, I&amp;#8217;m both pushing the results into Graphite so I can see usage over time, and sending myself a daily email so I can keep on top of&amp;nbsp;usage.&lt;/p&gt;
 &lt;p&gt;Apparently Comcast used to have &lt;a href="http://usmapp-qa.comcast.net/"&gt;a desktop app&lt;/a&gt; to track usage but it&amp;#8217;s since been completely shut down, along with the &lt;span class="caps"&gt;API&lt;/span&gt; that backed it (which an enterprising fellow reverse-engineered in &lt;a href="https://github.com/WTFox/comcastUsage"&gt;this script&lt;/a&gt;). I can only assume this is another indication that, though the bandwidth cap was introduced citing &amp;#8220;network performance&amp;#8221;, they really don&amp;#8217;t want people lowering network load (and avoiding&amp;nbsp;fees).&lt;/p&gt;
 &lt;p&gt;I don&amp;#8217;t remember anything about screen-scraping in the Xfinity terms of service - and if they&amp;#8217;re f-ing injecting elements into &lt;em&gt;my&lt;/em&gt; web traffic, I sure as hell hope they don&amp;#8217;t complain about me checking my own usage - but use this at your own risk. Also be aware that it&amp;#8217;s screen-scraping, so it may well break with a site redesign or element &lt;span class="caps"&gt;ID&lt;/span&gt;&amp;nbsp;changes.&lt;/p&gt;
