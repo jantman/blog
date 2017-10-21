@@ -13,7 +13,7 @@ I'll apologize in advance that this is a bit of a rambling rant...
 I just finished reading ["The Coming Software Apocalypse" by James Somers](https://www.theatlantic.com/technology/archive/2017/09/saving-the-world-from-code/540393/),
 and the article really resonated with me on a deep level. I've never worked on life-critical software, but I
 have worked at a number of companies with very large workloads, places that pushed popular and widely-deployed
-software past it's tested limits... and seen it fail in ways that nobody else had. And after a decade in the
+software past its tested limits... and seen it fail in unusual and unexpected ways. And after a decade in the
 industry, I've seen first-hand far too many examples of shoddy work, from laziness or lack of planning
 ("rare edge case" bugs being hot within minutes of real production user traffic) to outright unethical
 practices (like dead-man switches in code). But even more disturbing to me are the times I've seen teams
