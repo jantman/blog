@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="en" prefix="og: http://ogp.me/ns# fb: https://www.facebook.com/2008/fbml">
+<head>
+    <title>Cloud Custodian Architecture, Deployment and Policy Preprocessing - Jason Antman's Blog</title>
+    <!-- Using the latest rendering mode for IE -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+
+<link rel="canonical" href="http://blog.jasonantman.com/2017/10/cloud-custodian-architecture-deployment-and-policy-preprocessing/">
+
+        <meta name="author" content="Jason Antman" />
+        <meta name="keywords" content="aws,cloud-custodian,cloud custodian,c7n,lambda,sqs,splunk" />
+        <meta name="description" content="Details of how I setup Capital One’s Cloud Custodain at work, including our monitoring, logging and policy preprocessing." />
+
+        <meta property="og:site_name" content="Jason Antman's Blog" />
+        <meta property="og:type" content="article"/>
+        <meta property="og:title" content="Cloud Custodian Architecture, Deployment and Policy Preprocessing"/>
+        <meta property="og:url" content="http://blog.jasonantman.com/2017/10/cloud-custodian-architecture-deployment-and-policy-preprocessing/"/>
+        <meta property="og:description" content="Details of how I setup Capital One’s Cloud Custodain at work, including our monitoring, logging and policy preprocessing."/>
+        <meta property="article:published_time" content="2017-10-24" />
+            <meta property="article:section" content="Tech HowTos" />
+            <meta property="article:tag" content="aws" />
+            <meta property="article:tag" content="cloud-custodian" />
+            <meta property="article:tag" content="cloud custodian" />
+            <meta property="article:tag" content="c7n" />
+            <meta property="article:tag" content="lambda" />
+            <meta property="article:tag" content="sqs" />
+            <meta property="article:tag" content="splunk" />
+            <meta property="article:author" content="Jason Antman" />
+
+
+
+    <!-- Bootstrap -->
+        <link rel="stylesheet" href="http://blog.jasonantman.com/theme/css/bootstrap.flatly.min.css" type="text/css"/>
+    <link href="http://blog.jasonantman.com/theme/css/font-awesome.min.css" rel="stylesheet">
+
+    <link href="http://blog.jasonantman.com/theme/css/pygments/default.css" rel="stylesheet">
+        <link href="http://blog.jasonantman.com/theme/css/typogrify.css" rel="stylesheet">
+    <link rel="stylesheet" href="http://blog.jasonantman.com/theme/css/style.css" type="text/css"/>
+        <link href="http://blog.jasonantman.com/theme/css/shariff/shariff.min.css" rel="stylesheet">
+
+    <link rel="stylesheet" href="http://blog.jasonantman.com/theme/css/forkongithub.min.css" type="text/css" />
+
+        <link href="http://blog.jasonantman.com/feeds/all.atom.xml" type="application/atom+xml" rel="alternate"
+              title="Jason Antman's Blog ATOM Feed"/>
+
+        <link href="http://blog.jasonantman.com/feeds/all.rss.xml" type="application/rss+xml" rel="alternate"
+              title="Jason Antman's Blog RSS Feed"/>
+
+
+        <link href="http://blog.jasonantman.com/feeds/categories/tech-howtos.atom.xml" type="application/atom+xml" rel="alternate"
+              title="Jason Antman's Blog Tech HowTos ATOM Feed"/>
+
+</head>
+<body>
+
+<div class="navbar navbar-default navbar-fixed-top" role="navigation">
+	<div class="container">
+<span id="forkongithub"><a href="https://github.com/jantman/blog">Fork me on GitHub</a></span>        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="http://blog.jasonantman.com/" class="navbar-brand">
+Jason Antman's Blog            </a>
+        </div>
+        <div class="collapse navbar-collapse navbar-ex1-collapse">
+            <ul class="nav navbar-nav">
+                         <li><a href="http://blog.jasonantman.com/pages/about.html">
+                             About
+                          </a></li>
+                        <li >
+                            <a href="http://blog.jasonantman.com/categories/ideas-and-rants/index.html">Ideas and rants</a>
+                        </li>
+                        <li >
+                            <a href="http://blog.jasonantman.com/categories/miscellaneous/index.html">Miscellaneous</a>
+                        </li>
+                        <li >
+                            <a href="http://blog.jasonantman.com/categories/monitoring/index.html">Monitoring</a>
+                        </li>
+                        <li >
+                            <a href="http://blog.jasonantman.com/categories/ops/index.html">Ops</a>
+                        </li>
+                        <li >
+                            <a href="http://blog.jasonantman.com/categories/projects/index.html">Projects</a>
+                        </li>
+                        <li >
+                            <a href="http://blog.jasonantman.com/categories/puppet/index.html">Puppet</a>
+                        </li>
+                        <li class="active">
+                            <a href="http://blog.jasonantman.com/categories/tech-howtos/index.html">Tech howtos</a>
+                        </li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+              <li><a href="http://blog.jasonantman.com/archives.html"><i class="fa fa-th-list"></i><span class="icon-label">Archives</span></a></li>
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+</div> <!-- /.navbar -->
+<!-- Banner -->
+<!-- End Banner -->
+<div class="container">
+    <div class="row">
+        <div class="col-sm-9">
+    <section id="content">
+        <article>
+            <header class="page-header">
+                <h1>
+                    <a href="http://blog.jasonantman.com/2017/10/cloud-custodian-architecture-deployment-and-policy-preprocessing/"
+                       rel="bookmark"
+                       title="Permalink to Cloud Custodian Architecture, Deployment and Policy Preprocessing">
+                        Cloud Custodian Architecture, Deployment and Policy&nbsp;Preprocessing
+                    </a>
+                </h1>
+            </header>
+            <div class="entry-content">
+                <div class="panel">
+                    <div class="panel-body">
+<footer class="post-info">
+    <span class="label label-default">Date</span>
+    <span class="published">
+        <i class="fa fa-calendar"></i><time datetime="2017-10-24T16:49:00-04:00"> Tue 24 October 2017</time>
+    </span>
+
+
+
+
+
+<span class="label label-default">Tags</span>
+	<a href="http://blog.jasonantman.com/tags/aws/index.html">aws</a>
+        /
+	<a href="http://blog.jasonantman.com/tags/cloud-custodian/index.html">cloud-custodian</a>
+        /
+	<a href="http://blog.jasonantman.com/tags/cloud-custodian/index.html">cloud custodian</a>
+        /
+	<a href="http://blog.jasonantman.com/tags/c7n/index.html">c7n</a>
+        /
+	<a href="http://blog.jasonantman.com/tags/lambda/index.html">lambda</a>
+        /
+	<a href="http://blog.jasonantman.com/tags/sqs/index.html">sqs</a>
+        /
+	<a href="http://blog.jasonantman.com/tags/splunk/index.html">splunk</a>
+    
+</footer><!-- /.post-info -->                    </div>
+                </div>
+                <p><em>This post was originally published to my company&#8217;s internal blog platform; I&#8217;m publishing it here for the
+larger Cloud Custodian user community, but unfortunately I haven&#8217;t gotten (or sought) approval to publish
+any of our internal code referenced&nbsp;herein.</em></p>
+<p>At work I&#8217;ve spent quite a bit of time over the past few weeks working on our deployment of Capital One&#8217;s
+<a href="https://github.com/capitalone/cloud-custodian">cloud custodian</a> (a.k.a. <a href="https://pypi.python.org/pypi/c7n">c7n</a>)
+for rules and policy enforcement in our <span class="caps">AWS</span> accounts, both to replace our aged
+<a href="https://github.com/Netflix/SimianArmy/wiki/Janitor-Home">Netflix Janitor Monkey</a>
+installation and to enable us to expand the cleanup rules we execute and begin
+enforcing more granular policies. While we&#8217;ve only been running c7n for a few months
+(and most of that time in a test only/dry run mode), we&#8217;ve already accumulated
+29 different policies (mostly Janitor Monkey replacements for tag enforcement and low utilization instance termination)
+and are adding new ones rather quickly. Based on interest from colleagues I&#8217;d like
+to explain a bit about how we manage and deploy Cloud Custodian, and specifically
+about how we preprocess our policies to generate the <code>custodian.yml</code> configuration.</p>
+<h2 id="overall-architecture">Overall&nbsp;Architecture</h2>
+<p>We currently run all of our Cloud Custodian policies as Lambda functions, taking
+advantage of c7n&#8217;s excellent <a href="http://www.capitalone.io/cloud-custodian/docs/policy/lambda.html">Lambda support</a>.
+Each policy currently runs on a schedule (based on CloudWatch Events); we&#8217;ve experimented
+with running policies based on Config rules, Instance state changes and CloudTrail Events,
+but most of those executed too quickly to prove useful for our needs (specifically tag enforcement
+policies, as many of our development teams use tooling that defers tagging until significantly
+after resource creation). In addition to the main Lambda functions that execute the policies,
+we run a number of other ancillary tools related to Cloud&nbsp;Custodian:</p>
+<ol>
+<li>We use the <a href="https://github.com/capitalone/cloud-custodian/tree/master/tools/c7n_mailer">Custodian Mailer (c7n-mailer)</a>
+  tool for email notifications, coupled with a customized
+  <a href="https://gist.github.com/jantman/44eede9654dbb64e1d2abaa62ebbc0f3#file-redefault-html-j2">email template</a> based on the <a href="https://github.com/capitalone/cloud-custodian/blob/master/tools/c7n_mailer/msg-templates/default.html.j2">example</a>
+  for visually appealing and useful notifications across email clients (like the example below). This also runs as a Lambda
+  function, and processes notification events that c7n policies push onto an <span class="caps">SQS</span> queue.
+  <img alt="screenshot of c7n notification email template" src="/GFX/custodian-email-example.png"></li>
+<li>We use Splunk as our (new) central logging solution and run a custom Lambda function, <code>sqs_splunk_lambda</code>,
+  forked from <code>c7n-mailer</code> but modified to send cloud-custodian policy run results to Splunk Cloud instead of email.
+  Cloud Custodian&#8217;s <a href="http://www.capitalone.io/cloud-custodian/docs/generated/c7n.html#c7n.actions.Notify">notify action</a>,
+  which is used to trigger <code>c7n-mailer</code>, works by pushing some <span class="caps">JSON</span> data to an <span class="caps">SQS</span> queue; this data includes the full
+  details of the policy itself, the resources that the policy matched, and why (what filter(s)) each resource was matched.
+  Our policy preprocessor (see below) adds a notify action to <em>every</em> policy that sends to a specific, separate <span class="caps">SQS</span> queue
+  for the Splunk function. The Lambda function processes this queue every five minutes, removes some repetitive and
+  less-important data (to get the message size below <span class="caps">10KB</span>), and then sends the <span class="caps">JSON</span> message on to Splunk. This places
+  the full data from every policy execution in Splunk, and allows us to search
+  Splunk for high-level queries like &#8220;every <span class="caps">EC2</span> Instance that c7n stopped&#8221;, &#8220;every resource matched by a specific policy&#8221;,
+  or &#8220;every action that a specific policy has&nbsp;taken&#8221;.</li>
+<li>Asynchronous Lambda function executions - such as those triggered by CloudWatch Events - are automatically retried up
+  to three times if the invocation fails. However, there&#8217;s no easy way to tell if all tries of a particular function
+  invocation failed. <code>errorscan.py</code>
+  is our solution to this problem. We configure all of our Cloud Custodian policy Lambda functions with a Dead Letter Queue,
+  a feature of Lambda that pushes a message to a <span class="caps">SQS</span> queue if all retries of an invocation failed. <code>errorscan.py</code> runs
+  once a day via Jenkins and checks for messages in a single shared Dead Letter Queue (<span class="caps">DLQ</span>). If there are any, it uses CloudWatch
+  Logs to associate the queue entry with the Lambda function that failed, and outputs the logs from the failed invocation(s).
+  The <code>errorscan.py</code> script also examines the Failed and Throttled Invocations metrics in CloudWatch for each function.
+  If there were any entries in the <span class="caps">DLQ</span> or failed/throttled invocations metrics beyond a specified threshold, the job will
+  report that information and then fail, triggering a low urgency notification to our on-call&nbsp;engineer.</li>
+<li>We store our policies in git, one file per policy, with common default values removed. Our <code>policygen.py</code> script,
+  explained in detail below, reads the policy files, interpolates our defaults, performs some sanity checking,
+  and then generates the single <code>custodian.yml</code> file actually used by&nbsp;c7n.</li>
+</ol>
+<h2 id="test-and-deployment">Test and&nbsp;Deployment</h2>
+<p>We test and deploy our Cloud Custodian infrastructure using a Jenkinsfile.
+For simplicity of dependencies, most of the stages utilize the Jenkins <a href="https://plugins.jenkins.io/docker-workflow">Docker Workflow</a>
+plugin and run inside the public <a href="https://hub.docker.com/_/python/">python:2-wheezy</a> image and the jobs that manage the
+infrastructure dependencies run inside the public <a href="https://hub.docker.com/r/hashicorp/terraform/">hashicorp/terraform</a> image.
+Most of the actual custodian commands are run from a <code>Makefile</code>, which makes it
+easier to run the same commands from either the Jenkins pipeline or a local development&nbsp;environment.</p>
+<p>We follow a pull request GitHub workflow, and only allow merges to the master branch from PRs that have been successfully
+built by Jenkins. Our pipeline differentiates between builds of the master branch (which triggers deployment) and builds
+of PRs or other branches (which are test/dry run&nbsp;only).</p>
+<p>The steps in the pipeline are as&nbsp;follows:</p>
+<ol>
+<li><strong>Terraform</strong> - run a <code>terraform apply</code> for master, or a <code>terraform plan</code> for non-master. This uses terraform to manage the
+  required infrastructure for c7n,
+  namely the CloudWatch Log Group for the c7n lambda functions, the s3 bucket for the c7n output, the <span class="caps">IAM</span> Role that the
+  c7n functions execute with, and the <span class="caps">SQS</span> queues for the mailer, splunk log shipper, and the dead letter&nbsp;queue.</li>
+<li><strong>virtualenv</strong> - Setup a new Python virtualenv in the Docker container for the following steps, and copy the current directory
+  (git clone / Jenkins workspace) to <code>/app</code> in the container. We do the latter because Jenkins runs as a normal user
+  but the public Python docker container prefers to run as root (0:0). To prevent problems, we copy the Jenkins workspace
+  to <code>/app</code> in the container, run what we need to, and then copy any desired output back to the workspace and <code>chown</code>
+  it to Jenkins&#8217; user and group when&nbsp;finished.</li>
+<li><strong>tox</strong> - Install <a href="https://tox.readthedocs.io/en/latest/">tox</a> in the virtualenv; we use this to run pytest unit tests for
+  our custom code in subsequent&nbsp;steps.</li>
+<li><strong>policygen tests</strong> - Run unit tests for our <code>policygen.py</code> script.</li>
+<li><strong>sqs_splunk_lambda tests</strong> - Run unit tests for our <code>sqs_splunk_lambda</code> Splunk log shipper&nbsp;code.</li>
+<li><strong>Validate</strong> - Install dependencies for c7n, generate our <code>custodian.yml</code> file using <code>policygen.py</code>, and then
+  run <code>custodian validate</code> on the resulting file. This step also generates the <code>policies.rst</code> file containing a
+  table of our current policy names and comments/descriptions (which we include in our internal Sphinx-built documentation),
+  and copies both <code>custodian.yml</code> and <code>policies.rst</code> back to the Jenkins workspace for archiving in the job&nbsp;history.</li>
+<li><strong>mugc dry run</strong> - Cloud Custodian deploys its Lambda functions via a reusable Lambda management library,
+  <a href="https://github.com/capitalone/cloud-custodian/blob/master/c7n/mu.py">c7n.mu</a>, and we use its garbage collection
+  tool, <a href="https://github.com/capitalone/cloud-custodian/blob/master/tools/ops/mugc.py">mugc.py</a>, to clean up the
+  Lambda functions and CloudWatch Events for policies we&#8217;ve deleted. In this step, we do a dry run of the garbage
+  collection&nbsp;script.</li>
+<li><strong>custodian dry run</strong> - This performs a <code>custodian</code> dry run as a final check for our policies, copies the
+  dry-run results/output back to the Jenkins workspace, and archives it in the job&nbsp;history.</li>
+<li><strong>Run</strong> - For builds of the master branch, we do the actual <code>mugc.py</code> garbage collection of old Lambdas/Events,
+  do the actual <code>custodian</code> run to provision our c7n Lambda functions, and provision the <code>c7n_mailer</code> Lambda function.
+  For non-master branches, we only install the mailer&#8217;s dependencies (sanity check) and print our mailer config file
+  to&nbsp;<span class="caps">STDOUT</span>.</li>
+<li><strong>sqs_splunk_lambda</strong> - For builds of master, we install our <code>sqs_splunk_lambda</code> code and provision its
+  Lambda function. For builds other than master, we run <code>sqs_splunk_lambda --validate</code> to validate its configuration
+  file. This step is run in a <code>VaultBuildWrapper</code>, as it securely retrieves Splunk credentials from our
+  <a href="https://www.vaultproject.io/">HashiCorp Vault</a>&nbsp;instance.</li>
+<li><strong>Build Docs</strong> - We run a Sphinx build of our documentation, which is mostly static content but also includes the
+  generated list of our policies from step&nbsp;6.</li>
+<li><strong>Publish Docs</strong> - For builds of master, we push the <span class="caps">HTML</span> documentation built in the last step to the <code>gh-pages</code> branch
+  for serving via GitHub&nbsp;Pages.</li>
+<li><strong>Job <span class="caps">DSL</span> for Monitoring Job</strong> - For builds of master, we run
+  <a href="https://jenkinsci.github.io/job-dsl-plugin/">Job <span class="caps">DSL</span></a> to create or update a persistent Jenkins job
+  (outside the pipeline) that runs <code>errorscan.py</code> once a day and notifies us if any Lambda function errors were&nbsp;found.</li>
+</ol>
+<p>We also have shell scripts provided for testing changes and doing dry runs locally, which use the same Docker images and Makefile as the Jenkins-based&nbsp;build.</p>
+<h2 id="policy-preprocessing">Policy&nbsp;Preprocessing</h2>
+<p>Our <code>policygen.py</code> script is responsible for reading in the directory of per-policy <span class="caps">YAML</span> files,
+performing some sanity checks on them, interpolating defaults from a <code>policies/defaults.yml</code> file,
+and then writing out the single <code>custodian.yml</code> that Cloud Custodian actually runs. The overall program flow is as&nbsp;follows:</p>
+<ol>
+<li>Read in all <code>.yml</code> files from the <code>policies/</code> directory; build a dict of policy names to the policy contents, deserialized from <span class="caps">YAML</span> into native Python data structures. For each policy file, ensure that the filename without the extension (i.e. the basename) matches the value of the &#8220;name&#8221; key in the policy <span class="caps">YAML</span>; raise an exception if any policies do not have a filename that matches their policy&nbsp;name.</li>
+<li>Remove the <code>defaults</code> policy from that dict, and store it separately for later&nbsp;use.</li>
+<li>Iterate over all policies in the dict, lexicographically by policy name; for each of them, interpolate our defaults into the policy and append the result to a &#8220;policies&#8221; list. See below for details of the defaults interpolation&nbsp;process.</li>
+<li>Generate &#8220;cleanup&#8221; policies and append them to the list. This step is a holdover from before cloud-custodian had the <a href="https://github.com/capitalone/cloud-custodian/blob/master/tools/ops/mugc.py">mugc Lambda cleanup tool</a> but we still use it; this uses the names of all current policies to generate two policies that identify Lambda functions and CloudWatch Event Targets, respectively, that were provisioned by Cloud Custodian for policies that no longer exist. The resulting policies run once per day, and email us if there are any &#8220;orphaned&#8221; Cloud Custodian functions or&nbsp;rules.</li>
+<li>Run a series of sanity and safety checks on the generated policies (see &#8220;Policy Sanity Checks&#8221;, below, for more&nbsp;information).</li>
+<li>Write the final <code>custodian.yml</code> that will be used by Cloud Custodian, containing all of our final&nbsp;policies.</li>
+<li>Write a <code>policies.rst</code> file that will be incorporated into our Sphinx-generated <span class="caps">HTML</span> documentation site. This file contains a table with one row per policy for all of our policies; the first column is the policy name as a <span class="caps">HTML</span> link to the policy <code>.yml</code> file in the git repository, and the second column is the text of the policy&#8217;s <code>comment</code> or <code>comments</code> field.</li>
+</ol>
+<h3 id="interpolating-defaults-into-policies">Interpolating Defaults into&nbsp;Policies</h3>
+<p>The most important part of <code>policygen.py</code> is the interpolation of defaults into policies.
+When we originally deployed Cloud Custodian in our test environment, we noticed that our
+policies had two large blocks that were almost identical across all policies: the <code>mode</code>
+configuration telling Cloud Custodian to deploy the policies as Lambda functions triggered
+by periodic CloudWatch Events rules, and the notification action that we use for email
+notifications. This was the genesis of <code>policygen.py</code>; we moved these common policy
+sections to a <code>defaults.yml</code> file, and wrote <code>policygen.py</code> to perform intelligent
+merging of the defaults with each policy file, allowing us to override defaults in the
+individual policies but still keep some mandatory&nbsp;settings.</p>
+<p>Our <code>defaults.yml</code> file currently looks like&nbsp;this:</p>
+<div class="highlight"><pre><span></span><span class="c1"># <span class="caps">IMPORTANT</span> <span class="caps">NOTE</span>: **<span class="caps">ALL</span>** policies will have an additional notification action.</span>
+<span class="c1"># See <span class="caps">README</span>.md and policygen.py `SPLUNK_SQS` for further info and config.</span>
+<span class="l l-Scalar l-Scalar-Plain">mode</span><span class="p p-Indicator">:</span>
+  <span class="l l-Scalar l-Scalar-Plain">type</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">periodic</span>
+  <span class="c1"># This will trigger our rules at 15:20 <span class="caps">UTC</span> (11:20 <span class="caps">EDT</span> / 10:20 <span class="caps">EST</span>)</span>
+  <span class="c1"># it might be better to spread them out over time a bit, but right now our</span>
+  <span class="c1"># main concern is ensuring that policies run during work hours.</span>
+  <span class="l l-Scalar l-Scalar-Plain">schedule</span><span class="p p-Indicator">:</span> <span class="s">&#39;cron(20</span><span class="nv"> </span><span class="s">15</span><span class="nv"> </span><span class="s">*</span><span class="nv"> </span><span class="s">*</span><span class="nv"> </span><span class="s">?</span><span class="nv"> </span><span class="s">*)&#39;</span>
+  <span class="l l-Scalar l-Scalar-Plain">timeout</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">300</span>
+  <span class="l l-Scalar l-Scalar-Plain">execution-options</span><span class="p p-Indicator">:</span>
+    <span class="l l-Scalar l-Scalar-Plain">log_group</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">/cloud-custodian/123456789012/us-east-1</span>
+    <span class="l l-Scalar l-Scalar-Plain">output_dir</span><span class="p p-Indicator">:</span> <span class="s">&#39;s3://<span class="caps">SOME</span>-<span class="caps">BUCKET</span>-<span class="caps">NAME</span>/logs&#39;</span>
+  <span class="l l-Scalar l-Scalar-Plain">dead_letter_config</span><span class="p p-Indicator">:</span>
+    <span class="l l-Scalar l-Scalar-Plain">TargetArn</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">arn:aws:sqs:us-east-1:123456789012:cloud-custodian-123456789012-deadletter</span>
+  <span class="l l-Scalar l-Scalar-Plain">role</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">arn:aws:iam::123456789012:role/cloud-custodian-123456789012</span>
+  <span class="l l-Scalar l-Scalar-Plain">tags</span><span class="p p-Indicator">:</span>
+    <span class="l l-Scalar l-Scalar-Plain">Project</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">cloud-custodian</span>
+    <span class="l l-Scalar l-Scalar-Plain">Environment</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">dev</span>
+    <span class="l l-Scalar l-Scalar-Plain">OwnerEmail</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">us@example.com</span>
+<span class="l l-Scalar l-Scalar-Plain">actions</span><span class="p p-Indicator">:</span>
+  <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">type</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">notify</span>
+    <span class="l l-Scalar l-Scalar-Plain">questions_email</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">us@example.com</span>
+    <span class="l l-Scalar l-Scalar-Plain">questions_slack</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">ourChannelName</span>
+    <span class="l l-Scalar l-Scalar-Plain">template</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">redefault.html</span>
+    <span class="l l-Scalar l-Scalar-Plain">to</span><span class="p p-Indicator">:</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">resource-owner</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">us@example.com</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">awsusers@example.com</span>
+    <span class="l l-Scalar l-Scalar-Plain">transport</span><span class="p p-Indicator">:</span>
+      <span class="l l-Scalar l-Scalar-Plain">type</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">sqs</span>
+      <span class="l l-Scalar l-Scalar-Plain">queue</span><span class="p p-Indicator">:</span> <span class="s">&#39;https://sqs.us-east-1.amazonaws.com/123456789012/cloud-custodian-123456789012&#39;</span>
+</pre></div>
+
+
+<p>This provides us with our default execution mode (Lambda function triggered once a day
+at a defined time via CloudWatch Events) and its configuration options (mainly, the
+<span class="caps">IAM</span> Role used for execution, the Dead Letter Queue, CloudWatch Log Group, and S3 output
+configuration for policy results), as well as our default email notification configuration
+using <span class="caps">SQS</span> to&nbsp;c7n-mailer.</p>
+<p>All of these options can be overridden in individual policies intelligently; a simple example
+policy that emails us about any <span class="caps">VPC</span> Peering Connections in a state other than
+&#8220;active&#8221; would look&nbsp;like:</p>
+<div class="highlight"><pre><span></span><span class="c1"># <span class="caps">REMINDER</span>: defaults.yml will be merged in to this. See the <span class="caps">README</span>.</span>
+<span class="l l-Scalar l-Scalar-Plain">name</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">inactive-vpc-peers</span>
+<span class="l l-Scalar l-Scalar-Plain">comment</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">Notify <span class="caps">RE</span> of any <span class="caps">VPC</span> Peering Connections not in Active state (i.e. pending-acceptance, failed, etc.)</span>
+<span class="l l-Scalar l-Scalar-Plain">resource</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">peering-connection</span>
+<span class="l l-Scalar l-Scalar-Plain">filters</span><span class="p p-Indicator">:</span>
+  <span class="c1"># Peering Connection not in &quot;active&quot; state</span>
+  <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">type</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">value</span>
+    <span class="l l-Scalar l-Scalar-Plain">key</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">Status.Code</span>
+    <span class="l l-Scalar l-Scalar-Plain">op</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">ne</span>
+    <span class="l l-Scalar l-Scalar-Plain">value</span><span class="p p-Indicator">:</span> <span class="s">&quot;active&quot;</span>
+<span class="l l-Scalar l-Scalar-Plain">actions</span><span class="p p-Indicator">:</span>
+  <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">type</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">notify</span>
+    <span class="l l-Scalar l-Scalar-Plain">violation_desc</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">The following <span class="caps">VPC</span> Peering Connections are in a state other than &quot;active&quot;</span>
+    <span class="l l-Scalar l-Scalar-Plain">action_desc</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">likely need to be accepted, deleted, or investigated.</span>
+    <span class="l l-Scalar l-Scalar-Plain">subject</span><span class="p p-Indicator">:</span> <span class="s">&#39;[cloud-custodian</span><span class="nv"> </span><span class="s">{{</span><span class="nv"> </span><span class="s">account</span><span class="nv"> </span><span class="s">}}]</span><span class="nv"> </span><span class="s"><span class="caps">VPC</span></span><span class="nv"> </span><span class="s">Peering</span><span class="nv"> </span><span class="s">Connections</span><span class="nv"> </span><span class="s">not</span><span class="nv"> </span><span class="s">in</span><span class="nv"> </span><span class="s">Active</span><span class="nv"> </span><span class="s">state</span><span class="nv"> </span><span class="s">{{</span><span class="nv"> </span><span class="s">region</span><span class="nv"> </span><span class="s">}}&#39;</span>
+    <span class="l l-Scalar l-Scalar-Plain">to</span><span class="p p-Indicator">:</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">us@example.com</span>
+</pre></div>
+
+
+<p>This policy automatically inherits all of the <code>mode</code> defaults configuration and the <code>notify</code>
+action is merged with the defaults; the resulting generated policy will combine all of the keys
+in the defaults notification action and the policy notification action, with the exception of the
+<code>to</code> block where the defaults are overridden by the&nbsp;policy.</p>
+<p>The actual process of merging the policy and defaults is a recursive deep merge of the dicts, merging
+the individual policy over a copy of the defaults, with special logic for lists and
+<code>type: notify</code> actions. Overall, the procedure&nbsp;is:</p>
+<ul>
+<li>We start with <code>defaults.yml</code> as a base, and layer the policy-specific config on top of&nbsp;it.</li>
+<li>We merge recursively (i.e. deep&nbsp;merging).</li>
+<li>Keys from the policy overwrite identical keys in the defaults; the policy-specific config always wins over the&nbsp;defaults.</li>
+<li>In the case of lists (i.e. the <code>actions</code> list), the end result includes all elements that are simple data types (i.e. strings). For
+  dict items in lists, we look at the value of the <code>type</code> element; if both the policy and the defaults lists have
+  dicts with the same <code>type</code>, we merge them together, with the policy overwriting the defaults. Defaults dicts without a
+  matching <code>type</code> in the policy will always be in the final result, <strong>except for</strong> <code>actions</code> with a type of <code>notify</code>; policies that do
+  not have a <code>type: notify</code> action will not have one added. This allows us to set defaults for dicts embedded in lists, like the
+  <code>type: notify</code> action.</li>
+<li>When finished merging, add a notification action to every policy that pushes to the Splunk queue, which is handled by our
+  sqs_splunk_lambda&nbsp;code.</li>
+</ul>
+<p>To merge the two dicts together, we begin with a copy of the defaults and then iterate over all of the items in the policy as key/value pairs, updating the defaults as we go to build the final&nbsp;policy:</p>
+<ul>
+<li>If the key from the policy-specific config isn&#8217;t in the defaults, we add the key and value and move on.&nbsp;Otherwise;</li>
+<li>If the value is a list, we use special list merging logic (see below) and update with the result of the list&nbsp;merge.</li>
+<li>If the value is another dict, we call the same function recursively and update with its&nbsp;result.</li>
+<li>If the value isn&#8217;t a list or dict, we assume it to be a simple type (string, int, etc.) and overwrite the default value with the one specified in the policy-specific&nbsp;configuration.</li>
+<li>The end result of this is&nbsp;returned.</li>
+</ul>
+<p>List merging is somewhat special, to let us set defaults for&nbsp;actions:</p>
+<ul>
+<li>We begin with the policy itself as the base list, instead of the&nbsp;defaults.</li>
+<li>Any non-dict items in defaults that aren&#8217;t in the policy are appended to the policy&nbsp;list.</li>
+<li>Any dict items in the policy list with a <code>type</code> key/value pair that matches one of the dict items in the defaults list, will have additional key/value pairs added from the defaults&nbsp;dict.</li>
+<li>Any defaults dicts not handled under the previous condition will be appended to the result, with the exception of a <code>type: notify</code> dict in the <code>['actions']</code> path.</li>
+</ul>
+<h3 id="policy-sanity-checks">Policy Sanity&nbsp;Checks</h3>
+<p>Before writing out the final <code>custodian.yml</code> configuration, each policy is run through a sanity/safety checking
+function. The function is written to be easily extendable to add new policy checks (written in Python), but currently
+only has a single check to ensure that any <code>marked-for-op</code> filters come first in the filter list. When we originally
+deployed Cloud Custodian, one of our policies had a <code>marked-for-op</code> filter (which allows Cloud Custodian to take action
+on a resource that was specifically tagged for delayed action in the future) accidentally nested under an <code>or</code> clause
+in the policy <span class="caps">YAML</span> (which was unfortunately easy to do, as it only required accidentally indenting the block two extra
+spaces). This resulted in the policy taking action immediately instead of a week later, which could have been catastrophic
+(luckily the action in this case was benign). To prevent this from happening again, our checks ensure that <code>marked-for-op</code>
+filters, if present, always come at the beginning of the list of&nbsp;filters.</p>
+<h2 id="conclusion">Conclusion</h2>
+<p>We&#8217;re still in the process of expanding our Cloud Custodian deployment; right now we&#8217;re only running
+it in one region of one non-production account, but that one region contains the vast majority of our infrastructure.
+We&#8217;ll be expanding to other regions and then production accounts in the next few weeks, and that will require changing
+some portions of our configuration, management, and policy generation code to compensate. So far we&#8217;ve seen good results
+with using Cloud Custodian to enforce tagging and cost-reduction rules, such as terminating instances that have been
+idle for a long time. We hope to continue extending the role that Cloud Custodian plays in cost reduction, and also
+expand into enforcing more security and &#8220;housekeeping&#8221;&nbsp;policies.</p>
+            </div>
+            <!-- /.entry-content -->
+    <hr />
+    <!-- Shariff Button BEGIN -->
+    <div class="shariff"
+        data-lang="en"
+        data-orientation="horizontal"
+        data-services = "[&quot;facebook&quot;,&quot;googleplus&quot;,&quot;twitter&quot;,&quot;linkedin&quot;,&quot;diaspora&quot;]"
+        data-theme="standard"
+        data-url="http://blog.jasonantman.com/2017/10/cloud-custodian-architecture-deployment-and-policy-preprocessing/"></div>
+    <!-- Shariff Button END -->
+    <hr/>
+    <section class="comments" id="comments">
+        <h2>Comments</h2>
+
+        <div id="disqus_thread"></div>
+        <script type="text/javascript">
+            /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+            var disqus_shortname = 'jantman'; // required: replace example with your forum shortname
+
+                    var disqus_identifier = 'cloud-custodian-architecture-deployment-and-policy-preprocessing';
+                var disqus_url = 'http://blog.jasonantman.com/2017/10/cloud-custodian-architecture-deployment-and-policy-preprocessing/';
+
+            var disqus_config = function () {
+                this.language = "en";
+            };
+
+            /* * * DON'T EDIT BELOW THIS LINE * * */
+            (function () {
+                var dsq = document.createElement('script');
+                dsq.type = 'text/javascript';
+                dsq.async = true;
+                dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+                (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+            })();
+        </script>
+        <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by
+            Disqus.</a></noscript>
+        <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+
+    </section>
+        </article>
+    </section>
+
+        </div>
+        <div class="col-sm-3" id="sidebar">
+            <aside>
+<!-- Sidebar -->
+<section class="well well-sm">
+  <ul class="list-group list-group-flush">
+
+<!-- Sidebar/Recent Posts -->
+<li class="list-group-item">
+  <h4><i class="fa fa-home fa-lg"></i><span class="icon-label">Recent Posts</span></h4>
+  <ul class="list-group" id="recentposts">
+    <li class="list-group-item"><a href="http://blog.jasonantman.com/2017/10/cloud-custodian-architecture-deployment-and-policy-preprocessing/">Cloud Custodian Architecture, Deployment and Policy&nbsp;Preprocessing</a></li>
+    <li class="list-group-item"><a href="http://blog.jasonantman.com/2017/10/pre-authorized-aws-console-urls-for-notifications/">Pre-Authorized <span class="caps">AWS</span> Console URLs for&nbsp;Notifications</a></li>
+    <li class="list-group-item"><a href="http://blog.jasonantman.com/2017/04/python-script-to-check-xfinity-data-usage/">Python script to check xfinity data&nbsp;usage</a></li>
+    <li class="list-group-item"><a href="http://blog.jasonantman.com/2017/03/vyos-on-alix-2c1-single-board-computer/">VyOS on Alix 2C1 Single Board&nbsp;Computer</a></li>
+    <li class="list-group-item"><a href="http://blog.jasonantman.com/2016/10/yesterdays-widespread-internet-outage-for-non-geeks/">Yesterday&#8217;s Widespread Internet Outage, for&nbsp;non-geeks</a></li>
+  </ul>
+</li>
+<!-- End Sidebar/Recent Posts -->
+
+<!-- Sidebar/Twitter Timeline -->
+<li class="list-group-item">
+  <h4><i class="fa fa-twitter fa-lg"></i><span class="icon-label">Latest Tweets</span></h4>
+  <div id="twitter_timeline">
+    <a class="twitter-timeline" data-width="250" data-height="300" data-dnt="true" data-theme="light" href="https://twitter.com/j_antman">Tweets by j_antman</a> <script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
+  </div>
+</li>
+<!-- End Sidebar/Twitter Timeline -->
+
+<!-- Sidebar/Github -->
+<li class="list-group-item">
+  <h4><i class="fa fa-github fa-lg"></i><span class="icon-label">GitHub Repos</span></h4>
+  <div id="gh_repos">
+    <p class="list-group-item">Status updating...</p>
+  </div>
+  <a href="https://github.com/jantman">@jantman</a> on GitHub
+</li>
+<!-- End Sidebar/Github -->
+
+<!-- Sidebar/Links -->
+<li class="list-group-item">
+  <h4><i class="fa fa-external-link-square fa-lg"></i><span class="icon-label">Links</span></h4>
+  <ul class="list-group" id="links">
+    <li class="list-group-item">
+      <a href="http://www.jasonantman.com" target="_blank">Homepage</a>
+    </li>
+    <li class="list-group-item">
+      <a href="http://resume.jasonantman.com" target="_blank">Resume</a>
+    </li>
+  </ul>
+</li>
+<!-- End Sidebar/Links -->
+  </ul>
+</section>
+<!-- End Sidebar -->            </aside>
+        </div>
+    </div>
+</div>
+<footer>
+   <div class="container">
+      <hr>
+      <div class="row">
+         <div class="col-xs-10">&copy; 2017 Jason Antman
+            &middot; Powered by <a href="https://github.com/getpelican/pelican-themes/tree/master/pelican-bootstrap3" target="_blank">pelican-bootstrap3</a>,
+            <a href="http://docs.getpelican.com/" target="_blank">Pelican</a>,
+            <a href="http://getbootstrap.com" target="_blank">Bootstrap</a>         </div>
+         <div class="col-xs-2"><p class="pull-right"><i class="fa fa-arrow-up"></i> <a href="#">Back to top</a></p></div>
+      </div>
+   </div>
+</footer>
+<script src="http://blog.jasonantman.com/theme/js/jquery.min.js"></script>
+
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="http://blog.jasonantman.com/theme/js/bootstrap.min.js"></script>
+
+<!-- Enable responsive features in IE8 with Respond.js (https://github.com/scottjehl/Respond) -->
+<script src="http://blog.jasonantman.com/theme/js/respond.min.js"></script>
+
+
+
+    <!-- GITHUB_REPOS_JSON (explicitly pinned repos ) -->
+  <script id="GithubReposJson" type="application/json">
+  [{"description": "A script and python module to check your AWS service limits and usage via boto.", "name": "awslimitchecker", "html_url": "https://github.com/jantman/awslimitchecker"}, {"description": "Puppet module and accompanying documentation to install/setup Arch linux on a MacBook Pro Retina 11,4", "name": "puppet-archlinux-macbookretina", "html_url": "https://github.com/jantman/puppet-archlinux-macbookretina"}, {"description": "A collection of scripts that I've written", "name": "misc-scripts", "html_url": "https://github.com/jantman/misc-scripts"}, {"description": "Responsive Flask/SQLAlchemy personal finance app, specifically for biweekly budgeting.", "name": "biweeklybudget", "html_url": "https://github.com/jantman/biweeklybudget"}, {"description": "Calculate detailed download stats and generate HTML and badges for PyPI packages", "name": "pypi-download-stats", "html_url": "https://github.com/jantman/pypi-download-stats"}, {"description": "A standard to easily communicate to humans and machines the development/support and usability status of software repositories/projects.", "name": "repostatus.org", "html_url": "https://github.com/jantman/repostatus.org"}]
+  </script>
+
+<!-- GitHub JS Code -->
+<script type="text/javascript">
+$(document).ready(function () {
+  if (!window.jXHR) {
+    var jxhr = document.createElement('script');
+    jxhr.type = 'text/javascript';
+    jxhr.src = 'http://blog.jasonantman.com/theme/js/jXHR.js';
+    var s = document.getElementsByTagName('script')[0];
+    s.parentNode.insertBefore(jxhr, s);
+  }
+
+  console.log($('#GithubReposJson').html());
+  github.showSpecificRepos({
+    user: 'jantman',
+    target: '#gh_repos',
+    repos: JSON.parse($('#GithubReposJson').html())
+  });
+});
+</script>
+<script src="http://blog.jasonantman.com/theme/js/github.js" type="text/javascript"></script>
+<!-- End GitHub JS Code -->
+    <!-- Disqus -->
+    <script type="text/javascript">
+        /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+        var disqus_shortname = 'jantman'; // required: replace example with your forum shortname
+
+        /* * * DON'T EDIT BELOW THIS LINE * * */
+        (function () {
+            var s = document.createElement('script');
+            s.async = true;
+            s.type = 'text/javascript';
+            s.src = '//' + disqus_shortname + '.disqus.com/count.js';
+            (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+        }());
+    </script>
+    <!-- End Disqus Code -->
+    <!-- Google Analytics Universal -->
+    <script type="text/javascript">
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+        ga('create', 'UA-2718127-2', 'jasonantman.com');
+        ga('send', 'pageview');
+    </script>
+    <!-- End Google Analytics Universal Code -->
+
+
+    <!-- add shariff support -->
+    <script src="http://blog.jasonantman.com/theme/js/shariff.min.js"></script>
+</body>
+</html>

@@ -1,5 +1,251 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Jason Antman's Blog</title><link href="http://blog.jasonantman.com/" rel="alternate"></link><link href="http://blog.jasonantman.com/feeds/all-en.atom.xml" rel="self"></link><id>http://blog.jasonantman.com/</id><updated>2017-10-08T19:14:00-04:00</updated><entry><title>Pre-Authorized AWS Console URLs for Notifications</title><link href="http://blog.jasonantman.com/2017/10/pre-authorized-aws-console-urls-for-notifications/" rel="alternate"></link><published>2017-10-08T19:14:00-04:00</published><updated>2017-10-08T19:14:00-04:00</updated><author><name>Jason Antman</name></author><id>tag:blog.jasonantman.com,2017-10-08:/2017/10/pre-authorized-aws-console-urls-for-notifications/</id><summary type="html">&lt;p&gt;Pre-authorized &lt;span class="caps"&gt;AWS&lt;/span&gt; Console login URLs with limited permissions allow immediate investigation from&amp;nbsp;notifications.&lt;/p&gt;</summary><content type="html">&lt;h2 id="background"&gt;Background&lt;/h2&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Jason Antman's Blog</title><link href="http://blog.jasonantman.com/" rel="alternate"></link><link href="http://blog.jasonantman.com/feeds/all-en.atom.xml" rel="self"></link><id>http://blog.jasonantman.com/</id><updated>2017-10-24T16:49:00-04:00</updated><entry><title>Cloud Custodian Architecture, Deployment and Policy Preprocessing</title><link href="http://blog.jasonantman.com/2017/10/cloud-custodian-architecture-deployment-and-policy-preprocessing/" rel="alternate"></link><published>2017-10-24T16:49:00-04:00</published><updated>2017-10-24T16:49:00-04:00</updated><author><name>Jason Antman</name></author><id>tag:blog.jasonantman.com,2017-10-24:/2017/10/cloud-custodian-architecture-deployment-and-policy-preprocessing/</id><summary type="html">&lt;p&gt;Details of how I setup Capital One&amp;#8217;s Cloud Custodain at work, including our monitoring, logging and policy&amp;nbsp;preprocessing.&lt;/p&gt;</summary><content type="html">&lt;p&gt;&lt;em&gt;This post was originally published to my company&amp;#8217;s internal blog platform; I&amp;#8217;m publishing it here for the
+larger Cloud Custodian user community, but unfortunately I haven&amp;#8217;t gotten (or sought) approval to publish
+any of our internal code referenced&amp;nbsp;herein.&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;At work I&amp;#8217;ve spent quite a bit of time over the past few weeks working on our deployment of Capital One&amp;#8217;s
+&lt;a href="https://github.com/capitalone/cloud-custodian"&gt;cloud custodian&lt;/a&gt; (a.k.a. &lt;a href="https://pypi.python.org/pypi/c7n"&gt;c7n&lt;/a&gt;)
+for rules and policy enforcement in our &lt;span class="caps"&gt;AWS&lt;/span&gt; accounts, both to replace our aged
+&lt;a href="https://github.com/Netflix/SimianArmy/wiki/Janitor-Home"&gt;Netflix Janitor Monkey&lt;/a&gt;
+installation and to enable us to expand the cleanup rules we execute and begin
+enforcing more granular policies. While we&amp;#8217;ve only been running c7n for a few months
+(and most of that time in a test only/dry run mode), we&amp;#8217;ve already accumulated
+29 different policies (mostly Janitor Monkey replacements for tag enforcement and low utilization instance termination)
+and are adding new ones rather quickly. Based on interest from colleagues I&amp;#8217;d like
+to explain a bit about how we manage and deploy Cloud Custodian, and specifically
+about how we preprocess our policies to generate the &lt;code&gt;custodian.yml&lt;/code&gt; configuration.&lt;/p&gt;
+&lt;h2 id="overall-architecture"&gt;Overall&amp;nbsp;Architecture&lt;/h2&gt;
+&lt;p&gt;We currently run all of our Cloud Custodian policies as Lambda functions, taking
+advantage of c7n&amp;#8217;s excellent &lt;a href="http://www.capitalone.io/cloud-custodian/docs/policy/lambda.html"&gt;Lambda support&lt;/a&gt;.
+Each policy currently runs on a schedule (based on CloudWatch Events); we&amp;#8217;ve experimented
+with running policies based on Config rules, Instance state changes and CloudTrail Events,
+but most of those executed too quickly to prove useful for our needs (specifically tag enforcement
+policies, as many of our development teams use tooling that defers tagging until significantly
+after resource creation). In addition to the main Lambda functions that execute the policies,
+we run a number of other ancillary tools related to Cloud&amp;nbsp;Custodian:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;We use the &lt;a href="https://github.com/capitalone/cloud-custodian/tree/master/tools/c7n_mailer"&gt;Custodian Mailer (c7n-mailer)&lt;/a&gt;
+  tool for email notifications, coupled with a customized
+  &lt;a href="https://gist.github.com/jantman/44eede9654dbb64e1d2abaa62ebbc0f3#file-redefault-html-j2"&gt;email template&lt;/a&gt; based on the &lt;a href="https://github.com/capitalone/cloud-custodian/blob/master/tools/c7n_mailer/msg-templates/default.html.j2"&gt;example&lt;/a&gt;
+  for visually appealing and useful notifications across email clients (like the example below). This also runs as a Lambda
+  function, and processes notification events that c7n policies push onto an &lt;span class="caps"&gt;SQS&lt;/span&gt; queue.
+  &lt;img alt="screenshot of c7n notification email template" src="/GFX/custodian-email-example.png"&gt;&lt;/li&gt;
+&lt;li&gt;We use Splunk as our (new) central logging solution and run a custom Lambda function, &lt;code&gt;sqs_splunk_lambda&lt;/code&gt;,
+  forked from &lt;code&gt;c7n-mailer&lt;/code&gt; but modified to send cloud-custodian policy run results to Splunk Cloud instead of email.
+  Cloud Custodian&amp;#8217;s &lt;a href="http://www.capitalone.io/cloud-custodian/docs/generated/c7n.html#c7n.actions.Notify"&gt;notify action&lt;/a&gt;,
+  which is used to trigger &lt;code&gt;c7n-mailer&lt;/code&gt;, works by pushing some &lt;span class="caps"&gt;JSON&lt;/span&gt; data to an &lt;span class="caps"&gt;SQS&lt;/span&gt; queue; this data includes the full
+  details of the policy itself, the resources that the policy matched, and why (what filter(s)) each resource was matched.
+  Our policy preprocessor (see below) adds a notify action to &lt;em&gt;every&lt;/em&gt; policy that sends to a specific, separate &lt;span class="caps"&gt;SQS&lt;/span&gt; queue
+  for the Splunk function. The Lambda function processes this queue every five minutes, removes some repetitive and
+  less-important data (to get the message size below &lt;span class="caps"&gt;10KB&lt;/span&gt;), and then sends the &lt;span class="caps"&gt;JSON&lt;/span&gt; message on to Splunk. This places
+  the full data from every policy execution in Splunk, and allows us to search
+  Splunk for high-level queries like &amp;#8220;every &lt;span class="caps"&gt;EC2&lt;/span&gt; Instance that c7n stopped&amp;#8221;, &amp;#8220;every resource matched by a specific policy&amp;#8221;,
+  or &amp;#8220;every action that a specific policy has&amp;nbsp;taken&amp;#8221;.&lt;/li&gt;
+&lt;li&gt;Asynchronous Lambda function executions - such as those triggered by CloudWatch Events - are automatically retried up
+  to three times if the invocation fails. However, there&amp;#8217;s no easy way to tell if all tries of a particular function
+  invocation failed. &lt;code&gt;errorscan.py&lt;/code&gt;
+  is our solution to this problem. We configure all of our Cloud Custodian policy Lambda functions with a Dead Letter Queue,
+  a feature of Lambda that pushes a message to a &lt;span class="caps"&gt;SQS&lt;/span&gt; queue if all retries of an invocation failed. &lt;code&gt;errorscan.py&lt;/code&gt; runs
+  once a day via Jenkins and checks for messages in a single shared Dead Letter Queue (&lt;span class="caps"&gt;DLQ&lt;/span&gt;). If there are any, it uses CloudWatch
+  Logs to associate the queue entry with the Lambda function that failed, and outputs the logs from the failed invocation(s).
+  The &lt;code&gt;errorscan.py&lt;/code&gt; script also examines the Failed and Throttled Invocations metrics in CloudWatch for each function.
+  If there were any entries in the &lt;span class="caps"&gt;DLQ&lt;/span&gt; or failed/throttled invocations metrics beyond a specified threshold, the job will
+  report that information and then fail, triggering a low urgency notification to our on-call&amp;nbsp;engineer.&lt;/li&gt;
+&lt;li&gt;We store our policies in git, one file per policy, with common default values removed. Our &lt;code&gt;policygen.py&lt;/code&gt; script,
+  explained in detail below, reads the policy files, interpolates our defaults, performs some sanity checking,
+  and then generates the single &lt;code&gt;custodian.yml&lt;/code&gt; file actually used by&amp;nbsp;c7n.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id="test-and-deployment"&gt;Test and&amp;nbsp;Deployment&lt;/h2&gt;
+&lt;p&gt;We test and deploy our Cloud Custodian infrastructure using a Jenkinsfile.
+For simplicity of dependencies, most of the stages utilize the Jenkins &lt;a href="https://plugins.jenkins.io/docker-workflow"&gt;Docker Workflow&lt;/a&gt;
+plugin and run inside the public &lt;a href="https://hub.docker.com/_/python/"&gt;python:2-wheezy&lt;/a&gt; image and the jobs that manage the
+infrastructure dependencies run inside the public &lt;a href="https://hub.docker.com/r/hashicorp/terraform/"&gt;hashicorp/terraform&lt;/a&gt; image.
+Most of the actual custodian commands are run from a &lt;code&gt;Makefile&lt;/code&gt;, which makes it
+easier to run the same commands from either the Jenkins pipeline or a local development&amp;nbsp;environment.&lt;/p&gt;
+&lt;p&gt;We follow a pull request GitHub workflow, and only allow merges to the master branch from PRs that have been successfully
+built by Jenkins. Our pipeline differentiates between builds of the master branch (which triggers deployment) and builds
+of PRs or other branches (which are test/dry run&amp;nbsp;only).&lt;/p&gt;
+&lt;p&gt;The steps in the pipeline are as&amp;nbsp;follows:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;Terraform&lt;/strong&gt; - run a &lt;code&gt;terraform apply&lt;/code&gt; for master, or a &lt;code&gt;terraform plan&lt;/code&gt; for non-master. This uses terraform to manage the
+  required infrastructure for c7n,
+  namely the CloudWatch Log Group for the c7n lambda functions, the s3 bucket for the c7n output, the &lt;span class="caps"&gt;IAM&lt;/span&gt; Role that the
+  c7n functions execute with, and the &lt;span class="caps"&gt;SQS&lt;/span&gt; queues for the mailer, splunk log shipper, and the dead letter&amp;nbsp;queue.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;virtualenv&lt;/strong&gt; - Setup a new Python virtualenv in the Docker container for the following steps, and copy the current directory
+  (git clone / Jenkins workspace) to &lt;code&gt;/app&lt;/code&gt; in the container. We do the latter because Jenkins runs as a normal user
+  but the public Python docker container prefers to run as root (0:0). To prevent problems, we copy the Jenkins workspace
+  to &lt;code&gt;/app&lt;/code&gt; in the container, run what we need to, and then copy any desired output back to the workspace and &lt;code&gt;chown&lt;/code&gt;
+  it to Jenkins&amp;#8217; user and group when&amp;nbsp;finished.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;tox&lt;/strong&gt; - Install &lt;a href="https://tox.readthedocs.io/en/latest/"&gt;tox&lt;/a&gt; in the virtualenv; we use this to run pytest unit tests for
+  our custom code in subsequent&amp;nbsp;steps.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;policygen tests&lt;/strong&gt; - Run unit tests for our &lt;code&gt;policygen.py&lt;/code&gt; script.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;sqs_splunk_lambda tests&lt;/strong&gt; - Run unit tests for our &lt;code&gt;sqs_splunk_lambda&lt;/code&gt; Splunk log shipper&amp;nbsp;code.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Validate&lt;/strong&gt; - Install dependencies for c7n, generate our &lt;code&gt;custodian.yml&lt;/code&gt; file using &lt;code&gt;policygen.py&lt;/code&gt;, and then
+  run &lt;code&gt;custodian validate&lt;/code&gt; on the resulting file. This step also generates the &lt;code&gt;policies.rst&lt;/code&gt; file containing a
+  table of our current policy names and comments/descriptions (which we include in our internal Sphinx-built documentation),
+  and copies both &lt;code&gt;custodian.yml&lt;/code&gt; and &lt;code&gt;policies.rst&lt;/code&gt; back to the Jenkins workspace for archiving in the job&amp;nbsp;history.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;mugc dry run&lt;/strong&gt; - Cloud Custodian deploys its Lambda functions via a reusable Lambda management library,
+  &lt;a href="https://github.com/capitalone/cloud-custodian/blob/master/c7n/mu.py"&gt;c7n.mu&lt;/a&gt;, and we use its garbage collection
+  tool, &lt;a href="https://github.com/capitalone/cloud-custodian/blob/master/tools/ops/mugc.py"&gt;mugc.py&lt;/a&gt;, to clean up the
+  Lambda functions and CloudWatch Events for policies we&amp;#8217;ve deleted. In this step, we do a dry run of the garbage
+  collection&amp;nbsp;script.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;custodian dry run&lt;/strong&gt; - This performs a &lt;code&gt;custodian&lt;/code&gt; dry run as a final check for our policies, copies the
+  dry-run results/output back to the Jenkins workspace, and archives it in the job&amp;nbsp;history.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Run&lt;/strong&gt; - For builds of the master branch, we do the actual &lt;code&gt;mugc.py&lt;/code&gt; garbage collection of old Lambdas/Events,
+  do the actual &lt;code&gt;custodian&lt;/code&gt; run to provision our c7n Lambda functions, and provision the &lt;code&gt;c7n_mailer&lt;/code&gt; Lambda function.
+  For non-master branches, we only install the mailer&amp;#8217;s dependencies (sanity check) and print our mailer config file
+  to&amp;nbsp;&lt;span class="caps"&gt;STDOUT&lt;/span&gt;.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;sqs_splunk_lambda&lt;/strong&gt; - For builds of master, we install our &lt;code&gt;sqs_splunk_lambda&lt;/code&gt; code and provision its
+  Lambda function. For builds other than master, we run &lt;code&gt;sqs_splunk_lambda --validate&lt;/code&gt; to validate its configuration
+  file. This step is run in a &lt;code&gt;VaultBuildWrapper&lt;/code&gt;, as it securely retrieves Splunk credentials from our
+  &lt;a href="https://www.vaultproject.io/"&gt;HashiCorp Vault&lt;/a&gt;&amp;nbsp;instance.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Build Docs&lt;/strong&gt; - We run a Sphinx build of our documentation, which is mostly static content but also includes the
+  generated list of our policies from step&amp;nbsp;6.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Publish Docs&lt;/strong&gt; - For builds of master, we push the &lt;span class="caps"&gt;HTML&lt;/span&gt; documentation built in the last step to the &lt;code&gt;gh-pages&lt;/code&gt; branch
+  for serving via GitHub&amp;nbsp;Pages.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Job &lt;span class="caps"&gt;DSL&lt;/span&gt; for Monitoring Job&lt;/strong&gt; - For builds of master, we run
+  &lt;a href="https://jenkinsci.github.io/job-dsl-plugin/"&gt;Job &lt;span class="caps"&gt;DSL&lt;/span&gt;&lt;/a&gt; to create or update a persistent Jenkins job
+  (outside the pipeline) that runs &lt;code&gt;errorscan.py&lt;/code&gt; once a day and notifies us if any Lambda function errors were&amp;nbsp;found.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;We also have shell scripts provided for testing changes and doing dry runs locally, which use the same Docker images and Makefile as the Jenkins-based&amp;nbsp;build.&lt;/p&gt;
+&lt;h2 id="policy-preprocessing"&gt;Policy&amp;nbsp;Preprocessing&lt;/h2&gt;
+&lt;p&gt;Our &lt;code&gt;policygen.py&lt;/code&gt; script is responsible for reading in the directory of per-policy &lt;span class="caps"&gt;YAML&lt;/span&gt; files,
+performing some sanity checks on them, interpolating defaults from a &lt;code&gt;policies/defaults.yml&lt;/code&gt; file,
+and then writing out the single &lt;code&gt;custodian.yml&lt;/code&gt; that Cloud Custodian actually runs. The overall program flow is as&amp;nbsp;follows:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Read in all &lt;code&gt;.yml&lt;/code&gt; files from the &lt;code&gt;policies/&lt;/code&gt; directory; build a dict of policy names to the policy contents, deserialized from &lt;span class="caps"&gt;YAML&lt;/span&gt; into native Python data structures. For each policy file, ensure that the filename without the extension (i.e. the basename) matches the value of the &amp;#8220;name&amp;#8221; key in the policy &lt;span class="caps"&gt;YAML&lt;/span&gt;; raise an exception if any policies do not have a filename that matches their policy&amp;nbsp;name.&lt;/li&gt;
+&lt;li&gt;Remove the &lt;code&gt;defaults&lt;/code&gt; policy from that dict, and store it separately for later&amp;nbsp;use.&lt;/li&gt;
+&lt;li&gt;Iterate over all policies in the dict, lexicographically by policy name; for each of them, interpolate our defaults into the policy and append the result to a &amp;#8220;policies&amp;#8221; list. See below for details of the defaults interpolation&amp;nbsp;process.&lt;/li&gt;
+&lt;li&gt;Generate &amp;#8220;cleanup&amp;#8221; policies and append them to the list. This step is a holdover from before cloud-custodian had the &lt;a href="https://github.com/capitalone/cloud-custodian/blob/master/tools/ops/mugc.py"&gt;mugc Lambda cleanup tool&lt;/a&gt; but we still use it; this uses the names of all current policies to generate two policies that identify Lambda functions and CloudWatch Event Targets, respectively, that were provisioned by Cloud Custodian for policies that no longer exist. The resulting policies run once per day, and email us if there are any &amp;#8220;orphaned&amp;#8221; Cloud Custodian functions or&amp;nbsp;rules.&lt;/li&gt;
+&lt;li&gt;Run a series of sanity and safety checks on the generated policies (see &amp;#8220;Policy Sanity Checks&amp;#8221;, below, for more&amp;nbsp;information).&lt;/li&gt;
+&lt;li&gt;Write the final &lt;code&gt;custodian.yml&lt;/code&gt; that will be used by Cloud Custodian, containing all of our final&amp;nbsp;policies.&lt;/li&gt;
+&lt;li&gt;Write a &lt;code&gt;policies.rst&lt;/code&gt; file that will be incorporated into our Sphinx-generated &lt;span class="caps"&gt;HTML&lt;/span&gt; documentation site. This file contains a table with one row per policy for all of our policies; the first column is the policy name as a &lt;span class="caps"&gt;HTML&lt;/span&gt; link to the policy &lt;code&gt;.yml&lt;/code&gt; file in the git repository, and the second column is the text of the policy&amp;#8217;s &lt;code&gt;comment&lt;/code&gt; or &lt;code&gt;comments&lt;/code&gt; field.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id="interpolating-defaults-into-policies"&gt;Interpolating Defaults into&amp;nbsp;Policies&lt;/h3&gt;
+&lt;p&gt;The most important part of &lt;code&gt;policygen.py&lt;/code&gt; is the interpolation of defaults into policies.
+When we originally deployed Cloud Custodian in our test environment, we noticed that our
+policies had two large blocks that were almost identical across all policies: the &lt;code&gt;mode&lt;/code&gt;
+configuration telling Cloud Custodian to deploy the policies as Lambda functions triggered
+by periodic CloudWatch Events rules, and the notification action that we use for email
+notifications. This was the genesis of &lt;code&gt;policygen.py&lt;/code&gt;; we moved these common policy
+sections to a &lt;code&gt;defaults.yml&lt;/code&gt; file, and wrote &lt;code&gt;policygen.py&lt;/code&gt; to perform intelligent
+merging of the defaults with each policy file, allowing us to override defaults in the
+individual policies but still keep some mandatory&amp;nbsp;settings.&lt;/p&gt;
+&lt;p&gt;Our &lt;code&gt;defaults.yml&lt;/code&gt; file currently looks like&amp;nbsp;this:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="c1"&gt;# &lt;span class="caps"&gt;IMPORTANT&lt;/span&gt; &lt;span class="caps"&gt;NOTE&lt;/span&gt;: **&lt;span class="caps"&gt;ALL&lt;/span&gt;** policies will have an additional notification action.&lt;/span&gt;
+&lt;span class="c1"&gt;# See &lt;span class="caps"&gt;README&lt;/span&gt;.md and policygen.py `SPLUNK_SQS` for further info and config.&lt;/span&gt;
+&lt;span class="l l-Scalar l-Scalar-Plain"&gt;mode&lt;/span&gt;&lt;span class="p p-Indicator"&gt;:&lt;/span&gt;
+  &lt;span class="l l-Scalar l-Scalar-Plain"&gt;type&lt;/span&gt;&lt;span class="p p-Indicator"&gt;:&lt;/span&gt; &lt;span class="l l-Scalar l-Scalar-Plain"&gt;periodic&lt;/span&gt;
+  &lt;span class="c1"&gt;# This will trigger our rules at 15:20 &lt;span class="caps"&gt;UTC&lt;/span&gt; (11:20 &lt;span class="caps"&gt;EDT&lt;/span&gt; / 10:20 &lt;span class="caps"&gt;EST&lt;/span&gt;)&lt;/span&gt;
+  &lt;span class="c1"&gt;# it might be better to spread them out over time a bit, but right now our&lt;/span&gt;
+  &lt;span class="c1"&gt;# main concern is ensuring that policies run during work hours.&lt;/span&gt;
+  &lt;span class="l l-Scalar l-Scalar-Plain"&gt;schedule&lt;/span&gt;&lt;span class="p p-Indicator"&gt;:&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;cron(20&lt;/span&gt;&lt;span class="nv"&gt; &lt;/span&gt;&lt;span class="s"&gt;15&lt;/span&gt;&lt;span class="nv"&gt; &lt;/span&gt;&lt;span class="s"&gt;*&lt;/span&gt;&lt;span class="nv"&gt; &lt;/span&gt;&lt;span class="s"&gt;*&lt;/span&gt;&lt;span class="nv"&gt; &lt;/span&gt;&lt;span class="s"&gt;?&lt;/span&gt;&lt;span class="nv"&gt; &lt;/span&gt;&lt;span class="s"&gt;*)&amp;#39;&lt;/span&gt;
+  &lt;span class="l l-Scalar l-Scalar-Plain"&gt;timeout&lt;/span&gt;&lt;span class="p p-Indicator"&gt;:&lt;/span&gt; &lt;span class="l l-Scalar l-Scalar-Plain"&gt;300&lt;/span&gt;
+  &lt;span class="l l-Scalar l-Scalar-Plain"&gt;execution-options&lt;/span&gt;&lt;span class="p p-Indicator"&gt;:&lt;/span&gt;
+    &lt;span class="l l-Scalar l-Scalar-Plain"&gt;log_group&lt;/span&gt;&lt;span class="p p-Indicator"&gt;:&lt;/span&gt; &lt;span class="l l-Scalar l-Scalar-Plain"&gt;/cloud-custodian/123456789012/us-east-1&lt;/span&gt;
+    &lt;span class="l l-Scalar l-Scalar-Plain"&gt;output_dir&lt;/span&gt;&lt;span class="p p-Indicator"&gt;:&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;s3://&lt;span class="caps"&gt;SOME&lt;/span&gt;-&lt;span class="caps"&gt;BUCKET&lt;/span&gt;-&lt;span class="caps"&gt;NAME&lt;/span&gt;/logs&amp;#39;&lt;/span&gt;
+  &lt;span class="l l-Scalar l-Scalar-Plain"&gt;dead_letter_config&lt;/span&gt;&lt;span class="p p-Indicator"&gt;:&lt;/span&gt;
+    &lt;span class="l l-Scalar l-Scalar-Plain"&gt;TargetArn&lt;/span&gt;&lt;span class="p p-Indicator"&gt;:&lt;/span&gt; &lt;span class="l l-Scalar l-Scalar-Plain"&gt;arn:aws:sqs:us-east-1:123456789012:cloud-custodian-123456789012-deadletter&lt;/span&gt;
+  &lt;span class="l l-Scalar l-Scalar-Plain"&gt;role&lt;/span&gt;&lt;span class="p p-Indicator"&gt;:&lt;/span&gt; &lt;span class="l l-Scalar l-Scalar-Plain"&gt;arn:aws:iam::123456789012:role/cloud-custodian-123456789012&lt;/span&gt;
+  &lt;span class="l l-Scalar l-Scalar-Plain"&gt;tags&lt;/span&gt;&lt;span class="p p-Indicator"&gt;:&lt;/span&gt;
+    &lt;span class="l l-Scalar l-Scalar-Plain"&gt;Project&lt;/span&gt;&lt;span class="p p-Indicator"&gt;:&lt;/span&gt; &lt;span class="l l-Scalar l-Scalar-Plain"&gt;cloud-custodian&lt;/span&gt;
+    &lt;span class="l l-Scalar l-Scalar-Plain"&gt;Environment&lt;/span&gt;&lt;span class="p p-Indicator"&gt;:&lt;/span&gt; &lt;span class="l l-Scalar l-Scalar-Plain"&gt;dev&lt;/span&gt;
+    &lt;span class="l l-Scalar l-Scalar-Plain"&gt;OwnerEmail&lt;/span&gt;&lt;span class="p p-Indicator"&gt;:&lt;/span&gt; &lt;span class="l l-Scalar l-Scalar-Plain"&gt;us@example.com&lt;/span&gt;
+&lt;span class="l l-Scalar l-Scalar-Plain"&gt;actions&lt;/span&gt;&lt;span class="p p-Indicator"&gt;:&lt;/span&gt;
+  &lt;span class="p p-Indicator"&gt;-&lt;/span&gt; &lt;span class="l l-Scalar l-Scalar-Plain"&gt;type&lt;/span&gt;&lt;span class="p p-Indicator"&gt;:&lt;/span&gt; &lt;span class="l l-Scalar l-Scalar-Plain"&gt;notify&lt;/span&gt;
+    &lt;span class="l l-Scalar l-Scalar-Plain"&gt;questions_email&lt;/span&gt;&lt;span class="p p-Indicator"&gt;:&lt;/span&gt; &lt;span class="l l-Scalar l-Scalar-Plain"&gt;us@example.com&lt;/span&gt;
+    &lt;span class="l l-Scalar l-Scalar-Plain"&gt;questions_slack&lt;/span&gt;&lt;span class="p p-Indicator"&gt;:&lt;/span&gt; &lt;span class="l l-Scalar l-Scalar-Plain"&gt;ourChannelName&lt;/span&gt;
+    &lt;span class="l l-Scalar l-Scalar-Plain"&gt;template&lt;/span&gt;&lt;span class="p p-Indicator"&gt;:&lt;/span&gt; &lt;span class="l l-Scalar l-Scalar-Plain"&gt;redefault.html&lt;/span&gt;
+    &lt;span class="l l-Scalar l-Scalar-Plain"&gt;to&lt;/span&gt;&lt;span class="p p-Indicator"&gt;:&lt;/span&gt;
+      &lt;span class="p p-Indicator"&gt;-&lt;/span&gt; &lt;span class="l l-Scalar l-Scalar-Plain"&gt;resource-owner&lt;/span&gt;
+      &lt;span class="p p-Indicator"&gt;-&lt;/span&gt; &lt;span class="l l-Scalar l-Scalar-Plain"&gt;us@example.com&lt;/span&gt;
+      &lt;span class="p p-Indicator"&gt;-&lt;/span&gt; &lt;span class="l l-Scalar l-Scalar-Plain"&gt;awsusers@example.com&lt;/span&gt;
+    &lt;span class="l l-Scalar l-Scalar-Plain"&gt;transport&lt;/span&gt;&lt;span class="p p-Indicator"&gt;:&lt;/span&gt;
+      &lt;span class="l l-Scalar l-Scalar-Plain"&gt;type&lt;/span&gt;&lt;span class="p p-Indicator"&gt;:&lt;/span&gt; &lt;span class="l l-Scalar l-Scalar-Plain"&gt;sqs&lt;/span&gt;
+      &lt;span class="l l-Scalar l-Scalar-Plain"&gt;queue&lt;/span&gt;&lt;span class="p p-Indicator"&gt;:&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;https://sqs.us-east-1.amazonaws.com/123456789012/cloud-custodian-123456789012&amp;#39;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;This provides us with our default execution mode (Lambda function triggered once a day
+at a defined time via CloudWatch Events) and its configuration options (mainly, the
+&lt;span class="caps"&gt;IAM&lt;/span&gt; Role used for execution, the Dead Letter Queue, CloudWatch Log Group, and S3 output
+configuration for policy results), as well as our default email notification configuration
+using &lt;span class="caps"&gt;SQS&lt;/span&gt; to&amp;nbsp;c7n-mailer.&lt;/p&gt;
+&lt;p&gt;All of these options can be overridden in individual policies intelligently; a simple example
+policy that emails us about any &lt;span class="caps"&gt;VPC&lt;/span&gt; Peering Connections in a state other than
+&amp;#8220;active&amp;#8221; would look&amp;nbsp;like:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="c1"&gt;# &lt;span class="caps"&gt;REMINDER&lt;/span&gt;: defaults.yml will be merged in to this. See the &lt;span class="caps"&gt;README&lt;/span&gt;.&lt;/span&gt;
+&lt;span class="l l-Scalar l-Scalar-Plain"&gt;name&lt;/span&gt;&lt;span class="p p-Indicator"&gt;:&lt;/span&gt; &lt;span class="l l-Scalar l-Scalar-Plain"&gt;inactive-vpc-peers&lt;/span&gt;
+&lt;span class="l l-Scalar l-Scalar-Plain"&gt;comment&lt;/span&gt;&lt;span class="p p-Indicator"&gt;:&lt;/span&gt; &lt;span class="l l-Scalar l-Scalar-Plain"&gt;Notify &lt;span class="caps"&gt;RE&lt;/span&gt; of any &lt;span class="caps"&gt;VPC&lt;/span&gt; Peering Connections not in Active state (i.e. pending-acceptance, failed, etc.)&lt;/span&gt;
+&lt;span class="l l-Scalar l-Scalar-Plain"&gt;resource&lt;/span&gt;&lt;span class="p p-Indicator"&gt;:&lt;/span&gt; &lt;span class="l l-Scalar l-Scalar-Plain"&gt;peering-connection&lt;/span&gt;
+&lt;span class="l l-Scalar l-Scalar-Plain"&gt;filters&lt;/span&gt;&lt;span class="p p-Indicator"&gt;:&lt;/span&gt;
+  &lt;span class="c1"&gt;# Peering Connection not in &amp;quot;active&amp;quot; state&lt;/span&gt;
+  &lt;span class="p p-Indicator"&gt;-&lt;/span&gt; &lt;span class="l l-Scalar l-Scalar-Plain"&gt;type&lt;/span&gt;&lt;span class="p p-Indicator"&gt;:&lt;/span&gt; &lt;span class="l l-Scalar l-Scalar-Plain"&gt;value&lt;/span&gt;
+    &lt;span class="l l-Scalar l-Scalar-Plain"&gt;key&lt;/span&gt;&lt;span class="p p-Indicator"&gt;:&lt;/span&gt; &lt;span class="l l-Scalar l-Scalar-Plain"&gt;Status.Code&lt;/span&gt;
+    &lt;span class="l l-Scalar l-Scalar-Plain"&gt;op&lt;/span&gt;&lt;span class="p p-Indicator"&gt;:&lt;/span&gt; &lt;span class="l l-Scalar l-Scalar-Plain"&gt;ne&lt;/span&gt;
+    &lt;span class="l l-Scalar l-Scalar-Plain"&gt;value&lt;/span&gt;&lt;span class="p p-Indicator"&gt;:&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;active&amp;quot;&lt;/span&gt;
+&lt;span class="l l-Scalar l-Scalar-Plain"&gt;actions&lt;/span&gt;&lt;span class="p p-Indicator"&gt;:&lt;/span&gt;
+  &lt;span class="p p-Indicator"&gt;-&lt;/span&gt; &lt;span class="l l-Scalar l-Scalar-Plain"&gt;type&lt;/span&gt;&lt;span class="p p-Indicator"&gt;:&lt;/span&gt; &lt;span class="l l-Scalar l-Scalar-Plain"&gt;notify&lt;/span&gt;
+    &lt;span class="l l-Scalar l-Scalar-Plain"&gt;violation_desc&lt;/span&gt;&lt;span class="p p-Indicator"&gt;:&lt;/span&gt; &lt;span class="l l-Scalar l-Scalar-Plain"&gt;The following &lt;span class="caps"&gt;VPC&lt;/span&gt; Peering Connections are in a state other than &amp;quot;active&amp;quot;&lt;/span&gt;
+    &lt;span class="l l-Scalar l-Scalar-Plain"&gt;action_desc&lt;/span&gt;&lt;span class="p p-Indicator"&gt;:&lt;/span&gt; &lt;span class="l l-Scalar l-Scalar-Plain"&gt;likely need to be accepted, deleted, or investigated.&lt;/span&gt;
+    &lt;span class="l l-Scalar l-Scalar-Plain"&gt;subject&lt;/span&gt;&lt;span class="p p-Indicator"&gt;:&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;[cloud-custodian&lt;/span&gt;&lt;span class="nv"&gt; &lt;/span&gt;&lt;span class="s"&gt;{{&lt;/span&gt;&lt;span class="nv"&gt; &lt;/span&gt;&lt;span class="s"&gt;account&lt;/span&gt;&lt;span class="nv"&gt; &lt;/span&gt;&lt;span class="s"&gt;}}]&lt;/span&gt;&lt;span class="nv"&gt; &lt;/span&gt;&lt;span class="s"&gt;&lt;span class="caps"&gt;VPC&lt;/span&gt;&lt;/span&gt;&lt;span class="nv"&gt; &lt;/span&gt;&lt;span class="s"&gt;Peering&lt;/span&gt;&lt;span class="nv"&gt; &lt;/span&gt;&lt;span class="s"&gt;Connections&lt;/span&gt;&lt;span class="nv"&gt; &lt;/span&gt;&lt;span class="s"&gt;not&lt;/span&gt;&lt;span class="nv"&gt; &lt;/span&gt;&lt;span class="s"&gt;in&lt;/span&gt;&lt;span class="nv"&gt; &lt;/span&gt;&lt;span class="s"&gt;Active&lt;/span&gt;&lt;span class="nv"&gt; &lt;/span&gt;&lt;span class="s"&gt;state&lt;/span&gt;&lt;span class="nv"&gt; &lt;/span&gt;&lt;span class="s"&gt;{{&lt;/span&gt;&lt;span class="nv"&gt; &lt;/span&gt;&lt;span class="s"&gt;region&lt;/span&gt;&lt;span class="nv"&gt; &lt;/span&gt;&lt;span class="s"&gt;}}&amp;#39;&lt;/span&gt;
+    &lt;span class="l l-Scalar l-Scalar-Plain"&gt;to&lt;/span&gt;&lt;span class="p p-Indicator"&gt;:&lt;/span&gt;
+      &lt;span class="p p-Indicator"&gt;-&lt;/span&gt; &lt;span class="l l-Scalar l-Scalar-Plain"&gt;us@example.com&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;This policy automatically inherits all of the &lt;code&gt;mode&lt;/code&gt; defaults configuration and the &lt;code&gt;notify&lt;/code&gt;
+action is merged with the defaults; the resulting generated policy will combine all of the keys
+in the defaults notification action and the policy notification action, with the exception of the
+&lt;code&gt;to&lt;/code&gt; block where the defaults are overridden by the&amp;nbsp;policy.&lt;/p&gt;
+&lt;p&gt;The actual process of merging the policy and defaults is a recursive deep merge of the dicts, merging
+the individual policy over a copy of the defaults, with special logic for lists and
+&lt;code&gt;type: notify&lt;/code&gt; actions. Overall, the procedure&amp;nbsp;is:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;We start with &lt;code&gt;defaults.yml&lt;/code&gt; as a base, and layer the policy-specific config on top of&amp;nbsp;it.&lt;/li&gt;
+&lt;li&gt;We merge recursively (i.e. deep&amp;nbsp;merging).&lt;/li&gt;
+&lt;li&gt;Keys from the policy overwrite identical keys in the defaults; the policy-specific config always wins over the&amp;nbsp;defaults.&lt;/li&gt;
+&lt;li&gt;In the case of lists (i.e. the &lt;code&gt;actions&lt;/code&gt; list), the end result includes all elements that are simple data types (i.e. strings). For
+  dict items in lists, we look at the value of the &lt;code&gt;type&lt;/code&gt; element; if both the policy and the defaults lists have
+  dicts with the same &lt;code&gt;type&lt;/code&gt;, we merge them together, with the policy overwriting the defaults. Defaults dicts without a
+  matching &lt;code&gt;type&lt;/code&gt; in the policy will always be in the final result, &lt;strong&gt;except for&lt;/strong&gt; &lt;code&gt;actions&lt;/code&gt; with a type of &lt;code&gt;notify&lt;/code&gt;; policies that do
+  not have a &lt;code&gt;type: notify&lt;/code&gt; action will not have one added. This allows us to set defaults for dicts embedded in lists, like the
+  &lt;code&gt;type: notify&lt;/code&gt; action.&lt;/li&gt;
+&lt;li&gt;When finished merging, add a notification action to every policy that pushes to the Splunk queue, which is handled by our
+  sqs_splunk_lambda&amp;nbsp;code.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;To merge the two dicts together, we begin with a copy of the defaults and then iterate over all of the items in the policy as key/value pairs, updating the defaults as we go to build the final&amp;nbsp;policy:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;If the key from the policy-specific config isn&amp;#8217;t in the defaults, we add the key and value and move on.&amp;nbsp;Otherwise;&lt;/li&gt;
+&lt;li&gt;If the value is a list, we use special list merging logic (see below) and update with the result of the list&amp;nbsp;merge.&lt;/li&gt;
+&lt;li&gt;If the value is another dict, we call the same function recursively and update with its&amp;nbsp;result.&lt;/li&gt;
+&lt;li&gt;If the value isn&amp;#8217;t a list or dict, we assume it to be a simple type (string, int, etc.) and overwrite the default value with the one specified in the policy-specific&amp;nbsp;configuration.&lt;/li&gt;
+&lt;li&gt;The end result of this is&amp;nbsp;returned.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;List merging is somewhat special, to let us set defaults for&amp;nbsp;actions:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;We begin with the policy itself as the base list, instead of the&amp;nbsp;defaults.&lt;/li&gt;
+&lt;li&gt;Any non-dict items in defaults that aren&amp;#8217;t in the policy are appended to the policy&amp;nbsp;list.&lt;/li&gt;
+&lt;li&gt;Any dict items in the policy list with a &lt;code&gt;type&lt;/code&gt; key/value pair that matches one of the dict items in the defaults list, will have additional key/value pairs added from the defaults&amp;nbsp;dict.&lt;/li&gt;
+&lt;li&gt;Any defaults dicts not handled under the previous condition will be appended to the result, with the exception of a &lt;code&gt;type: notify&lt;/code&gt; dict in the &lt;code&gt;['actions']&lt;/code&gt; path.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="policy-sanity-checks"&gt;Policy Sanity&amp;nbsp;Checks&lt;/h3&gt;
+&lt;p&gt;Before writing out the final &lt;code&gt;custodian.yml&lt;/code&gt; configuration, each policy is run through a sanity/safety checking
+function. The function is written to be easily extendable to add new policy checks (written in Python), but currently
+only has a single check to ensure that any &lt;code&gt;marked-for-op&lt;/code&gt; filters come first in the filter list. When we originally
+deployed Cloud Custodian, one of our policies had a &lt;code&gt;marked-for-op&lt;/code&gt; filter (which allows Cloud Custodian to take action
+on a resource that was specifically tagged for delayed action in the future) accidentally nested under an &lt;code&gt;or&lt;/code&gt; clause
+in the policy &lt;span class="caps"&gt;YAML&lt;/span&gt; (which was unfortunately easy to do, as it only required accidentally indenting the block two extra
+spaces). This resulted in the policy taking action immediately instead of a week later, which could have been catastrophic
+(luckily the action in this case was benign). To prevent this from happening again, our checks ensure that &lt;code&gt;marked-for-op&lt;/code&gt;
+filters, if present, always come at the beginning of the list of&amp;nbsp;filters.&lt;/p&gt;
+&lt;h2 id="conclusion"&gt;Conclusion&lt;/h2&gt;
+&lt;p&gt;We&amp;#8217;re still in the process of expanding our Cloud Custodian deployment; right now we&amp;#8217;re only running
+it in one region of one non-production account, but that one region contains the vast majority of our infrastructure.
+We&amp;#8217;ll be expanding to other regions and then production accounts in the next few weeks, and that will require changing
+some portions of our configuration, management, and policy generation code to compensate. So far we&amp;#8217;ve seen good results
+with using Cloud Custodian to enforce tagging and cost-reduction rules, such as terminating instances that have been
+idle for a long time. We hope to continue extending the role that Cloud Custodian plays in cost reduction, and also
+expand into enforcing more security and &amp;#8220;housekeeping&amp;#8221;&amp;nbsp;policies.&lt;/p&gt;</content><category term="aws"></category><category term="cloud-custodian"></category><category term="cloud custodian"></category><category term="c7n"></category><category term="lambda"></category><category term="sqs"></category><category term="splunk"></category></entry><entry><title>Pre-Authorized AWS Console URLs for Notifications</title><link href="http://blog.jasonantman.com/2017/10/pre-authorized-aws-console-urls-for-notifications/" rel="alternate"></link><published>2017-10-08T19:14:00-04:00</published><updated>2017-10-08T19:14:00-04:00</updated><author><name>Jason Antman</name></author><id>tag:blog.jasonantman.com,2017-10-08:/2017/10/pre-authorized-aws-console-urls-for-notifications/</id><summary type="html">&lt;p&gt;Pre-authorized &lt;span class="caps"&gt;AWS&lt;/span&gt; Console login URLs with limited permissions allow immediate investigation from&amp;nbsp;notifications.&lt;/p&gt;</summary><content type="html">&lt;h2 id="background"&gt;Background&lt;/h2&gt;
 &lt;p&gt;Almost all of my work for the past two and a half years has revolved around Amazon Web Services,
 but my personal &lt;span class="caps"&gt;AWS&lt;/span&gt; account (mostly a single tiny t2.micro instance that handles a tiny amount
 of &lt;span class="caps"&gt;HTTP&lt;/span&gt; traffic and some cron jobs) has languished. Recently I&amp;#8217;ve undertaken a project to modernize
@@ -3699,29 +3945,4 @@ commits&amp;#8221;&amp;nbsp;medal&amp;#8230;&lt;/p&gt;
 &lt;p&gt;&lt;a href="http://www.custommotelsign.com/"&gt;CustomMotelSign.com&lt;/a&gt;&lt;/p&gt;
 &lt;p&gt;&lt;img alt="Motel-style sign with 'Your Text Goes Here' written on it" src="/GFX/motelsign.jpg"&gt;&lt;/p&gt;
 &lt;p&gt;&lt;a href="http://www.getamedal.com/"&gt;GetAMedal.com&lt;/a&gt;&lt;/p&gt;
-&lt;p&gt;&lt;img alt="Gold medal with 'Your Text Goes Here' written on it" src="/GFX/medal.jpg"&gt;&lt;/p&gt;</content><category term="graphics"></category><category term="humor"></category><category term="road sign"></category><category term="sign"></category><category term="tombstone"></category></entry><entry><title>All-Mechanical Computer Instructional Video</title><link href="http://blog.jasonantman.com/2012/10/all-mechanical-computer-instructional-video/" rel="alternate"></link><published>2012-10-12T20:54:00-04:00</published><updated>2012-10-12T20:54:00-04:00</updated><author><name>admin</name></author><id>tag:blog.jasonantman.com,2012-10-12:/2012/10/all-mechanical-computer-instructional-video/</id><summary type="html">&lt;p&gt;I saw a link to &lt;a href="http://www.youtube.com/watch?v=s1i-dnAH9Y4"&gt;this YouTube
-video&lt;/a&gt; shared on &lt;a href="http://everythingsysadmin.com/2012/10/mechanical-computer-instructio.html"&gt;Tom
-Limoncelli&amp;#8217;s
-blog&lt;/a&gt;.
-It&amp;#8217;s a 1953 &lt;span class="caps"&gt;US&lt;/span&gt; Navy instructional video about an all-mechanical fire
-control computer. Yes, I really mean a &lt;em&gt;computer&lt;/em&gt; that can solve
-continuously changing 25-variable fire control problems using only
-mechanical means (gears, cams, etc …&lt;/p&gt;</summary><content type="html">&lt;p&gt;I saw a link to &lt;a href="http://www.youtube.com/watch?v=s1i-dnAH9Y4"&gt;this YouTube
-video&lt;/a&gt; shared on &lt;a href="http://everythingsysadmin.com/2012/10/mechanical-computer-instructio.html"&gt;Tom
-Limoncelli&amp;#8217;s
-blog&lt;/a&gt;.
-It&amp;#8217;s a 1953 &lt;span class="caps"&gt;US&lt;/span&gt; Navy instructional video about an all-mechanical fire
-control computer. Yes, I really mean a &lt;em&gt;computer&lt;/em&gt; that can solve
-continuously changing 25-variable fire control problems using only
-mechanical means (gears, cams, etc.). Think about it for a minute - it&amp;#8217;s
-truly mind-boggling. And really gives one an amazing appreciation for
-the power of a simple pocket calculator, and the amazing engineering
-that went into solving these problems before electronic computers. I&amp;#8217;m
-usually not much of a math geek, but I watched the whole 40 minute video
-and was in awe of both the simple ability to use three arms and a pin to
-multiply numbers, and the amazingly precise engineering and machining it
-would take to translate various rotation inputs into landing a shell on
-a moving ship miles away. It&amp;#8217;s a really good watch, and will probably
-leave you astonished by both how far technology has come (and what we
-take for granted every day), and by the fact that feats of engineering
-like this one worked quite&amp;nbsp;well.&lt;/p&gt;</content><category term="mechanical computer"></category></entry></feed>
+&lt;p&gt;&lt;img alt="Gold medal with 'Your Text Goes Here' written on it" src="/GFX/medal.jpg"&gt;&lt;/p&gt;</content><category term="graphics"></category><category term="humor"></category><category term="road sign"></category><category term="sign"></category><category term="tombstone"></category></entry></feed>
