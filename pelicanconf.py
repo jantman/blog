@@ -75,7 +75,9 @@ MARKDOWN = {
             'css_class': 'highlight'
         },
         'markdown.extensions.fenced_code': {},
-        'markdown.extensions.toc': {}
+        'markdown.extensions.toc': {
+            'anchorlink': True
+        }
     },
     'output_format': 'html5'
 }

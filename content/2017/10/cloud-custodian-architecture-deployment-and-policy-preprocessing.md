@@ -7,6 +7,8 @@ Tags: aws, cloud-custodian, cloud custodian, c7n, lambda, sqs, splunk
 Slug: cloud-custodian-architecture-deployment-and-policy-preprocessing
 Summary: Details of how I setup Capital One's Cloud Custodain at work, including our monitoring, logging and policy preprocessing.
 
+[TOC]
+
 _This post was originally published to my company's internal blog platform; I'm publishing it here for the
 larger Cloud Custodian user community, but unfortunately I haven't gotten (or sought) approval to publish
 any of our internal code referenced herein._

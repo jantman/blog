@@ -185,7 +185,8 @@ Slug: {slug}
 Summary: <<<<< summary goes here >>>>>>>
 Status: draft
 
-content (written in MarkDown - http://daringfireball.net/projects/markdown/syntax )
+<!--- remove this next line to disable Table of Contents -->
+[TOC]
 """.format(title=title,
            datestr=datestr,
            category=category,
