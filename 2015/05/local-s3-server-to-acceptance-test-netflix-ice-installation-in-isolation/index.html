@@ -169,7 +169,7 @@ unit tests but also <a href="https://github.com/puppetlabs/beaker">beaker</a> ac
 that&#8217;s similar to Test Kitchen; it spins up Vagrant machines, runs some code in them, and then uses <a href="http://serverspec.org/">serverspec</a> to make assertions about
 the state of the system (file contents, running processes, command output, etc.) (side note: if you used Beaker prior to the
 <a href="https://github.com/puppetlabs/beaker/blob/master/HISTORY.md#beaker2.0.0">2.0 release</a> in December 2014, you should really try it again; they&#8217;ve made some great&nbsp;improvements).</p>
-<h2 id="the-problem">The&nbsp;Problem</h2>
+<h2 id="the-problem"><a class="toclink" href="#the-problem">The&nbsp;Problem</a></h2>
 <p>This posed a bit of a challenge, as Ice (in addition to being pretty poorly documented) is really designed to run in <span class="caps">AWS</span>. Firstly, the very reason we started running Ice was
 to get a handle on our fast-growing <span class="caps">AWS</span> spend; as a result, we&#8217;re trying hard not to use <span class="caps">AWS</span> for small-scale projects that could use existing resources. Second, while our
 company very unfortunately doesn&#8217;t have an open source policy and isn&#8217;t releasing anything (hopefully this may be changing soon), we try hard to write generic, forge-quality&nbsp;modules.</p>
@@ -178,13 +178,13 @@ want the acceptance tests to require anything specific to my company, such as an
 (one of its three inputs; <span class="caps">EC2</span> pricing data and your accounts&#8217; reservation pricing/capacity being the others) and writes state from and to S3. So, this was a bit difficult.
 As we don&#8217;t plan on upgrading Ice terribly often, and we wanted to install from the <a href="https://netflixoss.ci.cloudbees.com/job/ice-master/">cloudbees master builds</a>, we wanted
 acceptance testing of not just the provisioning tooling, but also some basic smoke tests for the application&nbsp;itself.</p>
-<h2 id="the-solution">The&nbsp;Solution</h2>
+<h2 id="the-solution"><a class="toclink" href="#the-solution">The&nbsp;Solution</a></h2>
 <p>I managed to come up with a working, albeit somewhat Rube Goldberg, method of getting isolated acceptance tests to work. What follows is the gist of how I got Ice
 working in complete isolation. The majority of this happens in <code>spec/acceptance/0prerequisite_spec.rb</code> which runs first and both does the prerequisite setup
 and validates that everything is setup right and working for the tests. The following solution is based on the amazingly helpful <a href="https://github.com/jubos/fake-s3">fakes3</a>
 Ruby gem, the <a href="http://www.apsis.ch/pound/">Pound</a> reverse proxy, and some <span class="caps">SSL</span> certificate trickery. While my code was specific to Beaker, this should be generic
 enough to use with any system acceptance testing&nbsp;tool.</p>
-<h2 id="prerequisites">Prerequisites</h2>
+<h2 id="prerequisites"><a class="toclink" href="#prerequisites">Prerequisites</a></h2>
 <p>First, we obtain or create some files that we&#8217;ll need on the test&nbsp;instance:</p>
 <ol>
 <li>
@@ -205,7 +205,7 @@ enough to use with any system acceptance testing&nbsp;tool.</p>
     to https://<span class="caps">BUCKETNAME</span>.s3amazonaws.com. As a result, this <span class="caps">SSL</span> foolery is&nbsp;required.)</p>
 </li>
 </ol>
-<h2 id="setup">Setup</h2>
+<h2 id="setup"><a class="toclink" href="#setup">Setup</a></h2>
 <ol>
 <li>
 <p>Install the <a href="https://rubygems.org/gems/fakes3">fakes3</a> rubygem; this provides an s3-compliant <span class="caps">API</span> backed by local filesystem storage.

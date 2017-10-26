@@ -155,7 +155,7 @@ fix these issues, essentially re-implementing yum and rpm&#8217;s version compar
 me a few days of research and sorting through source code (and in the process I found that <code>yum</code>, despite
 its use in so many distributions, has no unit tests at all) but I finally got it finished. In the process,
 I found out exactly how&#8230; weird&#8230; <span class="caps">RPM</span>&#8217;s version comparison rules&nbsp;are.</p>
-<h3 id="package-naming-and-parsing">Package Naming and&nbsp;Parsing</h3>
+<h3 id="package-naming-and-parsing"><a class="toclink" href="#package-naming-and-parsing">Package Naming and&nbsp;Parsing</a></h3>
 <p><span class="caps">RPM</span> package names are made up of five parts; the package name, epoch, version, release, and architecture.
 This format is commonly referred to as the acronym <span class="caps">NEVRA</span>. The epoch is not always included; it is assumed
 to be zero (0) on any packages that lack it explicitly. The format for the whole string is <code>n-e:v-r.a</code>.
@@ -166,7 +166,7 @@ and the bug herein was with what Puppet calls the &#8220;version&#8221; (<span c
 <li>If there is a <code>-</code> in the <em>remaining</em> string, everything before the first <code>-</code> is the version,
   and everything after it is the release. If there isn&#8217;t one, the release is considered&nbsp;null/nill/None/whatever.</li>
 </ul>
-<h3 id="how-yum-compares-evr">How Yum Compares&nbsp;<span class="caps">EVR</span></h3>
+<h3 id="how-yum-compares-evr"><a class="toclink" href="#how-yum-compares-evr">How Yum Compares&nbsp;<span class="caps">EVR</span></a></h3>
 <p>Once the package string is parsed into its <span class="caps">EVR</span> components, yum calls <code>rpmUtils.miscutils.compareEVR()</code>,
 which does some data type massaging for the inputs, and then calls out to <code>rpm.labelCompare()</code>
 (found in <code>rpm.git/python/header-py.c</code>). <code>labelCompare()</code> sets each epoch
@@ -186,7 +186,7 @@ to a function called <code>rpmvercmp()</code> (see below). The algorithm for <co
 </ol>
 <p>The real magic, obviously, happens in <code>rpmvercmp()</code>, the rpm library function to compare two
 versions (or epochs, or releases). That&#8217;s also where the madness&nbsp;happens.</p>
-<h3 id="how-rpm-compares-version-parts">How <span class="caps">RPM</span> Compares Version&nbsp;Parts</h3>
+<h3 id="how-rpm-compares-version-parts"><a class="toclink" href="#how-rpm-compares-version-parts">How <span class="caps">RPM</span> Compares Version&nbsp;Parts</a></h3>
 <p><span class="caps">RPM</span> is written in C. Converting all of the buffer and pointer processing for these strings
 over to Ruby was quite a pain. That being said, I didn&#8217;t make this up, this is actually the
 algorithm that <code>rpmvercmp()</code> (<code>lib/rpmvercmp.c</code>) uses to compare version &#8220;parts&#8221;

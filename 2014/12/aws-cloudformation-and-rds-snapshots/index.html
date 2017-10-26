@@ -159,7 +159,7 @@ such as the <a href="http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGui
 parameters and properties, and resources and&nbsp;instances.</p>
 <p><strong>Note:</strong> I&#8217;m writing this in mid-December 2014. I&#8217;ll make every effort to keep this updated as I continue working with <span class="caps">AWS</span>, but it&#8217;s possible
 that some of the problems described herein will be fixed by <span class="caps">AWS</span> in the&nbsp;future.</p>
-<h2 id="deletionpolicy-snapshot">DeletionPolicy&nbsp;Snapshot</h2>
+<h2 id="deletionpolicy-snapshot"><a class="toclink" href="#deletionpolicy-snapshot">DeletionPolicy&nbsp;Snapshot</a></h2>
 <p>CloudFormation resources support a <a href="http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-attribute-deletionpolicy.html">DeletionPolicy</a>
 attribute that says what to do to a resource when deleted. For <span class="caps">RDS</span> instances, &#8220;Snapshot&#8221; is an option, which takes a manual snapshot when the resource
 is deleted (manual snapshots, unlike the automated daily ones, live on even after the instance is deleted). Be warned, this only takes effect when you
@@ -168,7 +168,7 @@ that requires a <a href="http://docs.aws.amazon.com/AWSCloudFormation/latest/Use
 take effect, the <span class="caps">RDS</span> instance will be replaced with a new one, and all of the data and automatic snapshots from the old one will be deleted.
 That last part deserves repeating: automatic snapshots (the daily ones created by <span class="caps">RDS</span>) are tied to the instance; if the instance is replaced
 by CloudFormation, you lose all automatic (backup) snapshots with&nbsp;it.</p>
-<h2 id="stack-policy-to-prevent-updates">Stack Policy to Prevent&nbsp;Updates</h2>
+<h2 id="stack-policy-to-prevent-updates"><a class="toclink" href="#stack-policy-to-prevent-updates">Stack Policy to Prevent&nbsp;Updates</a></h2>
 <p>To prevent <span class="caps">RDS</span> data loss from accidentally changing a property of the instance, it&#8217;s wise to add a
 <a href="http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/protect-stack-resources.html">stack policy to prevent updates to <span class="caps">RDS</span> resources</a>.
 This will prevent CloudFormation from making any changes to the <span class="caps">RDS</span> instance at all. Once the stack policy
@@ -182,7 +182,7 @@ describes which properties can be updated in-place (&#8220;Update requires: No i
 and which trigger complete replacement of the <span class="caps">RDS</span> instance (&#8220;Update requires:&nbsp;replacement&#8221;).</p>
 <p>When you try to update a protected resource through the <code>aws</code> <span class="caps">CLI</span> tools, the update will appear to have worked, but the event
 log on the stack will show the update denied and the update will be rolled&nbsp;back.</p>
-<h2 id="restoring-snapshots-and-dbname">Restoring Snapshots and&nbsp;DBName</h2>
+<h2 id="restoring-snapshots-and-dbname"><a class="toclink" href="#restoring-snapshots-and-dbname">Restoring Snapshots and&nbsp;DBName</a></h2>
 <p>The DBSnapshotIdentifier property on a MySQL <span class="caps">RDS</span> instance specifies a <span class="caps">RDS</span> snapshot to restore into the instance. The DBName
 property will create a new <span class="caps">RDS</span> instance with a single blank database of that name. This bears repeating again; if the DBName
 property ever changes, your <span class="caps">RDS</span> instance will be replaced with one with a new, blank database of that name.
@@ -206,7 +206,7 @@ the value of <code>DBName</code> matches the database currently in the <span cla
 is not known by CloudFormation. In short, if you create an <span class="caps">RDS</span> instance from a snapshot of a &#8220;foo&#8221; database
 and then change the template to have a <code>DBName</code> of &#8220;foo&#8221;, CloudFormation will spin up a new <span class="caps">RDS</span> instance
 with an empty &#8220;foo&#8221;&nbsp;database.</p>
-<h2 id="restoring-to-a-new-stack">Restoring to a New&nbsp;Stack</h2>
+<h2 id="restoring-to-a-new-stack"><a class="toclink" href="#restoring-to-a-new-stack">Restoring to a New&nbsp;Stack</a></h2>
 <p>When restoring to a new stack (stack creation), specify the <code>DBSnapshotIdentifier</code> and make sure <code>DBName</code> is set
 to <code>AWS::NoValue</code> per the previous paragraph (condition in the template). Note that for the life of the stack, you
 must continue specifying these parameters (or the &#8220;use previous value&#8221; option for them). Using my example template
@@ -215,7 +215,7 @@ and omitted that parameter (which, because of the condition, would set it to <co
 to its default value) the <span class="caps">RDS</span> instance would be replaced with a new one with a blank&nbsp;database.</p>
 <p>Because of this, stack updates should always use the previous value for the <code>DBSnapshotIdentifier</code> parameter; this can
 be done through the <span class="caps">AWS</span> Console, or using the <code>aws</code> command line tools and a parameter like: <code>--parameters ParameterKey=DBSnapshotIdentifier,UsePreviousValue=true</code>.</p>
-<h2 id="restoring-to-an-existing-stack">Restoring to an Existing&nbsp;Stack</h2>
+<h2 id="restoring-to-an-existing-stack"><a class="toclink" href="#restoring-to-an-existing-stack">Restoring to an Existing&nbsp;Stack</a></h2>
 <p>Restoring a snapshot to an existing stack is a bit more nuanced. You can&#8217;t restore a snapshot to an existing <span class="caps">RDS</span> instance,
 you can only restore to a new instance. If you do this through the <span class="caps">AWS</span> Console, you&#8217;ll end up with an <span class="caps">RDS</span> instance disconnected
 from your CloudFormation stack. So the way to do this is more or less the same as restoring to a new stack - specify
@@ -230,7 +230,7 @@ instance re-created with an empty database, and then update again with the <code
 This is because CloudFormation doesn&#8217;t reconcile the current state of instances to determine which actions to take, it only diffs
 the updated template against the existing one. If the existing template and the updated one have the same value for the <span class="caps">RDS</span> instance&#8217;s
 properties (specifically <code>DBSnapshotIdentifier</code>), CloudFormation determines there are no changes, and does&nbsp;nothing.</p>
-<h2 id="launchconfig-metadata-issues">LaunchConfig Metadata&nbsp;Issues</h2>
+<h2 id="launchconfig-metadata-issues"><a class="toclink" href="#launchconfig-metadata-issues">LaunchConfig Metadata&nbsp;Issues</a></h2>
 <p>The <span class="caps">EC2</span> instances I&#8217;m using for this project are &#8220;baked&#8221; AMIs (built with <a href="https://packer.io/">packer.io</a>) in an Auto-Scaling Group (<span class="caps">ASG</span>).
 They use a <a href="http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-as-launchconfig.html">LaunchConfig</a> to write
 out a file on disk with the database connection information for the application. In addition, my <span class="caps">ASG</span> has an <a href="http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-attribute-updatepolicy.html">UpdatePolicy</a>
@@ -246,7 +246,7 @@ to ensure that the running <span class="caps">EC2</span> instances have the upda
 <p>Another option would be to use the <a href="http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/cfn-hup.html">cfn-hup daemon</a> to
 listen for stack updates that cause changes in resource metadata, and perform the required actions without needing the rolling update
 to replace the&nbsp;instances.</p>
-<h2 id="how-to-do-things-using-the-template-below">How to Do Things Using the Template&nbsp;Below</h2>
+<h2 id="how-to-do-things-using-the-template-below"><a class="toclink" href="#how-to-do-things-using-the-template-below">How to Do Things Using the Template&nbsp;Below</a></h2>
 <p>I&#8217;m currently using the <code>aws</code> command line tools to perform stack creation and updates,
 wrapped in a Rakefile (I plan on changing this to use <a href="https://github.com/boto/boto">boto</a>
 inside a <a href="http://jenkins-ci.org/">Jenkins</a> job). What follows is a quick high-level guide
@@ -325,7 +325,7 @@ $ aws cloudformation update-stack --stack-name mystack --template-body file:///h
 
 </li>
 </ul>
-<h2 id="cloudformation-template-snippet">CloudFormation Template&nbsp;Snippet</h2>
+<h2 id="cloudformation-template-snippet"><a class="toclink" href="#cloudformation-template-snippet">CloudFormation Template&nbsp;Snippet</a></h2>
 <p>This is by no means complete, but just includes the parameters, conditions, and resources which I make reference&nbsp;to.</p>
 <div class="highlight"><pre><span></span><span class="p">{</span>
   <span class="nt">&quot;Parameters&quot;</span> <span class="p">:</span> <span class="p">{</span>

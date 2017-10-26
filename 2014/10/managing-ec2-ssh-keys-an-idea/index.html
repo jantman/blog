@@ -156,7 +156,7 @@ access to all these instances. Right now we have a single &#8220;bastion&#8221; 
 shared used keyed to access every <span class="caps">EC2</span> instance; that doesn&#8217;t scale and doesn&#8217;t meet the security&nbsp;requirements.</p>
 <p>What follows is one theory of mine on how to solve this problem. I&#8217;ve been thinking about this for the past
 day; this might not be the Right answer, and it&#8217;s just a theory at this point, but I think it&nbsp;works.</p>
-<h1 id="requirements-and-assumptions">Requirements and&nbsp;Assumptions</h1>
+<h1 id="requirements-and-assumptions"><a class="toclink" href="#requirements-and-assumptions">Requirements and&nbsp;Assumptions</a></h1>
 <ul>
 <li>We have Active Directory as the one source of authentication/authorization truth, but it&#8217;s only in the corporate
   network. For various reasons both technical and political, accessing it from <span class="caps">AWS</span> (whether directly, over <span class="caps">VPN</span>,
@@ -194,7 +194,7 @@ day; this might not be the Right answer, and it&#8217;s just a theory at this po
 <li>We want to minimize reliance on our existing corporate infrastructure, so that <span class="caps">AWS</span> can be used for business
   continuity&nbsp;purposes.</li>
 </ul>
-<h1 id="main-goals">Main&nbsp;Goals</h1>
+<h1 id="main-goals"><a class="toclink" href="#main-goals">Main&nbsp;Goals</a></h1>
 <ul>
 <li>Provide users with <span class="caps">SSH</span> access to <span class="caps">EC2</span> servers; privilege should be able to be granted to a subset of users and/or groups
   for each &#8220;application&#8221;. Users should not be able to access other&nbsp;instances.</li>
@@ -204,7 +204,7 @@ day; this might not be the Right answer, and it&#8217;s just a theory at this po
   it&#8217;s not an option to solve this&nbsp;problem.</li>
 <li>This should involve a minimum of administrative overhead when a user leaves the&nbsp;company.</li>
 </ul>
-<h1 id="proposed-solution">Proposed&nbsp;Solution</h1>
+<h1 id="proposed-solution"><a class="toclink" href="#proposed-solution">Proposed&nbsp;Solution</a></h1>
 <p>My solution relies on <span class="caps">SSH</span> agent forwarding and the <code>AuthorizedKeysCommand</code> introduced in OpenSSH 6.2 (see &#8220;Limitations&#8221;, below, for more information),
 most likely inspired by (or maybe literally the same code)
 as the patch formerly used by GitHub. This allows sshd to execute an arbitrary command, passing it the login username, which returns output identical to what would
@@ -212,7 +212,7 @@ be in the <code>authorized_keys</code> file. If none of the keys successfully au
 advantage of this feature, in addition to <span class="caps">SSH</span> agent forwarding, to provide our granular access control. Public keys are pulled from a central location <em>at login time</em>
 (and cached for a set amount of time); each user has control over their own public keys, and a central process builds sets of public keys authorized to access a given
 group of&nbsp;instances.</p>
-<h2 id="infrastructure">Infrastructure</h2>
+<h2 id="infrastructure"><a class="toclink" href="#infrastructure">Infrastructure</a></h2>
 <p>Each <span class="caps">EC2</span> instance will be a member of an Access Group, which is a unique identifier for the set of users authorized to access instances
 in the group. In implementation, Access Groups will likely just be a tag on <span class="caps">EC2</span> instances that maps to a set of predefined values
 (see below for&nbsp;more).</p>
@@ -228,7 +228,7 @@ using their own personal public keys on the destination&nbsp;instances.</p>
 <p>To make it easier for end-users, we could develop a wrapper script like <a href="https://pypi.python.org/pypi/ec2-ssh">Instagram&#8217;s ec2-ssh</a> that
 checks for a valid, running ssh agent with keys in it, and then crafts the correct <span class="caps">SSH</span> command to land the user on the desired end
 host - i.e. something like <code>ec2ssh instance_id</code> would generate and execute a command like <code>ssh -At bastion_hostname 'ssh instance_ip'</code>.</p>
-<h2 id="on-the-servers-instances">On the Servers&nbsp;(Instances)</h2>
+<h2 id="on-the-servers-instances"><a class="toclink" href="#on-the-servers-instances">On the Servers&nbsp;(Instances)</a></h2>
 <p>Each instance, when initially built/provisioned, is given a <code>get_authorized_keys</code> script, which is configured to be run by sshd as the
 <code>AuthorizedKeysCommand</code>. This script uses one of the following three public key distribution services to retrieve the authorized public keys
 for that instance, which are then echoed on <span class="caps">STDOUT</span> and used to authenticate the user. For the sake of simplicity, we&#8217;ll assume (which is
@@ -252,9 +252,9 @@ determine which group that instance belongs to). With this solution, only the se
 <p>If a shorter delay to authorization changes is needed, it would be feasible for instances to also run a separate process
 (cronjob, daemon, etc.) that polls the key distribution service at a regular interval to check for updates (i.e.
 <span class="caps">HTTP</span> <span class="caps">HEAD</span>, something <span class="caps">SQS</span>-based, etc.) and updates the local cache when they&nbsp;occur.</p>
-<h1 id="public-key-distribution-service">Public Key Distribution&nbsp;Service</h1>
+<h1 id="public-key-distribution-service"><a class="toclink" href="#public-key-distribution-service">Public Key Distribution&nbsp;Service</a></h1>
 <p>Instances will retrieve their authorized public keys from a key distribution service. Three examples&nbsp;follow:</p>
-<h2 id="alternative-1-scalable-architecture-aws-and-local">Alternative 1 - Scalable Architecture - <span class="caps">AWS</span> and&nbsp;Local</h2>
+<h2 id="alternative-1-scalable-architecture-aws-and-local"><a class="toclink" href="#alternative-1-scalable-architecture-aws-and-local">Alternative 1 - Scalable Architecture - <span class="caps">AWS</span> and&nbsp;Local</a></h2>
 <p>Keys will be managed by a web-based application (with a complete and documented <span class="caps">API</span>) living in the corporate data center.
 The application will provide facilities for authorized users (managers, operations) to define new Access Groups and modify
 the list of users allowed to access them. Individual end-users will be able to manage their public keys. At a set interval,
@@ -267,7 +267,7 @@ user running the application. All instances will have <span class="caps">IAM</sp
 <p>This method allows us to provide self-service to users and application administrators, and keeps all data about users within
 the corporate network. It provides automatic revocation of access for disabled Active Directory accounts. It does introduce
 a delay in revocation of access for disabled <span class="caps">AD</span> accounts, but a delay of ~10 minutes is certainly not a concern in our&nbsp;environment.</p>
-<h2 id="alternative-2-scalable-architecture-entirely-in-aws">Alternative 2 - Scalable Architecture Entirely in&nbsp;<span class="caps">AWS</span></h2>
+<h2 id="alternative-2-scalable-architecture-entirely-in-aws"><a class="toclink" href="#alternative-2-scalable-architecture-entirely-in-aws">Alternative 2 - Scalable Architecture Entirely in&nbsp;<span class="caps">AWS</span></a></h2>
 <p>A similar application exists, but lives entirely in <span class="caps">AWS</span>, utilizing its native high availability technologies (i.e. multi-<span class="caps">AZ</span>
 <span class="caps">RDS</span> as a data store). A script still runs in the corporate data center, but all it does is query the <span class="caps">API</span> for a list of all
 active users, check <span class="caps">AD</span> account status, and deactivate any users that no longer have a valid account. Instead of writing the
@@ -279,7 +279,7 @@ fails, it will only impact <em>changes</em> to access, whereas if this applicati
 emergency keys) will break. However, this method allows us to control access at a level finer than Access Groups; rules
 could be developed based on any attributes of the requesting instance, including (if the latency was allowable) queries
 to the <span class="caps">EC2</span> <span class="caps">API</span> for instance-specific&nbsp;data.</p>
-<h2 id="alternative-3-simple-architecture">Alternative 3 - Simple&nbsp;Architecture</h2>
+<h2 id="alternative-3-simple-architecture"><a class="toclink" href="#alternative-3-simple-architecture">Alternative 3 - Simple&nbsp;Architecture</a></h2>
 <p>A text file stores mappings of Access Groups to the Active Directory users and groups authorized for them. The text file
 is manually maintained, stored in version control, and all changes must comply with an access policy and be peer-reviewed.
 A script runs at a set interval (let&#8217;s say cron every 5-10 minutes) that reads the user/group mapping, translates groups
@@ -293,7 +293,7 @@ have only one script and its&#8217; cron job to maintain, rather than a whole ap
 control isn&#8217;t terribly scalable, but it should work for the ~100 users that we have to deal with. Checking <span class="caps">AD</span> account status
 when generating the file should provide a feasible safeguard for users whose corporate accounts are locked/revoked without
 requiring someone to remember to also remove them from the <span class="caps">AWS</span> user&nbsp;list.</p>
-<h2 id="advantages-over-other-solutions">Advantages Over Other&nbsp;Solutions</h2>
+<h2 id="advantages-over-other-solutions"><a class="toclink" href="#advantages-over-other-solutions">Advantages Over Other&nbsp;Solutions</a></h2>
 <ul>
 <li>Self-service for users and for managers/administrators of&nbsp;applications.</li>
 <li>No manual intervention when a user leaves the company; users automatically deactivated when their <span class="caps">AD</span> account&nbsp;is.</li>
@@ -312,13 +312,13 @@ requiring someone to remember to also remove them from the <span class="caps">AW
 <li>Can be easily audited by having a scheduled job add a key for all instances, wait ~15 minutes, and then attempt <span class="caps">SSH</span>
   connections to all&nbsp;instances.</li>
 </ul>
-<h2 id="trade-offs">Trade-Offs</h2>
+<h2 id="trade-offs"><a class="toclink" href="#trade-offs">Trade-Offs</a></h2>
 <ul>
 <li>Delay between user access addition/removal and updates (though this can be minimized by a shorter cache&nbsp;time).</li>
 <li>Latency during initial login with a cold&nbsp;cache.</li>
 <li>Addition of another system that could&nbsp;break.</li>
 </ul>
-<h2 id="limitations">Limitations</h2>
+<h2 id="limitations"><a class="toclink" href="#limitations">Limitations</a></h2>
 <p>My company is a CentOS shop. The <code>AuthorizedKeysCommand</code> feature of OpenSSH itself was only released in <a href="http://www.openssh.com/txt/release-6.2">OpenSSH 6.2</a>,
 on March 22, 2013. A patch for it was backported to the 5.3p1 version of openssh-server in <span class="caps">RHEL</span> and CentOS 6. However,
 this method will certainly not work on CentOS 5, which is still running OpenSSH 4.3. Be aware that when the new <code>AuthorizedKeysCommand</code>
@@ -328,11 +328,11 @@ find anything in the <span class="caps">RPM</span> changelog about it, but the <
 to do on CentOS 6 until I found the <code>openssh-ldap</code> package (in the default repos) and discovered that it uses this&nbsp;feature.</p>
 <p>Also, this solution requires (depending on which alternative is chosen) working access to either S3 or instances serving an application.
 Assuming proper configuration (and distribution across AZs) this should be a&nbsp;non-issue.</p>
-<h2 id="accountability">Accountability</h2>
+<h2 id="accountability"><a class="toclink" href="#accountability">Accountability</a></h2>
 <p>If accountability is a concern, we will handle this through detailed logging in every step of the key creation, authorization, distribution
 and retrieval process. In addition, all instances will run sshd with <code>LogLevel VERBOSE</code>, which will log the fingerprint of all public keys
 used to connect to the instance. Logs will be written to a secure, append-only&nbsp;medium.</p>
-<h1 id="references-and-further-details">References and Further&nbsp;Details</h1>
+<h1 id="references-and-further-details"><a class="toclink" href="#references-and-further-details">References and Further&nbsp;Details</a></h1>
 <ul>
 <li>There is an existing <code>openssh-ldap</code> package in CentOS that provides instructions on setting up public key storage in an <span class="caps">LDAP</span> backend,
   using <code>AuthorizedKeysCommand</code>.</li>
@@ -340,7 +340,7 @@ used to connect to the instance. Logs will be written to a secure, append-only&n
   6.2 OpenSSH for <span class="caps">RHEL</span>/Cent&nbsp;5.</li>
 <li>An <span class="caps">EC2</span> instance can retrieve its own tags using tools such as <code>awscli</code> or <code>ec2-api-tools</code> and an appropriate <span class="caps">IAM</span> role set on the&nbsp;instance.</li>
 </ul>
-<h1 id="rejected-ideas">Rejected&nbsp;Ideas</h1>
+<h1 id="rejected-ideas"><a class="toclink" href="#rejected-ideas">Rejected&nbsp;Ideas</a></h1>
 <p>While thinking through this I considered and rejected a number of alternate methods. Here are some of&nbsp;them:</p>
 <ul>
 <li>While <span class="caps">SSH</span>&#8217;s relatively new Certificate support (<span class="caps">CA</span>-based) sounds nice, it doesn&#8217;t solve the problem; according to

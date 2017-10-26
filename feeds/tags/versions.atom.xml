@@ -14,7 +14,7 @@ fix these issues, essentially re-implementing yum and rpm&amp;#8217;s version co
 me a few days of research and sorting through source code (and in the process I found that &lt;code&gt;yum&lt;/code&gt;, despite
 its use in so many distributions, has no unit tests at all) but I finally got it finished. In the process,
 I found out exactly how&amp;#8230; weird&amp;#8230; &lt;span class="caps"&gt;RPM&lt;/span&gt;&amp;#8217;s version comparison rules&amp;nbsp;are.&lt;/p&gt;
-&lt;h3 id="package-naming-and-parsing"&gt;Package Naming and&amp;nbsp;Parsing&lt;/h3&gt;
+&lt;h3 id="package-naming-and-parsing"&gt;&lt;a class="toclink" href="#package-naming-and-parsing"&gt;Package Naming and&amp;nbsp;Parsing&lt;/a&gt;&lt;/h3&gt;
 &lt;p&gt;&lt;span class="caps"&gt;RPM&lt;/span&gt; package names are made up of five parts; the package name, epoch, version, release, and architecture.
 This format is commonly referred to as the acronym &lt;span class="caps"&gt;NEVRA&lt;/span&gt;. The epoch is not always included; it is assumed
 to be zero (0) on any packages that lack it explicitly. The format for the whole string is &lt;code&gt;n-e:v-r.a&lt;/code&gt;.
@@ -25,7 +25,7 @@ and the bug herein was with what Puppet calls the &amp;#8220;version&amp;#8221; 
 &lt;li&gt;If there is a &lt;code&gt;-&lt;/code&gt; in the &lt;em&gt;remaining&lt;/em&gt; string, everything before the first &lt;code&gt;-&lt;/code&gt; is the version,
   and everything after it is the release. If there isn&amp;#8217;t one, the release is considered&amp;nbsp;null/nill/None/whatever.&lt;/li&gt;
 &lt;/ul&gt;
-&lt;h3 id="how-yum-compares-evr"&gt;How Yum Compares&amp;nbsp;&lt;span class="caps"&gt;EVR&lt;/span&gt;&lt;/h3&gt;
+&lt;h3 id="how-yum-compares-evr"&gt;&lt;a class="toclink" href="#how-yum-compares-evr"&gt;How Yum Compares&amp;nbsp;&lt;span class="caps"&gt;EVR&lt;/span&gt;&lt;/a&gt;&lt;/h3&gt;
 &lt;p&gt;Once the package string is parsed into its &lt;span class="caps"&gt;EVR&lt;/span&gt; components, yum calls &lt;code&gt;rpmUtils.miscutils.compareEVR()&lt;/code&gt;,
 which does some data type massaging for the inputs, and then calls out to &lt;code&gt;rpm.labelCompare()&lt;/code&gt;
 (found in &lt;code&gt;rpm.git/python/header-py.c&lt;/code&gt;). &lt;code&gt;labelCompare()&lt;/code&gt; sets each epoch
@@ -45,7 +45,7 @@ to a function called &lt;code&gt;rpmvercmp()&lt;/code&gt; (see below). The algor
 &lt;/ol&gt;
 &lt;p&gt;The real magic, obviously, happens in &lt;code&gt;rpmvercmp()&lt;/code&gt;, the rpm library function to compare two
 versions (or epochs, or releases). That&amp;#8217;s also where the madness&amp;nbsp;happens.&lt;/p&gt;
-&lt;h3 id="how-rpm-compares-version-parts"&gt;How &lt;span class="caps"&gt;RPM&lt;/span&gt; Compares Version&amp;nbsp;Parts&lt;/h3&gt;
+&lt;h3 id="how-rpm-compares-version-parts"&gt;&lt;a class="toclink" href="#how-rpm-compares-version-parts"&gt;How &lt;span class="caps"&gt;RPM&lt;/span&gt; Compares Version&amp;nbsp;Parts&lt;/a&gt;&lt;/h3&gt;
 &lt;p&gt;&lt;span class="caps"&gt;RPM&lt;/span&gt; is written in C. Converting all of the buffer and pointer processing for these strings
 over to Ruby was quite a pain. That being said, I didn&amp;#8217;t make this up, this is actually the
 algorithm that &lt;code&gt;rpmvercmp()&lt;/code&gt; (&lt;code&gt;lib/rpmvercmp.c&lt;/code&gt;) uses to compare version &amp;#8220;parts&amp;#8221;

@@ -26,7 +26,7 @@ with cat-proof&amp;nbsp;models).&lt;/p&gt;
 in a few days, and at this point, it&amp;#8217;s not really intended to be used by anyone who doesn&amp;#8217;t have a good understanding of the
 components (and Python). But I&amp;#8217;m hoping that someone else might find it interesting, or perhaps improve on it. It&amp;#8217;s not terribly
 robust, but it seems to be working acceptably well for my&amp;nbsp;needs.&lt;/p&gt;
-&lt;h2 id="components"&gt;Components&lt;/h2&gt;
+&lt;h2 id="components"&gt;&lt;a class="toclink" href="#components"&gt;Components&lt;/a&gt;&lt;/h2&gt;
 &lt;p&gt;The system is split into a number of components, with some of them running on the Raspberry Pi and some on my desktop&amp;nbsp;computer.&lt;/p&gt;
 &lt;p&gt;The Pi is running my &lt;a href="https://github.com/jantman/piface-webhooks"&gt;piface-webhooks&lt;/a&gt; project (everything needed to set it up on
 &lt;a href="https://www.raspbian.org/"&gt;Raspbian&lt;/a&gt; or &lt;a href="https://osmc.tv/"&gt;&lt;span class="caps"&gt;OSMC&lt;/span&gt;&lt;/a&gt; is available in the repo), which is made up of two Python&amp;nbsp;services:&lt;/p&gt;
@@ -50,7 +50,7 @@ with links to all uploaded files. At startup, any files that aren&amp;#8217;t ye
 &lt;li&gt;&lt;strong&gt;handle_motion.py&lt;/strong&gt; is the command executed by &lt;code&gt;motion&lt;/code&gt; when an event is detected; it POSTs data to &lt;code&gt;motion_piface_handler.py&lt;/code&gt;.&lt;/li&gt;
 &lt;li&gt;&lt;strong&gt;motion_piface_handler.py&lt;/strong&gt; is the heart of the system, explained&amp;nbsp;below.&lt;/li&gt;
 &lt;/ul&gt;
-&lt;h2 id="motion_piface_handlerpy-pulling-it-all-together"&gt;motion_piface_handler.py - Pulling it all&amp;nbsp;together&lt;/h2&gt;
+&lt;h2 id="motion_piface_handlerpy-pulling-it-all-together"&gt;&lt;a class="toclink" href="#motion_piface_handlerpy-pulling-it-all-together"&gt;motion_piface_handler.py - Pulling it all&amp;nbsp;together&lt;/a&gt;&lt;/h2&gt;
 &lt;p&gt;Webhooks from both the Raspberry Pi door sensor and &lt;code&gt;motion&lt;/code&gt;&amp;#8216;s command execution go to a Python &lt;a href="http://flask.pocoo.org/"&gt;Flask&lt;/a&gt; app
 running on my desktop. This app accepts the incoming data, and also connects to the MySQL database used by Motion. When a &lt;span class="caps"&gt;POST&lt;/span&gt; from
 &lt;code&gt;piface-worker&lt;/code&gt; comes in showing that a door has been opened, it adds a record to the MySQL database with information on the input
@@ -73,7 +73,7 @@ I&amp;#8217;m not sure this was the right way to approach it, but my initial the
 concerned about keeping the system running than getting an individual message through. The point of the system is to let
 me know if my home - and more importantly, my four-legged children - are in danger. I figured that I&amp;#8217;d rather get a delayed
 notification than none at&amp;nbsp;all.&lt;/p&gt;
-&lt;h2 id="results"&gt;Results&lt;/h2&gt;
+&lt;h2 id="results"&gt;&lt;a class="toclink" href="#results"&gt;Results&lt;/a&gt;&lt;/h2&gt;
 &lt;p&gt;After two weeks away, the system worked quite well. It triggered correctly, and quickly, when my family came to check on the cats.
 On average, it took about 3-5 seconds for me to receive the PushOver and GMail notifications for a door open event, and about 30 seconds
 for an alarm (motion after door state change)&amp;nbsp;event.&lt;/p&gt;
@@ -90,7 +90,7 @@ bad idea. &lt;code&gt;motion&lt;/code&gt; was triggered quite often by the cats;
 &lt;code&gt;index.html&lt;/code&gt; file was over &lt;span class="caps"&gt;7MB&lt;/span&gt;. Not only did the index page take a painfully long amount of time to load, but generation of it introduced enough
 latency in the upload process that &lt;code&gt;s3sync_inotify.py&lt;/code&gt; ended up missing a large number of&amp;nbsp;files.&lt;/li&gt;
 &lt;/ol&gt;
-&lt;h2 id="next-steps"&gt;Next&amp;nbsp;Steps&lt;/h2&gt;
+&lt;h2 id="next-steps"&gt;&lt;a class="toclink" href="#next-steps"&gt;Next&amp;nbsp;Steps&lt;/a&gt;&lt;/h2&gt;
 &lt;p&gt;I&amp;#8217;m not sure if I&amp;#8217;ll do much more work on this - we don&amp;#8217;t travel often - but if I do, the next things that I want to tackle&amp;nbsp;are:&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;Queueing of outgoing messages, so that network outages won&amp;#8217;t result in completely-lost&amp;nbsp;communication.&lt;/li&gt;

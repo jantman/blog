@@ -45,7 +45,7 @@ unit tests but also &lt;a href="https://github.com/puppetlabs/beaker"&gt;beaker&
 that&amp;#8217;s similar to Test Kitchen; it spins up Vagrant machines, runs some code in them, and then uses &lt;a href="http://serverspec.org/"&gt;serverspec&lt;/a&gt; to make assertions about
 the state of the system (file contents, running processes, command output, etc.) (side note: if you used Beaker prior to the
 &lt;a href="https://github.com/puppetlabs/beaker/blob/master/HISTORY.md#beaker2.0.0"&gt;2.0 release&lt;/a&gt; in December 2014, you should really try it again; they&amp;#8217;ve made some great&amp;nbsp;improvements).&lt;/p&gt;
-&lt;h2 id="the-problem"&gt;The&amp;nbsp;Problem&lt;/h2&gt;
+&lt;h2 id="the-problem"&gt;&lt;a class="toclink" href="#the-problem"&gt;The&amp;nbsp;Problem&lt;/a&gt;&lt;/h2&gt;
 &lt;p&gt;This posed a bit of a challenge, as Ice (in addition to being pretty poorly documented) is really designed to run in &lt;span class="caps"&gt;AWS&lt;/span&gt;. Firstly, the very reason we started running Ice was
 to get a handle on our fast-growing &lt;span class="caps"&gt;AWS&lt;/span&gt; spend; as a result, we&amp;#8217;re trying hard not to use &lt;span class="caps"&gt;AWS&lt;/span&gt; for small-scale projects that could use existing resources. Second, while our
 company very unfortunately doesn&amp;#8217;t have an open source policy and isn&amp;#8217;t releasing anything (hopefully this may be changing soon), we try hard to write generic, forge-quality&amp;nbsp;modules.&lt;/p&gt;
@@ -54,13 +54,13 @@ want the acceptance tests to require anything specific to my company, such as an
 (one of its three inputs; &lt;span class="caps"&gt;EC2&lt;/span&gt; pricing data and your accounts&amp;#8217; reservation pricing/capacity being the others) and writes state from and to S3. So, this was a bit difficult.
 As we don&amp;#8217;t plan on upgrading Ice terribly often, and we wanted to install from the &lt;a href="https://netflixoss.ci.cloudbees.com/job/ice-master/"&gt;cloudbees master builds&lt;/a&gt;, we wanted
 acceptance testing of not just the provisioning tooling, but also some basic smoke tests for the application&amp;nbsp;itself.&lt;/p&gt;
-&lt;h2 id="the-solution"&gt;The&amp;nbsp;Solution&lt;/h2&gt;
+&lt;h2 id="the-solution"&gt;&lt;a class="toclink" href="#the-solution"&gt;The&amp;nbsp;Solution&lt;/a&gt;&lt;/h2&gt;
 &lt;p&gt;I managed to come up with a working, albeit somewhat Rube Goldberg, method of getting isolated acceptance tests to work. What follows is the gist of how I got Ice
 working in complete isolation. The majority of this happens in &lt;code&gt;spec/acceptance/0prerequisite_spec.rb&lt;/code&gt; which runs first and both does the prerequisite setup
 and validates that everything is setup right and working for the tests. The following solution is based on the amazingly helpful &lt;a href="https://github.com/jubos/fake-s3"&gt;fakes3&lt;/a&gt;
 Ruby gem, the &lt;a href="http://www.apsis.ch/pound/"&gt;Pound&lt;/a&gt; reverse proxy, and some &lt;span class="caps"&gt;SSL&lt;/span&gt; certificate trickery. While my code was specific to Beaker, this should be generic
 enough to use with any system acceptance testing&amp;nbsp;tool.&lt;/p&gt;
-&lt;h2 id="prerequisites"&gt;Prerequisites&lt;/h2&gt;
+&lt;h2 id="prerequisites"&gt;&lt;a class="toclink" href="#prerequisites"&gt;Prerequisites&lt;/a&gt;&lt;/h2&gt;
 &lt;p&gt;First, we obtain or create some files that we&amp;#8217;ll need on the test&amp;nbsp;instance:&lt;/p&gt;
 &lt;ol&gt;
 &lt;li&gt;
@@ -81,7 +81,7 @@ enough to use with any system acceptance testing&amp;nbsp;tool.&lt;/p&gt;
     to https://&lt;span class="caps"&gt;BUCKETNAME&lt;/span&gt;.s3amazonaws.com. As a result, this &lt;span class="caps"&gt;SSL&lt;/span&gt; foolery is&amp;nbsp;required.)&lt;/p&gt;
 &lt;/li&gt;
 &lt;/ol&gt;
-&lt;h2 id="setup"&gt;Setup&lt;/h2&gt;
+&lt;h2 id="setup"&gt;&lt;a class="toclink" href="#setup"&gt;Setup&lt;/a&gt;&lt;/h2&gt;
 &lt;ol&gt;
 &lt;li&gt;
 &lt;p&gt;Install the &lt;a href="https://rubygems.org/gems/fakes3"&gt;fakes3&lt;/a&gt; rubygem; this provides an s3-compliant &lt;span class="caps"&gt;API&lt;/span&gt; backed by local filesystem storage.
@@ -161,7 +161,7 @@ fix these issues, essentially re-implementing yum and rpm&amp;#8217;s version co
 me a few days of research and sorting through source code (and in the process I found that &lt;code&gt;yum&lt;/code&gt;, despite
 its use in so many distributions, has no unit tests at all) but I finally got it finished. In the process,
 I found out exactly how&amp;#8230; weird&amp;#8230; &lt;span class="caps"&gt;RPM&lt;/span&gt;&amp;#8217;s version comparison rules&amp;nbsp;are.&lt;/p&gt;
-&lt;h3 id="package-naming-and-parsing"&gt;Package Naming and&amp;nbsp;Parsing&lt;/h3&gt;
+&lt;h3 id="package-naming-and-parsing"&gt;&lt;a class="toclink" href="#package-naming-and-parsing"&gt;Package Naming and&amp;nbsp;Parsing&lt;/a&gt;&lt;/h3&gt;
 &lt;p&gt;&lt;span class="caps"&gt;RPM&lt;/span&gt; package names are made up of five parts; the package name, epoch, version, release, and architecture.
 This format is commonly referred to as the acronym &lt;span class="caps"&gt;NEVRA&lt;/span&gt;. The epoch is not always included; it is assumed
 to be zero (0) on any packages that lack it explicitly. The format for the whole string is &lt;code&gt;n-e:v-r.a&lt;/code&gt;.
@@ -172,7 +172,7 @@ and the bug herein was with what Puppet calls the &amp;#8220;version&amp;#8221; 
 &lt;li&gt;If there is a &lt;code&gt;-&lt;/code&gt; in the &lt;em&gt;remaining&lt;/em&gt; string, everything before the first &lt;code&gt;-&lt;/code&gt; is the version,
   and everything after it is the release. If there isn&amp;#8217;t one, the release is considered&amp;nbsp;null/nill/None/whatever.&lt;/li&gt;
 &lt;/ul&gt;
-&lt;h3 id="how-yum-compares-evr"&gt;How Yum Compares&amp;nbsp;&lt;span class="caps"&gt;EVR&lt;/span&gt;&lt;/h3&gt;
+&lt;h3 id="how-yum-compares-evr"&gt;&lt;a class="toclink" href="#how-yum-compares-evr"&gt;How Yum Compares&amp;nbsp;&lt;span class="caps"&gt;EVR&lt;/span&gt;&lt;/a&gt;&lt;/h3&gt;
 &lt;p&gt;Once the package string is parsed into its &lt;span class="caps"&gt;EVR&lt;/span&gt; components, yum calls &lt;code&gt;rpmUtils.miscutils.compareEVR()&lt;/code&gt;,
 which does some data type massaging for the inputs, and then calls out to &lt;code&gt;rpm.labelCompare()&lt;/code&gt;
 (found in &lt;code&gt;rpm.git/python/header-py.c&lt;/code&gt;). &lt;code&gt;labelCompare()&lt;/code&gt; sets each epoch
@@ -192,7 +192,7 @@ to a function called &lt;code&gt;rpmvercmp()&lt;/code&gt; (see below). The algor
 &lt;/ol&gt;
 &lt;p&gt;The real magic, obviously, happens in &lt;code&gt;rpmvercmp()&lt;/code&gt;, the rpm library function to compare two
 versions (or epochs, or releases). That&amp;#8217;s also where the madness&amp;nbsp;happens.&lt;/p&gt;
-&lt;h3 id="how-rpm-compares-version-parts"&gt;How &lt;span class="caps"&gt;RPM&lt;/span&gt; Compares Version&amp;nbsp;Parts&lt;/h3&gt;
+&lt;h3 id="how-rpm-compares-version-parts"&gt;&lt;a class="toclink" href="#how-rpm-compares-version-parts"&gt;How &lt;span class="caps"&gt;RPM&lt;/span&gt; Compares Version&amp;nbsp;Parts&lt;/a&gt;&lt;/h3&gt;
 &lt;p&gt;&lt;span class="caps"&gt;RPM&lt;/span&gt; is written in C. Converting all of the buffer and pointer processing for these strings
 over to Ruby was quite a pain. That being said, I didn&amp;#8217;t make this up, this is actually the
 algorithm that &lt;code&gt;rpmvercmp()&lt;/code&gt; (&lt;code&gt;lib/rpmvercmp.c&lt;/code&gt;) uses to compare version &amp;#8220;parts&amp;#8221;

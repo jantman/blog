@@ -13,7 +13,7 @@ unit tests but also &lt;a href="https://github.com/puppetlabs/beaker"&gt;beaker&
 that&amp;#8217;s similar to Test Kitchen; it spins up Vagrant machines, runs some code in them, and then uses &lt;a href="http://serverspec.org/"&gt;serverspec&lt;/a&gt; to make assertions about
 the state of the system (file contents, running processes, command output, etc.) (side note: if you used Beaker prior to the
 &lt;a href="https://github.com/puppetlabs/beaker/blob/master/HISTORY.md#beaker2.0.0"&gt;2.0 release&lt;/a&gt; in December 2014, you should really try it again; they&amp;#8217;ve made some great&amp;nbsp;improvements).&lt;/p&gt;
-&lt;h2 id="the-problem"&gt;The&amp;nbsp;Problem&lt;/h2&gt;
+&lt;h2 id="the-problem"&gt;&lt;a class="toclink" href="#the-problem"&gt;The&amp;nbsp;Problem&lt;/a&gt;&lt;/h2&gt;
 &lt;p&gt;This posed a bit of a challenge, as Ice (in addition to being pretty poorly documented) is really designed to run in &lt;span class="caps"&gt;AWS&lt;/span&gt;. Firstly, the very reason we started running Ice was
 to get a handle on our fast-growing &lt;span class="caps"&gt;AWS&lt;/span&gt; spend; as a result, we&amp;#8217;re trying hard not to use &lt;span class="caps"&gt;AWS&lt;/span&gt; for small-scale projects that could use existing resources. Second, while our
 company very unfortunately doesn&amp;#8217;t have an open source policy and isn&amp;#8217;t releasing anything (hopefully this may be changing soon), we try hard to write generic, forge-quality&amp;nbsp;modules.&lt;/p&gt;
@@ -22,13 +22,13 @@ want the acceptance tests to require anything specific to my company, such as an
 (one of its three inputs; &lt;span class="caps"&gt;EC2&lt;/span&gt; pricing data and your accounts&amp;#8217; reservation pricing/capacity being the others) and writes state from and to S3. So, this was a bit difficult.
 As we don&amp;#8217;t plan on upgrading Ice terribly often, and we wanted to install from the &lt;a href="https://netflixoss.ci.cloudbees.com/job/ice-master/"&gt;cloudbees master builds&lt;/a&gt;, we wanted
 acceptance testing of not just the provisioning tooling, but also some basic smoke tests for the application&amp;nbsp;itself.&lt;/p&gt;
-&lt;h2 id="the-solution"&gt;The&amp;nbsp;Solution&lt;/h2&gt;
+&lt;h2 id="the-solution"&gt;&lt;a class="toclink" href="#the-solution"&gt;The&amp;nbsp;Solution&lt;/a&gt;&lt;/h2&gt;
 &lt;p&gt;I managed to come up with a working, albeit somewhat Rube Goldberg, method of getting isolated acceptance tests to work. What follows is the gist of how I got Ice
 working in complete isolation. The majority of this happens in &lt;code&gt;spec/acceptance/0prerequisite_spec.rb&lt;/code&gt; which runs first and both does the prerequisite setup
 and validates that everything is setup right and working for the tests. The following solution is based on the amazingly helpful &lt;a href="https://github.com/jubos/fake-s3"&gt;fakes3&lt;/a&gt;
 Ruby gem, the &lt;a href="http://www.apsis.ch/pound/"&gt;Pound&lt;/a&gt; reverse proxy, and some &lt;span class="caps"&gt;SSL&lt;/span&gt; certificate trickery. While my code was specific to Beaker, this should be generic
 enough to use with any system acceptance testing&amp;nbsp;tool.&lt;/p&gt;
-&lt;h2 id="prerequisites"&gt;Prerequisites&lt;/h2&gt;
+&lt;h2 id="prerequisites"&gt;&lt;a class="toclink" href="#prerequisites"&gt;Prerequisites&lt;/a&gt;&lt;/h2&gt;
 &lt;p&gt;First, we obtain or create some files that we&amp;#8217;ll need on the test&amp;nbsp;instance:&lt;/p&gt;
 &lt;ol&gt;
 &lt;li&gt;
@@ -49,7 +49,7 @@ enough to use with any system acceptance testing&amp;nbsp;tool.&lt;/p&gt;
     to https://&lt;span class="caps"&gt;BUCKETNAME&lt;/span&gt;.s3amazonaws.com. As a result, this &lt;span class="caps"&gt;SSL&lt;/span&gt; foolery is&amp;nbsp;required.)&lt;/p&gt;
 &lt;/li&gt;
 &lt;/ol&gt;
-&lt;h2 id="setup"&gt;Setup&lt;/h2&gt;
+&lt;h2 id="setup"&gt;&lt;a class="toclink" href="#setup"&gt;Setup&lt;/a&gt;&lt;/h2&gt;
 &lt;ol&gt;
 &lt;li&gt;
 &lt;p&gt;Install the &lt;a href="https://rubygems.org/gems/fakes3"&gt;fakes3&lt;/a&gt; rubygem; this provides an s3-compliant &lt;span class="caps"&gt;API&lt;/span&gt; backed by local filesystem storage.
