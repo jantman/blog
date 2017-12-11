@@ -1,7 +1,9 @@
-Title: About
+Title: About Me
 Date: 2008-12-17 09:17
 Author: admin
 Slug: about
+
+![my gravatar portrait](https://www.gravatar.com/avatar/e74809005072f6d8dc133307e4a04e3b?s=300)
 
 Originally from suburban New Jersey and residing in the Atlanta area since 2012, I'm a proud geek and love what I do for work. I've had many job titles over the years; I started as a part-time software developer in college, worked for a while as a system administrator, and then found my strongest passion in tooling/automation development and developer productivity. In the current market I'd probably describe myself as a "DevOps Engineer" (a title I loathe) or a full-stack developer. I'm currently immersed in all things AWS, reliability, security, continuous integration/delivery, and developer enablement; right now, this is mainly focused on providing shared services and common tooling, patterns and documentation for a large and growing AWS infrastructure. In the past my major focuses have included large-scale Puppet configuration management deployments and redesigns, monitoring (metrics, logs, and some big Nagios/Icinga installs), web application development, wireless network architecture and deployment, and datacenter operations.
 
