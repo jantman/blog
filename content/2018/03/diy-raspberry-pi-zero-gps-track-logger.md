@@ -6,7 +6,6 @@ Category: Tech HowTos
 Tags: embedded, gps, hiking, logger, raspberrypi
 Slug: diy-raspberry-pi-zero-gps-track-logger
 Summary: Simple DIY Raspberry Pi Zero USB GPS logger, with code and instructions.
-Status: draft
 
 Last weekend I was out hiking with one of my dogs when I realized that I didn't know the exact length of the route we were taking. We were at the [Davidson-Arabia Nature Preserve](http://arabiaalliance.org/explore/plan-your-visit/visit-davidson-arabia-nature-preserve/), part of the Arabia Mountain National Heritage Area, only about 20 minutes from home. It's a wonderful afternoon hike for me since it's so close to home and the trails are easy. It's also a laid back hike - the area is only about 2.1 square miles (5.4 sq. km.) bordered on all sides by well-traveled roads or suburban neighborhoods and dominated by Arabia Mountain and a lake - with many trails and high traffic, so I'm less concerned about navigation than I would be in the backcountry. However, since my usual route covers portions of two trails and a cut-through between them, I don't know what the actual distance is.
 
@@ -32,9 +31,9 @@ This all fits conveniently in my hiking pack inside the mesh bag that the batter
 
 It's worth mention that my hardware choice was largely dependent on what I already had or what I thought I could reuse for other projects. While the GPS receiver is small and lightweight - about 2" (5cm) around and about 2 ounces (57g) - I could have saved a fair amount of space and some weight by purchasing a component GPS to connect to the Pi via GPIO and mount directly to the Pi itself. I decided to get a USB model as it will be more useful to me for other projects as well. Some space and weight could also be saved by using a simpler microcontroller than the Pi Zero (this application certainly doesn't need the power of a Pi, or a full Linux system) but I used what I had handy.
 
-The full system as I have it set up weighs 11.5 ounces (326g) which is quite heavy by the standards of serious hikers. However, 7 ounces (203g) of that is the 10,000mAh external battery pack which I already had for my cell phone. This battery can run the logger for >>>>TODO<<<<< continuously, which is definitely overkill for my purposes. I could likely cut the weight in half if I used a more appropriately-sized battery; Anker, a company whose products I really like, makes a $15 [3350mAh USB battery pack](https://www.amazon.com/dp/B005X1Y7I2) that weighs in at just 3oz (85g), to say nothing of the lighter Pi-specific options available.
+The full system as I have it set up weighs 11.5 ounces (326g) which is quite heavy by the standards of serious hikers. However, 7 ounces (203g) of that is the 10,000mAh external battery pack which I already had for my cell phone. This battery can run the logger for 42 hours continuously, which is definitely overkill for my purposes. I could likely cut the weight in half if I used a more appropriately-sized battery; Anker, a company whose products I really like, makes a $15 [3350mAh USB battery pack](https://www.amazon.com/dp/B005X1Y7I2) that weighs in at just 3oz (85g), to say nothing of the lighter Pi-specific options available.
 
-As-is, this hardware allows me to continuously log GPS fixes every 5 seconds for >>>>TODO<<<<<. Each data point is approximately 1400 bytes, and the 8GB microSD card I use (5.6G free after OS and software) has space to log about __240 days__ of data at this interval.
+As-is, this hardware allows me to continuously log GPS fixes every 5 seconds for 42 hours, consuming about 40MB for the data. Each data point is approximately 1400 bytes, and the 8GB microSD card I use (5.6G free after OS and software) has space to log about __240 days__ of data at this interval.
 
 ## Initial Tests
 
@@ -42,7 +41,7 @@ My first test, as described above, was just a test of the "cold fix" speed for t
 
 My next test was placing the GPS on the dash of my car during a quick five-mile trip to the grocery store and gas station. The results were shockingly accurate: not only did the unit perform perfectly as intended, but when I converted the logs to GPX format and used [gpsvisualizer.com](http://www.gpsvisualizer.com/) to overlay them on Google Maps, I could clearly see my route down to which side of the road I was driving on, the exact space I parked in, and which gas pump I used.
 
-I also did a test of the total time that I can capture data using the 10Ah battery pack and 8GB SD card. This might be a very slight amount unrealistic, since the GPS was stationary most of the time. After doing the above driving test I set the GPS up on the inside sill of my bedroom window and let it run. And run. And drove to work the next day with it on the dashboard of my car, left it in the car during my work day (on the bottom floor of a 4-story parking deck, where a GPS fix is impossible to get) and... >>>>TODO<<<<
+I also did a test of the total time that I can capture data using the 10Ah battery pack and 8GB SD card. This might be a very slight amount unrealistic, since the GPS was stationary most of the time. After doing the above driving test I set the GPS up on the inside sill of my bedroom window and let it run. And run. And drove to work the next day with it on the dashboard of my car, left it in the car during my work day (on the bottom floor of a 4-story parking deck, where a GPS fix is impossible to get), drove home, put it back on the window sill, and eventually fell asleep. Sometime during the night, at the 42-hour mark, the battery finally gave out. The total space used for 42 hours of data was approximately 40MB.
 
 ## Source Code
 
