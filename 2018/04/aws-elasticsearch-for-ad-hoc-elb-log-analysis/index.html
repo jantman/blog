@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="en" prefix="og: http://ogp.me/ns# fb: https://www.facebook.com/2008/fbml">
+<head>
+    <title>AWS ElasticSearch for Ad-Hoc ELB Log Analysis - Jason Antman's Blog</title>
+    <!-- Using the latest rendering mode for IE -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+
+<link rel="canonical" href="http://blog.jasonantman.com/2018/04/aws-elasticsearch-for-ad-hoc-elb-log-analysis/">
+
+        <meta name="author" content="Jason Antman" />
+        <meta name="keywords" content="aws,amazon,elb,elasticsearch,logstash,kibana,logs,analysis" />
+        <meta name="description" content="How I used AWS hosted ElasticSearch for ad-hoc analysis of ELB logs." />
+
+        <meta property="og:site_name" content="Jason Antman's Blog" />
+        <meta property="og:type" content="article"/>
+        <meta property="og:title" content="AWS ElasticSearch for Ad-Hoc ELB Log Analysis"/>
+        <meta property="og:url" content="http://blog.jasonantman.com/2018/04/aws-elasticsearch-for-ad-hoc-elb-log-analysis/"/>
+        <meta property="og:description" content="How I used AWS hosted ElasticSearch for ad-hoc analysis of ELB logs."/>
+        <meta property="article:published_time" content="2018-04-01" />
+            <meta property="article:section" content="Tech HowTos" />
+            <meta property="article:tag" content="aws" />
+            <meta property="article:tag" content="amazon" />
+            <meta property="article:tag" content="elb" />
+            <meta property="article:tag" content="elasticsearch" />
+            <meta property="article:tag" content="logstash" />
+            <meta property="article:tag" content="kibana" />
+            <meta property="article:tag" content="logs" />
+            <meta property="article:tag" content="analysis" />
+            <meta property="article:author" content="Jason Antman" />
+
+
+
+    <!-- Bootstrap -->
+        <link rel="stylesheet" href="http://blog.jasonantman.com/theme/css/bootstrap.flatly.min.css" type="text/css"/>
+    <link href="http://blog.jasonantman.com/theme/css/font-awesome.min.css" rel="stylesheet">
+
+    <link href="http://blog.jasonantman.com/theme/css/pygments/default.css" rel="stylesheet">
+        <link href="http://blog.jasonantman.com/theme/css/typogrify.css" rel="stylesheet">
+    <link rel="stylesheet" href="http://blog.jasonantman.com/theme/css/style.css" type="text/css"/>
+        <link href="http://blog.jasonantman.com/theme/css/shariff/shariff.min.css" rel="stylesheet">
+
+    <link rel="stylesheet" href="http://blog.jasonantman.com/theme/css/forkongithub.min.css" type="text/css" />
+
+        <link href="http://blog.jasonantman.com/feeds/all.atom.xml" type="application/atom+xml" rel="alternate"
+              title="Jason Antman's Blog ATOM Feed"/>
+
+        <link href="http://blog.jasonantman.com/feeds/all.rss.xml" type="application/rss+xml" rel="alternate"
+              title="Jason Antman's Blog RSS Feed"/>
+
+
+        <link href="http://blog.jasonantman.com/feeds/categories/tech-howtos.atom.xml" type="application/atom+xml" rel="alternate"
+              title="Jason Antman's Blog Tech HowTos ATOM Feed"/>
+
+    <script src="https://widget.battleforthenet.com/widget.js" async></script>
+
+</head>
+<body>
+
+<div class="navbar navbar-default navbar-fixed-top" role="navigation">
+	<div class="container">
+<span id="forkongithub"><a href="https://github.com/jantman/blog">Fork me on GitHub</a></span>        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="http://blog.jasonantman.com/" class="navbar-brand">
+Jason Antman's Blog            </a>
+        </div>
+        <div class="collapse navbar-collapse navbar-ex1-collapse">
+            <ul class="nav navbar-nav">
+                         <li><a href="http://blog.jasonantman.com/pages/about.html">
+                             About&nbsp;Me
+                          </a></li>
+                        <li >
+                            <a href="http://blog.jasonantman.com/categories/ideas-and-rants/index.html">Ideas and rants</a>
+                        </li>
+                        <li >
+                            <a href="http://blog.jasonantman.com/categories/miscellaneous/index.html">Miscellaneous</a>
+                        </li>
+                        <li >
+                            <a href="http://blog.jasonantman.com/categories/monitoring/index.html">Monitoring</a>
+                        </li>
+                        <li >
+                            <a href="http://blog.jasonantman.com/categories/ops/index.html">Ops</a>
+                        </li>
+                        <li >
+                            <a href="http://blog.jasonantman.com/categories/projects/index.html">Projects</a>
+                        </li>
+                        <li >
+                            <a href="http://blog.jasonantman.com/categories/puppet/index.html">Puppet</a>
+                        </li>
+                        <li class="active">
+                            <a href="http://blog.jasonantman.com/categories/tech-howtos/index.html">Tech howtos</a>
+                        </li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+              <li><a href="http://blog.jasonantman.com/archives.html"><i class="fa fa-th-list"></i><span class="icon-label">Archives</span></a></li>
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+</div> <!-- /.navbar -->
+<!-- Banner -->
+<!-- End Banner -->
+<div class="container">
+    <div class="row">
+        <div class="col-sm-9">
+    <section id="content">
+        <article>
+            <header class="page-header">
+                <h1>
+                    <a href="http://blog.jasonantman.com/2018/04/aws-elasticsearch-for-ad-hoc-elb-log-analysis/"
+                       rel="bookmark"
+                       title="Permalink to AWS ElasticSearch for Ad-Hoc ELB Log Analysis">
+                        <span class="caps">AWS</span> ElasticSearch for Ad-Hoc <span class="caps">ELB</span> Log&nbsp;Analysis
+                    </a>
+                </h1>
+            </header>
+            <div class="entry-content">
+                <div class="panel">
+                    <div class="panel-body">
+<footer class="post-info">
+    <span class="label label-default">Date</span>
+    <span class="published">
+        <i class="fa fa-calendar"></i><time datetime="2018-04-01T14:36:00-04:00"> Sun 01 April 2018</time>
+    </span>
+
+
+
+
+
+<span class="label label-default">Tags</span>
+	<a href="http://blog.jasonantman.com/tags/aws/index.html">aws</a>
+        /
+	<a href="http://blog.jasonantman.com/tags/amazon/index.html">amazon</a>
+        /
+	<a href="http://blog.jasonantman.com/tags/elb/index.html">elb</a>
+        /
+	<a href="http://blog.jasonantman.com/tags/elasticsearch/index.html">elasticsearch</a>
+        /
+	<a href="http://blog.jasonantman.com/tags/logstash/index.html">logstash</a>
+        /
+	<a href="http://blog.jasonantman.com/tags/kibana/index.html">kibana</a>
+        /
+	<a href="http://blog.jasonantman.com/tags/logs/index.html">logs</a>
+        /
+	<a href="http://blog.jasonantman.com/tags/analysis/index.html">analysis</a>
+    
+</footer><!-- /.post-info -->                    </div>
+                </div>
+                <p><em>This is a slightly modified and sanitized version of a post that I wrote on my employer&#8217;s internal collaboration site. I&#8217;m sharing it here because I wasn&#8217;t able to find any clear guide to this exact process, and because I&#8217;ve been really bad at keeping up with my blog&nbsp;lately.</em></p>
+<p>At work my team runs an internal instance of <a href="https://jfrog.com/artifactory/features/">Artifactory</a>, a binary artifact repository manager that stores and serves artifacts for multiple software packaging systems (we use it for Ruby Gems, Maven packages, <span class="caps">NPM</span>, PyPI and Docker images). Many teams within our company rely on this service in their build and deploy processes. Last week we suffered a severe degradation of Ruby Gem serving from our Artifactory instance. One of the other engineers on my team was able to identify and resolve the problem based on intuition and experience, but I&#8217;d like to walk through a process that I used to collect some detailed data for troubleshooting and confirmation of the&nbsp;cause.</p>
+<p>Our Artifactory service runs in <span class="caps">AWS</span> as a <span class="caps">HA</span> cluster of three <span class="caps">EC2</span> instances fronted by a classic Elastic Load Balancer (<span class="caps">ELB</span>), with a private address only so that it&#8217;s only available internally. Artifactory itself is a Java application running under Tomcat Catalina, with repository metadata stored in a MySQL <span class="caps">RDS</span> cluster and binary artifacts stored in S3. Artifacts are organized into repositories, with each repository containing a specific set of artifacts of a given type (i.e. Maven, gems, <span class="caps">NPM</span>, etc. In addition to storing and serving artifacts locally, Artifactory also has the capability to configure remote repositories that retrieve and cache artifacts from remote servers, and &#8220;virtual&#8221; repositories that combine two or more local or remote repositories into one unified&nbsp;view.</p>
+<p>My first reaction was to begin with the high-level monitoring of the <span class="caps">ELB</span> provided by CloudWatch. While I&#8217;d expected to see various metrics (most likely <span class="caps">HTTP</span> 4xx or 5xx errors) far from their historical baseline, the only obvious deviations from normal were number of connections and backend request time (the time the actual Artifactory instances were taking to handle requests). While the rest of my team was also investigating, I attempted to start analyzing the Artifactory logs in our Splunk instance (our company&#8217;s official Enterprise Log Solution). Unfortunately, I quickly found that the logs were not very useful. First, the logs contained a high volume of noise: repeated and persistent errors present for a very long time, overly verbose logs for certain actions, and Java stack traces split across dozens or hundreds of separate log entries in Splunk. Second, and more importantly, Artifactory was logging requests as coming from the <span class="caps">IP</span> address of the load balancer instead of the actual client and was missing other key pieces of information such as the user-agent and time taken to serve the request. It seemed clear to me that these logs weren&#8217;t going to provide as much information as I&#8217;d&nbsp;hoped.</p>
+<p>Luckily I found that we had <a href="https://docs.aws.amazon.com/elasticloadbalancing/latest/classic/access-log-collection.html"><span class="caps">ELB</span> access logging</a> enabled on the load balancer, sending access logs to S3 once an hour. Unfortunately, we weren&#8217;t doing anything with those logs and I don&#8217;t believe they had ever been referenced before; we certainly weren&#8217;t ingesting them into Splunk or any other centralized log store. But the <a href="https://docs.aws.amazon.com/elasticloadbalancing/latest/classic/access-log-collection.html#access-log-entry-format"><span class="caps">ELB</span> access log format</a> contains all of the information I was looking for: timestamp with milliseconds, exact request <span class="caps">URL</span>, actual client <span class="caps">IP</span> address, user-agent, sizes of request and response, <span class="caps">ELB</span> and backend (Artifactory) <span class="caps">HTTP</span> status codes, and the time taken to process the request both by the backend and the <span class="caps">ELB</span>&nbsp;itself.</p>
+<p>With the useful and relevant logs sitting in S3 and not being ingested to any analysis system, my first instinct was to use <a href="https://aws.amazon.com/athena/">Amazon Athena</a>, a tool to execute <span class="caps">SQL</span>-like queries directly against data in S3. The results were certainly better than anything else we had access to, but without the ability to graph elements of interest over time they did not prove to be helpful in determining what patterns had changed since the previous hours, days and weeks. After some thought, my next instinct was to turn to the Elasticsearch, Logstash, Kibana (<a href="https://www.elastic.co/elk-stack"><span class="caps">ELK</span></a>) stack that I&#8217;m familiar with from previous&nbsp;jobs.</p>
+<p><a href="https://www.elastic.co/products/elasticsearch">Elasticsearch</a> is a clustered full-text search service built atop Apache Lucene, <a href="https://www.elastic.co/products/logstash">Logstash</a> is a log aggregator and shipper with flexible plugin-based inputs, outputs, pre-processing and filters, and <a href="https://www.elastic.co/products/kibana">Kibana</a> a dynamic web interface for Elasticsearch geared towards search, analysis and graphing of time-series and log data. They&#8217;re all open source projects now developed and commercially supported by <a href="https://www.elastic.co/">Elastic</a>, and together they form what is likely the largest and strongest open-source alternative to Splunk. Amazon has a managed <a href="https://aws.amazon.com/elasticsearch-service/">Elasticsearch Service</a> that includes the Kibana web interface, so I knew that getting up and running would be quick and&nbsp;easy.</p>
+<p>I was able to go from start to analyzing a months&#8217; worth of <span class="caps">ELB</span> access logs in just over an hour, using the process described below (that time could&#8217;ve been greatly reduced if I changed some default Logstash configuration and didn&#8217;t read the logs from S3 one file at a time in serial). Fortunately one of the other engineers on my team was able to restore Artifactory service while I was going through this process, but I continued anyway in order to see what data we could obtain. <em>Note that none of this would have been needed if we were properly ingesting the <span class="caps">ELB</span> access logs into a centralized analysis tool before the&nbsp;incident.</em></p>
+<ol>
+<li>Identify a suitable subnet in our <span class="caps">VPC</span> that has a <span class="caps">NAT</span> instance for outgoing Internet connectivity and a suitably high number of free <span class="caps">IP</span> addresses. Record the subnet&nbsp;<span class="caps">ID</span>.</li>
+<li>Amazon Elasticsearch and Kibana run over <span class="caps">HTTPS</span> on port 443, so identify or create appropriate security groups that allow you and your team to access port 443 (ideally, you access private resources in <span class="caps">AWS</span> over <span class="caps">VPN</span> or Direct&nbsp;Connect).</li>
+<li>Create a new Elasticsearch Domain (cluster) in <span class="caps">AWS</span>. Since I wasn&#8217;t terribly familiar with the service, I did this manually through the <span class="caps">AWS</span> Console. For short-lived ad-hoc analysis, leave most options at their default and create a single-instance cluster. Use General Purpose <span class="caps">SSD</span> storage; I provisioned storage at just under 10x the size of the months&#8217; raw logs in S3. I set the access policy for Elasticsearch to the canned option to disable requiring <span class="caps">IAM</span> signatures on requests and control access only via the security group, so that any engineers with access to the account could use the Kibana <span class="caps">UI</span>. I then added the subnet I identified in the first step and the security groups identified in the previous&nbsp;step.</li>
+<li>It took about ten minutes for the Elasticsearch domain to become operational; until then, the <span class="caps">AWS</span> Console showed the domain to be in &#8220;Processing&#8221; status. During this time I spun up an <span class="caps">EC2</span> instance to run Logstash on. I used the CentOS base <span class="caps">AMI</span>, but Amazon Linux would work just as well. I created the instance in the same subnet as the Elasticsearch cluster, added a security group allowing <span class="caps">SSH</span> access for our team, and attached an <span class="caps">IAM</span> Role allowing S3 access to retrieve the <span class="caps">ELB</span>&nbsp;logs.</li>
+<li>Once the <span class="caps">EC2</span> instance was running and accessible over <span class="caps">SSH</span>, I installed Java 8 with <code>yum install java-1.8.0-openjdk-headless</code> and then followed the <a href="https://www.elastic.co/guide/en/logstash/current/installing-logstash.html#_yum">Logstash installation instructions for yum-based systems</a>.</li>
+<li>Create <code>/etc/logstash/conf.d/logstash.conf</code> as shown&nbsp;below.</li>
+<li>Wait for the Elasticsearch domain to status to reach &#8220;Active&#8221;. Once that happens, you should see two URLs for the Domain: a &#8220;<span class="caps">VPC</span> endpoint&#8221; where the Elasticsearch <span class="caps">API</span> can be reached (mine was <code>https://vpc-jantman-art-elb-test2-ryomklmh5hr7pcmhw7jvx7t374.us-east-1.es.amazonaws.com</code>) and a &#8220;Kibana&#8221; <span class="caps">URL</span> where the Kibana web interface is available (mine was <code>https://vpc-jantman-art-elb-test2-ryomklmh5hr7pcmhw7jvx7t374.us-east-1.es.amazonaws.com/_plugin/kibana/</code>).</li>
+<li><span class="caps">SSH</span> to the <span class="caps">EC2</span> instance and confirm connectivity to Elasticsearch via <code>curl</code>, substituting in the <span class="caps">VPC</span> endpoint <span class="caps">URL</span> for your cluster: <code>curl https://vpc-jantman-art-elb-test2-ryomklmh5hr7pcmhw7jvx7t374.us-east-1.es.amazonaws.com</code>. If all is well, you should get back a <span class="caps">JSON</span> response that includes a name, cluster name, version, etc. If this doesn&#8217;t work, troubleshoot connectivity issues until it&nbsp;does.</li>
+<li>Start the Logstash service with <code>sudo systemctl start logstash</code> and then watch the initial logs with <code>journalctl -u logstash</code>. It should shortly tell you that it is writing logs to <code>/var/log/logstash</code>. At this point you can <code>sudo tail -f /var/log/logstash/logstash-plain.log</code> to follow logstash&#8217;s&nbsp;progress.</li>
+<li>If all went well, Logstash should tell you that it&#8217;s connected to elasticsearch (<code>New Elasticsearch output</code>) and S3 (<code>Registering s3 input</code>), and then that it has successfully begun working (<code>Pipeline started succesfully</code>). On new installations you should see a message similar to <code>[logstash.inputs.s3       ] Using default generated file for the sincedb</code>, which indicates that the S3 input is starting to process&nbsp;files.</li>
+<li>Browse to the Kibana <span class="caps">URL</span> found in the Elasticsearch console, above (step 7). Soon after Logstash begins ingesting data, Kibana should recognize the new indices and prompt you to create an Index Pattern for them (if the interface says that no indices could be found, wait a minute or two and then refresh). Since Logstash creates a separate index for each days&#8217; data named according to a <code>logstash-YYYY.MM.DD</code> pattern, enter <code>logstash-*</code> for your index pattern and click &#8220;Next&#8221;. The &#8220;Time Filter field name&#8221; used by our Logstash configuration file is <code>timestamp</code> (not <code>@timestamp</code>), so select that from the dropdown and click &#8220;Create Index Pattern&#8221;. That&#8217;s it, Kibana is&nbsp;configured.</li>
+<li>Click the &#8220;Discover&#8221; link on the left sidebar in the Kibana interface, and then click the clock icon in the far top right of the screen and select an appropriate time range for the data you&#8217;re ingesting (I selected the last 30 days, as I was ingesting <span class="caps">ELB</span> access logs for the current month). After a brief delay messages should be visible and the graph of messages will populate. Because of how <span class="caps">ELB</span> access logs are written to S3 and how Logstash ingests them, logs will be ingested in chronological order by day, so the graph by date is a good indication of ingest progress. <img alt="screenshot of Kibana during initial data load" src="/GFX/kibana-initial-data.png"></li>
+<li>When all data up to the current time is ingested you can either terminate the <span class="caps">EC2</span> instance running Logstash, or keep it running. It will check S3 for new files every minute and keep ingesting them as long as Logstash is running. <em>(Note: the Logstash configuration described here is only for ad-hoc analysis, not a long-running&nbsp;need.)</em></li>
+</ol>
+<p>I&#8217;ll leave further discussion of how data can be analyzed and visualized to others; the <a href="https://www.elastic.co/guide/en/kibana/current/index.html">Kibana User Guide</a> does a great job of it and even links to some introductory videos, and there is much information on the Internet. I find the recent versions of Kibana to be one of the best interfaces I&#8217;ve ever seen for exploring complex log data, and it&#8217;s also designed with graphical visualizations as a first-class citizen with many helpful&nbsp;links.</p>
+<p>For analysis of this particular issue I was focusing on &#8220;backend_processing_time&#8221;, the time it took Artifactory to handle requests. My first real dive into the data was graphing mean and 75th, 95th and 99th percentile processing times over all the&nbsp;data:</p>
+<p><img alt="graph of mean and percentile processing times" src="/GFX/artifactory_backend_time.png"></p>
+<p>While there&#8217;s a large difference between the average and even 95th percentile versus the 99th throughout the data, the extreme jump in the 99th percentile value (about 16x the previous value and significantly more than the 95th) confirmed our findings that this was likely not a system-wide failure but something affecting a certain population of&nbsp;users.</p>
+<p>By this time we&#8217;d resolved the issued by disabling a specific remote RubyGems repository (a largely forgotten and unsupported internal one used by a handful of teams) which was found to be offline. We presumed that having that remote repository included in virtual repositories, including our master &#8220;all-gems&#8221; repository, was causing them to fail as well. To evaluate this based on data, I graphed the processing times of requests to repositories that included the problematic one, and requests to repositories that did not. The result is the proverbial &#8220;smoking gun&#8221;. The top graph shows processing time of requests to repositories including the problematic one, which increase over twenty times the baseline and shows a shape very similar to our 99th percentile. The bottom graph shows processing time of requests to repositories that do not include the problematic one, and shows no discernible difference during the outage from the previous thirty&nbsp;days.</p>
+<p><img alt="graph of processing times for the two groups of repositories" src="/GFX/gems-vs-not.png"></p>
+<h2 id="logstash-configuration-file"><a class="toclink" href="#logstash-configuration-file">Logstash Configuration&nbsp;File</a></h2>
+<p>Logstash&#8217;s configuration format has three main parts: input, filter, and output. Below you&#8217;ll find the configuration file that I used for this project and an explanation of it. I can&#8217;t take credit for most of it, but rather pieced it together under pressure from a few sources&nbsp;online.</p>
+<div class="highlight"><pre><span></span>input {
+    s3 {
+        bucket =&gt; &quot;our-artifactory-log-bucket-name&quot;
+        region =&gt; &quot;us-east-1&quot;
+        prefix =&gt; &quot;elb_access_logs/AWSLogs/012345678901/elasticloadbalancing/us-east-1/2018/03&quot;
+        type   =&gt; &quot;elb&quot;
+    }
+}
+
+filter {
+   if [type] == &quot;elb&quot; {
+      grok {
+         match =&gt; [&quot;message&quot;, &quot;%{TIMESTAMP_ISO8601:timestamp} %{<span class="caps">NOTSPACE</span>:loadbalancer} %{<span class="caps">IP</span>:client_ip}:%{<span class="caps">NUMBER</span>:client_port:int} (?:%{<span class="caps">IP</span>:backend_ip}:%{<span class="caps">NUMBER</span>:backend_port:int}|-) %{<span class="caps">NUMBER</span>:request_processing_time:float} %{<span class="caps">NUMBER</span>:backend_processing_time:float} %{<span class="caps">NUMBER</span>:response_processing_time:float} (?:%{<span class="caps">NUMBER</span>:elb_status_code:int}|-) (?:%{<span class="caps">NUMBER</span>:backend_status_code:int}|-) %{<span class="caps">NUMBER</span>:received_bytes:int} %{<span class="caps">NUMBER</span>:sent_bytes:int} \&quot;(?:%{<span class="caps">WORD</span>:verb}|-) (?:%{<span class="caps">GREEDYDATA</span>:request}|-) (?:<span class="caps">HTTP</span>/%{<span class="caps">NUMBER</span>:httpversion}|-( )?)\&quot; \&quot;%{<span class="caps">DATA</span>:userAgent}\&quot;( %{<span class="caps">NOTSPACE</span>:ssl_cipher} %{<span class="caps">NOTSPACE</span>:ssl_protocol})?&quot;]
+      }
+      grok {
+         match =&gt; [&quot;request&quot;, &quot;%{<span class="caps">URIPROTO</span>:http_protocol}&quot;]
+      }
+      if [request] != &quot;-&quot; {
+         grok {
+            match =&gt; [&quot;request&quot;, &quot;(?&lt;request&gt;[^?]*)&quot;]
+            overwrite =&gt; [&quot;request&quot;]
+         }
+      }
+      useragent {
+         source =&gt; &quot;userAgent&quot;
+      }
+      date {
+         match =&gt; [&quot;timestamp&quot;, &quot;<span class="caps">ISO8601</span>&quot;]
+      }
+   }
+}
+
+output{
+    elasticsearch {
+        hosts =&gt; &quot;https://vpc-jantman-art-elb-test2-ryomklmh5hr7pcmhw7jvx7t374.us-east-1.es.amazonaws.com:443&quot;
+        ssl =&gt; true
+    }
+}
+</pre></div>
+
+
+<h3 id="input"><a class="toclink" href="#input">Input</a></h3>
+<p>The <code>input</code> section defines our data source, in this case the <a href="https://www.elastic.co/guide/en/logstash/current/plugins-inputs-s3.html">S3 input plugin</a> which reads files from an S3 bucket (after reading the existing files, it polls every 60 seconds for new ones). The above example is configured to read from a bucket named &#8220;our-artifactory-log-bucket-name&#8221; in us-east-1, and read files under the <code>elb_access_logs/AWSLogs/423319072129/elasticloadbalancing/us-east-1/2018/03</code> prefix. It also assigns a &#8220;type&#8221; of <code>elb</code> to the logs, for reference later in the&nbsp;configuration.</p>
+<h3 id="filter"><a class="toclink" href="#filter">Filter</a></h3>
+<p>The heart and real power of Logstash is in its ability to transform data via both <a href="https://www.elastic.co/guide/en/logstash/current/transformation.html">built-in capabilities</a> and <a href="https://www.elastic.co/guide/en/logstash/current/filter-plugins.html">filter plugins</a>. Unlike in some other tools such as Splunk, in the <span class="caps">ELK</span> stack <em>all</em> data manipulation, parsing, extraction, and filtering is generally done where events originate in Logstash rather than on the server. Events are sent to Elasticsearch as <span class="caps">JSON</span> documents, and Elasticsearch stores, indexes, searches, and returns those <span class="caps">JSON</span> documents exactly as they were sent&nbsp;in.</p>
+<p>The filter we use here has a number of statements wrapped inside <code>if [type] == "elb"</code>, which ensures that they only operate on logs from our S3 input which we assigned the &#8220;elb&#8221; type to. Let&#8217;s examine the statements within the <code>if</code> one by&nbsp;one:</p>
+<div class="highlight"><pre><span></span>grok {
+    match =&gt; [&quot;message&quot;, &quot;%{TIMESTAMP_ISO8601:timestamp} %{<span class="caps">NOTSPACE</span>:loadbalancer} %{<span class="caps">IP</span>:client_ip}:%{<span class="caps">NUMBER</span>:client_port:int} (?:%{<span class="caps">IP</span>:backend_ip}:%{<span class="caps">NUMBER</span>:backend_port:int}|-) %{<span class="caps">NUMBER</span>:request_processing_time:float} %{<span class="caps">NUMBER</span>:backend_processing_time:float} %{<span class="caps">NUMBER</span>:response_processing_time:float} (?:%{<span class="caps">NUMBER</span>:elb_status_code:int}|-) (?:%{<span class="caps">NUMBER</span>:backend_status_code:int}|-) %{<span class="caps">NUMBER</span>:received_bytes:int} %{<span class="caps">NUMBER</span>:sent_bytes:int} \&quot;(?:%{<span class="caps">WORD</span>:verb}|-) (?:%{<span class="caps">GREEDYDATA</span>:request}|-) (?:<span class="caps">HTTP</span>/%{<span class="caps">NUMBER</span>:httpversion}|-( )?)\&quot; \&quot;%{<span class="caps">DATA</span>:userAgent}\&quot;( %{<span class="caps">NOTSPACE</span>:ssl_cipher} %{<span class="caps">NOTSPACE</span>:ssl_protocol})?&quot;]
+}
+</pre></div>
+
+
+<p><a href="https://www.elastic.co/guide/en/logstash/current/plugins-filters-grok.html">grok</a> statements are one of Logstash&#8217;s most commonly used filters. They parse arbitrary text and turn it into structured data via regular expression patterns. They also have many built-in shortcuts for <a href="https://github.com/logstash-plugins/logstash-patterns-core/blob/master/patterns/grok-patterns">common patterns</a> (i.e. <code>NUMBER</code>, <code>IP</code>, <code>WORD</code>, <code>NOTSPACE</code>, etc). The above statement applies regular expression matching to the incoming log line (<code>message</code>) and assigns the results to named fields in the event (timestamp, loadbalancer, client_ip, client_port, etc.). This forms the basis for our structured <span class="caps">ELB</span> access log, and represents the bulk of the work that Logstash does when turning the lines of our text file access logs into <span class="caps">JSON</span> documents suitable for&nbsp;Elasticsearch.</p>
+<p><em>Note: A Google search should turn up grok patterns for many common log types. If you need to develop your own, <a href="https://grokdebug.herokuapp.com/">https://grokdebug.herokuapp.com/</a> is an invaluable tool for&nbsp;experimentation.</em></p>
+<div class="highlight"><pre><span></span>grok {
+    match =&gt; [&quot;request&quot;, &quot;%{<span class="caps">URIPROTO</span>:http_protocol}&quot;]
+}
+</pre></div>
+
+
+<p>In the previous grok statement we set the <code>request</code> field, the full <span class="caps">URI</span> requested from the <span class="caps">ELB</span>, using the <code>GREEDYDATA</code> pattern (<code>.*</code>) based on its position in the log. Here, we extract the leading protocol from the <span class="caps">URI</span> (<code>http</code> or <code>https</code> for Artifactory) and store it in a new <code>http_protocol</code> field.</p>
+<div class="highlight"><pre><span></span>if [request] != &quot;-&quot; {
+    grok {
+        match =&gt; [&quot;request&quot;, &quot;(?&lt;request&gt;[^?]*)&quot;]
+        overwrite =&gt; [&quot;request&quot;]
+    }
+}
+</pre></div>
+
+
+<p>I <em>believe</em> this trims the query string from request, if&nbsp;present.</p>
+<div class="highlight"><pre><span></span>useragent {
+    source =&gt; &quot;userAgent&quot;
+}
+</pre></div>
+
+
+<p>This runs the <code>userAgent</code> field of the event through Logstash&#8217;s built-in <a href="https://www.elastic.co/guide/en/logstash/current/plugins-filters-useragent.html">useragent filter plugin</a>. This parses the user-agent string using BrowserScope data and, for recognized user agents, turns it into structured data including information like browser family, operating system, version, and&nbsp;device.</p>
+<div class="highlight"><pre><span></span>date {
+    match =&gt; [&quot;timestamp&quot;, &quot;<span class="caps">ISO8601</span>&quot;]
+}
+</pre></div>
+
+
+<p>This uses the <a href="https://www.elastic.co/guide/en/logstash/current/plugins-filters-date.html">date filter</a> to match an <a href="https://en.wikipedia.org/wiki/ISO_8601"><span class="caps">ISO8601</span>-format date</a> in the <code>timestamp</code> field (extracted in our first <code>grok</code> pattern) and use it to set the event&nbsp;timestamp.</p>
+<h3 id="output"><a class="toclink" href="#output">Output</a></h3>
+<p>We have a single output configured in the example above, the built-in <a href="https://www.elastic.co/guide/en/logstash/current/plugins-outputs-elasticsearch.html">elasticsearch</a> output plugin, that sends logs to our Elasticsearch instance. The only configuration it needs (following the instructions above) is the <span class="caps">URL</span> to our <span class="caps">AWS</span> Elasticsearch domain, specified in the <code>hosts</code> field, and indication that the cluster uses <span class="caps">SSL</span>. It is important to note that the <code>hosts</code> <span class="caps">URL</span> <em>must</em> include the <code>:443</code> port specification explicitly, or else it will default to Elasticsearch&#8217;s default port of 9200. Also note that if you configure Elasticsearch with <span class="caps">IAM</span> Authentication enabled, you must use the <a href="https://github.com/awslabs/logstash-output-amazon_es">logstash-output-amazon_es</a> plugin from Amazon&nbsp;instead.</p>
+            </div>
+            <!-- /.entry-content -->
+    <hr />
+    <!-- Shariff Button BEGIN -->
+    <div class="shariff"
+        data-lang="en"
+        data-orientation="horizontal"
+        data-services = "[&quot;facebook&quot;,&quot;googleplus&quot;,&quot;twitter&quot;,&quot;linkedin&quot;,&quot;diaspora&quot;]"
+        data-theme="standard"
+        data-url="http://blog.jasonantman.com/2018/04/aws-elasticsearch-for-ad-hoc-elb-log-analysis/"></div>
+    <!-- Shariff Button END -->
+    <hr/>
+    <section class="comments" id="comments">
+        <h2>Comments</h2>
+
+        <div id="disqus_thread"></div>
+        <script type="text/javascript">
+            /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+            var disqus_shortname = 'jantman'; // required: replace example with your forum shortname
+
+                    var disqus_identifier = 'aws-elasticsearch-for-ad-hoc-elb-log-analysis';
+                var disqus_url = 'http://blog.jasonantman.com/2018/04/aws-elasticsearch-for-ad-hoc-elb-log-analysis/';
+
+            var disqus_config = function () {
+                this.language = "en";
+            };
+
+            /* * * DON'T EDIT BELOW THIS LINE * * */
+            (function () {
+                var dsq = document.createElement('script');
+                dsq.type = 'text/javascript';
+                dsq.async = true;
+                dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+                (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+            })();
+        </script>
+        <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by
+            Disqus.</a></noscript>
+        <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+
+    </section>
+        </article>
+    </section>
+
+        </div>
+        <div class="col-sm-3" id="sidebar">
+            <aside>
+<!-- Sidebar -->
+<section class="well well-sm">
+  <ul class="list-group list-group-flush">
+
+<!-- Sidebar/Recent Posts -->
+<li class="list-group-item">
+  <h4><i class="fa fa-home fa-lg"></i><span class="icon-label">Recent Posts</span></h4>
+  <ul class="list-group" id="recentposts">
+    <li class="list-group-item"><a href="http://blog.jasonantman.com/2018/04/aws-elasticsearch-for-ad-hoc-elb-log-analysis/"><span class="caps">AWS</span> ElasticSearch for Ad-Hoc <span class="caps">ELB</span> Log&nbsp;Analysis</a></li>
+    <li class="list-group-item"><a href="http://blog.jasonantman.com/2018/03/diy-raspberry-pi-zero-gps-track-logger/"><span class="caps">DIY</span> Raspberry Pi Zero <span class="caps">GPS</span> Track&nbsp;Logger</a></li>
+    <li class="list-group-item"><a href="http://blog.jasonantman.com/2017/10/cloud-custodian-architecture-deployment-and-policy-preprocessing/">Cloud Custodian Architecture, Deployment and Policy&nbsp;Preprocessing</a></li>
+    <li class="list-group-item"><a href="http://blog.jasonantman.com/2017/10/pre-authorized-aws-console-urls-for-notifications/">Pre-Authorized <span class="caps">AWS</span> Console URLs for&nbsp;Notifications</a></li>
+    <li class="list-group-item"><a href="http://blog.jasonantman.com/2017/04/python-script-to-check-xfinity-data-usage/">Python script to check xfinity data&nbsp;usage</a></li>
+  </ul>
+</li>
+<!-- End Sidebar/Recent Posts -->
+
+<!-- Sidebar/Twitter Timeline -->
+<li class="list-group-item">
+  <h4><i class="fa fa-twitter fa-lg"></i><span class="icon-label">Latest Tweets</span></h4>
+  <div id="twitter_timeline">
+    <a class="twitter-timeline" data-width="250" data-height="300" data-dnt="true" data-theme="light" href="https://twitter.com/j_antman">Tweets by j_antman</a> <script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
+  </div>
+</li>
+<!-- End Sidebar/Twitter Timeline -->
+
+<!-- Sidebar/Github -->
+<li class="list-group-item">
+  <h4><i class="fa fa-github fa-lg"></i><span class="icon-label">GitHub Repos</span></h4>
+  <div id="gh_repos">
+    <p class="list-group-item">Status updating...</p>
+  </div>
+  <a href="https://github.com/jantman">@jantman</a> on GitHub
+</li>
+<!-- End Sidebar/Github -->
+
+<!-- Sidebar/Links -->
+<li class="list-group-item">
+  <h4><i class="fa fa-external-link-square fa-lg"></i><span class="icon-label">Links</span></h4>
+  <ul class="list-group" id="links">
+    <li class="list-group-item">
+      <a href="http://www.jasonantman.com" target="_blank">Homepage</a>
+    </li>
+    <li class="list-group-item">
+      <a href="http://resume.jasonantman.com" target="_blank">Resume</a>
+    </li>
+  </ul>
+</li>
+<!-- End Sidebar/Links -->
+  </ul>
+</section>
+<!-- End Sidebar -->            </aside>
+        </div>
+    </div>
+</div>
+<footer>
+   <div class="container">
+      <hr>
+      <div class="row">
+         <div class="col-xs-10">&copy; 2018 Jason Antman
+            &middot; Powered by <a href="https://github.com/getpelican/pelican-themes/tree/master/pelican-bootstrap3" target="_blank">pelican-bootstrap3</a>,
+            <a href="http://docs.getpelican.com/" target="_blank">Pelican</a>,
+            <a href="http://getbootstrap.com" target="_blank">Bootstrap</a>         </div>
+         <div class="col-xs-2"><p class="pull-right"><i class="fa fa-arrow-up"></i> <a href="#">Back to top</a></p></div>
+      </div>
+   </div>
+</footer>
+<script src="http://blog.jasonantman.com/theme/js/jquery.min.js"></script>
+
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="http://blog.jasonantman.com/theme/js/bootstrap.min.js"></script>
+
+<!-- Enable responsive features in IE8 with Respond.js (https://github.com/scottjehl/Respond) -->
+<script src="http://blog.jasonantman.com/theme/js/respond.min.js"></script>
+
+
+
+    <!-- GITHUB_REPOS_JSON (explicitly pinned repos ) -->
+  <script id="GithubReposJson" type="application/json">
+  [{"description": "A script and python module to check your AWS service limits and usage via boto.", "name": "awslimitchecker", "html_url": "https://github.com/jantman/awslimitchecker"}, {"description": "Puppet module and accompanying documentation to install/setup Arch linux on a MacBook Pro Retina 11,4", "name": "puppet-archlinux-macbookretina", "html_url": "https://github.com/jantman/puppet-archlinux-macbookretina"}, {"description": "A collection of my standalone scripts to small/quick for their own repos. All kinds of useful stuff.", "name": "misc-scripts", "html_url": "https://github.com/jantman/misc-scripts"}, {"description": "Responsive Flask/SQLAlchemy personal finance app, specifically for biweekly budgeting.", "name": "biweeklybudget", "html_url": "https://github.com/jantman/biweeklybudget"}, {"description": "Calculate detailed download stats and generate HTML and badges for PyPI packages", "name": "pypi-download-stats", "html_url": "https://github.com/jantman/pypi-download-stats"}, {"description": "A standard to easily communicate to humans and machines the development/support and usability status of software repositories/projects.", "name": "repostatus.org", "html_url": "https://github.com/jantman/repostatus.org"}]
+  </script>
+
+<!-- GitHub JS Code -->
+<script type="text/javascript">
+$(document).ready(function () {
+  if (!window.jXHR) {
+    var jxhr = document.createElement('script');
+    jxhr.type = 'text/javascript';
+    jxhr.src = 'http://blog.jasonantman.com/theme/js/jXHR.js';
+    var s = document.getElementsByTagName('script')[0];
+    s.parentNode.insertBefore(jxhr, s);
+  }
+
+  console.log($('#GithubReposJson').html());
+  github.showSpecificRepos({
+    user: 'jantman',
+    target: '#gh_repos',
+    repos: JSON.parse($('#GithubReposJson').html())
+  });
+});
+</script>
+<script src="http://blog.jasonantman.com/theme/js/github.js" type="text/javascript"></script>
+<!-- End GitHub JS Code -->
+    <!-- Disqus -->
+    <script type="text/javascript">
+        /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+        var disqus_shortname = 'jantman'; // required: replace example with your forum shortname
+
+        /* * * DON'T EDIT BELOW THIS LINE * * */
+        (function () {
+            var s = document.createElement('script');
+            s.async = true;
+            s.type = 'text/javascript';
+            s.src = '//' + disqus_shortname + '.disqus.com/count.js';
+            (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+        }());
+    </script>
+    <!-- End Disqus Code -->
+    <!-- Google Analytics Universal -->
+    <script type="text/javascript">
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+        ga('create', 'UA-2718127-2', 'jasonantman.com');
+        ga('send', 'pageview');
+    </script>
+    <!-- End Google Analytics Universal Code -->
+
+
+    <!-- add shariff support -->
+    <script src="http://blog.jasonantman.com/theme/js/shariff.min.js"></script>
+</body>
+</html>
