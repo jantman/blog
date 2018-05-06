@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="en" prefix="og: http://ogp.me/ns# fb: https://www.facebook.com/2008/fbml">
+<head>
+    <title>Amcrest IP Camera First Impressions - Jason Antman's Blog</title>
+    <!-- Using the latest rendering mode for IE -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+
+<link rel="canonical" href="https://blog.jasonantman.com/2018/05/amcrest-ip-camera-first-impressions/">
+
+        <meta name="author" content="Jason Antman" />
+        <meta name="keywords" content="amcrest,camera,security,surveillance,video" />
+        <meta name="description" content="My first impressions on interfacing with Amcrest IP cameras" />
+
+        <meta property="og:site_name" content="Jason Antman's Blog" />
+        <meta property="og:type" content="article"/>
+        <meta property="og:title" content="Amcrest IP Camera First Impressions"/>
+        <meta property="og:url" content="https://blog.jasonantman.com/2018/05/amcrest-ip-camera-first-impressions/"/>
+        <meta property="og:description" content="My first impressions on interfacing with Amcrest IP cameras"/>
+        <meta property="article:published_time" content="2018-05-06" />
+            <meta property="article:section" content="Projects" />
+            <meta property="article:tag" content="amcrest" />
+            <meta property="article:tag" content="camera" />
+            <meta property="article:tag" content="security" />
+            <meta property="article:tag" content="surveillance" />
+            <meta property="article:tag" content="video" />
+            <meta property="article:author" content="Jason Antman" />
+
+
+
+    <!-- Bootstrap -->
+        <link rel="stylesheet" href="https://blog.jasonantman.com/theme/css/bootstrap.flatly.min.css" type="text/css"/>
+    <link href="https://blog.jasonantman.com/theme/css/font-awesome.min.css" rel="stylesheet">
+
+    <link href="https://blog.jasonantman.com/theme/css/pygments/default.css" rel="stylesheet">
+        <link href="https://blog.jasonantman.com/theme/css/typogrify.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://blog.jasonantman.com/theme/css/style.css" type="text/css"/>
+        <link href="https://blog.jasonantman.com/theme/css/shariff/shariff.min.css" rel="stylesheet">
+
+    <link rel="stylesheet" href="https://blog.jasonantman.com/theme/css/forkongithub.min.css" type="text/css" />
+
+        <link href="https://blog.jasonantman.com/feeds/all.atom.xml" type="application/atom+xml" rel="alternate"
+              title="Jason Antman's Blog ATOM Feed"/>
+
+        <link href="https://blog.jasonantman.com/feeds/all.rss.xml" type="application/rss+xml" rel="alternate"
+              title="Jason Antman's Blog RSS Feed"/>
+
+
+        <link href="https://blog.jasonantman.com/feeds/categories/projects.atom.xml" type="application/atom+xml" rel="alternate"
+              title="Jason Antman's Blog Projects ATOM Feed"/>
+
+    <script src="https://widget.battleforthenet.com/widget.js" async></script>
+
+</head>
+<body>
+
+<div class="navbar navbar-default navbar-fixed-top" role="navigation">
+	<div class="container">
+<span id="forkongithub"><a href="https://github.com/jantman/blog">Fork me on GitHub</a></span>        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="https://blog.jasonantman.com/" class="navbar-brand">
+Jason Antman's Blog            </a>
+        </div>
+        <div class="collapse navbar-collapse navbar-ex1-collapse">
+            <ul class="nav navbar-nav">
+                         <li><a href="https://blog.jasonantman.com/pages/about.html">
+                             About&nbsp;Me
+                          </a></li>
+                        <li >
+                            <a href="https://blog.jasonantman.com/categories/ideas-and-rants/index.html">Ideas and rants</a>
+                        </li>
+                        <li >
+                            <a href="https://blog.jasonantman.com/categories/miscellaneous/index.html">Miscellaneous</a>
+                        </li>
+                        <li >
+                            <a href="https://blog.jasonantman.com/categories/monitoring/index.html">Monitoring</a>
+                        </li>
+                        <li >
+                            <a href="https://blog.jasonantman.com/categories/ops/index.html">Ops</a>
+                        </li>
+                        <li class="active">
+                            <a href="https://blog.jasonantman.com/categories/projects/index.html">Projects</a>
+                        </li>
+                        <li >
+                            <a href="https://blog.jasonantman.com/categories/puppet/index.html">Puppet</a>
+                        </li>
+                        <li >
+                            <a href="https://blog.jasonantman.com/categories/tech-howtos/index.html">Tech howtos</a>
+                        </li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+              <li><a href="https://blog.jasonantman.com/archives.html"><i class="fa fa-th-list"></i><span class="icon-label">Archives</span></a></li>
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+</div> <!-- /.navbar -->
+<!-- Banner -->
+<!-- End Banner -->
+<div class="container">
+    <div class="row">
+        <div class="col-sm-9">
+    <section id="content">
+        <article>
+            <header class="page-header">
+                <h1>
+                    <a href="https://blog.jasonantman.com/2018/05/amcrest-ip-camera-first-impressions/"
+                       rel="bookmark"
+                       title="Permalink to Amcrest IP Camera First Impressions">
+                        Amcrest <span class="caps">IP</span> Camera First&nbsp;Impressions
+                    </a>
+                </h1>
+            </header>
+            <div class="entry-content">
+                <div class="panel">
+                    <div class="panel-body">
+<footer class="post-info">
+    <span class="label label-default">Date</span>
+    <span class="published">
+        <i class="fa fa-calendar"></i><time datetime="2018-05-06T20:13:00-04:00"> Sun 06 May 2018</time>
+    </span>
+
+
+
+
+
+<span class="label label-default">Tags</span>
+	<a href="https://blog.jasonantman.com/tags/amcrest/index.html">amcrest</a>
+        /
+	<a href="https://blog.jasonantman.com/tags/camera/index.html">camera</a>
+        /
+	<a href="https://blog.jasonantman.com/tags/security/index.html">security</a>
+        /
+	<a href="https://blog.jasonantman.com/tags/surveillance/index.html">surveillance</a>
+        /
+	<a href="https://blog.jasonantman.com/tags/video/index.html">video</a>
+    
+</footer><!-- /.post-info -->                    </div>
+                </div>
+                <!--- remove this next line to disable Table of Contents -->
+
+<div class="toc">
+<ul>
+<li><a href="#devices-and-purchase">Devices and&nbsp;Purchase</a></li>
+<li><a href="#initial-setup">Initial&nbsp;Setup</a></li>
+<li><a href="#chrome-app">Chrome&nbsp;App</a></li>
+<li><a href="#api-and-digest-auth"><span class="caps">API</span> and Digest Auth</a><ul>
+<li><a href="#python-digest-auth-removing-proxy">Python Digest-Auth-Removing&nbsp;Proxy</a></li>
+</ul>
+</li>
+<li><a href="#json-configuration-backups"><span class="caps">JSON</span> Configuration&nbsp;Backups</a></li>
+<li><a href="#api"><span class="caps">API</span></a></li>
+<li><a href="#alarms-events-initial-research">Alarms / Events - Initial Research</a><ul>
+<li><a href="#snmp"><span class="caps">SNMP</span></a></li>
+<li><a href="#smtp"><span class="caps">SMTP</span></a></li>
+</ul>
+</li>
+<li><a href="#system-logs">System&nbsp;logs</a></li>
+<li><a href="#gpl-compliance"><span class="caps">GPL</span>&nbsp;Compliance</a></li>
+<li><a href="#auto-maintain">Auto&nbsp;Maintain</a></li>
+<li><a href="#status-and-next-steps">Status and Next&nbsp;Steps</a></li>
+</ul>
+</div>
+<p>I&#8217;m going to be moving to a new area at the end of the month and will be leaving my dogs home alone during the days I work in the office - and my home unattended - on a regular basis for the first time. While the neighborhood I&#8217;m moving to seems safe, I wanted some peace of mind about both the security of my new home and the well-being of my dogs when I&#8217;m out. While I&#8217;ve set up a <a href="https://blog.jasonantman.com/2016/01/raspberry-pi-security-system/"><span class="caps">DIY</span> RaspberryPi-based security system</a> in a past apartment, that won&#8217;t help knowing that my dogs are doing <span class="caps">OK</span> (and the house I&#8217;m moving to isn&#8217;t wired for a security system). While I may look into setting up a security system in the future (likely based on <a href="https://en.wikipedia.org/wiki/Z-Wave">Z-Wave</a> wireless components), I decided that some <span class="caps">IP</span>-based surveillance cameras are the best way to achieve my short-term need. I recently bought some of them, and want to share my&nbsp;experience.</p>
+<h1 id="devices-and-purchase"><a class="toclink" href="#devices-and-purchase">Devices and&nbsp;Purchase</a></h1>
+<p>I started my search with the hardware compatibility lists of <a href="http://www.lavrsen.dk/foswiki/bin/view/Motion/WorkingDevices">Motion</a> and <a href="https://wiki.zoneminder.com/Hardware_Compatibility_List">ZoneMinder</a>, the most well-known (albeit rather aged) open source video motion detection projects. I figured that most likely I&#8217;d be using one of these to detect and alert on motion; I&#8217;ve used Motion before quite successfully but it is a daemon only whereas ZoneMinder offers a full web interface. The outcome of my research was that most decent modern <span class="caps">IP</span>-based surveillance cameras support the <a href="https://en.wikipedia.org/wiki/ONVIF"><span class="caps">ONVIF</span></a> interoperability standard, and almost any camera that supports <span class="caps">ONVIF</span> and third-party clients (i.e. unencrypted video streams) should&nbsp;work.</p>
+<p>I decided that I&#8217;d get three initial cameras for some tests: an indoor camera with remote pan and tilt to keep an eye on the dogs and two outdoor fixed cameras, one wireless and one wired with Power over Ethernet (PoE) support. I currently have a very good 5GHz wireless access point (a <a href="https://www.ubnt.com/airmax/nanostationm/">Uniquiti NanoStation M</a>) and a serviceable but nine-year-old 2.4 GHz 802.11b/g Ubiquiti PicoStation 2. Unfortunately, I&#8217;ve been unable to find <em>any</em> reasonably-priced 5GHz <span class="caps">IP</span>&nbsp;cameras.</p>
+<p>My initial desire was to get only 1080p cameras, but I decided to try a 960p wireless model given my aged access point. After a few hours of browsing on Amazon I settled on buying the following three cameras, all of which claimed <span class="caps">ONVIF</span> support and support for third-party video management&nbsp;systems:</p>
+<ul>
+<li><a href="https://www.amazon.com/gp/product/B01G1U4MVA/"><span class="caps">SV3C</span> V-B01-<span class="caps">1080PL</span></a> 1080P wired outdoor camera with PoE&nbsp;support</li>
+<li><a href="https://www.amazon.com/gp/product/B01I00987C/">Amcrest <span class="caps">IPM</span>-723W</a> 2.4GHz wireless 960P outdoor camera (shipped with latest firmware, <code>2.400.AC02.15.R,build:2017-07-31</code>)</li>
+<li><a href="https://www.amazon.com/gp/product/B0145OQTPG/">Amcrest &#8220;ProHD&#8221; <span class="caps">IP2M</span>-841B</a> 2.4GHz (or wired) 1080p indoor pan/tilt camera (shipped with latest firmware, <code>2.520.AC00.18.R,build:2017-06-29</code>)</li>
+</ul>
+<p>All of them support wired Ethernet in addition to WiFi. They&#8217;re all highly reviewed on Amazon with a number of positive reviews mentioning Linux. My choice of the Amcrest cameras was based largely on a number of very positive reviews from other people using Linux and/or leveraging their APIs and on the availability of a detailed <a href="https://support.amcrest.com/hc/en-us/articles/232310528-Amcrest-HTTP-API-SDK"><span class="caps">HTTP</span> <span class="caps">API</span> document</a> on Amcrest&#8217;s site. The Amcrest <span class="caps">API</span> document specifically mentioned <span class="caps">HTTP</span> Basic authentication, which I considered a plus since I could easily add the required headers in an Nginx reverse proxy and use my own authentication methods for remote&nbsp;access.</p>
+<p>After unboxing the Amcrest cameras and experimenting with them a bit, I decided to return the <span class="caps">SV3C</span> camera unopened. It was clear to me that if I wanted to use Amcrest&#8217;s <span class="caps">HTTP</span> <span class="caps">API</span>, it would make sense to stick with the cameras from one manufacturer. Since <span class="caps">SV3C</span> didn&#8217;t even have any <span class="caps">API</span> documentation that I could find, Amcrest won. The rest of this post will discuss my initial exploration of the Amcrest&nbsp;cameras.</p>
+<h1 id="initial-setup"><a class="toclink" href="#initial-setup">Initial&nbsp;Setup</a></h1>
+<p>While Amcrest seemed to be well-reviewed, I&#8217;m always very hesitant to put new devices on my network, especially if they&#8217;re running opaque proprietary firmware. And even more so if they have &#8220;cloud&#8221; features (as Amcrest does) that imply remote access which I&#8217;d need to trust the manufacturer to properly secure and allow me to disable. <a href="https://blog.jessfraz.com/post/home-lab-is-the-dopest-lab/">Jess Frazelle&#8217;s Home Lab blog post</a>, along with some great reviews from my colleague <a href="https://github.com/jniesen">jniesen</a>, spurred me to plan replacing my almost-decade-old Ubiquiti access points with some new ones that support BSSIDs and 802.1q VLANs, but until I do I&#8217;m still stuck with a single <span class="caps">SSID</span> and flat&nbsp;network.</p>
+<p>So, my initial unboxing process for each camera was as&nbsp;follows:</p>
+<ol>
+<li>Plug in to my MacBook with a crossover cable and Wireshark running; power on the camera and record the wired Ethernet <span class="caps">MAC</span> address for the camera. Then power off the&nbsp;camera.</li>
+<li>On my <a href="http://www.vyos.io/">VyOS</a> router, assign the camera&#8217;s wired <span class="caps">MAC</span> a static <span class="caps">IP</span> and local&nbsp;<span class="caps">DNS</span>.</li>
+<li>Alter my firewall rules to reject all traffic from the camera to the <span class="caps">WAN</span>, so it can&#8217;t phone home or send anything directly to the external&nbsp;world.</li>
+<li>Plug the camera in to my switch and power it on. Wait a few minutes and then access the builtin <span class="caps">HTTP</span> web interface at the <span class="caps">IP</span> I&nbsp;assigned.</li>
+<li>Log in with the default username/password (admin/admin) and change the&nbsp;password.</li>
+<li>Browse through the &#8220;setup&#8221; portion of the <span class="caps">UI</span> and record some of the current/default settings and&nbsp;information:</li>
+<li><span class="dquo">&#8220;</span>Information&#8221; -&gt; &#8220;Version&#8221; - record all&nbsp;versions</li>
+<li><span class="dquo">&#8220;</span>Camera&#8221; -&gt; &#8220;Video&#8221; - record streaming and snapshot settings; change Overlay to the camera&#8217;s hostname and the Sub Stream to <span class="caps">MJPEG</span>, <span class="caps">VGA</span>, 5&nbsp;<span class="caps">FPS</span>.</li>
+<li><span class="dquo">&#8220;</span>Camera&#8221; -&gt; &#8220;Audio&#8221; (on ProHD) - record stream&nbsp;information</li>
+<li><span class="dquo">&#8220;</span>Network&#8221; -&gt; &#8220;<span class="caps">TCP</span>/<span class="caps">IP</span>&#8221; - change hostname; record wireless <span class="caps">MAC</span>; disable&nbsp;<span class="caps">P2P</span></li>
+<li><span class="dquo">&#8220;</span>Network&#8221; -&gt; &#8220;Connection&#8221; - record all ports; ensure <span class="caps">ONVIF</span> authentication is&nbsp;enabled</li>
+<li><span class="dquo">&#8220;</span>Network&#8221; -&gt; (&#8220;<span class="caps">DDNS</span>&#8221;, &#8220;<span class="caps">IP</span> Filter&#8221;, &#8220;<span class="caps">SMTP</span>&#8221;, &#8220;UPnP&#8221;) - ensure all are&nbsp;disabled</li>
+<li><span class="dquo">&#8220;</span>Network&#8221; -&gt; &#8220;<span class="caps">SNMP</span>&#8221; (if present) - enable&nbsp;v1</li>
+<li><span class="dquo">&#8220;</span>Network&#8221; -&gt; (&#8220;Bonjour&#8221;, &#8220;Multicast&#8221;, &#8220;802.1x&#8221;, &#8220;QoS&#8221;, &#8220;HTTPs&#8221;) - ensure all are&nbsp;disabled</li>
+<li><span class="dquo">&#8220;</span>System&#8221; -&gt; &#8220;General&#8221; -&gt; &#8220;Date <span class="amp">&amp;</span> Time&#8221; - enable&nbsp;<span class="caps">NTP</span></li>
+<li><span class="dquo">&#8220;</span>System&#8221; -&gt; &#8220;Export&#8221; - export a configuration file and save&nbsp;it.</li>
+<li><span class="dquo">&#8220;</span>Event&#8221; - disable all of them for&nbsp;now</li>
+</ol>
+<p>After that, I added the wireless <span class="caps">MAC</span> address for the camera to my access point&#8217;s <span class="caps">ACL</span> and then set up a static <span class="caps">IP</span>, local <span class="caps">DNS</span>, and outbound traffic reject the same way I did for the wired <span class="caps">MAC</span>. I then configured the WiFi connection in the camera&#8217;s Setup <span class="caps">UI</span>, ensured it connected to the network properly, and unplugged the wired&nbsp;Ethernet.</p>
+<h1 id="chrome-app"><a class="toclink" href="#chrome-app">Chrome&nbsp;App</a></h1>
+<p>One thing I noted in the web <span class="caps">UI</span> in Chrome is the high-res H.264 video stream was unavailable, displaying a &#8220;Please click here to download and install the plug-in&#8221; link. I was amazingly happy to find that this link brought me to the <a href="https://chrome.google.com/webstore/detail/amcrest-web-view/oddndbjhpcpopbebhonolceinkbnheih?hl=en-US">Amcrest Web View</a> Chrome App, which actually works with Linux. The Chrome App really just seems to wrap the existing web <span class="caps">UI</span> while providing the required plug-in, but it works fine in Chrome on Linux. I&#8217;m vaguely concerned about the Chrome App being another data exfiltration or phone-home avenue, but for initial testing I was willing to take that risk. The App worked quite nicely, streaming near-realtime and very fluid, high-<span class="caps">FPS</span> images from both the 960P and 1080P cameras over WiFi, and gave me smooth, natural control of the pan and tilt for the ProHD&nbsp;camera.</p>
+<h1 id="api-and-digest-auth"><a class="toclink" href="#api-and-digest-auth"><span class="caps">API</span> and Digest&nbsp;Auth</a></h1>
+<p>Next I wanted to dive right into the documented <span class="caps">CGI</span> <span class="caps">API</span>, and had even prepared a few curl commands for the basics (according to the <a href="https://support.amcrest.com/hc/en-us/articles/232310528-Amcrest-HTTP-API-SDK"><span class="caps">API</span> document</a> on Amcrest&#8217;s site) before I even got the cameras. Unfortunately, they all failed with 401 Unauthorized errors. After some investigation and a trip to the <a href="https://amcrest.com/forum/technical-discussion-f3/">Amcrest Technical Forums</a>, I found that recent firmware versions dropped support for Basic authentication in favor of only Digest. This was confirmed by <a href="https://amcrest.com/forum/technical-discussion-f3/cgi-sdk-no-longer-functioning-on-17r--t2401.html">multiple</a> <a href="https://amcrest.com/forum/technical-discussion-f3/basic-http-auth-not-working-after-firmware-update--t2771.html">threads</a> <a href="https://amcrest.com/forum/technical-discussion-f3/http-api-authentication-via-url-t3899.html">on</a> <a href="https://amcrest.com/forum/technical-discussion-f3/authentication-examples--t7128.html">the</a> forum. This was quite problematic for my plans, since <a href="https://en.wikipedia.org/wiki/Digest_access_authentication">Digest authentication</a> is significantly more complicated than Basic and relies on <span class="caps">MD5</span> hashes generated on the client that include various fields sent in the headers of the server 401 response. In short, there doesn&#8217;t seem to be any common reverse proxy (I checked Nginx, Apache, Lighttpd, and HAproxy) that supports Digest authentication to the backend/upstream. So my plans of wrapping the cameras in my own security (<span class="caps">TLS</span> and client certificate authentication in Nginx, with Nginx adding the appropriate Basic auth headers during the proxy process) weren&#8217;t working out so well - the best I could get is a combination of the authentication I enabled in Nginx, plus Digest authentication to each&nbsp;stream.</p>
+<p>I spent the better part of two afternoons and evenings looking into this and trying to develop a workaround. The <a href="https://amcrest.com/forum/technical-discussion-f3/cgi-sdk-no-longer-functioning-on-17r--t2401.html">main Amcrest forum thread</a> about this didn&#8217;t have a whole lot of information other than many frustrated customers broken by the latest firmware upgrade (without even a corresponding <span class="caps">API</span> documentation update; the latest <span class="caps">API</span> docs still listed support for both Basic and Digest) and a few people who received unhelpful support responses. I opened my own support ticket about the problem, stating that I&#8217;d purchased the cameras based on the <span class="caps">API</span> documentation and planned to integrate them with a system that only supports Basic authentication. I received a response the next day, stating in&nbsp;part:</p>
+<blockquote>
+<p>I am sorry for the bad information you got about our cameras. You are correct, Basic Authentication is no longer supported on our <span class="caps">IP</span> Cameras, <span class="caps">NVR</span>&#8217;s and <span class="caps">DVR</span>&#8217;s since latest firmware&nbsp;updates.</p>
+<p>This was an intended decision as our developer decided to move away from Basic Authentication due to major security concern. Our devices will work only on Digest Authentication from now on. We did suggest our product management team and developers to re-enable Basic Authentication as some sort of &#8220;optional&#8221; feature able to be disabled by the user. However, this suggestion was&nbsp;dismissed.</p>
+<p>The best situation for you at this point is to send back the cameras as, as stated, they won&#8217;t work with Basic&nbsp;Authentication.</p>
+</blockquote>
+<p>It&#8217;s worth pointing out at this point that the recent firmware versions for these cameras include <span class="caps">HTTPS</span> support, and even include support for either uploading your own <span class="caps">TLS</span> cert and key or generating a <span class="caps">CSR</span> on the camera and then uploading the signed certificate. <span class="caps">TLS</span> with Basic auth (i.e. <span class="caps">API</span> keys/tokens) is a widely accepted method in the world of public APIs, and would surely be sufficient for devices such as these cameras. In fact, Amcrest runs their own dynamic <span class="caps">DNS</span> service for (optional) remote access to cameras, so it should be relatively simple to leverage that and LetsEncrypt for automated certs. Instead - probably spurred on by the archaic <span class="caps">ONVIF</span> standard that specifies Digest authentication - they seem to be going the route of alleviating their &#8220;major security concern&#8221; by means of a 25-year-old authentication system based on <span class="caps">MD5</span> hashes, and likely quite easy to break offline given access to a successful authentication exchange and a <span class="caps">GPU</span>-based <span class="caps">EC2</span> instance (not to mention simple to&nbsp;man-in-the-middle).</p>
+<p>So, being the obsessive person that I am, I started thinking about how to fix this. I went through the usual suspects for reverse proxying - Nginx, Apache, HAproxy, Lighttpd, etc. - and couldn&#8217;t find any examples of existing solutions to handle Digest authentication for the upstream. While it would probably be <em>possible</em>, most of my recent programming experience is in Python and Ruby with a handful of Groovy and <span class="caps">JS</span>, and none of those seemed to fit the bill. I spent a bit of time looking at simple <span class="caps">HTTP</span> proxy solutions in languages that I know (or at least sort-of know) and found the <a href="https://github.com/nodejitsu/node-http-proxy">nodejitsu/node-http-proxy</a> project. With a bit of experimentation I was able to get that working for the simple text-based <span class="caps">API</span> URLs but (as expected, looking at the source) it failed completely for the secondary <span class="caps">MJPEG</span> streams. I found and tried <a href="https://github.com/legege/node-mjpeg-proxy">node-mjpeg-proxy</a> next, but was unable to get it working&nbsp;satisfactorily.</p>
+<p>After all of those experiments and research I decided that I should stop looking for an exsiting solution or magic bullet and go back to what I know best: Python. After only a few minutes more on Google, I stumbled on a complete gem in the form of a Flask snippet, <a href="http://flask.pocoo.org/snippets/118/">Stream Proxy with Requests</a>:</p>
+<div class="highlight"><pre><span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+
+<span class="kn">from</span> <span class="nn">flask</span> <span class="kn">import</span> <span class="n">Flask</span>
+<span class="kn">from</span> <span class="nn">flask</span> <span class="kn">import</span> <span class="n">Response</span>
+<span class="kn">from</span> <span class="nn">flask</span> <span class="kn">import</span> <span class="n">stream_with_context</span>
+
+<span class="kn">import</span> <span class="nn">requests</span>
+
+<span class="n">app</span> <span class="o">=</span> <span class="n">Flask</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+<span class="nd">@app.route</span><span class="p">(</span><span class="s1">&#39;/&lt;path:url&gt;&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">home</span><span class="p">(</span><span class="n">url</span><span class="p">):</span>
+    <span class="n">req</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">stream</span> <span class="o">=</span> <span class="bp">True</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">Response</span><span class="p">(</span><span class="n">stream_with_context</span><span class="p">(</span><span class="n">req</span><span class="o">.</span><span class="n">iter_content</span><span class="p">()),</span> <span class="n">content_type</span> <span class="o">=</span> <span class="n">req</span><span class="o">.</span><span class="n">headers</span><span class="p">[</span><span class="s1">&#39;content-type&#39;</span><span class="p">])</span>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">app</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+</pre></div>
+
+
+<h2 id="python-digest-auth-removing-proxy"><a class="toclink" href="#python-digest-auth-removing-proxy">Python Digest-Auth-Removing&nbsp;Proxy</a></h2>
+<p>Starting with the above snippet using <a href="http://flask.pocoo.org/">Flask</a> and <a href="http://docs.python-requests.org/en/master/">requests</a> - two Python packages that I&#8217;m quite familiar with - I was able to quickly add the Digest authentication option to the requests call and achieve a working, auth-less <span class="caps">MJPEG</span> stream from the camera. With a bit of tuning, I came up with a rough proof-of-concept that provided unauthenticated access to the <span class="caps">MJPEG</span> stream and <span class="caps">CGI</span>-based <span class="caps">API</span> (including snapshots and <span class="caps">PTZ</span> control) simultaneously via multiple workers. It&#8217;s not amazing; running on my desktop the <span class="caps">MJPEG</span> stream suffers some pretty bad latency that gets even worse when other <span class="caps">CGI</span> <span class="caps">API</span> endpoints are used simultaneously (I suspect this may be a problem on the camera&nbsp;itself).</p>
+<p>Note that this does not proxy either non-<span class="caps">MJPEG</span> streams (i.e. the high-resolution <span class="caps">RSTP</span> stream) or the built-in web <span class="caps">UI</span> itself (which relies on client-side javascript XMLHttpRequest and cookies for&nbsp;login).</p>
+<p>For the time being I&#8217;m not sure if I&#8217;m even going to use this proxy, but for anyone who&#8217;s interested, the code is <a href="https://github.com/jantman/python-amcrest-noauth-proxy">on GitHub</a> along with a ready-to-run <a href="https://hub.docker.com/r/jantman/python-amcrest-noauth-proxy/">Docker image</a>.</p>
+<h1 id="json-configuration-backups"><a class="toclink" href="#json-configuration-backups"><span class="caps">JSON</span> Configuration&nbsp;Backups</a></h1>
+<p>While looking into the Digest authentication changes, I used the configuration export/backup functionality (Export via the Setup web <span class="caps">UI</span>, or <code>/cgi-bin/Config.backup?action=All</code> via the <span class="caps">API</span> for a more detailed config) to see if there was a chance that Digest/Basic was hidden somewhere in the config. It&#8217;s not, but I was pleasantly surprised to see that the exported configuration file was plain and cleanly-deserializable <span class="caps">JSON</span> (even pretty-printed). This definitely makes it easier to back up configuration to a git repository and track changes over time, or make sweeping changes to defaults for provisioning new&nbsp;cameras.</p>
+<h1 id="api"><a class="toclink" href="#api"><span class="caps">API</span></a></h1>
+<p>For the majority of the last five-plus years of my career, I&#8217;ve worked almost exclusively with software and generally with modern, well-known systems and services. Coming from a ReST-ful world, the Amcrest cameras&#8217; <span class="caps">API</span> was a bit of a shock and trip back in time for me. While the current version (2.12) of the <span class="caps">API</span> documentation calls it a &#8220;<span class="caps">HTTP</span> <span class="caps">API</span>&#8221;, the filename of the previous version that I found (1.51) is much more accurate: <a href="https://s3.amazonaws.com/amcrest-files/AMCREST_CGI_SDK_API.pdf">AMCREST_CGI_SDK_API.pdf</a>. While functional, the <span class="caps">API</span> appears to be a minimum-effort project to wrap (likely existing) system tooling on the camera in some sort of <span class="caps">HTTP</span> <span class="caps">API</span>. Some pertinent pieces of the <span class="caps">API</span> specification&nbsp;include:</p>
+<ul>
+<li>Aside from <span class="caps">RSTP</span> streams, all paths are to <span class="caps">CGI</span> scripts - i.e. <code>/cgi-bin/mjpg/video.cgi</code>, <code>/cgi-bin/configManager.cgi</code>,&nbsp;etc.</li>
+<li>Many of the paths use query parameters that sound like they map to command-line arguments, i.e. <code>/cgi-bin/configManager.cgi?action=getConfig&amp;name=Snap</code>.</li>
+<li>While the <span class="caps">API</span> specification defines <span class="caps">HTTP</span> status codes including 200, 400, 404, and 500, it also <em>clearly</em> states (with examples) that &#8220;fits with syntax but an error occurs while the server handles it&#8221; will result in a <span class="caps">HTTP</span> 200 with a body containing a plain text error&nbsp;message.</li>
+<li>The <span class="caps">API</span> appears to use the <span class="caps">POST</span> verb for anything that uploads a file, and <span class="caps">GET</span> for everything else. URLs that result in configuration changes or pan/tilt/zoom commands are still <span class="caps">GET</span>&nbsp;requests.</li>
+<li>For query parameters (which drive the majority of the <span class="caps">API</span>), various <span class="caps">CGI</span> paths use either logically-named parameters (e.g. &#8220;channel&#8221;, &#8220;action&#8221;, etc.) or generic ones (&#8220;arg1&#8221;, &#8220;arg2&#8221;, &#8220;arg3&#8221;,&nbsp;etc.).</li>
+<li>While the <span class="caps">JSON</span> configuration file format was a welcome surprise, <span class="caps">API</span> endpoints that return textual responses (as opposed to image/video/audio) respond with line-based key/value pairs separated by equal&nbsp;signs.</li>
+</ul>
+<p>I imagine that much of this is dictated by needing to support Amcrest&#8217;s network video recorder products, and perhaps some of it is also dictated by their manufacturer Dahua (Amcrest&#8217;s products seem to be running customized and branded Dahua software, and likely hardware too). While much of this <span class="caps">API</span> is simpler for me to work with than the <span class="caps">SOAP</span>- and <span class="caps">WSDL</span>-based <span class="caps">ONVIF</span> standard, I&#8217;d still be much happier if the devices exposed a modern ReST/<span class="caps">JSON</span>&nbsp;<span class="caps">API</span>.</p>
+<p>There <em>is</em> a Python package, <a href="http://python-amcrest.readthedocs.io/">python-amcrest</a>, that claims to provide a native Python client for this <span class="caps">CGI</span> <span class="caps">API</span> but I haven&#8217;t tried it&nbsp;yet.</p>
+<h1 id="alarms-events-initial-research"><a class="toclink" href="#alarms-events-initial-research">Alarms / Events - Initial&nbsp;Research</a></h1>
+<p>These cameras support a number of internal &#8220;alarms&#8221; for events such as motion detection (likely nowhere near as good as Motion or ZoneMinder), video loss, audio detection, failed logins, disk (optional <span class="caps">SD</span> card) missing, error or full, network disconnect or <span class="caps">IP</span> conflict, or external alarms (the ProHD has four analog relay input/output connections on the back that can be used for either external trigger inputs or outputs). I&#8217;m not concerned with most of them and currently don&#8217;t have <span class="caps">SD</span> cards in the cameras, but I am interested in the &#8220;Video Tamper&#8221; alarm that detects loss of picture such as when the lens is obstructed. So, I began a bit of research into what options were available for receiving these alarms. Of course I wasn&#8217;t lucky enough to see a webhook or <span class="caps">HTTP</span> <span class="caps">GET</span>/<span class="caps">POST</span> delivery method, let alone <span class="caps">SNS</span> or <span class="caps">SQS</span>. The options for alarm handling are recording, triggering one of the relays (on the ProHD that supports them), taking a snapshot, sending email, or polling the <span class="caps">API</span> for alarm events. The ProHD also supposedly supports <span class="caps">SNMP</span> traps, though they&#8217;re not explicitly listed as an event&nbsp;action.</p>
+<p><strong>Update:</strong> Upon review of the <span class="caps">API</span> documentation, it appears that it&#8217;s also possible to &#8220;subscribe&#8221; to events via <span class="caps">HTTP</span>/<span class="caps">CGI</span>. This <span class="caps">API</span> appears to be a <span class="caps">HTTP</span> <span class="caps">GET</span> that responds with a <code>multipart/x-mixed-replace</code> content-type and streams plaintext event descriptions to the client as they occur. The client must send keepalive data to the server every 1 to 60 seconds (helpfully, the doc states that the keepalive data can be the string &#8220;keep&nbsp;alive&#8221;).</p>
+<p>Given those options, I decided that either <span class="caps">SNMP</span> or &#8220;email&#8221; (<span class="caps">SMTP</span>) would be the best bet for programmatically receiving the events and acting on&nbsp;them.</p>
+<h2 id="snmp"><a class="toclink" href="#snmp"><span class="caps">SNMP</span></a></h2>
+<p>The latest firmware for the <span class="caps">IPM</span>-723W, &#8220;15.R&#8221;, doesn&#8217;t appear to support <span class="caps">SNMP</span> at all; it&#8217;s missing the &#8220;Setup&#8221; -&gt; &#8220;Network&#8221; -&gt; &#8220;<span class="caps">SNMP</span>&#8221; configuration that the ProHD running &#8220;18.R&#8221; software has. So it seems like <span class="caps">SNMP</span> isn&#8217;t going to be a viable option for me but I wanted to explore it anyway. I enabled <span class="caps">SNMP</span> v1 with the default &#8220;public&#8221; read community and issued a quick <code>snmpwalk</code>. There wasn&#8217;t a whole lot aside from what I&#8217;d expect to find on a typical Linux device (<span class="caps">SNMP</span>*-<span class="caps">MIB</span>, <span class="caps">IF</span>-<span class="caps">MIB</span>, <span class="caps">TCP</span>-<span class="caps">MIB</span>, <span class="caps">IP</span>-<span class="caps">MIB</span>, etc.). The sum of the interesting parts&nbsp;was:</p>
+<div class="highlight"><pre><span></span>SNMPv2-<span class="caps">MIB</span>::sysORID.10 = <span class="caps">OID</span>: SNMPv2-<span class="caps">SMI</span>::enterprises.1004849.2.1.1
+SNMPv2-<span class="caps">MIB</span>::sysORID.11 = <span class="caps">OID</span>: SNMPv2-<span class="caps">SMI</span>::enterprises.1004849.2.1.2
+SNMPv2-<span class="caps">MIB</span>::sysORID.12 = <span class="caps">OID</span>: SNMPv2-<span class="caps">SMI</span>::enterprises.1004849.2.1
+SNMPv2-<span class="caps">MIB</span>::sysORID.13 = <span class="caps">OID</span>: SNMPv2-<span class="caps">SMI</span>::enterprises.1004849.2.2.1
+SNMPv2-<span class="caps">MIB</span>::sysORID.14 = <span class="caps">OID</span>: SNMPv2-<span class="caps">SMI</span>::enterprises.1004849.2.2.2
+SNMPv2-<span class="caps">MIB</span>::sysORID.15 = <span class="caps">OID</span>: ccitt.1
+SNMPv2-<span class="caps">MIB</span>::sysORID.16 = <span class="caps">OID</span>: ccitt.1
+SNMPv2-<span class="caps">MIB</span>::sysORID.17 = <span class="caps">OID</span>: ccitt.1
+SNMPv2-<span class="caps">MIB</span>::sysORID.18 = <span class="caps">OID</span>: ccitt.1
+SNMPv2-<span class="caps">MIB</span>::sysORID.19 = <span class="caps">OID</span>: ccitt.1
+SNMPv2-<span class="caps">MIB</span>::sysORID.20 = <span class="caps">OID</span>: ccitt.1
+SNMPv2-<span class="caps">MIB</span>::sysORID.21 = <span class="caps">OID</span>: ccitt.1
+SNMPv2-<span class="caps">MIB</span>::sysORID.22 = <span class="caps">OID</span>: ccitt.1
+SNMPv2-<span class="caps">MIB</span>::sysORID.23 = <span class="caps">OID</span>: ccitt.1
+SNMPv2-<span class="caps">MIB</span>::sysORID.24 = <span class="caps">OID</span>: ccitt.1
+SNMPv2-<span class="caps">MIB</span>::sysORID.25 = <span class="caps">OID</span>: ccitt.1
+SNMPv2-<span class="caps">MIB</span>::sysORDescr.10 = <span class="caps">STRING</span>: Dahua <span class="caps">SNMP</span> Mib Module -- System oidVersionInfo
+SNMPv2-<span class="caps">MIB</span>::sysORDescr.11 = <span class="caps">STRING</span>: Dahua <span class="caps">SNMP</span> Mib Module -- System oidProductInfo
+SNMPv2-<span class="caps">MIB</span>::sysORDescr.12 = <span class="caps">STRING</span>: Dahua <span class="caps">SNMP</span> Mib Module -- System oidSysetmInfo
+SNMPv2-<span class="caps">MIB</span>::sysORDescr.13 = <span class="caps">STRING</span>: Dahua <span class="caps">SNMP</span> Mib Module -- network oidNetworkPort
+SNMPv2-<span class="caps">MIB</span>::sysORDescr.14 = <span class="caps">STRING</span>: Dahua <span class="caps">SNMP</span> Mib Module -- network oidTcpIpInfo
+SNMPv2-<span class="caps">MIB</span>::sysORDescr.15 = <span class="caps">STRING</span>: RegularStreamInfoTable
+SNMPv2-<span class="caps">MIB</span>::sysORDescr.16 = <span class="caps">STRING</span>: MDStreamInfoTable
+SNMPv2-<span class="caps">MIB</span>::sysORDescr.17 = <span class="caps">STRING</span>: AlarmStreamInfoTable
+SNMPv2-<span class="caps">MIB</span>::sysORDescr.18 = <span class="caps">STRING</span>: Extra1StreamInfoTable
+SNMPv2-<span class="caps">MIB</span>::sysORDescr.19 = <span class="caps">STRING</span>: VideoMotionInfoTable
+SNMPv2-<span class="caps">MIB</span>::sysORDescr.20 = <span class="caps">STRING</span>: VideoLossInfoTable
+SNMPv2-<span class="caps">MIB</span>::sysORDescr.21 = <span class="caps">STRING</span>: VideoBlindInfoTable
+SNMPv2-<span class="caps">MIB</span>::sysORDescr.22 = <span class="caps">STRING</span>: LocalAlarmInfoTable
+SNMPv2-<span class="caps">MIB</span>::sysORDescr.23 = <span class="caps">STRING</span>: NetworkAlarmTable
+SNMPv2-<span class="caps">MIB</span>::sysORDescr.24 = <span class="caps">STRING</span>: RecordMainStreamInfoTable
+SNMPv2-<span class="caps">MIB</span>::sysORDescr.25 = <span class="caps">STRING</span>: PhysicalVolumeInfoTable
+</pre></div>
+
+
+<p>It appears that there are two sets of custom MIBs exposed, one from their manufacturer Dahua and another presumably from Amcrest and claiming to be exposed at &#8220;.0.1&#8221; (ccitt.1). I&#8217;ve been completely unable to get anything out of the Amcrest MIBs (sysORID&#8217;s 15 through 25; ccitt.1) and have presumed them to be broken; the <a href="https://amcrest.com/forum/technical-discussion-f3/snmp-t1045.html">one thread on the Amcrest forums</a> about this seems to concur. For the Dahua OIDs, neither Amcrest nor Dahua appear to publish the MIBs but thanks to a <a href="https://github.com/librenms/librenms/issues/8126">LibreNMS issue</a>, <a href="https://ipcamtalk.com/threads/snmp-mib.25434/">IPcamTalk forum thread</a> and <a href="https://www.reddit.com/r/homedefense/comments/7n0bhj/dahua_nvr_looking_for_snmp_mib_files/">reddit post</a> I was able to find them. The information I got from walking that <span class="caps">OID</span> tree with the appropriate <span class="caps">MIB</span> from those links didn&#8217;t prove terribly&nbsp;useful:</p>
+<div class="highlight"><pre><span></span><span class="caps">DAHUA</span>-<span class="caps">SNMP</span>-<span class="caps">MIB</span>::softwareRevision.0 = <span class="caps">STRING</span>: 2.520.<span class="caps">AC00</span>.18.R
+<span class="caps">DAHUA</span>-<span class="caps">SNMP</span>-<span class="caps">MIB</span>::hardwareRevision.0 = <span class="caps">STRING</span>: 1.00
+<span class="caps">DAHUA</span>-<span class="caps">SNMP</span>-<span class="caps">MIB</span>::videoChannel.0 = <span class="caps">INTEGER</span>: 0
+<span class="caps">DAHUA</span>-<span class="caps">SNMP</span>-<span class="caps">MIB</span>::alarmInput.0 = <span class="caps">INTEGER</span>: 1
+<span class="caps">DAHUA</span>-<span class="caps">SNMP</span>-<span class="caps">MIB</span>::alarmOutput.0 = <span class="caps">INTEGER</span>: 1
+<span class="caps">DAHUA</span>-<span class="caps">SNMP</span>-<span class="caps">MIB</span>::serialNumber.0 = <span class="caps">STRING</span>: <span class="caps">AMC00056485D24AAF8</span>
+<span class="caps">DAHUA</span>-<span class="caps">SNMP</span>-<span class="caps">MIB</span>::systemVersion.0 = <span class="caps">STRING</span>: 2.520.0000.18, Build Date:2017-06-29
+<span class="caps">DAHUA</span>-<span class="caps">SNMP</span>-<span class="caps">MIB</span>::deviceType.0 = <span class="caps">STRING</span>: <span class="caps">IP2M</span>-841B
+<span class="caps">DAHUA</span>-<span class="caps">SNMP</span>-<span class="caps">MIB</span>::deviceClass.0 = <span class="caps">STRING</span>: <span class="caps">IPC</span>
+<span class="caps">DAHUA</span>-<span class="caps">SNMP</span>-<span class="caps">MIB</span>::deviceStatus.0 = <span class="caps">INTEGER</span>: 1
+<span class="caps">DAHUA</span>-<span class="caps">SNMP</span>-<span class="caps">MIB</span>::machineName.0 = <span class="caps">STRING</span>: AMC00056_24AAF8
+<span class="caps">DAHUA</span>-<span class="caps">SNMP</span>-<span class="caps">MIB</span>::cpuUsage.0 = <span class="caps">INTEGER</span>: 70
+<span class="caps">DAHUA</span>-<span class="caps">SNMP</span>-<span class="caps">MIB</span>::lastestEvent.0 = <span class="caps">STRING</span>: videoBlindEvent
+<span class="caps">DAHUA</span>-<span class="caps">SNMP</span>-<span class="caps">MIB</span>::encodeNo.0 = <span class="caps">INTEGER</span>: 0
+<span class="caps">DAHUA</span>-<span class="caps">SNMP</span>-<span class="caps">MIB</span>::tcpPort.0 = <span class="caps">INTEGER</span>: 37777
+<span class="caps">DAHUA</span>-<span class="caps">SNMP</span>-<span class="caps">MIB</span>::udpPort.0 = <span class="caps">INTEGER</span>: 37778
+<span class="caps">DAHUA</span>-<span class="caps">SNMP</span>-<span class="caps">MIB</span>::httpPort.0 = <span class="caps">INTEGER</span>: 80
+<span class="caps">DAHUA</span>-<span class="caps">SNMP</span>-<span class="caps">MIB</span>::rtspPort.0 = <span class="caps">INTEGER</span>: 554
+<span class="caps">DAHUA</span>-<span class="caps">SNMP</span>-<span class="caps">MIB</span>::maxConnectNum.0 = <span class="caps">INTEGER</span>: 10
+<span class="caps">DAHUA</span>-<span class="caps">SNMP</span>-<span class="caps">MIB</span>::httpsPort.0 = <span class="caps">INTEGER</span>: 443
+<span class="caps">DAHUA</span>-<span class="caps">SNMP</span>-<span class="caps">MIB</span>::getIpmode.0 = <span class="caps">INTEGER</span>: 0
+<span class="caps">DAHUA</span>-<span class="caps">SNMP</span>-<span class="caps">MIB</span>::macAddr.0 = <span class="caps">STRING</span>: 9c:8e:cd:xx:xx:xx
+<span class="caps">DAHUA</span>-<span class="caps">SNMP</span>-<span class="caps">MIB</span>::ipVersion.0 = <span class="caps">INTEGER</span>: 0
+<span class="caps">DAHUA</span>-<span class="caps">SNMP</span>-<span class="caps">MIB</span>::subnetMast.0 = <span class="caps">STRING</span>: 255.255.255.0
+<span class="caps">DAHUA</span>-<span class="caps">SNMP</span>-<span class="caps">MIB</span>::defaultGateway.0 = <span class="caps">STRING</span>: 192.168.0.1
+<span class="caps">DAHUA</span>-<span class="caps">SNMP</span>-<span class="caps">MIB</span>::preferredDns.0 = <span class="caps">STRING</span>: 192.168.0.1
+<span class="caps">DAHUA</span>-<span class="caps">SNMP</span>-<span class="caps">MIB</span>::alternateDns.0 = <span class="caps">STRING</span>: 1.0.0.1
+<span class="caps">DAHUA</span>-<span class="caps">SNMP</span>-<span class="caps">MIB</span>::ipAddr.0 = <span class="caps">STRING</span>: 192.168.0.60
+<span class="caps">DAHUA</span>-<span class="caps">SNMP</span>-<span class="caps">MIB</span>::localAlarmIndex.1 = <span class="caps">INTEGER</span>: 1
+<span class="caps">DAHUA</span>-<span class="caps">SNMP</span>-<span class="caps">MIB</span>::networkAlarmIndex.1 = <span class="caps">INTEGER</span>: 1
+</pre></div>
+
+
+<p>So&#8230; nothing terribly interesting. I&#8217;m planning on seeing what I can get from the <span class="caps">SNMP</span> traps, but since only one of my cameras supports them (and they&#8217;re <span class="caps">UDP</span>) I&#8217;m not planning on using them for actually receiving&nbsp;events/alarms.</p>
+<h2 id="smtp"><a class="toclink" href="#smtp"><span class="caps">SMTP</span></a></h2>
+<p>With <span class="caps">SNMP</span> out of the running for receiving alarms, I turned to <span class="caps">SMTP</span>. The configuration page I was greeted with, as well as its pop-up help page, left me slightly confused and&nbsp;unsettled:</p>
+<p><a href="/GFX/amcrest_smtp_config.png"><img alt="screenshot of Amcrest camera SMTP configuration page and help pop-up" src="/GFX/amcrest_smtp_config_sm.png"></a></p>
+<p>When I finally muddled through the options and poor translation - checking the &#8220;Login Anonymously&#8221; checkbox directly above the <span class="caps">SMTP</span> username and password actually enables authentication, i.e. disables non-<span class="caps">AUTH</span>/anonymous <span class="caps">SMTP</span> - I found that support for anonymous <span class="caps">SMTP</span> (i.e. without <span class="caps">AUTH</span>) is completely broken. When setting unchecking the &#8220;Login anonymously&#8221; box (i.e. no <span class="caps">AUTH</span>), the <span class="caps">UI</span> displays the same &#8220;Email test failed&#8221; error message as with bad credentials, but (per Wireshark/tcpdump) it never actually sends <em>any</em> traffic to the <span class="caps">SMTP</span> server at all. I found a <a href="https://amcrest.com/forum/technical-discussion-f3/email-test-always-fails-brand-new-camera-t1104-s10.html">forum thread</a> going back <strong>almost two years</strong> confirming&nbsp;this.</p>
+<p>I quickly hacked together a <span class="caps">SMTP</span> server that accepts any credentials and prints the message to <span class="caps">STDOUT</span> (based on <a href="https://github.com/bcoe/secure-smtpd">secure-smtpd</a>), pointed the camera&#8217;s <span class="caps">SMTP</span> settings to it, and then threw a black shirt over the lens of the camera. Within a minute or so, I got the following message via my dummy <span class="caps">SMTP</span>&nbsp;server:</p>
+<div class="highlight"><pre><span></span>Date: Sun, 06 May 2018 15:28:45 -0600
+From: &lt;&gt;
+To: &lt;jason@jasonantman.com&gt;
+Subject: =?<span class="caps">UTF</span>-8?B?SVBDIE1lc3NhZ2U=?=
+<span class="caps">MIME</span>-Version: 1.0
+Content-type: multipart/mixed;boundary=&quot;======DAHUA_TECH======&quot;
+
+This is a multi-part message in <span class="caps">MIME</span> format.
+
+--======DAHUA_TECH======
+Content-Type: text/plain;
+        charset=<span class="caps">UTF</span>-8
+Content-Transfer-Encoding: base64
+
+QWxhcm0gRXZlbnQ6IFRhbXBlciBEZXRlY3QNCkFsYXJtIElucHV0IENoYW5uZWw6IDENCkFsYXJt
+IFN0YXJ0IFRpbWUoRC9NL1kgSDpNOlMpOiAwNi8wNS8yMDE4IDE1OjI4OjQwDQpBbGFybSBEZXZp
+Y2UgTmFtZTogQU1DMDAwNTZfMjRBQUY4DQpBbGFybSBOYW1lOiANCklQIEFkZHJlc3M6IDE5Mi4x
+NjguMC42MA0K
+
+
+
+--======DAHUA_TECH======
+Content-Type: application/octet-stream;
+        name=&quot;20180506152840423ch01.jpg&quot;
+Content-Disposition: attachment;
+        filename=&quot;20180506152840423ch01.jpg&quot;
+Content-Transfer-Encoding: base64
+...
+</pre></div>
+
+
+<p>The second attachment is a full 1920x1080 snapshot of the video. I was a bit confused to see the <span class="caps">UTF</span>-8 base64-encoded subject, but the base64-decoded Subject is &#8220;<span class="caps">IPC</span> Message&#8221; and body text&nbsp;is:</p>
+<div class="highlight"><pre><span></span>Alarm Event: Tamper Detect
+Alarm Input Channel: 1
+Alarm Start Time(D/M/Y H:M:S): 06/05/2018 15:28:40
+Alarm Device Name: AMC00056_24AAF8
+Alarm Name:
+<span class="caps">IP</span> Address: 192.168.0.60
+</pre></div>
+
+
+<p>Since the only alarm/event I really care about is loss of picture, and motion detection software should be able to handle the same task, I&#8217;m going to completely ignore the alarm/event features for now and focus on the camera solely as a video&nbsp;source.</p>
+<h1 id="system-logs"><a class="toclink" href="#system-logs">System&nbsp;logs</a></h1>
+<p>The cameras keep rudimentary &#8220;system logs&#8221; which include events (e.g. video tamper/video loss) as well as login/logout from the web <span class="caps">UI</span> as well as <span class="caps">API</span>, configuration saves, and &#8220;Set Time&#8221; events which perplex me as they show web <span class="caps">UI</span> client IPs as the source. These logs are available via a searchable table in the web <span class="caps">UI</span>, as well as <span class="caps">CGI</span> access to either page through logs filtered by date/time or return a &#8220;log backup&#8221; file of all logs between a given start and end time. Unfortunately, they don&#8217;t support syslog or any other remote log&nbsp;aggregation.</p>
+<h1 id="gpl-compliance"><a class="toclink" href="#gpl-compliance"><span class="caps">GPL</span>&nbsp;Compliance</a></h1>
+<p>Between the <span class="caps">SNMP</span> output and nmap results, as well as some other information exposed in the documentation and user interface, I&#8217;m certain that these devices are running Linux and <a href="https://www.ffmpeg.org/">FFmpeg</a> (LGPLv2). I&#8217;ve also seen some things that make it highly likely that they&#8217;re also running <a href="https://busybox.net/">busybox</a> (GPLv2) and the other common embedded Linux utilities. However, I was unable to find any open source license information or source code offer in the packaging and printed documentation that came with either camera, or on Amcrest&#8217;s website or user documentation. I&#8217;ve posted a <a href="https://amcrest.com/forum/technical-discussion-f3/source-code-availability--t8163.html">thread</a> in Amcrest&#8217;s technical discussion forums inquiring about this but don&#8217;t expect much response from them. If I have time, I may try downloading one of the firmware images and doing some simple tests like running it through <code>strings</code> to see if I can spot any well-known copyright headers. But as far as I can&nbsp;tell,</p>
+<h1 id="auto-maintain"><a class="toclink" href="#auto-maintain">Auto&nbsp;Maintain</a></h1>
+<p>The cameras both came out-of-the-box with the &#8220;Auto maintain&#8221; feature enabled, which&#8230; reboots the cameras automatically once a week. By default, on Thursday mornings just after 3am&nbsp;local.</p>
+<p>Having spent some time in the past developing embedded Linux network devices, this does <em>not</em> give me a terribly confident feeling about the&nbsp;software.</p>
+<h1 id="status-and-next-steps"><a class="toclink" href="#status-and-next-steps">Status and Next&nbsp;Steps</a></h1>
+<p>To wrap up, I currently have two Amcrest <span class="caps">IP</span> cameras running on my home network; one looking out the front window, and one (indoor pan/tilt) overlooking my dogs&#8217; crates. Now that I have them configured for the basics, I&#8217;m going to attempt to ignore Amcrest&#8217;s irritating software and focus on the cameras solely as video sources. My next steps - hopefully in a follow-up post not too long from now - will&nbsp;include:</p>
+<ul>
+<li>Evaluation of Linux-based video surveillance recording/streaming/motion detection software, and choosing one to use. This will likely come down to choosing between something with an existing multi-camera web interface (ZoneMinder, or perhaps one of the newer variants) or something to handle motion detection only (Motion, or a modern variant) and cobbling together a simple web <span class="caps">UI</span> for streaming and event&nbsp;viewing.</li>
+<li>Experimenting with using <span class="caps">ONVIF</span> instead of the <span class="caps">CGI</span>&nbsp;interface.</li>
+<li>Expermenting with FFmpeg or something else to restream the video instead of trying to remove authentication in a&nbsp;proxy.</li>
+<li>Possibly using <a href="http://python-amcrest.readthedocs.io/">python-amcrest</a> as a wrapper around the <span class="caps">CGI</span>&nbsp;interface.</li>
+<li>Figuring out a system to notify me of important events such as motion, video loss, or connectivity loss to a&nbsp;camera.</li>
+<li>The cameras support <span class="caps">SD</span> cards and a built-in simple <span class="caps">DVR</span> feature. I may get cards for them and configure them to record on network connection loss, just as a&nbsp;test.</li>
+</ul>
+            </div>
+            <!-- /.entry-content -->
+    <hr />
+    <!-- Shariff Button BEGIN -->
+    <div class="shariff"
+        data-lang="en"
+        data-orientation="horizontal"
+        data-services = "[&quot;facebook&quot;,&quot;googleplus&quot;,&quot;twitter&quot;,&quot;linkedin&quot;,&quot;diaspora&quot;]"
+        data-theme="standard"
+        data-url="https://blog.jasonantman.com/2018/05/amcrest-ip-camera-first-impressions/"></div>
+    <!-- Shariff Button END -->
+    <hr/>
+    <section class="comments" id="comments">
+        <h2>Comments</h2>
+
+        <div id="disqus_thread"></div>
+        <script type="text/javascript">
+            /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+            var disqus_shortname = 'jantman'; // required: replace example with your forum shortname
+
+                    var disqus_identifier = 'amcrest-ip-camera-first-impressions';
+                var disqus_url = 'https://blog.jasonantman.com/2018/05/amcrest-ip-camera-first-impressions/';
+
+            var disqus_config = function () {
+                this.language = "en";
+            };
+
+            /* * * DON'T EDIT BELOW THIS LINE * * */
+            (function () {
+                var dsq = document.createElement('script');
+                dsq.type = 'text/javascript';
+                dsq.async = true;
+                dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+                (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+            })();
+        </script>
+        <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by
+            Disqus.</a></noscript>
+        <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+
+    </section>
+        </article>
+    </section>
+
+        </div>
+        <div class="col-sm-3" id="sidebar">
+            <aside>
+<!-- Sidebar -->
+<section class="well well-sm">
+  <ul class="list-group list-group-flush">
+
+<!-- Sidebar/Recent Posts -->
+<li class="list-group-item">
+  <h4><i class="fa fa-home fa-lg"></i><span class="icon-label">Recent Posts</span></h4>
+  <ul class="list-group" id="recentposts">
+    <li class="list-group-item"><a href="https://blog.jasonantman.com/2018/05/amcrest-ip-camera-first-impressions/">Amcrest <span class="caps">IP</span> Camera First&nbsp;Impressions</a></li>
+    <li class="list-group-item"><a href="https://blog.jasonantman.com/2018/04/aws-elasticsearch-for-ad-hoc-elb-log-analysis/"><span class="caps">AWS</span> ElasticSearch for Ad-Hoc <span class="caps">ELB</span> Log&nbsp;Analysis</a></li>
+    <li class="list-group-item"><a href="https://blog.jasonantman.com/2018/03/diy-raspberry-pi-zero-gps-track-logger/"><span class="caps">DIY</span> Raspberry Pi Zero <span class="caps">GPS</span> Track&nbsp;Logger</a></li>
+    <li class="list-group-item"><a href="https://blog.jasonantman.com/2017/10/cloud-custodian-architecture-deployment-and-policy-preprocessing/">Cloud Custodian Architecture, Deployment and Policy&nbsp;Preprocessing</a></li>
+    <li class="list-group-item"><a href="https://blog.jasonantman.com/2017/10/pre-authorized-aws-console-urls-for-notifications/">Pre-Authorized <span class="caps">AWS</span> Console URLs for&nbsp;Notifications</a></li>
+  </ul>
+</li>
+<!-- End Sidebar/Recent Posts -->
+
+<!-- Sidebar/Twitter Timeline -->
+<li class="list-group-item">
+  <h4><i class="fa fa-twitter fa-lg"></i><span class="icon-label">Latest Tweets</span></h4>
+  <div id="twitter_timeline">
+    <a class="twitter-timeline" data-width="250" data-height="300" data-dnt="true" data-theme="light" href="https://twitter.com/j_antman">Tweets by j_antman</a> <script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
+  </div>
+</li>
+<!-- End Sidebar/Twitter Timeline -->
+
+<!-- Sidebar/Github -->
+<li class="list-group-item">
+  <h4><i class="fa fa-github fa-lg"></i><span class="icon-label">GitHub Repos</span></h4>
+  <div id="gh_repos">
+    <p class="list-group-item">Status updating...</p>
+  </div>
+  <a href="https://github.com/jantman">@jantman</a> on GitHub
+</li>
+<!-- End Sidebar/Github -->
+
+<!-- Sidebar/Links -->
+<li class="list-group-item">
+  <h4><i class="fa fa-external-link-square fa-lg"></i><span class="icon-label">Links</span></h4>
+  <ul class="list-group" id="links">
+    <li class="list-group-item">
+      <a href="http://www.jasonantman.com" target="_blank">Homepage</a>
+    </li>
+    <li class="list-group-item">
+      <a href="http://resume.jasonantman.com" target="_blank">Resume</a>
+    </li>
+  </ul>
+</li>
+<!-- End Sidebar/Links -->
+  </ul>
+</section>
+<!-- End Sidebar -->            </aside>
+        </div>
+    </div>
+</div>
+<footer>
+   <div class="container">
+      <hr>
+      <div class="row">
+         <div class="col-xs-10">&copy; 2018 Jason Antman
+            &middot; Powered by <a href="https://github.com/getpelican/pelican-themes/tree/master/pelican-bootstrap3" target="_blank">pelican-bootstrap3</a>,
+            <a href="http://docs.getpelican.com/" target="_blank">Pelican</a>,
+            <a href="http://getbootstrap.com" target="_blank">Bootstrap</a>         </div>
+         <div class="col-xs-2"><p class="pull-right"><i class="fa fa-arrow-up"></i> <a href="#">Back to top</a></p></div>
+      </div>
+   </div>
+</footer>
+<script src="https://blog.jasonantman.com/theme/js/jquery.min.js"></script>
+
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="https://blog.jasonantman.com/theme/js/bootstrap.min.js"></script>
+
+<!-- Enable responsive features in IE8 with Respond.js (https://github.com/scottjehl/Respond) -->
+<script src="https://blog.jasonantman.com/theme/js/respond.min.js"></script>
+
+
+
+    <!-- GITHUB_REPOS_JSON (explicitly pinned repos ) -->
+  <script id="GithubReposJson" type="application/json">
+  [{"description": "A script and python module to check your AWS service limits and usage via boto.", "name": "awslimitchecker", "html_url": "https://github.com/jantman/awslimitchecker"}, {"description": "Puppet module and accompanying documentation to install/setup Arch linux on a MacBook Pro Retina 11,4", "name": "puppet-archlinux-macbookretina", "html_url": "https://github.com/jantman/puppet-archlinux-macbookretina"}, {"description": "A collection of my standalone scripts to small/quick for their own repos. All kinds of useful stuff.", "name": "misc-scripts", "html_url": "https://github.com/jantman/misc-scripts"}, {"description": "Responsive Flask/SQLAlchemy personal finance app, specifically for biweekly budgeting.", "name": "biweeklybudget", "html_url": "https://github.com/jantman/biweeklybudget"}, {"description": "A standard to easily communicate to humans and machines the development/support and usability status of software repositories/projects.", "name": "repostatus.org", "html_url": "https://github.com/jantman/repostatus.org"}, {"description": "Python/selenium script to get Xfinity bandwidth usage", "name": "xfinity-usage", "html_url": "https://github.com/jantman/xfinity-usage"}]
+  </script>
+
+<!-- GitHub JS Code -->
+<script type="text/javascript">
+$(document).ready(function () {
+  if (!window.jXHR) {
+    var jxhr = document.createElement('script');
+    jxhr.type = 'text/javascript';
+    jxhr.src = 'https://blog.jasonantman.com/theme/js/jXHR.js';
+    var s = document.getElementsByTagName('script')[0];
+    s.parentNode.insertBefore(jxhr, s);
+  }
+
+  console.log($('#GithubReposJson').html());
+  github.showSpecificRepos({
+    user: 'jantman',
+    target: '#gh_repos',
+    repos: JSON.parse($('#GithubReposJson').html())
+  });
+});
+</script>
+<script src="https://blog.jasonantman.com/theme/js/github.js" type="text/javascript"></script>
+<!-- End GitHub JS Code -->
+    <!-- Disqus -->
+    <script type="text/javascript">
+        /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+        var disqus_shortname = 'jantman'; // required: replace example with your forum shortname
+
+        /* * * DON'T EDIT BELOW THIS LINE * * */
+        (function () {
+            var s = document.createElement('script');
+            s.async = true;
+            s.type = 'text/javascript';
+            s.src = '//' + disqus_shortname + '.disqus.com/count.js';
+            (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+        }());
+    </script>
+    <!-- End Disqus Code -->
+    <!-- Google Analytics Universal -->
+    <script type="text/javascript">
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+        ga('create', 'UA-2718127-2', 'jasonantman.com');
+        ga('send', 'pageview');
+    </script>
+    <!-- End Google Analytics Universal Code -->
+
+
+    <!-- add shariff support -->
+    <script src="https://blog.jasonantman.com/theme/js/shariff.min.js"></script>
+</body>
+</html>
