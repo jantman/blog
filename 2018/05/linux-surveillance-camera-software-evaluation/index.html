@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="en" prefix="og: http://ogp.me/ns# fb: https://www.facebook.com/2008/fbml">
+<head>
+    <title>Linux Surveillance Camera Software Evaluation - Jason Antman's Blog</title>
+    <!-- Using the latest rendering mode for IE -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+
+<link rel="canonical" href="https://blog.jasonantman.com/2018/05/linux-surveillance-camera-software-evaluation/">
+
+        <meta name="author" content="Jason Antman" />
+        <meta name="keywords" content="amcrest,camera,security,surveillance,video,linux,IP camera,evaluation" />
+        <meta name="description" content="My evaluation of some options for streaming and motion-activated recording of IP cameras." />
+
+        <meta property="og:site_name" content="Jason Antman's Blog" />
+        <meta property="og:type" content="article"/>
+        <meta property="og:title" content="Linux Surveillance Camera Software Evaluation"/>
+        <meta property="og:url" content="https://blog.jasonantman.com/2018/05/linux-surveillance-camera-software-evaluation/"/>
+        <meta property="og:description" content="My evaluation of some options for streaming and motion-activated recording of IP cameras."/>
+        <meta property="article:published_time" content="2018-05-12" />
+            <meta property="article:section" content="Projects" />
+            <meta property="article:tag" content="amcrest" />
+            <meta property="article:tag" content="camera" />
+            <meta property="article:tag" content="security" />
+            <meta property="article:tag" content="surveillance" />
+            <meta property="article:tag" content="video" />
+            <meta property="article:tag" content="linux" />
+            <meta property="article:tag" content="IP camera" />
+            <meta property="article:tag" content="evaluation" />
+            <meta property="article:author" content="Jason Antman" />
+
+
+
+    <!-- Bootstrap -->
+        <link rel="stylesheet" href="https://blog.jasonantman.com/theme/css/bootstrap.flatly.min.css" type="text/css"/>
+    <link href="https://blog.jasonantman.com/theme/css/font-awesome.min.css" rel="stylesheet">
+
+    <link href="https://blog.jasonantman.com/theme/css/pygments/default.css" rel="stylesheet">
+        <link href="https://blog.jasonantman.com/theme/css/typogrify.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://blog.jasonantman.com/theme/css/style.css" type="text/css"/>
+        <link href="https://blog.jasonantman.com/theme/css/shariff/shariff.min.css" rel="stylesheet">
+
+    <link rel="stylesheet" href="https://blog.jasonantman.com/theme/css/forkongithub.min.css" type="text/css" />
+
+        <link href="https://blog.jasonantman.com/feeds/all.atom.xml" type="application/atom+xml" rel="alternate"
+              title="Jason Antman's Blog ATOM Feed"/>
+
+        <link href="https://blog.jasonantman.com/feeds/all.rss.xml" type="application/rss+xml" rel="alternate"
+              title="Jason Antman's Blog RSS Feed"/>
+
+
+        <link href="https://blog.jasonantman.com/feeds/categories/projects.atom.xml" type="application/atom+xml" rel="alternate"
+              title="Jason Antman's Blog Projects ATOM Feed"/>
+
+    <script src="https://widget.battleforthenet.com/widget.js" async></script>
+
+</head>
+<body>
+
+<div class="navbar navbar-default navbar-fixed-top" role="navigation">
+	<div class="container">
+<span id="forkongithub"><a href="https://github.com/jantman/blog">Fork me on GitHub</a></span>        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="https://blog.jasonantman.com/" class="navbar-brand">
+Jason Antman's Blog            </a>
+        </div>
+        <div class="collapse navbar-collapse navbar-ex1-collapse">
+            <ul class="nav navbar-nav">
+                         <li><a href="https://blog.jasonantman.com/pages/about.html">
+                             About&nbsp;Me
+                          </a></li>
+                        <li >
+                            <a href="https://blog.jasonantman.com/categories/ideas-and-rants/index.html">Ideas and rants</a>
+                        </li>
+                        <li >
+                            <a href="https://blog.jasonantman.com/categories/miscellaneous/index.html">Miscellaneous</a>
+                        </li>
+                        <li >
+                            <a href="https://blog.jasonantman.com/categories/monitoring/index.html">Monitoring</a>
+                        </li>
+                        <li >
+                            <a href="https://blog.jasonantman.com/categories/ops/index.html">Ops</a>
+                        </li>
+                        <li class="active">
+                            <a href="https://blog.jasonantman.com/categories/projects/index.html">Projects</a>
+                        </li>
+                        <li >
+                            <a href="https://blog.jasonantman.com/categories/puppet/index.html">Puppet</a>
+                        </li>
+                        <li >
+                            <a href="https://blog.jasonantman.com/categories/tech-howtos/index.html">Tech howtos</a>
+                        </li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+              <li><a href="https://blog.jasonantman.com/archives.html"><i class="fa fa-th-list"></i><span class="icon-label">Archives</span></a></li>
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+</div> <!-- /.navbar -->
+<!-- Banner -->
+<!-- End Banner -->
+<div class="container">
+    <div class="row">
+        <div class="col-sm-9">
+    <section id="content">
+        <article>
+            <header class="page-header">
+                <h1>
+                    <a href="https://blog.jasonantman.com/2018/05/linux-surveillance-camera-software-evaluation/"
+                       rel="bookmark"
+                       title="Permalink to Linux Surveillance Camera Software Evaluation">
+                        Linux Surveillance Camera Software&nbsp;Evaluation
+                    </a>
+                </h1>
+            </header>
+            <div class="entry-content">
+                <div class="panel">
+                    <div class="panel-body">
+<footer class="post-info">
+    <span class="label label-default">Date</span>
+    <span class="published">
+        <i class="fa fa-calendar"></i><time datetime="2018-05-12T07:18:00-04:00"> Sat 12 May 2018</time>
+    </span>
+
+
+
+
+
+<span class="label label-default">Tags</span>
+	<a href="https://blog.jasonantman.com/tags/amcrest/index.html">amcrest</a>
+        /
+	<a href="https://blog.jasonantman.com/tags/camera/index.html">camera</a>
+        /
+	<a href="https://blog.jasonantman.com/tags/security/index.html">security</a>
+        /
+	<a href="https://blog.jasonantman.com/tags/surveillance/index.html">surveillance</a>
+        /
+	<a href="https://blog.jasonantman.com/tags/video/index.html">video</a>
+        /
+	<a href="https://blog.jasonantman.com/tags/linux/index.html">linux</a>
+        /
+	<a href="https://blog.jasonantman.com/tags/ip-camera/index.html">IP camera</a>
+        /
+	<a href="https://blog.jasonantman.com/tags/evaluation/index.html">evaluation</a>
+    
+</footer><!-- /.post-info -->                    </div>
+                </div>
+                <div class="toc">
+<ul>
+<li><a href="#initial-requirements">Initial&nbsp;Requirements</a></li>
+<li><a href="#contenders">Contenders</a><ul>
+<li><a href="#zoneminder">ZoneMinder</a></li>
+<li><a href="#kerberosio">Kerberos.io</a></li>
+<li><a href="#shinobi">Shinobi</a></li>
+<li><a href="#motion">Motion</a></li>
+</ul>
+</li>
+<li><a href="#final-choice">Final&nbsp;Choice</a></li>
+</ul>
+</div>
+<p>In my last post, <a href="/2018/05/amcrest-ip-camera-first-impressions/">Amcrest <span class="caps">IP</span> Camera First Impressions</a>, I went over what I&#8217;d found about the pair of <span class="caps">IP</span> cameras that I bought to keep an eye on my dogs and my new house. My next step was to figure out how I&#8217;d handle motion-activated recording, and that&#8217;s what I&#8217;ll discuss this time. I&#8217;ve spent all of my spare time in the past week - probably twenty to thirty hours - researching and experimenting and the results have actually been quite&nbsp;surprising.</p>
+<h2 id="initial-requirements"><a class="toclink" href="#initial-requirements">Initial&nbsp;Requirements</a></h2>
+<p>The initial requirements that I identified&nbsp;were:</p>
+<ul>
+<li>Open source (preferably <span class="caps">GPL</span>) and runs on&nbsp;Linux</li>
+<li>Must be able to run with low-end hardware - either a Raspberry Pi or another small and inexpensive system (I don&#8217;t want this to depend on my desktop, and I don&#8217;t want to invest a lot in&nbsp;it)</li>
+<li>Support multiple cameras - at least two, ideally four or&nbsp;six</li>
+<li>Works behind a <span class="caps">HTTP</span> reverse proxy, such as nginx with certificate&nbsp;auth</li>
+<li>Can stream live via the <span class="caps">UI</span>, ideally full resolution with low&nbsp;latency</li>
+<li><span class="caps">PTZ</span> (pan/tilt/zoom) control from the&nbsp;<span class="caps">UI</span></li>
+<li>List, search and playback videos from the&nbsp;<span class="caps">UI</span></li>
+<li>Decent mobile support, either via built-in web <span class="caps">UI</span> or native&nbsp;app</li>
+<li>Motion detection to trigger recording and notifications/scripts; configurable post-motion recording time; prerecord&nbsp;buffer</li>
+<li>On-demand manual recording (ideally via both <span class="caps">UI</span> and&nbsp;script/<span class="caps">API</span>)</li>
+<li>Ability to disable motion activation/recording via script or&nbsp;<span class="caps">API</span></li>
+<li>Detect loss of video/tamper and trigger&nbsp;notification</li>
+<li>Detect loss of camera (on network) and trigger&nbsp;notification</li>
+<li>Relatively straightforward monitoring (i.e. I should get a text message if the system goes down or stops working&nbsp;correctly)</li>
+<li>Bonuses:</li>
+<li>Runs in Docker, even if not officially&nbsp;supported</li>
+<li>Written in a language I have some experience in (which essentially means Python, Ruby, or maybe (maaaaybe)&nbsp;NodeJS)</li>
+<li>Only uses&nbsp;<span class="caps">HTTP</span></li>
+<li>Nice multi-camera&nbsp;view</li>
+</ul>
+<h2 id="contenders"><a class="toclink" href="#contenders">Contenders</a></h2>
+<p>Right away I knew two of the projects I wanted to look at: <a href="https://zoneminder.com/">ZoneMinder</a>, which I&#8217;ve heard many people mention and seems to be the de-facto standard in open-source video surveillance, and <a href="https://motion-project.github.io/">Motion</a> which I&#8217;ve used before and only knew as a limited and somewhat archaic daemon. After some investigation and reading of feature lists, I came up with two other, much newer, contenders in <a href="https://shinobi.video/">Shinobi</a> and <a href="https://www.kerberos.io/">Kerberos.io</a>. I saw a few other possibilities online, but they didn&#8217;t fit the above&nbsp;criteria.</p>
+<p>I did all of my initial tests in Docker since I was testing each of these on my main computer and didn&#8217;t want to clutter up the system, and I also <em>really</em> like using Docker for testing and deployment of software. That may be unfair for some of them, but it&#8217;s both how I intend on deploying the final choice and my preferred deployment strategy lately in general. I can&#8217;t say that I dove deep into all, or even any, of these options but I gave each of them at least four hours (and quite more than that for some of them) of experimentation. I expect to be able to get something at least minimally working within that amount of&nbsp;time.</p>
+<h3 id="zoneminder"><a class="toclink" href="#zoneminder">ZoneMinder</a></h3>
+<p><a href="https://zoneminder.com/">ZoneMinder</a> seems to be what everyone talks about when the topic of Linux-based open source surveillance software comes up. It&#8217;s an incredibly mature and long-lived project - first released in 2002 - and for a long time seems to have been the only option. It&#8217;s probably most famous for allowing the user to select various &#8220;zones&#8221; (regions of the image) with different motion detection sensitivity levels, including completely ignoring certain areas. When I started actually looking into it, though, my expectations decreased significantly. During my testing the first problem I found was that, while Docker is now a <a href="https://zoneminder.readthedocs.io/en/latest/installationguide/packpack.html">recommended installation method</a>, all of the <a href="https://github.com/ZoneMinder/zmdockerfiles">official Dockerfiles</a> and most of the others that I could find run it in a single super-container with <em>every</em> process, including MySQL and all of the web tier (which ends up being 20-something processes). This is extremely un-Docker-like, and horribly inefficient for me since my test system (my desktop) already runs MariaDB for a number of other applications. The official Dockerfiles are also based on a full and bloated <code>centos:7</code> image (73 <span class="caps">MB</span> just for the base image). Lastly, and most shocking to me, while Docker is an officially-supported installation method the project doesn&#8217;t actually distribute Docker images. While ZoneMinder has packages for Ubuntu, <span class="caps">RHEL</span>, Debian and Gentoo, their Docker-based installation instructions build the image locally which almost completely obviates the entire purpose and idea of Docker as a build-once, run-anywhere packaging&nbsp;format.</p>
+<p>After some investigation, I was able to find <a href="https://github.com/pschmitt/docker-zoneminder">Philipp Schmitt&#8217;s docker-zoneminder repo</a> which provides an Alpine 3.4-based ZoneMinder image. Unfortunately it includes MySQL and doesn&#8217;t build anymore (the last commit was two years ago), but I <a href="https://github.com/jantman/docker-zoneminder">forked the repo</a> and was able to get it to build and run on the latest Alpine Linux 3.7 with the distro&#8217;s official zoneminder package. That took me a mere three days, which included giving up on Philipp&#8217;s use of lighttpd and switching to Apache httpd 2.4 configured according to ZoneMinder&#8217;s upstream instructions. Let&#8217;s just say that the process was anything but easy. I eventually got ZoneMinder working, but didn&#8217;t even get as far as setting up motion detection. I attempted to tell my <span class="caps">ONVIF</span>-compliant Amcrest ProHD camera to pan right using ZoneMinder&#8217;s builtin <span class="caps">ONVIF</span> control support, and my entire machine locked up for about an hour (note this is an Arch Linux desktop with a 4-code/8-thread (<span class="caps">HT</span>) Intel i7-3770 at 3.4GHz and <span class="caps">16GB</span> of <span class="caps">DDR3</span> memory). Even before that just watching the live streams of my two cameras (1920x1080 and 1280x960) at 15fps, with motion detection and recording and all other features disabled, would result in them regularly dropping to 1-2 fps for a minute or&nbsp;two.</p>
+<p>After the lockup caused by <span class="caps">ONVIF</span> support, I went about setting up resource constraints on memory and <span class="caps">CPU</span> usage for the container. That was the final straw; no matter what I set the constraints to, even values far in excess of the maximum of what the container was actually using, ZoneMinder seemed to behave horribly. I tried setting the memory limits to 12G (75% of my system&#8217;s memory, when the container was only using ~<span class="caps">512MB</span>) and the <span class="caps">CPU</span> limits to a period of 100000 and a limit of 700000 (allowing it to consume 7 of my 8 threads/virtual cores) and it still performed as though ZoneMinder was crippled. Given that my target platform is a Raspberry Pi (3 B+ with 1.4GHz 64-bit quad-core <span class="caps">ARM</span> Coretx-A53 and <span class="caps">1GB</span> <span class="caps">LPDDR2</span> memory), I figured it was time to stop my ZoneMinder experiments. I know people and have heard many positive stories about ZoneMinder, and work with a few people who use it and find it to be great, but I think it&#8217;s just capable of doing too much - and has too high resource requirements - for my&nbsp;needs.</p>
+<p>In the interest of transparency, here are some of the <a href="https://github.com/jantman/docker-zoneminder/blob/master/README.md#current-status">notes</a> I wrote down during my attempt at an Alpine-based Docker&nbsp;container:</p>
+<ul>
+<li>As a preface, I need to mention that ZoneMinder was first released in 2002. It is a mature, even aged, piece of software. The level of effort that has gone into it is astonishing, and the mere fact that it&#8217;s still an active and well-respected project after 16 years is pretty damn amazing, even more so for an open source project. That being said, two of my main criteria for selecting home security/surveillance software are how stable I think it will be (will it run for weeks/months without me even looking at it, and be working when I need it to) and how easily I can customize it&nbsp;(code).</li>
+<li>ZoneMinder is a <em>giant</em> codebase made up of Perl, <span class="caps">PHP</span>, C++, JavaScript, and probably some others. There are just <em>so</em> many moving pieces (see the <a href="http://zoneminder.readthedocs.io/en/stable/userguide/components.html">Components documentation</a>) that I can&#8217;t really imagine this running reliably without intervention for terribly&nbsp;long.</li>
+<li>As a corollary, when I did finally get this running, the logs (written to the <span class="caps">DB</span> and shown in the <span class="caps">UI</span>) kept reporting Errors (in red nonetheless) for processes that died and were then respawned by the watchdog without any noticeable effects in the <span class="caps">UI</span>/streams. I don&#8217;t want to take on a system that doesn&#8217;t even know the difference between an error and a warning, or that reports errors (with whistles and bells and sirens) to the user that it can self-recover from. I intend on leaving this alone as a security system, and need to be able to reliably tell (and programmatically alert on) whether it&#8217;s &#8220;working&#8221; or &#8220;not working&#8221;. A process dying and being successfully restarted a second later isn&#8217;t what I&#8217;d call an&nbsp;&#8220;error&#8221;.</li>
+<li>Apparently Docker is now <a href="https://github.com/ZoneMinder/ZoneMinder/wiki/Docker">a recommended install mathod</a>, but the <a href="https://github.com/ZoneMinder/zmdockerfiles">official Dockerfiles</a> (and almost all of the others I&#8217;ve found) are decidedly un-Docker-like, running <em>everything</em> including both the web and <span class="caps">DB</span> tiers in one container. Given how many components make up ZoneMinder, it seems like it would much more naturally be made up of a handful of containers - maybe half a dozen plus a container per&nbsp;camera.</li>
+<li>Even on my main desktop computer - a relatively beefy machine for its day, with a four-core/eight-thread Intel i7-3770 @ 3.4GHz and <span class="caps">16GB</span> <span class="caps">DDR3</span> - ZoneMinder seemed to be struggling with two <span class="caps">IP</span> cameras and I saw occasional framerate drops down to one to two fps. It just seems to be trying to do too&nbsp;much.</li>
+<li>I still think there&#8217;s a ghost in the machine re: docker resource constraints. Once I set <span class="caps">CPU</span> or memory limits on the container, even if I set them way (i.e. ten times) above what Docker reports ZoneMinder to be using, <span class="caps">ZM</span> behaves differently and starts to have crippling performance&nbsp;issues.</li>
+<li>Bottom line: I do a lot of work with Docker, and automating deployment and monitoring of software has been a big part of my job for the last decade. I need something that&#8217;s simpler, feels more reliable, and is easier to deploy and monitor. Something that logs to <span class="caps">STDOUT</span>/<span class="caps">STDERR</span>, looks at least something like a 12-factor app, and feels like it can actually run (if not be designed) natively in&nbsp;Docker.</li>
+</ul>
+<p>So after three or four incredibly frustrating afternoons and evenings, I put ZoneMinder aside and continued down my evaluation&nbsp;list.</p>
+<p><strong>Postscript:</strong> One of my colleagues, <a href="https://github.com/jbruce12000">Jason Bruce</a>, told me that he uses the <a href="https://hub.docker.com/r/aptalca/zoneminder-1.29/">aptalca/zoneminder-1.29</a> Docker image to great success. If you&#8217;re considering ZoneMinder, it&#8217;s probably worth trying that image, and it&#8217;s only&nbsp;<span class="caps">310MB</span>.</p>
+<h3 id="kerberosio"><a class="toclink" href="#kerberosio">Kerberos.io</a></h3>
+<p>The next candidate on my list was <a href="https://www.kerberos.io/">Kerberos.io</a>, one of the newcomers that I&#8217;d never heard of before. It&#8217;s billed as a &#8220;free [and open-source] video surveillance solution, which works with any camera and on every Linux based machine. You can deploy a fully configured video surveillance system within a few minutes on the environment you prefer: Raspberry Pi, Orange Pi, Docker, etc.&#8221; So that caught my attention as it seemed to check a lot of the non-functional boxes - Docker, modern, etc. - right in the introductory &#8220;advertising&#8221;. The website also looks clean and modern, and the screenshots and demo look nice. The one negative instantly apparent is that it only supports one camera unless you use the paid and hosted Kerberos.cloud product, but I figured that I could either run the cloud software myself or else hack something together (their <a href="https://doc.kerberos.io/2.0/installation/Multi-camera/Docker">docs on Multi-Camera Docker</a> are essentially just how to run multiple instances, one per&nbsp;camera).</p>
+<p>On the positive side, Kerberos.io <em>was</em> incredibly easy to get running. The <a href="https://doc.kerberos.io/2.0/installation/Docker">docs</a> just point to their <a href="https://hub.docker.com/u/kerberos/">public images on the Docker Hub</a> and a <a href="https://github.com/kerberos-io/docker">github repo</a> with a <code>docker-compose.yml</code> that runs the appropriate containers (one for the &#8220;machinery&#8221; capture backend and one for the &#8220;web&#8221; frontend), and even has an <span class="caps">ARM</span>-specific Dockerfile for Raspberry Pi users. Setup was a complete breeze as the web <span class="caps">UI</span> starts out with an installation wizard that walks you through configuring the app. After setting up a user I was able to log in and click the &#8220;Configuration&#8221; button on the top menu bar and configure my camera. It was quite straightforward - just select &#8220;<span class="caps">IP</span> Camera&#8221; and specify the <span class="caps">RSTP</span> <span class="caps">URL</span>, dimensions, delay (zero) and live stream framerate, click save, and view the camera. I had a <span class="caps">UI</span> showing the stream from my 1080P camera and the ability to record within about two minutes. The <span class="caps">UI</span> initially loads to a dashboard with the live camera view and some graphs of motion detection metrics by hour of day, day of week, and today vs average, as well as a listing of dates (presumably motion detection history/recordings) on the left sidebar. There&#8217;s also a handy &#8220;System&#8221; video that shows uptime, some system information, the currently-running Kerberos.io versions, statistics on captured images, and some system performance information (disk space that was incorrect in Docker, network <span class="caps">IO</span>, and <span class="caps">CPU</span>&nbsp;usage).</p>
+<p>Unfortunately, the system almost instantly showed a &#8220;Hey, your disk is almost full. Please remove some images..&#8221; header at the top of the pages. Yes, with the containers running, my <code>/var</code> partition was 97% full (lots of churn lately, and lots of cruft from the ZoneMinder&nbsp;tests).</p>
+<p>At this point I went back to &#8220;Configuration&#8221; and clicked the &#8220;Motion&#8221; button to set up motion detection. I was presented with a gray box that I assume was supposed to show the live image from the camera, and some points on a polygon to select a motion detection region. I did the best I could with the missing image and moved on to some sliders for &#8220;sensitivity&#8221; (default fifteen on a scale of zero to thirty) and &#8220;number of detections before valid&#8221; (default two on a scale of zero to ten) and then configured the recording settings: both images and video, no timestamp overlays, fifteen frames per second (the same as the cameras), record five seconds after motion detection, and nothing set for the options to trigger webhooks, scripts, <span class="caps">GPIO</span> or <span class="caps">MQTT</span> on detection. I should note that the &#8220;seconds to record&#8221; field is a slider for &#8220;The number of seconds that will be recorded after motion was detected&#8221;, which defaults to five and can go from zero to&nbsp;thirty.</p>
+<p>I confirmed those settings and browsed back to the Dashboard, where I could see the live video view and&#8230; a whole lot of nothing&nbsp;else:</p>
+<p><a href="/GFX/kerberos1.png"><img alt="screenshot of Kerberos.io dashboard with live webcam feed but all graphs saying &quot;No data available&quot;" src="/GFX/kerberos1_sm.png"></a></p>
+<p>Refreshing the page didn&#8217;t seem to help get any of the other data to show up, even when there was obviously motion. There&#8217;s a Heatmap feature in the Configuration page, but I haven&#8217;t been able to get it to display anything other than &#8220;No data available&#8221;. Thinking that something was wrong, I went back through the motion detection configuration and found that the region I&#8217;d selected was reset back to the strange-shaped default. I fixed it, pressed the &#8220;Confirm and Select&#8221; button without going through to the second and third screens of the Motion configuration dialog, and then opened the Motion configuration dialog again. This time, the region was effectively empty (a flat line in the top left corner, with multiple points on it) but I could actually see the camera stream albeit frozen at the latest frame. I adjusted the region polygon again, Saved, and then reloaded the Motion configuration dialog&#8230; and got back to a correct-looking region but no picture. I assumed that was right and proceeded back through the three screens of the dialog and found the rest of my settings back to default. Through trial and error, I found that the configuration dialog for the Motion detection has three screens, which are paged through by using either left/right arrows on the sides of the dialog or one of three small circles (inactive two grayed out) at the bottom of the settings. Apparently, while the &#8220;Confirm and Select&#8221; button dismisses the dialog, it only saves the settings on the <em>current</em> one of three pages. So eventually, I realized that I had to edit the first page, save, bring the dialog back up, move to the second page, save, then bring the dialog back up, move to the third page, and save. I then needed to press the &#8220;Update&#8221; button on the main Configuration page to commit my&nbsp;changes.</p>
+<p>After all that, things seemed to be working. Navingating back to the Dashboard showed some actual data on the graphs including a large number of detections for the current&nbsp;hour:</p>
+<p><a href="/GFX/kerberos2.png"><img alt="screenshot of Kerberos.io dashboard with data in graphs and hourly graph showing 18 motion detections this hour" src="/GFX/kerberos2_sm.png"></a></p>
+<p>However, when I clicked on the date in the left sidebar, something seemed to be very&nbsp;amiss:</p>
+<p><a href="/GFX/kerberos3.png"><img alt="screenshot of Kerberos.io dashboard for current date, saying &quot;Oeps, no detections found at 11 o'clock&quot;" src="/GFX/kerberos3_sm.png"></a></p>
+<p>The main Dashboard had reported 18 detections, and the slider bar on the view for today&#8217;s date (above) clearly showed some heatmap colors for the current hour, but it was also telling me that it couldn&#8217;t find any detections (videos/images). On a hunch I looked at the Docker logs for the container, and found the &#8220;machinery&#8221; (capture and storage) container&#8217;s logs full of this, repeated over and&nbsp;over:</p>
+<div class="highlight"><pre><span></span>machinery_1  | Cleaning disk
+machinery_1  | Cleaning disk
+machinery_1  | rm: missing operand
+machinery_1  | Try &#39;rm --help&#39; for more information.
+machinery_1  | Cleaning disk
+machinery_1  | rm: missing operand
+machinery_1  | Try &#39;rm --help&#39; for more information.
+</pre></div>
+
+
+<p>As best I can tell, it was detecting that the disk backing the Docker volume was 97% full (it&#8217;s a 100G volume) and cleaning up the disk&#8230; which apparently meant deleting all of the recordings, including the ones that had just been made and I hadn&#8217;t reviewed&nbsp;yet.</p>
+<p>That was the end of my experimentation with Kerberos.io. Not only was it apparently executing a shell command (<code>rm</code>) with invalid/missing arguments, but it was also deleting all of the recordings it had because the disk was 97% full. First and foremost, the camera I&#8217;m using is streaming 1920x1080 H.264 at 15 frames per second; <span class="caps">3GB</span> of disk space remaining shouldn&#8217;t be a reason to delete all of the five-second video clips unless the cleanup logic is purely based on percentages. I didn&#8217;t dig into the source code, but I&#8217;m pretty sure if my 100-Petabyte disk was 97% full, it would still start deleting single-digit-megabyte images to free up space. Secondly, and more importantly, I intend on using this as part of a security system which to me means engineering for the worst-case scenario. Under normal circumstances, I should be able to respond to a low disk warning and manually free up some space. My Internet connection is generally very stable, so the &#8220;worst case&#8221; I want to engineer for is someone burglarizing my house and being smart enough to cut the cable line. If that happens, causing storage to fill up, the most important video is actually the <em>oldest</em>! It&#8217;s the video that was recorded closest to when I lost access to the system. In which case, I&#8217;d want the failure mode to be either filling up the storage or ceasing to record, but definitely not to arbitrarily delete old-but-unreviewed&nbsp;recordings.</p>
+<h3 id="shinobi"><a class="toclink" href="#shinobi">Shinobi</a></h3>
+<p>Aside from my old standby of Motion, the last candidate on my list was <a href="https://shinobi.video/">Shinobi</a>. Shinobi&#8217;s tag line is &#8220;The open source <span class="caps">CCTV</span> solution&#8221; and prides itself on being modern and using modern technologies. The first section of their pretty and modern homepage, https://shinobi.video/, includes a link to the docs and GitHub and&nbsp;states:</p>
+<blockquote>
+<p>Shinobi is Open Source, written in Node.js, and real easy to use. It is the future of <span class="caps">CCTV</span> and <span class="caps">NVR</span> for developers and end-users alike. It is catered to by professionals and most importantly by the one who created&nbsp;it.</p>
+</blockquote>
+<p>After seeing what&#8217;s happening under the hood of ZoneMinder, this certainly got my attention, as did the general modern open-source community feel of the site. Granted, I initially missed the section comparing Shinobi <span class="caps">CE</span> (Community Edition; GPLv3) and Shinobi Pro (Professional but free for non-commercial use; Creative Commons) and that Community Edition is &#8220;updated only for major changes or bug fixes.&#8221; But the <a href="https://github.com/ShinobiCCTV/Shinobi/blob/2bc74064da5484545d86fce9cf95db74ace0db48/README.md#key-aspects">current features list</a> includes most of what I wanted (even audio recording too, from my&nbsp;ProHD)</p>
+<p>First I headed over to the <a href="https://github.com/moeiscool/docker-shinobi">Dockerfiles from Shinobi&#8217;s author</a>. I had some issues with the Alpine-based vatiant and decided to give the Debian ones a try. One <code>docker-compose up</code> and some patience later, I had two containers running: camera and cron. I immediately hit the web port and got a login box, which confused me with invalid logins for a while until I went back and re-read the <a href="https://shinobi.video/docs/start">installation docs</a> and realized that Shinobi supports multiple users, and I had to login via <code>/super</code> (superuser) to set up a user account for myself. I did that and logged in as a regular user, and was greeted with a clean, modern, responsive&nbsp;<span class="caps">UI</span>.</p>
+<p>Not being one to read documentation for end-user software, I muddled around in the <span class="caps">UI</span> a bit until I managed to add my two cameras. It wasn&#8217;t terribly difficult: click the &#8220;+&#8221; icon in the top left of the <span class="caps">UI</span> (tooltip says, &#8220;Add Monitor&#8221;) and fill out the form. One early problem I had adding the first camera is that the <span class="caps">URL</span> parsing discards query strings. I added my Amcrest ProHD with its primary stream <span class="caps">URL</span>, which has a path of <code>/cam/realmonitor?channel=1&amp;subtype=0</code>. The stream didn&#8217;t work and when I went back into the settings to edit it, the query string had been discarded. I just changed the &#8220;Automatic&#8221; (parsing of <span class="caps">URL</span>) to &#8220;No&#8221; and manually entered the protocol, host, port, authentication and path details myself, and it worked fine. Shinobi has a very nice interface for adding cameras, and one of the things I liked the most was the ability to choose the streaming details for the live stream; it supports Poseidon, <span class="caps">JPEG</span>, <span class="caps">MJPEG</span>, <span class="caps">FLV</span>, <span class="caps">HLS</span> (with audio) or a custom base64-over-websockets. The <span class="caps">HLS</span> stream also allows selection of video and audio codecs including copying the source codec (which is what I did). There&#8217;s also an option for a <span class="caps">CGI</span>-style <span class="caps">JPEG</span> snapshot&nbsp;<span class="caps">API</span>.</p>
+<p><a href="/GFX/shinobi1.png"><img alt="screenshot of Shinobi dialog to add a monitor" src="/GFX/shinobi1_sm.png"></a></p>
+<p>The <span class="caps">UI</span> is smooth and modern, with a fully responsive design that apparently works on mobile too (though I didn&#8217;t test it). It even includes nice dropdown menus and mouseover menus for streams that  include snapshot, start/stop recording, pop-out, recording list, calendar of events, monitor/stream settings, and fullscreen. It also includes something called the &#8220;Power Viewer&#8221; that I&#8217;ll discuss&nbsp;later.</p>
+<p><a href="/GFX/shinobi2.png"><img alt="screenshot of Shinobi with mouseover controls for streams" src="/GFX/shinobi2_sm.png"></a></p>
+<p>Within a few minutes, I had both cameras up and running with their full resolution H.264 <span class="caps">RTSP</span> streams (1920x1080 and 1280x960, respectively) at 15fps. The camera streams are shown by clicking on the camera in the left sidebar, and the stream windows can be resized by dragging the lower right corner (though it doesn&#8217;t keep the aspect ratio) and rearranged via&nbsp;drag-and-drop.</p>
+<p><a href="/GFX/shinobi3.png"><img alt="screenshot of Shinobi with both streams" src="/GFX/shinobi3_sm.png"></a></p>
+<p>I was happy to see that, in this configuration with video streaming but not being analyzed, the Docker containers were only using a combined total of about 5% of my <span class="caps">CPU</span> and <span class="caps">100MB</span> <span class="caps">RAM</span>. I tried some experiments with snapshots (they force-download) and manually-requested recordings and was quite happy with both. I did have some occasional issues with live streams freezing if I refreshed the page, but they resumed fine if I logged back in. The calendar interface seemed handy - it shows a monthly calendar with the time, camera name, and size of each recording for each day - and the videos list for each camera lists the start and end time, filename, and size of each video for each camera, along with buttons to preview (on the same dialog), watch (fullscreen-ish in the viewer), download, and&nbsp;delete.</p>
+<p>This all seemed wonderful, so I figured it was time to enable motion detection. Well&#8230; little did I know that would be a six-hour struggle. The <a href="https://shinobi.video/docs/motion">documentation on Motion detection</a> is separate, and states that motion detection isn&#8217;t built-in because not everybody wants it and it has dependencies, which is also started at other places on their site. The <a href="https://shinobi.video/docs/motion#content-use-builtin">first section on the Motion detection docs page</a> says that it&#8217;s now built-in and people should just use that, but is rather easy to miss (the section heading is at the same level as &#8220;Install on Ubuntu/Debian&#8221;, &#8220;Install on CentOS/Fedora&#8221;, etc.) and doesn&#8217;t explicitly say whether there are external dependencies or not. Without going into the details, I went through a six-hour marathon of trying different Docker images, installing dependencies, running NodeJS scripts, starting other processes, adding containers, etc. in an attempt to get motion detection&nbsp;working.</p>
+<p>Through the course of this I found that Shinobi&#8217;s documentation is quite lacking, and also that it seems to be sporadically updated. The <a href="https://shinobi.video/docs/settings">settings documentation</a> contains a lot that doesn&#8217;t seem to line up with what I&#8217;m seeing in the <span class="caps">UI</span>, and I&#8217;m not sure if it&#8217;s because the docs are out of date or because they&#8217;re ahead of the code, or a Pro vs Community Edition issue, or what. There are other places in the docs that seem horribly outdated, and many sections that seem to give conflicting&nbsp;information.</p>
+<p>At one point I also stopped and tried to configure pan/tilt control, but couldn&#8217;t find a setting for that either, so I went back to motion&nbsp;detection.</p>
+<p>Most of my frustration was based on the Motion Detection documentation page and its statements that once Motion Detection is set up you should see &#8220;Detector: Motion Connected&#8221; in the Monitor Settings, and have configuration options for motion detection. No matter what I tried - Debian or Alpine, different images, adding packages and <span class="caps">OS</span>-level dependencies, restarting the services, trying the older, no-longer-recommended plugin-based method - I couldn&#8217;t find or see the Motion Detection settings like the docs said I should. I just kept trying different things to get those settings to show up. When I was just about to give up and was searching through Shinobi&#8217;s <a href="https://forum.shinobi.video/">forums</a> for some confirmation of whether anyone could get this working, I stumbled upon a <a href="https://forum.shinobi.video/post/160">forum post</a> that mentioned something about &#8220;Advanced&nbsp;settings&#8221;.</p>
+<p>I started the containers back up and sure enough, in the far lower right corner of the Monitor Settings dialog, colored almost the same as the background, was a button that says &#8220;Simple&#8221; and has an arrow. I clicked it, selected &#8220;Advanced&#8221;, and suddenly the left sidebar of the dialog grew&#8230; to include Global Detector Settings and Control, among other&nbsp;options.</p>
+<p><a href="/GFX/shinobi4.png"><img alt="screenshot of Shinobi Monitor Settings in Advanced mode" src="/GFX/shinobi4_sm.png"></a></p>
+<p>As far as I can tell, motion detection was probably working the whole time and my six-ish hours of struggling were all for naught. The only problem I had was not changing the Monitor Settings dialog from Simple mode - which hides all motion detection and control settings - to Advanced. I&#8217;ve gone back over the documentation multiple times, and there&#8217;s not a single occurrence of the word &#8220;Advanced&#8221; on the Motion Detection page or the Settings page, and certainly nothing telling users that they need to explicitly switch to Advanced Mode to see these&nbsp;settings.</p>
+<p>At that point, I was already quite frustrated with Shinobi and felt that if this was at all indicative of the quality of documentation and user experience, I should definitely avoid it. But I at least wanted to know what its motion detection could&nbsp;do.</p>
+<p>The <a href="https://shinobi.video/docs/settings#content-detector">settings documentation for Motion Detection</a> was mostly straightforward, with the exception of a few&nbsp;settings:</p>
+<ul>
+<li><strong>Recording Timeout</strong> - &#8220;The length of time &#8220;Trigger Record&#8221; will run for. This is read in minutes.&#8221; Apparently when Shinobi detects motion it records <em>minutes</em> of video, with a minimum of one and a default of ten. This was very strange to me, especially since many motion events that I&#8217;ve seen only span a few&nbsp;seconds.</li>
+<li><strong>Timeout Reset on Next Motion</strong> - &#8220;If there is an overlap in trigger record should it reset. <strong>No:</strong> Finish the current 10 minute order.. <strong>Yes:</strong> Reset the timer&#8221;. I didn&#8217;t have to worry about this since it wasn&#8217;t visible in my&nbsp;version.</li>
+<li><strong>Save Events to <span class="caps">SQL</span></strong> - &#8220;Save Motion Events in <span class="caps">SQL</span>. This will allow display of motion over video during the time motion events occured [sic] in the Power&nbsp;Viewer.&#8221;</li>
+<li><strong>Indifference</strong> - &#8220;How much Shinobi doesn&#8217;t care about motion before doing something. The opposite of sensitivity; a lower number means it will trigger sooner. The value ranges up to 15(+) decimal places. 10 is default, 0.005 is pretty sensitive to motion changes. Note: If using Region Editor, leave this blank, and set indifference in the Region Editor (below).&#8221; So&#8230; firstly, the semantics of this are awful. Secondly, in my version, the global default (if not using Regions) isn&#8217;t 10 it&#8217;s 0.5, and the per-region default is&nbsp;0.0005.</li>
+</ul>
+<p>There were also a number of settings visible in the <span class="caps">UI</span> for the version I was running (<a href="https://github.com/ShinobiCCTV/Shinobi/commit/4bf071abb5706f9240f32617bf3bb4b8aa52f3ca">https://github.com/ShinobiCCTV/Shinobi.git &#8220;dev&#8221; branch 4bf071abb5706f9240f32617bf3bb4b8aa52f3ca</a>) that weren&#8217;t in the&nbsp;documentation:</p>
+<ul>
+<li><strong>Allow Next Trigger</strong> - &#8220;in Milliseconds&#8221;, default&nbsp;2000.</li>
+<li><strong>Send Events to <span class="caps">SQL</span></strong> - &#8220;Save Motion Events in <span class="caps">SQL</span>. This will allow display of motion over video during the time motion events occured [sic] in the Power Viewer.&#8221; As I found out later, the Power Viewer does barely anything without&nbsp;this.</li>
+</ul>
+<p>After configuring the detection settings, the documentation told me that I had to add regions (zones) or else the detection would use the full frame. I did that via an editor modal from the Monitor Settings which allows adding multiple region polygons to the video via a simple but somewhat jerky and annoying (drag too close to the edges and points won&#8217;t stick there) polygon editor. It was supposed to show the live video stream under the polygon, but that only worked once or twice for me, usually being a brown box where the video should&nbsp;be.</p>
+<p>I was happy to see that running almost-full-frame, 15fps motion detection on both video feeds was only using about <span class="caps">400MB</span> <span class="caps">RAM</span> and the equivalent of one core (on my host <span class="caps">OS</span> it showed all 8 cores running around 20%, which is pretty good since I was also running graphite, grafana, nginx, apache, MySQL, Chrome, Atom,&nbsp;etc.).</p>
+<p>One thing I immediately noticed after enabling motion detection, though, is that there&#8217;s no <span class="caps">UI</span> indication of motion events. To see motion events for a camera, you need to use the Calendar, Video List, or Power Viewer modals. The other thing I noticed immediately is that using the default &#8220;indifference&#8221; value, my outdoor camera was recording constantly. I tried adjusting this value on both cameras but it certainly wasn&#8217;t scientific; the default indifference for a zone was &#8220;0.0005&#8221; so I tried increasing it (decreasing sensitivity) by powers of 10. The best I could get that way was a point where almost everything was recorded, and then another point where it never&nbsp;triggered.</p>
+<p>After that experience, I turned to the &#8220;Power Viewer&#8221; which seemed like it might be able to solve this. The layout actually seems quite well done and useful, despite the fact that the Live View of the camera was only sporadically working for&nbsp;me.</p>
+<p><a href="/GFX/shinobi5.png"><img alt="screenshot of Shinobi Power Viewer" src="/GFX/shinobi5_sm.png"></a></p>
+<p>The main elements&nbsp;are:</p>
+<ol>
+<li><strong>Live View</strong> - This only worked sporadically for me, and I was unable to get a screenshot of it. When it worked, it showed the live stream from the&nbsp;camera.</li>
+<li><strong>Timeline</strong> - A relatively handy view of all recordings and motion events for the specified date range. It seems to default to two days, though I only had the system running and recording for an hour or so. The blue dots along the timeline represent recordings; clicking one of them brings up the recording and starts playing it. The red bars represent the count of motion detection events in each&nbsp;recording.</li>
+<li><strong>Recording</strong> - Plays the selected recording along with displaying the&nbsp;filename.</li>
+<li><strong>Playback Timer</strong> - It&#8217;s a simple playback timer for the currently-playing video. It&#8217;s clickable and draggable to advance through the&nbsp;video.</li>
+<li><strong>Motion Meter</strong> - The tooltip for this says &#8220;Motion Meter&#8221;, and the only clear documentation I could find on this says, &#8220;When motion occurs a red bar will appear under your stream to indicate how much motion has happened.&#8221; Some other documentation <em>implies</em> that this should be the detected indifference value, presumably on a scale of zero to 100, but nothing explains that specifically. This also appeared to lag quite a bit behind the video and doesn&#8217;t have a numeric output even on&nbsp;hover.</li>
+<li><strong>Motion Confidence</strong> - This is a graph over time (for the currently-playing recording) of &#8220;Motion Confidence&#8221;. I was unable to find any reference to this in the documentation and haven&#8217;t yet received a response to my <a href="https://forum.shinobi.video/topic/216/relationship-between-indifference-and-motion-confidence">forum post</a> asking about it. The numeric definitely seems different from the &#8220;Motion Meter&#8221; to me, but I don&#8217;t know what it&nbsp;means.</li>
+</ol>
+<p>At this point it seemed like Shinobi was the frontrunner in everything except motion detection, which it seemed to fail horribly at. There&#8217;s a Noise Filter setting that I tried, but I couldn&#8217;t find any clear documentation on how to tune Shinobi for motion thresholds and it certainly seemed to lack many of the advanced tuning features of <code>motion</code> such as imprinting the number of changed pixels in the frame, debug images/videos with motion highlighted, adaptive thresholds or blob detection. I decided that I might as well explore <code>motion</code> since I understand it and it&#8217;s well documented, and come back to Shinobi later if I want&nbsp;to.</p>
+<p><strong>Postscript:</strong> Some of my other notes on&nbsp;Shinobi:</p>
+<ul>
+<li>One feature I do like about Shinobi is the &#8220;Delete Motionless&#8221; toggle that apparently records all the time and then deletes recording segments that didn&#8217;t have motion detected. This seems like a <em>very</em> good idea and, if done right, could help with capturing the low-motion events leading up to an event that crosses the&nbsp;threshold.</li>
+<li>There were some annoying timezone bugs, where the <span class="caps">UI</span> showed the time in my local timezone (including the clock in the upper right corner) but the filenames and Power Viewer were using&nbsp;<span class="caps">UTC</span>.</li>
+</ul>
+<h3 id="motion"><a class="toclink" href="#motion">Motion</a></h3>
+<p>I&#8217;ve used the <a href="https://motion-project.github.io/">Motion Project</a> a few times over the years and had a pretty good impression of it - at one point I had it running motion detection with a 1080P webcam on an original Raspberry Pi Model B (700MHz <span class="caps">ARM</span> with <span class="caps">512MB</span> <span class="caps">RAM</span>). It&#8217;s an established project (the git history goes back to 2005, but the initial commit is &#8220;initial import&#8221;), written in C and highly performant, and follows the Unix philosophy of doing one thing and doing it well. The project has been recently taken over by new developers and has a new home in the <a href="https://github.com/Motion-Project">Motion-Project GitHub org</a> but the previous maintainer&#8217;s amazingly detailed and helpful wiki is still available at <a href="http://www.lavrsen.dk/foswiki/bin/view/Motion/WebHome">http://www.lavrsen.dk/foswiki/bin/view/Motion/WebHome</a>. Also note that I&#8217;m not sure about the other projects listed here, but Motion uses luminance / intensity only to detect motion, i.e. no color&nbsp;information.</p>
+<p>The main things that I remember about Motion from using it in the past (aside from feeling somewhat archaic though amazingly stable and fast)&nbsp;are:</p>
+<ul>
+<li>Tuning of thresholds as a number of changed&nbsp;pixels.</li>
+<li>For tuning, the ability to output &#8220;debug&#8221; images showing only the pixels that triggered motion&nbsp;detection.</li>
+<li>Output as videos and/or <span class="caps">JPEG</span> snapshots, but it handles everything internally as still&nbsp;frames.</li>
+<li>Ability to mask off certain parts of the frame using a manually-generated mask&nbsp;image.</li>
+<li>Ability to watermark every frame with the number of changes pixels, for&nbsp;debugging/tuning.</li>
+<li><span class="dquo">&#8220;</span>Lightswitch mode&#8221; that automatically ignores massive changes in&nbsp;brightness.</li>
+<li>Motion detection based on the largest contiguous region of changed pixels, so it&#8217;s less effected by&nbsp;wind/leaves/rain/etc.</li>
+<li>Support for multiple&nbsp;cameras.</li>
+<li>Snapshots either on a regular interval automatically, or triggered by a&nbsp;signal.</li>
+<li>Ability to execute arbitrary programs/scripts when events occur (<em>many</em> events; motion detect start and end, pictures and movies being written, event start and end,&nbsp;etc.)</li>
+<li>Built-in ability to write extremely detailed information to&nbsp;MySQL/PostgreSQL/SQLite3</li>
+<li>Highly configurable picture/video paths/filenames and overlay of text on&nbsp;images.</li>
+</ul>
+<p>Apparently since I last looked at the project, a number of major new features have been introduced&nbsp;including:</p>
+<ul>
+<li>Live streaming of incoming cam video via <span class="caps">HTTP</span>&nbsp;<span class="caps">MJPEG</span>.</li>
+<li>Motion tracking in the frame, and experimental control of tracking motion via pan/tilt camera&nbsp;controls.</li>
+<li>Control via a simple web interface, even including the ability to change/tune many settings live from the web&nbsp;interface.</li>
+<li>Automatic/adaptive noise and threshold&nbsp;control.</li>
+<li>Official support for both the RaspberryPi and <span class="caps">MUSL</span> LibC (i.e. Alpine&nbsp;Linux)</li>
+</ul>
+<p>The project also has wonderfully detailed documentation, as well as active <span class="caps">IRC</span> and mailing&nbsp;lists.</p>
+<p>While Motion only has a very basic web interface for control, there are a number of more full-featured web UIs for it including the quite popular <a href="https://github.com/ccrisan/motioneye">MotionEye</a> that uses Python and&nbsp;Tornado.</p>
+<h2 id="final-choice"><a class="toclink" href="#final-choice">Final&nbsp;Choice</a></h2>
+<p>After my frustrations with ZoneMinder, Kerberos.io, and Shinobi, I believe I&#8217;m going to be going the minimalist route and using Motion with some sort of web <span class="caps">UI</span> for motion detection, recording, and review, and the cameras&#8217; built-in <span class="caps">RSTP</span> stream for high-resolution live viewing. Given how long this post ended up being, I&#8217;ll save the Motion setup and testing for my next&nbsp;installment.</p>
+            </div>
+            <!-- /.entry-content -->
+    <hr />
+    <!-- Shariff Button BEGIN -->
+    <div class="shariff"
+        data-lang="en"
+        data-orientation="horizontal"
+        data-services = "[&quot;facebook&quot;,&quot;googleplus&quot;,&quot;twitter&quot;,&quot;linkedin&quot;,&quot;diaspora&quot;]"
+        data-theme="standard"
+        data-url="https://blog.jasonantman.com/2018/05/linux-surveillance-camera-software-evaluation/"></div>
+    <!-- Shariff Button END -->
+    <hr/>
+    <section class="comments" id="comments">
+        <h2>Comments</h2>
+
+        <div id="disqus_thread"></div>
+        <script type="text/javascript">
+            /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+            var disqus_shortname = 'jantman'; // required: replace example with your forum shortname
+
+                    var disqus_identifier = 'linux-surveillance-camera-software-evaluation';
+                var disqus_url = 'https://blog.jasonantman.com/2018/05/linux-surveillance-camera-software-evaluation/';
+
+            var disqus_config = function () {
+                this.language = "en";
+            };
+
+            /* * * DON'T EDIT BELOW THIS LINE * * */
+            (function () {
+                var dsq = document.createElement('script');
+                dsq.type = 'text/javascript';
+                dsq.async = true;
+                dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+                (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+            })();
+        </script>
+        <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by
+            Disqus.</a></noscript>
+        <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+
+    </section>
+        </article>
+    </section>
+
+        </div>
+        <div class="col-sm-3" id="sidebar">
+            <aside>
+<!-- Sidebar -->
+<section class="well well-sm">
+  <ul class="list-group list-group-flush">
+
+<!-- Sidebar/Recent Posts -->
+<li class="list-group-item">
+  <h4><i class="fa fa-home fa-lg"></i><span class="icon-label">Recent Posts</span></h4>
+  <ul class="list-group" id="recentposts">
+    <li class="list-group-item"><a href="https://blog.jasonantman.com/2018/05/linux-surveillance-camera-software-evaluation/">Linux Surveillance Camera Software&nbsp;Evaluation</a></li>
+    <li class="list-group-item"><a href="https://blog.jasonantman.com/2018/05/amcrest-ip-camera-first-impressions/">Amcrest <span class="caps">IP</span> Camera First&nbsp;Impressions</a></li>
+    <li class="list-group-item"><a href="https://blog.jasonantman.com/2018/04/aws-elasticsearch-for-ad-hoc-elb-log-analysis/"><span class="caps">AWS</span> ElasticSearch for Ad-Hoc <span class="caps">ELB</span> Log&nbsp;Analysis</a></li>
+    <li class="list-group-item"><a href="https://blog.jasonantman.com/2018/03/diy-raspberry-pi-zero-gps-track-logger/"><span class="caps">DIY</span> Raspberry Pi Zero <span class="caps">GPS</span> Track&nbsp;Logger</a></li>
+    <li class="list-group-item"><a href="https://blog.jasonantman.com/2017/10/cloud-custodian-architecture-deployment-and-policy-preprocessing/">Cloud Custodian Architecture, Deployment and Policy&nbsp;Preprocessing</a></li>
+  </ul>
+</li>
+<!-- End Sidebar/Recent Posts -->
+
+<!-- Sidebar/Twitter Timeline -->
+<li class="list-group-item">
+  <h4><i class="fa fa-twitter fa-lg"></i><span class="icon-label">Latest Tweets</span></h4>
+  <div id="twitter_timeline">
+    <a class="twitter-timeline" data-width="250" data-height="300" data-dnt="true" data-theme="light" href="https://twitter.com/j_antman">Tweets by j_antman</a> <script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
+  </div>
+</li>
+<!-- End Sidebar/Twitter Timeline -->
+
+<!-- Sidebar/Github -->
+<li class="list-group-item">
+  <h4><i class="fa fa-github fa-lg"></i><span class="icon-label">GitHub Repos</span></h4>
+  <div id="gh_repos">
+    <p class="list-group-item">Status updating...</p>
+  </div>
+  <a href="https://github.com/jantman">@jantman</a> on GitHub
+</li>
+<!-- End Sidebar/Github -->
+
+<!-- Sidebar/Links -->
+<li class="list-group-item">
+  <h4><i class="fa fa-external-link-square fa-lg"></i><span class="icon-label">Links</span></h4>
+  <ul class="list-group" id="links">
+    <li class="list-group-item">
+      <a href="http://www.jasonantman.com" target="_blank">Homepage</a>
+    </li>
+    <li class="list-group-item">
+      <a href="http://resume.jasonantman.com" target="_blank">Resume</a>
+    </li>
+  </ul>
+</li>
+<!-- End Sidebar/Links -->
+  </ul>
+</section>
+<!-- End Sidebar -->            </aside>
+        </div>
+    </div>
+</div>
+<footer>
+   <div class="container">
+      <hr>
+      <div class="row">
+         <div class="col-xs-10">&copy; 2018 Jason Antman
+            &middot; Powered by <a href="https://github.com/getpelican/pelican-themes/tree/master/pelican-bootstrap3" target="_blank">pelican-bootstrap3</a>,
+            <a href="http://docs.getpelican.com/" target="_blank">Pelican</a>,
+            <a href="http://getbootstrap.com" target="_blank">Bootstrap</a>         </div>
+         <div class="col-xs-2"><p class="pull-right"><i class="fa fa-arrow-up"></i> <a href="#">Back to top</a></p></div>
+      </div>
+   </div>
+</footer>
+<script src="https://blog.jasonantman.com/theme/js/jquery.min.js"></script>
+
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="https://blog.jasonantman.com/theme/js/bootstrap.min.js"></script>
+
+<!-- Enable responsive features in IE8 with Respond.js (https://github.com/scottjehl/Respond) -->
+<script src="https://blog.jasonantman.com/theme/js/respond.min.js"></script>
+
+
+
+    <!-- GITHUB_REPOS_JSON (explicitly pinned repos ) -->
+  <script id="GithubReposJson" type="application/json">
+  [{"description": "A script and python module to check your AWS service limits and usage via boto.", "name": "awslimitchecker", "html_url": "https://github.com/jantman/awslimitchecker"}, {"description": "Puppet module and accompanying documentation to install/setup Arch linux on a MacBook Pro Retina 11,4", "name": "puppet-archlinux-macbookretina", "html_url": "https://github.com/jantman/puppet-archlinux-macbookretina"}, {"description": "A collection of my standalone scripts to small/quick for their own repos. All kinds of useful stuff.", "name": "misc-scripts", "html_url": "https://github.com/jantman/misc-scripts"}, {"description": "Responsive Flask/SQLAlchemy personal finance app, specifically for biweekly budgeting.", "name": "biweeklybudget", "html_url": "https://github.com/jantman/biweeklybudget"}, {"description": "A standard to easily communicate to humans and machines the development/support and usability status of software repositories/projects.", "name": "repostatus.org", "html_url": "https://github.com/jantman/repostatus.org"}, {"description": "Python/selenium script to get Xfinity bandwidth usage", "name": "xfinity-usage", "html_url": "https://github.com/jantman/xfinity-usage"}]
+  </script>
+
+<!-- GitHub JS Code -->
+<script type="text/javascript">
+$(document).ready(function () {
+  if (!window.jXHR) {
+    var jxhr = document.createElement('script');
+    jxhr.type = 'text/javascript';
+    jxhr.src = 'https://blog.jasonantman.com/theme/js/jXHR.js';
+    var s = document.getElementsByTagName('script')[0];
+    s.parentNode.insertBefore(jxhr, s);
+  }
+
+  console.log($('#GithubReposJson').html());
+  github.showSpecificRepos({
+    user: 'jantman',
+    target: '#gh_repos',
+    repos: JSON.parse($('#GithubReposJson').html())
+  });
+});
+</script>
+<script src="https://blog.jasonantman.com/theme/js/github.js" type="text/javascript"></script>
+<!-- End GitHub JS Code -->
+    <!-- Disqus -->
+    <script type="text/javascript">
+        /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+        var disqus_shortname = 'jantman'; // required: replace example with your forum shortname
+
+        /* * * DON'T EDIT BELOW THIS LINE * * */
+        (function () {
+            var s = document.createElement('script');
+            s.async = true;
+            s.type = 'text/javascript';
+            s.src = '//' + disqus_shortname + '.disqus.com/count.js';
+            (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+        }());
+    </script>
+    <!-- End Disqus Code -->
+    <!-- Google Analytics Universal -->
+    <script type="text/javascript">
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+        ga('create', 'UA-2718127-2', 'jasonantman.com');
+        ga('send', 'pageview');
+    </script>
+    <!-- End Google Analytics Universal Code -->
+
+
+    <!-- add shariff support -->
+    <script src="https://blog.jasonantman.com/theme/js/shariff.min.js"></script>
+</body>
+</html>
