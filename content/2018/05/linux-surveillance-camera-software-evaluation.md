@@ -6,7 +6,8 @@ Category: Projects
 Tags: amcrest, camera, security, surveillance, video, linux, IP camera, evaluation
 Slug: linux-surveillance-camera-software-evaluation
 Summary: My evaluation of some options for streaming and motion-activated recording of IP cameras.
-Status: draft
+
+[TOC]
 
 In my last post, [Amcrest IP Camera First Impressions](/2018/05/amcrest-ip-camera-first-impressions/), I went over what I'd found about the pair of IP cameras that I bought to keep an eye on my dogs and my new house. My next step was to figure out how I'd handle motion-activated recording, and that's what I'll discuss this time. I've spent all of my spare time in the past week - probably twenty to thirty hours - researching and experimenting and the results have actually been quite surprising.
 
@@ -108,14 +109,109 @@ Aside from my old standby of Motion, the last candidate on my list was [Shinobi]
 
 > Shinobi is Open Source, written in Node.js, and real easy to use. It is the future of CCTV and NVR for developers and end-users alike. It is catered to by professionals and most importantly by the one who created it.
 
-After seeing what's happening under the hood of ZoneMinder, this certainly got my attention, as did the general modern open-source community feel of the site. Granted, I initially missed the section comparing Shinobi CE (Community Edition; GPLv3) and Shinobi Pro (Professional but free for non-commercial use; Creative Commons) and that Community Edition is "updated only for major changes or bug fixes."
+After seeing what's happening under the hood of ZoneMinder, this certainly got my attention, as did the general modern open-source community feel of the site. Granted, I initially missed the section comparing Shinobi CE (Community Edition; GPLv3) and Shinobi Pro (Professional but free for non-commercial use; Creative Commons) and that Community Edition is "updated only for major changes or bug fixes." But the [current features list](https://github.com/ShinobiCCTV/Shinobi/blob/2bc74064da5484545d86fce9cf95db74ace0db48/README.md#key-aspects) includes most of what I wanted (even audio recording too, from my ProHD)
 
-Docker.
+First I headed over to the [Dockerfiles from Shinobi's author](https://github.com/moeiscool/docker-shinobi). I had some issues with the Alpine-based vatiant and decided to give the Debian ones a try. One ``docker-compose up`` and some patience later, I had two containers running: camera and cron. I immediately hit the web port and got a login box, which confused me with invalid logins for a while until I went back and re-read the [installation docs](https://shinobi.video/docs/start) and realized that Shinobi supports multiple users, and I had to login via ``/super`` (superuser) to set up a user account for myself. I did that and logged in as a regular user, and was greeted with a clean, modern, responsive UI.
+
+Not being one to read documentation for end-user software, I muddled around in the UI a bit until I managed to add my two cameras. It wasn't terribly difficult: click the "+" icon in the top left of the UI (tooltip says, "Add Monitor") and fill out the form. One early problem I had adding the first camera is that the URL parsing discards query strings. I added my Amcrest ProHD with its primary stream URL, which has a path of ``/cam/realmonitor?channel=1&subtype=0``. The stream didn't work and when I went back into the settings to edit it, the query string had been discarded. I just changed the "Automatic" (parsing of URL) to "No" and manually entered the protocol, host, port, authentication and path details myself, and it worked fine. Shinobi has a very nice interface for adding cameras, and one of the things I liked the most was the ability to choose the streaming details for the live stream; it supports Poseidon, JPEG, MJPEG, FLV, HLS (with audio) or a custom base64-over-websockets. The HLS stream also allows selection of video and audio codecs including copying the source codec (which is what I did). There's also an option for a CGI-style JPEG snapshot API.
+
+[![screenshot of Shinobi dialog to add a monitor](/GFX/shinobi1_sm.png)](/GFX/shinobi1.png)
+
+The UI is smooth and modern, with a fully responsive design that apparently works on mobile too (though I didn't test it). It even includes nice dropdown menus and mouseover menus for streams that  include snapshot, start/stop recording, pop-out, recording list, calendar of events, monitor/stream settings, and fullscreen. It also includes something called the "Power Viewer" that I'll discuss later.
+
+[![screenshot of Shinobi with mouseover controls for streams](/GFX/shinobi2_sm.png)](/GFX/shinobi2.png)
+
+Within a few minutes, I had both cameras up and running with their full resolution H.264 RTSP streams (1920x1080 and 1280x960, respectively) at 15fps. The camera streams are shown by clicking on the camera in the left sidebar, and the stream windows can be resized by dragging the lower right corner (though it doesn't keep the aspect ratio) and rearranged via drag-and-drop.
+
+[![screenshot of Shinobi with both streams](/GFX/shinobi3_sm.png)](/GFX/shinobi3.png)
+
+I was happy to see that, in this configuration with video streaming but not being analyzed, the Docker containers were only using a combined total of about 5% of my CPU and 100MB RAM. I tried some experiments with snapshots (they force-download) and manually-requested recordings and was quite happy with both. I did have some occasional issues with live streams freezing if I refreshed the page, but they resumed fine if I logged back in. The calendar interface seemed handy - it shows a monthly calendar with the time, camera name, and size of each recording for each day - and the videos list for each camera lists the start and end time, filename, and size of each video for each camera, along with buttons to preview (on the same dialog), watch (fullscreen-ish in the viewer), download, and delete.
+
+This all seemed wonderful, so I figured it was time to enable motion detection. Well... little did I know that would be a six-hour struggle. The [documentation on Motion detection](https://shinobi.video/docs/motion) is separate, and states that motion detection isn't built-in because not everybody wants it and it has dependencies, which is also started at other places on their site. The [first section on the Motion detection docs page](https://shinobi.video/docs/motion#content-use-builtin) says that it's now built-in and people should just use that, but is rather easy to miss (the section heading is at the same level as "Install on Ubuntu/Debian", "Install on CentOS/Fedora", etc.) and doesn't explicitly say whether there are external dependencies or not. Without going into the details, I went through a six-hour marathon of trying different Docker images, installing dependencies, running NodeJS scripts, starting other processes, adding containers, etc. in an attempt to get motion detection working.
+
+Through the course of this I found that Shinobi's documentation is quite lacking, and also that it seems to be sporadically updated. The [settings documentation](https://shinobi.video/docs/settings) contains a lot that doesn't seem to line up with what I'm seeing in the UI, and I'm not sure if it's because the docs are out of date or because they're ahead of the code, or a Pro vs Community Edition issue, or what. There are other places in the docs that seem horribly outdated, and many sections that seem to give conflicting information.
+
+At one point I also stopped and tried to configure pan/tilt control, but couldn't find a setting for that either, so I went back to motion detection.
+
+Most of my frustration was based on the Motion Detection documentation page and its statements that once Motion Detection is set up you should see "Detector: Motion Connected" in the Monitor Settings, and have configuration options for motion detection. No matter what I tried - Debian or Alpine, different images, adding packages and OS-level dependencies, restarting the services, trying the older, no-longer-recommended plugin-based method - I couldn't find or see the Motion Detection settings like the docs said I should. I just kept trying different things to get those settings to show up. When I was just about to give up and was searching through Shinobi's [forums](https://forum.shinobi.video/) for some confirmation of whether anyone could get this working, I stumbled upon a [forum post](https://forum.shinobi.video/post/160) that mentioned something about "Advanced settings".
+
+I started the containers back up and sure enough, in the far lower right corner of the Monitor Settings dialog, colored almost the same as the background, was a button that says "Simple" and has an arrow. I clicked it, selected "Advanced", and suddenly the left sidebar of the dialog grew... to include Global Detector Settings and Control, among other options.
+
+[![screenshot of Shinobi Monitor Settings in Advanced mode](/GFX/shinobi4_sm.png)](/GFX/shinobi4.png)
+
+As far as I can tell, motion detection was probably working the whole time and my six-ish hours of struggling were all for naught. The only problem I had was not changing the Monitor Settings dialog from Simple mode - which hides all motion detection and control settings - to Advanced. I've gone back over the documentation multiple times, and there's not a single occurrence of the word "Advanced" on the Motion Detection page or the Settings page, and certainly nothing telling users that they need to explicitly switch to Advanced Mode to see these settings.
+
+At that point, I was already quite frustrated with Shinobi and felt that if this was at all indicative of the quality of documentation and user experience, I should definitely avoid it. But I at least wanted to know what its motion detection could do.
+
+The [settings documentation for Motion Detection](https://shinobi.video/docs/settings#content-detector) was mostly straightforward, with the exception of a few settings:
+
+* __Recording Timeout__ - "The length of time "Trigger Record" will run for. This is read in minutes." Apparently when Shinobi detects motion it records _minutes_ of video, with a minimum of one and a default of ten. This was very strange to me, especially since many motion events that I've seen only span a few seconds.
+* __Timeout Reset on Next Motion__ - "If there is an overlap in trigger record should it reset. __No:__ Finish the current 10 minute order.. __Yes:__ Reset the timer". I didn't have to worry about this since it wasn't visible in my version.
+* __Save Events to SQL__ - "Save Motion Events in SQL. This will allow display of motion over video during the time motion events occured in the Power Viewer."
+* __Indifference__ - "How much Shinobi doesn't care about motion before doing something. The opposite of sensitivity; a lower number means it will trigger sooner. The value ranges up to 15(+) decimal places. 10 is default, 0.005 is pretty sensitive to motion changes. Note: If using Region Editor, leave this blank, and set indifference in the Region Editor (below)." So... firstly, the semantics of this are awful. Secondly, in my version, the global default (if not using Regions) isn't 10 it's 0.5, and the per-region default is 0.0005.
+
+There were also a number of settings visible in the UI for the version I was running ([https://github.com/ShinobiCCTV/Shinobi.git "dev" branch 4bf071abb5706f9240f32617bf3bb4b8aa52f3ca](https://github.com/ShinobiCCTV/Shinobi/commit/4bf071abb5706f9240f32617bf3bb4b8aa52f3ca)) that weren't in the documentation:
+
+* __Allow Next Trigger__ - "in Milliseconds", default 2000.
+* __Send Events to SQL__ - "Save Motion Events in SQL. This will allow display of motion over video during the time motion events occured [sic] in the Power Viewer." As I found out later, the Power Viewer does barely anything without this.
+
+After configuring the detection settings, the documentation told me that I had to add regions (zones) or else the detection would use the full frame. I did that via an editor modal from the Monitor Settings which allows adding multiple region polygons to the video via a simple but somewhat jerky and annoying (drag too close to the edges and points won't stick there) polygon editor. It was supposed to show the live video stream under the polygon, but that only worked once or twice for me, usually being a brown box where the video should be.
+
+I was happy to see that running almost-full-frame, 15fps motion detection on both video feeds was only using about 400MB RAM and the equivalent of one core (on my host OS it showed all 8 cores running around 20%, which is pretty good since I was also running graphite, grafana, nginx, apache, MySQL, Chrome, Atom, etc.).
+
+One thing I immediately noticed after enabling motion detection, though, is that there's no UI indication of motion events. To see motion events for a camera, you need to use the Calendar, Video List, or Power Viewer modals. The other thing I noticed immediately is that using the default "indifference" value, my outdoor camera was recording constantly. I tried adjusting this value on both cameras but it certainly wasn't scientific; the default indifference for a zone was "0.0005" so I tried increasing it (decreasing sensitivity) by powers of 10. The best I could get that way was a point where almost everything was recorded, and then another point where it never triggered.
+
+After that experience, I turned to the "Power Viewer" which seemed like it might be able to solve this. The layout actually seems quite well done and useful, despite the fact that the Live View of the camera was only sporadically working for me.
+
+[![screenshot of Shinobi Power Viewer](/GFX/shinobi5_sm.png)](/GFX/shinobi5.png)
+
+The main elements are:
+
+1. __Live View__ - This only worked sporadically for me, and I was unable to get a screenshot of it. When it worked, it showed the live stream from the camera.
+2. __Timeline__ - A relatively handy view of all recordings and motion events for the specified date range. It seems to default to two days, though I only had the system running and recording for an hour or so. The blue dots along the timeline represent recordings; clicking one of them brings up the recording and starts playing it. The red bars represent the count of motion detection events in each recording.
+3. __Recording__ - Plays the selected recording along with displaying the filename.
+4. __Playback Timer__ - It's a simple playback timer for the currently-playing video. It's clickable and draggable to advance through the video.
+5. __Motion Meter__ - The tooltip for this says "Motion Meter", and the only clear documentation I could find on this says, "When motion occurs a red bar will appear under your stream to indicate how much motion has happened." Some other documentation _implies_ that this should be the detected indifference value, presumably on a scale of zero to 100, but nothing explains that specifically. This also appeared to lag quite a bit behind the video and doesn't have a numeric output even on hover.
+6. __Motion Confidence__ - This is a graph over time (for the currently-playing recording) of "Motion Confidence". I was unable to find any reference to this in the documentation and haven't yet received a response to my [forum post](https://forum.shinobi.video/topic/216/relationship-between-indifference-and-motion-confidence) asking about it. The numeric definitely seems different from the "Motion Meter" to me, but I don't know what it means.
+
+At this point it seemed like Shinobi was the frontrunner in everything except motion detection, which it seemed to fail horribly at. There's a Noise Filter setting that I tried, but I couldn't find any clear documentation on how to tune Shinobi for motion thresholds and it certainly seemed to lack many of the advanced tuning features of ``motion`` such as imprinting the number of changed pixels in the frame, debug images/videos with motion highlighted, adaptive thresholds or blob detection. I decided that I might as well explore ``motion`` since I understand it and it's well documented, and come back to Shinobi later if I want to.
+
+__Postscript:__ Some of my other notes on Shinobi:
+
+* One feature I do like about Shinobi is the "Delete Motionless" toggle that apparently records all the time and then deletes recording segments that didn't have motion detected. This seems like a _very_ good idea and, if done right, could help with capturing the low-motion events leading up to an event that crosses the threshold.
+* There were some annoying timezone bugs, where the UI showed the time in my local timezone (including the clock in the upper right corner) but the filenames and Power Viewer were using UTC.
 
 ### Motion
 
-* [Motion](https://motion-project.github.io/) (recently taken over by new developers; the original and very helpful wiki is at [https://www.lavrsen.dk/foswiki/bin/view/Motion/WebHome](https://www.lavrsen.dk/foswiki/bin/view/Motion/WebHome)) is
+I've used the [Motion Project](https://motion-project.github.io/) a few times over the years and had a pretty good impression of it - at one point I had it running motion detection with a 1080P webcam on an original Raspberry Pi Model B (700MHz ARM with 512MB RAM). It's an established project (the git history goes back to 2005, but the initial commit is "initial import"), written in C and highly performant, and follows the Unix philosophy of doing one thing and doing it well. The project has been recently taken over by new developers and has a new home in the [Motion-Project GitHub org](https://github.com/Motion-Project) but the previous maintainer's amazingly detailed and helpful wiki is still available at [http://www.lavrsen.dk/foswiki/bin/view/Motion/WebHome](http://www.lavrsen.dk/foswiki/bin/view/Motion/WebHome). Also note that I'm not sure about the other projects listed here, but Motion uses luminance / intensity only to detect motion, i.e. no color information.
 
-Apparently Motion has been taken over by new developers and has undergone some major improvements recently; it certainly can do a lot more than when I first investigated it five or six years ago.
+The main things that I remember about Motion from using it in the past (aside from feeling somewhat archaic though amazingly stable and fast) are:
+
+* Tuning of thresholds as a number of changed pixels.
+* For tuning, the ability to output "debug" images showing only the pixels that triggered motion detection.
+* Output as videos and/or JPEG snapshots, but it handles everything internally as still frames.
+* Ability to mask off certain parts of the frame using a manually-generated mask image.
+* Ability to watermark every frame with the number of changes pixels, for debugging/tuning.
+* "Lightswitch mode" that automatically ignores massive changes in brightness.
+* Motion detection based on the largest contiguous region of changed pixels, so it's less effected by wind/leaves/rain/etc.
+* Support for multiple cameras.
+* Snapshots either on a regular interval automatically, or triggered by a signal.
+* Ability to execute arbitrary programs/scripts when events occur (_many_ events; motion detect start and end, pictures and movies being written, event start and end, etc.)
+* Built-in ability to write extremely detailed information to MySQL/PostgreSQL/SQLite3
+* Highly configurable picture/video paths/filenames and overlay of text on images.
+
+Apparently since I last looked at the project, a number of major new features have been introduced including:
+
+* Live streaming of incoming cam video via HTTP MJPEG.
+* Motion tracking in the frame, and experimental control of tracking motion via pan/tilt camera controls.
+* Control via a simple web interface, even including the ability to change/tune many settings live from the web interface.
+* Automatic/adaptive noise and threshold control.
+* Official support for both the RaspberryPi and MUSL LibC (i.e. Alpine Linux)
+
+The project also has wonderfully detailed documentation, as well as active IRC and mailing lists.
+
+While Motion only has a very basic web interface for control, there are a number of more full-featured web UIs for it including the quite popular [MotionEye](https://github.com/ccrisan/motioneye) that uses Python and Tornado.
 
 ## Final Choice
+
+After my frustrations with ZoneMinder, Kerberos.io, and Shinobi, I believe I'm going to be going the minimalist route and using Motion with some sort of web UI for motion detection, recording, and review, and the cameras' built-in RSTP stream for high-resolution live viewing. Given how long this post ended up being, I'll save the Motion setup and testing for my next installment.

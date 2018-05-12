@@ -12,6 +12,8 @@ Summary: My first impressions on interfacing with Amcrest IP cameras
 
 I'm going to be moving to a new area at the end of the month and will be leaving my dogs home alone during the days I work in the office - and my home unattended - on a regular basis for the first time. While the neighborhood I'm moving to seems safe, I wanted some peace of mind about both the security of my new home and the well-being of my dogs when I'm out. While I've set up a [DIY RaspberryPi-based security system](https://blog.jasonantman.com/2016/01/raspberry-pi-security-system/) in a past apartment, that won't help knowing that my dogs are doing OK (and the house I'm moving to isn't wired for a security system). While I may look into setting up a security system in the future (likely based on [Z-Wave](https://en.wikipedia.org/wiki/Z-Wave) wireless components), I decided that some IP-based surveillance cameras are the best way to achieve my short-term need. I recently bought some of them, and want to share my experience.
 
+__Update:__ The next post in this series is up, [Linux Surveillance Camera Software Evaluation](/2018/05/linux-surveillance-camera-software-evaluation).
+
 # Devices and Purchase
 
 I started my search with the hardware compatibility lists of [Motion](http://www.lavrsen.dk/foswiki/bin/view/Motion/WorkingDevices) and [ZoneMinder](https://wiki.zoneminder.com/Hardware_Compatibility_List), the most well-known (albeit rather aged) open source video motion detection projects. I figured that most likely I'd be using one of these to detect and alert on motion; I've used Motion before quite successfully but it is a daemon only whereas ZoneMinder offers a full web interface. The outcome of my research was that most decent modern IP-based surveillance cameras support the [ONVIF](https://en.wikipedia.org/wiki/ONVIF) interoperability standard, and almost any camera that supports ONVIF and third-party clients (i.e. unencrypted video streams) should work.
@@ -285,3 +287,5 @@ To wrap up, I currently have two Amcrest IP cameras running on my home network; 
 * Possibly using [python-amcrest](http://python-amcrest.readthedocs.io/) as a wrapper around the CGI interface.
 * Figuring out a system to notify me of important events such as motion, video loss, or connectivity loss to a camera.
 * The cameras support SD cards and a built-in simple DVR feature. I may get cards for them and configure them to record on network connection loss, just as a test.
+
+__Update:__ The next post in this series is up, [Linux Surveillance Camera Software Evaluation](/2018/05/linux-surveillance-camera-software-evaluation).
