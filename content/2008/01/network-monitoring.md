@@ -35,7 +35,7 @@ Monitor](http://www.groundworkopensource.com/products/os-overview.html)
 [Zenoss](http://www.zenoss.com/product/core) ("Core" free version and a
 paid-for Enterprise version), [Zabbix](http://www.zabbix.com/),
 [OpenNMS](http://www.opennms.org), and
-[Munin](http://munin.projects.linpro.no/),
+[Munin](http://munin-monitoring.org/),
 [Cacti](http://www.cacti.net/), or one of the other
 [MRTG](http://oss.oetiker.ch/mrtg/)-/RRD-based applications for
 graphing/trending.
