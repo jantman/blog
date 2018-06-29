@@ -159,11 +159,11 @@ https://groups.google.com/forum/#!topic/darknet/tVMLWKDqXNM
 
 ### Door/Window and Motion Sensors
 
-https://www.amazon.com/gp/product/B01MQXXG0I/ref=od_aui_detailpages00?ie=UTF8&psc=1
+https://www.amazon.com/gp/product/B01MQXXG0I/
 
-https://www.amazon.com/gp/product/B00X0AWA6E/ref=od_aui_detailpages00?ie=UTF8&psc=1
+https://www.amazon.com/gp/product/B00X0AWA6E/
 
-https://www.amazon.com/gp/product/B01N5HB4U5/ref=od_aui_detailpages01?ie=UTF8&psc=1
+https://www.amazon.com/gp/product/B01N5HB4U5/
 
 ### Thermostat
 
