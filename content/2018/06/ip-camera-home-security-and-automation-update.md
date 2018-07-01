@@ -151,6 +151,8 @@ For the "Image check" tests, I do the following:
 
 ### Neural Network Object Detection
 
+[I wrote an object-detection add-on for ZM - ZoneMinder Forums](https://forums.zoneminder.com/viewtopic.php?f=36&t=26222)
+
 https://www.amazon.com/gp/product/B00BLTE8HK/
 
 https://groups.google.com/forum/#!topic/darknet/tVMLWKDqXNM
