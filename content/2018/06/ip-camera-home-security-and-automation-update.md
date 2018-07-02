@@ -1,12 +1,11 @@
 Title: IP Camera, Home Security and Automation Update
-Date: 2018-06-27 17:49
-Modified: 2018-06-27 17:49
+Date: 2018-07-02 06:10
+Modified: 2018-07-02 06:10
 Author: Jason Antman
 Category: Projects
-Tags: amcrest, camera, security, surveillance, video, linux, IP camera, evaluation, alarm, IR, homeassistant, hass, automation, z-wave
+Tags: amcrest, camera, security, surveillance, video, linux, IP camera, evaluation, alarm, IR, homeassistant, hass, automation, z-wave, darknet, yolo, machine learning, neural network, object detection
 Slug: ip-camera-home-security-and-automation-update
 Summary: An update on my IP camera and home security project, now branching out into home automation and machine learning as well.
-Status: draft
 
 [TOC]
 
@@ -100,6 +99,11 @@ My notification script simply looks at each event, checks if the first frame is 
 and the last is black and white or vice-versa, and if so suppresses the notification
 and renames the Event in ZoneMinder for later cleanup.
 
+__There is one issue with this method,__ when ZoneMinder loses signal from a camera it
+generates a completely blue frame until signal is regained. I've only had this happen
+once, but at some point I plan on modifying the above to ignore the blue "loss of signal"
+frames.
+
 ### Monitoring
 
 At this point I decided that I was sufficiently close to having a minimally-usable system that
@@ -122,7 +126,7 @@ single-page web view of the current Dynamo contents.
 
 The checks that I'm currently running are:
 
-* System load average
+* System load average<sup>1</sup>
 * Disk free space as reported by ZoneMinder
 * ZoneMinder daemon status as reported by API
 * ZoneMinder Run State (one of my custom values, not "stopped")
@@ -149,26 +153,29 @@ For the "Image check" tests, I do the following:
 4. Use the PIL ``getextrema()`` function to ensure that there's more than one color in the image (i.e. fail if it's an all-blue "signal lost" or an all-black image).
 5. Ensure that the histogram of the image has more than 20 distinct buckets / pixel values.
 
+<sup>1</sup> I've usually found Load Average to be an often misunderstood metric, and one that people rely on much too often (generally without knowing enough about it). ZoneMinder exposes it prominently in the UI as one of the three health metrics, and while I'm not sure I agree with this, it _is_ a good metric for the specific workload of this particular system of mine. If you'd like to learn more about Load Average as a performance metric on modern Linux systems, system performance expert and current Senior Performance Architect at Netflix Brendan Gregg has an excellent blog post, [Linux Load Averages: Solving the Mystery](http://www.brendangregg.com/blog/2017-08-08/linux-load-averages.html).
+
 ### Neural Network Object Detection
 
-When I was researching how other ZoneMinder users are attempting to reduce false positives, I came by a [post on the ZoneMinder Forums](https://forums.zoneminder.com/viewtopic.php?f=36&t=26222) from someone who is using [Joseph Redmon's Darknet yolo3](https://pjreddie.com/darknet/yolo/) neutral network object detection implementation for detecting and localizing meaningful changes in ZoneMinder's captured frames. This idea immediately appealed to me; if I could reliably tell whether a frame contains a person, for my purposes as a security system, nothing else really matters. I was also very interested in Darknet yolo3 as it is simple to build and distributes pre-trained models - my initial testing was as simple as cloning a repo, downloading a few files, running ``make``, and then running the included command-line script on a JPEG image. I was pretty amazed at how accurately it recognized the person, car, and dogs in the image I selected. There is also a Python wrapper around yolo3, [yolo34py](https://github.com/madhawav/YOLO3-4-Py), which I found quite easy to use.
+When I was researching how other ZoneMinder users are attempting to reduce false positives, I came by a [post on the ZoneMinder Forums](https://forums.zoneminder.com/viewtopic.php?f=36&t=26222) from someone who is using [Joseph Redmon's Darknet yolo3](https://pjreddie.com/darknet/yolo/) neutral network object detection implementation for detecting and localizing meaningful changes in ZoneMinder's captured frames. This idea immediately appealed to me; if I could reliably tell whether a frame contains a person, for my purposes as a security system, that would completely solve the environmental false positive problem. I was also very interested in Darknet yolo3 as it is simple to build and distributes pre-trained models - my initial testing was as simple as cloning a repo, downloading a few files, running ``make``, and then running the included command-line script on a JPEG image. I was pretty amazed at how accurately it recognized the person, car, and dogs in the image I selected. There is also a Python wrapper around yolo3, [yolo34py](https://github.com/madhawav/YOLO3-4-Py), which I found quite easy to use.
 
 Using yolo34py I was able to relatively quickly add object detection to my Python-based ZoneMinder event notification script. Over three or four days of testing, I found yolo3 using the pre-trained model to be _extremely_ accurate across all of the events my camera captured. The one down side was that, running on my Intel i7-2600 at 3.4GHz, it was taking a full _ten to fifteen seconds per frame_ to run the object detection. That's fine for testing, but if I were to rely on this as an alarm system, I'd want something considerably faster.
 
-A cursory glance at the Darknet documentation told me what I already knew - though I have no prior experience with either - that running neural network image processing with any reasonable speed requires a GPU. I decided that I could allocate around $100 to speeding up the detection, given the Darknet documentation's claim of a 10x or better speedup on a GPU. I found that about the best GPU I could afford on Amazon was a 1GB Nvidia Quadro K600, so I purchased [this](https://www.amazon.com/gp/product/B00BLTE8HK/) PNY card.
+A cursory glance at the Darknet documentation told me what I already knew - though I have no prior experience with the subject - that running neural network image processing with any reasonable speed requires a GPU. I decided that I could allocate around $100 to speeding up the detection given the Darknet documentation's claim of a 10x or better speedup on a GPU. I found that about the best $100 GPU I could get on Amazon was a 1GB Nvidia Quadro K600, so I purchased [this](https://www.amazon.com/gp/product/B00BLTE8HK/) PNY card.
 
 When I got the card and requisite software installed and recompiled Darknet with CUDA support and attempted to run detection on an image, I was rather dismayed to be greeted with an error message:
 
 > 0 CUDA Error: out of memory
+>
 > darknet: ./src/cuda.c:36: check_error: Assertion `0` failed.
 
-Unfortunately, after just googling that error for Darknet, I found quite a few GitHub issues and mailing list threads explaining that Darknet Yolo3's default (and most accurate) model requires about 3.6GB of GPU memory, far too much for my 1GB card (at the moment, this translates to a new card costing at least $500 or easily twice that).
+Unfortunately, after just googling that error for Darknet, I found quite a few GitHub issues and mailing list threads explaining that Darknet Yolo3's default (and most accurate) model requires about 3.6GB of GPU memory, far too much for my 1GB card (at the moment, 4GB GPUs start at $500USD).
 
 Luckily for the fate of my project, Darknet also has a pre-trained "tiny" model designed to work for low-memory GPUs - like the apparently-puny one I just bought. The project states that its accuracy is only about 2-3% lower, though the results I've seen are noticeably inferior especially when two objects are in close proximity or overlap. For the time being, I'm still getting notified by my Python script for every motion detection event, along with the YOLO object detection results. I'm saving every event that has questionable results for later comparison against the full (albeit slow, running on CPU) model and possibly other object detection tools.
 
 ## HomeAssistant and Z-Wave
 
-Just before I began experimenting with Darknet object detection, I decided that the number of false positive motion detection events I was receiving merited investigation into a more classic alarm system approach. I also received a coupon for the [SimpliSafe](https://simplisafe.com/) home security system in my address change packet from the USPS. After a fair amount of investigation I decided that there weren't any off-the-shelf wireless home alarm systems that seemed attractive to me (I don't really need central monitoring, but I do need to be able to access the system and status programmatically) but there is a wide array of alarm system components using the [Z-Wave](http://www.z-wave.com/) radio technology that seemed suitable.
+Just before I began experimenting with Darknet object detection, I decided that the number of false positive motion detection events I was receiving merited investigation into a more classic alarm system approach. I also received a coupon for the [SimpliSafe](https://simplisafe.com/) home security system in my address change packet from the USPS. After a fair amount of investigation I decided that there weren't any off-the-shelf wireless home alarm systems that seemed attractive to me (I don't really need central monitoring, but I do need to be able to access the system and status programmatically) but this did get me doing some research, and I found there is a wide array of alarm system components using the [Z-Wave](http://www.z-wave.com/) radio technology that seemed suitable for a DIY system.
 
 One of my colleagues speaks quite highly of [HomeAssistant](https://www.home-assistant.io/), an open source (though Apache licensed) home automation suite written in Python3. Browsing through the project's website and documentation, I became reasonably confident that it could handle my needs for an alarm system (it has a fair amount of built-in logic for this use case, and other people actively use it for this) and that it also integrates natively with Z-Wave. Even better, it also has a native integration with ZoneMinder to tie the two systems together.
 
@@ -190,7 +197,10 @@ So far I'm quite happy with it. I had some initial concerns - even though the de
 
 ## What's Next
 
-* GPU and image analysis to reduce false positives
-* More cameras
-* Door and motion sensors
-* Actual alarm alerts, pan interior camera to alert location, and possibly lights/siren
+This past weekend I purchased two more outdoor Amcrest WiFi cameras - this time the [IP2M-852W](https://amcrest.com/amcrest-prohd-outdoor-1080p-wifi-wireless-ip-security-bullet-camera-ip67-weatherproof-1080p-1920tvl-ip2m-852w-white.html) 1080P models with an impressive 128º field of view - to complete my camera coverage, as well as a few more of the same [Z-Wave door/window sensors](https://www.amazon.com/gp/product/B01N5HB4U5/), a pair of Z-Wave lightbulbs to try, and some well-reviewed [ZOOZ Z-Wave 4-in-1 sensors](https://www.amazon.com/gp/product/B01AKSO80O/) that combine motion sensors with light level, temperature, and humidity. Over the next week or two I'll be installing all of that to finally finish the system, and also spending quite a bit of time customizing HomeAssistant to be the heart of it all. I'll share my experiences in follow-up posts, but some of the things I have planned include:
+
+* Experimenting with some other machine-learning-based object detection implementations
+* Localizing detected objects to a ZoneMinder zone in the image, and using that to determine whether to alarm or not
+* Modifying the ZoneMinder HomeAssistant integration to know about run states
+* Using HomeAssistant's alarm control panel component to implement real alarm system logic, with notifications to my phone
+* Having my Amcrest ProHD pan/tilt camera, which has clear line of sight to both front and back doors, pan to a door and capture a snapshot when the door sensor activates.

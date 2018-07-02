@@ -9,6 +9,8 @@ Summary: My evaluation of some options for streaming and motion-activated record
 
 [TOC]
 
+__Update:__ The next post in this series is up, [IP Camera, Home Security and Automation Update](/2018/07/ip-camera-home-security-and-automation-update).
+
 In my last post, [Amcrest IP Camera First Impressions](/2018/05/amcrest-ip-camera-first-impressions/), I went over what I'd found about the pair of IP cameras that I bought to keep an eye on my dogs and my new house. My next step was to figure out how I'd handle motion-activated recording, and that's what I'll discuss this time. I've spent all of my spare time in the past week - probably twenty to thirty hours - researching and experimenting and the results have actually been quite surprising.
 
 ## Initial Requirements
