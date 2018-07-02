@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="en" prefix="og: http://ogp.me/ns# fb: https://www.facebook.com/2008/fbml">
+<head>
+    <title>IP Camera, Home Security and Automation Update - Jason Antman's Blog</title>
+    <!-- Using the latest rendering mode for IE -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+
+<link rel="canonical" href="https://blog.jasonantman.com/2018/07/ip-camera-home-security-and-automation-update/">
+
+        <meta name="author" content="Jason Antman" />
+        <meta name="keywords" content="amcrest,camera,security,surveillance,video,linux,IP camera,evaluation,alarm,IR,homeassistant,hass,automation,z-wave,darknet,yolo,machine learning,neural network,object detection" />
+        <meta name="description" content="An update on my IP camera and home security project, now branching out into home automation and machine learning as well." />
+
+        <meta property="og:site_name" content="Jason Antman's Blog" />
+        <meta property="og:type" content="article"/>
+        <meta property="og:title" content="IP Camera, Home Security and Automation Update"/>
+        <meta property="og:url" content="https://blog.jasonantman.com/2018/07/ip-camera-home-security-and-automation-update/"/>
+        <meta property="og:description" content="An update on my IP camera and home security project, now branching out into home automation and machine learning as well."/>
+        <meta property="article:published_time" content="2018-07-02" />
+            <meta property="article:section" content="Projects" />
+            <meta property="article:tag" content="amcrest" />
+            <meta property="article:tag" content="camera" />
+            <meta property="article:tag" content="security" />
+            <meta property="article:tag" content="surveillance" />
+            <meta property="article:tag" content="video" />
+            <meta property="article:tag" content="linux" />
+            <meta property="article:tag" content="IP camera" />
+            <meta property="article:tag" content="evaluation" />
+            <meta property="article:tag" content="alarm" />
+            <meta property="article:tag" content="IR" />
+            <meta property="article:tag" content="homeassistant" />
+            <meta property="article:tag" content="hass" />
+            <meta property="article:tag" content="automation" />
+            <meta property="article:tag" content="z-wave" />
+            <meta property="article:tag" content="darknet" />
+            <meta property="article:tag" content="yolo" />
+            <meta property="article:tag" content="machine learning" />
+            <meta property="article:tag" content="neural network" />
+            <meta property="article:tag" content="object detection" />
+            <meta property="article:author" content="Jason Antman" />
+
+
+
+    <!-- Bootstrap -->
+        <link rel="stylesheet" href="https://blog.jasonantman.com/theme/css/bootstrap.flatly.min.css" type="text/css"/>
+    <link href="https://blog.jasonantman.com/theme/css/font-awesome.min.css" rel="stylesheet">
+
+    <link href="https://blog.jasonantman.com/theme/css/pygments/default.css" rel="stylesheet">
+        <link href="https://blog.jasonantman.com/theme/css/typogrify.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://blog.jasonantman.com/theme/css/style.css" type="text/css"/>
+        <link href="https://blog.jasonantman.com/theme/css/shariff/shariff.min.css" rel="stylesheet">
+
+    <link rel="stylesheet" href="https://blog.jasonantman.com/theme/css/forkongithub.min.css" type="text/css" />
+
+        <link href="https://blog.jasonantman.com/feeds/all.atom.xml" type="application/atom+xml" rel="alternate"
+              title="Jason Antman's Blog ATOM Feed"/>
+
+        <link href="https://blog.jasonantman.com/feeds/all.rss.xml" type="application/rss+xml" rel="alternate"
+              title="Jason Antman's Blog RSS Feed"/>
+
+
+        <link href="https://blog.jasonantman.com/feeds/categories/projects.atom.xml" type="application/atom+xml" rel="alternate"
+              title="Jason Antman's Blog Projects ATOM Feed"/>
+
+</head>
+<body>
+
+<div class="navbar navbar-default navbar-fixed-top" role="navigation">
+	<div class="container">
+<span id="forkongithub"><a href="https://github.com/jantman/blog">Fork me on GitHub</a></span>        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="https://blog.jasonantman.com/" class="navbar-brand">
+Jason Antman's Blog            </a>
+        </div>
+        <div class="collapse navbar-collapse navbar-ex1-collapse">
+            <ul class="nav navbar-nav">
+                         <li><a href="https://blog.jasonantman.com/pages/about.html">
+                             About&nbsp;Me
+                          </a></li>
+                        <li >
+                            <a href="https://blog.jasonantman.com/categories/ideas-and-rants/index.html">Ideas and rants</a>
+                        </li>
+                        <li >
+                            <a href="https://blog.jasonantman.com/categories/miscellaneous/index.html">Miscellaneous</a>
+                        </li>
+                        <li >
+                            <a href="https://blog.jasonantman.com/categories/monitoring/index.html">Monitoring</a>
+                        </li>
+                        <li >
+                            <a href="https://blog.jasonantman.com/categories/ops/index.html">Ops</a>
+                        </li>
+                        <li class="active">
+                            <a href="https://blog.jasonantman.com/categories/projects/index.html">Projects</a>
+                        </li>
+                        <li >
+                            <a href="https://blog.jasonantman.com/categories/puppet/index.html">Puppet</a>
+                        </li>
+                        <li >
+                            <a href="https://blog.jasonantman.com/categories/tech-howtos/index.html">Tech howtos</a>
+                        </li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+              <li><a href="https://blog.jasonantman.com/archives.html"><i class="fa fa-th-list"></i><span class="icon-label">Archives</span></a></li>
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+</div> <!-- /.navbar -->
+<!-- Banner -->
+<!-- End Banner -->
+<div class="container">
+    <div class="row">
+        <div class="col-sm-9">
+    <section id="content">
+        <article>
+            <header class="page-header">
+                <h1>
+                    <a href="https://blog.jasonantman.com/2018/07/ip-camera-home-security-and-automation-update/"
+                       rel="bookmark"
+                       title="Permalink to IP Camera, Home Security and Automation Update">
+                        <span class="caps">IP</span> Camera, Home Security and Automation&nbsp;Update
+                    </a>
+                </h1>
+            </header>
+            <div class="entry-content">
+                <div class="panel">
+                    <div class="panel-body">
+<footer class="post-info">
+    <span class="label label-default">Date</span>
+    <span class="published">
+        <i class="fa fa-calendar"></i><time datetime="2018-07-02T06:10:00-04:00"> Mon 02 July 2018</time>
+    </span>
+
+
+
+
+
+<span class="label label-default">Tags</span>
+	<a href="https://blog.jasonantman.com/tags/amcrest/index.html">amcrest</a>
+        /
+	<a href="https://blog.jasonantman.com/tags/camera/index.html">camera</a>
+        /
+	<a href="https://blog.jasonantman.com/tags/security/index.html">security</a>
+        /
+	<a href="https://blog.jasonantman.com/tags/surveillance/index.html">surveillance</a>
+        /
+	<a href="https://blog.jasonantman.com/tags/video/index.html">video</a>
+        /
+	<a href="https://blog.jasonantman.com/tags/linux/index.html">linux</a>
+        /
+	<a href="https://blog.jasonantman.com/tags/ip-camera/index.html">IP camera</a>
+        /
+	<a href="https://blog.jasonantman.com/tags/evaluation/index.html">evaluation</a>
+        /
+	<a href="https://blog.jasonantman.com/tags/alarm/index.html">alarm</a>
+        /
+	<a href="https://blog.jasonantman.com/tags/ir/index.html">IR</a>
+        /
+	<a href="https://blog.jasonantman.com/tags/homeassistant/index.html">homeassistant</a>
+        /
+	<a href="https://blog.jasonantman.com/tags/hass/index.html">hass</a>
+        /
+	<a href="https://blog.jasonantman.com/tags/automation/index.html">automation</a>
+        /
+	<a href="https://blog.jasonantman.com/tags/z-wave/index.html">z-wave</a>
+        /
+	<a href="https://blog.jasonantman.com/tags/darknet/index.html">darknet</a>
+        /
+	<a href="https://blog.jasonantman.com/tags/yolo/index.html">yolo</a>
+        /
+	<a href="https://blog.jasonantman.com/tags/machine-learning/index.html">machine learning</a>
+        /
+	<a href="https://blog.jasonantman.com/tags/neural-network/index.html">neural network</a>
+        /
+	<a href="https://blog.jasonantman.com/tags/object-detection/index.html">object detection</a>
+    
+</footer><!-- /.post-info -->                    </div>
+                </div>
+                <div class="toc">
+<ul>
+<li><a href="#amcrest-cameras">Amcrest Cameras</a><ul>
+<li><a href="#ir-illuminator"><span class="caps">IR</span>&nbsp;Illuminator</a></li>
+</ul>
+</li>
+<li><a href="#surveillance-software-zoneminder">Surveillance Software - ZoneMinder</a><ul>
+<li><a href="#notifications">Notifications</a></li>
+<li><a href="#image-processing-ir-switch-detection">Image Processing - <span class="caps">IR</span> Switch&nbsp;Detection</a></li>
+<li><a href="#monitoring">Monitoring</a></li>
+<li><a href="#neural-network-object-detection">Neural Network Object&nbsp;Detection</a></li>
+</ul>
+</li>
+<li><a href="#homeassistant-and-z-wave">HomeAssistant and Z-Wave</a><ul>
+<li><a href="#doorwindow-and-motion-sensors">Door/Window and Motion&nbsp;Sensors</a></li>
+<li><a href="#thermostat">Thermostat</a></li>
+</ul>
+</li>
+<li><a href="#whats-next">What&#8217;s&nbsp;Next</a></li>
+</ul>
+</div>
+<p>Last month I posted about my <a href="/2018/05/linux-surveillance-camera-software-evaluation/">Linux Surveillance Camera Software Evaluation</a> and my plans for turning some Amcrest <span class="caps">IP</span> cameras into a home security system. I&#8217;ve made a lot of progress and some big changes since then and decided that I had better post an update before the effort of doing so becomes overwhelming. There are a lot of changes and new information, and some really cool plans for the future (this has become my new obsession, albeit a prohibitively expensive one), so I&#8217;ll break this up into a number of&nbsp;sections.</p>
+<h2 id="amcrest-cameras"><a class="toclink" href="#amcrest-cameras">Amcrest&nbsp;Cameras</a></h2>
+<p>I&#8217;m extremely happy with the two Amcrest cameras I purchased, and am planning to add two more at some point in the near future to cover the rest of the exterior of my house. The one I currently have outside is an Amcrest <a href="https://amcrest.com/amcrest-1-3mp-bullt-wifi-video-security-ip-camera-pt-ipm-723w.html"><span class="caps">IPM</span>-723W</a> WiFi camera with a 1.<span class="caps">3MP</span> 1280x960 resolution and a 92º field of view. It&#8217;s a decent camera and the resolution is perfectly adequate but I wouldn&#8217;t mind a bit more, and more importantly, both sides of my house would benefit a lot from a winder field of view. I believe I&#8217;ve settled on two Amcrest <a href="https://amcrest.com/amcrest-prohd-outdoor-1080p-wifi-wireless-ip-security-bullet-camera-ip67-weatherproof-1080p-1920tvl-ip2m-852w-white.html"><span class="caps">IP2M</span>-852W</a>, which are similar outdoor WiFi cameras but with 1920x1080 resolution and a super-wide 128º field of&nbsp;view.</p>
+<p>I received some questions via email after writing this post about the Amcrest cameras with Linux as well as the security of them. I think I&#8217;m quite happy with both, but both with some caveats. First of all, regarding security, I&#8217;m skeptical of the security of any proprietary software (especially from a small vendor or one not in the software business) and generally expect all IoT devices to have abysmal security. When I originally purchased the devices, I blocked all Internet-bound traffic from them at my router before even plugging them in. For the time being at least, I&#8217;m going to assume that to be enough for my needs. I certainly wouldn&#8217;t expose these directly to the Internet or allow them to access both the Internet and my home network, as is the case for any consumer-oriented&nbsp;devices.</p>
+<p>I&#8217;ve also received some questions about the Linux support for Amcrest cameras. My experience so far has been consistent with my <a href="/2018/05/amcrest-ip-camera-first-impressions/">Amcrest <span class="caps">IP</span> Camera First Impressions - Jason Antman&#8217;s Blog</a>. The cameras certainly work fine under Linux in general; they can be fully controlled and configured via any browser and you can view the low-resolution <span class="caps">MJPEG</span> stream in any browser. Viewing the full-resolution <span class="caps">RTSP</span> stream requires either the Amcrest Web View Chrome app or a viewer that supports <span class="caps">RTSP</span> streams (<span class="caps">VLC</span> or any common surveillance camera software). Aside from watching the stream in <span class="caps">VLC</span> or Amcrest Web View while I was outside aiming the camera, I&#8217;ve been using either the low-res <span class="caps">MJPEG</span> stream in a browser or, more recently ZoneMinder and HomeAssistant, to view it. Unless you want a closed-source native desktop app, I can&#8217;t find any meaningful difference between how the cameras work on Linux vs Mac or presumably&nbsp;Windows.</p>
+<h3 id="ir-illuminator"><a class="toclink" href="#ir-illuminator"><span class="caps">IR</span>&nbsp;Illuminator</a></h3>
+<p>My first step in attempting to reduce false-positive motion detection caused by flying bugs at night was purchasing an external <span class="caps">IR</span> illuminator. I opted for a 12V <span class="caps">DC</span> model on amazon that uses the same power supply as the camera (I purchased a splitter for them), the
+<a href="https://www.amazon.com/gp/product/B01G6EDOO2/">Univivi 850nm 12 <span class="caps">LED</span> Wide Angle <span class="caps">IR</span> Illuminator</a>. It&#8217;s a large-ish unit that looks much like a <span class="caps">LED</span> floodlight, except that when on it emits only a barely-visible red glow from the LEDs. This has helped immensely; I have it placed about a foot and a half away from the camera and it has dramatically cut down on (but not eliminated) the number of times that the motion detection is triggered at night by moths and other light-seeking insects. That being said, with some of the advances I&#8217;ve made in other areas (read on) I probably won&#8217;t be replicating this for my other cameras, at least not initially. I <em>will</em> also remark that the light output from this unit isn&#8217;t wide enough to cover the camera&#8217;s whole field of view, and it does suffer from some definite hot&nbsp;spots.</p>
+<p>Here&#8217;s a view of the camera and <span class="caps">IR</span> illuminator during the&nbsp;day:</p>
+<p><a href="/GFX/ir_illuminator_day.jpg"><img alt="camera and IR illuminator as installed, during the day" src="/GFX/ir_illuminator_day_sm.jpg"></a></p>
+<p>And here&#8217;s a view of it at night. Note that this was taken in almost total darkness and to the human eye the illuminator only emits a barely-visible red glow; unfortunately this photo does more to illustrate how sensitive my phone camera is to <span class="caps">IR</span> than what it actually looks&nbsp;like.</p>
+<p><a href="/GFX/ir_illuminator_night.jpg"><img alt="camera and IR illuminator at night" src="/GFX/ir_illuminator_night_sm.jpg"></a></p>
+<h2 id="surveillance-software-zoneminder"><a class="toclink" href="#surveillance-software-zoneminder">Surveillance Software -&nbsp;ZoneMinder</a></h2>
+<p>When I last posted I&#8217;d done an <a href="/2018/05/linux-surveillance-camera-software-evaluation/">evaluation</a> of a number of options for Linux-based video surveillance, discounted ZoneMinder mainly because of its age, resource requirements, and difficulty getting it running in Docker. I ended up settling on the <a href="https://motion-project.github.io/">Motion Project</a> (<code>motion</code>) because of its simplicity and low resource requirements. Unfortunately, that path ended up being a dead&nbsp;end.</p>
+<p>I spent quite a bit of time tuning motion and developing a horribly simple proof-of-concept web interface for it (the defunct project lives at <a href="https://github.com/jantman/motion-pipeline">https://github.com/jantman/motion-pipeline</a> if anyone is interested) and playing with masks and various values to get reliable motion detection at 1920x1080 10fps on a RaspberryPi 3B+. While I eventually got that working including notifications with images, it failed completely when I installed the camera in its final environment - the exterior of my house. No matter how hard I tried, I couldn&#8217;t get the motion detection to capture legitimate events but ignore the large amounts of shadow motion when wind caught the trees around my house. I hadn&#8217;t considered this relatively obvious issue when I did my initial tests at my former (and relatively tree-free) apartment complex. It&#8217;s also worth noting that when running motion detection at 1920x1080 10fps, the RaspberryPi 3B+ was essentially at its limits; if I wanted to add another camera of equal resolution and frame rate I&#8217;d need a Pi per&nbsp;camera.</p>
+<p>After that non-starter I remembered that the motion detection algorithm in <code>motion</code> only takes luminance into account (effectively a black-and-white image) but ZoneMinder uses full color in its motion detection. So, I decided to take another look at ZoneMinder. After some initial hiccups I decided to just install the <code>zoneminder</code> package on the RaspberryPi 3B+ running Debian 9. After a bit of setup, I had it running and processing 1920x1080 10fps on the Pi. This taxed the system quite a bit and the web <span class="caps">UI</span> was almost unusably sluggish, but it was enough for me to get <span class="caps">ZM</span> up and running and to prove that its motion detection algorithm handles clouds and shadows <em>much</em> better than <code>motion</code>.</p>
+<p>It was apparent that if I wanted to make use of <span class="caps">ZM</span> with multiple cameras and also have it be useful and reliable, I needed significantly better hardware than the RaspberryPi. After some searching on Amazon, I found a <a href="https://www.amazon.com/gp/product/B01KWP82CK/">refurbished <span class="caps">HP</span> Elite 8200 small-form-factor desktop</a> on Amazon for $300. It was quite a bit more money than I&#8217;d wanted to put into this system, but with an Intel Core i7-2600 with four cores (plus hyper-threading) at 3.4GHz, <span class="caps">16GB</span> memory and a <span class="caps">2TB</span> spinning disk, I figured it would be more than adequate for four or more cameras (in fact the specs are shockingly close to my desktop computer, which was quite beefy when I built it three or four years&nbsp;ago).</p>
+<p>That machine arrived two weeks ago and I installed Debian 9 on it along with the official ZoneMinder package, and it&#8217;s performing amazingly well. With one camera at 1920x1080 10fps in monitor mode and another at 1280x960 10fps in motion detection (Modect) mode, the system barely breaks a sweat with half of its memory free and half or three-quarters of the <span class="caps">CPU</span> cores idle. <span class="caps">ZM</span> is performing exceedingly well, with the web <span class="caps">UI</span> fast and streaming working very well. I&#8217;m still having some false positives from shadows when it gets very windy, but I have a plan for addressing that as well. Overall I&#8217;m really glad I switched to ZoneMinder with decent hardware, and plan on further improving and expanding this set-up in the&nbsp;future.</p>
+<h3 id="notifications"><a class="toclink" href="#notifications">Notifications</a></h3>
+<p>One thing that ZoneMinder completely lacks is the built-in ability to notify immediately on new events/alarms. The closest that it has are &#8220;filters&#8221;, which run at a configurable interval (usually 60 seconds) and can be set to send email or execute an external command for new alarms. Unfortunately there are some issues around how they&#8217;re configured that result in either notification storms or severe delays when multiple short events happen in rapid succession. After using this method for a few days and researching other possibilities, I found the <a href="https://github.com/pliablepixels/zmeventserver">zmeventserver</a> project, a daemon written in Perl that polls the ZoneMinder shared memory map for new events at a short interval and pushes them to clients via a websocket server. After some initial experimentation, I unashamedly hacked up the Perl source, ripped out the websocket server, and modified it to execute a shell command with the event <span class="caps">ID</span> as an argument (backgrounded with <code>&amp;</code> so as not to tie up the Perl&nbsp;code).</p>
+<p>For my event handler script I wrote something in Python that grabs the details of the event directly from ZoneMinder&#8217;s database, along with the first and best (most motion) frames, and sends them to me via email and Pushover. I&#8217;ve added a bit more to the script but it&#8217;s still quite a hack-ish proof-of-concept and too rough to share, but there&#8217;s really nothing terribly complicated about it: it gets called with ZoneMinder&#8217;s EventId, looks up that event and a bunch of related stuff in the database, and then generates an email and Pushover notification. I&#8217;m not sure if I&#8217;m going to keep using this or try to push most of the logic into HomeAssistant (see below); if I do stick with this script, I&#8217;ll make an effort to clean it up and publish the&nbsp;code.</p>
+<h3 id="image-processing-ir-switch-detection"><a class="toclink" href="#image-processing-ir-switch-detection">Image Processing - <span class="caps">IR</span> Switch&nbsp;Detection</a></h3>
+<p>Once I got ZoneMinder relatively well tuned for motion detection in my environment and notifications up and running, my first bit of intelligence in the alerting process was disregarding events when the camera switched from visible light to infra-red mode. This <span class="caps">IR</span> switch occurs twice a day - visible to <span class="caps">IR</span> around dusk and <span class="caps">IR</span> to visible around dawn - and was a bit of an annoyance to me. When the switch-over happens, virtually all pixels in the image go white for a frame or two and the image switches between color and black and white. My gut reaction was to ignore events with a massive percentage of changed pixels around dawn or dusk, but that seemed too uncertain. With a bit of thought, I realized that detecting a change from color to black-and-white (or vice-versa) should be rather&nbsp;straightforward.</p>
+<p>As the script was already written in Python, I installed <a href="https://pillow.readthedocs.io/">pillow</a>, a modern fork of the Python Imaging Library, and came up with the following snippet to tell whether a specific Frame from ZoneMinder is color or black-and-white (note this is a partial snippet with a lot of unrelated code&nbsp;removed):</p>
+<div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn"><span class="caps">PIL</span></span> <span class="kn">import</span> <span class="n">Image</span>
+
+<span class="k">class</span> <span class="nc">Frame</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+      <span class="c1"># lots of internals redacted here...</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">filename</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">event</span><span class="o">.</span><span class="n">frame_fmt</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">FrameId</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">path</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">event</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">filename</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">is_color</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">img</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">image</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Finding if image is color or not for </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+        <span class="n">bands</span> <span class="o">=</span> <span class="n">img</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+        <span class="n">histos</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">histogram</span><span class="p">()</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">bands</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">histos</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="o">==</span> <span class="n">histos</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
+            <span class="k">return</span> <span class="bp">False</span>
+        <span class="k">return</span> <span class="bp">True</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">image</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_image</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_image</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Loading image for </span><span class="si">%s</span><span class="s1"> from: </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_image</span> <span class="o">=</span> <span class="n">Image</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_image</span>
+</pre></div>
+
+
+<p>This loads the <span class="caps">JPEG</span> image (frame) from ZoneMinder as a <span class="caps">PIL</span> <code>Image</code>, splits the image
+into its color-component bands (red, green, and blue), and then checks if the histograms
+of the three color bands are identical. If so, the image is&nbsp;black-and-white.</p>
+<p>My notification script simply looks at each event, checks if the first frame is color
+and the last is black and white or vice-versa, and if so suppresses the notification
+and renames the Event in ZoneMinder for later&nbsp;cleanup.</p>
+<p><strong>There is one issue with this method,</strong> when ZoneMinder loses signal from a camera it
+generates a completely blue frame until signal is regained. I&#8217;ve only had this happen
+once, but at some point I plan on modifying the above to ignore the blue &#8220;loss of signal&#8221;&nbsp;frames.</p>
+<h3 id="monitoring"><a class="toclink" href="#monitoring">Monitoring</a></h3>
+<p>At this point I decided that I was sufficiently close to having a minimally-usable system that
+I should turn my attention to monitoring it, and making sure I&#8217;m alerted if it stops working.
+Since I&#8217;ve moved all of my personal services to <span class="caps">AWS</span>, I didn&#8217;t have an existing monitoring
+infrastructure for anything running in my home. Not wanting anything too heavy-weight or
+complicated, and having an existing Lambda function to handle re-notification of CloudWatch
+alarms, I hacked a &#8220;monitoring system&#8221; together using that Lambda function and <span class="caps">API</span> Gateway
+in a few&nbsp;hours.</p>
+<p>The functionality is relatively simple: every five minutes a Python script runs on my ZoneMinder
+system that does a bunch of checks and <span class="caps">POSTS</span> them to <span class="caps">API</span> Gateway as a <span class="caps">JSON</span> array of results. The
+POSTed data for each check includes the timestamp, a check name, a boolean <code>is_ok</code> field, and
+an optional string with additional information. <span class="caps">API</span> Gateway writes this information to DynamoDB,
+and triggers a Lambda function if any of the <code>is_ok</code> fields changed from true to false. The
+Lambda is also run every 30 minutes, and notifies me via email or text message if any of the
+check <code>is_ok</code> fields is False <em>or</em> if any of the timestamp values are more than 10 minutes old.
+For now, this should suffice as a really simple monitoring system. I also have a quick and simple
+single-page web view of the current Dynamo&nbsp;contents.</p>
+<p>The checks that I&#8217;m currently running&nbsp;are:</p>
+<ul>
+<li>System load average<sup>1</sup></li>
+<li>Disk free space as reported by&nbsp;ZoneMinder</li>
+<li>ZoneMinder daemon status as reported by&nbsp;<span class="caps">API</span></li>
+<li>ZoneMinder Run State (one of my custom values, not&nbsp;&#8220;stopped&#8221;)</li>
+<li>ZoneMinder <span class="caps">SHM</span>&nbsp;free</li>
+<li>ZoneMinder status as reported by <code>zmpkg.pl</code> (&#8220;running&#8221;)</li>
+<li>ZoneMinder <span class="caps">UI</span> - page loads and has a link to my primary&nbsp;camera</li>
+<li>zmdc process&nbsp;running</li>
+<li>zmwatch process&nbsp;running</li>
+<li>My custom event server process running (based on zmeventnotification.pl; see&nbsp;above)</li>
+<li>For each&nbsp;camera:</li>
+<li>Direct image check against the Amcrest&nbsp;camera</li>
+<li>Camera&nbsp;enabled</li>
+<li>Image check via&nbsp;ZoneMinder</li>
+<li>zmu frame&nbsp;rate</li>
+<li>zmu last frame&nbsp;time</li>
+<li>zmc process&nbsp;running</li>
+<li>zma process running if Monitor is set to a motion-detecting&nbsp;state</li>
+</ul>
+<p>For the &#8220;Image check&#8221; tests, I do the&nbsp;following:</p>
+<ol>
+<li>Retrieve the binary image from the camera or&nbsp;<span class="caps">ZM</span></li>
+<li>Use the python <code>imghdr.what()</code> function to ensure it&#8217;s a <span class="caps">JPEG</span>&nbsp;image</li>
+<li>Ensure that the size of the image matches what <span class="caps">ZM</span> thinks the monitor size&nbsp;is</li>
+<li>Use the <span class="caps">PIL</span> <code>getextrema()</code> function to ensure that there&#8217;s more than one color in the image (i.e. fail if it&#8217;s an all-blue &#8220;signal lost&#8221; or an all-black&nbsp;image).</li>
+<li>Ensure that the histogram of the image has more than 20 distinct buckets / pixel&nbsp;values.</li>
+</ol>
+<p><sup>1</sup> I&#8217;ve usually found Load Average to be an often misunderstood metric, and one that people rely on much too often (generally without knowing enough about it). ZoneMinder exposes it prominently in the <span class="caps">UI</span> as one of the three health metrics, and while I&#8217;m not sure I agree with this, it <em>is</em> a good metric for the specific workload of this particular system of mine. If you&#8217;d like to learn more about Load Average as a performance metric on modern Linux systems, system performance expert and current Senior Performance Architect at Netflix Brendan Gregg has an excellent blog post, <a href="http://www.brendangregg.com/blog/2017-08-08/linux-load-averages.html">Linux Load Averages: Solving the Mystery</a>.</p>
+<h3 id="neural-network-object-detection"><a class="toclink" href="#neural-network-object-detection">Neural Network Object&nbsp;Detection</a></h3>
+<p>When I was researching how other ZoneMinder users are attempting to reduce false positives, I came by a <a href="https://forums.zoneminder.com/viewtopic.php?f=36&amp;t=26222">post on the ZoneMinder Forums</a> from someone who is using <a href="https://pjreddie.com/darknet/yolo/">Joseph Redmon&#8217;s Darknet yolo3</a> neutral network object detection implementation for detecting and localizing meaningful changes in ZoneMinder&#8217;s captured frames. This idea immediately appealed to me; if I could reliably tell whether a frame contains a person, for my purposes as a security system, that would completely solve the environmental false positive problem. I was also very interested in Darknet yolo3 as it is simple to build and distributes pre-trained models - my initial testing was as simple as cloning a repo, downloading a few files, running <code>make</code>, and then running the included command-line script on a <span class="caps">JPEG</span> image. I was pretty amazed at how accurately it recognized the person, car, and dogs in the image I selected. There is also a Python wrapper around yolo3, <a href="https://github.com/madhawav/YOLO3-4-Py">yolo34py</a>, which I found quite easy to&nbsp;use.</p>
+<p>Using yolo34py I was able to relatively quickly add object detection to my Python-based ZoneMinder event notification script. Over three or four days of testing, I found yolo3 using the pre-trained model to be <em>extremely</em> accurate across all of the events my camera captured. The one down side was that, running on my Intel i7-2600 at 3.4GHz, it was taking a full <em>ten to fifteen seconds per frame</em> to run the object detection. That&#8217;s fine for testing, but if I were to rely on this as an alarm system, I&#8217;d want something considerably&nbsp;faster.</p>
+<p>A cursory glance at the Darknet documentation told me what I already knew - though I have no prior experience with the subject - that running neural network image processing with any reasonable speed requires a <span class="caps">GPU</span>. I decided that I could allocate around $100 to speeding up the detection given the Darknet documentation&#8217;s claim of a 10x or better speedup on a <span class="caps">GPU</span>. I found that about the best $100 <span class="caps">GPU</span> I could get on Amazon was a <span class="caps">1GB</span> Nvidia Quadro K600, so I purchased <a href="https://www.amazon.com/gp/product/B00BLTE8HK/">this</a> <span class="caps">PNY</span>&nbsp;card.</p>
+<p>When I got the card and requisite software installed and recompiled Darknet with <span class="caps">CUDA</span> support and attempted to run detection on an image, I was rather dismayed to be greeted with an error&nbsp;message:</p>
+<blockquote>
+<p>0 <span class="caps">CUDA</span> Error: out of&nbsp;memory</p>
+<p>darknet: ./src/cuda.c:36: check_error: Assertion <code>0</code> failed.</p>
+</blockquote>
+<p>Unfortunately, after just googling that error for Darknet, I found quite a few GitHub issues and mailing list threads explaining that Darknet Yolo3&#8217;s default (and most accurate) model requires about 3.<span class="caps">6GB</span> of <span class="caps">GPU</span> memory, far too much for my <span class="caps">1GB</span> card (at the moment, <span class="caps">4GB</span> GPUs start at&nbsp;$<span class="caps">500USD</span>).</p>
+<p>Luckily for the fate of my project, Darknet also has a pre-trained &#8220;tiny&#8221; model designed to work for low-memory GPUs - like the apparently-puny one I just bought. The project states that its accuracy is only about 2-3% lower, though the results I&#8217;ve seen are noticeably inferior especially when two objects are in close proximity or overlap. For the time being, I&#8217;m still getting notified by my Python script for every motion detection event, along with the <span class="caps">YOLO</span> object detection results. I&#8217;m saving every event that has questionable results for later comparison against the full (albeit slow, running on <span class="caps">CPU</span>) model and possibly other object detection&nbsp;tools.</p>
+<h2 id="homeassistant-and-z-wave"><a class="toclink" href="#homeassistant-and-z-wave">HomeAssistant and&nbsp;Z-Wave</a></h2>
+<p>Just before I began experimenting with Darknet object detection, I decided that the number of false positive motion detection events I was receiving merited investigation into a more classic alarm system approach. I also received a coupon for the <a href="https://simplisafe.com/">SimpliSafe</a> home security system in my address change packet from the <span class="caps">USPS</span>. After a fair amount of investigation I decided that there weren&#8217;t any off-the-shelf wireless home alarm systems that seemed attractive to me (I don&#8217;t really need central monitoring, but I do need to be able to access the system and status programmatically) but this did get me doing some research, and I found there is a wide array of alarm system components using the <a href="http://www.z-wave.com/">Z-Wave</a> radio technology that seemed suitable for a <span class="caps">DIY</span>&nbsp;system.</p>
+<p>One of my colleagues speaks quite highly of <a href="https://www.home-assistant.io/">HomeAssistant</a>, an open source (though Apache licensed) home automation suite written in Python3. Browsing through the project&#8217;s website and documentation, I became reasonably confident that it could handle my needs for an alarm system (it has a fair amount of built-in logic for this use case, and other people actively use it for this) and that it also integrates natively with Z-Wave. Even better, it also has a native integration with ZoneMinder to tie the two systems&nbsp;together.</p>
+<p>I&#8217;m really, <em>really</em> liking HomeAssistant so far, but I&#8217;ll leave the details of that for a future&nbsp;post.</p>
+<h3 id="doorwindow-and-motion-sensors"><a class="toclink" href="#doorwindow-and-motion-sensors">Door/Window and Motion&nbsp;Sensors</a></h3>
+<p>After a bit of research, I determined that I wanted Z-Wave Plus components for their better (than none) security and advanced features and purchased some initial Z-Wave components to test from Amazon: a <span class="caps">USB</span> <a href="https://www.amazon.com/gp/product/B00X0AWA6E/">Aeotec Gen5 Z-Stick</a> Z-Wave controller for $45, an <a href="https://www.amazon.com/gp/product/B01N5HB4U5/">Ecolink Z-Wave Plus magnetic Door/Window sensor</a> for $30, and an <a href="https://www.amazon.com/gp/product/B01MQXXG0I/">Ecolink Z-Wave Plus <span class="caps">PIR</span> Motion Sensor</a> for $40. I figured that was a reasonable enough price to test the system and determine how well it works, and either move forward or return the&nbsp;items.</p>
+<p>So far I&#8217;ve had the Z-Wave components running via HomeAssistant for seven days, with the door sensor on my front door and the motion sensor placed atop the adjacent window. I&#8217;ve configured HomeAssistant to do nothing more than notify me via Pushover when the door opens or motion is sensed. So far in a week, I&#8217;ve received zero false-positive alarms and zero false-negative alarms, so I&#8217;m quite happy. The motion or door opening signals make it from the sensors to HomeAssistant, out to Pushover, and to my phone within one to three seconds, which seems quite reasonable to me. The &#8220;pet immunity&#8221; on the motion sensor <em>is</em> still triggered by my two dogs walking around, but that&#8217;s rather expected since they&#8217;re fifty-five and seventy pounds, respectively, and not a problem since they&#8217;re crated whenever I&#8217;m not home. I&#8217;m quite happy with the performance of both of these sensors so&nbsp;far.</p>
+<h3 id="thermostat"><a class="toclink" href="#thermostat">Thermostat</a></h3>
+<p>Last weekend, after unpacking and enabling my two <a href="https://github.com/jantman/pi2graphite">RaspberryPi-to-Graphite temperature sensors</a>, I finally determined that I&#8217;m not going crazy but the thermostat in my house was. It was wildly inaccurate, and letting the house overheat during the day and then over-cooling at night. I knew I had to replace it and, having seen that HomeAssistant supports climate control systems, immediately remembered my dream of having a computer-controlled thermostat that I briefly <a href="https://github.com/jantman/RPyMostat">explored</a> since I first built a <a href="https://github.com/jantman/tuxostat">crude solution</a> back <a href="http://blog.jasonantman.com/2008/06/new-project/">in 2008</a>.</p>
+<p>After a short search on Amazon, I found the <a href="https://www.amazon.com/gp/product/B0095P7B80/">Iris <span class="caps">CT</span>-101 Z-Wave thermostat</a>. It&#8217;s a touchscreen 7-day programmable thermostat with Z-Wave, essentially the same unit as the <a href="http://www.radiothermostat.com/products/">Radio Thermostat <span class="caps">CT</span>-101</a> but intended to work with the Lowes Iris home automation system. A number of the positive reviews mentioned it working with HomeAssistant or other F/<span class="caps">OSS</span> home automation systems, and the $40 price was well below most networked thermostats and about the same as a normal &#8220;dumb&#8221; 7-day thermostat at local&nbsp;stores.</p>
+<p>So far I&#8217;m quite happy with it. I had some initial concerns - even though the device is constantly powered and even a Z-Wave repeater, I had to configure HomeAssistant to explicitly poll it on a regular interval for up-to-date information - but now that I&#8217;ve figured it out, the thermostat seems to be working quite well. I can view the current and target temperatures, the operational/power status of my <span class="caps">HVAC</span> system&#8217;s fan and compressor, and set the target temperature and on/off controls. The unit <em>does</em> show up as two separate controls - heating and cooling - but that seems to be the standard for Z-Wave climate controls and logically matches up with the physical thermostat&#8217;s &#8220;heat/off/cool&#8221; controls. I haven&#8217;t done any automation with it yet, but at a minimum this should make it easy for me to control heating and cooling based on different temperature sensors throughout the house at different times of&nbsp;day.</p>
+<h2 id="whats-next"><a class="toclink" href="#whats-next">What&#8217;s&nbsp;Next</a></h2>
+<p>This past weekend I purchased two more outdoor Amcrest WiFi cameras - this time the <a href="https://amcrest.com/amcrest-prohd-outdoor-1080p-wifi-wireless-ip-security-bullet-camera-ip67-weatherproof-1080p-1920tvl-ip2m-852w-white.html"><span class="caps">IP2M</span>-852W</a> 1080P models with an impressive 128º field of view - to complete my camera coverage, as well as a few more of the same <a href="https://www.amazon.com/gp/product/B01N5HB4U5/">Z-Wave door/window sensors</a>, a pair of Z-Wave lightbulbs to try, and some well-reviewed <a href="https://www.amazon.com/gp/product/B01AKSO80O/"><span class="caps">ZOOZ</span> Z-Wave 4-in-1 sensors</a> that combine motion sensors with light level, temperature, and humidity. Over the next week or two I&#8217;ll be installing all of that to finally finish the system, and also spending quite a bit of time customizing HomeAssistant to be the heart of it all. I&#8217;ll share my experiences in follow-up posts, but some of the things I have planned&nbsp;include:</p>
+<ul>
+<li>Experimenting with some other machine-learning-based object detection&nbsp;implementations</li>
+<li>Localizing detected objects to a ZoneMinder zone in the image, and using that to determine whether to alarm or&nbsp;not</li>
+<li>Modifying the ZoneMinder HomeAssistant integration to know about run&nbsp;states</li>
+<li>Using HomeAssistant&#8217;s alarm control panel component to implement real alarm system logic, with notifications to my&nbsp;phone</li>
+<li>Having my Amcrest ProHD pan/tilt camera, which has clear line of sight to both front and back doors, pan to a door and capture a snapshot when the door sensor&nbsp;activates.</li>
+</ul>
+            </div>
+            <!-- /.entry-content -->
+    <hr />
+    <!-- Shariff Button BEGIN -->
+    <div class="shariff"
+        data-lang="en"
+        data-orientation="horizontal"
+        data-services = "[&quot;facebook&quot;,&quot;googleplus&quot;,&quot;twitter&quot;,&quot;linkedin&quot;,&quot;diaspora&quot;]"
+        data-theme="standard"
+        data-url="https://blog.jasonantman.com/2018/07/ip-camera-home-security-and-automation-update/"></div>
+    <!-- Shariff Button END -->
+    <hr/>
+    <section class="comments" id="comments">
+        <h2>Comments</h2>
+
+        <div id="disqus_thread"></div>
+        <script type="text/javascript">
+            /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+            var disqus_shortname = 'jantman'; // required: replace example with your forum shortname
+
+                    var disqus_identifier = 'ip-camera-home-security-and-automation-update';
+                var disqus_url = 'https://blog.jasonantman.com/2018/07/ip-camera-home-security-and-automation-update/';
+
+            var disqus_config = function () {
+                this.language = "en";
+            };
+
+            /* * * DON'T EDIT BELOW THIS LINE * * */
+            (function () {
+                var dsq = document.createElement('script');
+                dsq.type = 'text/javascript';
+                dsq.async = true;
+                dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+                (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+            })();
+        </script>
+        <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by
+            Disqus.</a></noscript>
+        <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+
+    </section>
+        </article>
+    </section>
+
+        </div>
+        <div class="col-sm-3" id="sidebar">
+            <aside>
+<!-- Sidebar -->
+<section class="well well-sm">
+  <ul class="list-group list-group-flush">
+
+<!-- Sidebar/Recent Posts -->
+<li class="list-group-item">
+  <h4><i class="fa fa-home fa-lg"></i><span class="icon-label">Recent Posts</span></h4>
+  <ul class="list-group" id="recentposts">
+    <li class="list-group-item"><a href="https://blog.jasonantman.com/2018/07/ip-camera-home-security-and-automation-update/"><span class="caps">IP</span> Camera, Home Security and Automation&nbsp;Update</a></li>
+    <li class="list-group-item"><a href="https://blog.jasonantman.com/2018/06/new-home-router---partaker-i5/">New Home Router - Partaker&nbsp;I5</a></li>
+    <li class="list-group-item"><a href="https://blog.jasonantman.com/2018/05/linux-surveillance-camera-software-evaluation/">Linux Surveillance Camera Software&nbsp;Evaluation</a></li>
+    <li class="list-group-item"><a href="https://blog.jasonantman.com/2018/05/amcrest-ip-camera-first-impressions/">Amcrest <span class="caps">IP</span> Camera First&nbsp;Impressions</a></li>
+    <li class="list-group-item"><a href="https://blog.jasonantman.com/2018/04/aws-elasticsearch-for-ad-hoc-elb-log-analysis/"><span class="caps">AWS</span> ElasticSearch for Ad-Hoc <span class="caps">ELB</span> Log&nbsp;Analysis</a></li>
+  </ul>
+</li>
+<!-- End Sidebar/Recent Posts -->
+
+<!-- Sidebar/Twitter Timeline -->
+<li class="list-group-item">
+  <h4><i class="fa fa-twitter fa-lg"></i><span class="icon-label">Latest Tweets</span></h4>
+  <div id="twitter_timeline">
+    <a class="twitter-timeline" data-width="250" data-height="300" data-dnt="true" data-theme="light" href="https://twitter.com/j_antman">Tweets by j_antman</a> <script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
+  </div>
+</li>
+<!-- End Sidebar/Twitter Timeline -->
+
+<!-- Sidebar/Github -->
+<li class="list-group-item">
+  <h4><i class="fa fa-github fa-lg"></i><span class="icon-label">GitHub Repos</span></h4>
+  <div id="gh_repos">
+    <p class="list-group-item">Status updating...</p>
+  </div>
+  <a href="https://github.com/jantman">@jantman</a> on GitHub
+</li>
+<!-- End Sidebar/Github -->
+
+<!-- Sidebar/Links -->
+<li class="list-group-item">
+  <h4><i class="fa fa-external-link-square fa-lg"></i><span class="icon-label">Links</span></h4>
+  <ul class="list-group" id="links">
+    <li class="list-group-item">
+      <a href="http://www.jasonantman.com" target="_blank">Homepage</a>
+    </li>
+    <li class="list-group-item">
+      <a href="http://resume.jasonantman.com" target="_blank">Resume</a>
+    </li>
+  </ul>
+</li>
+<!-- End Sidebar/Links -->
+  </ul>
+</section>
+<!-- End Sidebar -->            </aside>
+        </div>
+    </div>
+</div>
+<footer>
+   <div class="container">
+      <hr>
+      <div class="row">
+         <div class="col-xs-10">&copy; 2018 Jason Antman
+            &middot; Powered by <a href="https://github.com/getpelican/pelican-themes/tree/master/pelican-bootstrap3" target="_blank">pelican-bootstrap3</a>,
+            <a href="http://docs.getpelican.com/" target="_blank">Pelican</a>,
+            <a href="http://getbootstrap.com" target="_blank">Bootstrap</a>         </div>
+         <div class="col-xs-2"><p class="pull-right"><i class="fa fa-arrow-up"></i> <a href="#">Back to top</a></p></div>
+      </div>
+   </div>
+</footer>
+<script src="https://blog.jasonantman.com/theme/js/jquery.min.js"></script>
+
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="https://blog.jasonantman.com/theme/js/bootstrap.min.js"></script>
+
+<!-- Enable responsive features in IE8 with Respond.js (https://github.com/scottjehl/Respond) -->
+<script src="https://blog.jasonantman.com/theme/js/respond.min.js"></script>
+
+
+
+    <!-- GITHUB_REPOS_JSON (explicitly pinned repos ) -->
+  <script id="GithubReposJson" type="application/json">
+  [{"description": "A script and python module to check your AWS service limits and usage via boto.", "name": "awslimitchecker", "html_url": "https://github.com/jantman/awslimitchecker"}, {"description": "Puppet module and accompanying documentation to install/setup Arch linux on a MacBook Pro Retina 11,4", "name": "puppet-archlinux-macbookretina", "html_url": "https://github.com/jantman/puppet-archlinux-macbookretina"}, {"description": "A collection of my standalone scripts to small/quick for their own repos. All kinds of useful stuff.", "name": "misc-scripts", "html_url": "https://github.com/jantman/misc-scripts"}, {"description": "Responsive Flask/SQLAlchemy personal finance app, specifically for biweekly budgeting.", "name": "biweeklybudget", "html_url": "https://github.com/jantman/biweeklybudget"}, {"description": "A standard to easily communicate to humans and machines the development/support and usability status of software repositories/projects.", "name": "repostatus.org", "html_url": "https://github.com/jantman/repostatus.org"}, {"description": "Python/selenium script to get Xfinity bandwidth usage", "name": "xfinity-usage", "html_url": "https://github.com/jantman/xfinity-usage"}]
+  </script>
+
+<!-- GitHub JS Code -->
+<script type="text/javascript">
+$(document).ready(function () {
+  if (!window.jXHR) {
+    var jxhr = document.createElement('script');
+    jxhr.type = 'text/javascript';
+    jxhr.src = 'https://blog.jasonantman.com/theme/js/jXHR.js';
+    var s = document.getElementsByTagName('script')[0];
+    s.parentNode.insertBefore(jxhr, s);
+  }
+
+  console.log($('#GithubReposJson').html());
+  github.showSpecificRepos({
+    user: 'jantman',
+    target: '#gh_repos',
+    repos: JSON.parse($('#GithubReposJson').html())
+  });
+});
+</script>
+<script src="https://blog.jasonantman.com/theme/js/github.js" type="text/javascript"></script>
+<!-- End GitHub JS Code -->
+    <!-- Disqus -->
+    <script type="text/javascript">
+        /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+        var disqus_shortname = 'jantman'; // required: replace example with your forum shortname
+
+        /* * * DON'T EDIT BELOW THIS LINE * * */
+        (function () {
+            var s = document.createElement('script');
+            s.async = true;
+            s.type = 'text/javascript';
+            s.src = '//' + disqus_shortname + '.disqus.com/count.js';
+            (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+        }());
+    </script>
+    <!-- End Disqus Code -->
+    <!-- Google Analytics Universal -->
+    <script type="text/javascript">
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+        ga('create', 'UA-2718127-2', 'jasonantman.com');
+        ga('send', 'pageview');
+    </script>
+    <!-- End Google Analytics Universal Code -->
+
+
+    <!-- add shariff support -->
+    <script src="https://blog.jasonantman.com/theme/js/shariff.min.js"></script>
+</body>
+</html>
