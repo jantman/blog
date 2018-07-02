@@ -151,33 +151,46 @@ For the "Image check" tests, I do the following:
 
 ### Neural Network Object Detection
 
-[I wrote an object-detection add-on for ZM - ZoneMinder Forums](https://forums.zoneminder.com/viewtopic.php?f=36&t=26222)
+When I was researching how other ZoneMinder users are attempting to reduce false positives, I came by a [post on the ZoneMinder Forums](https://forums.zoneminder.com/viewtopic.php?f=36&t=26222) from someone who is using [Joseph Redmon's Darknet yolo3](https://pjreddie.com/darknet/yolo/) neutral network object detection implementation for detecting and localizing meaningful changes in ZoneMinder's captured frames. This idea immediately appealed to me; if I could reliably tell whether a frame contains a person, for my purposes as a security system, nothing else really matters. I was also very interested in Darknet yolo3 as it is simple to build and distributes pre-trained models - my initial testing was as simple as cloning a repo, downloading a few files, running ``make``, and then running the included command-line script on a JPEG image. I was pretty amazed at how accurately it recognized the person, car, and dogs in the image I selected. There is also a Python wrapper around yolo3, [yolo34py](https://github.com/madhawav/YOLO3-4-Py), which I found quite easy to use.
 
-https://www.amazon.com/gp/product/B00BLTE8HK/
+Using yolo34py I was able to relatively quickly add object detection to my Python-based ZoneMinder event notification script. Over three or four days of testing, I found yolo3 using the pre-trained model to be _extremely_ accurate across all of the events my camera captured. The one down side was that, running on my Intel i7-2600 at 3.4GHz, it was taking a full _ten to fifteen seconds per frame_ to run the object detection. That's fine for testing, but if I were to rely on this as an alarm system, I'd want something considerably faster.
 
-https://groups.google.com/forum/#!topic/darknet/tVMLWKDqXNM
+A cursory glance at the Darknet documentation told me what I already knew - though I have no prior experience with either - that running neural network image processing with any reasonable speed requires a GPU. I decided that I could allocate around $100 to speeding up the detection, given the Darknet documentation's claim of a 10x or better speedup on a GPU. I found that about the best GPU I could afford on Amazon was a 1GB Nvidia Quadro K600, so I purchased [this](https://www.amazon.com/gp/product/B00BLTE8HK/) PNY card.
+
+When I got the card and requisite software installed and recompiled Darknet with CUDA support and attempted to run detection on an image, I was rather dismayed to be greeted with an error message:
+
+> 0 CUDA Error: out of memory
+> darknet: ./src/cuda.c:36: check_error: Assertion `0` failed.
+
+Unfortunately, after just googling that error for Darknet, I found quite a few GitHub issues and mailing list threads explaining that Darknet Yolo3's default (and most accurate) model requires about 3.6GB of GPU memory, far too much for my 1GB card (at the moment, this translates to a new card costing at least $500 or easily twice that).
+
+Luckily for the fate of my project, Darknet also has a pre-trained "tiny" model designed to work for low-memory GPUs - like the apparently-puny one I just bought. The project states that its accuracy is only about 2-3% lower, though the results I've seen are noticeably inferior especially when two objects are in close proximity or overlap. For the time being, I'm still getting notified by my Python script for every motion detection event, along with the YOLO object detection results. I'm saving every event that has questionable results for later comparison against the full (albeit slow, running on CPU) model and possibly other object detection tools.
 
 ## HomeAssistant and Z-Wave
 
+Just before I began experimenting with Darknet object detection, I decided that the number of false positive motion detection events I was receiving merited investigation into a more classic alarm system approach. I also received a coupon for the [SimpliSafe](https://simplisafe.com/) home security system in my address change packet from the USPS. After a fair amount of investigation I decided that there weren't any off-the-shelf wireless home alarm systems that seemed attractive to me (I don't really need central monitoring, but I do need to be able to access the system and status programmatically) but there is a wide array of alarm system components using the [Z-Wave](http://www.z-wave.com/) radio technology that seemed suitable.
+
+One of my colleagues speaks quite highly of [HomeAssistant](https://www.home-assistant.io/), an open source (though Apache licensed) home automation suite written in Python3. Browsing through the project's website and documentation, I became reasonably confident that it could handle my needs for an alarm system (it has a fair amount of built-in logic for this use case, and other people actively use it for this) and that it also integrates natively with Z-Wave. Even better, it also has a native integration with ZoneMinder to tie the two systems together.
+
+I'm really, _really_ liking HomeAssistant so far, but I'll leave the details of that for a future post.
+
 ### Door/Window and Motion Sensors
 
-https://www.amazon.com/gp/product/B01MQXXG0I/
+After a bit of research, I determined that I wanted Z-Wave Plus components for their better (than none) security and advanced features and purchased some initial Z-Wave components to test from Amazon: a USB [Aeotec Gen5 Z-Stick](https://www.amazon.com/gp/product/B00X0AWA6E/) Z-Wave controller for $45, an [Ecolink Z-Wave Plus magnetic Door/Window sensor](https://www.amazon.com/gp/product/B01N5HB4U5/) for $30, and an [Ecolink Z-Wave Plus PIR Motion Sensor](https://www.amazon.com/gp/product/B01MQXXG0I/) for $40. I figured that was a reasonable enough price to test the system and determine how well it works, and either move forward or return the items.
 
-https://www.amazon.com/gp/product/B00X0AWA6E/
-
-https://www.amazon.com/gp/product/B01N5HB4U5/
+So far I've had the Z-Wave components running via HomeAssistant for seven days, with the door sensor on my front door and the motion sensor placed atop the adjacent window. I've configured HomeAssistant to do nothing more than notify me via Pushover when the door opens or motion is sensed. So far in a week, I've received zero false-positive alarms and zero false-negative alarms, so I'm quite happy. The motion or door opening signals make it from the sensors to HomeAssistant, out to Pushover, and to my phone within one to three seconds, which seems quite reasonable to me. The "pet immunity" on the motion sensor _is_ still triggered by my two dogs walking around, but that's rather expected since they're fifty-five and seventy pounds, respectively, and not a problem since they're crated whenever I'm not home. I'm quite happy with the performance of both of these sensors so far.
 
 ### Thermostat
 
-https://github.com/jantman/RPyMostat
+Last weekend, after unpacking and enabling my two [RaspberryPi-to-Graphite temperature sensors](https://github.com/jantman/pi2graphite), I finally determined that I'm not going crazy but the thermostat in my house was. It was wildly inaccurate, and letting the house overheat during the day and then over-cooling at night. I knew I had to replace it and, having seen that HomeAssistant supports climate control systems, immediately remembered my dream of having a computer-controlled thermostat that I briefly [explored](https://github.com/jantman/RPyMostat) since I first built a [crude solution](https://github.com/jantman/tuxostat) back [in 2008](http://blog.jasonantman.com/2008/06/new-project/).
 
-https://github.com/jantman/tuxostat
+After a short search on Amazon, I found the [Iris CT-101 Z-Wave thermostat](https://www.amazon.com/gp/product/B0095P7B80/). It's a touchscreen 7-day programmable thermostat with Z-Wave, essentially the same unit as the [Radio Thermostat CT-101](http://www.radiothermostat.com/products/) but intended to work with the Lowes Iris home automation system. A number of the positive reviews mentioned it working with HomeAssistant or other F/OSS home automation systems, and the $40 price was well below most networked thermostats and about the same as a normal "dumb" 7-day thermostat at local stores.
 
-https://www.amazon.com/gp/product/B0095P7B80/
+So far I'm quite happy with it. I had some initial concerns - even though the device is constantly powered and even a Z-Wave repeater, I had to configure HomeAssistant to explicitly poll it on a regular interval for up-to-date information - but now that I've figured it out, the thermostat seems to be working quite well. I can view the current and target temperatures, the operational/power status of my HVAC system's fan and compressor, and set the target temperature and on/off controls. The unit _does_ show up as two separate controls - heating and cooling - but that seems to be the standard for Z-Wave climate controls and logically matches up with the physical thermostat's "heat/off/cool" controls. I haven't done any automation with it yet, but at a minimum this should make it easy for me to control heating and cooling based on different temperature sensors throughout the house at different times of day.
 
 ## What's Next
 
 * GPU and image analysis to reduce false positives
 * More cameras
 * Door and motion sensors
-* Actual alarm alerts and possibly lights/siren
+* Actual alarm alerts, pan interior camera to alert location, and possibly lights/siren
