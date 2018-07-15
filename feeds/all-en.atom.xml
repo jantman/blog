@@ -1,5 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Jason Antman's Blog</title><link href="https://blog.jasonantman.com/" rel="alternate"></link><link href="https://blog.jasonantman.com/feeds/all-en.atom.xml" rel="self"></link><id>https://blog.jasonantman.com/</id><updated>2018-07-05T16:43:00-04:00</updated><entry><title>Shamelessly Over-Engineered Coax Lightning Protector</title><link href="https://blog.jasonantman.com/2018/07/shamelessly-over-engineered-coax-lightning-protector/" rel="alternate"></link><published>2018-07-05T16:43:00-04:00</published><updated>2018-07-05T16:43:00-04:00</updated><author><name>Jason Antman</name></author><id>tag:blog.jasonantman.com,2018-07-05:/2018/07/shamelessly-over-engineered-coax-lightning-protector/</id><summary type="html">&lt;p&gt;My shamelessly over-engineered coax lightning protector using fiber media&amp;nbsp;converters.&lt;/p&gt;</summary><content type="html">&lt;p&gt;I wrote a few weeks ago about my &lt;a href="/2018/06/new-home-router---partaker-i5"&gt;new router purchase&lt;/a&gt; thanks to a close lightning strike that came in over the coax for my cable &lt;span class="caps"&gt;TV&lt;/span&gt; and Internet (we have aerial lines in my neighborhood) and fried a good portion of my network (my router, switch, and the on-board Ethernet port on my desktop). A few days later I learned that at least four of my neighbors had damage from the same storm, all to devices connected to incoming coax or their home networks, and in some cases much more catastrophic than&amp;nbsp;mine.&lt;/p&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Jason Antman's Blog</title><link href="https://blog.jasonantman.com/" rel="alternate"></link><link href="https://blog.jasonantman.com/feeds/all-en.atom.xml" rel="self"></link><id>https://blog.jasonantman.com/</id><updated>2018-07-15T07:38:00-04:00</updated><entry><title>Better Logging for AppDaemon Apps</title><link href="https://blog.jasonantman.com/2018/07/better-logging-for-appdaemon-apps/" rel="alternate"></link><published>2018-07-15T07:38:00-04:00</published><updated>2018-07-15T07:38:00-04:00</updated><author><name>Jason Antman</name></author><id>tag:blog.jasonantman.com,2018-07-15:/2018/07/better-logging-for-appdaemon-apps/</id><summary type="html">&lt;p&gt;A small Python class I wrote to give AppDaemon apps more Pythonic&amp;nbsp;logging.&lt;/p&gt;</summary><content type="html">&lt;p&gt;As I briefly mentioned in my last post, &lt;a href="/2018/07/ip-camera-home-security-and-automation-update/"&gt;&lt;span class="caps"&gt;IP&lt;/span&gt; Camera, Home Security and Automation Update&lt;/a&gt;, I&amp;#8217;ve begun using the &lt;a href="https://www.home-assistant.io/"&gt;HomeAssistant&lt;/a&gt; project for home automation and also to act as the brain for my &lt;span class="caps"&gt;DIY&lt;/span&gt; alarm system. The logic behind some of this is somewhat complex, so rather than try to use HomeAssistant&amp;#8217;s &lt;span class="caps"&gt;YAML&lt;/span&gt;-based automation configuration for all of it, I&amp;#8217;ve implemented the alarm logic using AppDaemon. &lt;a href="http://appdaemon.readthedocs.io/en/latest/"&gt;AppDaemon&lt;/a&gt; is a Python daemon that integrates with HomeAssistant&amp;#8217;s &lt;span class="caps"&gt;API&lt;/span&gt; and message/event bus, and allows standalone Python classes (&amp;#8220;apps&amp;#8221;) to operate like HomeAssistant automations - be triggered by events or state change, access internal state and attributes, call services, and control anything that HomeAssistant can control. For someone with at least a basic working knowledge of Python, this makes it much easier to write complex conditional logic than attempting to use&amp;nbsp;&lt;span class="caps"&gt;YAML&lt;/span&gt;.&lt;/p&gt;
+&lt;p&gt;However, when I wrote my first AppDaemon app, I was quite frustrated by the built-in logging system. The &lt;a href="http://appdaemon.readthedocs.io/en/latest/APPGUIDE.html#writing-to-logfiles"&gt;documentation&lt;/a&gt; explains that AppDaemon uses two log files by default, &amp;#8220;general&amp;#8221; and &amp;#8220;error&amp;#8221;, and that each AppDaemon app (subclass of &lt;code&gt;appdaemon.plugins.hass.hassapi.Hass&lt;/code&gt;) can log to them using &lt;code&gt;self.log()&lt;/code&gt; and &lt;code&gt;self.error()&lt;/code&gt; convenience methods. So far this sounds fine. However, looking at the &lt;span class="caps"&gt;API&lt;/span&gt; documentation for these &lt;a href="http://appdaemon.readthedocs.io/en/latest/APIREFERENCE.html#log"&gt;log()&lt;/a&gt; and &lt;a href="http://appdaemon.readthedocs.io/en/latest/APIREFERENCE.html#error"&gt;error()&lt;/a&gt; methods, it becomes apparent that the only arguments they take are a string &lt;code&gt;message&lt;/code&gt; and a log level that defaults to &lt;code&gt;INFO&lt;/code&gt;. Unlike the ubiquitous logging methods of the &lt;a href="https://docs.python.org/3/library/logging.html#logger-objects"&gt;Python standard library&lt;/a&gt;, they don&amp;#8217;t accept a message with percent-formatting placeholders and a list of arguments, meaning that the message string needs to be formatted in the logging call&amp;nbsp;itself.&lt;/p&gt;
+&lt;p&gt;Another annoyance is the fixed logging format that includes only the timestamp, log level, app name, and message; when I&amp;#8217;m developing and debugging code I often find it useful to include at least the source module and line number in the log message. At first I tried to alter the logging formatter in use by AppDaemon, but that gave some strange results because it turns out that AppDaemon doesn&amp;#8217;t actually use a logging format, but rather in the &lt;a href="https://github.com/home-assistant/appdaemon/blob/e04820aafafe840fb4be7a8bef1996b70e62506f/appdaemon/utils.py#L143-L160"&gt;appdaemon.utils.log()&lt;/a&gt; function interpolates the timestamp, level and app name directly into the message and passes that to&amp;nbsp;logging.&lt;/p&gt;
+&lt;p&gt;Furthermore, and even more bothersome during development, there&amp;#8217;s no way to enable debug-level logging on a per-app basis. Logging level is controlled by a command line flag (&lt;code&gt;-D&lt;/code&gt;) to &lt;code&gt;appdaemon&lt;/code&gt; itself, which means that debug logging is all-or-nothing for both AppDaemon itself and all apps. I found a &lt;a href="https://community.home-assistant.io/t/appdaemon-debug-mode/9703"&gt;forum thread&lt;/a&gt; complaining about this and also a &lt;a href="https://github.com/home-assistant/appdaemon/issues/45"&gt;closed GitHub issue&lt;/a&gt; looking for a better&amp;nbsp;solution.&lt;/p&gt;
+&lt;p&gt;So, I came up with my own solution to this in the form of my &lt;a href="https://github.com/jantman/home-automation-configs/blob/9c196f1e552fc9fbdfe15f2e27a7275bca24f167/appdaemon/apps/sane_app_logging.py"&gt;sane_app_logging.py&lt;/a&gt; module and the &lt;a href="https://github.com/jantman/home-automation-configs/blob/9c196f1e552fc9fbdfe15f2e27a7275bca24f167/appdaemon/apps/sane_app_logging.py"&gt;SaneAppLogging&lt;/a&gt; mixin class in it. All I need to do is add &lt;code&gt;SaneAppLogging&lt;/code&gt; to the list of classes my app inherits from and add a call to &lt;code&gt;self._setup_logging(self.__class__.__name__, False)&lt;/code&gt; at the beginning of the &lt;code&gt;initialize()&lt;/code&gt; method. What this gets me&amp;nbsp;is:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;self._log.(debug|info|warning|error|critical|log)&lt;/code&gt; methods that pass directly through to the standard library logging methods, including args and kwargs (and therefore support for log messages with percent-formatting of&amp;nbsp;args).&lt;/li&gt;
+&lt;li&gt;Log message formatting for all of AppDaemon that includes the filename, line number and function name (&lt;code&gt;"[%(levelname)s %(filename)s:%(lineno)s - %(name)s.%(funcName)s() ] %(message)s"&lt;/code&gt;). A large portion of the code in my &lt;code&gt;sane_app_logging.py&lt;/code&gt; module is dedicated to finding the proper stack frame so that source location is correct even with the wrapper in&amp;nbsp;place.&lt;/li&gt;
+&lt;li&gt;&lt;em&gt;Runtime&lt;/em&gt; toggling of &amp;#8220;debug-as-info&amp;#8221; logging. To get around AppDaemon&amp;#8217;s global log levels and the requirement of enabling debugging at AppDaemon start and for all running code, apps using &lt;code&gt;SaneAppLogging&lt;/code&gt; listen for a &lt;code&gt;LOGWRAPPER_SET_DEBUG&lt;/code&gt; event from HomeAssistant. When received this event toggles a specific app class to log all &lt;code&gt;.debug()&lt;/code&gt; messages at &lt;span class="caps"&gt;INFO&lt;/span&gt; level instead, allowing me to selectively turn on and off debug logging on a single app at&amp;nbsp;runtime.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;The event payloads for debug-as-info toggling are quite simple, a dictionary with two keys: &lt;code&gt;app_class&lt;/code&gt; and &lt;code&gt;debug_value&lt;/code&gt;. &lt;code&gt;app_class&lt;/code&gt; should be set to the name of the class (App) we want to change, and &lt;code&gt;debug_value&lt;/code&gt; a boolean. When True, any messages logged via &lt;code&gt;self._log.debug()&lt;/code&gt; will &lt;a href="https://github.com/jantman/home-automation-configs/blob/9c196f1e552fc9fbdfe15f2e27a7275bca24f167/appdaemon/apps/sane_app_logging.py#L100-L102"&gt;actually be logged&lt;/a&gt; via &lt;code&gt;self._log.info()&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;So far this seems to be working quite well for me, and allowing me to have a much better experience with developing, debugging and testing AppDaemon apps. Perhaps it will be useful to someone else as&amp;nbsp;well.&lt;/p&gt;</content><category term="AppDaemon"></category><category term="HomeAssistant"></category><category term="automation"></category><category term="python"></category><category term="logging"></category></entry><entry><title>Shamelessly Over-Engineered Coax Lightning Protector</title><link href="https://blog.jasonantman.com/2018/07/shamelessly-over-engineered-coax-lightning-protector/" rel="alternate"></link><published>2018-07-05T16:43:00-04:00</published><updated>2018-07-05T16:43:00-04:00</updated><author><name>Jason Antman</name></author><id>tag:blog.jasonantman.com,2018-07-05:/2018/07/shamelessly-over-engineered-coax-lightning-protector/</id><summary type="html">&lt;p&gt;My shamelessly over-engineered coax lightning protector using fiber media&amp;nbsp;converters.&lt;/p&gt;</summary><content type="html">&lt;p&gt;I wrote a few weeks ago about my &lt;a href="/2018/06/new-home-router---partaker-i5"&gt;new router purchase&lt;/a&gt; thanks to a close lightning strike that came in over the coax for my cable &lt;span class="caps"&gt;TV&lt;/span&gt; and Internet (we have aerial lines in my neighborhood) and fried a good portion of my network (my router, switch, and the on-board Ethernet port on my desktop). A few days later I learned that at least four of my neighbors had damage from the same storm, all to devices connected to incoming coax or their home networks, and in some cases much more catastrophic than&amp;nbsp;mine.&lt;/p&gt;
 &lt;p&gt;Given what this &lt;em&gt;could&lt;/em&gt; have cost me both monetarily and in time - if it had decimated my desktop and/or the rest of my wired devices - I decided that I had to find a decent solution. I bought an inexpensive &lt;span class="caps"&gt;UPS&lt;/span&gt; to provide backup power and hopefully-better &lt;span class="caps"&gt;AC&lt;/span&gt; surge protection (it&amp;#8217;s not a double-conversion so I&amp;#8217;m doubtful it would do much for a lightning-induced surge) but still needed to figure out a solution for coax, the actual source of the damaging surge last month. Unfortunately it seems that there aren&amp;#8217;t many options for suppressing high-current surges on coax that work without permanent installation and with broadband Internet. There certainly are some, but many seem to either have little proof for their effectiveness against lightning-induced surges or are single-use devices that fail destructively and &lt;em&gt;should&lt;/em&gt; stop the&amp;nbsp;surge.&lt;/p&gt;
 &lt;p&gt;After trying for a while to come up with a decent, reliable solution I realized that I may be approaching the problem from the wrong direction. My cable modem is rented from Comcast, and I really don&amp;#8217;t care if it gets damaged from lightning - that&amp;#8217;s Comcast&amp;#8217;s problem. What I care about is my network. And while there may not be accepted and readily-accessible methods of protecting coax, air-gapping an Ethernet network is both feasible and relatively common. Enter, the shamelessly over-engineered coax lightning&amp;nbsp;protector:&lt;/p&gt;
 &lt;p&gt;&lt;a href="/GFX/mediaconverter1_med.jpg"&gt;&lt;img alt="side view of my desk with the fiber media converters installed" src="/GFX/mediaconverter1_sm.jpg"&gt;&lt;/a&gt;&lt;/p&gt;
@@ -6752,129 +6763,4 @@ git merge other-guys-repo/master
 
 
 &lt;/li&gt;
-&lt;/ul&gt;</content><category term="git"></category></entry><entry><title>Search for a small-scale but automated RPM build system</title><link href="https://blog.jasonantman.com/2013/05/search-for-a-small-scale-but-automated-rpm-build-system/" rel="alternate"></link><published>2013-05-13T05:00:00-04:00</published><updated>2013-05-13T05:00:00-04:00</updated><author><name>admin</name></author><id>tag:blog.jasonantman.com,2013-05-13:/2013/05/search-for-a-small-scale-but-automated-rpm-build-system/</id><summary type="html">&lt;p&gt;&lt;strong&gt;This post is part of a series of older draft posts from a few months
-ago that I&amp;#8217;m just getting around to publishing. Unfortunately, I have
-yet to find a build system that meets my requirements (see the last&amp;nbsp;paragraph).&lt;/strong&gt;&lt;/p&gt;
-&lt;p&gt;At work, we have a handful - currently a really …&lt;/p&gt;</summary><content type="html">&lt;p&gt;&lt;strong&gt;This post is part of a series of older draft posts from a few months
-ago that I&amp;#8217;m just getting around to publishing. Unfortunately, I have
-yet to find a build system that meets my requirements (see the last&amp;nbsp;paragraph).&lt;/strong&gt;&lt;/p&gt;
-&lt;p&gt;At work, we have a handful - currently a really small number - of &lt;span class="caps"&gt;RPM&lt;/span&gt;
-packages that we need to build and deploy internally for our CentOS
-server infrastructure. A number of them are just pulled down from
-specific third-party repositories and rebuilt to have the vendor set as
-us, and some are internally patched or developed software. We run
-websites, and on the product side, we&amp;#8217;re a
-Python/&lt;a href="https://www.djangoproject.com/"&gt;Django&lt;/a&gt; shop (in fact, probably
-one of the largest Django apps out there). We don&amp;#8217;t deploy our Django
-apps via &lt;span class="caps"&gt;RPM&lt;/span&gt;, so building and distributing RPMs is definitely not one of
-our core competencies. In fact, we really only want to do it when we&amp;#8217;re
-testing/deploying a new distro, or when an upstream package is&amp;nbsp;updated.&lt;/p&gt;
-&lt;p&gt;Last week I pulled a ticket to deploy &lt;a href="http://nodejs.org/"&gt;node.js&lt;/a&gt; to
-one of our build hosts, and we&amp;#8217;ve got a few things in the pipeline that
-also rely on it. I found the
-&lt;a href="https://github.com/puppetlabs/puppetlabs-nodejs"&gt;puppetlabs-nodejs&lt;/a&gt;
-module on Github that&amp;#8217;s supposed to install it on &lt;span class="caps"&gt;RHEL&lt;/span&gt;/CentOS, but it
-pulls packages from
-&lt;a href="http://patches.fedorapeople.org/oldnode/stable/"&gt;http://patches.fedorapeople.org/oldnode/stable/&lt;/a&gt;,
-and the newest version of nodejs there is 0.6.18, which is quite old. I
-can&amp;#8217;t find any actively maintained sources of newer nodejs packages for
-&lt;span class="caps"&gt;RHEL&lt;/span&gt;/CentOS (yeah, I know, that&amp;#8217;s one down side to the
-distributions&amp;#8230;). However, I did find that nodejs 0.9.5 is being &lt;a href="http://koji.fedoraproject.org/koji/packageinfo?packageID=15154"&gt;built
-for Fedora 18/19 in the Fedora build
-system&lt;/a&gt;,
-is already in the Fedora 18 Testing and Fedora Rawhide repos, but is
-failing its &lt;span class="caps"&gt;EL6&lt;/span&gt; builds in their system. The decision I&amp;#8217;ve come to is to
-use the puppetlabs-nodejs module to install it, but try and rebuild the
-Fedora 18 RPMs under CentOS 5 and&amp;nbsp;6.&lt;/p&gt;
-&lt;p&gt;So that&amp;#8217;s the background. Now, my current task: to search for an &lt;span class="caps"&gt;RPM&lt;/span&gt;
-build system for my current job. My core requirements, in no specific
-order,&amp;nbsp;are:&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;Be relatively easy and quick to use for people who have a specfile
-    or &lt;span class="caps"&gt;SRPM&lt;/span&gt; and want to be able to &amp;#8220;ensure =&gt; present&amp;#8221; the finished &lt;span class="caps"&gt;RPM&lt;/span&gt;
-    on a system. i.e., require as little per-package configuration as&amp;nbsp;possible.&lt;/li&gt;
-&lt;li&gt;Be able to handle rebuilding &amp;#8220;all&amp;#8221; of our RPMs when we roll out a
-    new distro version. Doesn&amp;#8217;t necessarily need to be automatic, but
-    should be relatively&amp;nbsp;simple.&lt;/li&gt;
-&lt;li&gt;Ideally, not need to be running constantly - i.e. something that
-    will cope well with build hosts being VMs that are shut down when
-    they&amp;#8217;re not&amp;nbsp;needed.&lt;/li&gt;
-&lt;li&gt;Handle automatically putting successfully built packages into a
-    repository, ideally with some sort of (manual) promotion process
-    from staging to&amp;nbsp;stable.&lt;/li&gt;
-&lt;li&gt;Have minimal external (infrastructure) dependencies that we can&amp;#8217;t
-    satisfy with existing&amp;nbsp;systems.&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;So, the first step was to research existing &lt;span class="caps"&gt;RPM&lt;/span&gt; build systems and how
-others do this. Here&amp;#8217;s a list of what I could find online, though most
-of these are from distributions and software vendors/projects, not
-end-user companies that are only building for internal&amp;nbsp;use.&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;&lt;a href="https://fedorahosted.org/koji/wiki"&gt;Koji&lt;/a&gt; is the build system used
-    by &lt;a href="http://fedoraproject.org/wiki/Koji"&gt;Fedora&lt;/a&gt; and RedHat. It&amp;#8217;s
-    about as full-featured as any can be, and I&amp;#8217;m familiar with it from
-    my time at &lt;a href="http://koji.rutgers.edu/koji/"&gt;Rutgers University&lt;/a&gt;, as
-    it&amp;#8217;s used to maintain their CentOS/&lt;span class="caps"&gt;RHEL&lt;/span&gt; packages. It&amp;#8217;s based largely
-    on Mock. However, &lt;a href="http://fedoraproject.org/wiki/Koji/ServerHowTo"&gt;setting up the build
-    server&lt;/a&gt; is no
-    trivial task; there are few installations outside of Fedora/RedHat,
-    and it relies on either Kerberos or an &lt;span class="caps"&gt;SSL&lt;/span&gt; &lt;span class="caps"&gt;CA&lt;/span&gt; infrastructure to
-    authenticate machines and clients. So, it&amp;#8217;s designed for too large a
-    scale and too much infrastructure for&amp;nbsp;me.&lt;/li&gt;
-&lt;li&gt;&lt;span class="caps"&gt;PLD&lt;/span&gt; Linux has a &lt;a href="https://www.pld-linux.org/developingpld/builderscript"&gt;builder
-    script&lt;/a&gt; that
-    seems to automate &lt;code&gt;rpmbuild&lt;/code&gt; as well as fetching sources and
-    resolving/building dependencies. I haven&amp;#8217;t looked at the script yet,
-    but apparently it&amp;#8217;s in &lt;span class="caps"&gt;PLD&lt;/span&gt;&amp;#8217;s &amp;#8220;rpm-build-tools&amp;#8221;&amp;nbsp;package.&lt;/li&gt;
-&lt;li&gt;&lt;span class="caps"&gt;PLD&lt;/span&gt; Linux also has a &lt;span class="caps"&gt;CVS&lt;/span&gt; repository for something called
-    &lt;a href="http://cvs.pld-linux.org/cgi-bin/cvsweb/pld-builder.new"&gt;pld-builder.new&lt;/a&gt;.
-    The
-    &lt;a href="http://cvs.pld-linux.org/cgi-bin/cvsweb/pld-builder.new/doc/README?rev=1.5"&gt;&lt;span class="caps"&gt;README&lt;/span&gt;&lt;/a&gt;
-    and
-    &lt;a href="http://cvs.pld-linux.org/cgi-bin/cvsweb/pld-builder.new/doc/ARCHITECTURE?rev=1.6"&gt;&lt;span class="caps"&gt;ARCHITECTURE&lt;/span&gt;&lt;/a&gt;
-    files make it sound like a relatively simple mainly-Python system
-    that builds &lt;span class="caps"&gt;SRPMS&lt;/span&gt; and binary packages when requested, and most
-    importantly, seems like a simple system that uses little more than
-    shared filesystem access for communication and&amp;nbsp;coordination.&lt;/li&gt;
-&lt;li&gt;&lt;span class="caps"&gt;ALT&lt;/span&gt; Linux has &lt;a href="http://en.altlinux.org/Sisyphus"&gt;Sisyphus&lt;/a&gt;, which
-    combines repository management and web interface tools, package
-    building and testing tools, and&amp;nbsp;more.&lt;/li&gt;
-&lt;li&gt;The Dries &lt;span class="caps"&gt;RPM&lt;/span&gt; repository uses (or at least used&amp;#8230; my reference is
-    quite old) &lt;a href="http://dries.ulyssis.org/rpm/pydar2/index.html"&gt;pydar2&lt;/a&gt;,
-    &amp;#8220;a distributed client/server program which allows you to build
-    multiple spec files on multiple distribution/architecture
-    combinations automatically.&amp;#8221; That sounds like it could be what I
-    need, but the last update says that it isn&amp;#8217;t finished yet, and that
-    was in &lt;strong&gt;2005&lt;/strong&gt;.&lt;/li&gt;
-&lt;li&gt;Mandriva Linux has pretty extensive information on their build
-    system &lt;a href="http://wiki.mandriva.com/en/Category:Build_System"&gt;on their
-    wiki&lt;/a&gt; and a
-    &lt;a href="http://wiki.mandriva.com/en/Development/Packaging/BuildSystem/Theory"&gt;build system theory
-    page&lt;/a&gt;,
-    but it seems to be largely a hodgepodge of shell scripts and
-    cronjobs, and is likely not a candidate for use by anyone other than
-    its&amp;nbsp;designers.&lt;/li&gt;
-&lt;li&gt;Argeo provides the &lt;a href="https://www.argeo.org/wiki/SLC"&gt;&lt;span class="caps"&gt;SLC&lt;/span&gt; framework&lt;/a&gt;
-    which has a &amp;#8220;&lt;span class="caps"&gt;RPM&lt;/span&gt; Factory&amp;#8221; component, but I can&amp;#8217;t seem to find much
-    more than a wiki page, and can&amp;#8217;t tell if it&amp;#8217;s a build automation
-    system or just handles mocking packages and putting them in a repo
-    on a single&amp;nbsp;host.&lt;/li&gt;
-&lt;li&gt;Dag Wieers&amp;#8217; repositories use (or used) a set of python scripts
-    called &lt;a href="http://dag.wieers.com/home-made/dar/"&gt;&lt;span class="caps"&gt;DAR&lt;/span&gt;, &amp;#8220;Dynamic Apt Repository
-    builder&amp;#8221;&lt;/a&gt;. They&amp;#8217;re on
-    &lt;a href="https://github.com/dagwieers/dar"&gt;github&lt;/a&gt; but are listed as &amp;#8220;old&amp;#8221;
-    and haven&amp;#8217;t been updated in at least 2 years. The features sound
-    quite interesting, and though it&amp;#8217;s based on the Apt repo format, it
-    might provide some good ideas for implementing a similar&amp;nbsp;system.&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;&lt;strong&gt;Update four months later:&lt;/strong&gt; I&amp;#8217;ve yet to find a build system that meets
-my requirements above. For the moment I&amp;#8217;m only managing \~20 packages,
-so my &amp;#8220;build system&amp;#8221; is a single shell script that reads in some
-environment variables and runs through using
-&lt;a href="http://fedoraproject.org/wiki/Projects/Mock"&gt;mock&lt;/a&gt; to build them in the
-correct order (including pushing the finished RPMs back into the local
-repository that mock reads from) and then pushing the finished packages
-to our internal repository. Maybe when I have some spare time, I&amp;#8217;ll
-consider a project to either make a slightly better (but simple) &lt;span class="caps"&gt;RPM&lt;/span&gt;
-build system based on Python, or get our
-&lt;a href="http://jenkins-ci.org/"&gt;Jenkins&lt;/a&gt; install to handle this for&amp;nbsp;me.&lt;/p&gt;</content><category term="build"></category><category term="linux"></category><category term="nodejs"></category><category term="package"></category><category term="packaging"></category><category term="repository"></category><category term="rpm"></category><category term="rpmbuild"></category><category term="software"></category><category term="sysadmin"></category><category term="yum"></category></entry></feed>
+&lt;/ul&gt;</content><category term="git"></category></entry></feed>
