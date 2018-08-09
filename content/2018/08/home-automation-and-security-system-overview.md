@@ -13,4 +13,22 @@ Status: draft
 
 I've done a lot of work on my DIY HomeAssistant-based home automation and security system since my [last post on it](/2018/07/ip-camera-home-security-and-automation-update/) just over a month ago. While it was a lot of work and frustrating at times, I'm happy to say that I think I've finally gotten everything to a usable and working state, and I don't currently have anything left on my to-do list for this project. I have four working security cameras that run both motion detection and object detection and notify me if a person is detected, a functional alarm system for unauthorized entry, and a few home automation conveniences.
 
-Virtually all of the code and configuration backing this is available in my [home-automation-configs GitHub repo](https://github.com/jantman/home-automation-configs). Below, I'll go over each of the major components as well as some of the difficulties I encountered.
+Virtually all of the code and configuration backing this is available in my [home-automation-configs GitHub repo](https://github.com/jantman/home-automation-configs) but I want to use this post to go over each of the major components as well as some of the difficulties I encountered.
+
+# Security Cameras
+
+## Object Detection
+
+## Tie-In with Alarm System
+
+# Alarm System
+
+## Overall Functionality
+
+## Zooz Multi-Sensors
+
+## Control Panel
+
+# Home Automation
+
+- lights based on motion, door sensors and proximity
