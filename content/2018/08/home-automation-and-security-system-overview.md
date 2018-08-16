@@ -25,28 +25,39 @@ After spending another afternoon considering some options - moving my AP or addi
 
 One thing that I have noticed in the past month of having both wireless and wired cameras is the difference in frame rate. While my one outdoor camera that's actually using the 2.4GHz WiFi works acceptably well, ZoneMinder is all too happy to show me that it runs at between five and nine FPS, whereas the indoor WiFi and outdoor wired cameras run at the full configured 10FPS rate. If I had to do the camera installation over again, I would've spent much more time assessing the 2.4GHz coverage around my house from my existing AP and likely considered PoE cameras for all of the outdoor locations.
 
-## Object Detection
+## Neural Network Object Detection
 
-- object detection from images, identification of motion zones, localization of objects to zones; pass off to AppDaemon via event
-- yolov3-tiny; comparison and accuracy issues
+In my last post, I [mentioned](/2018/07/ip-camera-home-security-and-automation-update/#neural-network-object-detection) how I started passing still images from motion events through [Joseph Redmon's Darknet yolo3](https://pjreddie.com/darknet/yolo/) neural network object detection library. With some caveats this has worked out extremely well. While I've decided that my cameras are mainly for remote monitoring and possible evidentiary value, and not really for use as an alarm, I'm still pushing notifications from them to my phone when my alarm is armed; I'm just not relying on them as a primary means of detecting a problem.
+
+One down side to my current setup is the "tiny" version of the yolov3 model that I'm forced to use because of my poor choice of graphics card. I got the feeling that the performance of the tiny model was significantly worse than the full version and, sure enough, comparison tests on the same images proved that. It seems reasonably good at detecting people, but has a relatively high number of false positives. To compensate for this, I've built functionality to ignore certain objects in certain locations in to my image processing scripts; I can now easily log but ignore when yolo detects a stump in my front yard as a cow, or my porch railing as a bench.
+
+My current code for handling ZoneMinder events, available [on github](https://github.com/jantman/home-automation-configs/tree/master/zoneminder) implements what seems to me to be a reasonable workflow for my needs. When events are detected by ZoneMinder a selection of frames - first, last, and a variable number of high-motion (high-score) frames - are passed through yolov3-tiny object detection. Using the tiny model and 1920x1080 frames, this takes about 1/4 second per frame on my GPU. Once a list of detections is obtained (category, confidence level, and bounding boxes for each detected object) it parses the Notes field on the ZoneMinder event to determine what zones motion was detected in, then retrieves the coordinates of each zone on the monitor form ZoneMinder and calculates which zones contain each detected object. All of that information is used to evaluate - via a configuration file - which objects should be ignored. All of this information - the ZoneMinder Event details, object detections and their containing zones, etc. - is passed to HomeAssistant as an event, where it's picked up by an AppDaemon app.
 
 ## Tie-In with Alarm System
 
-- processing of events by AppDaemon
-- tie-in with alarm state
-- notifications
+Once the ZoneMinder events/alarms are sent to HomeAssistant as events they're picked up by an AppDaemon app, [zmevent_alarm_handler.py](https://github.com/jantman/home-automation-configs/blob/master/appdaemon/apps/zmevent_alarm_handler.py). This handles the logic behind whether or not to send me a notification for a given ZoneMinder alarm. The logic I'm currently using is as follows:
+
+1. If my alarm system is disarmed, no notification.
+2. If no objects were detected by YOLO3, no notification.
+3. If the only motion was in the "Street" zones, no notification. I have distinct zones for the road in front of my property, and record motion there but don't alert on it.
+4. Formulate a short string describing the objects detected and what zones they're in, for use in notifications.
+5. If an ``input_boolean`` in HomeAssistant called "silence_cameras" is _not_ on, send a Pushover notification to my phone containing the description of the alert and the highest-motion frame containing the detected object(s).
+6. Send an email containing all analyzed/detected frames as well as the full details of the event.
+
+So far this is working quite well for me. I get _very_ few false positives with the above logic combined with object detection, only get notified if my alarm system is armed, and as far as I can tell get notified 100% of the time a person is on my property.
 
 # Alarm System
 
-- overview
+My traditional alarm system hasn't changed much since my last post. I have door/window sensors on both entry doors to the house as well as the gate to my fenced yard and the door on the crawlspace under the house. I've added motion detectors in most rooms, but because of problems with the sensors I chose (more on that below) I only have one in use as a trigger for the alarm, a more reliable model than the other four I purchased. With the addition of a physical control panel near the front door (more on that below as well) it's working quite well for me. I've had zero false positives so far, and a 100% detection rate based on HomeAssistant's logs of the sensors (and my own occasional forgetting to disarm the system before I open a door). There's still something to be desired in terms of reliability of notifications as it relies on my cable Internet connection, but I _do_ get notified within five minutes by offsite monitoring if my Internet connection goes down. If I really wanted more than that, I'd look into some sort of cellular backup connection.
 
-## Overall Functionality
+The overall functionality of the system is incredibly basic: when armed (``input_select`` in HomeAssistant) and one of the sensors is tripped, it pushes a loud high-priority notification to my phone via Pushover. I opted not to use HomeAssistant's state machine-based [manual alarm control panel](https://www.home-assistant.io/components/alarm_control_panel.manual/) component and rather implement my own logic in AppDaemon. I have an ``input_select`` with three options: Disarmed, Home and Away. The alarm does nothing in "Disarmed" state. The "Home" state uses only external (door/window) sensors for trigger and the "Away" state also includes interior motion sensors. This trinary state is also used to control whether ZoneMinder events notify me, as described previously. My logic doesn't include any "triggered" state or delay; I get one notification for every sensor trigger. It also doesn't include any arming delay, but since I built and installed a real physical control panel near the door, it includes a configurable delay (currently 10 seconds) to give me time to disarm before triggering the alarm if it's currently in the Away state.
 
-- manual control; proximity
-- door sensors
+One added bit of fancy-ness that I put into the alarm is integration with ZoneMinder and my cameras. All of the doors (as well as the fence gate) have external coverage by outdoor cameras, and the front and back doors also share internal coverage from a PTZ camera mounted in view of both of them. When the alarm is armed and a door sensor trips, the AppDaemon app that handles the alarm captures images from whatever cameras have a view of the door that opened (including panning the indoor camera if needed). Those images are included in the Pushover notification that I receive, making it much more informative than just knowing that a particular door opened.
 
 ## Zooz Multi-Sensors
 
+[EcoLink PIRZWAVE2.5-ECO](https://www.amazon.com/gp/product/B01MQXXG0I/) Z-Wave Plus motion sensor "with PET immunity" $40
+[ZOOZ ZSE40 4-in-1 sensor, version 2.0](https://www.amazon.com/gp/product/B01AKSO80O/) $36, 3.5 stars
 - why I got them, price, problems
 
 ## Control Panel
