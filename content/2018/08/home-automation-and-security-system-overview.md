@@ -56,13 +56,43 @@ One added bit of fancy-ness that I put into the alarm is integration with ZoneMi
 
 ## Zooz Multi-Sensors
 
-[EcoLink PIRZWAVE2.5-ECO](https://www.amazon.com/gp/product/B01MQXXG0I/) Z-Wave Plus motion sensor "with PET immunity" $40
-[ZOOZ ZSE40 4-in-1 sensor, version 2.0](https://www.amazon.com/gp/product/B01AKSO80O/) $36, 3.5 stars
-- why I got them, price, problems
+In my last post I [mentioned](/2018/07/ip-camera-home-security-and-automation-update/#doorwindow-and-motion-sensors) that I'd purchased some Z-Wave security sensors, including a $40 [EcoLink PIRZWAVE2.5-ECO](https://www.amazon.com/gp/product/B01MQXXG0I/) Z-Wave Plus PIR motion sensor "with PET immunity" (I'm pretty sure they mean domestic animals, not Positron Emission Tomography). I originally just set it to lowest sensitivity (via a physical jumper) and balanced it on top of the blinds in my living room to see how it worked. I was pleasantly surprised to find that it seemed to work perfectly - it triggered every time I moved in the room, and never when no person was in the room. After a week or so I decided that it was working well enough to order some more for full coverage of my house. I put the EcoLink PIR sensor in the back room that I use for storage and the cats' food and litter boxes, and in the month-plus since then it's had a 100% accuracy rate.
+
+When I began shopping for four more sensors, though, I was tempted to see if I could find something a bit less expensive. As I'd just gotten my Z-Wave thermostat working, I was really intrigued by the $36 [ZOOZ ZSE40 4-in-1 sensor, version 2.0](https://www.amazon.com/gp/product/B01AKSO80O/) which combines a PIR motion sensor with sensors for light, temperature, and humidity. I figured these would let me save a tiny bit of money while also getting the bonus of temperature sensors in every room, and the PIR motion sensors have seven levels of sensitivity - settable over Z-Wave - which I figured would be more than enough to get them to ignore my cats.
+
+The Zooz sensors only had a 3.5 star rating on Amazon and lots of negative reviews, but it seemed that most of the reviews were for the older (non-2.0) version. Unfortunately I didn't heed my concerns and bought four of them.
 
 ## Control Panel
 
 - project, hardware, photos, functionality
+
+Here are a few photos of the finished unit currently hanging out on top of the entertainment center in my living room, just a few feet inside the front door:
+
+[![photo of finished touchscreen control panel in place](/GFX/doorpanel_installed1_480x320.jpg)](/GFX/doorpanel_installed1_1920x1080.jpg)
+
+[![photo of finished touchscreen control panel in place](/GFX/doorpanel_installed2_480x320.jpg)](/GFX/doorpanel_installed2_1920x1080.jpg)
+
+[![photo of finished touchscreen control panel in place](/GFX/doorpanel_installed3_480x320.jpg)](/GFX/doorpanel_installed3_1920x1080.jpg)
+
+[![photo of finished touchscreen control panel in place](/GFX/doorpanel_installed4_480x320.jpg)](/GFX/doorpanel_installed4_1920x1080.jpg)
+
+And some screenshots of the 480x320 touchscreen display:
+
+Disarmed:
+
+![screenshot of touchscreen in disarmed mode](/GFX/doorpanel_disarmed_480x320.png)
+
+Arming Away (exit delay):
+
+![screenshot of touchscreen in arming away mode](/GFX/doorpanel_arming-away_480x320.png)
+
+Armed Away:
+
+![screenshot of touchscreen in armed away mode](/GFX/doorpanel_armed-away_480x320.png)
+
+Armed home:
+
+![screenshot of touchscreen in armed home mode](/GFX/doorpanel_armed-home_480x320.png)
 
 # Home Automation
 
