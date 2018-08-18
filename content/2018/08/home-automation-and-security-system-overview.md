@@ -60,11 +60,22 @@ In my last post I [mentioned](/2018/07/ip-camera-home-security-and-automation-up
 
 When I began shopping for four more sensors, though, I was tempted to see if I could find something a bit less expensive. As I'd just gotten my Z-Wave thermostat working, I was really intrigued by the $36 [ZOOZ ZSE40 4-in-1 sensor, version 2.0](https://www.amazon.com/gp/product/B01AKSO80O/) which combines a PIR motion sensor with sensors for light, temperature, and humidity. I figured these would let me save a tiny bit of money while also getting the bonus of temperature sensors in every room, and the PIR motion sensors have seven levels of sensitivity - settable over Z-Wave - which I figured would be more than enough to get them to ignore my cats.
 
-The Zooz sensors only had a 3.5 star rating on Amazon and lots of negative reviews, but it seemed that most of the reviews were for the older (non-2.0) version. Unfortunately I didn't heed my concerns and bought four of them, and I've regretted that ever since. 
+The Zooz sensors only had a 3.5 star rating on Amazon and lots of negative reviews, but it seemed that most of the reviews were for the older (non-2.0) version. Unfortunately I didn't heed my concerns and bought four of them, and I've regretted that ever since. Setting them up initially was nowhere near as simple as the EcoLink products, since they'd usually end up going to sleep before they completed pairing with my Z-Wave controller. The same was true of their seven-level sensitivity; each change required me to run around the house with a laptop and paperclip, setting the sensitivity I wanted and then waking the device up with the paperclip. This often required multiple cycles per sensor until the setting change took. Lastly, and most importantly, the machine I have running HASS and my Z-Wave network went offline for about six hours a few weeks ago. All of my other battery-operated sensors came back online within 30 minutes of getting HASS up and running again, but these took up to four hours to come back even after manually waking them up.
+
+After all of that, even on the lowest of the seven sensitivity levels, my cats still set them off. The motion sensing is adequate for controlling lights, but causes false alarms quite often for security purposes. I've only had them for about a month and a half, but one of the four is now completely dead - it won't even blink when I replace the battery. The temperature sensors are adequate, but not terribly accurate and suffer from serious lag problems. The light sensors function but report in _percentage_ instead of any actual measurement of light and the scale seems poorly calibrated for indoor use unless the sensor is pointed directly at the dominant light source. The sensor in my kitchen (which is pointed almost directly at the ceiling fixture) reads near 80% with the light on, about 60% with the light off during the day, and about 20% with the light off at night. However, the sensor in my bedroom reads about 2% when dark at night and only increases to about 10% with the light on during the day.
+
+In all, I was tempted by the prospect of being able to get motion, temperature, and light level sensors all in one package and for a really low price. I ended up getting what I paid for - a $10 motion sensor, $10 temperature sensor, and $10 light level sensor. If I had to do it over again (or, when I eventually do) I'd get more of the EcoLink motion sensors and add some dedicated temperature/light sensors where I need them.
 
 ## Control Panel
 
-- project, hardware, photos, functionality
+After using my alarm system for a few weeks, it was clear to me that relying on proximity detection of my phone (updated by GPS using the [GPSLogger app](https://gpslogger.app/)) or the HASS web interface to arm and disarm wasn't going to work. The presence detection often didn't update fast enough if I was driving to or from my house and disarming via the HASS UI just took way too long - especially since my phone connecting to WiFi when I get home causes problems with this. After giving it some thought, I decided to build a physical alarm control panel. I did some quick proofs-of-concept using the HASS WebSocket API, static HTML and Javascript served by HASS itself, and an AppDaemon app to handle the logic. It's not pretty, but it gives me a working interface that handled my main requirements:
+
+* Control of the lights in the room
+* Arming in either Home or Away modes, with a configurable delay for arming in Away (and ensuring all external door sensors are closed before arming)
+* One-touch diarming from Home state
+* Code-entry disarming from Away state, with a configurable delay between sensor activation and alarm trigger
+
+After getting the software side of that working locally on my desktop computer, I decided that I'd use a Raspberry Pi 3B+ that I already had for the control panel. I ordered a simple 320x480 3.5-inch TFT touchscreen [from Amazon](https://www.amazon.com/gp/product/B01FXC5ECS/), along with a [decent case](https://www.amazon.com/gp/product/B07B5YG4LC/) for the Pi and screen, for about $46 total. Assembly and getting the software up and running was pretty easy (my notes are [on GitHub here](https://github.com/jantman/home-automation-configs/blob/master/doorpanels.md)) and I had it up and running in an hour or so. This has really helped make the alarm more usable, since I have the touchscreen near my front door and can just tap a button to arm on my way out the door, and have fifteen seconds to enter a code when I get home.
 
 Here are a few photos of the finished unit currently hanging out on top of the entertainment center in my living room, just a few feet inside the front door:
 
@@ -76,7 +87,7 @@ Here are a few photos of the finished unit currently hanging out on top of the e
 
 [![photo of finished touchscreen control panel in place](/GFX/doorpanel_installed4_480x320.jpg)](/GFX/doorpanel_installed4_1920x1080.jpg)
 
-And some screenshots of the 480x320 touchscreen display:
+And some screenshots of the really simple UI that I set up for it:
 
 Disarmed:
 
@@ -94,6 +105,13 @@ Armed home:
 
 ![screenshot of touchscreen in armed home mode](/GFX/doorpanel_armed-home_480x320.png)
 
+All of the code for this is available in my GitHub repo:
+
+* [notes on the hardware and software](https://github.com/jantman/home-automation-configs/blob/master/doorpanels.md)
+* [HTML, CSS and JS for the UI](https://github.com/jantman/home-automation-configs/tree/master/homeassistant/www/doorpanels)
+* [appdaemon app](https://github.com/jantman/home-automation-configs/blob/master/appdaemon/apps/doorpanels.py)
+* [some scripts I use for running it locally](https://github.com/jantman/home-automation-configs/tree/master/testing)
+
 # Home Automation
 
-- lights based on motion, door sensors and proximity; first morning
+I haven't delved too deep into the home automation side of things yet, and am going to try not to go overboard with it. The Z-Wave thermostat [that I mentioned previously](/2018/07/ip-camera-home-security-and-automation-update/#thermostat) is working well, but unfortunately the undersized and poorly-installed HVAC system in my poorly-insulated house renders it largely moot; in the summer heat the air conditioning can't keep up anyway so there's little need for me to change the thermostat. I do have motion-activated lights in my kitchen which has proved quite convenient and satisfying, and I've also set up some automations around my front porch light to automatically turn it on when the front door opens and it's dark outside and to turn it on just before I arrive home when I'm away from the house at night. I've also set up an automation in HASS to detect when I first turn on my bedroom light in the morning, and automatically disarm the alarm and turn on the kitchen and living room lights. I'm going to try and make this the end of my home automation experiment, but I'm sure I'll give in and add a few more pieces over time.
