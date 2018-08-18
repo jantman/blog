@@ -60,7 +60,7 @@ In my last post I [mentioned](/2018/07/ip-camera-home-security-and-automation-up
 
 When I began shopping for four more sensors, though, I was tempted to see if I could find something a bit less expensive. As I'd just gotten my Z-Wave thermostat working, I was really intrigued by the $36 [ZOOZ ZSE40 4-in-1 sensor, version 2.0](https://www.amazon.com/gp/product/B01AKSO80O/) which combines a PIR motion sensor with sensors for light, temperature, and humidity. I figured these would let me save a tiny bit of money while also getting the bonus of temperature sensors in every room, and the PIR motion sensors have seven levels of sensitivity - settable over Z-Wave - which I figured would be more than enough to get them to ignore my cats.
 
-The Zooz sensors only had a 3.5 star rating on Amazon and lots of negative reviews, but it seemed that most of the reviews were for the older (non-2.0) version. Unfortunately I didn't heed my concerns and bought four of them.
+The Zooz sensors only had a 3.5 star rating on Amazon and lots of negative reviews, but it seemed that most of the reviews were for the older (non-2.0) version. Unfortunately I didn't heed my concerns and bought four of them, and I've regretted that ever since. 
 
 ## Control Panel
 
