@@ -25,8 +25,8 @@ Overall, I'd say that I got what I paid for and I'm quite happy with the camera.
 
 For reference, here are some stills from the camera in my storage room where I have the cats' litter boxes, first during the day and then at night with a light on and without any lights on.
 
-[![still from camera during day](/GFX/UnionCamQ5_1.jpg)](/GFX/UnionCamQ5_1_sm.jpg)
+[![still from camera during day](/GFX/UnionCamQ5_1_sm.jpg)](/GFX/UnionCamQ5_1.jpg)
 
-[![still from camera at night with a light on](/GFX/UnionCamQ5_2.jpg)](/GFX/UnionCamQ5_2_sm.jpg)
+[![still from camera at night with a light on](/GFX/UnionCamQ5_2_sm.jpg)](/GFX/UnionCamQ5_2.jpg)
 
-[![still from camera at night with no lights on](/GFX/UnionCamQ5_3.jpg)](/GFX/UnionCamQ5_3_sm.jpg)
+[![still from camera at night with no lights on](/GFX/UnionCamQ5_3_sm.jpg)](/GFX/UnionCamQ5_3.jpg)
