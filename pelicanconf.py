@@ -96,8 +96,19 @@ BOOTSTRAP_THEME = 'flatly'
 THEME_BRANCH = 'jantman-bootstrap3'
 PYGMENTS_STYLE = 'default'
 
-DISPLAY_CATEGORIES_ON_MENU = True
+DISPLAY_CATEGORIES_ON_MENU = False
 DISPLAY_CATEGORIES_ON_SIDEBAR = False
+DISPLAY_PAGES_ON_MENU = False
+
+MENUITEMS = (
+    ('About Me', '/pages/about.html'),
+    ('AWS', '/categories/aws/index.html'),
+    ('Software', '/categories/software/index.html'),
+    ('Hardware', '/categories/hardware/index.html'),
+    ('DIY / Home Automation / Security', '/categories/diy-home-automation-security/index.html'),
+    ('Miscellaneous', '/categories/miscellaneous/index.html'),
+    ('Tags', '/tags.html'),
+)
 
 DISPLAY_RECENT_POSTS_ON_SIDEBAR = True
 RECENT_POST_COUNT = 5

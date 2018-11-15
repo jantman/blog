@@ -2,7 +2,7 @@ Title: Inexpensive $26USD 1080p WiFi Camera
 Date: 2018-11-04 18:04
 Modified: 2018-11-04 18:04
 Author: Jason Antman
-Category: DIY
+Category: DIY / Home Automation / Security
 Tags: camera, security, surveillance, video, linux, IP camera
 Slug: inexpensive-26USD-1080p-wifi-camera
 Summary: Review of a tiny inexpensive $26USD 1080p WiFi surveillance camera.

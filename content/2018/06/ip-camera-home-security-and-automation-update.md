@@ -2,7 +2,7 @@ Title: IP Camera, Home Security and Automation Update
 Date: 2018-07-02 06:10
 Modified: 2018-07-02 06:10
 Author: Jason Antman
-Category: DIY
+Category: DIY / Home Automation / Security
 Tags: amcrest, camera, security, surveillance, video, linux, IP camera, evaluation, alarm, IR, homeassistant, hass, automation, z-wave, darknet, yolo, machine learning, neural network, object detection
 Slug: ip-camera-home-security-and-automation-update
 Summary: An update on my IP camera and home security project, now branching out into home automation and machine learning as well.

@@ -2,7 +2,7 @@ Title: Shamelessly Over-Engineered Coax Lightning Protector
 Date: 2018-07-05 16:43
 Modified: 2018-07-05 16:43
 Author: Jason Antman
-Category: DIY
+Category: DIY / Home Automation / Security
 Tags: network, lightning, surge, fiber, coax
 Slug: shamelessly-over-engineered-coax-lightning-protector
 Summary: My shamelessly over-engineered coax lightning protector using fiber media converters.

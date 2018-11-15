@@ -2,7 +2,7 @@ Title: Home Automation and Security System Overview
 Date: 2018-08-18 19:19
 Modified: 2018-08-18 19:19
 Author: Jason Antman
-Category: DIY
+Category: DIY / Home Automation / Security
 Tags: amcrest, camera, security, surveillance, video, linux, IP camera, evaluation, alarm, IR, homeassistant, hass, automation, z-wave, darknet, yolo, machine learning, neural network, object detection
 Slug: home-automation-and-security-system-overview
 Summary: An overview of the current working state of my DIY home automation and security system.

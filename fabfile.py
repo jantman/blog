@@ -11,7 +11,10 @@ import json
 import time
 from pprint import pformat
 
-from pelicanconf import ARTICLE_PATHS, DEFAULT_CATEGORY, AUTHOR, OUTPUT_PATH, THEME, THEME_BRANCH, PLUGIN_PATHS, PLUGIN_BRANCH, GITHUB_USER
+from pelicanconf import (
+    ARTICLE_PATHS, DEFAULT_CATEGORY, AUTHOR, OUTPUT_PATH, THEME, THEME_BRANCH,
+    PLUGIN_PATHS, PLUGIN_BRANCH, GITHUB_USER, MENUITEMS
+)
 
 # Local path configuration (can be absolute or relative to fabfile)
 env.deploy_path = 'output'
@@ -44,6 +47,13 @@ def prebuild():
     if branch != PLUGIN_BRANCH:
         print("ERROR: %s is on wrong branch (%s not %s)" % (PLUGIN_PATHS[0], branch, PLUGIN_BRANCH))
         sys.exit(1)
+    cats = _get_categories()
+    mitems = [x[0] for x in MENUITEMS]
+    missing = [i for i in cats if i not in mitems]
+    if len(missing) > 0:
+        raise RuntimeError(
+            'Categories missing from MENUITEMS in pelicanconf.py: %s' % missing
+        )
     update_pinned_repos()
 
 def update_pinned_repos():

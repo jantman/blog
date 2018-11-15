@@ -2,7 +2,7 @@ Title: Amcrest IP Camera First Impressions
 Date: 2018-05-06 20:13
 Modified: 2018-05-06 20:13
 Author: Jason Antman
-Category: DIY
+Category: DIY / Home Automation / Security
 Tags: amcrest, camera, security, surveillance, video
 Slug: amcrest-ip-camera-first-impressions
 Summary: My first impressions on interfacing with Amcrest IP cameras
