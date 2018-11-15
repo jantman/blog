@@ -1,7 +1,7 @@
 Title: Documentation generation for web apps - PHP and JavaScript
 Date: 2010-08-26 08:10
 Author: admin
-Category: Tech HowTos
+Category: Software
 Tags: documentation, javascript, PHP, web programming
 Slug: documentation-generation-for-web-apps-php-and-javascript
 

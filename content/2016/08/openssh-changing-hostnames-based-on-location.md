@@ -1,7 +1,7 @@
 Title: OpenSSH changing hostnames based on location
 Date: 2016-08-27 11:22
 Author: Jason Antman
-Category: Tech HowTos
+Category: Software
 Tags: openssh, ssh
 Slug: openssh-changing-hostnames-based-on-location
 Summary: How to change SSH hostnames based on guessed location

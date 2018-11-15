@@ -1,7 +1,7 @@
 Title: Idea for a Generic Method to Communicate Repository/Project Status
 Date: 2014-12-07 18:24
 Author: Jason Antman
-Category: Miscellaneous
+Category: Software
 Tags: repository, project, git, github
 Slug: idea-for-a-generic-method-to-communicate-repositoryproject-status
 Summary: Some ideas for generic methods of communicating the status of a project / source code repository to humans and machines.

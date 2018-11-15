@@ -1,7 +1,7 @@
 Title: New Project
 Date: 2008-06-04 10:34
 Author: admin
-Category: Projects
+Category: Miscellaneous
 Tags: 1wire, automation, home control, linux, thermostat
 Slug: new-project
 

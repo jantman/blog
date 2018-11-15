@@ -1,7 +1,7 @@
 Title: Interesting Systems Links for September 3, 2012
 Date: 2012-09-03 09:42
 Author: admin
-Category: Ops
+Category: Miscellaneous
 Tags: devops, links, portmortem, sysadmin
 Slug: interesting-systems-links-for-september-3-2012
 

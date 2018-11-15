@@ -2,7 +2,7 @@ Title: New Home Router - Partaker I5
 Date: 2018-06-14 16:28
 Modified: 2018-06-14 16:28
 Author: Jason Antman
-Category: Projects
+Category: Hardware
 Tags: router, firewall, vyos, network, partaker, embedded, appliance
 Slug: new-home-router---partaker-i5
 Summary: Quick overview of the Partaker I5 network appliance that I bought for my new home router.

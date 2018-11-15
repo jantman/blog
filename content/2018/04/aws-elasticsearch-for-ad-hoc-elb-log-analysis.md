@@ -2,7 +2,7 @@ Title: AWS ElasticSearch for Ad-Hoc ELB Log Analysis
 Date: 2018-04-01 14:36
 Modified: 2018-04-01 14:36
 Author: Jason Antman
-Category: Tech HowTos
+Category: AWS
 Tags: aws, amazon, elb, elasticsearch, logstash, kibana, logs, analysis
 Slug: aws-elasticsearch-for-ad-hoc-elb-log-analysis
 Summary: How I used AWS hosted ElasticSearch for ad-hoc analysis of ELB logs.

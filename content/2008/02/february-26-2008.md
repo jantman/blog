@@ -1,7 +1,7 @@
 Title: February 26, 2008
 Date: 2008-02-26 11:32
 Author: admin
-Category: Projects
+Category: Miscellaneous
 Tags: GigE, microsoft, mythtv, sata, storage
 Slug: february-26-2008
 

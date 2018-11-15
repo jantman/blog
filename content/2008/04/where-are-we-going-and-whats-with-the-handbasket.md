@@ -1,7 +1,7 @@
 Title: Where are we going and what's with the handbasket?
 Date: 2008-04-02 12:13
 Author: admin
-Category: Ideas and Rants
+Category: Miscellaneous
 Tags: 700mhz, microsoft, ooxml, spectrum
 Slug: where-are-we-going-and-whats-with-the-handbasket
 

@@ -1,7 +1,7 @@
 Title: Puppet facter facts for syslog daemon type and version, symantec netbackup
 Date: 2012-08-25 11:33
 Author: admin
-Category: Puppet
+Category: Software
 Tags: facter, nbu, netbackup, puppet, rsyslog, syslog
 Slug: puppet-facter-facts-for-syslog-daemon-type-and-version-symantec-netbackup
 

@@ -1,7 +1,7 @@
 Title: Puppet facter fact for last applied configuration version
 Date: 2012-08-21 08:55
 Author: admin
-Category: Puppet
+Category: Software
 Tags: config_version, fact, facter, puppet
 Slug: puppet-facter-fact-for-last-applied-configuration-version
 

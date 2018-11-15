@@ -1,7 +1,7 @@
 Title: Consolidation of nmap port scan results to HTML table
 Date: 2011-01-30 20:00
 Author: admin
-Category: Tech HowTos
+Category: Software
 Tags: nmap, security
 Slug: consolidation-of-nmap-port-scan-results-to-html-table
 

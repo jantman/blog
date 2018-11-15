@@ -1,7 +1,7 @@
 Title: Community Datacenter
 Date: 2009-02-07 00:50
 Author: admin
-Category: Ideas and Rants
+Category: Miscellaneous
 Tags: community, datacenter
 Slug: community-datacenter
 

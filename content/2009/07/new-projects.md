@@ -1,7 +1,7 @@
 Title: New Projects
 Date: 2009-07-16 14:05
 Author: admin
-Category: Projects
+Category: Miscellaneous
 Tags: bind, dns, google, PHPsa, rackman
 Slug: new-projects
 

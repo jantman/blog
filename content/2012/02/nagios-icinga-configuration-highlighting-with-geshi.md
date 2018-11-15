@@ -1,7 +1,7 @@
 Title: Nagios / Icinga Configuration Highlighting with GeSHi
 Date: 2012-02-28 18:42
 Author: admin
-Category: Monitoring
+Category: Software
 Tags: GeSHi, icinga, mediawiki, Nagios, PHP, wordpress
 Slug: nagios-icinga-configuration-highlighting-with-geshi
 

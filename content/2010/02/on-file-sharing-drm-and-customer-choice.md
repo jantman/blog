@@ -1,7 +1,7 @@
 Title: On FIle Sharing, DRM, and customer choice
 Date: 2010-02-27 13:04
 Author: admin
-Category: Ideas and Rants
+Category: Miscellaneous
 Tags: drm, file sharing, intellectual property, IP, music, p2p, peer to peer, shopping
 Slug: on-file-sharing-drm-and-customer-choice
 

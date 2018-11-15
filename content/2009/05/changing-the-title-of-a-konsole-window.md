@@ -1,7 +1,7 @@
 Title: Changing the title of a Konsole window
 Date: 2009-05-19 15:10
 Author: admin
-Category: Tech HowTos
+Category: Miscellaneous
 Tags: kde, knosone
 Slug: changing-the-title-of-a-konsole-window
 

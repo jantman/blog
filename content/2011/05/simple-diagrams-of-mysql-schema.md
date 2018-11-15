@@ -1,7 +1,7 @@
 Title: Simple Diagrams of MySQL Schema
 Date: 2011-05-04 08:47
 Author: admin
-Category: Tech HowTos
+Category: Software
 Tags: database, db, diagram, mysql, sql
 Slug: simple-diagrams-of-mysql-schema
 

@@ -1,7 +1,7 @@
 Title: Testing GPG Key Passphrases
 Date: 2013-08-26 06:00
 Author: admin
-Category: Tech HowTos
+Category: Software
 Tags: encryption, gnupg, gpg, key, passphrase, pgp
 Slug: testing-gpg-key-passphrases
 

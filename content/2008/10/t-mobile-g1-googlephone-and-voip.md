@@ -1,7 +1,7 @@
 Title: T-Mobile G1 (Googlephone) and VoIP?
 Date: 2008-10-27 08:12
 Author: admin
-Category: Ideas and Rants
+Category: Miscellaneous
 Tags: cell, g1, google, phone, t-mobile, voip
 Slug: t-mobile-g1-googlephone-and-voip
 

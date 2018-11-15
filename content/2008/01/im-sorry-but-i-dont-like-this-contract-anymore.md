@@ -1,7 +1,7 @@
 Title: I'm sorry, but I don't like this contract anymore.
 Date: 2008-01-28 13:43
 Author: admin
-Category: Ideas and Rants
+Category: Miscellaneous
 Slug: im-sorry-but-i-dont-like-this-contract-anymore
 
 The other big news in tech today - as posted on

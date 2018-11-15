@@ -1,7 +1,7 @@
 Title: SunBlade Workstations
 Date: 2007-12-12 22:51
 Author: admin
-Category: Projects
+Category: Hardware
 Tags: sunblade sun solaris opensolaris install firmware boot
 Slug: sunblade-workstations
 

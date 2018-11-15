@@ -1,7 +1,7 @@
 Title: Adding Piwik Web Analytics Integration to ViewVC
 Date: 2012-03-23 21:15
 Author: admin
-Category: Tech HowTos
+Category: Software
 Tags: analytics, piwik, python, subversion, svn, tracking, viewvc
 Slug: adding-piwik-web-analytics-integration-to-viewvc
 

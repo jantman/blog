@@ -1,7 +1,7 @@
 Title: AwsLimitChecker - Check Your AWS Usage Against Service Limits
 Date: 2015-07-25 08:35
 Author: Jason Antman
-Category: Projects
+Category: AWS
 Tags: aws, ec2, limits, python, awslimitchecker, cloud
 Slug: awslimitchecker-check-your-aws-usage-against-service-limits
 Summary: Initial release of AwsLimitChecker, a tool to check your AWS usage against service limits and Trusted Advisor.

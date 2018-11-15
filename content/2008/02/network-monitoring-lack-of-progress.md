@@ -1,7 +1,7 @@
 Title: Network Monitoring (lack of) Progress
 Date: 2008-02-06 00:07
 Author: admin
-Category: Projects
+Category: Software
 Slug: network-monitoring-lack-of-progress
 
 So, I've been plodding along after troubleshooting some VPN issues with

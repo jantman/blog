@@ -1,7 +1,7 @@
 Title: September 2009 Project Updates
 Date: 2009-09-17 13:00
 Author: admin
-Category: Projects
+Category: Miscellaneous
 Tags: machdb, php ems tools, PHPsa, Projects, rackman
 Slug: september-2009-project-updates
 

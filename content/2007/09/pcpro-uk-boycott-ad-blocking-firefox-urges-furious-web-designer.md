@@ -1,7 +1,7 @@
 Title: PCpro UK: Boycott ad-blocking Firefox, urges furious web designer
 Date: 2007-09-17 14:04
 Author: admin
-Category: Ideas and Rants
+Category: Miscellaneous
 Tags: ad blocker, firefox, internet, standards
 Slug: pcpro-uk-boycott-ad-blocking-firefox-urges-furious-web-designer
 

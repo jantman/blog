@@ -1,7 +1,7 @@
 Title: Where have I gone?
 Date: 2008-03-25 09:07
 Author: admin
-Category: Projects
+Category: Miscellaneous
 Tags: calendar, gps, kpilot, mdc1200, palm, rutgers, ruwireless
 Slug: where-have-i-gone
 

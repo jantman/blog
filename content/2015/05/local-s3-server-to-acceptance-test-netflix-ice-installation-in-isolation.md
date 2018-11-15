@@ -1,7 +1,7 @@
 Title: Local S3 Server to Acceptance Test Netflix Ice Installation In Isolation
 Date: 2015-05-05 06:45
 Author: Jason Antman
-Category: Tech HowTos
+Category: AWS
 Tags: netflix, ice, puppet, beaker, acceptance testing, aws, s3, fakes3, testing
 Slug: local-s3-server-to-acceptance-test-netflix-ice-installation-in-isolation
 Summary: How I wrote isolated acceptance tests for Netflix Ice Puppet installation using a locally-backed S3 API server.

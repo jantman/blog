@@ -1,7 +1,7 @@
 Title: Website, Blog, Bacula
 Date: 2007-10-10 13:35
 Author: admin
-Category: Projects
+Category: Software
 Tags: bacula, blog, jasonantman, mediawiki, wiki
 Slug: website-blog-bacula
 

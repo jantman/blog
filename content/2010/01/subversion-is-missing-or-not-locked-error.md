@@ -1,7 +1,7 @@
 Title: Subversion 'is missing or not locked' error
 Date: 2010-01-29 15:58
 Author: admin
-Category: Tech HowTos
+Category: Miscellaneous
 Tags: subversion, svn, version control
 Slug: subversion-is-missing-or-not-locked-error
 

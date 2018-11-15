@@ -1,7 +1,7 @@
 Title: VyOS on Alix 2C1 Single Board Computer
 Date: 2017-03-04 12:27
 Author: Jason Antman
-Category: Tech HowTos
+Category: Hardware
 Tags: vyos,vyatta,alix,virtualbox,network,router,firewall,linux,sbc
 Slug: vyos-on-alix-2c1-single-board-computer
 Summary: How to install VyOS 1.1.7 on an Alix 2c1 or similar i386 single board computer

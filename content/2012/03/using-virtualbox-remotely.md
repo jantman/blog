@@ -1,7 +1,7 @@
 Title: Using VirtualBox Remotely
 Date: 2012-03-09 12:00
 Author: admin
-Category: Tech HowTos
+Category: Software
 Tags: rdp, virtualbox, virtualization, vm
 Slug: using-virtualbox-remotely
 

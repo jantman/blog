@@ -1,7 +1,7 @@
 Title: IEI HubMax Access Control and Linux
 Date: 2008-03-31 12:43
 Author: admin
-Category: Tech HowTos
+Category: Hardware
 Tags: access control, door lock, hubmax, iei, ieib
 Slug: iei-access-control-and-linux
 

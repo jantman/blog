@@ -1,7 +1,7 @@
 Title: Motorola Droid - Volume way too low
 Date: 2009-11-17 08:51
 Author: admin
-Category: Tech HowTos
+Category: Miscellaneous
 Tags: android, droid
 Slug: motorola-droid-volume-way-too-low
 

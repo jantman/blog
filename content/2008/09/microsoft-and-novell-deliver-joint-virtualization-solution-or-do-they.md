@@ -1,7 +1,7 @@
 Title: Microsoft and Novell Deliver Joint Virtualization Solution - or do they?
 Date: 2008-09-11 11:40
 Author: admin
-Category: Ideas and Rants
+Category: Miscellaneous
 Tags: microsoft, novell, suse, virtualization
 Slug: microsoft-and-novell-deliver-joint-virtualization-solution-or-do-they
 

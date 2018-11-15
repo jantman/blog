@@ -1,7 +1,7 @@
 Title: Xen/Etherboot and DHCP Problems
 Date: 2010-04-20 10:46
 Author: admin
-Category: Tech HowTos
+Category: Software
 Tags: dhcp, dhcpd, etherboot, ldap, pxe, xen
 Slug: xenetherboot-and-dhcp-problems
 

@@ -1,7 +1,7 @@
 Title: Many Many Changes; Downtime
 Date: 2009-03-07 19:05
 Author: admin
-Category: Projects
+Category: Miscellaneous
 Tags: firewall, optimum, rack, router, wan
 Slug: many-many-changes
 

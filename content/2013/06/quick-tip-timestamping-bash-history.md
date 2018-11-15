@@ -1,7 +1,7 @@
 Title: Quick Tip: Timestamping bash history
 Date: 2013-06-11 07:09
 Author: admin
-Category: Tech HowTos
+Category: Software
 Tags: bash, history, shell, timestamp
 Slug: quick-tip-timestamping-bash-history
 

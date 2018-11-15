@@ -1,7 +1,7 @@
 Title: Handling mailto links on another computer
 Date: 2010-11-16 11:34
 Author: admin
-Category: Tech HowTos
+Category: Software
 Tags: firefox, Thunderbird
 Slug: handling-mailto-links-on-another-computer
 

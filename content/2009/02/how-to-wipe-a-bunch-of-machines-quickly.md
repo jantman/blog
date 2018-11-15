@@ -1,7 +1,7 @@
 Title: How To Wipe a Bunch of Machines Quickly
 Date: 2009-02-03 15:51
 Author: admin
-Category: Tech HowTos
+Category: Software
 Tags: automation, cobbler, dban, pxe, retirement, security, wiping
 Slug: how-to-wipe-a-bunch-of-machines-quickly
 

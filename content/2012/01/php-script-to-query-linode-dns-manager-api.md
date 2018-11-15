@@ -1,7 +1,7 @@
 Title: PHP Script to Query Linode DNS Manager API
 Date: 2012-01-20 22:49
 Author: admin
-Category: Tech HowTos
+Category: Software
 Tags: api, dns, linode, PHP, sysadmin
 Slug: php-script-to-query-linode-dns-manager-api
 

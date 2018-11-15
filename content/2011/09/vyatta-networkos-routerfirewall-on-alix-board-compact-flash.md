@@ -1,7 +1,7 @@
 Title: Vyatta NetworkOS router/firewall on Alix board / Compact Flash
 Date: 2011-09-30 14:16
 Author: admin
-Category: Projects
+Category: Hardware
 Tags: alix, embedded, network, pcengines, router, vyatta
 Slug: vyatta-networkos-routerfirewall-on-alix-board-compact-flash
 

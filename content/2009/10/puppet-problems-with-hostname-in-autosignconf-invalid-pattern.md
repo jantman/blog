@@ -1,7 +1,7 @@
 Title: Puppet problems with hostname in autosign.conf - Invalid pattern
 Date: 2009-10-14 14:45
 Author: admin
-Category: Puppet
+Category: Software
 Tags: autosign.conf, hostname, puppet
 Slug: puppet-problems-with-hostname-in-autosignconf-invalid-pattern
 

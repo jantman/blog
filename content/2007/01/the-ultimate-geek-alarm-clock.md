@@ -1,7 +1,7 @@
 Title: The ultimate Geek alarm clock!
 Date: 2007-01-16 22:55
 Author: admin
-Category: Ideas and Rants
+Category: Miscellaneous
 Tags: alarm clock, embedded, geek, PoE
 Slug: the-ultimate-geek-alarm-clock
 

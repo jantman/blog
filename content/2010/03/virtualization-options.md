@@ -1,7 +1,7 @@
 Title: Virtualization Options
 Date: 2010-03-19 20:55
 Author: admin
-Category: Projects
+Category: Miscellaneous
 Tags: OpenVZ, virtualization, xen
 Slug: virtualization-options
 

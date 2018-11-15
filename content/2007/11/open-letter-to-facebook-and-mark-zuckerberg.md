@@ -1,7 +1,7 @@
 Title: Open Letter to Facebook and Mark Zuckerberg
 Date: 2007-11-22 20:59
 Author: admin
-Category: Ideas and Rants
+Category: Miscellaneous
 Slug: open-letter-to-facebook-and-mark-zuckerberg
 
 I sent the following as (appropriately enough) a Facebook message to

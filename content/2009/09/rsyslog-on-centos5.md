@@ -1,7 +1,7 @@
 Title: rsyslog on CentOS5
 Date: 2009-09-17 15:45
 Author: admin
-Category: Tech HowTos
+Category: Miscellaneous
 Tags: centos, logging, rsyslog, syslog
 Slug: rsyslog-on-centos5
 

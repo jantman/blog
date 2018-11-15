@@ -1,7 +1,7 @@
 Title: Readable Nagios Log Timestamps
 Date: 2012-10-17 05:00
 Author: admin
-Category: Ops
+Category: Software
 Tags: icinga, Nagios, perl, timestamp
 Slug: readable-nagios-log-timestamps
 

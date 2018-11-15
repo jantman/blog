@@ -1,7 +1,7 @@
 Title: Internet Security, Microsoft Lies
 Date: 2008-09-16 23:24
 Author: admin
-Category: Ideas and Rants
+Category: Miscellaneous
 Tags: microsoft, rutgers, school, security
 Slug: internet-security-microsoft-lies
 

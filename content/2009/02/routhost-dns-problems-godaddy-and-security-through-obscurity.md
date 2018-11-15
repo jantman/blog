@@ -1,7 +1,7 @@
 Title: ROUThost DNS problems; GoDaddy and Security through Obscurity
 Date: 2009-02-25 11:07
 Author: admin
-Category: Ideas and Rants
+Category: Miscellaneous
 Tags: dns, godaddy, hosting, routhost, security through obscurity, support
 Slug: routhost-dns-problems-godaddy-and-security-through-obscurity
 

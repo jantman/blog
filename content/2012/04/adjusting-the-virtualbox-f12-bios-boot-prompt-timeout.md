@@ -1,7 +1,7 @@
 Title: Adjusting the VirtualBox F12 BIOS Boot Prompt Timeout
 Date: 2012-04-09 13:52
 Author: admin
-Category: Tech HowTos
+Category: Software
 Tags: provisioning, pxe, rdp, sysadmin, vbox, virtualbox, virtualization, vm
 Slug: adjusting-the-virtualbox-f12-bios-boot-prompt-timeout
 

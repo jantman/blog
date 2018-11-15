@@ -1,7 +1,7 @@
 Title: Logging OpenSSH SFTP Transactions
 Date: 2012-07-16 08:47
 Author: admin
-Category: Tech HowTos
+Category: Software
 Tags: logging, openssh, sftp, ssh
 Slug: logging-openssh-sftp-transactions
 

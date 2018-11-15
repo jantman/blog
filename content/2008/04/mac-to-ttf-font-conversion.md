@@ -1,7 +1,7 @@
 Title: Mac to TTF font conversion
 Date: 2008-04-16 23:03
 Author: admin
-Category: Tech HowTos
+Category: Software
 Tags: font, mac
 Slug: mac-to-ttf-font-conversion
 

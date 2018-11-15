@@ -1,7 +1,7 @@
 Title: Sending AOL Instant Messenger (AIM) Messages from a Perl Script
 Date: 2012-02-28 18:33
 Author: admin
-Category: Monitoring
+Category: Software
 Tags: aim, aol, icinga, instant messenger, Nagios, notifications, perl
 Slug: sending-aim-messages-from-a-perl-script
 

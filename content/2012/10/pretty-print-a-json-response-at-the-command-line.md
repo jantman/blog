@@ -1,7 +1,7 @@
 Title: Pretty-Print a JSON response at the command line
 Date: 2012-10-09 14:44
 Author: admin
-Category: Tech HowTos
+Category: Miscellaneous
 Tags: curl, json, python, rabbitmq
 Slug: pretty-print-a-json-response-at-the-command-line
 

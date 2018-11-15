@@ -1,7 +1,7 @@
 Title: Bug / Issue Tracking Software
 Date: 2007-09-07 11:44
 Author: admin
-Category: Projects
+Category: Software
 Tags: bug tracking, bugs, bugzero, eventum, flyspray, otrs, rt, ticketing, trac
 Slug: bug-issue-tracking-software
 

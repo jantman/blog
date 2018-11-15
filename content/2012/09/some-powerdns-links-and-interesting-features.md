@@ -1,7 +1,7 @@
 Title: Some PowerDNS Links and Interesting Features
 Date: 2012-09-05 05:00
 Author: admin
-Category: Ops
+Category: Miscellaneous
 Tags: bind, dns, multibindadmin, powerdns
 Slug: some-powerdns-links-and-interesting-features
 

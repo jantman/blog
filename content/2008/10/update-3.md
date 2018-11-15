@@ -1,7 +1,7 @@
 Title: Update
 Date: 2008-10-24 12:50
 Author: admin
-Category: Projects
+Category: Miscellaneous
 Tags: android, g1, google
 Slug: update-3
 

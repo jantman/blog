@@ -1,7 +1,7 @@
 Title: MySQL General Query Log and Awk Trimming Columns
 Date: 2010-12-21 11:45
 Author: admin
-Category: Tech HowTos
+Category: Software
 Tags: awk, database, logging, mysql
 Slug: mysql-general-query-log-and-awk-trimming-columns
 

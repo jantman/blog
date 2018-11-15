@@ -1,7 +1,7 @@
 Title: Print Accounting
 Date: 2007-11-27 00:51
 Author: admin
-Category: Projects
+Category: Software
 Slug: print-accounting
 
 Since we moved into our apartment at the end of last summer, my

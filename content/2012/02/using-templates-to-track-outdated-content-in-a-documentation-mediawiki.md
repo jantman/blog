@@ -1,7 +1,7 @@
 Title: Using Templates to Track Outdated Content in a Documentation MediaWiki
 Date: 2012-02-02 11:02
 Author: admin
-Category: Tech HowTos
+Category: Software
 Tags: documentation, mediawiki, sysadmin
 Slug: using-templates-to-track-outdated-content-in-a-documentation-mediawiki
 

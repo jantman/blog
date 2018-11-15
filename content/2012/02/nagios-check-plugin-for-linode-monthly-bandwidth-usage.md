@@ -1,7 +1,7 @@
 Title: Nagios Check Plugin for Linode Monthly Bandwidth Usage
 Date: 2012-02-29 20:32
 Author: admin
-Category: Monitoring
+Category: Software
 Tags: linode, monitoring, Nagios, plugin
 Slug: nagios-check-plugin-for-linode-monthly-bandwidth-usage
 

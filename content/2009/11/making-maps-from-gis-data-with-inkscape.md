@@ -1,7 +1,7 @@
 Title: Making maps from GIS data with Inkscape
 Date: 2009-11-25 09:24
 Author: admin
-Category: Tech HowTos
+Category: Miscellaneous
 Tags: gis, inkscape, map, shapefile, svg
 Slug: making-maps-from-gis-data-with-inkscape
 

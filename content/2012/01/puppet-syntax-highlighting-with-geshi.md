@@ -1,7 +1,7 @@
 Title: Puppet Syntax Highlighting with GeSHi
 Date: 2012-01-11 12:32
 Author: admin
-Category: Puppet
+Category: Software
 Tags: GeSHi, mediawiki, PHP, puppet, wordpress
 Slug: puppet-syntax-highlighting-with-geshi
 

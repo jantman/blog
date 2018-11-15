@@ -1,7 +1,7 @@
 Title: Getting Sun iLOM information within Linux
 Date: 2010-09-16 10:28
 Author: admin
-Category: Tech HowTos
+Category: Hardware
 Tags: inventory, ipmi, ipmitool, ocs-inventory, sun, sunfire, sysadmin
 Slug: getting-sun-ilom-information-within-linux
 

@@ -1,7 +1,7 @@
 Title: Getting SunSPOTs working under OpenSuSE 10.1
 Date: 2008-05-13 13:09
 Author: admin
-Category: Tech HowTos
+Category: Software
 Tags: java, linux, netbeans, sun, sunspot
 Slug: getting-sunspots-working-under-opensuse-101
 

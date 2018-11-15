@@ -1,7 +1,7 @@
 Title: Leap Year Windows Azure Cloud Outage
 Date: 2012-03-20 18:12
 Author: admin
-Category: Ops
+Category: Miscellaneous
 Tags: azure, microsoft, outage, release, testing, windows
 Slug: leap-year-windows-azure-cloud-outage
 

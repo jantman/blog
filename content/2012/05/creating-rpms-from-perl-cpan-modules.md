@@ -1,7 +1,7 @@
 Title: Creating RPMs from Perl CPAN Modules
 Date: 2012-05-15 15:01
 Author: admin
-Category: Tech HowTos
+Category: Software
 Tags: cpan, cpan2rpm, perl, rpm, yum
 Slug: creating-rpms-from-perl-cpan-modules
 

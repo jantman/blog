@@ -1,7 +1,7 @@
 Title: eeePC, Solaris, other updates
 Date: 2008-01-27 02:18
 Author: admin
-Category: Projects
+Category: Hardware
 Slug: eeepc-solaris-other-updates
 
 I'm trying to get around to updating my blog on a regular basis. I have

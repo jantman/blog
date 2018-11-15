@@ -1,7 +1,7 @@
 Title: Centralized Storage via SFTP
 Date: 2008-04-21 17:28
 Author: admin
-Category: Tech HowTos
+Category: Software
 Tags: fuse, sftp, ssh, sshfs, storage
 Slug: centralized-storage-via-sftp
 

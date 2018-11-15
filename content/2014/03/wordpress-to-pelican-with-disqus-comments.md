@@ -1,7 +1,7 @@
 Title: Wordpress to Pelican with Disqus comments
 Date: 2014-03-01 09:09
 Author: Jason Antman
-Category: Tech HowTos
+Category: Miscellaneous
 Tags: wordpress, pelican, blog, disqus, comments
 Slug: wordpress-to-pelican-with-disqus-comments
 Summary: Solutions to some of the many problems converting a WordPress blog to a Pelican blog with Disqus for commenting.

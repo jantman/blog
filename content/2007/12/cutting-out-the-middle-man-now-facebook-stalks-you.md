@@ -1,7 +1,7 @@
 Title: Cutting out the middle man - Now Facebook stalks you!
 Date: 2007-12-03 15:21
 Author: admin
-Category: Ideas and Rants
+Category: Miscellaneous
 Slug: cutting-out-the-middle-man-now-facebook-stalks-you
 
 For those of you who aren't familiar, Facebook recently rolled out the

@@ -1,7 +1,7 @@
 Title: How to make software distribution secure
 Date: 2010-09-17 12:42
 Author: admin
-Category: Ideas and Rants
+Category: Miscellaneous
 Tags: linux, mac, packaging, security, software, windows
 Slug: how-to-make-software-distribution-secure
 

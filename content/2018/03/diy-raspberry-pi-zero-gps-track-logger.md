@@ -2,7 +2,7 @@ Title: DIY Raspberry Pi Zero GPS Track Logger
 Date: 2018-03-06 16:00
 Modified: 2018-03-06 16:00
 Author: Jason Antman
-Category: Tech HowTos
+Category: DIY
 Tags: embedded, gps, hiking, logger, raspberrypi
 Slug: diy-raspberry-pi-zero-gps-track-logger
 Summary: Simple DIY Raspberry Pi Zero USB GPS logger, with code and instructions.

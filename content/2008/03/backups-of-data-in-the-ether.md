@@ -1,7 +1,7 @@
 Title: Backups of data in the ether
 Date: 2008-03-06 12:11
 Author: admin
-Category: Tech HowTos
+Category: Miscellaneous
 Tags: backups, del.icio.us, docs, google, reader
 Slug: backups-of-data-in-the-ether
 

@@ -1,7 +1,7 @@
 Title: A Rant on Post-Secondary Tech Education
 Date: 2015-10-05 16:46
 Author: Jason Antman
-Category: Ideas and Rants
+Category: Miscellaneous
 Tags: college, computer science, CS, technology, education
 Slug: a-rant-on-post-secondary-tech-education
 Summary: A rant on the state of post-secondary technology education.

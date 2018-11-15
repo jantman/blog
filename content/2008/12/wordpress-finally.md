@@ -1,7 +1,7 @@
 Title: WordPress... Finally!
 Date: 2008-12-17 15:58
 Author: admin
-Category: Projects
+Category: Software
 Tags: blogger, blogging, PHP, wordpress
 Slug: wordpress-finally
 

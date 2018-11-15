@@ -1,7 +1,7 @@
 Title: Support Open Source
 Date: 2007-02-08 18:09
 Author: admin
-Category: Ideas and Rants
+Category: Miscellaneous
 Slug: support-open-source
 
 I get paid tomorrow, and it's time to spend some money. Sure, there are

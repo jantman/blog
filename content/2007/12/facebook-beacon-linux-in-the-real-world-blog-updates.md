@@ -1,7 +1,7 @@
 Title: Facebook Beacon; Linux in the Real World; Blog Updates
 Date: 2007-12-15 22:57
 Author: admin
-Category: Ideas and Rants
+Category: Miscellaneous
 Tags: facebook beacon blog linux NYSE
 Slug: facebook-beacon-linux-in-the-real-world-blog-updates
 

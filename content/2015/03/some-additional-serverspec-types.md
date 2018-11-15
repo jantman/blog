@@ -1,7 +1,7 @@
 Title: Some Additional Serverspec Types
 Date: 2015-03-14 11:58
 Author: Jason Antman
-Category: Projects
+Category: Software
 Tags: serverspec, specinfra, testing, beaker, ruby, rspec, gem
 Slug: some-additional-serverspec-types
 Summary: Some additional types that I wrote for Serverspec

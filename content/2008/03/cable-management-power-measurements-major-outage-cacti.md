@@ -1,7 +1,7 @@
 Title: Cable Management, Power Measurements, Major Outage, Cacti
 Date: 2008-03-06 01:02
 Author: admin
-Category: Projects
+Category: Hardware
 Tags: apc, cable management, cacti, disaster, monitoring, power distribution, power failure, rack, UPS
 Slug: cable-management-power-measurements-major-outage-cacti
 

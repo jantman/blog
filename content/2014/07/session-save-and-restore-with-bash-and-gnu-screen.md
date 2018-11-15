@@ -1,7 +1,7 @@
 Title: Session Save and Restore with Bash and GNU Screen
 Date: 2014-07-25 10:09
 Author: Jason Antman
-Category: Tech HowTos
+Category: Software
 Tags: bash, screen, restore, bashrc
 Slug: session-save-and-restore-with-bash-and-gnu-screen
 Summary: How to automatically save and restore GNU screen sessions including windows, pwd and history

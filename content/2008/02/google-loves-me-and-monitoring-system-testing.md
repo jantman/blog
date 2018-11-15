@@ -1,7 +1,7 @@
 Title: Google Loves Me! and Monitoring System Testing
 Date: 2008-02-05 03:15
 Author: admin
-Category: Projects
+Category: Miscellaneous
 Tags: google, groundwork, hyperic, montoring, opennms
 Slug: google-loves-me-and-monitoring-system-testing
 

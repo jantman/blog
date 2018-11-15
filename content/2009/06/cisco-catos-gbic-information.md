@@ -1,7 +1,7 @@
 Title: Cisco CatOS GBIC Information
 Date: 2009-06-20 11:35
 Author: admin
-Category: Tech HowTos
+Category: Hardware
 Tags: catos, cisco, gbic, networking
 Slug: cisco-catos-gbic-information
 

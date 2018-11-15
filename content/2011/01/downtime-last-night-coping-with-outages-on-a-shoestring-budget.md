@@ -1,7 +1,7 @@
 Title: Downtime Last Night; Coping with outages on a shoestring budget
 Date: 2011-01-10 09:22
 Author: admin
-Category: Projects
+Category: Miscellaneous
 Tags: disaster recovery, downtime, failover, redundancy
 Slug: downtime-last-night-coping-with-outages-on-a-shoestring-budget
 

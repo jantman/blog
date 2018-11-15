@@ -1,7 +1,7 @@
 Title: New MacBook Pro; Dual boot with Linux
 Date: 2010-06-22 15:17
 Author: admin
-Category: Tech HowTos
+Category: Hardware
 Tags: apple, dual boot, laptop, linux, mac, macbook, opensuse
 Slug: new-macbook-pro-dual-boot-with-linux
 

@@ -1,7 +1,7 @@
 Title: Parsing Nagios status.dat in PHP
 Date: 2010-02-21 22:42
 Author: admin
-Category: Monitoring
+Category: Software
 Tags: Nagios, PHP, xml
 Slug: parsing-nagios-status-dat-in-php
 

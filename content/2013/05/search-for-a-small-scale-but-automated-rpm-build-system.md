@@ -1,7 +1,7 @@
 Title: Search for a small-scale but automated RPM build system
 Date: 2013-05-13 05:00
 Author: admin
-Category: Tech HowTos
+Category: Software
 Tags: build, linux, nodejs, package, packaging, repository, rpm, rpmbuild, software, sysadmin, yum
 Slug: search-for-a-small-scale-but-automated-rpm-build-system
 

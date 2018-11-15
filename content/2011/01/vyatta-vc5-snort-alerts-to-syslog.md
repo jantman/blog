@@ -1,7 +1,7 @@
 Title: Vyatta VC5 - Snort alerts to syslog
 Date: 2011-01-30 19:54
 Author: admin
-Category: Tech HowTos
+Category: Software
 Tags: security, snort, syslog, vyatta
 Slug: vyatta-vc5-snort-alerts-to-syslog
 

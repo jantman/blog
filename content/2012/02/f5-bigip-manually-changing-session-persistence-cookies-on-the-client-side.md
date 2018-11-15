@@ -1,7 +1,7 @@
 Title: F5 BigIp - Manually Changing Session Persistence Cookies on the Client Side
 Date: 2012-02-03 13:32
 Author: admin
-Category: Tech HowTos
+Category: Hardware
 Tags: bigip, cookies, debugging, f5, load balancer, perl, persistence, web app
 Slug: f5-bigip-manually-changing-session-persistence-cookies-on-the-client-side
 

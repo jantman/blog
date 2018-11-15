@@ -1,7 +1,7 @@
 Title: Vyatta - Showing ISC dhcpd fixed-address leases
 Date: 2011-12-24 14:42
 Author: admin
-Category: Tech HowTos
+Category: Software
 Tags: dhcpd, rsyslog, vyatta
 Slug: vyatta-showing-isc-dhcpd-fixed-address-leases
 

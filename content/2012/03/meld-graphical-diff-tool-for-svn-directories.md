@@ -1,7 +1,7 @@
 Title: Meld - Graphical Diff Tool for SVN Directories
 Date: 2012-03-12 09:48
 Author: admin
-Category: Tech HowTos
+Category: Software
 Tags: diff, kde, kdiff, meld, merge, subversion, svn
 Slug: meld-graphical-diff-tool-for-svn-directories
 

@@ -1,7 +1,7 @@
 Title: DHCP Debugging and Handy TCPdump filters
 Date: 2010-04-14 09:21
 Author: admin
-Category: Tech HowTos
+Category: Software
 Tags: dhcp, tcpdump, wireshark
 Slug: dhcp-debugging-and-handy-tcpdump-filters
 

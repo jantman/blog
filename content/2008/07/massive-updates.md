@@ -1,7 +1,7 @@
 Title: Massive Updates
 Date: 2008-07-17 12:28
 Author: admin
-Category: Projects
+Category: Miscellaneous
 Tags: access point, alix, BlackLabAuth, mythtv, Nagios, pc engines, soekris, tuxostat, WifiDog, wireless
 Slug: massive-updates
 

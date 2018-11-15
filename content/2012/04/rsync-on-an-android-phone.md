@@ -1,7 +1,7 @@
 Title: Rsync on an Android phone
 Date: 2012-04-04 20:40
 Author: admin
-Category: Miscellaneous
+Category: Software
 Tags: android, rsync, tasker
 Slug: rsync-on-an-android-phone
 

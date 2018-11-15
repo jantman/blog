@@ -1,7 +1,7 @@
 Title: VMWare vSphere CLI and Perl SDK as an RPM
 Date: 2012-02-28 19:01
 Author: admin
-Category: Tech HowTos
+Category: Software
 Tags: perl, rpm, vcli, vmware, vsphere
 Slug: vmware-vsphere-cli-and-perl-sdk-as-an-rpm
 

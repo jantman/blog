@@ -1,7 +1,7 @@
 Title: Syslog from KickStart / Anaconda
 Date: 2010-03-24 13:52
 Author: admin
-Category: Tech HowTos
+Category: Software
 Slug: syslog-from-kickstart-anaconda
 
 Yesterday I was installing a new machine at $WORK, and we'd been having

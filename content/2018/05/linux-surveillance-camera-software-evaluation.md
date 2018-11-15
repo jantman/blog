@@ -2,7 +2,7 @@ Title: Linux Surveillance Camera Software Evaluation
 Date: 2018-05-12 07:18
 Modified: 2018-05-12 07:18
 Author: Jason Antman
-Category: Projects
+Category: DIY
 Tags: amcrest, camera, security, surveillance, video, linux, IP camera, evaluation
 Slug: linux-surveillance-camera-software-evaluation
 Summary: My evaluation of some options for streaming and motion-activated recording of IP cameras.

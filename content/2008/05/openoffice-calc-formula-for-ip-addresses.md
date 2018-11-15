@@ -1,7 +1,7 @@
 Title: OpenOffice Calc formula for IP addresses
 Date: 2008-05-30 10:56
 Author: admin
-Category: Tech HowTos
+Category: Software
 Tags: ip address, openoffice, spreadsheet, tuxtruck
 Slug: openoffice-calc-formula-for-ip-addresses
 

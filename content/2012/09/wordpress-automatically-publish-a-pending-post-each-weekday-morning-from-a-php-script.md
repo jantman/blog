@@ -1,7 +1,7 @@
 Title: Wordpress - Automatically publish a pending post each weekday morning from a PHP script
 Date: 2012-09-04 05:00
 Author: admin
-Category: Tech HowTos
+Category: Miscellaneous
 Tags: cron, PHP, wordpress
 Slug: wordpress-automatically-publish-a-pending-post-each-weekday-morning-from-a-php-script
 

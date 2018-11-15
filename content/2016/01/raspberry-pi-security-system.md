@@ -1,7 +1,7 @@
 Title: Raspberry Pi Security System
 Date: 2016-01-16 10:00
 Author: Jason Antman
-Category: Tech HowTos
+Category: DIY
 Tags: rpi, pi, raspberrypi, security, alarm, motion, camera
 Slug: raspberry-pi-security-system
 Summary: A Raspberry Pi and webcam security system.

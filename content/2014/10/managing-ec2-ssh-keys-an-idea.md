@@ -1,7 +1,7 @@
 Title: Managing EC2 SSH Keys - An Idea
 Date: 2014-10-04 11:59
 Author: Jason Antman
-Category: Tech HowTos
+Category: AWS
 Tags: ssh, ec2, aws, keys, public key, pubkey
 Slug: managing-ec2-ssh-keys-an-idea
 Summary: An idea on how to manage EC2 SSH keys for a large number of users

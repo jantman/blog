@@ -1,7 +1,7 @@
 Title: Emacs Mode Variable for HTML
 Date: 2012-06-26 08:43
 Author: admin
-Category: Tech HowTos
+Category: Miscellaneous
 Tags: emacs, html. php
 Slug: emacs-mode-variable-for-html
 

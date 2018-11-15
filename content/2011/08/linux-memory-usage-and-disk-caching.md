@@ -1,7 +1,7 @@
 Title: Linux Memory Usage and Disk Caching
 Date: 2011-08-23 08:17
 Author: admin
-Category: Tech HowTos
+Category: Software
 Tags: linux, memory, rsyslog, syslog
 Slug: linux-memory-usage-and-disk-caching
 

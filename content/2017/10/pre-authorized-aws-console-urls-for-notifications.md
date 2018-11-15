@@ -2,7 +2,7 @@ Title: Pre-Authorized AWS Console URLs for Notifications
 Date: 2017-10-08 19:14
 Modified: 2017-10-08 19:14
 Author: Jason Antman
-Category: Monitoring
+Category: AWS
 Tags: aws, iam, monitoring, notifications
 Slug: pre-authorized-aws-console-urls-for-notifications
 Summary: Pre-authorized AWS Console login URLs with limited permissions allow immediate investigation from notifications.

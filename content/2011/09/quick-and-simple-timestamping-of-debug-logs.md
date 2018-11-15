@@ -1,7 +1,7 @@
 Title: Quick and Simple Timestamping of Debug Logs
 Date: 2011-09-08 07:06
 Author: admin
-Category: Tech HowTos
+Category: Software
 Tags: debugging, logs, puppet, sysadmin, timestamp
 Slug: quick-and-simple-timestamping-of-debug-logs
 

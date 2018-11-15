@@ -1,7 +1,7 @@
 Title: Synaptics touchpad driver synclient in Fedora 16 / Xorg with UDEV
 Date: 2012-01-27 17:51
 Author: admin
-Category: Tech HowTos
+Category: Hardware
 Tags: synaptics, synclient, thinkpad, touchpad, xorg
 Slug: synaptics-touchpad-driver-synclient-in-fedora-16-xorg-with-udev
 

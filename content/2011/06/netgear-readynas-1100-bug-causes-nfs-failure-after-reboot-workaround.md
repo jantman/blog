@@ -1,7 +1,7 @@
 Title: Netgear ReadyNAS 1100 Bug causes NFS Failure after reboot - workaround
 Date: 2011-06-28 08:40
 Author: admin
-Category: Tech HowTos
+Category: Hardware
 Tags: appliance, embedded, linux, nas, netgear, nfs, readynas
 Slug: netgear-readynas-1100-bug-causes-nfs-failure-after-reboot-workaround
 

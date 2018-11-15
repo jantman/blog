@@ -1,7 +1,7 @@
 Title: Madwifi on the eeePC
 Date: 2008-05-04 22:32
 Author: admin
-Category: Tech HowTos
+Category: Software
 Tags: atheros, eeepc, madwifi, wifi, wireless
 Slug: madwifi-on-the-eeepc
 

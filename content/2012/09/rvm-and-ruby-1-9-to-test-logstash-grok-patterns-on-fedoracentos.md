@@ -1,7 +1,7 @@
 Title: RVM and Ruby 1.9 to test logstash grok patterns on Fedora/CentOS
 Date: 2012-09-03 08:37
 Author: admin
-Category: Tech HowTos
+Category: Software
 Tags: grok, grokparsefailure, jruby, kibana, logstash, ruby, rvm
 Slug: rvm-and-ruby-1-9-to-test-logstash-grok-patterns-on-fedoracentos
 

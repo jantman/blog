@@ -1,7 +1,7 @@
 Title: 700MHz - Salvation or more of the same?
 Date: 2008-01-28 12:12
 Author: admin
-Category: Ideas and Rants
+Category: Miscellaneous
 Slug: 700mhz-salvation-or-more-of-the-same
 
 One of the biggest pieces of news in the tech world today is the FCC's

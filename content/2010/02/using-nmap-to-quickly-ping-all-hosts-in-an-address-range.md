@@ -1,7 +1,7 @@
 Title: Using nmap to quickly ping all hosts in an address range
 Date: 2010-02-08 09:10
 Author: admin
-Category: Tech HowTos
+Category: Miscellaneous
 Tags: dhcp, nmap, ping, sysadmin
 Slug: using-nmap-to-quickly-ping-all-hosts-in-an-address-range
 

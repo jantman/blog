@@ -1,7 +1,7 @@
 Title: Script to easily rebuild a SRPM
 Date: 2013-05-28 10:26
 Author: admin
-Category: Tech HowTos
+Category: Software
 Tags: lzma, packaging, rpm, rpm2cpio, rpmbuild, srpm, xz
 Slug: script-to-easily-rebuild-a-srpm
 

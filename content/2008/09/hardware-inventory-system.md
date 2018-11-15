@@ -1,7 +1,7 @@
 Title: Hardware Inventory System
 Date: 2008-09-12 13:01
 Author: admin
-Category: Projects
+Category: Miscellaneous
 Tags: configuration, inventory
 Slug: hardware-inventory-system
 

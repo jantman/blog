@@ -1,7 +1,7 @@
 Title: Python script to find dependency cycles in GraphViz dot files
 Date: 2012-03-28 22:05
 Author: admin
-Category: Puppet
+Category: Software
 Tags: dot, graph, graphviz, puppet, python
 Slug: python-script-to-find-dependency-cycles-in-graphviz-dot-files
 

@@ -1,7 +1,7 @@
 Title: My New-found Love of Trello and a Helpful GreaseMonkey Script
 Date: 2015-03-22 19:36
 Author: Jason Antman
-Category: Tech HowTos
+Category: Miscellaneous
 Tags: Trello, kanban, tickets, organization, work
 Slug: my-new-found-love-of-trello-and-a-helpful-greasemonkey-script
 Summary: How Trello has made my past week so much less stressful, and a helpful GreaseMonkey script to help add new cards.

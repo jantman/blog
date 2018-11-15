@@ -1,7 +1,7 @@
 Title: Droid Camera problem solved
 Date: 2009-11-18 13:17
 Author: admin
-Category: Miscellaneous
+Category: Hardware
 Tags: android, droid, motorola
 Slug: droid-camera-problem-solved
 

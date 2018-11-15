@@ -1,7 +1,7 @@
 Title: Network Monitoring Trials - Part I
 Date: 2008-02-05 20:26
 Author: admin
-Category: Projects
+Category: Software
 Tags: groundwork, hyperic, monitoring, opennms
 Slug: network-monitoring-trials-part-i
 

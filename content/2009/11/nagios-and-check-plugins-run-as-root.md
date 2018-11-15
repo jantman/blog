@@ -1,7 +1,7 @@
 Title: Nagios and check plugins run as root
 Date: 2009-11-05 17:05
 Author: admin
-Category: Monitoring
+Category: Miscellaneous
 Tags: Nagios
 Slug: nagios-and-check-plugins-run-as-root
 

@@ -1,7 +1,7 @@
 Title: Vyatta Initial Impressions
 Date: 2009-02-26 10:06
 Author: admin
-Category: Projects
+Category: Miscellaneous
 Tags: cisco, networking, router, vyatta
 Slug: vyatta-initial-impressions
 

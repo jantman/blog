@@ -1,7 +1,7 @@
 Title: New Project - Blog Migration to WordPress
 Date: 2008-09-18 12:49
 Author: admin
-Category: Projects
+Category: Software
 Tags: blog, wordpress
 Slug: new-project-blog-migration-to-wordpress
 

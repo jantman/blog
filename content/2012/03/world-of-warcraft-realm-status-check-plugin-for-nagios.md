@@ -1,7 +1,7 @@
 Title: World of Warcraft Realm Status Check Plugin for Nagios
 Date: 2012-03-16 07:40
 Author: admin
-Category: Monitoring
+Category: Miscellaneous
 Tags: blizzard, check plugin, monitoring, Nagios, warcraft, wow
 Slug: world-of-warcraft-realm-status-check-plugin-for-nagios
 

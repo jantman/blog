@@ -1,7 +1,7 @@
 Title: Why hasn't Linux caught up to Windows?
 Date: 2007-02-19 17:20
 Author: admin
-Category: Ideas and Rants
+Category: Miscellaneous
 Tags: compatibility, development, distribution, linux, novice, windows
 Slug: why-hasnt-linux-caught-up-to-windows
 

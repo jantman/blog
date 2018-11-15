@@ -1,7 +1,7 @@
 Title: Apache httpd - logging for sites with and without load balancing
 Date: 2012-05-30 09:46
 Author: admin
-Category: Tech HowTos
+Category: Software
 Tags: apache, bigip, f5, httpd, load balancer, logging
 Slug: apache-httpd-logging-for-sites-with-and-without-load-balancing
 

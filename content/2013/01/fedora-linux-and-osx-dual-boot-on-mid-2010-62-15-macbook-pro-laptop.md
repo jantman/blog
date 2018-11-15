@@ -1,7 +1,7 @@
 Title: Fedora Linux and OSX Dual Boot on Mid-2010 (6,2) 15" MacBook Pro Laptop
 Date: 2013-01-21 12:13
 Author: admin
-Category: Tech HowTos
+Category: Hardware
 Tags: bootloader, efi, fedora, gpt, grub, installation, laptop, mac, macbook, os x
 Slug: fedora-linux-and-osx-dual-boot-on-mid-2010-62-15-macbook-pro-laptop
 

@@ -1,7 +1,7 @@
 Title: The Big Name consipracy - and SSL certs
 Date: 2007-02-06 02:28
 Author: admin
-Category: Ideas and Rants
+Category: Miscellaneous
 Slug: the-big-name-consipracy-and-ssl-certs
 
 So I decided to setup SSL on my Apache server. After looking around for

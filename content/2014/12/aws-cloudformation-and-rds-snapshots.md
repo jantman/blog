@@ -1,7 +1,7 @@
 Title: AWS CloudFormation and RDS Snapshots
 Date: 2014-12-15 09:29
 Author: Jason Antman
-Category: Tech HowTos
+Category: AWS
 Tags: aws, cloudformation, rds, mysql, snapshot
 Slug: aws-cloudformation-and-rds-snapshots
 Summary: Some tips, tricks and non-intuitive information about working with AWS CloudFormation and RDS snapshots.

@@ -1,7 +1,7 @@
 Title: Workflow for contributing to GitHub projects
 Date: 2012-08-11 09:35
 Author: admin
-Category: Tech HowTos
+Category: Miscellaneous
 Tags: foreman, git, github, workflow
 Slug: workflow-for-contributing-to-github-projects
 

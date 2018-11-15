@@ -1,7 +1,7 @@
 Title: Wait! Stop! Don't copy that repo!
 Date: 2016-04-03 20:58
 Author: Jason Antman
-Category: Ideas and Rants
+Category: Miscellaneous
 Tags: clone, fork, repository, code, management, versiong
 Slug: wait-stop-dont-copy-that-repo
 Summary: An argument for why not to do internal development on open source projects.

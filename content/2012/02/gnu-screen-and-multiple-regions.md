@@ -1,7 +1,7 @@
 Title: GNU Screen and Multiple Regions
 Date: 2012-02-03 09:13
 Author: admin
-Category: Tech HowTos
+Category: Software
 Tags: console, screen, sysadmin
 Slug: gnu-screen-and-multiple-regions
 

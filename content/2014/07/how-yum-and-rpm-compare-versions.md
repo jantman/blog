@@ -1,7 +1,7 @@
 Title: How Yum and RPM Compare Versions
 Date: 2014-07-11 23:31
 Author: Jason Antman
-Category: Miscellaneous
+Category: Software
 Tags: rpm, yum, puppet, versions
 Slug: how-yum-and-rpm-compare-versions
 Summary: A description of the algorithms used by Yum and RPM to compare package versions.

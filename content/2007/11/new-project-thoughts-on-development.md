@@ -1,7 +1,7 @@
 Title: New Project, Thoughts on Development
 Date: 2007-11-19 23:49
 Author: admin
-Category: Projects
+Category: Software
 Slug: new-project-thoughts-on-development
 
 I know I don't update anywhere near often enough - then again, I update

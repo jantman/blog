@@ -1,7 +1,7 @@
 Title: Pushover Notifications for Shell Command Completion and Status
 Date: 2014-09-27 21:20
 Author: Jason Antman
-Category: Tech HowTos
+Category: Software
 Tags: pushover, shell, notifications
 Slug: pushover-notifications-for-shell-command-completion-and-status
 Summary: How to get pushover notifications of shell command completion and status

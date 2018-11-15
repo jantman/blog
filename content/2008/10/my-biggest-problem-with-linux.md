@@ -1,7 +1,7 @@
 Title: My biggest problem with Linux
 Date: 2008-10-27 15:27
 Author: admin
-Category: Ideas and Rants
+Category: Miscellaneous
 Tags: linux, patch management, solaris, updates, upgrades
 Slug: my-biggest-problem-with-linux
 

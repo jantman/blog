@@ -1,7 +1,7 @@
 Title: Updates, SuSE Online Update Issues
 Date: 2007-11-01 15:29
 Author: admin
-Category: Ideas and Rants
+Category: Miscellaneous
 Slug: updates-suse-online-update-issues
 
 It's been way too long since I've posted an update. But I haven't been

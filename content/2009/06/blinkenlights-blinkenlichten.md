@@ -1,7 +1,7 @@
 Title: Blinkenlights (blinkenlichten)
 Date: 2009-06-23 10:54
 Author: admin
-Category: Projects
+Category: Miscellaneous
 Slug: blinkenlights-blinkenlichten
 
 I'll be posting more on this in the next few days, but I did a few more

@@ -1,7 +1,7 @@
 Title: Slashdot - A Public Funded "Microsoft Shop?"
 Date: 2010-03-04 21:27
 Author: admin
-Category: Ideas and Rants
+Category: Miscellaneous
 Tags: microsoft
 Slug: slashdot-a-public-funded-microsoft-shop
 

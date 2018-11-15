@@ -1,7 +1,7 @@
 Title: PC vs Mac
 Date: 2010-08-15 16:25
 Author: admin
-Category: Ideas and Rants
+Category: Miscellaneous
 Tags: mac, pc, windows
 Slug: pc-vs-mac
 

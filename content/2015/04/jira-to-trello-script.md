@@ -1,7 +1,7 @@
 Title: Jira to Trello Script
 Date: 2015-04-10 05:58
 Author: Jason Antman
-Category: Miscellaneous
+Category: Software
 Tags: jira, trello, python, ticket, kanban
 Slug: jira-to-trello-script
 Summary: A script to pull time tracking and dependency information for Jira tickets onto Trello cards.

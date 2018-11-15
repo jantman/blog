@@ -1,7 +1,7 @@
 Title: Patch to Puppet Dashboard 1.2.10 to show arbitrary facts in the main node table
 Date: 2012-08-11 10:34
 Author: admin
-Category: Puppet
+Category: Software
 Tags: dashboard, facts, puppet, ruby, sysadmin
 Slug: patch-to-puppet-dashboard-1-2-10-to-show-arbitrary-facts-in-the-main-node-table
 

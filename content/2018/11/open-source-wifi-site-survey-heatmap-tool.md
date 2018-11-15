@@ -2,7 +2,7 @@ Title: Open Source WiFi Site Survey Heatmap Tool
 Date: 2018-11-01 18:07
 Modified: 2018-11-01 18:07
 Author: Jason Antman
-Category: Projects
+Category: Software
 Tags: wifi, survey, wireless, heatmap, python
 Slug: open-source-wifi-site-survey-tool
 Summary: A bit about a Python project I wrote to plot floorplan heatmaps of wireless site surveys.

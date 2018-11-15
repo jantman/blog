@@ -1,7 +1,7 @@
 Title: Project Announcement - PHPsa
 Date: 2009-09-29 15:36
 Author: admin
-Category: Projects
+Category: Miscellaneous
 Tags: bind, cacti, dns, Nagios, PHPsa, Projects, puppet, rsyslog, sysadmin, syslog
 Slug: project-announcement-phpsa
 

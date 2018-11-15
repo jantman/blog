@@ -1,7 +1,7 @@
 Title: Stallman and Free Software
 Date: 2007-12-21 00:28
 Author: admin
-Category: Ideas and Rants
+Category: Miscellaneous
 Tags: stallman RMS GPL software proprietary free GNU
 Slug: stallman-and-free-software
 

@@ -1,7 +1,7 @@
 Title: openEPCR
 Date: 2007-12-27 01:46
 Author: admin
-Category: Miscellaneous
+Category: Software
 Tags: emergency medical, EMS, free, healthcare, medical, open source, openepcr, patient care report, pcr, prehospital
 Slug: openepcr
 

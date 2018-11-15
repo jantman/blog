@@ -1,7 +1,7 @@
 Title: Modern (0.10.x+) NodeJS RPMs on CentOS/REHL 5 and 6
 Date: 2013-06-06 20:47
 Author: admin
-Category: Tech HowTos
+Category: Software
 Tags: build, centos, EPEL, node, nodejs, package, packaging, redhat, RHEL, rpm, specfile
 Slug: modern-0-10-x-nodejs-rpms-on-centosrehl-5-and-6
 

@@ -1,7 +1,7 @@
 Title: Big Plans - Major Infrastructure Upgrades
 Date: 2008-02-05 01:36
 Author: admin
-Category: Projects
+Category: Miscellaneous
 Slug: big-plans-major-infrastructure-upgrades
 
 Well, some more news. I've got some pay coming to me, and I also

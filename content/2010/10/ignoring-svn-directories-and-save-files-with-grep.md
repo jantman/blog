@@ -1,7 +1,7 @@
 Title: Ignoring SVN directories and save files with grep
 Date: 2010-10-15 07:27
 Author: admin
-Category: Tech HowTos
+Category: Software
 Tags: grep, linux
 Slug: ignoring-svn-directories-and-save-files-with-grep
 

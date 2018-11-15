@@ -1,7 +1,7 @@
 Title: How to get actual login username when using sudo su
 Date: 2011-01-05 11:48
 Author: admin
-Category: Tech HowTos
+Category: Software
 Tags: linux, login, sudo, username
 Slug: how-to-get-actual-login-username-when-using-sudo-su
 

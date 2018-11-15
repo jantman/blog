@@ -1,7 +1,7 @@
 Title: MediaWiki - Preformatted Text within Lists
 Date: 2012-03-15 18:10
 Author: admin
-Category: Tech HowTos
+Category: Software
 Tags: formatting, mediawiki, wiki
 Slug: mediawiki-preformatted-text-within-lists
 

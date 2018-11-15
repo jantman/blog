@@ -1,7 +1,7 @@
 Title: Environment Variable Substitution in Apache httpd Configs
 Date: 2013-05-11 12:01
 Author: admin
-Category: Tech HowTos
+Category: Software
 Tags: apache, environment, httpd, variable
 Slug: environment-variable-substitution-in-apache-httpd-configs
 

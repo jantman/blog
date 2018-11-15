@@ -1,7 +1,7 @@
 Title: New web server, WP optimization
 Date: 2010-02-28 23:19
 Author: admin
-Category: Projects
+Category: Miscellaneous
 Tags: apache, optimization, performance, wordpress
 Slug: new-web-server-wp-optimization
 

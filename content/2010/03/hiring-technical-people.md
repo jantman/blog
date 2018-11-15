@@ -1,7 +1,7 @@
 Title: Hiring Technical People
 Date: 2010-03-07 10:48
 Author: admin
-Category: Ideas and Rants
+Category: Miscellaneous
 Tags: hiring, hr, jobs
 Slug: hiring-technical-people
 

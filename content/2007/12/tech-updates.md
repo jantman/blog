@@ -1,7 +1,7 @@
 Title: Tech - Updates
 Date: 2007-12-11 15:54
 Author: admin
-Category: Projects
+Category: Miscellaneous
 Tags: passwords
 Slug: tech-updates
 

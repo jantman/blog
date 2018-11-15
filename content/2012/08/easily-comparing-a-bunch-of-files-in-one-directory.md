@@ -1,7 +1,7 @@
 Title: Easily comparing a bunch of files in one directory
 Date: 2012-08-10 09:50
 Author: admin
-Category: Tech HowTos
+Category: Miscellaneous
 Tags: compare, diff
 Slug: easily-comparing-a-bunch-of-files-in-one-directory
 

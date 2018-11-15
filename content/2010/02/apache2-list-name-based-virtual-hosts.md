@@ -1,7 +1,7 @@
 Title: Apache2 - list Name-Based Virtual Hosts
 Date: 2010-02-11 09:48
 Author: admin
-Category: Tech HowTos
+Category: Miscellaneous
 Tags: apache, configuration, linux
 Slug: apache2-list-name-based-virtual-hosts
 

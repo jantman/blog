@@ -1,7 +1,7 @@
 Title: Access control in ViewVC
 Date: 2007-07-25 12:00
 Author: admin
-Category: Tech HowTos
+Category: Software
 Tags: cvs, viewvc
 Slug: access-control-in-viewvc
 

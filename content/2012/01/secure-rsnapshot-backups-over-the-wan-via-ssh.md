@@ -1,7 +1,7 @@
 Title: Secure rsnapshot backups over the WAN via SSH
 Date: 2012-01-15 17:26
 Author: admin
-Category: Tech HowTos
+Category: Software
 Tags: backups, linode, rsnapshot, rsync, security, ssh, wrapper
 Slug: secure-rsnapshot-backups-over-the-wan-via-ssh
 

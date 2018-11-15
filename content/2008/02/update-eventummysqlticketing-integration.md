@@ -1,7 +1,7 @@
 Title: Update, Eventum/MySQLTicketing Integration
 Date: 2008-02-21 14:53
 Author: admin
-Category: Tech HowTos
+Category: Software
 Tags: eventum, monitoring, mysql, programming, ticketing
 Slug: update-eventummysqlticketing-integration
 

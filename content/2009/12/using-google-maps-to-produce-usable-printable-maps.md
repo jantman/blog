@@ -1,7 +1,7 @@
 Title: Using Google Maps to produce usable, printable maps
 Date: 2009-12-01 14:11
 Author: admin
-Category: Tech HowTos
+Category: Software
 Tags: catrography, emergency, EMS, google, maps, PHP
 Slug: using-google-maps-to-produce-usable-printable-maps
 

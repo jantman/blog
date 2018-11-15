@@ -1,7 +1,7 @@
 Title: Setting emacs zone-mode based on path
 Date: 2012-08-15 08:00
 Author: admin
-Category: Tech HowTos
+Category: Software
 Tags: bind, emacs, lisp, named, zone-mode
 Slug: setting-emacs-zone-mode-based-on-path
 

@@ -1,7 +1,7 @@
 Title: F/OSS Monitoring Comparison - Hyperic Part I
 Date: 2008-02-08 16:54
 Author: admin
-Category: Projects
+Category: Miscellaneous
 Tags: hyperic, monitoring, open source
 Slug: foss-monitoring-comparison-hyperic-part-i
 

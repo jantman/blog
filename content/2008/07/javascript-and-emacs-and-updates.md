@@ -1,7 +1,7 @@
 Title: JavaScript and Emacs, and updates
 Date: 2008-07-01 11:09
 Author: admin
-Category: Projects
+Category: Miscellaneous
 Tags: ajax, call report, dhtml, javascript, pcr, tuxostat, tuxtruck
 Slug: javascript-and-emacs-and-updates
 

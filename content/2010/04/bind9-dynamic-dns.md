@@ -1,7 +1,7 @@
 Title: BIND9 Dynamic DNS
 Date: 2010-04-07 09:04
 Author: admin
-Category: Tech HowTos
+Category: Software
 Tags: bind, ddns, dhcp, multibindadmin
 Slug: bind9-dynamic-dns
 

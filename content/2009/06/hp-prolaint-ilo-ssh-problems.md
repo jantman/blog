@@ -1,7 +1,7 @@
 Title: HP Prolaint iLO SSH Problems
 Date: 2009-06-11 23:52
 Author: admin
-Category: Tech HowTos
+Category: Miscellaneous
 Tags: ilo, openssh, proliant, ssh
 Slug: hp-prolaint-ilo-ssh-problems
 

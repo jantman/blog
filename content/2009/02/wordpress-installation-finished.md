@@ -1,7 +1,7 @@
 Title: Wordpress Installation, Finished
 Date: 2009-02-03 10:13
 Author: admin
-Category: Projects
+Category: Software
 Tags: apache, blogger, dynamic IP, wordpress
 Slug: wordpress-installation-finished
 

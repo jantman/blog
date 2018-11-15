@@ -1,7 +1,7 @@
 Title: Custom MediaWiki Sidebar; New Blog?
 Date: 2008-06-18 22:26
 Author: admin
-Category: Projects
+Category: Miscellaneous
 Tags: blog, firefox, mediawiki, PHP
 Slug: custom-mediawiki-sidebar-new-blog
 

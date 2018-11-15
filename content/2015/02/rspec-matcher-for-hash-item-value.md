@@ -1,7 +1,7 @@
 Title: RSpec Matcher For Hash Item Value
 Date: 2015-02-21 10:33
 Author: Jason Antman
-Category: Tech HowTos
+Category: Software
 Tags: ruby, rspec, spec, testing
 Slug: rspec-matcher-for-hash-item-value
 Summary: An RSpec matcher for hash item value regex

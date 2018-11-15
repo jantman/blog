@@ -1,7 +1,7 @@
 Title: SOPA Blackouts
 Date: 2012-01-24 20:29
 Author: admin
-Category: Ideas and Rants
+Category: Miscellaneous
 Tags: blackout, censorship, SOPA
 Slug: sopa-blackouts
 

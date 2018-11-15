@@ -1,7 +1,7 @@
 Title: Blacklists, Network Performance, New Project, XKCD
 Date: 2007-10-10 14:03
 Author: admin
-Category: Projects
+Category: Software
 Tags: bandwidth, blacklist, comic, epcr, firefox, java, openepcr, patient care report, pcr, php ems tools, reverse-validation, XKCD
 Slug: blacklists-network-performance-new-project-xkcd
 

@@ -1,7 +1,7 @@
 Title: Thunderbird SSL "Domain Name Mismatch"
 Date: 2010-02-12 09:34
 Author: admin
-Category: Tech HowTos
+Category: Miscellaneous
 Tags: certificates, dns, Mozilla, SSL, Thunderbird
 Slug: thunderbird-ssl-domain-name-mismatch
 

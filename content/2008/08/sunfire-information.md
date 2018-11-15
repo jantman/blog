@@ -1,7 +1,7 @@
 Title: SunFire Information
 Date: 2008-08-08 14:45
 Author: admin
-Category: Tech HowTos
+Category: Hardware
 Tags: sun, sunfire
 Slug: sunfire-information
 

@@ -1,7 +1,7 @@
 Title: Sun Blade 150 working!
 Date: 2007-12-14 02:44
 Author: admin
-Category: Tech HowTos
+Category: Hardware
 Tags: nvram, openboot, password, smc, solaris, sun, sunblade
 Slug: sun-blade-150-working
 

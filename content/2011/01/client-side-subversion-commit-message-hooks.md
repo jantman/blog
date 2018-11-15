@@ -1,7 +1,7 @@
 Title: Client-side subversion commit message hooks
 Date: 2011-01-05 11:23
 Author: admin
-Category: Tech HowTos
+Category: Miscellaneous
 Tags: linux, puppet, subversion, svn
 Slug: client-side-subversion-commit-message-hooks
 

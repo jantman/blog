@@ -2,7 +2,7 @@ Title: Cloud Custodian Architecture, Deployment and Policy Preprocessing
 Date: 2017-10-24 16:49
 Modified: 2017-10-24 16:49
 Author: Jason Antman
-Category: Tech HowTos
+Category: AWS
 Tags: aws, cloud-custodian, cloud custodian, c7n, lambda, sqs, splunk
 Slug: cloud-custodian-architecture-deployment-and-policy-preprocessing
 Summary: Details of how I setup Capital One's Cloud Custodain at work, including our monitoring, logging and policy preprocessing.

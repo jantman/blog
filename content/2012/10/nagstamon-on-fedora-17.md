@@ -1,7 +1,7 @@
 Title: Nagstamon on Fedora 17
 Date: 2012-10-05 07:37
 Author: admin
-Category: Tech HowTos
+Category: Miscellaneous
 Tags: fedora, nagios. icinga, nagstamon, package, rpm
 Slug: nagstamon-on-fedora-17
 

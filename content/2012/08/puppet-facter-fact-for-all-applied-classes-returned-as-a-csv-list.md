@@ -1,7 +1,7 @@
 Title: Puppet facter fact for all applied classes, returned as a CSV list
 Date: 2012-08-22 07:05
 Author: admin
-Category: Puppet
+Category: Software
 Tags: classes, csv, fact, facter, node, puppet
 Slug: puppet-facter-fact-for-all-applied-classes-returned-as-a-csv-list
 

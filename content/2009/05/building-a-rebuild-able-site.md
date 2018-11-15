@@ -1,7 +1,7 @@
 Title: Building a Rebuild-able Site
 Date: 2009-05-06 08:42
 Author: admin
-Category: Puppet
+Category: Software
 Tags: backup, configuration, kickstart, linux, puppet, recovery, work
 Slug: building-a-rebuild-able-site
 

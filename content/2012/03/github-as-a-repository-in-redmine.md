@@ -1,7 +1,7 @@
 Title: Github as a repository in Redmine
 Date: 2012-03-27 21:36
 Author: admin
-Category: Miscellaneous
+Category: Software
 Tags: git, github, redmine
 Slug: github-as-a-repository-in-redmine
 

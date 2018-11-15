@@ -1,7 +1,7 @@
 Title: New server, and looking for work
 Date: 2011-09-27 19:35
 Author: admin
-Category: Miscellaneous
+Category: Hardware
 Tags: linode, move, rack, servers
 Slug: new-server-and-looking-for-work
 

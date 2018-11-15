@@ -1,7 +1,7 @@
 Title: SunSPOT; CarPC; MediaWiki Logging
 Date: 2008-05-07 10:03
 Author: admin
-Category: Projects
+Category: Hardware
 Tags: bluetooth, car, carpc, conres, gps, linux, mediawiki, novell, obd, rutgers, sun, sunspot, suse, tuxtruck
 Slug: sunspot-carpc-mediawiki-logging
 

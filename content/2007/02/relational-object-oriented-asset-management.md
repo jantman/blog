@@ -1,7 +1,7 @@
 Title: Relational / Object-Oriented Asset Management
 Date: 2007-02-21 16:27
 Author: admin
-Category: Ideas and Rants
+Category: Miscellaneous
 Tags: asset management, asset tracking, IT, object-oriented, relational
 Slug: relational-object-oriented-asset-management
 

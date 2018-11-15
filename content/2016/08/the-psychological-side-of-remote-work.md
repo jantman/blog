@@ -1,7 +1,7 @@
 Title: The Psychological Side of Remote Work
 Date: 2016-08-26 15:10
 Author: Jason Antman
-Category: Ideas and Rants
+Category: Miscellaneous
 Tags: wfh, remote, work, balance, work from home, culture
 Slug: the-psychological-side-of-remote-work
 Summary: Some thoughts on the psychological aspects of remote work

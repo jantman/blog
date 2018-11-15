@@ -1,7 +1,7 @@
 Title: Droid!
 Date: 2009-11-10 08:46
 Author: admin
-Category: Miscellaneous
+Category: Hardware
 Tags: android, droid, google
 Slug: droid
 

@@ -1,7 +1,7 @@
 Title: Highlighting matches with grep and less
 Date: 2010-12-09 09:08
 Author: admin
-Category: Tech HowTos
+Category: Miscellaneous
 Tags: color, grep, less, terminal
 Slug: highlighting-matches-with-grep-and-less
 

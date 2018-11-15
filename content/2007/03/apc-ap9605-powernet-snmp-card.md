@@ -1,7 +1,7 @@
 Title: APC AP9605 PowerNet SNMP Card
 Date: 2007-03-01 17:09
 Author: admin
-Category: Tech HowTos
+Category: Hardware
 Tags: ap9605, apc, powernet, snmp, UPS
 Slug: apc-ap9605-powernet-snmp-card
 

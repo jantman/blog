@@ -1,7 +1,7 @@
 Title: Piracy and options
 Date: 2008-01-25 13:44
 Author: admin
-Category: Ideas and Rants
+Category: Miscellaneous
 Slug: piracy-and-options
 
 Well, the semester is starting to heat up, and I have a bunch of

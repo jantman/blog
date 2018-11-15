@@ -1,7 +1,7 @@
 Title: My Dream Network
 Date: 2009-02-07 01:15
 Author: admin
-Category: Ideas and Rants
+Category: Miscellaneous
 Tags: configuration, dream network, ideal network, management
 Slug: my-dream-network
 

@@ -1,7 +1,7 @@
 Title: bashrc Vagrant / VirtualBox reminder
 Date: 2014-07-10 06:45
 Author: Jason Antman
-Category: Tech HowTos
+Category: Software
 Tags: vagrant, bashrc, profile, virtualbox
 Slug: bashrc-vagrant-virtualbox-reminder
 Summary: Add a little reminder about Vagrant/VirtualBox running machines in your profile/bashrc.

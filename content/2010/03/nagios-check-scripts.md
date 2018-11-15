@@ -1,7 +1,7 @@
 Title: Nagios check scripts
 Date: 2010-03-16 22:33
 Author: admin
-Category: Monitoring
+Category: Software
 Tags: 1-wire, asterisk, bacula, DOCSIS, Nagios, snmp, syslog, ubiquiti
 Slug: nagios-check-scripts
 

@@ -1,7 +1,7 @@
 Title: Git Cheat Sheet
 Date: 2013-05-14 05:00
 Author: admin
-Category: Tech HowTos
+Category: Miscellaneous
 Tags: git
 Slug: git-cheat-sheet
 

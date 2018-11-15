@@ -1,7 +1,7 @@
 Title: Why Doesn't it Just Work
 Date: 2007-10-02 13:21
 Author: admin
-Category: Ideas and Rants
+Category: Miscellaneous
 Tags: linux suse printing
 Slug: why-doesnt-it-just-work
 

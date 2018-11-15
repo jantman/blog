@@ -1,7 +1,7 @@
 Title: Getting oVirt up and running
 Date: 2012-09-07 05:00
 Author: admin
-Category: Tech HowTos
+Category: Software
 Tags: fedora, kvm, ovirt, qemu, redhat, rhev, spice, virtualization
 Slug: getting-ovirt-up-and-running
 

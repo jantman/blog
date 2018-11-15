@@ -1,7 +1,7 @@
 Title: Python script to check xfinity data usage
 Date: 2017-04-17 16:11
 Author: Jason Antman
-Category: Tech HowTos
+Category: Software
 Tags: comcast, xfinity, data, usage, bandwidth, cap, python, selenium
 Slug: python-script-to-check-xfinity-data-usage
 Summary: Python/selenium script to check your Xfinity data usage

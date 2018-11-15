@@ -1,7 +1,7 @@
 Title: Tools for watching apache httpd and memcached
 Date: 2012-06-26 13:46
 Author: admin
-Category: Tech HowTos
+Category: Software
 Tags: apache, memcached, perl, top, troubleshooting
 Slug: tools-for-watching-apache-httpd-and-memcached
 

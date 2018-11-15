@@ -1,7 +1,7 @@
 Title: root on a Cyclades ACS console server
 Date: 2009-11-18 16:21
 Author: admin
-Category: Tech HowTos
+Category: Hardware
 Tags: acs, cyclades, gettingroot
 Slug: root-on-a-cyclades-acs-console-server
 

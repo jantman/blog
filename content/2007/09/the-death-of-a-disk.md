@@ -1,7 +1,7 @@
 Title: The Death of a Disk
 Date: 2007-09-07 11:34
 Author: admin
-Category: Miscellaneous
+Category: Hardware
 Slug: the-death-of-a-disk
 
 A few months ago, a disk on my Compaq Proliant ML370 went down. The

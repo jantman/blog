@@ -1,7 +1,7 @@
 Title: Microsoft submits driver code for Linux kernel
 Date: 2009-07-23 09:32
 Author: admin
-Category: Ideas and Rants
+Category: Miscellaneous
 Tags: gpl, kernel, linux, microsoft
 Slug: microsoft-submits-driver-code-for-linux-kernel
 

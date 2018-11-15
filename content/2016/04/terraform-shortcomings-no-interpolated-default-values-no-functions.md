@@ -1,7 +1,7 @@
 Title: Terraform Shortcomings - No Interpolated Default Values, No Functions, No Conditionals, Local State Storage
 Date: 2016-04-19 07:40
 Author: Jason Antman
-Category: Ideas and Rants
+Category: AWS
 Tags: terraform, hashicorp, AWS, go
 Slug: terraform-shortcomings-no-interpolated-default-values-no-functions
 Summary: some complaints about Terraform's lack of functions and variable default values

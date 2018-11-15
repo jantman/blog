@@ -1,7 +1,7 @@
 Title: php-suhosin syslog issues
 Date: 2011-10-21 10:24
 Author: admin
-Category: Tech HowTos
+Category: Software
 Tags: centos, logging, PHP, security, suhosin, syslog
 Slug: php-suhosin-syslog-issues
 

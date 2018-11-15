@@ -1,7 +1,7 @@
 Title: Tooling for AWS - webhooks to SQS via API Gateway and Lambda
 Date: 2016-08-06 21:38
 Author: Jason Antman
-Category: Projects
+Category: AWS
 Tags: aws, webhook, lambda, github, api-gateway, sqs, queue, python, terraform
 Slug: tooling-for-aws-webhooks-to-sqs-via-api-gateway-and-lambda
 Summary: Project I created that uses Python and Terraform to setup an AWS API Gateway instance to receive webhooks, and enqueue their content in SQS queues via Lambda.

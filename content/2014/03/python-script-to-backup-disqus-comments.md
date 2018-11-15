@@ -1,7 +1,7 @@
 Title: Python script to backup Disqus comments
 Date: 2014-03-01 19:01
 Author: Jason Antman
-Category: Tech HowTos
+Category: Software
 Tags: pelican,disqus,python
 Slug: python-script-to-backup-disqus-comments
 Summary: Quick Python script to backup Disqus comments for a forum

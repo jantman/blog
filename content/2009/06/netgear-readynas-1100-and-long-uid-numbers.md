@@ -1,7 +1,7 @@
 Title: Netgear ReadyNAS 1100 and long UID numbers
 Date: 2009-06-23 16:45
 Author: admin
-Category: Tech HowTos
+Category: Hardware
 Tags: debian, helpdesk, netgear, readynas
 Slug: netgear-readynas-1100-and-long-uid-numbers
 

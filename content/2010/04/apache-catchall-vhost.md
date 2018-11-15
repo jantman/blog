@@ -1,7 +1,7 @@
 Title: Apache catchall vhost
 Date: 2010-04-07 10:10
 Author: admin
-Category: Tech HowTos
+Category: Miscellaneous
 Tags: apache, catchall, PHP, web
 Slug: apache-catchall-vhost
 

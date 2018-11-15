@@ -1,7 +1,7 @@
 Title: Nagios check_by_ssh and NAT
 Date: 2009-10-22 13:58
 Author: admin
-Category: Monitoring
+Category: Miscellaneous
 Tags: monitoring, Nagios
 Slug: nagios-check_by_ssh-and-nat
 

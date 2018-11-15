@@ -1,7 +1,7 @@
 Title: Please Don't resize my browser
 Date: 2009-06-22 23:48
 Author: admin
-Category: Ideas and Rants
+Category: Miscellaneous
 Tags: design, standards, web
 Slug: please-dont-resize-my-browser
 

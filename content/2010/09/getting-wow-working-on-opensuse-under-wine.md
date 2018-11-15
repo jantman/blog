@@ -1,7 +1,7 @@
 Title: Getting WoW working on OpenSuSE under Wine
 Date: 2010-09-05 22:52
 Author: admin
-Category: Tech HowTos
+Category: Miscellaneous
 Tags: warcraft, wine, wow
 Slug: getting-wow-working-on-opensuse-under-wine
 

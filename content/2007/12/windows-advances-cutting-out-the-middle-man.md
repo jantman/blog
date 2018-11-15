@@ -1,7 +1,7 @@
 Title: Windows advances, Cutting out the middle-man
 Date: 2007-12-07 16:29
 Author: admin
-Category: Ideas and Rants
+Category: Miscellaneous
 Tags: lcd projector sflc busybox microsoft windows tv streaming
 Slug: windows-advances-cutting-out-the-middle-man
 

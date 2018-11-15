@@ -1,7 +1,7 @@
 Title: WP-Syntax Plugin GeSHi Path Fix
 Date: 2012-01-12 19:09
 Author: admin
-Category: Tech HowTos
+Category: Software
 Tags: GeSHi, PHP, syntax highlighting, wordpress
 Slug: wp-syntax-plugin-geshi-path-fix
 

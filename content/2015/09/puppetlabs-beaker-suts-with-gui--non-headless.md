@@ -1,7 +1,7 @@
 Title: Puppetlabs Beaker SUTs with GUI / Non-Headless
 Date: 2015-09-19 11:09
 Author: Jason Antman
-Category: Puppet
+Category: Software
 Tags: puppet, beaker, sut, rspec, virtualbox, headless, GUI
 Slug: puppetlabs-beaker-suts-with-gui--non-headless
 Summary: How to enable the GUI / disable headless mode on a puppetlabs Beaker SUT.

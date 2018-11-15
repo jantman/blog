@@ -1,7 +1,7 @@
 Title: Microsoft $1.35B poorer
 Date: 2008-02-27 14:42
 Author: admin
-Category: Ideas and Rants
+Category: Miscellaneous
 Tags: microsoft, patents
 Slug: microsoft-135b-poorer
 

@@ -1,7 +1,7 @@
 Title: Managing G1 Proliant Servers with modern Linux
 Date: 2007-03-01 16:27
 Author: admin
-Category: Tech HowTos
+Category: Hardware
 Tags: compaq, hp, hpadu, hpasm, linux, management, proliant, psp
 Slug: managing-g1-proliant-servers-with-modern-linux
 

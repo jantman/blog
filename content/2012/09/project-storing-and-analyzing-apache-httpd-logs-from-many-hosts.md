@@ -1,7 +1,7 @@
 Title: Project - Storing and Analyzing Apache httpd Logs from Many Hosts
 Date: 2012-09-06 05:00
 Author: admin
-Category: Projects
+Category: Software
 Slug: project-storing-and-analyzing-apache-httpd-logs-from-many-hosts
 
 I've recently started casual work on a side-project to collect, store,

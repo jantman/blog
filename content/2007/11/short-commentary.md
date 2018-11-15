@@ -1,7 +1,7 @@
 Title: Short Commentary
 Date: 2007-11-30 14:09
 Author: admin
-Category: Ideas and Rants
+Category: Miscellaneous
 Tags: open source, openoffice
 Slug: short-commentary
 

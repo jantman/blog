@@ -1,7 +1,7 @@
 Title: Solaris Update, Hardware Photos, SMF Manifests, Nagios Plugins
 Date: 2008-01-02 02:06
 Author: admin
-Category: Projects
+Category: Hardware
 Slug: solaris-update-hardware-photos-smf-manifests-nagios-plugins
 
 So in the past weekend, I had my first real experience with Solaris in

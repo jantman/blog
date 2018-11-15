@@ -2,7 +2,7 @@ Title: Better Logging for AppDaemon Apps
 Date: 2018-07-15 07:38
 Modified: 2018-07-15 07:38
 Author: Jason Antman
-Category: Tech HowTos
+Category: Software
 Tags: AppDaemon, HomeAssistant, automation, python, logging
 Slug: better-logging-for-appdaemon-apps
 Summary: A small Python class I wrote to give AppDaemon apps more Pythonic logging.

@@ -1,7 +1,7 @@
 Title: Nagios Check Plugin for Rsnapshot Backups
 Date: 2012-07-07 06:34
 Author: admin
-Category: Monitoring
+Category: Software
 Tags: backups, monitoring, Nagios, rsnapshot, rsync
 Slug: nagios-check-plugin-for-rsnapshot-backups
 

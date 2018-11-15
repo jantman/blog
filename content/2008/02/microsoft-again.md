@@ -1,7 +1,7 @@
 Title: Microsoft... again
 Date: 2008-02-27 14:05
 Author: admin
-Category: Ideas and Rants
+Category: Miscellaneous
 Tags: iso, microsoft, ooxml
 Slug: microsoft-again
 

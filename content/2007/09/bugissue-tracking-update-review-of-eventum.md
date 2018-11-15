@@ -1,7 +1,7 @@
 Title: Bug/Issue Tracking - Update / Review of Eventum
 Date: 2007-09-17 14:47
 Author: admin
-Category: Projects
+Category: Software
 Tags: bug tracking, eventum, PHP, review, ticketing
 Slug: bugissue-tracking-update-review-of-eventum
 

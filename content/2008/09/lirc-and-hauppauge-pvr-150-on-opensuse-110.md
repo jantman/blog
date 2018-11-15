@@ -1,7 +1,7 @@
 Title: LIRC and Hauppauge PVR-150 on OpenSuSE 11.0
 Date: 2008-09-01 10:37
 Author: admin
-Category: Tech HowTos
+Category: Hardware
 Tags: hauppauge, linux, lirc, mythtv, opensuse, pvr-150, suse
 Slug: lirc-and-hauppauge-pvr-150-on-opensuse-110
 

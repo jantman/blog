@@ -1,7 +1,7 @@
 Title: DNS Move
 Date: 2009-09-17 13:07
 Author: admin
-Category: Projects
+Category: Miscellaneous
 Tags: bind, dns, multibindadmin
 Slug: dns-move
 

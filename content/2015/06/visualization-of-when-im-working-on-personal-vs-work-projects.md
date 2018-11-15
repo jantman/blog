@@ -1,7 +1,7 @@
 Title: Visualization of when I'm working on personal vs work projects
 Date: 2015-06-05 21:20
 Author: Jason Antman
-Category: Miscellaneous
+Category: Software
 Tags: git, commits, python, graphs, visualization
 Slug: visualization-of-when-im-working-on-personal-vs-work-projects
 Summary: A fun python script to visualize the time of day and day of week of your commits to personal vs work repositories.

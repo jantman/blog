@@ -1,7 +1,7 @@
 Title: RPM Spec Files for nodejs 0.9.5 and v8 on CentOS 6
 Date: 2013-01-31 14:13
 Author: admin
-Category: Tech HowTos
+Category: Software
 Tags: build, centos, node, nodejs, package, packaging, redhat, RHEL, rpm, specfile
 Slug: rpm-spec-files-for-nodejs-0-9-5-and-v8-on-centos-5
 

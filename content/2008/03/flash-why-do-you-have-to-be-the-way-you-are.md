@@ -1,7 +1,7 @@
 Title: Flash - Why do you have to be the way you are?
 Date: 2008-03-13 09:02
 Author: admin
-Category: Ideas and Rants
+Category: Miscellaneous
 Tags: webdesign flash
 Slug: flash-why-do-you-have-to-be-the-way-you-are
 

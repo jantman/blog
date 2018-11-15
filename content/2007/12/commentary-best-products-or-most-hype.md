@@ -1,7 +1,7 @@
 Title: Commentary - Best Products, or most hype?
 Date: 2007-12-11 15:36
 Author: admin
-Category: Ideas and Rants
+Category: Miscellaneous
 Tags: important businessweek vista iphone products
 Slug: commentary-best-products-or-most-hype
 

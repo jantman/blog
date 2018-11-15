@@ -1,7 +1,7 @@
 Title: Sun and MySQL
 Date: 2008-01-20 02:00
 Author: admin
-Category: Ideas and Rants
+Category: Miscellaneous
 Tags: mysql, sun
 Slug: sun-and-mysql
 

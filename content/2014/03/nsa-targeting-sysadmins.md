@@ -1,7 +1,7 @@
 Title: NSA Targeting SysAdmins
 Date: 2014-03-22 09:38
 Author: Jason Antman
-Category: Ideas and Rants
+Category: Miscellaneous
 Tags: nsa,government,privacy,security
 Slug: nsa-targeting-sysadmins
 Summary: Newly leaked documents reveal NSA is targeting SysAdmins - disturbing new information.

@@ -1,7 +1,7 @@
 Title: Making Available finally recognized for the sham it is
 Date: 2008-02-26 13:38
 Author: admin
-Category: Ideas and Rants
+Category: Miscellaneous
 Tags: copyright, IP, riaa
 Slug: making-available-finally-recognized-for-the-sham-it-is
 

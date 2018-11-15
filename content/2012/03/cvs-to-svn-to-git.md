@@ -1,7 +1,7 @@
 Title: CVS to SVN to Git
 Date: 2012-03-25 12:11
 Author: admin
-Category: Projects
+Category: Miscellaneous
 Tags: cvs, git, svn, version control
 Slug: cvs-to-svn-to-git
 

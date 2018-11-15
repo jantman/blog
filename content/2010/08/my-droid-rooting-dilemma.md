@@ -1,7 +1,7 @@
 Title: My Droid Rooting Dilemma
 Date: 2010-08-16 09:14
 Author: admin
-Category: Miscellaneous
+Category: Hardware
 Tags: android, droid, root
 Slug: my-droid-rooting-dilemma
 

@@ -1,7 +1,7 @@
 Title: WiFi tether for Droid
 Date: 2010-08-15 10:29
 Author: admin
-Category: Tech HowTos
+Category: Miscellaneous
 Tags: android, droid, tether, wifi
 Slug: wifi-tether-for-droid
 

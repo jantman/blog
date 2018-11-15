@@ -1,7 +1,7 @@
 Title: Remotely-controlled deck.js slide presentations
 Date: 2014-05-12 09:34
 Author: Jason Antman
-Category: Tech HowTos
+Category: Software
 Tags: slide, presentation, deck.js, deckjs, javascript
 Slug: remotely-controlled-deckjs-slide-presentations
 Summary: A wonderful GitHub project by chrisjaure to remotely control deck.js slide presentations.

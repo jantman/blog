@@ -1,7 +1,7 @@
 Title: Running a script on USB drive insertion
 Date: 2009-11-11 11:47
 Author: admin
-Category: Tech HowTos
+Category: Miscellaneous
 Tags: linux, script, udev, usb
 Slug: running-a-script-on-usb-drive-insertion
 

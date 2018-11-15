@@ -1,7 +1,7 @@
 Title: Using wireshark to capture packets from a remote host
 Date: 2011-04-26 10:50
 Author: admin
-Category: Tech HowTos
+Category: Software
 Tags: ethereal, linux, sysadmin, tcpdump, troubleshooting, wireshark
 Slug: using-wireshark-to-capture-packets-from-a-remote-host
 

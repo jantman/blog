@@ -1,7 +1,7 @@
 Title: Managing Ubiquiti Networks MAC ACLs from a script
 Date: 2011-01-06 16:06
 Author: admin
-Category: Tech HowTos
+Category: Hardware
 Tags: airos, mac, PHP, security, ubiquiti, wap, wireless
 Slug: managing-ubiquiti-networks-mac-acls-from-a-script
 

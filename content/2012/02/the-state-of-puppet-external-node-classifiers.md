@@ -1,7 +1,7 @@
 Title: The state of Puppet External Node Classifiers
 Date: 2012-02-26 12:45
 Author: admin
-Category: Puppet
+Category: Software
 Tags: dashboard, foreman, node classifier, puppet
 Slug: the-state-of-puppet-external-node-classifiers
 

@@ -1,7 +1,7 @@
 Title: dashsnap.py - A Script to Snapshot a Graphite Dashboard
 Date: 2014-05-07 21:58
 Author: Jason Antman
-Category: Monitoring
+Category: Software
 Tags: graphite, monitoring
 Slug: dashsnap-a-script-to-snapshot-a-graphite-dashboard
 Summary: dashsnap.py, a script to snapshot a Graphite dashboard at various intervals

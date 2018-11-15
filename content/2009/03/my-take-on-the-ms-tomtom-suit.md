@@ -1,7 +1,7 @@
 Title: My Take on the MS TomTom Suit
 Date: 2009-03-05 10:05
 Author: admin
-Category: Ideas and Rants
+Category: Miscellaneous
 Tags: lawsuit, microsoft, patents, tomtom
 Slug: my-take-on-the-ms-tomtom-suit
 

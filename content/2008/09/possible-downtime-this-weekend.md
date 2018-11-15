@@ -1,7 +1,7 @@
 Title: Possible Downtime this weekend
 Date: 2008-09-04 23:03
 Author: admin
-Category: Projects
+Category: Miscellaneous
 Tags: downtime, emergency, hanna
 Slug: possible-downtime-this-weekend
 

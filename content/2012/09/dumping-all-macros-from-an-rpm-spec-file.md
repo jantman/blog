@@ -1,7 +1,7 @@
 Title: Dumping all Macros from an RPM Spec File
 Date: 2012-09-10 10:00
 Author: admin
-Category: Ops
+Category: Software
 Tags: packaging, rpm, rpmbuild
 Slug: dumping-all-macros-from-an-rpm-spec-file
 
