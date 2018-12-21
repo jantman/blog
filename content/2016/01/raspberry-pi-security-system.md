@@ -6,6 +6,8 @@ Tags: rpi, pi, raspberrypi, security, alarm, motion, camera
 Slug: raspberry-pi-security-system
 Summary: A Raspberry Pi and webcam security system.
 
+<div class="alert alert-warning" role="alert"><strong>Notice/Disclaimer:</strong> The information I provide on home automation/security and surveillance is based on what I've set up for myself based on a balance of cost, ease of use, and security, and should be considered for hobby purposes only. My current system and code has grown organically over time and is not how I'd approach this if I started over from scratch. My code and system has a few obvious vulnerabilities and probably some non-obvious ones as well; I humbly but sincerely ask that you do not attempt to exploit these. I highly recommend that anyone implementing a similar system - especially if you also publish the details of it - have undocumented backup systems/devices. Finally, the systems that I describe are intended to provide some protection against or notification of crimes of opportunity, not targeted attacks. Please keep in mind that none of this is intended to protect against someone who targets <em>me</em> specifically (and takes the time to research me) as opposed to my home at random.</div>
+
 It seems that crime is on the rise in the area where I live, and in my "gated" (when they actually close)
 apartment complex. I'm going out of town for a while to visit family, and was a bit wary of leaving my
 apartment - and all of my posessions, and most importantly my cats, unattended for too long. I'm having

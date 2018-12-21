@@ -9,6 +9,8 @@ Summary: An update on my IP camera and home security project, now branching out 
 
 [TOC]
 
+<div class="alert alert-warning" role="alert"><strong>Notice/Disclaimer:</strong> The information I provide on home automation/security and surveillance is based on what I've set up for myself based on a balance of cost, ease of use, and security, and should be considered for hobby purposes only. My current system and code has grown organically over time and is not how I'd approach this if I started over from scratch. My code and system has a few obvious vulnerabilities and probably some non-obvious ones as well; I humbly but sincerely ask that you do not attempt to exploit these. I highly recommend that anyone implementing a similar system - especially if you also publish the details of it - have undocumented backup systems/devices. Finally, the systems that I describe are intended to provide some protection against or notification of crimes of opportunity, not targeted attacks. Please keep in mind that none of this is intended to protect against someone who targets <em>me</em> specifically (and takes the time to research me) as opposed to my home at random.</div>
+
 Last month I posted about my [Linux Surveillance Camera Software Evaluation](/2018/05/linux-surveillance-camera-software-evaluation/) and my plans for turning some Amcrest IP cameras into a home security system. I've made a lot of progress and some big changes since then and decided that I had better post an update before the effort of doing so becomes overwhelming. There are a lot of changes and new information, and some really cool plans for the future (this has become my new obsession, albeit a prohibitively expensive one), so I'll break this up into a number of sections.
 
 ## Amcrest Cameras
