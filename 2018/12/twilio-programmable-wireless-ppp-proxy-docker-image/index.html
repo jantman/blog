@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en" prefix="og: http://ogp.me/ns# fb: https://www.facebook.com/2008/fbml">
+<head>
+    <title>Twilio Programmable Wireless PPP Proxy Docker Image - Jason Antman's Blog</title>
+    <!-- Using the latest rendering mode for IE -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+
+<link rel="canonical" href="https://blog.jasonantman.com/2018/12/twilio-programmable-wireless-ppp-proxy-docker-image/">
+
+        <meta name="author" content="Jason Antman" />
+        <meta name="keywords" content="twilio,wireless,cellular,4G,DIY,security,reliability,alarm" />
+        <meta name="description" content="Docker container with HTTP(S) proxy to Twilio Programmable Wirless PPP cellular connection." />
+
+        <meta property="og:site_name" content="Jason Antman's Blog" />
+        <meta property="og:type" content="article"/>
+        <meta property="og:title" content="Twilio Programmable Wireless PPP Proxy Docker Image"/>
+        <meta property="og:url" content="https://blog.jasonantman.com/2018/12/twilio-programmable-wireless-ppp-proxy-docker-image/"/>
+        <meta property="og:description" content="Docker container with HTTP(S) proxy to Twilio Programmable Wirless PPP cellular connection."/>
+        <meta property="article:published_time" content="2018-12-31" />
+            <meta property="article:section" content="DIY / Home Automation / Security" />
+            <meta property="article:tag" content="twilio" />
+            <meta property="article:tag" content="wireless" />
+            <meta property="article:tag" content="cellular" />
+            <meta property="article:tag" content="4G" />
+            <meta property="article:tag" content="DIY" />
+            <meta property="article:tag" content="security" />
+            <meta property="article:tag" content="reliability" />
+            <meta property="article:tag" content="alarm" />
+            <meta property="article:author" content="Jason Antman" />
+
+
+
+    <!-- Bootstrap -->
+        <link rel="stylesheet" href="https://blog.jasonantman.com/theme/css/bootstrap.flatly.min.css" type="text/css"/>
+    <link href="https://blog.jasonantman.com/theme/css/font-awesome.min.css" rel="stylesheet">
+
+    <link href="https://blog.jasonantman.com/theme/css/pygments/default.css" rel="stylesheet">
+        <link href="https://blog.jasonantman.com/theme/css/typogrify.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://blog.jasonantman.com/theme/css/style.css" type="text/css"/>
+        <link href="https://blog.jasonantman.com/theme/css/shariff/shariff.min.css" rel="stylesheet">
+
+    <link rel="stylesheet" href="https://blog.jasonantman.com/theme/css/forkongithub.min.css" type="text/css" />
+
+        <link href="https://blog.jasonantman.com/feeds/all.atom.xml" type="application/atom+xml" rel="alternate"
+              title="Jason Antman's Blog ATOM Feed"/>
+
+        <link href="https://blog.jasonantman.com/feeds/all.rss.xml" type="application/rss+xml" rel="alternate"
+              title="Jason Antman's Blog RSS Feed"/>
+
+
+        <link href="https://blog.jasonantman.com/feeds/categories/diy-home-automation-security.atom.xml" type="application/atom+xml" rel="alternate"
+              title="Jason Antman's Blog DIY / Home Automation / Security ATOM Feed"/>
+
+</head>
+<body>
+
+<div class="navbar navbar-default navbar-fixed-top" role="navigation">
+	<div class="container">
+<span id="forkongithub"><a href="https://github.com/jantman/blog">Fork me on GitHub</a></span>        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="https://blog.jasonantman.com/" class="navbar-brand">
+Jason Antman's Blog            </a>
+        </div>
+        <div class="collapse navbar-collapse navbar-ex1-collapse">
+            <ul class="nav navbar-nav">
+                    <li><a href="/pages/about.html">About Me</a></li>
+                    <li><a href="/categories/aws/index.html">AWS</a></li>
+                    <li><a href="/categories/software/index.html">Software</a></li>
+                    <li><a href="/categories/hardware/index.html">Hardware</a></li>
+                    <li><a href="/categories/diy-home-automation-security/index.html">DIY / Home Automation / Security</a></li>
+                    <li><a href="/categories/miscellaneous/index.html">Miscellaneous</a></li>
+                    <li><a href="/tags.html">Tags</a></li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+              <li><a href="https://blog.jasonantman.com/archives.html"><i class="fa fa-th-list"></i><span class="icon-label">Archives</span></a></li>
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+</div> <!-- /.navbar -->
+<!-- Banner -->
+<!-- End Banner -->
+<div class="container">
+    <div class="row">
+        <div class="col-sm-9">
+    <section id="content">
+        <article>
+            <header class="page-header">
+                <h1>
+                    <a href="https://blog.jasonantman.com/2018/12/twilio-programmable-wireless-ppp-proxy-docker-image/"
+                       rel="bookmark"
+                       title="Permalink to Twilio Programmable Wireless PPP Proxy Docker Image">
+                        Twilio Programmable Wireless <span class="caps">PPP</span> Proxy Docker&nbsp;Image
+                    </a>
+                </h1>
+            </header>
+            <div class="entry-content">
+                <div class="panel">
+                    <div class="panel-body">
+<footer class="post-info">
+    <span class="label label-default">Date</span>
+    <span class="published">
+        <i class="fa fa-calendar"></i><time datetime="2018-12-31T21:25:00-05:00"> Mon 31 December 2018</time>
+    </span>
+
+
+
+
+
+<span class="label label-default">Tags</span>
+	<a href="https://blog.jasonantman.com/tags/twilio/index.html">twilio</a>
+        /
+	<a href="https://blog.jasonantman.com/tags/wireless/index.html">wireless</a>
+        /
+	<a href="https://blog.jasonantman.com/tags/cellular/index.html">cellular</a>
+        /
+	<a href="https://blog.jasonantman.com/tags/4g/index.html">4G</a>
+        /
+	<a href="https://blog.jasonantman.com/tags/diy/index.html">DIY</a>
+        /
+	<a href="https://blog.jasonantman.com/tags/security/index.html">security</a>
+        /
+	<a href="https://blog.jasonantman.com/tags/reliability/index.html">reliability</a>
+        /
+	<a href="https://blog.jasonantman.com/tags/alarm/index.html">alarm</a>
+    
+</footer><!-- /.post-info -->                    </div>
+                </div>
+                <div class="alert alert-warning" role="alert"><strong>Notice/Disclaimer:</strong> The information I provide on home automation/security and surveillance is based on what I&#8217;ve set up for myself based on a balance of cost, ease of use, and security, and should be considered for hobby purposes only. My current system and code has grown organically over time and is not how I&#8217;d approach this if I started over from scratch. My code and system has a few obvious vulnerabilities and probably some non-obvious ones as well; I humbly but sincerely ask that you do not attempt to exploit these. I highly recommend that anyone implementing a similar system - especially if you also publish the details of it - have undocumented backup systems/devices. Finally, the systems that I describe are intended to provide some protection against or notification of crimes of opportunity, not targeted attacks. Please keep in mind that none of this is intended to protect against someone who targets <em>me</em> specifically (and takes the time to research me) as opposed to my home at random.</div>
+
+<p>While my <a href="/2018/12/aws-reinvent-2018-my-experience-and-recommendations-for-next-time/">trip to the <span class="caps">AWS</span> re:Invent conference last month</a> resulted in a giant pile of swag from the expo, by far the most interesting of it was from the communications company <a href="https://www.twilio.com">Twilio</a> that gave me a <span class="caps">SIM</span> card for their <a href="https://www.twilio.com/wireless">Programmable Wireless</a> service (as well as something else that will be the topic of at least one future post). Programmable Wireless is really cool: for $3 per <span class="caps">SIM</span> and $3 per month (in <strong>single unit</strong> quantity) I get a 2G/3G/4G <span class="caps">SIM</span> card with <span class="caps">20MB</span> of monthly data. That&#8217;s not much data in the world of smartphones, but it&#8217;s more than enough for many IoT or embedded use cases. More importantly, the <span class="caps">SIM</span> is also tied to your Twilio account that provides customizable rate plans (data rates, quotas, and roaming configuration) and detailed bi-hourly breakdowns of upload and download transfer, as well as <a href="https://www.twilio.com/docs/usage/api">ReST APIs</a> to manage everything and retrieve usage information and <a href="https://www.twilio.com/docs/wireless">wonderful documentation</a>.</p>
+<p>Anyway, at re:Invent one of the Twilio folks was telling me about their new Programmable Wireless service and the low costs even for a single <span class="caps">SIM</span>, and it occurred to me that this would be the perfect solution for an out-of-band notification solution for my <a href="/2018/08/home-automation-and-security-system-overview/">home automation and security system</a> (<a href="/tags/security/index.html">blog posts in the &#8220;security&#8221; category</a>). I&#8217;ve done quite a bit this year with automation and security for my house, as well as video surveillance. I&#8217;ve handled a lot of reasonable failure scenarios including power outage but, while my <span class="caps">AT</span>&amp;T fiber connection has been remarkably reliable so far, loss of connectivity was the one major issue I didn&#8217;t have a working solution for. My needs in the case of a loss of connectivity are somewhat different from the normal day-to-day; it&#8217;s a rare enough condition that I&#8217;m not really concerned with getting massive collections of surveillance camera still images like usual, but just a simple alert when connectivity is lost or restored, or if the alarm is triggered when my primary Internet connection is offline. Within those constraints it seemed like Programmable Wireless would be perfect for my needs, especially at the $3 <span class="caps">USD</span>/month price tag for a one-off personal&nbsp;project.</p>
+<p>A few weeks ago, before going out of state for a week, I purchased the Huawei E397u-53 unlocked <span class="caps">USB</span> 4G <span class="caps">LTE</span> modem on <a href="https://www.twilio.com/docs/wireless/tutorials/compatible-hardware">Twilio&#8217;s compatible hardware list</a> from <a href="https://www.amazon.com/gp/product/B01M0JY15V/">Amazon</a> and started work on the project. At first I spun my wheels for quite a while trying to figure out a way to handle the insane routing that I wanted in Linux: route everything out the default gateway (my <span class="caps">LAN</span>, going to my router and out the <span class="caps">AT</span>&amp;T Fiber uplink) when it&#8217;s working, but when the <span class="caps">AT</span>&amp;T link is down, route only certain &#8220;special&#8221; traffic through the <span class="caps">USB</span> modem. After a bunch of thinking in circles and researching - and digging into all sorts of ugly stuff like policy-based routing - I resorted to posting a question on Twitter. Luckily a brilliant engineer who I used to work with <a href="https://twitter.com/j_metzmeier/status/1076234692167454721">pointed me in the right direction</a> with Docker. After thinking through his suggestion for a comparatively short amount of time, I hit on the solution that I&#8217;m currently&nbsp;using.</p>
+<p>My solution was to run a lightweight <span class="caps">HTTP</span>(S) proxy server (<a href="https://tinyproxy.github.io/">tinyproxy</a>) inside a Docker container, with the container running in privileged mode and the <span class="caps">PPP</span> connection managed inside the container. Since it&#8217;s running in privileged mode, the Docker container has full access to the host devices including the <span class="caps">USB</span> modem. When the container starts it launches <a href="https://en.wikipedia.org/wiki/Point-to-Point_Protocol_daemon">pppd</a> which establishes the <span class="caps">PPP</span> link over the cellular modem, sets a new default route over the link, and then starts tinyproxy (adding some other routes to the <span class="caps">LAN</span> as needed). The container exposes port 8888 for tinyproxy, which allows <span class="caps">HTTP</span>(S) traffic to be routed over the cellular link just by using the container as a proxy. I handle the failover component at the application level, by attempting to send data over the default route a certain number of times and then falling back to the proxy if all attempts failed (<a href="https://github.com/jantman/home-automation-configs/commit/2cf9eb933969f7527786393703e91f0a32538deb">example commit</a>).</p>
+<p>My solution to this is still very rough around the edges and shows all the unfortunate signs of being thrown together in a single rushed evening, but the <a href="https://hub.docker.com/r/jantman/twilio-ppp-proxy">jantman/twilio-ppp-proxy Docker image</a> and corresponding <a href="https://github.com/jantman/docker-twilio-ppp-proxy">GitHub repo</a> are available for anyone who would like to use them; I hope to polish them up a bit in the near future. While my needs are somewhat specific, I hope this will be of assistance to anyone else who wants the ability to easily proxy certain traffic over a Twilio Programmable Wireless link while preserving their existing&nbsp;routing.</p>
+<p>Most importantly, many many thanks to the folks at the Twilio booth at re:Invent (I really, really wish I remembered the name of the person I spoke to) for discussing their services with me and giving me the <span class="caps">SIM</span> card that got this project&nbsp;started!</p>
+            </div>
+            <!-- /.entry-content -->
+    <hr />
+    <!-- Shariff Button BEGIN -->
+    <div class="shariff"
+        data-lang="en"
+        data-orientation="horizontal"
+        data-services = "[&quot;facebook&quot;,&quot;googleplus&quot;,&quot;twitter&quot;,&quot;linkedin&quot;,&quot;diaspora&quot;]"
+        data-theme="standard"
+        data-url="https://blog.jasonantman.com/2018/12/twilio-programmable-wireless-ppp-proxy-docker-image/"></div>
+    <!-- Shariff Button END -->
+    <hr/>
+    <section class="comments" id="comments">
+        <h2>Comments</h2>
+
+        <div id="disqus_thread"></div>
+        <script type="text/javascript">
+            /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+            var disqus_shortname = 'jantman'; // required: replace example with your forum shortname
+
+                    var disqus_identifier = 'twilio-programmable-wireless-ppp-proxy-docker-image';
+                var disqus_url = 'https://blog.jasonantman.com/2018/12/twilio-programmable-wireless-ppp-proxy-docker-image/';
+
+            var disqus_config = function () {
+                this.language = "en";
+            };
+
+            /* * * DON'T EDIT BELOW THIS LINE * * */
+            (function () {
+                var dsq = document.createElement('script');
+                dsq.type = 'text/javascript';
+                dsq.async = true;
+                dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+                (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+            })();
+        </script>
+        <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by
+            Disqus.</a></noscript>
+        <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+
+    </section>
+        </article>
+    </section>
+
+        </div>
+        <div class="col-sm-3" id="sidebar">
+            <aside>
+<!-- Sidebar -->
+<section class="well well-sm">
+  <ul class="list-group list-group-flush">
+
+<!-- Sidebar/Recent Posts -->
+<li class="list-group-item">
+  <h4><i class="fa fa-home fa-lg"></i><span class="icon-label">Recent Posts</span></h4>
+  <ul class="list-group" id="recentposts">
+    <li class="list-group-item"><a href="https://blog.jasonantman.com/2018/12/twilio-programmable-wireless-ppp-proxy-docker-image/">Twilio Programmable Wireless <span class="caps">PPP</span> Proxy Docker&nbsp;Image</a></li>
+    <li class="list-group-item"><a href="https://blog.jasonantman.com/2018/12/2018-in-review/">2018 in&nbsp;Review</a></li>
+    <li class="list-group-item"><a href="https://blog.jasonantman.com/2018/12/aws-reinvent-2018-my-experience-and-recommendations-for-next-time/"><span class="caps">AWS</span> re:Invent 2018: My Experience and Recommendations for Next&nbsp;Time</a></li>
+    <li class="list-group-item"><a href="https://blog.jasonantman.com/2018/11/inexpensive-26USD-1080p-wifi-camera/">Inexpensive $<span class="caps">26USD</span> 1080p WiFi&nbsp;Camera</a></li>
+    <li class="list-group-item"><a href="https://blog.jasonantman.com/2018/11/open-source-wifi-site-survey-tool/">Open Source WiFi Site Survey Heatmap&nbsp;Tool</a></li>
+  </ul>
+</li>
+<!-- End Sidebar/Recent Posts -->
+
+<!-- Sidebar/Twitter Timeline -->
+<li class="list-group-item">
+  <h4><i class="fa fa-twitter fa-lg"></i><span class="icon-label">Latest Tweets</span></h4>
+  <div id="twitter_timeline">
+    <a class="twitter-timeline" data-width="250" data-height="300" data-dnt="true" data-theme="light" href="https://twitter.com/j_antman">Tweets by j_antman</a> <script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
+  </div>
+</li>
+<!-- End Sidebar/Twitter Timeline -->
+
+<!-- Sidebar/Github -->
+<li class="list-group-item">
+  <h4><i class="fa fa-github fa-lg"></i><span class="icon-label">GitHub Repos</span></h4>
+  <div id="gh_repos">
+    <p class="list-group-item">Status updating...</p>
+  </div>
+  <a href="https://github.com/jantman">@jantman</a> on GitHub
+</li>
+<!-- End Sidebar/Github -->
+
+<!-- Sidebar/Links -->
+<li class="list-group-item">
+  <h4><i class="fa fa-external-link-square fa-lg"></i><span class="icon-label">Links</span></h4>
+  <ul class="list-group" id="links">
+    <li class="list-group-item">
+      <a href="http://www.jasonantman.com" target="_blank">Homepage</a>
+    </li>
+    <li class="list-group-item">
+      <a href="http://resume.jasonantman.com" target="_blank">Resume</a>
+    </li>
+  </ul>
+</li>
+<!-- End Sidebar/Links -->
+  </ul>
+</section>
+<!-- End Sidebar -->            </aside>
+        </div>
+    </div>
+</div>
+<footer>
+   <div class="container">
+      <hr>
+      <div class="row">
+         <div class="col-xs-10">&copy; 2018 Jason Antman
+            &middot; Powered by <a href="https://github.com/getpelican/pelican-themes/tree/master/pelican-bootstrap3" target="_blank">pelican-bootstrap3</a>,
+            <a href="http://docs.getpelican.com/" target="_blank">Pelican</a>,
+            <a href="http://getbootstrap.com" target="_blank">Bootstrap</a>         </div>
+         <div class="col-xs-2"><p class="pull-right"><i class="fa fa-arrow-up"></i> <a href="#">Back to top</a></p></div>
+      </div>
+   </div>
+</footer>
+<script src="https://blog.jasonantman.com/theme/js/jquery.min.js"></script>
+
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="https://blog.jasonantman.com/theme/js/bootstrap.min.js"></script>
+
+<!-- Enable responsive features in IE8 with Respond.js (https://github.com/scottjehl/Respond) -->
+<script src="https://blog.jasonantman.com/theme/js/respond.min.js"></script>
+
+
+
+    <!-- GITHUB_REPOS_JSON (explicitly pinned repos ) -->
+  <script id="GithubReposJson" type="application/json">
+  [{"description": "A script and python module to check your AWS service limits and usage via boto.", "name": "awslimitchecker", "html_url": "https://github.com/jantman/awslimitchecker"}, {"description": "Puppet module and accompanying documentation to install/setup Arch linux on a MacBook Pro Retina 11,4", "name": "puppet-archlinux-macbookretina", "html_url": "https://github.com/jantman/puppet-archlinux-macbookretina"}, {"description": "A collection of my standalone scripts to small/quick for their own repos. All kinds of useful stuff.", "name": "misc-scripts", "html_url": "https://github.com/jantman/misc-scripts"}, {"description": "Responsive Flask/SQLAlchemy personal finance app, specifically for biweekly budgeting.", "name": "biweeklybudget", "html_url": "https://github.com/jantman/biweeklybudget"}, {"description": "A standard to easily communicate to humans and machines the development/support and usability status of software repositories/projects.", "name": "repostatus.org", "html_url": "https://github.com/jantman/repostatus.org"}, {"description": "home automation/security config/scripts/tooling - HomeAssistant, AppDaemon, ZoneMinder, etc.", "name": "home-automation-configs", "html_url": "https://github.com/jantman/home-automation-configs"}]
+  </script>
+
+<!-- GitHub JS Code -->
+<script type="text/javascript">
+$(document).ready(function () {
+  if (!window.jXHR) {
+    var jxhr = document.createElement('script');
+    jxhr.type = 'text/javascript';
+    jxhr.src = 'https://blog.jasonantman.com/theme/js/jXHR.js';
+    var s = document.getElementsByTagName('script')[0];
+    s.parentNode.insertBefore(jxhr, s);
+  }
+
+  console.log($('#GithubReposJson').html());
+  github.showSpecificRepos({
+    user: 'jantman',
+    target: '#gh_repos',
+    repos: JSON.parse($('#GithubReposJson').html())
+  });
+});
+</script>
+<script src="https://blog.jasonantman.com/theme/js/github.js" type="text/javascript"></script>
+<!-- End GitHub JS Code -->
+    <!-- Disqus -->
+    <script type="text/javascript">
+        /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+        var disqus_shortname = 'jantman'; // required: replace example with your forum shortname
+
+        /* * * DON'T EDIT BELOW THIS LINE * * */
+        (function () {
+            var s = document.createElement('script');
+            s.async = true;
+            s.type = 'text/javascript';
+            s.src = '//' + disqus_shortname + '.disqus.com/count.js';
+            (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+        }());
+    </script>
+    <!-- End Disqus Code -->
+    <!-- Google Analytics Universal -->
+    <script type="text/javascript">
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+        ga('create', 'UA-2718127-2', 'jasonantman.com');
+        ga('send', 'pageview');
+    </script>
+    <!-- End Google Analytics Universal Code -->
+
+
+    <!-- add shariff support -->
+    <script src="https://blog.jasonantman.com/theme/js/shariff.min.js"></script>
+</body>
+</html>
