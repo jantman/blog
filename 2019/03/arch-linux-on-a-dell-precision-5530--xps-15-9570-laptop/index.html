@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en" prefix="og: http://ogp.me/ns# fb: https://www.facebook.com/2008/fbml">
+<head>
+    <title>Arch Linux on a Dell Precision 5530 / XPS 15 9570 Laptop - Jason Antman's Blog</title>
+    <!-- Using the latest rendering mode for IE -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+
+<link rel="canonical" href="https://blog.jasonantman.com/2019/03/arch-linux-on-a-dell-precision-5530--xps-15-9570-laptop/">
+
+        <meta name="author" content="Jason Antman" />
+        <meta name="keywords" content="arch,linux,dell,precision,xps,i915,nvidia,video,graphics,install,laptop" />
+        <meta name="description" content="The trouble I went through installing Arch Linux on a Precision 5530 (very similar to XPS 15 9570) and how it was solved." />
+
+        <meta property="og:site_name" content="Jason Antman's Blog" />
+        <meta property="og:type" content="article"/>
+        <meta property="og:title" content="Arch Linux on a Dell Precision 5530 / XPS 15 9570 Laptop"/>
+        <meta property="og:url" content="https://blog.jasonantman.com/2019/03/arch-linux-on-a-dell-precision-5530--xps-15-9570-laptop/"/>
+        <meta property="og:description" content="The trouble I went through installing Arch Linux on a Precision 5530 (very similar to XPS 15 9570) and how it was solved."/>
+        <meta property="article:published_time" content="2019-03-25" />
+            <meta property="article:section" content="Hardware" />
+            <meta property="article:tag" content="arch" />
+            <meta property="article:tag" content="linux" />
+            <meta property="article:tag" content="dell" />
+            <meta property="article:tag" content="precision" />
+            <meta property="article:tag" content="xps" />
+            <meta property="article:tag" content="i915" />
+            <meta property="article:tag" content="nvidia" />
+            <meta property="article:tag" content="video" />
+            <meta property="article:tag" content="graphics" />
+            <meta property="article:tag" content="install" />
+            <meta property="article:tag" content="laptop" />
+            <meta property="article:author" content="Jason Antman" />
+
+
+
+    <!-- Bootstrap -->
+        <link rel="stylesheet" href="https://blog.jasonantman.com/theme/css/bootstrap.flatly.min.css" type="text/css"/>
+    <link href="https://blog.jasonantman.com/theme/css/font-awesome.min.css" rel="stylesheet">
+
+    <link href="https://blog.jasonantman.com/theme/css/pygments/default.css" rel="stylesheet">
+        <link href="https://blog.jasonantman.com/theme/css/typogrify.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://blog.jasonantman.com/theme/css/style.css" type="text/css"/>
+        <link href="https://blog.jasonantman.com/theme/css/shariff/shariff.min.css" rel="stylesheet">
+
+    <link rel="stylesheet" href="https://blog.jasonantman.com/theme/css/forkongithub.min.css" type="text/css" />
+
+        <link href="https://blog.jasonantman.com/feeds/all.atom.xml" type="application/atom+xml" rel="alternate"
+              title="Jason Antman's Blog ATOM Feed"/>
+
+        <link href="https://blog.jasonantman.com/feeds/all.rss.xml" type="application/rss+xml" rel="alternate"
+              title="Jason Antman's Blog RSS Feed"/>
+
+
+        <link href="https://blog.jasonantman.com/feeds/categories/hardware.atom.xml" type="application/atom+xml" rel="alternate"
+              title="Jason Antman's Blog Hardware ATOM Feed"/>
+
+</head>
+<body>
+
+<div class="navbar navbar-default navbar-fixed-top" role="navigation">
+	<div class="container">
+<span id="forkongithub"><a href="https://github.com/jantman/blog">Fork me on GitHub</a></span>        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="https://blog.jasonantman.com/" class="navbar-brand">
+Jason Antman's Blog            </a>
+        </div>
+        <div class="collapse navbar-collapse navbar-ex1-collapse">
+            <ul class="nav navbar-nav">
+                    <li><a href="/pages/about.html">About Me</a></li>
+                    <li><a href="/categories/aws/index.html">AWS</a></li>
+                    <li><a href="/categories/software/index.html">Software</a></li>
+                    <li><a href="/categories/hardware/index.html">Hardware</a></li>
+                    <li><a href="/categories/diy-home-automation-security/index.html">DIY / Home Automation / Security</a></li>
+                    <li><a href="/categories/miscellaneous/index.html">Miscellaneous</a></li>
+                    <li><a href="/tags.html">Tags</a></li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+              <li><a href="https://blog.jasonantman.com/archives.html"><i class="fa fa-th-list"></i><span class="icon-label">Archives</span></a></li>
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+</div> <!-- /.navbar -->
+<!-- Banner -->
+<!-- End Banner -->
+<div class="container">
+    <div class="row">
+        <div class="col-sm-9">
+    <section id="content">
+        <article>
+            <header class="page-header">
+                <h1>
+                    <a href="https://blog.jasonantman.com/2019/03/arch-linux-on-a-dell-precision-5530--xps-15-9570-laptop/"
+                       rel="bookmark"
+                       title="Permalink to Arch Linux on a Dell Precision 5530 / XPS 15 9570 Laptop">
+                        Arch Linux on a Dell Precision 5530 / <span class="caps">XPS</span> 15 9570&nbsp;Laptop
+                    </a>
+                </h1>
+            </header>
+            <div class="entry-content">
+                <div class="panel">
+                    <div class="panel-body">
+<footer class="post-info">
+    <span class="label label-default">Date</span>
+    <span class="published">
+        <i class="fa fa-calendar"></i><time datetime="2019-03-25T21:10:00-04:00"> Mon 25 March 2019</time>
+    </span>
+
+
+
+
+
+<span class="label label-default">Tags</span>
+	<a href="https://blog.jasonantman.com/tags/arch/index.html">arch</a>
+        /
+	<a href="https://blog.jasonantman.com/tags/linux/index.html">linux</a>
+        /
+	<a href="https://blog.jasonantman.com/tags/dell/index.html">dell</a>
+        /
+	<a href="https://blog.jasonantman.com/tags/precision/index.html">precision</a>
+        /
+	<a href="https://blog.jasonantman.com/tags/xps/index.html">xps</a>
+        /
+	<a href="https://blog.jasonantman.com/tags/i915/index.html">i915</a>
+        /
+	<a href="https://blog.jasonantman.com/tags/nvidia/index.html">nvidia</a>
+        /
+	<a href="https://blog.jasonantman.com/tags/video/index.html">video</a>
+        /
+	<a href="https://blog.jasonantman.com/tags/graphics/index.html">graphics</a>
+        /
+	<a href="https://blog.jasonantman.com/tags/install/index.html">install</a>
+        /
+	<a href="https://blog.jasonantman.com/tags/laptop/index.html">laptop</a>
+    
+</footer><!-- /.post-info -->                    </div>
+                </div>
+                <p>One of the&#8230; things that, around the beginning of the year, I tentatively planned to do more of this year&#8230; was to share more of what I do and resurrect this blog. Well, it&#8217;s nearing the end of March, so it&#8217;s a good thing I didn&#8217;t make any formal New Year&#8217;s resolutions! In general I&#8217;ve been really busy at work with some esoteric big-company stuff, and really busy in my personal life as well with a new car and a bunch of projects around the house (including trying my hand at building a small shelving unit completely by hand, including some simple&nbsp;joinery).</p>
+<p>Two weeks ago my company replaced my four-year-old (mid-2015) MacBook Pro 11,4 (original <a href="https://github.com/jantman/workstation-bootstrap/blob/master/macbookpro11%2C4_install.md">install notes</a>) with a shiny, brand-new MacBook Pro 15,4 A1990. I&#8217;d been dual-booting my previous <span class="caps">MBP</span> between Linux (for any real work) and MacOS (for Netflix and quick Googles while at home) as I&#8217;ve been doing with MacBook Pros for almost a decade now, and loved it. Unfortunately, as is described in detail at <a href="https://github.com/Dunedan/mbp-2016-linux/issues/71">Dunedan/mbp-2016-linux Issue #71</a> as well as numerous <a href="https://unix.stackexchange.com/questions/463422/how-can-you-get-any-version-of-linux-to-see-the-2018-macbook-pro-ssd/479544">other</a> <a href="https://forum.level1techs.com/t/linux-doesnt-support-t2-as-a-ssd-controller-apples-t2-secure-boot-chip-is-blocking-usage-of-linux-in-t2-chip-macs/134832/36">places</a> online, because of the T2 security chip acting as the storage controller for the <span class="caps">SSD</span>, it&#8217;s currently impossible to install Linux on the built-in SSDs of the latest generation MacBook Pro. So I threw in the towel and requested to be re-platformed to a Dell laptop, and listed my <a href="https://github.com/jantman/puppet-archlinux-macbookretina">puppet-archlinux-macbookretina</a> module as unsupported and in need of a&nbsp;maintainer.</p>
+<p>Last week I picked up my <em>new</em> new work laptop, a Dell Precision 5530. I&#8217;d asked about an <span class="caps">XPS</span> 15 as those seem to be on par with the MacBook Pro in terms of price and specs, but when you work at a company with 34,000 employees and they tell you &#8220;our developer laptop is a Precision 5530&#8221; and you&#8217;re a developer, that&#8217;s the laptop you get. I was pleased to find out, though, that <strong>the internal hardware of the Precision 5530 is extremely similar to the <span class="caps">XPS</span> 15 9570</strong>, including having some of the same&nbsp;issues.</p>
+<p>My odyssey of getting <a href="https://www.archlinux.org/">Arch Linux</a> - my desktop distribution of choice for the past six years - installed on the new Dell laptop took me thirty hours or so (conservatively) over the course of one work day and four afternoons/evenings. The first day was mostly spent getting up to speed on changes in Arch in the past few years and the current best way to handle <span class="caps">LUKS</span>/dm-crypt encryption on an <span class="caps">EFI</span> system with NVMe storage. My first install was completely ruined when I got to the (literally) last step and realized that I&#8217;d forgotten to create an <span class="caps">EFI</span> system partition (<span class="caps">ESP</span>), so I started over. Luckily, as usual, I&#8217;d <a href="https://github.com/jantman/workstation-bootstrap/blob/master/precision5530_install.md">documented</a> every step of the install process in excruciating&nbsp;detail.</p>
+<p>When I finally got the system installed, I ran up against an interesting problem: when I launched Xorg, the laptop screen was either black (no backlight on at all), backlight black with no image, or flashing on and off. I fought with this for the better part of two days before I decided to try connecting an external display, and sure enough, <em>that</em> worked fine. I spent another two days or so with the laptop hooked up to an external monitor, repeating everything I&#8217;d done before, trying every combination I could think of of graphics drivers (nvidia and nouveau, intel i915 and not), graphics-related kernel parameters, Nvidia Optimus / <span class="caps">PRIME</span> software, etc. Finally, when I was well past my wits end and turned back to Google, I found a kernel bug for the issue and an eight-character patch that fixed&nbsp;it.</p>
+<h2 id="the-solution"><a class="toclink" href="#the-solution">The&nbsp;Solution</a></h2>
+<p>It turns out that the non-functional laptop display on these models is caused by <a href="https://github.com/torvalds/linux/commit/7769db5883841b03de544a35a71ff528d4131c17">this commit</a> to the kernel <code>i915</code> driver. The commit specifically effects embedded Display Port (eDP) displays, and changes the link configuration algorithm from the older variant that uses more data lanes with a slower link speed (&#8220;wide and slow&#8221;) to the newer eDP standard&#8217;s recommendation of fewer lanes with a higher link speed (&#8220;fast and narrow&#8221;). Unfortunately, it seems that the hardware in some of these Dell laptops will not function with this new method (even though the specification it was introduced in is <em>six</em> years old and, according to the commit message, they should be reporting that they&#8217;re compatible with&nbsp;it).</p>
+<p>After another exhaustive Google search lead me to the <a href="https://wiki.archlinux.org/index.php/Dell_XPS_15_9570">Dell <span class="caps">XPS</span> 15 9570 Arch Wiki page</a>, which contains a <a href="https://wiki.archlinux.org/index.php/Dell_XPS_15_9570#Built-in_screen_flickers_or_does_not_come_on_with_Linux_kernel_5.0.x">troubleshooting section</a> describing exactly this problem (well&#8230; it does now&#8230;) and pointing to <a href="https://bugs.archlinux.org/task/61964">ArchLinux bug 61964</a>. Somehow I found my way to the relevant upstream bug, <a href="https://bugs.freedesktop.org/show_bug.cgi?id=109959">FreeDesktop.org bug 109959</a>, which contains both multiple reports of the same issue as well as two kernel patches which fix&nbsp;it.</p>
+<p>Applying the noted kernel patches - and switching from <code>nvidia</code> to <code>nvidia-dkms</code> to support the custom kernel - fixed the bug completely, and graphics on the laptop now work&nbsp;perfectly.</p>
+<p>For anyone else who&#8217;s running Arch, until the bug is fixed upstream and Arch picks it up in their official kernel, I have my <span class="caps">PKGBUILD</span> file and sources in <a href="https://github.com/jantman/arch-pkgbuilds/tree/master/linux-precision5530">my arch-pkgbuilds GitHub repo</a> as well as (unsigned, sorry) compiled binary packages in my <a href="http://archrepo.jasonantman.com/current/index.html">arch packages repo (index page)</a>.</p>
+            </div>
+            <!-- /.entry-content -->
+    <hr />
+    <!-- Shariff Button BEGIN -->
+    <div class="shariff"
+        data-lang="en"
+        data-orientation="horizontal"
+        data-services = "[&quot;facebook&quot;,&quot;googleplus&quot;,&quot;twitter&quot;,&quot;linkedin&quot;,&quot;diaspora&quot;]"
+        data-theme="standard"
+        data-url="https://blog.jasonantman.com/2019/03/arch-linux-on-a-dell-precision-5530--xps-15-9570-laptop/"></div>
+    <!-- Shariff Button END -->
+    <hr/>
+    <section class="comments" id="comments">
+        <h2>Comments</h2>
+
+        <div id="disqus_thread"></div>
+        <script type="text/javascript">
+            /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+            var disqus_shortname = 'jantman'; // required: replace example with your forum shortname
+
+                    var disqus_identifier = 'arch-linux-on-a-dell-precision-5530--xps-15-9570-laptop';
+                var disqus_url = 'https://blog.jasonantman.com/2019/03/arch-linux-on-a-dell-precision-5530--xps-15-9570-laptop/';
+
+            var disqus_config = function () {
+                this.language = "en";
+            };
+
+            /* * * DON'T EDIT BELOW THIS LINE * * */
+            (function () {
+                var dsq = document.createElement('script');
+                dsq.type = 'text/javascript';
+                dsq.async = true;
+                dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+                (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+            })();
+        </script>
+        <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by
+            Disqus.</a></noscript>
+        <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+
+    </section>
+        </article>
+    </section>
+
+        </div>
+        <div class="col-sm-3" id="sidebar">
+            <aside>
+<!-- Sidebar -->
+<section class="well well-sm">
+  <ul class="list-group list-group-flush">
+
+<!-- Sidebar/Recent Posts -->
+<li class="list-group-item">
+  <h4><i class="fa fa-home fa-lg"></i><span class="icon-label">Recent Posts</span></h4>
+  <ul class="list-group" id="recentposts">
+    <li class="list-group-item"><a href="https://blog.jasonantman.com/2019/03/arch-linux-on-a-dell-precision-5530--xps-15-9570-laptop/">Arch Linux on a Dell Precision 5530 / <span class="caps">XPS</span> 15 9570&nbsp;Laptop</a></li>
+    <li class="list-group-item"><a href="https://blog.jasonantman.com/2018/12/twilio-programmable-wireless-ppp-proxy-docker-image/">Twilio Programmable Wireless <span class="caps">PPP</span> Proxy Docker&nbsp;Image</a></li>
+    <li class="list-group-item"><a href="https://blog.jasonantman.com/2018/12/2018-in-review/">2018 in&nbsp;Review</a></li>
+    <li class="list-group-item"><a href="https://blog.jasonantman.com/2018/12/aws-reinvent-2018-my-experience-and-recommendations-for-next-time/"><span class="caps">AWS</span> re:Invent 2018: My Experience and Recommendations for Next&nbsp;Time</a></li>
+    <li class="list-group-item"><a href="https://blog.jasonantman.com/2018/11/inexpensive-26USD-1080p-wifi-camera/">Inexpensive $<span class="caps">26USD</span> 1080p WiFi&nbsp;Camera</a></li>
+  </ul>
+</li>
+<!-- End Sidebar/Recent Posts -->
+
+<!-- Sidebar/Twitter Timeline -->
+<li class="list-group-item">
+  <h4><i class="fa fa-twitter fa-lg"></i><span class="icon-label">Latest Tweets</span></h4>
+  <div id="twitter_timeline">
+    <a class="twitter-timeline" data-width="250" data-height="300" data-dnt="true" data-theme="light" href="https://twitter.com/j_antman">Tweets by j_antman</a> <script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
+  </div>
+</li>
+<!-- End Sidebar/Twitter Timeline -->
+
+<!-- Sidebar/Github -->
+<li class="list-group-item">
+  <h4><i class="fa fa-github fa-lg"></i><span class="icon-label">GitHub Repos</span></h4>
+  <div id="gh_repos">
+    <p class="list-group-item">Status updating...</p>
+  </div>
+  <a href="https://github.com/jantman">@jantman</a> on GitHub
+</li>
+<!-- End Sidebar/Github -->
+
+<!-- Sidebar/Links -->
+<li class="list-group-item">
+  <h4><i class="fa fa-external-link-square fa-lg"></i><span class="icon-label">Links</span></h4>
+  <ul class="list-group" id="links">
+    <li class="list-group-item">
+      <a href="http://www.jasonantman.com" target="_blank">Homepage</a>
+    </li>
+    <li class="list-group-item">
+      <a href="http://resume.jasonantman.com" target="_blank">Resume</a>
+    </li>
+  </ul>
+</li>
+<!-- End Sidebar/Links -->
+  </ul>
+</section>
+<!-- End Sidebar -->            </aside>
+        </div>
+    </div>
+</div>
+<footer>
+   <div class="container">
+      <hr>
+      <div class="row">
+         <div class="col-xs-10">&copy; 2019 Jason Antman
+            &middot; Powered by <a href="https://github.com/getpelican/pelican-themes/tree/master/pelican-bootstrap3" target="_blank">pelican-bootstrap3</a>,
+            <a href="http://docs.getpelican.com/" target="_blank">Pelican</a>,
+            <a href="http://getbootstrap.com" target="_blank">Bootstrap</a>         </div>
+         <div class="col-xs-2"><p class="pull-right"><i class="fa fa-arrow-up"></i> <a href="#">Back to top</a></p></div>
+      </div>
+   </div>
+</footer>
+<script src="https://blog.jasonantman.com/theme/js/jquery.min.js"></script>
+
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="https://blog.jasonantman.com/theme/js/bootstrap.min.js"></script>
+
+<!-- Enable responsive features in IE8 with Respond.js (https://github.com/scottjehl/Respond) -->
+<script src="https://blog.jasonantman.com/theme/js/respond.min.js"></script>
+
+
+
+    <!-- GITHUB_REPOS_JSON (explicitly pinned repos ) -->
+  <script id="GithubReposJson" type="application/json">
+  [{"description": "A script and python module to check your AWS service limits and usage via boto.", "name": "awslimitchecker", "html_url": "https://github.com/jantman/awslimitchecker"}, {"description": "UNSUPPORTED - Puppet module and accompanying documentation to install/setup Arch linux on a MacBook Pro Retina 11,4", "name": "puppet-archlinux-macbookretina", "html_url": "https://github.com/jantman/puppet-archlinux-macbookretina"}, {"description": "A collection of my standalone scripts to small/quick for their own repos. All kinds of useful stuff.", "name": "misc-scripts", "html_url": "https://github.com/jantman/misc-scripts"}, {"description": "Responsive Flask/SQLAlchemy personal finance app, specifically for biweekly budgeting.", "name": "biweeklybudget", "html_url": "https://github.com/jantman/biweeklybudget"}, {"description": "A standard to easily communicate to humans and machines the development/support and usability status of software repositories/projects.", "name": "repostatus.org", "html_url": "https://github.com/jantman/repostatus.org"}, {"description": "home automation/security config/scripts/tooling - HomeAssistant, AppDaemon, ZoneMinder, etc.", "name": "home-automation-configs", "html_url": "https://github.com/jantman/home-automation-configs"}]
+  </script>
+
+<!-- GitHub JS Code -->
+<script type="text/javascript">
+$(document).ready(function () {
+  if (!window.jXHR) {
+    var jxhr = document.createElement('script');
+    jxhr.type = 'text/javascript';
+    jxhr.src = 'https://blog.jasonantman.com/theme/js/jXHR.js';
+    var s = document.getElementsByTagName('script')[0];
+    s.parentNode.insertBefore(jxhr, s);
+  }
+
+  console.log($('#GithubReposJson').html());
+  github.showSpecificRepos({
+    user: 'jantman',
+    target: '#gh_repos',
+    repos: JSON.parse($('#GithubReposJson').html())
+  });
+});
+</script>
+<script src="https://blog.jasonantman.com/theme/js/github.js" type="text/javascript"></script>
+<!-- End GitHub JS Code -->
+    <!-- Disqus -->
+    <script type="text/javascript">
+        /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+        var disqus_shortname = 'jantman'; // required: replace example with your forum shortname
+
+        /* * * DON'T EDIT BELOW THIS LINE * * */
+        (function () {
+            var s = document.createElement('script');
+            s.async = true;
+            s.type = 'text/javascript';
+            s.src = '//' + disqus_shortname + '.disqus.com/count.js';
+            (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+        }());
+    </script>
+    <!-- End Disqus Code -->
+    <!-- Google Analytics Universal -->
+    <script type="text/javascript">
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+        ga('create', 'UA-2718127-2', 'jasonantman.com');
+        ga('send', 'pageview');
+    </script>
+    <!-- End Google Analytics Universal Code -->
+
+
+    <!-- add shariff support -->
+    <script src="https://blog.jasonantman.com/theme/js/shariff.min.js"></script>
+</body>
+</html>
