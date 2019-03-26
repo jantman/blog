@@ -69,11 +69,11 @@ def update_pinned_repos():
     result = []
     r = requests.get('https://github.com/%s' % GITHUB_USER)
     soup = BeautifulSoup(r.text, 'html.parser')
-    for li in soup.select('li.pinned-repo-item.public'):
+    for li in soup.select('li.pinned-item-list-item'):
         result.append({
             'name': li.select('.repo')[0].string.strip(),
             'html_url': 'https://github.com%s' % li.select('.repo')[0].parent.attrs['href'].strip(),
-            'description': li.select('.pinned-repo-desc')[0].string.strip()
+            'description': li.select('.pinned-item-desc')[0].string.strip()
         })
     res = json.dumps(result)
     resp = prompt("New pinned repos:\n%s\nIs this right? [yes|No]" % pformat(result))
