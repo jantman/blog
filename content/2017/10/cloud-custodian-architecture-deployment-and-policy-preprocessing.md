@@ -9,6 +9,8 @@ Summary: Details of how I setup Capital One's Cloud Custodain at work, including
 
 [TOC]
 
+**UPDATE: The tooling originally described here, after much improvement, has been released publicly: https://github.com/manheim/manheim-c7n-tools**
+
 _This post was originally published to my company's internal blog platform; I'm publishing it here for the
 larger Cloud Custodian user community._
 
