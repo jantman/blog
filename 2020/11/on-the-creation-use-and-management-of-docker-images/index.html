@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="en" prefix="og: http://ogp.me/ns# fb: https://www.facebook.com/2008/fbml">
+<head>
+    <title>On The Creation, Use, and Management of Docker Images - Jason Antman's Blog</title>
+    <!-- Using the latest rendering mode for IE -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+
+<link rel="canonical" href="https://blog.jasonantman.com/2020/11/on-the-creation-use-and-management-of-docker-images/">
+
+        <meta name="author" content="Jason Antman" />
+        <meta name="keywords" content="docker,build,deploy,image,container" />
+        <meta name="description" content="Some hard-earned thoughts on how to build, manage, and use Docker images." />
+
+        <meta property="og:site_name" content="Jason Antman's Blog" />
+        <meta property="og:type" content="article"/>
+        <meta property="og:title" content="On The Creation, Use, and Management of Docker Images"/>
+        <meta property="og:url" content="https://blog.jasonantman.com/2020/11/on-the-creation-use-and-management-of-docker-images/"/>
+        <meta property="og:description" content="Some hard-earned thoughts on how to build, manage, and use Docker images."/>
+        <meta property="article:published_time" content="2020-11-10" />
+            <meta property="article:section" content="Software" />
+            <meta property="article:tag" content="docker" />
+            <meta property="article:tag" content="build" />
+            <meta property="article:tag" content="deploy" />
+            <meta property="article:tag" content="image" />
+            <meta property="article:tag" content="container" />
+            <meta property="article:author" content="Jason Antman" />
+
+
+
+    <!-- Bootstrap -->
+        <link rel="stylesheet" href="https://blog.jasonantman.com/theme/css/bootstrap.flatly.min.css" type="text/css"/>
+    <link href="https://blog.jasonantman.com/theme/css/font-awesome.min.css" rel="stylesheet">
+
+    <link href="https://blog.jasonantman.com/theme/css/pygments/default.css" rel="stylesheet">
+        <link href="https://blog.jasonantman.com/theme/css/typogrify.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://blog.jasonantman.com/theme/css/style.css" type="text/css"/>
+        <link href="https://blog.jasonantman.com/theme/css/shariff/shariff.min.css" rel="stylesheet">
+
+    <link rel="stylesheet" href="https://blog.jasonantman.com/theme/css/forkongithub.min.css" type="text/css" />
+
+        <link href="https://blog.jasonantman.com/feeds/all.atom.xml" type="application/atom+xml" rel="alternate"
+              title="Jason Antman's Blog ATOM Feed"/>
+
+        <link href="https://blog.jasonantman.com/feeds/all.rss.xml" type="application/rss+xml" rel="alternate"
+              title="Jason Antman's Blog RSS Feed"/>
+
+
+        <link href="https://blog.jasonantman.com/feeds/categories/software.atom.xml" type="application/atom+xml" rel="alternate"
+              title="Jason Antman's Blog Software ATOM Feed"/>
+
+</head>
+<body>
+
+<div class="navbar navbar-default navbar-fixed-top" role="navigation">
+	<div class="container">
+<span id="forkongithub"><a href="https://github.com/jantman/blog">Fork me on GitHub</a></span>        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="https://blog.jasonantman.com/" class="navbar-brand">
+Jason Antman's Blog            </a>
+        </div>
+        <div class="collapse navbar-collapse navbar-ex1-collapse">
+            <ul class="nav navbar-nav">
+                    <li><a href="/pages/about.html">About Me</a></li>
+                    <li><a href="/categories/aws/index.html">AWS</a></li>
+                    <li><a href="/categories/software/index.html">Software</a></li>
+                    <li><a href="/categories/hardware/index.html">Hardware</a></li>
+                    <li><a href="/categories/diy-home-automation-security/index.html">DIY / Home Automation / Security</a></li>
+                    <li><a href="/categories/miscellaneous/index.html">Miscellaneous</a></li>
+                    <li><a href="/tags.html">Tags</a></li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+              <li><a href="https://blog.jasonantman.com/archives.html"><i class="fa fa-th-list"></i><span class="icon-label">Archives</span></a></li>
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+</div> <!-- /.navbar -->
+<!-- Banner -->
+<!-- End Banner -->
+<div class="container">
+    <div class="row">
+        <div class="col-sm-9">
+    <section id="content">
+        <article>
+            <header class="page-header">
+                <h1>
+                    <a href="https://blog.jasonantman.com/2020/11/on-the-creation-use-and-management-of-docker-images/"
+                       rel="bookmark"
+                       title="Permalink to On The Creation, Use, and Management of Docker Images">
+                        On The Creation, Use, and Management of Docker&nbsp;Images
+                    </a>
+                </h1>
+            </header>
+            <div class="entry-content">
+                <div class="panel">
+                    <div class="panel-body">
+<footer class="post-info">
+    <span class="label label-default">Date</span>
+    <span class="published">
+        <i class="fa fa-calendar"></i><time datetime="2020-11-10T15:11:00-05:00"> Tue 10 November 2020</time>
+    </span>
+
+
+
+
+
+<span class="label label-default">Tags</span>
+	<a href="https://blog.jasonantman.com/tags/docker/index.html">docker</a>
+        /
+	<a href="https://blog.jasonantman.com/tags/build/index.html">build</a>
+        /
+	<a href="https://blog.jasonantman.com/tags/deploy/index.html">deploy</a>
+        /
+	<a href="https://blog.jasonantman.com/tags/image/index.html">image</a>
+        /
+	<a href="https://blog.jasonantman.com/tags/container/index.html">container</a>
+    
+</footer><!-- /.post-info -->                    </div>
+                </div>
+                <div class="toc">
+<ul>
+<li><a href="#introduction">Introduction</a></li>
+<li><a href="#on-to-the-topic-docker">On to the topic: Docker</a><ul>
+<li><a href="#aside-nomenclature">Aside -&nbsp;Nomenclature</a></li>
+<li><a href="#what-docker-images-are-and-arent">What Docker Images Are and&nbsp;Aren&#8217;t</a></li>
+<li><a href="#what-to-put-in-an-image">What to put in an&nbsp;image</a></li>
+<li><a href="#configuration">Configuration</a></li>
+<li><a href="#logging">Logging</a></li>
+<li><a href="#tagging-and-versioning">Tagging and&nbsp;Versioning</a></li>
+<li><a href="#repeatable-builds">Repeatable&nbsp;Builds</a></li>
+<li><a href="#no-runtime-downloads">No Runtime&nbsp;Downloads</a></li>
+<li><a href="#everything-in-source-control-git">Everything in Source Control&nbsp;(Git)</a></li>
+<li><a href="#labels">Labels</a></li>
+<li><a href="#add-a-healthcheck">Add a&nbsp;<span class="caps">HEALTHCHECK</span></a></li>
+<li><a href="#testing-built-images">Testing Built&nbsp;Images</a></li>
+<li><a href="#updates-rollbacks-issue-reproduction-and-disaster-recovery">Updates, Rollbacks, Issue Reproduction, and Disaster&nbsp;Recovery</a></li>
+<li><a href="#automated-builds">Automated&nbsp;Builds</a></li>
+</ul>
+</li>
+<li><a href="#docker-image-checklist">Docker Image Checklist</a><ul>
+<li><a href="#footnotes">Footnotes</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<h1 id="introduction"><a class="toclink" href="#introduction">Introduction</a></h1>
+<p>I know that it&#8217;s been ages since I&#8217;ve posted anything here, but frankly, I haven&#8217;t had much interest to. I&#8217;ve been in a strange place personally for the past few years, and especially for much of 2020. I&#8217;ve let much of my public/professional profile languish over the past few years, and I also haven&#8217;t given my open source projects the attention they deserve. I&#8217;m hoping to fix that soon, and hopefully this post is the first step. I&#8217;m also hoping to add a few posts on the non-computer-related <span class="caps">DIY</span> carpentry and electronics projects that I&#8217;ve worked on over the past year, as well as my first steps into 3D printing. Hopefully my interest in writing will&nbsp;hold.</p>
+<p>For the past five years I&#8217;ve been working on a team that&#8217;s called Release Engineering, but is best described as a tooling <span class="amp">&amp;</span> automation development and consulting team (we&#8217;d likely be Developer Enablement anywhere else). Our goal is to provide tooling, consulting services, processes, documentation, and timely advice to a bunch (i.e. over 100) of software development teams. While my team is heavily involved in many aspects of software and infrastructure lifecycle, most of our work is with <span class="caps">AWS</span> infrastructure automation and with build/test/deploy pipelines. One common thread that connects the two is the use of Docker images, both as the environment where we run much of our tooling, build, and test processes, as well as the final artifact from our build processes - the blob of ones and zeroes that actually gets deployed and&nbsp;run.</p>
+<p>It&#8217;s safe to say that I don&#8217;t make it through a normal work day without running a bunch of Docker containers and likely building (via automated pipelines, of course) a few. It&#8217;s also safe to say that, after spending five-ish years working on Docker-heavy processes at a large Enterprise, including being intimately involved with developing many of our tools, processes, and standards around Docker, and helping in the management of multiple private Docker Registries, I have some pretty strong opinions and some advice that I find myself passing on time after time. The extreme popularity and accessibility of Docker is wonderful, and has certainly been wonderful for everyone involved in the software and operations lifecycles. However, along with this has also come a large amount of misinformation and poor examples on how to use Docker, and a striking difficulty in finding good information on the hard-earned lessons from using Docker at&nbsp;scale.</p>
+<p>There are some wonderful resources, including the official Docker documentation, for how to run Docker. This post is going to focus on Docker Images and their&nbsp;lifecycle.</p>
+<p><strong><span class="caps">IMPORTANT</span>:</strong> Please note that (1) while my language may be rather declarative, <em>this is just my opinion</em>. It&#8217;s shared by many others in the industry, and it&#8217;s based on hard-learned lessons, but it&#8217;s still an opinion. Also, (2), if you&#8217;re not doing what I describe here, <em>I&#8217;m not by any means saying that you&#8217;re &#8220;doing Docker wrong&#8221;</em>. These are lessons learned from a company that builds hundreds of Docker images every day, and has thousands of them running at any given time. <strong>In short, this is what I wish someone told us many years&nbsp;ago.</strong></p>
+<h1 id="on-to-the-topic-docker"><a class="toclink" href="#on-to-the-topic-docker">On to the topic:&nbsp;Docker</a></h1>
+<h2 id="aside-nomenclature"><a class="toclink" href="#aside-nomenclature">Aside -&nbsp;Nomenclature</a></h2>
+<p>For those who may not be familiar with the difference, the following are taken from the <a href="https://docs.docker.com/glossary/">Docker Glossary</a>:</p>
+<p><a href="https://docs.docker.com/glossary/#image">Docker image</a>:</p>
+<blockquote>
+<p>Docker images are the basis of containers. An Image is an ordered collection of root filesystem changes and the corresponding execution parameters for use within a container runtime. An image typically contains a union of layered filesystems stacked on top of each other. An image does not have state and it never&nbsp;changes.</p>
+</blockquote>
+<p><a href="https://docs.docker.com/glossary/#container">Docker container</a>:</p>
+<blockquote>
+<p>A container is a runtime instance of a docker&nbsp;image.</p>
+<p>A Docker container consists&nbsp;of</p>
+<ul>
+<li>A Docker&nbsp;image</li>
+<li>An execution&nbsp;environment</li>
+<li>A standard set of&nbsp;instructions</li>
+</ul>
+<p>The concept is borrowed from Shipping Containers, which define a standard to ship goods globally. Docker defines a standard to ship&nbsp;software.</p>
+</blockquote>
+<h2 id="what-docker-images-are-and-arent"><a class="toclink" href="#what-docker-images-are-and-arent">What Docker Images Are and&nbsp;Aren&#8217;t</a></h2>
+<p>To begin with, I&#8217;m going to make some blanket statements about what Docker (mainly in the context of images, and containers) is and&nbsp;isn&#8217;t:</p>
+<ul>
+<li>Docker images are <strong>not Virtual Machines (VMs)</strong>. While they do provide a means to isolate some data and process(es) and a way to start and stop them, they still share a kernel with the underlying operating system and are visible to it, and do not <em>virtualize</em> anything. They&#8217;re really just a way to group and (somewhat, and only if done very carefully) isolate things from the underlying Linux kernel (or the various compatibility layers for Mac, Windows, and other&nbsp;OSes).</li>
+<li>Docker images are much more analogous to <strong>software packages</strong>, albeit ones that also know about the environment and some networking, and can have their own storage (volumes). In so far as building and distributing software is concerned, Docker images should mostly be regarded like any other package or&nbsp;artifact.</li>
+<li>Docker containers (and images) should ideally only <a href="https://docs.docker.com/config/containers/multi-service_container/">run on service per image/container</a>. Most of the docker ecosystem is built around this concept. While there are many images that don&#8217;t follow this pattern (especially earlier images and proprietary software), you usually wouldn&#8217;t put your application, web server, and database in the same package, and they shouldn&#8217;t be in the same image either. <a href="https://docs.docker.com/compose/">docker-compose</a> was specifically designed to aid in this&nbsp;pattern.</li>
+<li>Docker image <strong>tags are package versions.</strong> No packaging system that I&#8217;m aware of doesn&#8217;t have a concept of a version. With Docker images, that versioning is entirely up to you - by tagging your images. You can tag a single image multiple times, and probably should. Every docker image that&#8217;s built should have at least one completely unique tag, so that same exact image can be used where needed. For versioning, tags that get updated can and should be used (i.e. if you release version <span class="caps">X.Y.</span>Z of your image, you can have X and X.Y tags that point to the most recent relevant&nbsp;image).</li>
+<li>The <code>latest</code> tag is horribly misleading. There is nothing magic or special about <code>latest</code>; it is simply a convention. If you build and push a newer Docker image and don&#8217;t tag it <code>latest</code> (and push that tag), your <code>latest</code> will still point to an older image. Using the <code>latest</code> tag also removes repeatability when running&nbsp;containers.</li>
+<li>If at all possible, Docker images should not write log files to disk. Docker has pluggable <a href="https://docs.docker.com/config/containers/logging/configure/">logging drivers</a>, the simplest being the default which is what&#8217;s displayed by <code>docker logs</code>. Ideally, all logs should go to <span class="caps">STDOUT</span> or <span class="caps">STDERR</span> of the container, and the Docker daemon should be configured to handle them&nbsp;appropriately.</li>
+<li>Many of the best practices for working with Dockerized services match up well with the <a href="https://12factor.net/">12 factor app</a>&nbsp;guidelines.</li>
+</ul>
+<p>If you&#8217;re unsure about any of the prescriptive statements I&#8217;ve made, I&#8217;d encourage you to look at the <a href="https://github.com/docker-library/official-images">docker-library Official images</a>. These are the official Docker images for many popular programming languages, runtimes, and applications. Most, if not all, of them follow these guidelines. The <a href="https://github.com/docker-library/official-images/blob/master/README.md">docker-library <span class="caps">README</span></a> provides some very helpful&nbsp;information.</p>
+<h2 id="what-to-put-in-an-image"><a class="toclink" href="#what-to-put-in-an-image">What to put in an&nbsp;image</a></h2>
+<p>A Docker image should only run one service. That may mean more than one <em>process</em> (in the case of a forking or threaded model), but there should only be one service, and ideally no real init subsystem; just a daemon, perhaps run via a wrapper script. Not only is this in line with the Docker model (see <a href="https://docs.docker.com/config/containers/multi-service_container/">here</a> as an official reference), but it also provides many benefits in terms of isolation (especially if using resource limits), monitoring, modularity and management. Even in trivial cases such as a desktop or home computer, it may be desirable to upgrade or restart services separately, move them to different machines on the same network, or swap out one service for another. When multiple services are needed, they should be run as separate containers and connected via <a href="https://docs.docker.com/network/">Docker networking</a>. This can be made easy for inexperienced users via <a href="https://docs.docker.com/compose/">docker-compose</a>, but retains the flexibility desired by more experienced users with more advanced&nbsp;configurations.</p>
+<h2 id="configuration"><a class="toclink" href="#configuration">Configuration</a></h2>
+<p>Configuration should never be included in a Docker image. One of the main advantages of Docker is &#8220;build once, run anywhere&#8221;, where a single image can be used anywhere it&#8217;s needed (i.e. in the test environment, on a developer&#8217;s laptop, and anywhere through production). I won&#8217;t go into the many possibilities in configuration management, but for a general-purpose image, it&#8217;s most desirable to take all configuration via environment variables with sane defaults provided as needed. For more complex scenarios (such as a web server needing many configuration files), it&#8217;s preferable to provide sane defaults built-in to the container and allow overriding them by mounting a directory of configuration files to a known path in the&nbsp;container.</p>
+<p>Under no circumstances should a Docker image be built multiple times for running on different&nbsp;systems/environments/locations.</p>
+<h2 id="logging"><a class="toclink" href="#logging">Logging</a></h2>
+<p>Logging should not be written directly to files. This is a bit more difficult if you deviate from the one-service-per-container model, but ideally all logging should be sent to the container&#8217;s <span class="caps">STDOUT</span> and <span class="caps">STDERR</span> streams. This will be captured by the Docker daemon and available via the <code>docker logs</code> command if using the default <a href="https://docs.docker.com/config/containers/logging/configure/">logging driver</a>, or sent wherever the daemon is configured otherwise. Handling logging this way has a number of benefits including a unified way to view logs (<code>docker logs</code>), not bloating the container filesystem with log files, not needing to enter into the container to view logs, and compatibility with configurations that send logs to some variety of centralized aggregation, storage, or&nbsp;analysis.</p>
+<p>Furthermore, the <span class="caps">STDOUT</span> and <span class="caps">STDERR</span> streams should be logically separated either by level (i.e. error messages to <span class="caps">STDERR</span>, normal output or info/debug to <span class="caps">STDOUT</span>) or by function (i.e. web server access logs to <span class="caps">STDOUT</span> and error logs to&nbsp;<span class="caps">STDERR</span>).</p>
+<h2 id="tagging-and-versioning"><a class="toclink" href="#tagging-and-versioning">Tagging and&nbsp;Versioning</a></h2>
+<p>Docker image tags determine which one of an unlimited number of variations of a single image is used. On the official Docker Hub images, they&#8217;re used both to specify a version (i.e. <code>python:2.7</code> or <code>python:3.8.2</code>) as well as to specify an optional variant with some sort of difference, often the base image use (i.e. <code>python:3.8.6-buster</code> vs <code>python:3.8.6-alpine3.11</code>). On most official images, a given image has multiple tags; for example, the current <em>newest</em> stable Python image, <code>python:latest</code> (what you get if you omit a tag, and just <code>docker pull python</code>), is also tagged with <code>3.9.0-buster</code>, <code>3.9-buster</code>, <code>3-buster</code>, and <code>buster</code>. Similarly, the newest official Alpine Linux-based Python image is tagged with eight (8) tags: <code>3.9.0-alpine3.12</code>, <code>3.9-alpine3.12</code>, <code>3-alpine3.12</code>, <code>alpine3.12</code>, <code>3.9.0-alpine</code>, <code>3.9-alpine</code>, <code>3-alpine</code>, <code>alpine</code>. The first, and most specific, of these tags (<code>3.9.0-alpine3.12</code>) is generally unchanging; there will (usually) only be one <code>python:3.9.0-alpine3.12</code> image published ever. Running this image should always get you an identical container, without any changes from the last time you pulled and ran it, forever. The less-specific tags, however, change over time to point to the newest relevant image. In this way, image tags can be used like version specifiers in many packaging systems; you can choose to install a very specific, unchanging version of some dependency, or you can choose to install the newest version within some&nbsp;range.</p>
+<p>One possible caveat in this is that I&#8217;m not sure if Docker Hub (for official images) enforces that the most specific tag will <em>never</em> change. In general, I strongly recommend that every image built have at least one completely unique tag that will never be used on another build of that image. This makes it much easier to refer to one specific, unique image, than having to deal with the image digest hash. Many examples that I&#8217;ve seen build this unique tag based on some combination of source control information and timestamp; at my company, our usual practice is to build images with a tag based on the git branch or <span class="caps">PR</span> number, short commit <span class="caps">SHA</span> that&#8217;s being built, and the current integer timestamp. If a build succeeds and gets released, we&#8217;ll then re-tag the image with the <a href="https://semver.org/">semver</a> version&nbsp;number.</p>
+<p>The key point here is that (in most cases) any image that makes it past the initial image build and testing stage should be tagged multiple or many times, to suit the two different purposes of&nbsp;tags:</p>
+<ul>
+<li>One completely unique tag, to identify that exact image for all&nbsp;eternity.</li>
+<li>One or more (usually three or more) version tags, to allow specifying a major, major.minor, or major.minor.patch version of the&nbsp;image.</li>
+</ul>
+<p>For images that are used solely within an automated build and deploy process, you may choose to completely ignore and never use the <code>latest</code> tag. For images that at any point will or may be manually pulled by humans, or any public images, the <code>latest</code> tag should be used and point to the most recent <em>stable</em>&nbsp;version.</p>
+<h2 id="repeatable-builds"><a class="toclink" href="#repeatable-builds">Repeatable&nbsp;Builds</a></h2>
+<p>Especially since the 2020 <a href="https://www.docker.com/blog/scaling-dockers-business-to-serve-millions-more-developers-storage/">Docker Hub announcement</a> that images without any activity for six months will be deleted, it is vitally important that Docker image builds be <a href="https://martinfowler.com/bliki/ReproducibleBuild.html">reproducible</a>. Even for personal projects or companies with private Docker registries, it is always possible that you&#8217;ll need to revisit an old version, test for a regression, or simply rebuild a system that was happily running an uncommon image for a long time. <strong>Running <code>docker build</code> on a given Dockerfile, with the same arguments, should produce a functionally identical image on any machine at any point in time.</strong> As such, all version information for sources (including dependencies) outside of your repository should be either hard-coded explicitly or passed via build-time <a href="https://docs.docker.com/engine/reference/builder/#arg"><span class="caps">ARG</span></a> arguments in the Dockerfile. Further, nothing during the build process should ever download un-versioned URLs (i.e. clone from git master, or download the &#8220;latest&#8221; of&nbsp;something).</p>
+<p>Two possible exceptions to this are the base / <span class="caps">FROM</span> image, and operating system packages. Ideally the base/<span class="caps">FROM</span> image should be defined in the Dockerfile with an immutable tag, but in some cases it&#8217;s desirable to always use the latest image, or to use a less-constrained version tag. In these cases, your build tooling should resolve and record the image used in the <span class="caps">FROM</span> tag, and also ideally add this as a label on the final image. Similarly, when dealing with <span class="caps">OS</span> packages which may be updated within a given release, it&#8217;s desirable to generate a listing of all installed packages before the build finishes and store this somewhere if needed at a later&nbsp;date.</p>
+<h2 id="no-runtime-downloads"><a class="toclink" href="#no-runtime-downloads">No Runtime&nbsp;Downloads</a></h2>
+<p>Dependencies should never be downloaded by a container when it starts up. Doing so breaks repeatability of the image, introduces significant latency to the startup process, and makes possibly-invalid assumptions about network connectivity and available bandwidth. Dependencies that need to be downloaded from the Internet should either be packaged inside the image itself, or downloaded by the user (or some system/automation) and mounted into the&nbsp;container.</p>
+<h2 id="everything-in-source-control-git"><a class="toclink" href="#everything-in-source-control-git">Everything in Source Control&nbsp;(Git)</a></h2>
+<p>Your Dockerfile, as well as any dependencies for building the image that are not part of another project/artifact/package, should be stored in source control. More often than not these days, that means git. This repository should include the Dockerfile, instructions for building and developing the image, and anything that needs to be <span class="caps">COPY</span>&#8217;ed or <span class="caps">ADD</span>&#8217;ed into the image. If at all possible, your images should be tagged or labeled with the git commit hash that was used to build them. The repository should have tags (ideally full Releases, if hosting on GitHub or a similar system) at least corresponding to every released image (i.e. <span class="caps">X.Y.</span>Z for projects using&nbsp;semver).</p>
+<p>This process has a number of benefits for every image, but especially for public images of open-source&nbsp;projects:</p>
+<ul>
+<li>It&#8217;s clear how to find the exact source code that was used to build a specific image, so that you or contributors can troubleshoot or modify&nbsp;it.</li>
+<li>It allows easy reproduction and regression of bugs, by running specific versions of the&nbsp;image.</li>
+<li>It enables using automated systems to build the image, such as Docker Hub automated&nbsp;builds.</li>
+</ul>
+<h2 id="labels"><a class="toclink" href="#labels">Labels</a></h2>
+<p>Docker images should make use of <a href="https://docs.docker.com/develop/develop-images/dockerfile_best-practices/#label">LABELs</a> for storing metadata, passed in as build arguments (<span class="caps">ARG</span>). There is a label schema that&#8217;s gaining acceptance at <a href="http://label-schema.org/">http://label-schema.org/</a> which provides some very useful suggestions and guidelines. I recommend implementing as many of these as practical. In addition, I often find it useful to include a label with the <span class="caps">URL</span> to the automated build that generated the image if possible, as well as to any applicable test results. This can be quite useful when&nbsp;troubleshooting.</p>
+<h2 id="add-a-healthcheck"><a class="toclink" href="#add-a-healthcheck">Add a&nbsp;<span class="caps">HEALTHCHECK</span></a></h2>
+<p>The Dockerfile <a href="https://docs.docker.com/engine/reference/builder/#healthcheck"><span class="caps">HEALTHCHECK</span></a> allows specifying a command to be executed inside running containers at a configurable interval, to check the health of the container. Unless you know for certain that any critical failure in the container will cause it to exit, you should add a health check. This is especially important in any container that uses an init system or runs multiple services. It is generally assumed that, when running Docker containers, they will exit on failure and leave it up to some external system - your service manager, the docker Daemon, etc. - to restart them and track these&nbsp;events.</p>
+<h2 id="testing-built-images"><a class="toclink" href="#testing-built-images">Testing Built&nbsp;Images</a></h2>
+<p>It is generally unwise to assume that a <code>docker build</code> is correct just because all commands during the build succeeded. Many times I&#8217;ve seen otherwise-good Dockerfiles result in broken images because a library version changed, an executable was moved to a different package, some dependency problem exists, or an exit code went unchecked somewhere deep in a script. The Dockerfile <a href="https://docs.docker.com/engine/reference/builder/#healthcheck"><span class="caps">HEALTHCHECK</span></a> is very important, but it only applies to running&nbsp;containers.</p>
+<p>At a minimum, a script should be included in the Dockerfile and executed via <code>RUN</code> that performs a basic sanity/smoke test of the image before the build is complete. This can be as simple as running noop versions of important commands (such as a <code>--version</code> flag) to ensure that they execute without error, or adding a sanity check command to your&nbsp;service.</p>
+<p>Taken a step further, if at all possible, you should actually run containers from newly-built images before pushing them to a registry. This can be as simple as ensuring that the container starts up correctly, or running some basic network/functional tests against the service running in it. As a next step, you can run something like <a href="https://serverspec.org/">serverspec</a> / <a href="https://testinfra.readthedocs.io/en/latest/">testinfra</a> / <a href="https://github.com/aelsabbahy/goss">goss</a> against the container to verify the state of files, services, processes, listening ports, etc. Ideally, you should also run your application&#8217;s test suite (what I&#8217;d usually call &#8220;acceptance tests&#8221;), or a representative subset of it, against the&nbsp;container.</p>
+<h2 id="updates-rollbacks-issue-reproduction-and-disaster-recovery"><a class="toclink" href="#updates-rollbacks-issue-reproduction-and-disaster-recovery">Updates, Rollbacks, Issue Reproduction, and Disaster&nbsp;Recovery</a></h2>
+<p>In general, assuming the service inside an image is designed correctly, deploying an update should be as simple as pulling and running a newer tag of the same image. Ideally, the service inside the container is written to gracefully handle both upgrades and downgrades (if applicable). This allows our deployment/update and rollback plan to be the same: just stop the container that&#8217;s currently running, and start one of the unique tag that we want<sup><a href="#foot1">1</a></sup><a name="foot1source"></a>. Some orchestration is required when running multiple instances of a service, but the overall concept remains the same: aside from the data we store or pass in (i.e. environment variables, volume mounts, and any external stores such as databases), we should be able to completely and identically recreate a previous state by running the previous tag of the&nbsp;image.</p>
+<p>Since a Docker image is an immutable artifact with a unique identifier (tag), we can run a given image on any other system at any time in the future. This has very significant benefits for troubleshooting (issue reproduction) as well as disaster recovery. So long as we capture the state of all external data before changing the running image (i.e. dump databases, back up any filesystems mounted into the container), it should be possible to recreate a functionally identical system and state at any point in the future. Deploy an upgrade to production and find some really hard-to-troubleshoot bug? Just restore your backups (sanitized of any sensitive data, of course) to a test environment, run the same tag of your image with adjusted configuration, and reproduce the bug safely<sup><a href="#foot2">2</a></sup><a name="foot2source"></a>.</p>
+<p>Similarly, in a disaster recovery context, all we need to do is have a record of how our container was started/run (you&#8217;re using some sort of configuration management for this, right?) and a backup of any volumes that it uses. If the machine it&#8217;s running on catches fire, or gets deleted, two years from now&#8230; just restore the backed-up volumes, and pull and run the container the same way you did before. You should end up with an identical&nbsp;system.</p>
+<h2 id="automated-builds"><a class="toclink" href="#automated-builds">Automated&nbsp;Builds</a></h2>
+<p>Finally, while some may disagree, I&#8217;m a staunch advocate that <code>docker build</code> should <em>never</em> be directly executed by a human. It is virtually impossible to follow the other guidance here reliably - especially when it comes to tags and labels - by building a <code>docker build</code> command by hand. Ideally, all builds will be handled by an automated system, which could be anything from Docker Hub automated builds to Jenkins or another <span class="caps">CI</span> system, to a shell script. At times, I&#8217;ve gone so far as to add a required <code>ARG never_build_manually</code> to the Dockerfile to make this clear. For local development a <code>local_build.sh</code> script can be added to the repository, which sets tags and labels appropriately to ensure that if the image is pushed to a registry it&#8217;s clearly identified as a local development&nbsp;build.</p>
+<p>Enforcing that only automated builds are considered &#8220;real&#8221; builds ensures that the above points - especially repeatability, proper tagging and labeling, and full testing - are always in place for each&nbsp;image.</p>
+<h1 id="docker-image-checklist"><a class="toclink" href="#docker-image-checklist">Docker Image&nbsp;Checklist</a></h1>
+<ol>
+<li>Your Dockerfile follows the <a href="https://docs.docker.com/develop/develop-images/dockerfile_best-practices/">Best practices for writing Dockerfiles</a>, and your service is as close to a <a href="https://12factor.net/">12 factor app</a> as&nbsp;possible.</li>
+<li>Your image/container <a href="#what-to-put-in-an-image">only runs one service</a>, ideally without any sort of init&nbsp;subsystem.</li>
+<li>Your image takes its <a href="#configuration">configuration</a> via environment variables, or if need be, via config files mounted into the running container (with sane defaults&nbsp;provided).</li>
+<li>In no circumstances do you build different images for different environments or deployment&nbsp;scenarios.</li>
+<li>The service running in your images <a href="#logging">logs</a> to <span class="caps">STDOUT</span>/<span class="caps">STDERR</span>, to be handled by the Docker daemon, and not to files on disk. Ideally, out and err have some logical&nbsp;separation.</li>
+<li>Your image is <a href="#tagging-and-versioning">tagged</a> with both a unique/immutable tag per image as well as relevant version tags (ideally following semver, and allowing use of major or major.minor images). All images should be able to be referenced by a unique tag, for all time to&nbsp;come.</li>
+<li>For released software or open-source projects, the <code>latest</code> tag points to the most recent stable&nbsp;release.</li>
+<li>Within the constraints of base images, <span class="caps">OS</span> packages, etc. any given image is <a href="#repeatable-builds">repeatable</a> and can be rebuilt from source control at any point in the&nbsp;future.</li>
+<li>When run as a container, your image does not <a href="#no-runtime-downloads">download dependencies at runtime</a>. The image should include everything (except data) required to&nbsp;work.</li>
+<li>Everything needed to build the image (aside from external artifacts) is <a href="#everything-in-source-control-git">included in source control</a>, and versioned along with the Dockerfile. It is possible to tie an image to the commit / source state that it was generated from, and to tie a tag/release in source control to the corresponding&nbsp;image.</li>
+<li>Your image makes use of <a href="#labels">labels</a> on the image to store metadata about it, its contents, and the build&nbsp;process.</li>
+<li>Your image includes a <a href="#add-a-healthcheck">healthcheck</a> so that the Docker daemon can tell if containers are in a healthy, functional&nbsp;state.</li>
+<li>The process for building your image includes running <a href="#testing-built-images">tests</a> against it, and ideally also against a running&nbsp;container.</li>
+<li>Data used by your image is isolated in volumes, so that users can <a href="#updates-rollbacks-issue-reproduction-and-disaster-recovery">roll back and forward, reproduce issues, and perform disaster recovery</a> via&nbsp;tags.</li>
+<li>The process for building your image is <a href="#automated-builds">automated</a>, and manually/locally built images are easily identified as development / non-release&nbsp;artifacts.</li>
+</ol>
+<h2 id="footnotes"><a class="toclink" href="#footnotes">Footnotes</a></h2>
+<p><a name="foot1">1</a>: This is a gross simplification, describing a lab or desktop environment or the most trivial and unimportant service. For anything else, even in the lowest environments, you&#8217;d most likely have multiple containers running of the same service, and would use a zero-downtime deployment method such as blue/green or progressive traffic shifting. But at an extremely high level, the idea is the same: that you can roll backwards and forwards through container versions. <a href="#foot1source">back to&nbsp;source</a></p>
+<p><a name="foot2">2</a>: I&#8217;ll admit that this is rather optimistic, and makes a lot of assumptions. This may end up being <em>much</em> more complicated than &#8220;just restore your backups and run it in test&#8221;, but it&#8217;s still much simpler than what this process looked like a decade ago. <a href="#foot2source">back to&nbsp;source</a></p>
+            </div>
+            <!-- /.entry-content -->
+    <hr />
+    <!-- Shariff Button BEGIN -->
+    <div class="shariff"
+        data-lang="en"
+        data-orientation="horizontal"
+        data-services = "[&quot;facebook&quot;,&quot;googleplus&quot;,&quot;twitter&quot;,&quot;linkedin&quot;,&quot;diaspora&quot;]"
+        data-theme="standard"
+        data-url="https://blog.jasonantman.com/2020/11/on-the-creation-use-and-management-of-docker-images/"></div>
+    <!-- Shariff Button END -->
+    <hr/>
+    <section class="comments" id="comments">
+        <h2>Comments</h2>
+
+        <div id="disqus_thread"></div>
+        <script type="text/javascript">
+            /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+            var disqus_shortname = 'jantman'; // required: replace example with your forum shortname
+
+                    var disqus_identifier = 'on-the-creation-use-and-management-of-docker-images';
+                var disqus_url = 'https://blog.jasonantman.com/2020/11/on-the-creation-use-and-management-of-docker-images/';
+
+            var disqus_config = function () {
+                this.language = "en";
+            };
+
+            /* * * DON'T EDIT BELOW THIS LINE * * */
+            (function () {
+                var dsq = document.createElement('script');
+                dsq.type = 'text/javascript';
+                dsq.async = true;
+                dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+                (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+            })();
+        </script>
+        <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by
+            Disqus.</a></noscript>
+        <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+
+    </section>
+        </article>
+    </section>
+
+        </div>
+        <div class="col-sm-3" id="sidebar">
+            <aside>
+<!-- Sidebar -->
+<section class="well well-sm">
+  <ul class="list-group list-group-flush">
+
+<!-- Sidebar/Recent Posts -->
+<li class="list-group-item">
+  <h4><i class="fa fa-home fa-lg"></i><span class="icon-label">Recent Posts</span></h4>
+  <ul class="list-group" id="recentposts">
+    <li class="list-group-item"><a href="https://blog.jasonantman.com/2020/11/on-the-creation-use-and-management-of-docker-images/">On The Creation, Use, and Management of Docker&nbsp;Images</a></li>
+    <li class="list-group-item"><a href="https://blog.jasonantman.com/2019/04/galaxy-s10--android-9-alarm-app-broken-by-battery-optimization/">Galaxy S10 / Android 9 alarm app broken by battery&nbsp;optimization</a></li>
+    <li class="list-group-item"><a href="https://blog.jasonantman.com/2019/03/arch-linux-on-a-dell-precision-5530--xps-15-9570-laptop/">Arch Linux on a Dell Precision 5530 / <span class="caps">XPS</span> 15 9570&nbsp;Laptop</a></li>
+    <li class="list-group-item"><a href="https://blog.jasonantman.com/2018/12/twilio-programmable-wireless-ppp-proxy-docker-image/">Twilio Programmable Wireless <span class="caps">PPP</span> Proxy Docker&nbsp;Image</a></li>
+    <li class="list-group-item"><a href="https://blog.jasonantman.com/2018/12/2018-in-review/">2018 in&nbsp;Review</a></li>
+  </ul>
+</li>
+<!-- End Sidebar/Recent Posts -->
+
+<!-- Sidebar/Twitter Timeline -->
+<li class="list-group-item">
+  <h4><i class="fa fa-twitter fa-lg"></i><span class="icon-label">Latest Tweets</span></h4>
+  <div id="twitter_timeline">
+    <a class="twitter-timeline" data-width="250" data-height="300" data-dnt="true" data-theme="light" href="https://twitter.com/j_antman">Tweets by j_antman</a> <script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
+  </div>
+</li>
+<!-- End Sidebar/Twitter Timeline -->
+
+<!-- Sidebar/Github -->
+<li class="list-group-item">
+  <h4><i class="fa fa-github fa-lg"></i><span class="icon-label">GitHub Repos</span></h4>
+  <div id="gh_repos">
+    <p class="list-group-item">Status updating...</p>
+  </div>
+  <a href="https://github.com/jantman">@jantman</a> on GitHub
+</li>
+<!-- End Sidebar/Github -->
+
+<!-- Sidebar/Links -->
+<li class="list-group-item">
+  <h4><i class="fa fa-external-link-square fa-lg"></i><span class="icon-label">Links</span></h4>
+  <ul class="list-group" id="links">
+    <li class="list-group-item">
+      <a href="http://www.jasonantman.com" target="_blank">Homepage</a>
+    </li>
+    <li class="list-group-item">
+      <a href="http://resume.jasonantman.com" target="_blank">Resume</a>
+    </li>
+  </ul>
+</li>
+<!-- End Sidebar/Links -->
+  </ul>
+</section>
+<!-- End Sidebar -->            </aside>
+        </div>
+    </div>
+</div>
+<footer>
+   <div class="container">
+      <hr>
+      <div class="row">
+         <div class="col-xs-10">&copy; 2020 Jason Antman
+            &middot; Powered by <a href="https://github.com/getpelican/pelican-themes/tree/master/pelican-bootstrap3" target="_blank">pelican-bootstrap3</a>,
+            <a href="http://docs.getpelican.com/" target="_blank">Pelican</a>,
+            <a href="http://getbootstrap.com" target="_blank">Bootstrap</a>         </div>
+         <div class="col-xs-2"><p class="pull-right"><i class="fa fa-arrow-up"></i> <a href="#">Back to top</a></p></div>
+      </div>
+   </div>
+</footer>
+<script src="https://blog.jasonantman.com/theme/js/jquery.min.js"></script>
+
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="https://blog.jasonantman.com/theme/js/bootstrap.min.js"></script>
+
+<!-- Enable responsive features in IE8 with Respond.js (https://github.com/scottjehl/Respond) -->
+<script src="https://blog.jasonantman.com/theme/js/respond.min.js"></script>
+
+
+
+    <!-- GITHUB_REPOS_JSON (explicitly pinned repos ) -->
+  <script id="GithubReposJson" type="application/json">
+  [{"description": "A script and python package to check your AWS service limits and usage via boto3.", "name": "awslimitchecker", "html_url": "https://github.com/jantman/awslimitchecker"}, {"description": "UNSUPPORTED - Puppet module and accompanying documentation to install/setup Arch linux on a MacBook Pro Retina 11,4", "name": "puppet-archlinux-macbookretina", "html_url": "https://github.com/jantman/puppet-archlinux-macbookretina"}, {"description": "A collection of my standalone scripts to small/quick for their own repos. All kinds of useful stuff.", "name": "misc-scripts", "html_url": "https://github.com/jantman/misc-scripts"}, {"description": "Responsive Flask/SQLAlchemy personal finance app, specifically for biweekly budgeting.", "name": "biweeklybudget", "html_url": "https://github.com/jantman/biweeklybudget"}, {"description": "A standard to easily communicate to humans and machines the development/support and usability status of software repositories/projects.", "name": "repostatus.org", "html_url": "https://github.com/jantman/repostatus.org"}, {"description": "home automation/security config/scripts/tooling - HomeAssistant, AppDaemon, ZoneMinder, etc.", "name": "home-automation-configs", "html_url": "https://github.com/jantman/home-automation-configs"}]
+  </script>
+
+<!-- GitHub JS Code -->
+<script type="text/javascript">
+$(document).ready(function () {
+  if (!window.jXHR) {
+    var jxhr = document.createElement('script');
+    jxhr.type = 'text/javascript';
+    jxhr.src = 'https://blog.jasonantman.com/theme/js/jXHR.js';
+    var s = document.getElementsByTagName('script')[0];
+    s.parentNode.insertBefore(jxhr, s);
+  }
+
+  console.log($('#GithubReposJson').html());
+  github.showSpecificRepos({
+    user: 'jantman',
+    target: '#gh_repos',
+    repos: JSON.parse($('#GithubReposJson').html())
+  });
+});
+</script>
+<script src="https://blog.jasonantman.com/theme/js/github.js" type="text/javascript"></script>
+<!-- End GitHub JS Code -->
+    <!-- Disqus -->
+    <script type="text/javascript">
+        /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+        var disqus_shortname = 'jantman'; // required: replace example with your forum shortname
+
+        /* * * DON'T EDIT BELOW THIS LINE * * */
+        (function () {
+            var s = document.createElement('script');
+            s.async = true;
+            s.type = 'text/javascript';
+            s.src = '//' + disqus_shortname + '.disqus.com/count.js';
+            (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+        }());
+    </script>
+    <!-- End Disqus Code -->
+    <!-- Google Analytics Universal -->
+    <script type="text/javascript">
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+        ga('create', 'UA-2718127-2', 'jasonantman.com');
+        ga('send', 'pageview');
+    </script>
+    <!-- End Google Analytics Universal Code -->
+
+
+    <!-- add shariff support -->
+    <script src="https://blog.jasonantman.com/theme/js/shariff.min.js"></script>
+</body>
+</html>
