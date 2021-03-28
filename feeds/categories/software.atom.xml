@@ -1,5 +1,251 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Jason Antman's Blog - Software</title><link href="https://blog.jasonantman.com/" rel="alternate"></link><link href="https://blog.jasonantman.com/feeds/categories/software.atom.xml" rel="self"></link><id>https://blog.jasonantman.com/</id><updated>2020-11-10T15:11:00-05:00</updated><entry><title>On The Creation, Use, and Management of Docker Images</title><link href="https://blog.jasonantman.com/2020/11/on-the-creation-use-and-management-of-docker-images/" rel="alternate"></link><published>2020-11-10T15:11:00-05:00</published><updated>2020-11-10T15:11:00-05:00</updated><author><name>Jason Antman</name></author><id>tag:blog.jasonantman.com,2020-11-10:/2020/11/on-the-creation-use-and-management-of-docker-images/</id><summary type="html">&lt;p&gt;Some hard-earned thoughts on how to build, manage, and use Docker&amp;nbsp;images.&lt;/p&gt;</summary><content type="html">&lt;div class="toc"&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Jason Antman's Blog - Software</title><link href="https://blog.jasonantman.com/" rel="alternate"></link><link href="https://blog.jasonantman.com/feeds/categories/software.atom.xml" rel="self"></link><id>https://blog.jasonantman.com/</id><updated>2021-03-28T10:55:00-04:00</updated><entry><title>Migrating Kodi to MariaDB, with locked-down permissions and no import/export</title><link href="https://blog.jasonantman.com/2021/03/migrating-kodi-to-mariadb-with-locked-down-permissions-and-no-importexport/" rel="alternate"></link><published>2021-03-28T10:55:00-04:00</published><updated>2021-03-28T10:55:00-04:00</updated><author><name>Jason Antman</name></author><id>tag:blog.jasonantman.com,2021-03-28:/2021/03/migrating-kodi-to-mariadb-with-locked-down-permissions-and-no-importexport/</id><summary type="html">&lt;p&gt;Instructions for migrating Kodi from SQLite to MySQL/MariaDB, without giving root database permissions or needing import/export of&amp;nbsp;media.&lt;/p&gt;</summary><content type="html">&lt;p&gt;For the past two years or so, I&amp;#8217;ve been using &lt;a href="https://kodi.tv/"&gt;Kodi&lt;/a&gt; to power my television. It works great, as I don&amp;#8217;t have cable and all of my DVDs have been ripped to a hard drive. It lets me watch any of my digital movies/&lt;span class="caps"&gt;TV&lt;/span&gt; shows, as well as Netflix and Amazon Prime Video - which is all that I need. Kodi itself is running on a Raspberry Pi 4 in a tiny little case, so it works great for a media center / &lt;span class="caps"&gt;HTPC&lt;/span&gt;. I recently wanted to add another Kodi device for my bedroom &lt;span class="caps"&gt;TV&lt;/span&gt;, but unfortunately (unlike the older &lt;a href="https://www.mythtv.org/"&gt;MythTV&lt;/a&gt;, that I used years ago) Kodi isn&amp;#8217;t a client/server app, it&amp;#8217;s just a single local&amp;nbsp;program.&lt;/p&gt;
+&lt;p&gt;Using multiple front-ends is sort of supported by &lt;a href="https://kodi.wiki/view/MySQL"&gt;switching from the built-in SQLite database to MySQL&lt;/a&gt;, but there&amp;#8217;s a fair amount left out (such as addons). The process for switching to a MySQL-compatible database server also had some pain points for me, namely that it requires complete root permissions on the database and it relies on exporting and then re-importing all of your media. The first point (database permissions) is untenable, since my MariaDB server contains a number of other databases, some of which have private information in them. The second point - exporting information on all of the media, then switching from SQLite to MariaDB, then re-importing everything - just seemed horribly&amp;nbsp;inefficient.&lt;/p&gt;
+&lt;p&gt;So, here&amp;#8217;s the process I used for switching Kodi from SQLite to MariaDB and adding a second frontend. This assumes that you already have your media/library stored remotely and mounted via &lt;span class="caps"&gt;NFS&lt;/span&gt;, and that your two frontend devices (Raspberry Pi 4&amp;#8217;s for me) are running the exact same &lt;span class="caps"&gt;OS&lt;/span&gt;, Kodi version, and versions of everything else (for me, it&amp;#8217;s Raspberry Pi &lt;span class="caps"&gt;OS&lt;/span&gt;, everything updated to&amp;nbsp;latest).&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;tl;dr:&lt;/strong&gt; Point Kodi to a temporary MySQL server to create the schema. Use a Python script to &lt;span class="caps"&gt;SELECT&lt;/span&gt; every row from the SQLite DBs and &lt;span class="caps"&gt;INSERT&lt;/span&gt; them into MySQL. &lt;code&gt;mysqldump&lt;/code&gt; the result and import it into your production &lt;span class="caps"&gt;DB&lt;/span&gt; server.&amp;nbsp;Done.&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Identify the exact database server version you&amp;#8217;re going to be using. For me, this is MariaDB&amp;nbsp;10.5.9.&lt;/li&gt;
+&lt;li&gt;Stand up another, brand new and empty, server running that version. For ease, I&amp;#8217;m using the Docker container for &lt;code&gt;mariadb:10.5.9&lt;/code&gt; running on my laptop. Expose the port (3306) to your network. If running in Docker, make sure you mount a directory into the container. For me, this was &lt;code&gt;docker run -it --rm --name db -v /tmp:/host-tmp -p 3306:3306 -e MYSQL_ROOT_PASSWORD=foobar mariadb:10.5.9&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;Do whatever you need to, to get port 3306 passed through your firewall and available to the Kodi&amp;nbsp;hosts.&lt;/li&gt;
+&lt;li&gt;Stop/exit Kodi on the existing&amp;nbsp;host.&lt;/li&gt;
+&lt;li&gt;Back up your entire Kodi directory (&lt;code&gt;~/.kodi&lt;/code&gt;) somewhere. Copy the SQLite database files (&lt;code&gt;.kodi/userdata/Database&lt;/code&gt;) to the computer you&amp;#8217;re working on. Also rename or move the &lt;code&gt;MyMusic72.db&lt;/code&gt; and &lt;code&gt;MyVideos116.db&lt;/code&gt; files from the &lt;code&gt;Database&lt;/code&gt; directory, so we can be sure that we&amp;#8217;re using MySQL later&amp;nbsp;on.&lt;/li&gt;
+&lt;li&gt;Get a root session on your temporary database; for me, this is &lt;code&gt;docker exec -it db mysql -uroot -p&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;Set up permissions for kodi as described in &lt;a href="https://kodi.wiki/view/MySQL/Setting_up_MySQL"&gt;the documentation&lt;/a&gt;: &lt;code&gt;CREATE USER 'kodi' IDENTIFIED BY 'kodi'; GRANT ALL ON *.* TO 'kodi'; flush privileges;&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;Run &lt;code&gt;SHOW DATABASES;&lt;/code&gt; - this should list 3 default databases: information_schema, mysql, and&amp;nbsp;performance_schema&lt;/li&gt;
+&lt;li&gt;On the Kodi host, create &lt;code&gt;~/.kodi/userdata/advancedsettings.xml&lt;/code&gt; with the &lt;a href="https://kodi.wiki/view/MySQL/Setting_up_Kodi"&gt;appropriate content for MySQL&lt;/a&gt; pointing to your test/temporary &lt;span class="caps"&gt;DB&lt;/span&gt;. Start Kodi back&amp;nbsp;up.&lt;/li&gt;
+&lt;li&gt;You should get a blank, empty Kodi main screen, but on your temporary &lt;span class="caps"&gt;DB&lt;/span&gt; server you should see two new databases. For Kodi 18 (Leia) they will be called &lt;code&gt;MyMusic72&lt;/code&gt; and &lt;code&gt;MyVideos116&lt;/code&gt;. Once this is done, stop Kodi&amp;nbsp;again.&lt;/li&gt;
+&lt;li&gt;Save the &lt;code&gt;sqlite-to-mysql.py&lt;/code&gt; script, below, to the same directory as your database backups. This script is written for Python 3.7 or later, and needs the &lt;a href="https://pymysql.readthedocs.io/en/latest/"&gt;PyMySQL&lt;/a&gt; (&lt;code&gt;pip install PyMySQL&lt;/code&gt;)&amp;nbsp;package.&lt;/li&gt;
+&lt;li&gt;Run &lt;code&gt;python3 sqlite-to-mysql.py&lt;/code&gt; to copy all data from the SQLite databases to MySQL/MariaDB on the &lt;strong&gt;temporary&lt;/strong&gt; database server. Run first with &lt;code&gt;-h&lt;/code&gt; to see the available options and their default&amp;nbsp;values.&lt;/li&gt;
+&lt;li&gt;Start Kodi back up. You should see all of your library, your watched history and current positions, etc. That means&amp;#8230; it worked! Stop kodi on all&amp;nbsp;frontends.&lt;/li&gt;
+&lt;li&gt;On the temporary database server, dump both databases. For me, this was &lt;code&gt;docker exec -it db /bin/bash&lt;/code&gt; then &lt;code&gt;cd /host-tmp&lt;/code&gt; then &lt;code&gt;mysqldump --insert-ignore --routines --triggers --databases MyMusic72 MyVideos116 -uroot -p &amp;gt; kodi-data.sql&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;Copy the resulting &lt;span class="caps"&gt;SQL&lt;/span&gt; dump file (&lt;code&gt;kodi-data.sql&lt;/code&gt;) to your actual database server and restore&amp;nbsp;it.&lt;/li&gt;
+&lt;li&gt;Update &lt;code&gt;~/.kodi/userdata/advancedsettings.xml&lt;/code&gt; to point to your production database&amp;nbsp;server.&lt;/li&gt;
+&lt;li&gt;Now, copy all of &lt;code&gt;~/.kodi&lt;/code&gt; from the primary frontend that you&amp;#8217;ve been working on to all others. This will update them with not only your database configuration but also your addons, settings,&amp;nbsp;etc.&lt;/li&gt;
+&lt;li&gt;Start up all Kodi frontends; they should now be functional and&amp;nbsp;synchronized.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id="upgrading"&gt;&lt;a class="toclink" href="#upgrading"&gt;Upgrading&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;Upgrading will be a bit less of a pain, but still not&amp;nbsp;fun:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Dump your databases from MySQL/MariaDB, stand up another temporary &lt;span class="caps"&gt;DB&lt;/span&gt; server, restore the dump. Give Kodi full&amp;nbsp;privileges.&lt;/li&gt;
+&lt;li&gt;Stop all of your Kodi&amp;nbsp;frontends.&lt;/li&gt;
+&lt;li&gt;Switch one of your Kodi frontends to the temporary server, upgrade Kodi, start it up, let it upgrade the&amp;nbsp;database.&lt;/li&gt;
+&lt;li&gt;Dump the database, restore it on your production server. Adjust permissions for new database names as&amp;nbsp;needed.&lt;/li&gt;
+&lt;li&gt;Point your running Kodi instance back to the production&amp;nbsp;server.&lt;/li&gt;
+&lt;li&gt;Upgrade all remaining frontends and start them&amp;nbsp;up.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id="sqlite-to-mysqlpy"&gt;&lt;a class="toclink" href="#sqlite-to-mysqlpy"&gt;sqlite-to-mysql.py&lt;/a&gt;&lt;/h2&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="ch"&gt;#!/usr/bin/env python&lt;/span&gt;
+&lt;span class="sd"&gt;&amp;quot;&amp;quot;&amp;quot;&lt;/span&gt;
+&lt;span class="sd"&gt;Script for migrating Kodi SQLite databases to MySQL / MariaDB.&lt;/span&gt;
+
+&lt;span class="sd"&gt;Requires Python &amp;gt;= 3.7 and PyMySQL.&lt;/span&gt;
+
+&lt;span class="sd"&gt;For usage, see:&lt;/span&gt;
+&lt;span class="sd"&gt;https://blog.jasonantman.com/2021/03/migrating-kodi-to-mariadb-with-locked-down-permissions-and-no-importexport/&lt;/span&gt;
+
+&lt;span class="sd"&gt;&lt;span class="caps"&gt;NOTE&lt;/span&gt;: This currently ignores triggers, as all triggers that Kodi currently uses&lt;/span&gt;
+&lt;span class="sd"&gt;in these DBs are &lt;span class="caps"&gt;AFTER&lt;/span&gt; delete.&lt;/span&gt;
+&lt;span class="sd"&gt;&amp;quot;&amp;quot;&amp;quot;&lt;/span&gt;
+
+&lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="nn"&gt;sys&lt;/span&gt;
+&lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="nn"&gt;argparse&lt;/span&gt;
+&lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="nn"&gt;logging&lt;/span&gt;
+&lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;typing&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;Any&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;List&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;Tuple&lt;/span&gt;
+
+&lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="nn"&gt;pymysql&lt;/span&gt;
+&lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="nn"&gt;pymysql.cursors&lt;/span&gt;
+&lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="nn"&gt;sqlite3&lt;/span&gt;
+
+&lt;span class="n"&gt;&lt;span class="caps"&gt;FORMAT&lt;/span&gt;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="nb"&gt;str&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;[&lt;/span&gt;&lt;span class="si"&gt;%(asctime)s&lt;/span&gt;&lt;span class="s2"&gt; &lt;/span&gt;&lt;span class="si"&gt;%(levelname)s&lt;/span&gt;&lt;span class="s2"&gt;] &lt;/span&gt;&lt;span class="si"&gt;%(message)s&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;
+&lt;span class="n"&gt;logging&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;basicConfig&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;level&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="n"&gt;logging&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;&lt;span class="caps"&gt;WARNING&lt;/span&gt;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nb"&gt;format&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="n"&gt;&lt;span class="caps"&gt;FORMAT&lt;/span&gt;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="n"&gt;logger&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="n"&gt;logging&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;Logger&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;logging&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;getLogger&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+
+
+&lt;span class="k"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;KodiMigrator&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+
+    &lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="fm"&gt;__init__&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;
+        &lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;host&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="nb"&gt;str&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;port&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="nb"&gt;int&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;user&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="nb"&gt;str&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;passwd&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="nb"&gt;str&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+        &lt;span class="n"&gt;dry_run&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="nb"&gt;bool&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="kc"&gt;False&lt;/span&gt;
+    &lt;span class="p"&gt;):&lt;/span&gt;
+        &lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;dry_run&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="nb"&gt;bool&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;dry_run&lt;/span&gt;
+        &lt;span class="n"&gt;logger&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;debug&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;
+            &lt;span class="s1"&gt;&amp;#39;Connecting to MySQL at &lt;/span&gt;&lt;span class="si"&gt;%s&lt;/span&gt;&lt;span class="s1"&gt;:&lt;/span&gt;&lt;span class="si"&gt;%s&lt;/span&gt;&lt;span class="s1"&gt; as &lt;/span&gt;&lt;span class="si"&gt;%s&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;host&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;port&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;user&lt;/span&gt;
+        &lt;span class="p"&gt;)&lt;/span&gt;
+        &lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;mysql&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="n"&gt;pymysql&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;connections&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;Connection&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;pymysql&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;connect&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;
+            &lt;span class="n"&gt;host&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="n"&gt;host&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+            &lt;span class="n"&gt;user&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="n"&gt;user&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+            &lt;span class="n"&gt;port&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="n"&gt;port&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+            &lt;span class="n"&gt;password&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="n"&gt;passwd&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+            &lt;span class="n"&gt;charset&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;utf8mb4&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+            &lt;span class="n"&gt;cursorclass&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="n"&gt;pymysql&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;cursors&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;DictCursor&lt;/span&gt;
+        &lt;span class="p"&gt;)&lt;/span&gt;
+        &lt;span class="n"&gt;logger&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;info&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;Connected to MySQL&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+    &lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;run&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+        &lt;span class="k"&gt;for&lt;/span&gt; &lt;span class="n"&gt;dbname&lt;/span&gt; &lt;span class="ow"&gt;in&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;MyMusic72&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;MyVideos116&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;]:&lt;/span&gt;
+            &lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;handle_db&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;dbname&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+    &lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;handle_db&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;dbname&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="nb"&gt;str&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+        &lt;span class="n"&gt;logger&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;info&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;Handling database: &lt;/span&gt;&lt;span class="si"&gt;%s&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;dbname&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+        &lt;span class="n"&gt;logger&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;debug&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;MySQL select &lt;span class="caps"&gt;DB&lt;/span&gt; &lt;/span&gt;&lt;span class="si"&gt;%s&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;dbname&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+        &lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;mysql&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;select_db&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;dbname&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+        &lt;span class="n"&gt;mysql_tables&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;_mysql_table_names&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+        &lt;span class="n"&gt;logger&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;debug&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;SQLite3 open &lt;/span&gt;&lt;span class="si"&gt;%s&lt;/span&gt;&lt;span class="s1"&gt;.db&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;dbname&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+        &lt;span class="n"&gt;local&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="n"&gt;sqlite3&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;Connection&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;sqlite3&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;connect&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="sa"&gt;f&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;&lt;/span&gt;&lt;span class="si"&gt;{dbname}&lt;/span&gt;&lt;span class="s1"&gt;.db&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+        &lt;span class="n"&gt;sqlite_tables&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;_sqlite_table_names&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;local&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+        &lt;span class="n"&gt;local&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;row_factory&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;sqlite3&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;Row&lt;/span&gt;
+        &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="n"&gt;mysql_tables&lt;/span&gt; &lt;span class="o"&gt;!=&lt;/span&gt; &lt;span class="n"&gt;sqlite_tables&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+            &lt;span class="k"&gt;raise&lt;/span&gt; &lt;span class="ne"&gt;RuntimeError&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;
+                &lt;span class="sa"&gt;f&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;&lt;span class="caps"&gt;ERROR&lt;/span&gt;: MySQL table names in &lt;/span&gt;&lt;span class="si"&gt;{dbname}&lt;/span&gt;&lt;span class="s1"&gt; (&lt;/span&gt;&lt;span class="si"&gt;{mysql_tables}&lt;/span&gt;&lt;span class="s1"&gt;) do &amp;#39;&lt;/span&gt;
+                &lt;span class="sa"&gt;f&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;not match SQLite table names (&lt;/span&gt;&lt;span class="si"&gt;{sqlite_tables}&lt;/span&gt;&lt;span class="s1"&gt;)!&amp;#39;&lt;/span&gt;
+            &lt;span class="p"&gt;)&lt;/span&gt;
+        &lt;span class="k"&gt;with&lt;/span&gt; &lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;mysql&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;cursor&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt; &lt;span class="k"&gt;as&lt;/span&gt; &lt;span class="n"&gt;cursor&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+            &lt;span class="n"&gt;cursor&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;execute&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;set FOREIGN_KEY_CHECKS = 0;&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+            &lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;_fix_db&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;dbname&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;cursor&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+            &lt;span class="k"&gt;for&lt;/span&gt; &lt;span class="n"&gt;tname&lt;/span&gt; &lt;span class="ow"&gt;in&lt;/span&gt; &lt;span class="n"&gt;mysql_tables&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+                &lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;_handle_table&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;local&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;cursor&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;tname&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+            &lt;span class="n"&gt;cursor&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;execute&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;set FOREIGN_KEY_CHECKS = 1;&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+            &lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;mysql&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;commit&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+
+    &lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;_fix_db&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;dbname&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="nb"&gt;str&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;cur&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="n"&gt;pymysql&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;cursors&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;DictCursor&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+        &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="n"&gt;dbname&lt;/span&gt; &lt;span class="o"&gt;!=&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;MyVideos116&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+            &lt;span class="k"&gt;return&lt;/span&gt;
+        &lt;span class="c1"&gt;# for data conversion, change tvshow.c06 from &lt;span class="caps"&gt;TEXT&lt;/span&gt; to &lt;span class="caps"&gt;MEDIUMTEXT&lt;/span&gt;&lt;/span&gt;
+        &lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;_mysql_execute&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;
+            &lt;span class="n"&gt;cur&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;&lt;span class="caps"&gt;ALTER&lt;/span&gt; &lt;span class="caps"&gt;TABLE&lt;/span&gt; tvshow &lt;span class="caps"&gt;MODIFY&lt;/span&gt; &lt;span class="caps"&gt;COLUMN&lt;/span&gt; c06 &lt;span class="caps"&gt;MEDIUMTEXT&lt;/span&gt;;&amp;#39;&lt;/span&gt;
+        &lt;span class="p"&gt;)&lt;/span&gt;
+
+    &lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;_handle_table&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;
+        &lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;local&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="n"&gt;sqlite3&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;Connection&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;cur&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="n"&gt;pymysql&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;cursors&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;DictCursor&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+        &lt;span class="n"&gt;table_name&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="nb"&gt;str&lt;/span&gt;
+    &lt;span class="p"&gt;):&lt;/span&gt;
+        &lt;span class="c1"&gt;# first empty the MySQL table&lt;/span&gt;
+        &lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;_mysql_execute&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;cur&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="sa"&gt;f&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;&lt;span class="caps"&gt;DELETE&lt;/span&gt; &lt;span class="caps"&gt;FROM&lt;/span&gt; &lt;/span&gt;&lt;span class="si"&gt;{table_name}&lt;/span&gt;&lt;span class="s1"&gt;;&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+        &lt;span class="c1"&gt;# now get the data from SQLite and copy it over&lt;/span&gt;
+        &lt;span class="n"&gt;sql&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="sa"&gt;f&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;&lt;span class="caps"&gt;SELECT&lt;/span&gt; * &lt;span class="caps"&gt;FROM&lt;/span&gt; &lt;/span&gt;&lt;span class="si"&gt;{table_name}&lt;/span&gt;&lt;span class="s1"&gt;;&amp;#39;&lt;/span&gt;
+        &lt;span class="n"&gt;logger&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;debug&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;SQLite execute: &lt;/span&gt;&lt;span class="si"&gt;%s&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;sql&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+        &lt;span class="n"&gt;local_cur&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="n"&gt;sqlite3&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;Cursor&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;local&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;cursor&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+        &lt;span class="n"&gt;local_cur&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;execute&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;sql&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+        &lt;span class="n"&gt;count&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="nb"&gt;int&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt;
+        &lt;span class="k"&gt;for&lt;/span&gt; &lt;span class="n"&gt;row&lt;/span&gt; &lt;span class="ow"&gt;in&lt;/span&gt; &lt;span class="n"&gt;local_cur&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+            &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="n"&gt;table_name&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;tvshow&amp;#39;&lt;/span&gt; &lt;span class="ow"&gt;and&lt;/span&gt; &lt;span class="n"&gt;row&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;idShow&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="mi"&gt;3&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;  &lt;span class="c1"&gt;# Doctor Who - c06 too long&lt;/span&gt;
+                &lt;span class="k"&gt;continue&lt;/span&gt;
+            &lt;span class="n"&gt;tmp&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;_mysql_insert_for_row&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;table_name&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;row&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+            &lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;_mysql_execute&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;cur&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="n"&gt;tmp&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+            &lt;span class="n"&gt;count&lt;/span&gt; &lt;span class="o"&gt;+=&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt;
+        &lt;span class="n"&gt;logger&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;info&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;Copied &lt;/span&gt;&lt;span class="si"&gt;%d&lt;/span&gt;&lt;span class="s1"&gt; rows for table &lt;/span&gt;&lt;span class="si"&gt;%s&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;count&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;table_name&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+    &lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;_mysql_insert_for_row&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;
+        &lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;tname&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="nb"&gt;str&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;row&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="n"&gt;sqlite3&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;Row&lt;/span&gt;
+    &lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;-&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;Tuple&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="nb"&gt;str&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;Tuple&lt;/span&gt;&lt;span class="p"&gt;]:&lt;/span&gt;
+        &lt;span class="n"&gt;keys&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="n"&gt;List&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="nb"&gt;str&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;[]&lt;/span&gt;
+        &lt;span class="n"&gt;values&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="n"&gt;List&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="nb"&gt;str&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;[]&lt;/span&gt;
+        &lt;span class="k"&gt;for&lt;/span&gt; &lt;span class="n"&gt;k&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;v&lt;/span&gt; &lt;span class="ow"&gt;in&lt;/span&gt; &lt;span class="nb"&gt;dict&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;row&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;items&lt;/span&gt;&lt;span class="p"&gt;():&lt;/span&gt;
+            &lt;span class="n"&gt;keys&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;append&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;k&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+            &lt;span class="n"&gt;values&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;append&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;v&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+        &lt;span class="n"&gt;sql&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="sa"&gt;f&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;&lt;span class="caps"&gt;INSERT&lt;/span&gt; &lt;span class="caps"&gt;INTO&lt;/span&gt; &lt;/span&gt;&lt;span class="si"&gt;{tname}&lt;/span&gt;&lt;span class="s1"&gt; ({&amp;quot;, &amp;quot;.join(keys)}) &lt;span class="caps"&gt;VALUES&lt;/span&gt; (&amp;#39;&lt;/span&gt; \
+              &lt;span class="sa"&gt;f&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;{&amp;quot;, &amp;quot;.join([&amp;quot;&lt;/span&gt;&lt;span class="si"&gt;%s&lt;/span&gt;&lt;span class="s1"&gt;&amp;quot; for x in values])});&amp;#39;&lt;/span&gt;
+        &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="n"&gt;sql&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nb"&gt;tuple&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;values&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+    &lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;_mysql_execute&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;
+        &lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;cur&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="n"&gt;pymysql&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;cursors&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;Cursor&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;sql&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="nb"&gt;str&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;data&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="nb"&gt;tuple&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;()&lt;/span&gt;
+    &lt;span class="p"&gt;):&lt;/span&gt;
+        &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;dry_run&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+            &lt;span class="n"&gt;logger&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;warning&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;&lt;span class="caps"&gt;DRY&lt;/span&gt; &lt;span class="caps"&gt;RUN&lt;/span&gt;: MySQL Execute: &lt;/span&gt;&lt;span class="si"&gt;%s&lt;/span&gt;&lt;span class="s1"&gt; &lt;/span&gt;&lt;span class="si"&gt;%s&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;sql&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;data&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+        &lt;span class="k"&gt;else&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+            &lt;span class="n"&gt;logger&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;debug&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;MySQL Execute: &lt;/span&gt;&lt;span class="si"&gt;%s&lt;/span&gt;&lt;span class="s1"&gt; &lt;/span&gt;&lt;span class="si"&gt;%s&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;sql&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;data&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+            &lt;span class="k"&gt;try&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+                &lt;span class="n"&gt;cur&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;execute&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;sql&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;data&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+            &lt;span class="k"&gt;except&lt;/span&gt; &lt;span class="n"&gt;pymysql&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;err&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;MySQLError&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+                &lt;span class="n"&gt;logger&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;error&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;Error in query: &lt;/span&gt;&lt;span class="si"&gt;%s&lt;/span&gt;&lt;span class="s1"&gt; &lt;/span&gt;&lt;span class="si"&gt;%s&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;sql&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;data&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+                &lt;span class="k"&gt;raise&lt;/span&gt;
+
+    &lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;_sqlite_table_names&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;db&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="n"&gt;sqlite3&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;Connection&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;-&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;List&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="nb"&gt;str&lt;/span&gt;&lt;span class="p"&gt;]:&lt;/span&gt;
+        &lt;span class="n"&gt;cursor&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="n"&gt;sqlite3&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;Cursor&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;db&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;cursor&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+        &lt;span class="n"&gt;sql&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="nb"&gt;str&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;&lt;span class="caps"&gt;SELECT&lt;/span&gt; name &lt;span class="caps"&gt;FROM&lt;/span&gt; sqlite_master &lt;span class="caps"&gt;WHERE&lt;/span&gt; type=&amp;#39;table&amp;#39;;&amp;quot;&lt;/span&gt;
+        &lt;span class="n"&gt;logger&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;debug&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;SQLite execute: &lt;/span&gt;&lt;span class="si"&gt;%s&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;sql&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+        &lt;span class="n"&gt;cursor&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;execute&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;sql&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+        &lt;span class="n"&gt;res&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="n"&gt;List&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="nb"&gt;str&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nb"&gt;sorted&lt;/span&gt;&lt;span class="p"&gt;([&lt;/span&gt;&lt;span class="n"&gt;x&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="k"&gt;for&lt;/span&gt; &lt;span class="n"&gt;x&lt;/span&gt; &lt;span class="ow"&gt;in&lt;/span&gt; &lt;span class="n"&gt;cursor&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;fetchall&lt;/span&gt;&lt;span class="p"&gt;()])&lt;/span&gt;
+        &lt;span class="n"&gt;logger&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;debug&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;SQLite tables: &lt;/span&gt;&lt;span class="si"&gt;%s&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;res&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+        &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="n"&gt;res&lt;/span&gt;
+
+    &lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;_mysql_table_names&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;-&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;List&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="nb"&gt;str&lt;/span&gt;&lt;span class="p"&gt;]:&lt;/span&gt;
+        &lt;span class="n"&gt;sql&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="nb"&gt;str&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;show full tables where Table_Type != &amp;#39;&lt;span class="caps"&gt;VIEW&lt;/span&gt;&amp;#39;&amp;quot;&lt;/span&gt;
+        &lt;span class="n"&gt;logger&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;debug&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;MySQL execute: &lt;/span&gt;&lt;span class="si"&gt;%s&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;sql&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+        &lt;span class="k"&gt;with&lt;/span&gt; &lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;mysql&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;cursor&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;cursor&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="n"&gt;pymysql&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;cursors&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;Cursor&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="k"&gt;as&lt;/span&gt; &lt;span class="n"&gt;cursor&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+            &lt;span class="n"&gt;cursor&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;execute&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;sql&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+            &lt;span class="n"&gt;res&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="n"&gt;List&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="nb"&gt;str&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nb"&gt;sorted&lt;/span&gt;&lt;span class="p"&gt;([&lt;/span&gt;&lt;span class="n"&gt;x&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="k"&gt;for&lt;/span&gt; &lt;span class="n"&gt;x&lt;/span&gt; &lt;span class="ow"&gt;in&lt;/span&gt; &lt;span class="n"&gt;cursor&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;fetchall&lt;/span&gt;&lt;span class="p"&gt;()])&lt;/span&gt;
+        &lt;span class="n"&gt;logger&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;debug&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;MySQL tables: &lt;/span&gt;&lt;span class="si"&gt;%s&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;res&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+        &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="n"&gt;res&lt;/span&gt;
+
+
+&lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;parse_args&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;argv&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+    &lt;span class="sd"&gt;&amp;quot;&amp;quot;&amp;quot;&lt;/span&gt;
+&lt;span class="sd"&gt;    parse arguments/options&lt;/span&gt;
+
+&lt;span class="sd"&gt;    this uses the new argparse module instead of optparse&lt;/span&gt;
+&lt;span class="sd"&gt;    see: &amp;lt;https://docs.python.org/2/library/argparse.html&amp;gt;&lt;/span&gt;
+&lt;span class="sd"&gt;    &amp;quot;&amp;quot;&amp;quot;&lt;/span&gt;
+    &lt;span class="n"&gt;p&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;argparse&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;ArgumentParser&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;description&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;Migrate Kodi SQLite to MySQL&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+    &lt;span class="n"&gt;p&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;add_argument&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;-d&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;--dry-run&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;dest&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;dry_run&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;action&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;store_true&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+                   &lt;span class="n"&gt;default&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="kc"&gt;False&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+                   &lt;span class="n"&gt;help&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;dry-run - print &lt;span class="caps"&gt;SQL&lt;/span&gt; that would be sent to MySQL but &amp;quot;&lt;/span&gt;
+                        &lt;span class="s2"&gt;&amp;quot;don&amp;#39;t actually run it&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+    &lt;span class="n"&gt;p&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;add_argument&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;-v&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;--verbose&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;dest&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;verbose&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;action&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;store_true&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+                   &lt;span class="n"&gt;help&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;debug-level output.&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;default&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="kc"&gt;False&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+    &lt;span class="n"&gt;p&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;add_argument&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;-H&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;--host&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nb"&gt;type&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nb"&gt;str&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;dest&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;host&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+                   &lt;span class="n"&gt;help&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;MySQL host (default: 127.0.0.1)&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;default&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;127.0.0.1&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+    &lt;span class="n"&gt;p&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;add_argument&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;-P&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;--port&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nb"&gt;type&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nb"&gt;int&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;dest&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;port&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;default&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="mi"&gt;3306&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+                   &lt;span class="n"&gt;help&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;MySQL port (default: 3306)&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+    &lt;span class="n"&gt;p&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;add_argument&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;-u&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;--user&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nb"&gt;type&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nb"&gt;str&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;dest&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;user&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;default&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;kodi&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+                   &lt;span class="n"&gt;help&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;MySQL user (default: kodi)&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+    &lt;span class="n"&gt;p&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;add_argument&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;-p&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;--passwd&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nb"&gt;type&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nb"&gt;str&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;dest&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;passwd&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;default&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;kodi&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+                   &lt;span class="n"&gt;help&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;MySQL password (default: kodi)&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+    &lt;span class="n"&gt;args&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;p&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;parse_args&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;argv&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+    &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="n"&gt;args&lt;/span&gt;
+
+
+&lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;set_log_info&lt;/span&gt;&lt;span class="p"&gt;():&lt;/span&gt;
+    &lt;span class="sd"&gt;&amp;quot;&amp;quot;&amp;quot;set logger level to &lt;span class="caps"&gt;INFO&lt;/span&gt;&amp;quot;&amp;quot;&amp;quot;&lt;/span&gt;
+    &lt;span class="n"&gt;set_log_level_format&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;logging&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;&lt;span class="caps"&gt;INFO&lt;/span&gt;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+                         &lt;span class="s1"&gt;&amp;#39;&lt;/span&gt;&lt;span class="si"&gt;%(asctime)s&lt;/span&gt;&lt;span class="s1"&gt; &lt;/span&gt;&lt;span class="si"&gt;%(levelname)s&lt;/span&gt;&lt;span class="s1"&gt;:&lt;/span&gt;&lt;span class="si"&gt;%(name)s&lt;/span&gt;&lt;span class="s1"&gt;:&lt;/span&gt;&lt;span class="si"&gt;%(message)s&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+
+&lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;set_log_debug&lt;/span&gt;&lt;span class="p"&gt;():&lt;/span&gt;
+    &lt;span class="sd"&gt;&amp;quot;&amp;quot;&amp;quot;set logger level to &lt;span class="caps"&gt;DEBUG&lt;/span&gt;, and debug-level output format&amp;quot;&amp;quot;&amp;quot;&lt;/span&gt;
+    &lt;span class="n"&gt;set_log_level_format&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;
+        &lt;span class="n"&gt;logging&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;&lt;span class="caps"&gt;DEBUG&lt;/span&gt;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+        &lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="si"&gt;%(asctime)s&lt;/span&gt;&lt;span class="s2"&gt; [&lt;/span&gt;&lt;span class="si"&gt;%(levelname)s&lt;/span&gt;&lt;span class="s2"&gt; &lt;/span&gt;&lt;span class="si"&gt;%(filename)s&lt;/span&gt;&lt;span class="s2"&gt;:&lt;/span&gt;&lt;span class="si"&gt;%(lineno)s&lt;/span&gt;&lt;span class="s2"&gt; - &amp;quot;&lt;/span&gt;
+        &lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="si"&gt;%(name)s&lt;/span&gt;&lt;span class="s2"&gt;.&lt;/span&gt;&lt;span class="si"&gt;%(funcName)s&lt;/span&gt;&lt;span class="s2"&gt;() ] &lt;/span&gt;&lt;span class="si"&gt;%(message)s&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;
+    &lt;span class="p"&gt;)&lt;/span&gt;
+
+
+&lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;set_log_level_format&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;level&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nb"&gt;format&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+    &lt;span class="sd"&gt;&amp;quot;&amp;quot;&amp;quot;&lt;/span&gt;
+&lt;span class="sd"&gt;    Set logger level and format.&lt;/span&gt;
+
+&lt;span class="sd"&gt;    :param level: logging level; see the :py:mod:`logging` constants.&lt;/span&gt;
+&lt;span class="sd"&gt;    :type level: int&lt;/span&gt;
+&lt;span class="sd"&gt;    :param format: logging formatter format string&lt;/span&gt;
+&lt;span class="sd"&gt;    :type format: str&lt;/span&gt;
+&lt;span class="sd"&gt;    &amp;quot;&amp;quot;&amp;quot;&lt;/span&gt;
+    &lt;span class="n"&gt;formatter&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;logging&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;Formatter&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;fmt&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nb"&gt;format&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+    &lt;span class="n"&gt;logger&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;handlers&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;setFormatter&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;formatter&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+    &lt;span class="n"&gt;logger&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;setLevel&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;level&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+
+&lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="vm"&gt;__name__&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;__main__&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+    &lt;span class="n"&gt;args&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;parse_args&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;sys&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;argv&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;:])&lt;/span&gt;
+
+    &lt;span class="c1"&gt;# set logging level&lt;/span&gt;
+    &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="n"&gt;args&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;verbose&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+        &lt;span class="n"&gt;set_log_debug&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+    &lt;span class="k"&gt;else&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+        &lt;span class="n"&gt;set_log_info&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+    &lt;span class="n"&gt;KodiMigrator&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;
+        &lt;span class="n"&gt;args&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;host&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;args&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;port&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;args&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;user&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;args&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;passwd&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;dry_run&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="n"&gt;args&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;dry_run&lt;/span&gt;
+    &lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;run&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;</content><category term="kodi"></category><category term="osmc"></category><category term="database"></category><category term="mysql"></category><category term="mariadb"></category></entry><entry><title>On The Creation, Use, and Management of Docker Images</title><link href="https://blog.jasonantman.com/2020/11/on-the-creation-use-and-management-of-docker-images/" rel="alternate"></link><published>2020-11-10T15:11:00-05:00</published><updated>2020-11-10T15:11:00-05:00</updated><author><name>Jason Antman</name></author><id>tag:blog.jasonantman.com,2020-11-10:/2020/11/on-the-creation-use-and-management-of-docker-images/</id><summary type="html">&lt;p&gt;Some hard-earned thoughts on how to build, manage, and use Docker&amp;nbsp;images.&lt;/p&gt;</summary><content type="html">&lt;div class="toc"&gt;
 &lt;ul&gt;
 &lt;li&gt;&lt;a href="#introduction"&gt;Introduction&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a href="#on-to-the-topic-docker"&gt;On to the topic: Docker&lt;/a&gt;&lt;ul&gt;
@@ -2870,125 +3116,4 @@ hook&lt;/a&gt;
 setting up the repository
 clone&lt;/a&gt;
 instead of Step #2 in the plugin instructions. All worked well, though
-I&amp;#8217;ll admit I only tried it talking to redmine over plain &lt;span class="caps"&gt;HTTP&lt;/span&gt;, not&amp;nbsp;&lt;span class="caps"&gt;HTTPS&lt;/span&gt;.&lt;/p&gt;</content><category term="git"></category><category term="github"></category><category term="redmine"></category></entry><entry><title>Adding Piwik Web Analytics Integration to ViewVC</title><link href="https://blog.jasonantman.com/2012/03/adding-piwik-web-analytics-integration-to-viewvc/" rel="alternate"></link><published>2012-03-23T21:15:00-04:00</published><updated>2012-03-23T21:15:00-04:00</updated><author><name>admin</name></author><id>tag:blog.jasonantman.com,2012-03-23:/2012/03/adding-piwik-web-analytics-integration-to-viewvc/</id><summary type="html">&lt;p&gt;&lt;strong&gt;Update February 2014:&lt;/strong&gt; Give up the analytics, and just host your code
-on &lt;a href="https://github.com"&gt;GitHub&lt;/a&gt;.&lt;/p&gt;
-&lt;p&gt;All of my public &lt;a href="http://viewvc.jasonantman.com"&gt;subversion
-repositories&lt;/a&gt; and &lt;a href="http://cvs.jasonantman.com"&gt;&lt;span class="caps"&gt;CVS&lt;/span&gt;
-repositories&lt;/a&gt; are available online through a
-great Python application called &lt;a href="http://viewvc.org/"&gt;ViewVC&lt;/a&gt;, which
-provides a web-based interface to &lt;span class="caps"&gt;CVS&lt;/span&gt; and &lt;span class="caps"&gt;SVN&lt;/span&gt; repositories, as well as
-history browsing, graphical diffs …&lt;/p&gt;</summary><content type="html">&lt;p&gt;&lt;strong&gt;Update February 2014:&lt;/strong&gt; Give up the analytics, and just host your code
-on &lt;a href="https://github.com"&gt;GitHub&lt;/a&gt;.&lt;/p&gt;
-&lt;p&gt;All of my public &lt;a href="http://viewvc.jasonantman.com"&gt;subversion
-repositories&lt;/a&gt; and &lt;a href="http://cvs.jasonantman.com"&gt;&lt;span class="caps"&gt;CVS&lt;/span&gt;
-repositories&lt;/a&gt; are available online through a
-great Python application called &lt;a href="http://viewvc.org/"&gt;ViewVC&lt;/a&gt;, which
-provides a web-based interface to &lt;span class="caps"&gt;CVS&lt;/span&gt; and &lt;span class="caps"&gt;SVN&lt;/span&gt; repositories, as well as
-history browsing, graphical diffs, etc. An amazingly large amount of the
-traffic to my web server is for the vhosts that serve this, so I decided
-that I should add some analytics to it. I&amp;#8217;m in the process of trying out
-&lt;a href="http://piwik.org"&gt;Piwik&lt;/a&gt;, a full-featured, &lt;span class="caps"&gt;GPL&lt;/span&gt;-licensed, self-hosted
-alternative to &lt;a href="http://www.google.com/analytics/"&gt;Google Analytics&lt;/a&gt;. It
-gives lots of useful information like number of visits and unique visits
-per page, search engine keywords, referrers, average time on page,
-bounce rate (number of one-page visits),&amp;nbsp;etc.&lt;/p&gt;
-&lt;p&gt;I have ViewVC installed from the &lt;a href="http://pkgs.repoforge.org/viewvc/"&gt;RPMforge
-packages&lt;/a&gt;, so there&amp;#8217;s one code base
-for both of my vhosts. This means that I can&amp;#8217;t simply slap the tracking
-code at the bottom of the templates and call it a day. I opted to go for
-a nicer solution, and what follows is a patch (diff -u) to the current
-(1.1.13) version of ViewVC that adds a &amp;#8220;piwik&amp;#8221; section to viewvc.conf,
-and adds the piwik tracking code with the specified base &lt;span class="caps"&gt;URL&lt;/span&gt; and site &lt;span class="caps"&gt;ID&lt;/span&gt;
-into all ViewVC pages.&amp;nbsp;Enjoy.&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="gh"&gt;diff -ru viewvc-&lt;span class="caps"&gt;ORIG&lt;/span&gt;/lib/config.py viewvc/lib/config.py&lt;/span&gt;
-&lt;span class="gd"&gt;--- viewvc-&lt;span class="caps"&gt;ORIG&lt;/span&gt;/lib/config.py   2012-01-25 08:31:52.000000000 -0500&lt;/span&gt;
-&lt;span class="gi"&gt;+++ viewvc/lib/config.py    2012-03-23 21:57:08.000000000 -0400&lt;/span&gt;
-&lt;span class="gu"&gt;@@ -108,6 +108,7 @@&lt;/span&gt;
-     &amp;#39;query&amp;#39;,
-     &amp;#39;templates&amp;#39;,
-     &amp;#39;utilities&amp;#39;,
-&lt;span class="gi"&gt;+    &amp;#39;piwik&amp;#39;,&lt;/span&gt;
-     )
-   _force_multi_value = (
-     # Configuration values with multiple, comma-separated values.
-&lt;span class="gu"&gt;@@ -127,6 +128,7 @@&lt;/span&gt;
-                &amp;#39;options&amp;#39;,
-                &amp;#39;templates&amp;#39;,
-                &amp;#39;utilities&amp;#39;,
-&lt;span class="gi"&gt;+               &amp;#39;piwik&amp;#39;,&lt;/span&gt;
-                ),
-     &amp;#39;root&amp;#39;  : (&amp;#39;authz-*&amp;#39;,
-                &amp;#39;options&amp;#39;,
-&lt;span class="gu"&gt;@@ -461,7 +463,14 @@&lt;/span&gt;
-     self.cvsdb.check_database_for_root = 0
-
-     self.query.viewvc_base_url = None
-&lt;span class="gd"&gt;-    &lt;/span&gt;
-&lt;span class="gi"&gt;+&lt;/span&gt;
-&lt;span class="gi"&gt;+    # begin  patch for piwik integration&lt;/span&gt;
-&lt;span class="gi"&gt;+    self.piwik.use_piwik = 0&lt;/span&gt;
-&lt;span class="gi"&gt;+    self.piwik.base_url = &amp;#39;&amp;#39;&lt;/span&gt;
-&lt;span class="gi"&gt;+    self.piwik.site_id = &amp;#39;&amp;#39;&lt;/span&gt;
-&lt;span class="gi"&gt;+    self.piwik.use_jsindex = 0&lt;/span&gt;
-&lt;span class="gi"&gt;+    # end  patch for piwik integration&lt;/span&gt;
-&lt;span class="gi"&gt;+   &lt;/span&gt;
- def _startswith(somestr, substr):
-   return somestr[:len(substr)] == substr
-
-&lt;span class="gh"&gt;diff -ru viewvc-&lt;span class="caps"&gt;ORIG&lt;/span&gt;/templates/include/footer.ezt viewvc/templates/include/footer.ezt&lt;/span&gt;
-&lt;span class="gd"&gt;--- viewvc-&lt;span class="caps"&gt;ORIG&lt;/span&gt;/templates/include/footer.ezt    2012-01-25 08:31:52.000000000 -0500&lt;/span&gt;
-&lt;span class="gi"&gt;+++ viewvc/templates/include/footer.ezt 2012-03-23 22:03:04.000000000 -0400&lt;/span&gt;
-&lt;span class="gu"&gt;@@ -13,5 +13,17 @@&lt;/span&gt;
-
-
-
-&lt;span class="gi"&gt;+[is cfg.piwik.use_piwik &amp;quot;1&amp;quot;]&lt;/span&gt;
-&lt;span class="gi"&gt;+&lt;/span&gt;
-&lt;span class="gi"&gt;+var pkBaseURL = ((&amp;quot;https:&amp;quot; == document.location.protocol) ? &amp;quot;https://[cfg.piwik.base_url]/&amp;quot; : &amp;quot;http://[cfg.piwik.base_url]/&amp;quot;);&lt;/span&gt;
-&lt;span class="gi"&gt;+document.write(unescape(&amp;quot;%3Cscript src=&amp;#39;&amp;quot; + pkBaseURL + &amp;quot;[is cfg.piwik.use_jsindex &amp;quot;1&amp;quot;]js/[else]piwik.js[end]&amp;#39; type=&amp;#39;text/javascript&amp;#39;%3E%3C/script%3E&amp;quot;));&lt;/span&gt;
-&lt;span class="gi"&gt;+&lt;/span&gt;
-&lt;span class="gi"&gt;+try {&lt;/span&gt;
-&lt;span class="gi"&gt;+var piwikTracker = Piwik.getTracker(pkBaseURL + &amp;quot;piwik.php&amp;quot;, [cfg.piwik.site_id]);&lt;/span&gt;
-&lt;span class="gi"&gt;+piwikTracker.trackPageView();&lt;/span&gt;
-&lt;span class="gi"&gt;+piwikTracker.enableLinkTracking();&lt;/span&gt;
-&lt;span class="gi"&gt;+} catch( err ) {}&lt;/span&gt;
-&lt;span class="gi"&gt;+&lt;/span&gt;
-&lt;span class="gi"&gt;+[else][end]&lt;/span&gt;
-
-
-Only in viewvc-&lt;span class="caps"&gt;ORIG&lt;/span&gt;/templates/include: header.ezt~
-&lt;span class="gh"&gt;diff -ru viewvc-&lt;span class="caps"&gt;ORIG&lt;/span&gt;/viewvc.conf.dist viewvc/viewvc.conf.dist&lt;/span&gt;
-&lt;span class="gd"&gt;--- viewvc-&lt;span class="caps"&gt;ORIG&lt;/span&gt;/viewvc.conf.dist    2012-01-25 08:31:52.000000000 -0500&lt;/span&gt;
-&lt;span class="gi"&gt;+++ viewvc/viewvc.conf.dist 2012-03-23 21:44:02.000000000 -0400&lt;/span&gt;
-&lt;span class="gu"&gt;@@ -1131,3 +1131,29 @@&lt;/span&gt;
- #viewvc_base_url =
-
- ##---------------------------------------------------------------------------
-&lt;span class="gi"&gt;+[piwik]&lt;/span&gt;
-&lt;span class="gi"&gt;+&lt;/span&gt;
-&lt;span class="gi"&gt;+## This section enables Piwik  web analytics tracking.&lt;/span&gt;
-&lt;span class="gi"&gt;+## If piwik is enabled (use_piwik = 1) all other options must be specified.&lt;/span&gt;
-&lt;span class="gi"&gt;+##&lt;/span&gt;
-&lt;span class="gi"&gt;+## This is based on a patch by Jason Antman  &lt;/span&gt;
-&lt;span class="gi"&gt;+## to ViewVC 1.1.13, written 2012-03-23.&lt;/span&gt;
-&lt;span class="gi"&gt;+## The latest version of the patch, and information on it, can always be found at:&lt;/span&gt;
-&lt;span class="gi"&gt;+## &lt;/span&gt;
-&lt;span class="gi"&gt;+##&lt;/span&gt;
-&lt;span class="gi"&gt;+##&lt;/span&gt;
-&lt;span class="gi"&gt;+## To enable piwik, change use_piwik to 1. Set to 0 to disable&lt;/span&gt;
-&lt;span class="gi"&gt;+use_piwik = 1&lt;/span&gt;
-&lt;span class="gi"&gt;+##&lt;/span&gt;
-&lt;span class="gi"&gt;+## Set base_url to the hostname and path to your piwik installation, with no trailing slash.&lt;/span&gt;
-&lt;span class="gi"&gt;+## i.e. piwik.example.com or www.example.com/piwik&lt;/span&gt;
-&lt;span class="gi"&gt;+base_url = piwik.example.com&lt;/span&gt;
-&lt;span class="gi"&gt;+##&lt;/span&gt;
-&lt;span class="gi"&gt;+## Set to the numeric id of your website in Piwik&lt;/span&gt;
-&lt;span class="gi"&gt;+site_id = 5&lt;/span&gt;
-&lt;span class="gi"&gt;+##&lt;/span&gt;
-&lt;span class="gi"&gt;+## Set to 1 if you want to use js/index.php to serve the tracking code, &lt;/span&gt;
-&lt;span class="gi"&gt;+## or leave at 0 if you want to call piwik.js directly&lt;/span&gt;
-&lt;span class="gi"&gt;+use_jsindex = 0&lt;/span&gt;
-&lt;span class="gi"&gt;+&lt;/span&gt;
-&lt;span class="gi"&gt;+##---------------------------------------------------------------------------&lt;/span&gt;
-\ No newline at end of file
-&lt;/pre&gt;&lt;/div&gt;</content><category term="analytics"></category><category term="piwik"></category><category term="python"></category><category term="subversion"></category><category term="svn"></category><category term="tracking"></category><category term="viewvc"></category></entry></feed>
+I&amp;#8217;ll admit I only tried it talking to redmine over plain &lt;span class="caps"&gt;HTTP&lt;/span&gt;, not&amp;nbsp;&lt;span class="caps"&gt;HTTPS&lt;/span&gt;.&lt;/p&gt;</content><category term="git"></category><category term="github"></category><category term="redmine"></category></entry></feed>
