@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Jason Antman's Blog - 3d printing</title><link href="https://blog.jasonantman.com/" rel="alternate"></link><link href="https://blog.jasonantman.com/feeds/tags/3d-printing.atom.xml" rel="self"></link><id>https://blog.jasonantman.com/</id><updated>2021-03-28T08:44:00-04:00</updated><entry><title>OctoPrint Power Outage Handling</title><link href="https://blog.jasonantman.com/2021/03/octoprint-power-outage-handling/" rel="alternate"></link><published>2021-03-28T08:44:00-04:00</published><updated>2021-03-28T08:44:00-04:00</updated><author><name>Jason Antman</name></author><id>tag:blog.jasonantman.com,2021-03-28:/2021/03/octoprint-power-outage-handling/</id><summary type="html">&lt;p&gt;My simple method of handling power outages during OctoPrint 3d&amp;nbsp;printing.&lt;/p&gt;</summary><content type="html">&lt;p&gt;One of my recent interests has been 3D printing. A few months ago I obtained a used &lt;a href="https://www.creality.com/goods-detail/cr-10s-3d-printer"&gt;Creality &lt;span class="caps"&gt;CR&lt;/span&gt;-10S&lt;/a&gt; 3d printer and started doing some work with it. I even &lt;a href="https://www.thingiverse.com/jantman/designs"&gt;designed&lt;/a&gt; and &lt;a href="https://www.thingiverse.com/jantman/makes"&gt;printed&lt;/a&gt; some parts for it, and designed my new workbench around it. However, about eighteen hours into a twenty-hour print, my neighborhood suffered a power outage. It only lasted about twenty minutes, but the print was ruined and I had to start over. This was clearly a&amp;nbsp;problem.&lt;/p&gt;
+&lt;p&gt;I&amp;#8217;m using the absolutely wonderful &lt;a href="https://octoprint.org/"&gt;OctoPrint&lt;/a&gt; project to drive my printer, running on a RaspberryPi-based &lt;a href="https://github.com/guysoft/OctoPi"&gt;OctoPi&lt;/a&gt;. I did a bunch of research online, but it turns out that solving the general case of handling power outages is quite difficult, and not likely to be supported any time soon. However, I&amp;#8217;ve been able to come up with a workable solution made up of a few common tools. I thought I&amp;#8217;d share it with anyone else it may&amp;nbsp;benefit.&lt;/p&gt;
+&lt;p&gt;I had an extra &lt;span class="caps"&gt;UPS&lt;/span&gt; lying around - an &lt;span class="caps"&gt;APC&lt;/span&gt; BackUPS 1000 (&lt;span class="caps"&gt;1000VA&lt;/span&gt;) - so that seemed like an ideal solution to the problem. Unfortunately, when a print is in progress, the &lt;span class="caps"&gt;1000VA&lt;/span&gt; &lt;span class="caps"&gt;UPS&lt;/span&gt; will only power the OctoPi (Raspberry &lt;span class="caps"&gt;PI&lt;/span&gt; 4) and printer for about six minutes. This is mainly because of the immense power needs of the stepper motors and bed and extruder heaters. Luckily, there&amp;#8217;s a&amp;nbsp;solution.&lt;/p&gt;
+&lt;p&gt;After spending some time in the OctoPrint documentation and forums, I was able to come up with a pair of GCode scripts that move the hotend off the print and disable the heaters when a print is paused, and then revert those changes when the print is resumed. It&amp;#8217;s worth noting that this is far from foolproof, as disabling the heaters and moving the head around in the middle of a print can cause all sorts of problems&amp;#8230; but it&amp;#8217;s better than nothing. The following scripts are set in OctoPrint settings on the &lt;span class="caps"&gt;GCODE&lt;/span&gt; scripts&amp;nbsp;tab:&lt;/p&gt;
+&lt;p&gt;After print job is&amp;nbsp;paused:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;; from https://docs.octoprint.org/en/master/features/gcode_scripts.html#gcode-scripts
+; and https://community.octoprint.org/t/better-pause-function-in-octoprint/5331/4
+M117 Print Paused ; comment
+{% if pause_position.x is not none %}
+M117 Print Paused and pause_position.x is not none ; Comment
+G91 ; set &lt;span class="caps"&gt;XYZ&lt;/span&gt; relative  positioning
+M83 ; set E relative positioning
+
+G1 Z+15 E-5 F4500 ; retract filament, move Z slightly upwards
+
+M82 ; set E absolute positioning
+G90 ; set &lt;span class="caps"&gt;XYZ&lt;/span&gt; absolute positioning
+
+G1 X0 Y0 ; move to a safe rest position
+
+; disable all heaters
+{% snippet &amp;#39;disable_hotends&amp;#39; %}
+{% snippet &amp;#39;disable_bed&amp;#39; %}
+; note - I disabled the heaters but not the fan, because I don&amp;#39;t know how to restore the fan speed
+{% else %}
+M117 Print Paused but pause_position.x is none ; Comment
+M117 pause_position {{ pause_position }} ; Comment
+{% endif %}
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Before print job is&amp;nbsp;resumed:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;; from https://docs.octoprint.org/en/master/features/gcode_scripts.html#gcode-scripts
+; and https://community.octoprint.org/t/better-pause-function-in-octoprint/5331/4
+M117 Print Unpaused ; comment
+{% if pause_position.x is not none %}
+M117 pause_position.x is not none ; comment
+{% for tool in range(printer_profile.extruder.count) %}
+    {% if pause_temperature[tool] and pause_temperature[tool][&amp;#39;target&amp;#39;] is not none %}
+        {% if tool == 0 and printer_profile.extruder.count == 1 %}
+            M109 T{{ tool }} S{{ pause_temperature[tool][&amp;#39;target&amp;#39;] }}
+        {% else %}
+            M109 S{{ pause_temperature[tool][&amp;#39;target&amp;#39;] }}
+        {% endif %}
+    {% else %}
+        {% if tool == 0 and printer_profile.extruder.count == 1 %}
+            M104 T{{ tool }} S0
+        {% else %}
+            M104 S0
+        {% endif %}
+    {% endif %}
+{% endfor %}
+
+{% if printer_profile.heatedBed %}
+    {% if pause_temperature[&amp;#39;b&amp;#39;] and pause_temperature[&amp;#39;b&amp;#39;][&amp;#39;target&amp;#39;] is not none %}
+        M190 S{{ pause_temperature[&amp;#39;b&amp;#39;][&amp;#39;target&amp;#39;] }}
+    {% else %}
+        M140 S0
+    {% endif %}
+{% endif %}
+
+M83 ; set E relative positioning
+
+; prime nozzle
+G1 E-5 F4500
+G1 E5 F4500
+G1 E5 F4500
+
+M82 ; set E absolute positioning
+G90 ; set &lt;span class="caps"&gt;XYZ&lt;/span&gt; absolute positioning
+
+G92 E{{ pause_position.e }} ; reset E to pre-pause position
+
+G1 X{{ pause_position.x }} Y{{ pause_position.y }} Z{{ pause_position.z }} F4500 ; move back to pause position &lt;span class="caps"&gt;XYZ&lt;/span&gt;
+
+; reset to feed rate before pause if available
+{% if pause_position.f is not none %}G1 F{{ pause_position.f }}{% endif %}
+{% else %}
+M117 pause_position.x is none ; comment
+{% endif %}
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Testing those manually via the &amp;#8220;Pause&amp;#8221; button, they work for me&amp;#8230; at least for relatively short pause&amp;nbsp;durations.&lt;/p&gt;
+&lt;p&gt;The final piece of the solution is relatively simple: I have a script that runs as a daemon and monitors the &lt;span class="caps"&gt;UPS&lt;/span&gt; status (actually via &lt;a href="https://networkupstools.org/"&gt;Network &lt;span class="caps"&gt;UPS&lt;/span&gt; Tools&lt;/a&gt;). If the &lt;span class="caps"&gt;UPS&lt;/span&gt; is on battery and drops to 50% charge or less than 4 minutes remaining, the script calls OctoPrint&amp;#8217;s ReST &lt;span class="caps"&gt;API&lt;/span&gt; to pause the print and then sends me a notification. If power returns within a reasonable amount of time, I can resume the print and hopefully save&amp;nbsp;it.&lt;/p&gt;</content><category term="printing"></category><category term="3d printing"></category><category term="octoprint"></category><category term="octopi"></category><category term="diy"></category></entry></feed>

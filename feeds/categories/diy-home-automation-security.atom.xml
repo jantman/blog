@@ -1,5 +1,89 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Jason Antman's Blog - DIY / Home Automation / Security</title><link href="https://blog.jasonantman.com/" rel="alternate"></link><link href="https://blog.jasonantman.com/feeds/categories/diy-home-automation-security.atom.xml" rel="self"></link><id>https://blog.jasonantman.com/</id><updated>2018-12-31T21:25:00-05:00</updated><entry><title>Twilio Programmable Wireless PPP Proxy Docker Image</title><link href="https://blog.jasonantman.com/2018/12/twilio-programmable-wireless-ppp-proxy-docker-image/" rel="alternate"></link><published>2018-12-31T21:25:00-05:00</published><updated>2018-12-31T21:25:00-05:00</updated><author><name>Jason Antman</name></author><id>tag:blog.jasonantman.com,2018-12-31:/2018/12/twilio-programmable-wireless-ppp-proxy-docker-image/</id><summary type="html">&lt;p&gt;Docker container with &lt;span class="caps"&gt;HTTP&lt;/span&gt;(S) proxy to Twilio Programmable Wirless &lt;span class="caps"&gt;PPP&lt;/span&gt; cellular&amp;nbsp;connection.&lt;/p&gt;</summary><content type="html">&lt;div class="alert alert-warning" role="alert"&gt;&lt;strong&gt;Notice/Disclaimer:&lt;/strong&gt; The information I provide on home automation/security and surveillance is based on what I&amp;#8217;ve set up for myself based on a balance of cost, ease of use, and security, and should be considered for hobby purposes only. My current system and code has grown organically over time and is not how I&amp;#8217;d approach this if I started over from scratch. My code and system has a few obvious vulnerabilities and probably some non-obvious ones as well; I humbly but sincerely ask that you do not attempt to exploit these. I highly recommend that anyone implementing a similar system - especially if you also publish the details of it - have undocumented backup systems/devices. Finally, the systems that I describe are intended to provide some protection against or notification of crimes of opportunity, not targeted attacks. Please keep in mind that none of this is intended to protect against someone who targets &lt;em&gt;me&lt;/em&gt; specifically (and takes the time to research me) as opposed to my home at random.&lt;/div&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Jason Antman's Blog - DIY / Home Automation / Security</title><link href="https://blog.jasonantman.com/" rel="alternate"></link><link href="https://blog.jasonantman.com/feeds/categories/diy-home-automation-security.atom.xml" rel="self"></link><id>https://blog.jasonantman.com/</id><updated>2021-03-28T08:44:00-04:00</updated><entry><title>OctoPrint Power Outage Handling</title><link href="https://blog.jasonantman.com/2021/03/octoprint-power-outage-handling/" rel="alternate"></link><published>2021-03-28T08:44:00-04:00</published><updated>2021-03-28T08:44:00-04:00</updated><author><name>Jason Antman</name></author><id>tag:blog.jasonantman.com,2021-03-28:/2021/03/octoprint-power-outage-handling/</id><summary type="html">&lt;p&gt;My simple method of handling power outages during OctoPrint 3d&amp;nbsp;printing.&lt;/p&gt;</summary><content type="html">&lt;p&gt;One of my recent interests has been 3D printing. A few months ago I obtained a used &lt;a href="https://www.creality.com/goods-detail/cr-10s-3d-printer"&gt;Creality &lt;span class="caps"&gt;CR&lt;/span&gt;-10S&lt;/a&gt; 3d printer and started doing some work with it. I even &lt;a href="https://www.thingiverse.com/jantman/designs"&gt;designed&lt;/a&gt; and &lt;a href="https://www.thingiverse.com/jantman/makes"&gt;printed&lt;/a&gt; some parts for it, and designed my new workbench around it. However, about eighteen hours into a twenty-hour print, my neighborhood suffered a power outage. It only lasted about twenty minutes, but the print was ruined and I had to start over. This was clearly a&amp;nbsp;problem.&lt;/p&gt;
+&lt;p&gt;I&amp;#8217;m using the absolutely wonderful &lt;a href="https://octoprint.org/"&gt;OctoPrint&lt;/a&gt; project to drive my printer, running on a RaspberryPi-based &lt;a href="https://github.com/guysoft/OctoPi"&gt;OctoPi&lt;/a&gt;. I did a bunch of research online, but it turns out that solving the general case of handling power outages is quite difficult, and not likely to be supported any time soon. However, I&amp;#8217;ve been able to come up with a workable solution made up of a few common tools. I thought I&amp;#8217;d share it with anyone else it may&amp;nbsp;benefit.&lt;/p&gt;
+&lt;p&gt;I had an extra &lt;span class="caps"&gt;UPS&lt;/span&gt; lying around - an &lt;span class="caps"&gt;APC&lt;/span&gt; BackUPS 1000 (&lt;span class="caps"&gt;1000VA&lt;/span&gt;) - so that seemed like an ideal solution to the problem. Unfortunately, when a print is in progress, the &lt;span class="caps"&gt;1000VA&lt;/span&gt; &lt;span class="caps"&gt;UPS&lt;/span&gt; will only power the OctoPi (Raspberry &lt;span class="caps"&gt;PI&lt;/span&gt; 4) and printer for about six minutes. This is mainly because of the immense power needs of the stepper motors and bed and extruder heaters. Luckily, there&amp;#8217;s a&amp;nbsp;solution.&lt;/p&gt;
+&lt;p&gt;After spending some time in the OctoPrint documentation and forums, I was able to come up with a pair of GCode scripts that move the hotend off the print and disable the heaters when a print is paused, and then revert those changes when the print is resumed. It&amp;#8217;s worth noting that this is far from foolproof, as disabling the heaters and moving the head around in the middle of a print can cause all sorts of problems&amp;#8230; but it&amp;#8217;s better than nothing. The following scripts are set in OctoPrint settings on the &lt;span class="caps"&gt;GCODE&lt;/span&gt; scripts&amp;nbsp;tab:&lt;/p&gt;
+&lt;p&gt;After print job is&amp;nbsp;paused:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;; from https://docs.octoprint.org/en/master/features/gcode_scripts.html#gcode-scripts
+; and https://community.octoprint.org/t/better-pause-function-in-octoprint/5331/4
+M117 Print Paused ; comment
+{% if pause_position.x is not none %}
+M117 Print Paused and pause_position.x is not none ; Comment
+G91 ; set &lt;span class="caps"&gt;XYZ&lt;/span&gt; relative  positioning
+M83 ; set E relative positioning
+
+G1 Z+15 E-5 F4500 ; retract filament, move Z slightly upwards
+
+M82 ; set E absolute positioning
+G90 ; set &lt;span class="caps"&gt;XYZ&lt;/span&gt; absolute positioning
+
+G1 X0 Y0 ; move to a safe rest position
+
+; disable all heaters
+{% snippet &amp;#39;disable_hotends&amp;#39; %}
+{% snippet &amp;#39;disable_bed&amp;#39; %}
+; note - I disabled the heaters but not the fan, because I don&amp;#39;t know how to restore the fan speed
+{% else %}
+M117 Print Paused but pause_position.x is none ; Comment
+M117 pause_position {{ pause_position }} ; Comment
+{% endif %}
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Before print job is&amp;nbsp;resumed:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;; from https://docs.octoprint.org/en/master/features/gcode_scripts.html#gcode-scripts
+; and https://community.octoprint.org/t/better-pause-function-in-octoprint/5331/4
+M117 Print Unpaused ; comment
+{% if pause_position.x is not none %}
+M117 pause_position.x is not none ; comment
+{% for tool in range(printer_profile.extruder.count) %}
+    {% if pause_temperature[tool] and pause_temperature[tool][&amp;#39;target&amp;#39;] is not none %}
+        {% if tool == 0 and printer_profile.extruder.count == 1 %}
+            M109 T{{ tool }} S{{ pause_temperature[tool][&amp;#39;target&amp;#39;] }}
+        {% else %}
+            M109 S{{ pause_temperature[tool][&amp;#39;target&amp;#39;] }}
+        {% endif %}
+    {% else %}
+        {% if tool == 0 and printer_profile.extruder.count == 1 %}
+            M104 T{{ tool }} S0
+        {% else %}
+            M104 S0
+        {% endif %}
+    {% endif %}
+{% endfor %}
+
+{% if printer_profile.heatedBed %}
+    {% if pause_temperature[&amp;#39;b&amp;#39;] and pause_temperature[&amp;#39;b&amp;#39;][&amp;#39;target&amp;#39;] is not none %}
+        M190 S{{ pause_temperature[&amp;#39;b&amp;#39;][&amp;#39;target&amp;#39;] }}
+    {% else %}
+        M140 S0
+    {% endif %}
+{% endif %}
+
+M83 ; set E relative positioning
+
+; prime nozzle
+G1 E-5 F4500
+G1 E5 F4500
+G1 E5 F4500
+
+M82 ; set E absolute positioning
+G90 ; set &lt;span class="caps"&gt;XYZ&lt;/span&gt; absolute positioning
+
+G92 E{{ pause_position.e }} ; reset E to pre-pause position
+
+G1 X{{ pause_position.x }} Y{{ pause_position.y }} Z{{ pause_position.z }} F4500 ; move back to pause position &lt;span class="caps"&gt;XYZ&lt;/span&gt;
+
+; reset to feed rate before pause if available
+{% if pause_position.f is not none %}G1 F{{ pause_position.f }}{% endif %}
+{% else %}
+M117 pause_position.x is none ; comment
+{% endif %}
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Testing those manually via the &amp;#8220;Pause&amp;#8221; button, they work for me&amp;#8230; at least for relatively short pause&amp;nbsp;durations.&lt;/p&gt;
+&lt;p&gt;The final piece of the solution is relatively simple: I have a script that runs as a daemon and monitors the &lt;span class="caps"&gt;UPS&lt;/span&gt; status (actually via &lt;a href="https://networkupstools.org/"&gt;Network &lt;span class="caps"&gt;UPS&lt;/span&gt; Tools&lt;/a&gt;). If the &lt;span class="caps"&gt;UPS&lt;/span&gt; is on battery and drops to 50% charge or less than 4 minutes remaining, the script calls OctoPrint&amp;#8217;s ReST &lt;span class="caps"&gt;API&lt;/span&gt; to pause the print and then sends me a notification. If power returns within a reasonable amount of time, I can resume the print and hopefully save&amp;nbsp;it.&lt;/p&gt;</content><category term="printing"></category><category term="3d printing"></category><category term="octoprint"></category><category term="octopi"></category><category term="diy"></category></entry><entry><title>Twilio Programmable Wireless PPP Proxy Docker Image</title><link href="https://blog.jasonantman.com/2018/12/twilio-programmable-wireless-ppp-proxy-docker-image/" rel="alternate"></link><published>2018-12-31T21:25:00-05:00</published><updated>2018-12-31T21:25:00-05:00</updated><author><name>Jason Antman</name></author><id>tag:blog.jasonantman.com,2018-12-31:/2018/12/twilio-programmable-wireless-ppp-proxy-docker-image/</id><summary type="html">&lt;p&gt;Docker container with &lt;span class="caps"&gt;HTTP&lt;/span&gt;(S) proxy to Twilio Programmable Wirless &lt;span class="caps"&gt;PPP&lt;/span&gt; cellular&amp;nbsp;connection.&lt;/p&gt;</summary><content type="html">&lt;div class="alert alert-warning" role="alert"&gt;&lt;strong&gt;Notice/Disclaimer:&lt;/strong&gt; The information I provide on home automation/security and surveillance is based on what I&amp;#8217;ve set up for myself based on a balance of cost, ease of use, and security, and should be considered for hobby purposes only. My current system and code has grown organically over time and is not how I&amp;#8217;d approach this if I started over from scratch. My code and system has a few obvious vulnerabilities and probably some non-obvious ones as well; I humbly but sincerely ask that you do not attempt to exploit these. I highly recommend that anyone implementing a similar system - especially if you also publish the details of it - have undocumented backup systems/devices. Finally, the systems that I describe are intended to provide some protection against or notification of crimes of opportunity, not targeted attacks. Please keep in mind that none of this is intended to protect against someone who targets &lt;em&gt;me&lt;/em&gt; specifically (and takes the time to research me) as opposed to my home at random.&lt;/div&gt;
 
 &lt;p&gt;While my &lt;a href="/2018/12/aws-reinvent-2018-my-experience-and-recommendations-for-next-time/"&gt;trip to the &lt;span class="caps"&gt;AWS&lt;/span&gt; re:Invent conference last month&lt;/a&gt; resulted in a giant pile of swag from the expo, by far the most interesting of it was from the communications company &lt;a href="https://www.twilio.com"&gt;Twilio&lt;/a&gt; that gave me a &lt;span class="caps"&gt;SIM&lt;/span&gt; card for their &lt;a href="https://www.twilio.com/wireless"&gt;Programmable Wireless&lt;/a&gt; service (as well as something else that will be the topic of at least one future post). Programmable Wireless is really cool: for $3 per &lt;span class="caps"&gt;SIM&lt;/span&gt; and $3 per month (in &lt;strong&gt;single unit&lt;/strong&gt; quantity) I get a 2G/3G/4G &lt;span class="caps"&gt;SIM&lt;/span&gt; card with &lt;span class="caps"&gt;20MB&lt;/span&gt; of monthly data. That&amp;#8217;s not much data in the world of smartphones, but it&amp;#8217;s more than enough for many IoT or embedded use cases. More importantly, the &lt;span class="caps"&gt;SIM&lt;/span&gt; is also tied to your Twilio account that provides customizable rate plans (data rates, quotas, and roaming configuration) and detailed bi-hourly breakdowns of upload and download transfer, as well as &lt;a href="https://www.twilio.com/docs/usage/api"&gt;ReST APIs&lt;/a&gt; to manage everything and retrieve usage information and &lt;a href="https://www.twilio.com/docs/wireless"&gt;wonderful documentation&lt;/a&gt;.&lt;/p&gt;
 &lt;p&gt;Anyway, at re:Invent one of the Twilio folks was telling me about their new Programmable Wireless service and the low costs even for a single &lt;span class="caps"&gt;SIM&lt;/span&gt;, and it occurred to me that this would be the perfect solution for an out-of-band notification solution for my &lt;a href="/2018/08/home-automation-and-security-system-overview/"&gt;home automation and security system&lt;/a&gt; (&lt;a href="/tags/security/index.html"&gt;blog posts in the &amp;#8220;security&amp;#8221; category&lt;/a&gt;). I&amp;#8217;ve done quite a bit this year with automation and security for my house, as well as video surveillance. I&amp;#8217;ve handled a lot of reasonable failure scenarios including power outage but, while my &lt;span class="caps"&gt;AT&lt;/span&gt;&amp;amp;T fiber connection has been remarkably reliable so far, loss of connectivity was the one major issue I didn&amp;#8217;t have a working solution for. My needs in the case of a loss of connectivity are somewhat different from the normal day-to-day; it&amp;#8217;s a rare enough condition that I&amp;#8217;m not really concerned with getting massive collections of surveillance camera still images like usual, but just a simple alert when connectivity is lost or restored, or if the alarm is triggered when my primary Internet connection is offline. Within those constraints it seemed like Programmable Wireless would be perfect for my needs, especially at the $3 &lt;span class="caps"&gt;USD&lt;/span&gt;/month price tag for a one-off personal&amp;nbsp;project.&lt;/p&gt;
@@ -175,12 +259,12 @@
         &lt;span class="n"&gt;bands&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;img&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;split&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
         &lt;span class="n"&gt;histos&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;x&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;histogram&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt; &lt;span class="k"&gt;for&lt;/span&gt; &lt;span class="n"&gt;x&lt;/span&gt; &lt;span class="ow"&gt;in&lt;/span&gt; &lt;span class="n"&gt;bands&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;
         &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="n"&gt;histos&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;:]&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="n"&gt;histos&lt;/span&gt;&lt;span class="p"&gt;[:&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;]:&lt;/span&gt;
-            &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="bp"&gt;False&lt;/span&gt;
-        &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="bp"&gt;True&lt;/span&gt;
+            &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="kc"&gt;False&lt;/span&gt;
+        &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="kc"&gt;True&lt;/span&gt;
 
     &lt;span class="nd"&gt;@property&lt;/span&gt;
     &lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;image&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
-        &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;_image&lt;/span&gt; &lt;span class="ow"&gt;is&lt;/span&gt; &lt;span class="ow"&gt;not&lt;/span&gt; &lt;span class="bp"&gt;None&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+        &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;_image&lt;/span&gt; &lt;span class="ow"&gt;is&lt;/span&gt; &lt;span class="ow"&gt;not&lt;/span&gt; &lt;span class="kc"&gt;None&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
             &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;_image&lt;/span&gt;
         &lt;span class="n"&gt;logger&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;debug&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;Loading image for &lt;/span&gt;&lt;span class="si"&gt;%s&lt;/span&gt;&lt;span class="s1"&gt; from: &lt;/span&gt;&lt;span class="si"&gt;%s&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;path&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
         &lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;_image&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;Image&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;open&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;path&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
@@ -525,9 +609,9 @@ machinery_1  | Try &amp;#39;rm --help&amp;#39; for more information.
 
 &lt;span class="n"&gt;app&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;Flask&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="vm"&gt;__name__&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
 
-&lt;span class="nd"&gt;@app.route&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;/&amp;lt;path:url&amp;gt;&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="nd"&gt;@app&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;route&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;/&amp;lt;path:url&amp;gt;&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
 &lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;home&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;url&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
-    &lt;span class="n"&gt;req&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;requests&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;get&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;url&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;stream&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="bp"&gt;True&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+    &lt;span class="n"&gt;req&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;requests&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;get&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;url&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;stream&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="kc"&gt;True&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
     &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="n"&gt;Response&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;stream_with_context&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;req&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;iter_content&lt;/span&gt;&lt;span class="p"&gt;()),&lt;/span&gt; &lt;span class="n"&gt;content_type&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;req&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;headers&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;content-type&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;])&lt;/span&gt;
 
 &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="vm"&gt;__name__&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;__main__&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
