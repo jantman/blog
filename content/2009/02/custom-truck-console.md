@@ -5,6 +5,8 @@ Category: Miscellaneous
 Tags: console, emergency, emergency vehicle, EMS, lighting, truck
 Slug: custom-truck-console
 
+**Updated December 26, 2021:** This seems rather unbelievable almost thirteen years to the day after I started construction of this console... but I was just cleaning out a box of old paperwork of mine in my parents' garage, and found the original dimensioned drawing for this project. I've updated this with a scan of those dimensions at the end of the post.
+
 I'll keep this post relatively to the point (the original full story is
 on [eLightbars.org](http://www.elightbars.org)
 [here](http://www.elightbars.org/bb//topic401009.html) and
@@ -19,7 +21,7 @@ My main inspiration was some of the custom consoles done by places like
 [Odyssey](http://www.odysseyauto.com/), though I wanted something
 carpeted (hopefully a close match to the factory interior). The main
 idea I was working off of was this one from Odyssey:  
-  
+
 ![Odyssey Excursion
 console](http://www.odysseyauto.com/cabinets/Images/cabpics/excurcon-lg.jpg)
 
@@ -54,13 +56,13 @@ plywood. It was a bit difficult with only a jigsaw, but worked out
 relatively well. While I can't seem to find any pictures of the foam
 core, here are some of the wood form being assembled and the test fit in
 the truck:
-  
+
 ![first assembly and test of console](/GFX/TruckConsole/console2-small.jpg)
 
 ![first assembly and test of console](/GFX/TruckConsole/console1-small.jpg)
 
 ![first assembly and test of console](/GFX/TruckConsole/console3-small.jpg)
-  
+
 I'd originally been a bit worried about the structural integrity, but I
 found that by clamping the corners, pre-drilling and securing them with
 aggressive wood screws at approximately 1 screw per 1.5 inches along the
@@ -142,7 +144,7 @@ Semi-finished console with equipment mounted. Front-to back,
 [Pro-433](http://wiki.radioreference.com/index.php/Pro-433), Galls
 [SE082](http://www.galls.com/style.html?assort=general_catalog&style=SE082),
 nifty Jotto storage tray.
-  
+
 ![equipment in mounted
 position](/GFX/TruckConsole/DSC_0059_small.JPG)
 
@@ -162,3 +164,6 @@ Still to be done:
     liner.
 -   Making a cover/lid for the storage box.
 
+**Found, twelve years later: the original dimensioned drawing.** Also available [as a PDF](/GFX/TruckConsole/F250_console_dimensions.pdf).
+
+![scan of original dimensioned CAD drawing](/GFX/TruckConsole/F250_console_dimensions.png)
