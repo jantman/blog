@@ -22,8 +22,7 @@ My main inspiration was some of the custom consoles done by places like
 carpeted (hopefully a close match to the factory interior). The main
 idea I was working off of was this one from Odyssey:  
 
-![Odyssey Excursion
-console](http://www.odysseyauto.com/cabinets/Images/cabpics/excurcon-lg.jpg)
+![Odyssey Excursion console](/GFX/TruckConsole/excurcon-lg.jpg)
 
 The general idea was to have a replacement for the factory console which
 would allow mounting of a radio, emergency lighting controls, and a few
