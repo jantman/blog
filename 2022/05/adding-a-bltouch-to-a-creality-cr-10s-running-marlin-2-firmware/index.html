@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en" prefix="og: http://ogp.me/ns# fb: https://www.facebook.com/2008/fbml">
+<head>
+    <title>Adding a BLTouch to a Creality CR-10S running Marlin 2 Firmware - Jason Antman's Blog</title>
+    <!-- Using the latest rendering mode for IE -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+
+<link rel="canonical" href="https://blog.jasonantman.com/2022/05/adding-a-bltouch-to-a-creality-cr-10s-running-marlin-2-firmware/">
+
+        <meta name="author" content="Jason Antman" />
+        <meta name="keywords" content="printing,3d printing,octoprint,octopi,diy,creality,cr-10s" />
+        <meta name="description" content="How to add a BLTouch probe to a Creality CR-10S 3d printer running Marlin 2 firmware." />
+
+        <meta property="og:site_name" content="Jason Antman's Blog" />
+        <meta property="og:type" content="article"/>
+        <meta property="og:title" content="Adding a BLTouch to a Creality CR-10S running Marlin 2 Firmware"/>
+        <meta property="og:url" content="https://blog.jasonantman.com/2022/05/adding-a-bltouch-to-a-creality-cr-10s-running-marlin-2-firmware/"/>
+        <meta property="og:description" content="How to add a BLTouch probe to a Creality CR-10S 3d printer running Marlin 2 firmware."/>
+        <meta property="article:published_time" content="2022-05-15" />
+            <meta property="article:section" content="DIY / Home Automation / Security" />
+            <meta property="article:tag" content="printing" />
+            <meta property="article:tag" content="3d printing" />
+            <meta property="article:tag" content="octoprint" />
+            <meta property="article:tag" content="octopi" />
+            <meta property="article:tag" content="diy" />
+            <meta property="article:tag" content="creality" />
+            <meta property="article:tag" content="cr-10s" />
+            <meta property="article:author" content="Jason Antman" />
+
+
+
+    <!-- Bootstrap -->
+        <link rel="stylesheet" href="https://blog.jasonantman.com/theme/css/bootstrap.flatly.min.css" type="text/css"/>
+    <link href="https://blog.jasonantman.com/theme/css/font-awesome.min.css" rel="stylesheet">
+
+    <link href="https://blog.jasonantman.com/theme/css/pygments/default.css" rel="stylesheet">
+        <link href="https://blog.jasonantman.com/theme/css/typogrify.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://blog.jasonantman.com/theme/css/style.css" type="text/css"/>
+        <link href="https://blog.jasonantman.com/theme/css/shariff/shariff.min.css" rel="stylesheet">
+
+    <link rel="stylesheet" href="https://blog.jasonantman.com/theme/css/forkongithub.min.css" type="text/css" />
+
+        <link href="https://blog.jasonantman.com/feeds/all.atom.xml" type="application/atom+xml" rel="alternate"
+              title="Jason Antman's Blog ATOM Feed"/>
+
+        <link href="https://blog.jasonantman.com/feeds/all.rss.xml" type="application/rss+xml" rel="alternate"
+              title="Jason Antman's Blog RSS Feed"/>
+
+
+        <link href="https://blog.jasonantman.com/feeds/categories/diy-home-automation-security.atom.xml" type="application/atom+xml" rel="alternate"
+              title="Jason Antman's Blog DIY / Home Automation / Security ATOM Feed"/>
+
+</head>
+<body>
+
+<div class="navbar navbar-default navbar-fixed-top" role="navigation">
+	<div class="container">
+<span id="forkongithub"><a href="https://github.com/jantman/blog">Fork me on GitHub</a></span>        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="https://blog.jasonantman.com/" class="navbar-brand">
+Jason Antman's Blog            </a>
+        </div>
+        <div class="collapse navbar-collapse navbar-ex1-collapse">
+            <ul class="nav navbar-nav">
+                    <li><a href="/pages/about.html">About Me</a></li>
+                    <li><a href="/categories/aws/index.html">AWS</a></li>
+                    <li><a href="/categories/software/index.html">Software</a></li>
+                    <li><a href="/categories/hardware/index.html">Hardware</a></li>
+                    <li><a href="/categories/diy-home-automation-security/index.html">DIY / Home Automation / Security</a></li>
+                    <li><a href="/categories/miscellaneous/index.html">Miscellaneous</a></li>
+                    <li><a href="/tags.html">Tags</a></li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+              <li><a href="https://blog.jasonantman.com/archives.html"><i class="fa fa-th-list"></i><span class="icon-label">Archives</span></a></li>
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+</div> <!-- /.navbar -->
+<!-- Banner -->
+<!-- End Banner -->
+<div class="container">
+    <div class="row">
+        <div class="col-sm-9">
+    <section id="content">
+        <article>
+            <header class="page-header">
+                <h1>
+                    <a href="https://blog.jasonantman.com/2022/05/adding-a-bltouch-to-a-creality-cr-10s-running-marlin-2-firmware/"
+                       rel="bookmark"
+                       title="Permalink to Adding a BLTouch to a Creality CR-10S running Marlin 2 Firmware">
+                        Adding a BLTouch to a Creality <span class="caps">CR</span>-10S running Marlin 2&nbsp;Firmware
+                    </a>
+                </h1>
+            </header>
+            <div class="entry-content">
+                <div class="panel">
+                    <div class="panel-body">
+<footer class="post-info">
+    <span class="label label-default">Date</span>
+    <span class="published">
+        <i class="fa fa-calendar"></i><time datetime="2022-05-15T16:54:00-04:00"> Sun 15 May 2022</time>
+    </span>
+
+
+
+
+
+<span class="label label-default">Tags</span>
+	<a href="https://blog.jasonantman.com/tags/printing/index.html">printing</a>
+        /
+	<a href="https://blog.jasonantman.com/tags/3d-printing/index.html">3d printing</a>
+        /
+	<a href="https://blog.jasonantman.com/tags/octoprint/index.html">octoprint</a>
+        /
+	<a href="https://blog.jasonantman.com/tags/octopi/index.html">octopi</a>
+        /
+	<a href="https://blog.jasonantman.com/tags/diy/index.html">diy</a>
+        /
+	<a href="https://blog.jasonantman.com/tags/creality/index.html">creality</a>
+        /
+	<a href="https://blog.jasonantman.com/tags/cr-10s/index.html">cr-10s</a>
+    
+</footer><!-- /.post-info -->                    </div>
+                </div>
+                <p>I have a Creality <span class="caps">CR</span>-10S 3d printer that I purchased used, with many previous upgrades, in September 2020 (currently about 1.75 years ago). The printer has an original Creality v2.2 board in it. I&#8217;ve been <em>extremely</em> happy with it, especially with all of the existing upgrades that I didn&#8217;t have to deal with. However, the printer did not have a bed leveling sensor and also had third-party (<span class="caps">TH3D</span> U1.R2.B5) Marlin-based firmware installed but no configuration file for that firmware. Recently I started having some printing issues that I believed were related to bed leveling issues (specifically a sagging bed) and I decided to add a <a href="https://www.antclabs.com/bltouch">BLTouch</a> and see if that helped. So, I ordered an off-brand BLTouch from Amazon, listed as <a href="https://smile.amazon.com/gp/product/B088KLFPNV/">Creality Upgraded BLTouch V1 Auto Bed Leveling Sensor Kit Accessories for Creality Ender 3/ Ender 3 Pro/Ender 5/<span class="caps">CR</span> -10/<span class="caps">CR</span>-10S4/S5/<span class="caps">CR20</span>/20Pro</a> (<strong>note:</strong> This product has been updated, and is now a BLTouch&nbsp;V2).</p>
+<p>The process of both installing the sensor and updating my firmware to work with it were quite a bit more difficult than I&#8217;d hoped or thought. The former because the installation instructions for the third-party BLTouch v1 clone were flat-out wrong for my <span class="caps">CR</span>-10S with a V2.2 board. The latter because with a printer with third-party firmware but no configuration file, I had to start from scratch determining what configuration options I had to&nbsp;use.</p>
+<p>To try to prevent anyone else from going through the same headaches, here is the process that I&nbsp;used.</p>
+<h2 id="sensor-preparation"><a class="toclink" href="#sensor-preparation">Sensor&nbsp;Preparation</a></h2>
+<p>The sensor that I purchased was a BLTouch v1 clone. It came with a cable that had a small 5-pin <span class="caps">JST</span> connector on the probe end and two separate connectors on the board end, a 3-pin DuPont-style connector and a 2-pin <span class="caps">JST</span> connector. The first thing to do is disconnect your control box from your printer and confirm the correct wiring and connectors for your printer (see next section). Then if you (like me) have cable management on your extruder, you&#8217;ll want to order or make extension cables for the BLTouch; the cables that come with it are far too short to use with any cable&nbsp;management.</p>
+<h2 id="hardware-installation"><a class="toclink" href="#hardware-installation">Hardware&nbsp;Installation</a></h2>
+<p>Attach the probe to its bracket and the bracket to your extruder carriage. The bracket that came with mine works fine with a Micro-Swiss direct-drive&nbsp;extruder.</p>
+<p>Then route the cables to your main board and attach them. This was a big point of confusion to me, as my <span class="caps">CR</span>-10S has a Creality original V2.2 main board. The process for connecting the BLTouch v1 to this board is as&nbsp;follows:</p>
+<ol>
+<li>Throw out the instructions that came with the&nbsp;probe.</li>
+<li>Throw out the auxiliary adapter board that came with the&nbsp;probe.</li>
+<li>Disconnect the Z-axis limit switch (2-pin <span class="caps">JST</span> connector) from the main board (this is <code>Z-Min</code> on the board) and connect the 2-pin <span class="caps">JST</span> connector from the probe in place of&nbsp;it.</li>
+<li>Find the <code>D11</code> 3-pin header on the board; this is in a block of four 3-pin headers just inboard of the <code>EXP2</code> ribbon going to the <span class="caps">LCD</span> display. Connect the 3-pin DuPont plug from the probe to <code>D11</code>. The wires on this shoild be Red, Blue, Yellow; Red goes towards the outboard side of the main board, closest to <code>EXP2</code>.</li>
+</ol>
+<p>That&#8217;s it. No adapter boards or anything else crazy needed. Once you know that the instructions that came with the probe are <strong>not</strong> for the V2 board, and find the correct instructions, it&#8217;s easy. My process here is based on instructions that I found at <a href="https://www.ifixit.com/Guide/CR-10S+BL+Touch+Install/128525">iFixIt</a>.</p>
+<h2 id="firmware"><a class="toclink" href="#firmware">Firmware</a></h2>
+<p>The most difficult part of this process, by far, was configuring my firmware for the BLTouch. I bought my printer second-hand and it came to me with third-party <span class="caps">TH3D</span> firmware on it (U1.R2.B5) but no configuration file for the firmware. After a bunch of research and trying to find the exact firmware that my printer had running, I decided that the best option would be to re-flash with <a href="https://marlinfw.org/">Marlin 2 firmware</a>, most especially so that I could take advantage of the new <a href="https://marlinfw.org/docs/features/unified_bed_leveling.html">Unified Bed Leveling (<span class="caps">UBL</span>)</a> system. I&#8217;ve never flashed firmware on a 3D printer before, or even worked with <span class="caps">AVR</span> microcontrollers. It took quite a bunch of research, but here&#8217;s what I came up&nbsp;with.</p>
+<h3 id="preparation"><a class="toclink" href="#preparation">Preparation</a></h3>
+<p>Just in case, I wanted to be able to revert back to what I currently had running. Note that I&#8217;m running OctoPrint on an <a href="https://github.com/guysoft/OctoPi">OctoPi</a>, and that already includes <a href="https://www.nongnu.org/avrdude/">avrdude</a> for working with the firmware on <span class="caps">AVR</span>&nbsp;microcontrollers.</p>
+<ol>
+<li>In OctoPrint&#8217;s terminal, run <a href="https://marlinfw.org/docs/gcode/M115.html">M115</a> to show information about the current firmware and capabilities; save this output&nbsp;somewhere.</li>
+<li>In OctoPrint&#8217;s terminal, run <a href="https://marlinfw.org/docs/gcode/M503.html">M503</a> to report the current settings; save this output&nbsp;somewhere.</li>
+<li>On your OctoPrint machine, perform a backup of the current firmware/flash with <code>avrdude -p m2560 -c wiring -P /dev/ttyUSB0 -b 115200 -v -U flash:r:printerbackup.hex:i</code> and a backup of the <span class="caps">EEPROM</span> using <code>avrdude -p m2560 -c wiring -P /dev/ttyUSB0 -b 115200 -v -U eeprom:r:printereeprom.hex:i</code>.</li>
+</ol>
+<h3 id="compiling-and-flashing"><a class="toclink" href="#compiling-and-flashing">Compiling and&nbsp;Flashing</a></h3>
+<p>Note that the Creality V2.2 board doesn&#8217;t need any adapter to flash; it can be flashed directly over&nbsp;<span class="caps">USB</span>.</p>
+<ol>
+<li>Follow <a href="https://marlinfw.org/docs/basics/install_arduino.html">Installing Marlin (Arduino)</a> to set up the Arduino <span class="caps">IDE</span>; also install your distro&#8217;s <code>arduino-cli</code> package. Launch the <span class="caps">IDE</span> and install the <code>U8glib-HAL</code> library.</li>
+<li>Clone the <a href="https://github.com/MarlinFirmware/Marlin">Marlin GitHub repo</a> and check out the <code>2.0.9.3</code> tag (the latest release at this&nbsp;time).</li>
+<li>Set up a configuration file for your printer. I started with the <a href="https://github.com/MarlinFirmware/Configurations/tree/2.0.9.3/config/examples/Creality/CR-10S/CrealityV1">Marlin <span class="caps">CR</span>-10S example configuration for 2.0.9.3</a> and then made a few rounds of changes based on trial and error. You can see my current configurations <a href="https://github.com/jantman/3d-printed-things/tree/master/my-cr10s/marlin-configs">here</a> and the changes that I made from the examples <a href="https://github.com/jantman/3d-printed-things/compare/f546693de8de80a013b9e9aaaf2cbdb52dbe1175..bea951bc1a23f3d135ab831b52a8c6f2d92a2efa">here</a>.</li>
+<li>Copy all of those configuration files to the Marlin source repo&nbsp;clone.</li>
+<li>Build the firmware with <code>arduino-cli compile --fqbn arduino:avr:mega --export-binaries --verbose --clean Marlin.ino</code>; this should generate <code>build/arduino.avr.mega/Marlin.ino.hex</code></li>
+<li>Copy that file to your OctoPrint&nbsp;machine.</li>
+<li>In OctoPrint, disconnect from the printer if&nbsp;connected.</li>
+<li>Flash that to the printer with: <code>avrdude -p m2560 -c wiring -P /dev/ttyUSB0 -b 115200 -v -U flash:w:Marlin.ino.mega.hex:i</code></li>
+<li>When the printer reboots, connect&nbsp;OctoPrint.</li>
+<li>In OctoPrint terminal, reset the <span class="caps">EEPROM</span> to factory defaults with <a href="https://marlinfw.org/docs/gcode/M502.html">M502</a> and then write that to <span class="caps">EEPROM</span> with <a href="https://marlinfw.org/docs/gcode/M500.html">M500</a>.</li>
+</ol>
+<p>From there, we can go on to configure automatic bed leveling (see next&nbsp;section).</p>
+<p>Note that I had some issues because I accidentally swapped the X and Y endstop (limit switch) connectors during all of this. To troubleshoot that, <a href="https://marlinfw.org/docs/gcode/M119.html">M119</a> will log the current state of all endstop sensors to the&nbsp;terminal.</p>
+<h3 id="leveling-and-finishing-touches"><a class="toclink" href="#leveling-and-finishing-touches">Leveling and Finishing&nbsp;Touches</a></h3>
+<p>The rest of the bed leveling configuration was done according to the Marlin <a href="https://marlinfw.org/docs/features/auto_bed_leveling.html">Automatic Bed Leveling</a> documentation. In&nbsp;short:</p>
+<ol>
+<li>Send <a href="https://marlinfw.org/docs/gcode/M420.html">M420</a> to turn off bed&nbsp;leveling.</li>
+<li>Send <a href="https://marlinfw.org/docs/gcode/M111.html">M111 247</a> to turn on debug logging via the&nbsp;terminal.</li>
+<li>Send <a href="https://marlinfw.org/docs/gcode/G028.html">G28</a> to&nbsp;auto-home.</li>
+<li>Send <a href="https://marlinfw.org/docs/gcode/G029.html">G29</a> to begin bed&nbsp;leveling.</li>
+<li>Send <a href="https://marlinfw.org/docs/gcode/G029.html">G29 P0</a> to zero the mesh data and then <a href="https://marlinfw.org/docs/gcode/G029.html">G29 P1</a> to start Phase 1 bed leveling; this may take a while, as it probes up to 100&nbsp;points.</li>
+<li>Send <a href="https://marlinfw.org/docs/gcode/G029.html">G29 P3</a> to interpolate the rest of the points. Repeat as needed until the mesh is&nbsp;complete.</li>
+<li>Set the Z Offset using the Probe Offset Wizard in Marlin:<ol>
+<li>Heat build plate to 55 and nozzle to 210 (about average temperatures for&nbsp;me).</li>
+<li>Use the Probe Offset Wizard on the <span class="caps">LCD</span>:<ol>
+<li>Go to Configuration – Advanced Settings – Probe Offsets – Z Prob&nbsp;Wizard</li>
+<li>Select Move&nbsp;0.1mm</li>
+<li>Lower the z-axis by 0.1mm until you get to paper height from the build&nbsp;plate</li>
+<li>Closeout of that Move 0.1mm&nbsp;window</li>
+<li>Select&nbsp;Done</li>
+</ol>
+</li>
+<li>That gets me to a probe offset of -3.72. Running <code>M503</code> confirms that: <code>Recv: echo:  M851 X-44.00 Y-9.00 Z-3.72 ; (mm)</code></li>
+<li>Ok, let&#8217;s save those settings: <a href="https://marlinfw.org/docs/gcode/M500.html">M500</a></li>
+</ol>
+</li>
+<li>Home the machine (<a href="https://marlinfw.org/docs/gcode/G028.html">G28</a>), set it back to relative positioning (<a href="https://marlinfw.org/docs/gcode/G091.html">G91</a>), and try a test print. Maybe the best print to do is the Marlin built-in Mesh Validation pattern, which can be printed with <a href="https://marlinfw.org/docs/gcode/G026.html">G26</a>.</li>
+<li>Update OctoPrint and Cura scripts (see below). Install the <a href="https://plugins.octoprint.org/plugins/bedlevelvisualizer/">Bed Visualizer</a> plugin in OctoPrint, update its GCode as shown below, and run it to see what your bed mesh looks&nbsp;like.</li>
+</ol>
+<p>Note that I experienced an issue where after homing, the print would start with the middle of the build plate as the origin. I fixed this in my slicer (Cura) as shown&nbsp;below.</p>
+<h3 id="cura-updates"><a class="toclink" href="#cura-updates">Cura&nbsp;Updates</a></h3>
+<p>My printer profile in Cura had the following near the middle of its Start&nbsp;G-Code:</p>
+<div class="highlight"><pre><span></span>G28 ;Home
+
+G92 E0 ;Reset Extruder
+</pre></div>
+
+
+<p>This just needs to be changed to enable Automatic Bed Leveling after&nbsp;homing:</p>
+<div class="highlight"><pre><span></span>G28 ;Home
+G29 A ; enable <span class="caps">UBL</span>
+G92 E0 ;Reset Extruder
+</pre></div>
+
+
+<h3 id="octoprint-updates"><a class="toclink" href="#octoprint-updates">OctoPrint&nbsp;Updates</a></h3>
+<p>In OctoPrint Settings -&gt; Printer -&gt; <span class="caps">GCODE</span> Scripts set the &#8220;Before print job starts&#8221; script to load the mesh from slot 0 and enable automatic&nbsp;leveling:</p>
+<div class="highlight"><pre><span></span>G29 L0 ; load <span class="caps">UBL</span> mesh from slot 0
+</pre></div>
+
+
+<p>In the Bed Visualizer plugin, we want it to just show the existing mesh, not re-calculate anything. Set its GCode&nbsp;to:</p>
+<div class="highlight"><pre><span></span>M155 S30  ; reduce temperature reporting rate to reduce output pollution
+@<span class="caps">BEDLEVELVISUALIZER</span>    ; tell the plugin to watch for reported mesh
+G29 T           ; View the Z compensation values.
+M155 S3   ; reset temperature reporting
+</pre></div>
+
+
+<h3 id="re-calculating-the-mesh"><a class="toclink" href="#re-calculating-the-mesh">Re-Calculating the&nbsp;Mesh</a></h3>
+<p>You&#8217;ll want to re-calculate the bed mesh from time to time to make sure it&#8217;s accurate. To do this, use the following&nbsp;GCode:</p>
+<div class="highlight"><pre><span></span>G28       ; home all axes
+M420 S0   ; Turning off bed leveling while probing, if firmware is set to restore after G28
+M190 S55  ; (optional) wait for the bed to get up to temperature
+G29 P1    ; automatically populate mesh with all reachable points
+G29 P3 T   ; infer the rest of the mesh values
+G29 P3 T  ; infer the rest of the mesh values again, keep running until mesh complete
+
+G29 S0 ; enabled leveling and report the new mesh, saving it to slot 0
+G29 F 10.0 ; Set Fade Height for correction at 10.0 mm.
+G29 A     ; Activate the <span class="caps">UBL</span> System.
+M420 S1 ; enable bed leveling
+M500      ; save the current setup to <span class="caps">EEPROM</span>
+M140 S0   ; cooling down the bed
+</pre></div>
+            </div>
+            <!-- /.entry-content -->
+    <hr />
+    <!-- Shariff Button BEGIN -->
+    <div class="shariff"
+        data-lang="en"
+        data-orientation="horizontal"
+        data-services = "[&quot;facebook&quot;,&quot;googleplus&quot;,&quot;twitter&quot;,&quot;linkedin&quot;,&quot;diaspora&quot;]"
+        data-theme="standard"
+        data-url="https://blog.jasonantman.com/2022/05/adding-a-bltouch-to-a-creality-cr-10s-running-marlin-2-firmware/"></div>
+    <!-- Shariff Button END -->
+    <hr/>
+    <section class="comments" id="comments">
+        <h2>Comments</h2>
+
+        <div id="disqus_thread"></div>
+        <script type="text/javascript">
+            /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+            var disqus_shortname = 'jantman'; // required: replace example with your forum shortname
+
+                    var disqus_identifier = 'adding-a-bltouch-to-a-creality-cr-10s-running-marlin-2-firmware';
+                var disqus_url = 'https://blog.jasonantman.com/2022/05/adding-a-bltouch-to-a-creality-cr-10s-running-marlin-2-firmware/';
+
+            var disqus_config = function () {
+                this.language = "en";
+            };
+
+            /* * * DON'T EDIT BELOW THIS LINE * * */
+            (function () {
+                var dsq = document.createElement('script');
+                dsq.type = 'text/javascript';
+                dsq.async = true;
+                dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+                (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+            })();
+        </script>
+        <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by
+            Disqus.</a></noscript>
+        <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+
+    </section>
+        </article>
+    </section>
+
+        </div>
+        <div class="col-sm-3" id="sidebar">
+            <aside>
+<!-- Sidebar -->
+<section class="well well-sm">
+  <ul class="list-group list-group-flush">
+
+<!-- Sidebar/Recent Posts -->
+<li class="list-group-item">
+  <h4><i class="fa fa-home fa-lg"></i><span class="icon-label">Recent Posts</span></h4>
+  <ul class="list-group" id="recentposts">
+    <li class="list-group-item"><a href="https://blog.jasonantman.com/2022/05/adding-a-bltouch-to-a-creality-cr-10s-running-marlin-2-firmware/">Adding a BLTouch to a Creality <span class="caps">CR</span>-10S running Marlin 2&nbsp;Firmware</a></li>
+    <li class="list-group-item"><a href="https://blog.jasonantman.com/2021/03/migrating-kodi-to-mariadb-with-locked-down-permissions-and-no-importexport/">Migrating Kodi to MariaDB, with locked-down permissions and no&nbsp;import/export</a></li>
+    <li class="list-group-item"><a href="https://blog.jasonantman.com/2021/03/octoprint-power-outage-handling/">OctoPrint Power Outage&nbsp;Handling</a></li>
+    <li class="list-group-item"><a href="https://blog.jasonantman.com/2020/11/on-the-creation-use-and-management-of-docker-images/">On The Creation, Use, and Management of Docker&nbsp;Images</a></li>
+    <li class="list-group-item"><a href="https://blog.jasonantman.com/2019/04/galaxy-s10--android-9-alarm-app-broken-by-battery-optimization/">Galaxy S10 / Android 9 alarm app broken by battery&nbsp;optimization</a></li>
+  </ul>
+</li>
+<!-- End Sidebar/Recent Posts -->
+
+<!-- Sidebar/Twitter Timeline -->
+<li class="list-group-item">
+  <h4><i class="fa fa-twitter fa-lg"></i><span class="icon-label">Latest Tweets</span></h4>
+  <div id="twitter_timeline">
+    <a class="twitter-timeline" data-width="250" data-height="300" data-dnt="true" data-theme="light" href="https://twitter.com/j_antman">Tweets by j_antman</a> <script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
+  </div>
+</li>
+<!-- End Sidebar/Twitter Timeline -->
+
+<!-- Sidebar/Github -->
+<li class="list-group-item">
+  <h4><i class="fa fa-github fa-lg"></i><span class="icon-label">GitHub Repos</span></h4>
+  <div id="gh_repos">
+    <p class="list-group-item">Status updating...</p>
+  </div>
+  <a href="https://github.com/jantman">@jantman</a> on GitHub
+</li>
+<!-- End Sidebar/Github -->
+
+<!-- Sidebar/Links -->
+<li class="list-group-item">
+  <h4><i class="fa fa-external-link-square fa-lg"></i><span class="icon-label">Links</span></h4>
+  <ul class="list-group" id="links">
+    <li class="list-group-item">
+      <a href="http://www.jasonantman.com" target="_blank">Homepage</a>
+    </li>
+    <li class="list-group-item">
+      <a href="http://resume.jasonantman.com" target="_blank">Resume</a>
+    </li>
+  </ul>
+</li>
+<!-- End Sidebar/Links -->
+  </ul>
+</section>
+<!-- End Sidebar -->            </aside>
+        </div>
+    </div>
+</div>
+<footer>
+   <div class="container">
+      <hr>
+      <div class="row">
+         <div class="col-xs-10">&copy; 2022 Jason Antman
+            &middot; Powered by <a href="https://github.com/getpelican/pelican-themes/tree/master/pelican-bootstrap3" target="_blank">pelican-bootstrap3</a>,
+            <a href="http://docs.getpelican.com/" target="_blank">Pelican</a>,
+            <a href="http://getbootstrap.com" target="_blank">Bootstrap</a>         </div>
+         <div class="col-xs-2"><p class="pull-right"><i class="fa fa-arrow-up"></i> <a href="#">Back to top</a></p></div>
+      </div>
+   </div>
+</footer>
+<script src="https://blog.jasonantman.com/theme/js/jquery.min.js"></script>
+
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="https://blog.jasonantman.com/theme/js/bootstrap.min.js"></script>
+
+<!-- Enable responsive features in IE8 with Respond.js (https://github.com/scottjehl/Respond) -->
+<script src="https://blog.jasonantman.com/theme/js/respond.min.js"></script>
+
+
+
+    <!-- GITHUB_REPOS_JSON (explicitly pinned repos ) -->
+  <script id="GithubReposJson" type="application/json">
+  [{"description": "A script and python package to check your AWS service limits and usage via boto3.", "name": "awslimitchecker", "html_url": "https://github.com/jantman/awslimitchecker"}, {"description": "A collection of my standalone scripts to small/quick for their own repos. All kinds of useful stuff.", "name": "misc-scripts", "html_url": "https://github.com/jantman/misc-scripts"}, {"description": "Responsive Flask/SQLAlchemy personal finance app, specifically for biweekly budgeting.", "name": "biweeklybudget", "html_url": "https://github.com/jantman/biweeklybudget"}, {"description": "A standard to easily communicate to humans and machines the development/support and usability status of software repositories/projects.", "name": "repostatus.org", "html_url": "https://github.com/jantman/repostatus.org"}, {"description": "home automation/security config/scripts/tooling - HomeAssistant, AppDaemon, ZoneMinder, etc.", "name": "home-automation-configs", "html_url": "https://github.com/jantman/home-automation-configs"}, {"description": "A Python application for Linux machines to perform WiFi site surveys and present the results as a heatmap overlayed on a floorplan", "name": "python-wifi-survey-heatmap", "html_url": "https://github.com/jantman/python-wifi-survey-heatmap"}]
+  </script>
+
+<!-- GitHub JS Code -->
+<script type="text/javascript">
+$(document).ready(function () {
+  if (!window.jXHR) {
+    var jxhr = document.createElement('script');
+    jxhr.type = 'text/javascript';
+    jxhr.src = 'https://blog.jasonantman.com/theme/js/jXHR.js';
+    var s = document.getElementsByTagName('script')[0];
+    s.parentNode.insertBefore(jxhr, s);
+  }
+
+  console.log($('#GithubReposJson').html());
+  github.showSpecificRepos({
+    user: 'jantman',
+    target: '#gh_repos',
+    repos: JSON.parse($('#GithubReposJson').html())
+  });
+});
+</script>
+<script src="https://blog.jasonantman.com/theme/js/github.js" type="text/javascript"></script>
+<!-- End GitHub JS Code -->
+    <!-- Disqus -->
+    <script type="text/javascript">
+        /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+        var disqus_shortname = 'jantman'; // required: replace example with your forum shortname
+
+        /* * * DON'T EDIT BELOW THIS LINE * * */
+        (function () {
+            var s = document.createElement('script');
+            s.async = true;
+            s.type = 'text/javascript';
+            s.src = '//' + disqus_shortname + '.disqus.com/count.js';
+            (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+        }());
+    </script>
+    <!-- End Disqus Code -->
+    <!-- Google Analytics Universal -->
+    <script type="text/javascript">
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+        ga('create', 'UA-2718127-2', 'jasonantman.com');
+        ga('send', 'pageview');
+    </script>
+    <!-- End Google Analytics Universal Code -->
+
+
+    <!-- add shariff support -->
+    <script src="https://blog.jasonantman.com/theme/js/shariff.min.js"></script>
+</body>
+</html>

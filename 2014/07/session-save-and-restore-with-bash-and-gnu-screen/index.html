@@ -212,12 +212,12 @@ git-specific information, and then sets <code>PS1</code> correctly. Finally, we 
 current history, to make sure the history on disk is always accurate and&nbsp;up-to-date.</p>
 <p>This works in combination with the <a href="https://github.com/jantman/misc-scripts/blob/master/savescreen.py">latest version</a>
 of savescreen.py, which has some minor changes. The line to create each window,&nbsp;formerly:</p>
-<div class="highlight"><pre><span></span><span class="n">fh</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;screen -t </span><span class="se">\&quot;</span><span class="si">{name}</span><span class="se">\&quot;</span><span class="s2"> </span><span class="si">{num}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">windows</span><span class="p">[</span><span class="n">n</span><span class="p">],</span> <span class="n">num</span><span class="o">=</span><span class="n">n</span><span class="p">))</span>
+<div class="highlight"><pre><span></span><span class="n">fh</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;screen -t </span><span class="se">\&quot;</span><span class="s2">{name}</span><span class="se">\&quot;</span><span class="s2"> {num}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">windows</span><span class="p">[</span><span class="n">n</span><span class="p">],</span> <span class="n">num</span><span class="o">=</span><span class="n">n</span><span class="p">))</span>
 </pre></div>
 
 
 <p>becomes:</p>
-<div class="highlight"><pre><span></span><span class="n">fh</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;screen -t </span><span class="se">\&quot;</span><span class="si">{name}</span><span class="se">\&quot;</span><span class="s2"> </span><span class="si">{num}</span><span class="s2"> sh -c </span><span class="se">\&quot;</span><span class="s2">cd $(readlink -fn </span><span class="si">{dirpath}</span><span class="s2">/</span><span class="si">{num}</span><span class="s2">); bash</span><span class="se">\&quot;\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">windows</span><span class="p">[</span><span class="n">n</span><span class="p">],</span> <span class="n">num</span><span class="o">=</span><span class="n">n</span><span class="p">,</span> <span class="n">dirpath</span><span class="o">=</span><span class="n">dirpath</span><span class="p">))</span>
+<div class="highlight"><pre><span></span><span class="n">fh</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;screen -t </span><span class="se">\&quot;</span><span class="s2">{name}</span><span class="se">\&quot;</span><span class="s2"> {num} sh -c </span><span class="se">\&quot;</span><span class="s2">cd $(readlink -fn {dirpath}/{num}); bash</span><span class="se">\&quot;\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">windows</span><span class="p">[</span><span class="n">n</span><span class="p">],</span> <span class="n">num</span><span class="o">=</span><span class="n">n</span><span class="p">,</span> <span class="n">dirpath</span><span class="o">=</span><span class="n">dirpath</span><span class="p">))</span>
 </pre></div>
 
 
@@ -292,11 +292,11 @@ working directory, and that window&#8217;s&nbsp;history.</p>
 <li class="list-group-item">
   <h4><i class="fa fa-home fa-lg"></i><span class="icon-label">Recent Posts</span></h4>
   <ul class="list-group" id="recentposts">
+    <li class="list-group-item"><a href="https://blog.jasonantman.com/2022/05/adding-a-bltouch-to-a-creality-cr-10s-running-marlin-2-firmware/">Adding a BLTouch to a Creality <span class="caps">CR</span>-10S running Marlin 2&nbsp;Firmware</a></li>
     <li class="list-group-item"><a href="https://blog.jasonantman.com/2021/03/migrating-kodi-to-mariadb-with-locked-down-permissions-and-no-importexport/">Migrating Kodi to MariaDB, with locked-down permissions and no&nbsp;import/export</a></li>
     <li class="list-group-item"><a href="https://blog.jasonantman.com/2021/03/octoprint-power-outage-handling/">OctoPrint Power Outage&nbsp;Handling</a></li>
     <li class="list-group-item"><a href="https://blog.jasonantman.com/2020/11/on-the-creation-use-and-management-of-docker-images/">On The Creation, Use, and Management of Docker&nbsp;Images</a></li>
     <li class="list-group-item"><a href="https://blog.jasonantman.com/2019/04/galaxy-s10--android-9-alarm-app-broken-by-battery-optimization/">Galaxy S10 / Android 9 alarm app broken by battery&nbsp;optimization</a></li>
-    <li class="list-group-item"><a href="https://blog.jasonantman.com/2019/03/arch-linux-on-a-dell-precision-5530--xps-15-9570-laptop/">Arch Linux on a Dell Precision 5530 / <span class="caps">XPS</span> 15 9570&nbsp;Laptop</a></li>
   </ul>
 </li>
 <!-- End Sidebar/Recent Posts -->
@@ -343,7 +343,7 @@ working directory, and that window&#8217;s&nbsp;history.</p>
    <div class="container">
       <hr>
       <div class="row">
-         <div class="col-xs-10">&copy; 2021 Jason Antman
+         <div class="col-xs-10">&copy; 2022 Jason Antman
             &middot; Powered by <a href="https://github.com/getpelican/pelican-themes/tree/master/pelican-bootstrap3" target="_blank">pelican-bootstrap3</a>,
             <a href="http://docs.getpelican.com/" target="_blank">Pelican</a>,
             <a href="http://getbootstrap.com" target="_blank">Bootstrap</a>         </div>

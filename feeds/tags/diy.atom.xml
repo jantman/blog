@@ -1,5 +1,116 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Jason Antman's Blog - diy</title><link href="https://blog.jasonantman.com/" rel="alternate"></link><link href="https://blog.jasonantman.com/feeds/tags/diy.atom.xml" rel="self"></link><id>https://blog.jasonantman.com/</id><updated>2021-03-28T08:44:00-04:00</updated><entry><title>OctoPrint Power Outage Handling</title><link href="https://blog.jasonantman.com/2021/03/octoprint-power-outage-handling/" rel="alternate"></link><published>2021-03-28T08:44:00-04:00</published><updated>2021-03-28T08:44:00-04:00</updated><author><name>Jason Antman</name></author><id>tag:blog.jasonantman.com,2021-03-28:/2021/03/octoprint-power-outage-handling/</id><summary type="html">&lt;p&gt;My simple method of handling power outages during OctoPrint 3d&amp;nbsp;printing.&lt;/p&gt;</summary><content type="html">&lt;p&gt;One of my recent interests has been 3D printing. A few months ago I obtained a used &lt;a href="https://www.creality.com/goods-detail/cr-10s-3d-printer"&gt;Creality &lt;span class="caps"&gt;CR&lt;/span&gt;-10S&lt;/a&gt; 3d printer and started doing some work with it. I even &lt;a href="https://www.thingiverse.com/jantman/designs"&gt;designed&lt;/a&gt; and &lt;a href="https://www.thingiverse.com/jantman/makes"&gt;printed&lt;/a&gt; some parts for it, and designed my new workbench around it. However, about eighteen hours into a twenty-hour print, my neighborhood suffered a power outage. It only lasted about twenty minutes, but the print was ruined and I had to start over. This was clearly a&amp;nbsp;problem.&lt;/p&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Jason Antman's Blog - diy</title><link href="https://blog.jasonantman.com/" rel="alternate"></link><link href="https://blog.jasonantman.com/feeds/tags/diy.atom.xml" rel="self"></link><id>https://blog.jasonantman.com/</id><updated>2022-05-15T16:54:00-04:00</updated><entry><title>Adding a BLTouch to a Creality CR-10S running Marlin 2 Firmware</title><link href="https://blog.jasonantman.com/2022/05/adding-a-bltouch-to-a-creality-cr-10s-running-marlin-2-firmware/" rel="alternate"></link><published>2022-05-15T16:54:00-04:00</published><updated>2022-05-15T16:54:00-04:00</updated><author><name>Jason Antman</name></author><id>tag:blog.jasonantman.com,2022-05-15:/2022/05/adding-a-bltouch-to-a-creality-cr-10s-running-marlin-2-firmware/</id><summary type="html">&lt;p&gt;How to add a BLTouch probe to a Creality &lt;span class="caps"&gt;CR&lt;/span&gt;-10S 3d printer running Marlin 2&amp;nbsp;firmware.&lt;/p&gt;</summary><content type="html">&lt;p&gt;I have a Creality &lt;span class="caps"&gt;CR&lt;/span&gt;-10S 3d printer that I purchased used, with many previous upgrades, in September 2020 (currently about 1.75 years ago). The printer has an original Creality v2.2 board in it. I&amp;#8217;ve been &lt;em&gt;extremely&lt;/em&gt; happy with it, especially with all of the existing upgrades that I didn&amp;#8217;t have to deal with. However, the printer did not have a bed leveling sensor and also had third-party (&lt;span class="caps"&gt;TH3D&lt;/span&gt; U1.R2.B5) Marlin-based firmware installed but no configuration file for that firmware. Recently I started having some printing issues that I believed were related to bed leveling issues (specifically a sagging bed) and I decided to add a &lt;a href="https://www.antclabs.com/bltouch"&gt;BLTouch&lt;/a&gt; and see if that helped. So, I ordered an off-brand BLTouch from Amazon, listed as &lt;a href="https://smile.amazon.com/gp/product/B088KLFPNV/"&gt;Creality Upgraded BLTouch V1 Auto Bed Leveling Sensor Kit Accessories for Creality Ender 3/ Ender 3 Pro/Ender 5/&lt;span class="caps"&gt;CR&lt;/span&gt; -10/&lt;span class="caps"&gt;CR&lt;/span&gt;-10S4/S5/&lt;span class="caps"&gt;CR20&lt;/span&gt;/20Pro&lt;/a&gt; (&lt;strong&gt;note:&lt;/strong&gt; This product has been updated, and is now a BLTouch&amp;nbsp;V2).&lt;/p&gt;
+&lt;p&gt;The process of both installing the sensor and updating my firmware to work with it were quite a bit more difficult than I&amp;#8217;d hoped or thought. The former because the installation instructions for the third-party BLTouch v1 clone were flat-out wrong for my &lt;span class="caps"&gt;CR&lt;/span&gt;-10S with a V2.2 board. The latter because with a printer with third-party firmware but no configuration file, I had to start from scratch determining what configuration options I had to&amp;nbsp;use.&lt;/p&gt;
+&lt;p&gt;To try to prevent anyone else from going through the same headaches, here is the process that I&amp;nbsp;used.&lt;/p&gt;
+&lt;h2 id="sensor-preparation"&gt;&lt;a class="toclink" href="#sensor-preparation"&gt;Sensor&amp;nbsp;Preparation&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;The sensor that I purchased was a BLTouch v1 clone. It came with a cable that had a small 5-pin &lt;span class="caps"&gt;JST&lt;/span&gt; connector on the probe end and two separate connectors on the board end, a 3-pin DuPont-style connector and a 2-pin &lt;span class="caps"&gt;JST&lt;/span&gt; connector. The first thing to do is disconnect your control box from your printer and confirm the correct wiring and connectors for your printer (see next section). Then if you (like me) have cable management on your extruder, you&amp;#8217;ll want to order or make extension cables for the BLTouch; the cables that come with it are far too short to use with any cable&amp;nbsp;management.&lt;/p&gt;
+&lt;h2 id="hardware-installation"&gt;&lt;a class="toclink" href="#hardware-installation"&gt;Hardware&amp;nbsp;Installation&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;Attach the probe to its bracket and the bracket to your extruder carriage. The bracket that came with mine works fine with a Micro-Swiss direct-drive&amp;nbsp;extruder.&lt;/p&gt;
+&lt;p&gt;Then route the cables to your main board and attach them. This was a big point of confusion to me, as my &lt;span class="caps"&gt;CR&lt;/span&gt;-10S has a Creality original V2.2 main board. The process for connecting the BLTouch v1 to this board is as&amp;nbsp;follows:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Throw out the instructions that came with the&amp;nbsp;probe.&lt;/li&gt;
+&lt;li&gt;Throw out the auxiliary adapter board that came with the&amp;nbsp;probe.&lt;/li&gt;
+&lt;li&gt;Disconnect the Z-axis limit switch (2-pin &lt;span class="caps"&gt;JST&lt;/span&gt; connector) from the main board (this is &lt;code&gt;Z-Min&lt;/code&gt; on the board) and connect the 2-pin &lt;span class="caps"&gt;JST&lt;/span&gt; connector from the probe in place of&amp;nbsp;it.&lt;/li&gt;
+&lt;li&gt;Find the &lt;code&gt;D11&lt;/code&gt; 3-pin header on the board; this is in a block of four 3-pin headers just inboard of the &lt;code&gt;EXP2&lt;/code&gt; ribbon going to the &lt;span class="caps"&gt;LCD&lt;/span&gt; display. Connect the 3-pin DuPont plug from the probe to &lt;code&gt;D11&lt;/code&gt;. The wires on this shoild be Red, Blue, Yellow; Red goes towards the outboard side of the main board, closest to &lt;code&gt;EXP2&lt;/code&gt;.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;That&amp;#8217;s it. No adapter boards or anything else crazy needed. Once you know that the instructions that came with the probe are &lt;strong&gt;not&lt;/strong&gt; for the V2 board, and find the correct instructions, it&amp;#8217;s easy. My process here is based on instructions that I found at &lt;a href="https://www.ifixit.com/Guide/CR-10S+BL+Touch+Install/128525"&gt;iFixIt&lt;/a&gt;.&lt;/p&gt;
+&lt;h2 id="firmware"&gt;&lt;a class="toclink" href="#firmware"&gt;Firmware&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;The most difficult part of this process, by far, was configuring my firmware for the BLTouch. I bought my printer second-hand and it came to me with third-party &lt;span class="caps"&gt;TH3D&lt;/span&gt; firmware on it (U1.R2.B5) but no configuration file for the firmware. After a bunch of research and trying to find the exact firmware that my printer had running, I decided that the best option would be to re-flash with &lt;a href="https://marlinfw.org/"&gt;Marlin 2 firmware&lt;/a&gt;, most especially so that I could take advantage of the new &lt;a href="https://marlinfw.org/docs/features/unified_bed_leveling.html"&gt;Unified Bed Leveling (&lt;span class="caps"&gt;UBL&lt;/span&gt;)&lt;/a&gt; system. I&amp;#8217;ve never flashed firmware on a 3D printer before, or even worked with &lt;span class="caps"&gt;AVR&lt;/span&gt; microcontrollers. It took quite a bunch of research, but here&amp;#8217;s what I came up&amp;nbsp;with.&lt;/p&gt;
+&lt;h3 id="preparation"&gt;&lt;a class="toclink" href="#preparation"&gt;Preparation&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;Just in case, I wanted to be able to revert back to what I currently had running. Note that I&amp;#8217;m running OctoPrint on an &lt;a href="https://github.com/guysoft/OctoPi"&gt;OctoPi&lt;/a&gt;, and that already includes &lt;a href="https://www.nongnu.org/avrdude/"&gt;avrdude&lt;/a&gt; for working with the firmware on &lt;span class="caps"&gt;AVR&lt;/span&gt;&amp;nbsp;microcontrollers.&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;In OctoPrint&amp;#8217;s terminal, run &lt;a href="https://marlinfw.org/docs/gcode/M115.html"&gt;M115&lt;/a&gt; to show information about the current firmware and capabilities; save this output&amp;nbsp;somewhere.&lt;/li&gt;
+&lt;li&gt;In OctoPrint&amp;#8217;s terminal, run &lt;a href="https://marlinfw.org/docs/gcode/M503.html"&gt;M503&lt;/a&gt; to report the current settings; save this output&amp;nbsp;somewhere.&lt;/li&gt;
+&lt;li&gt;On your OctoPrint machine, perform a backup of the current firmware/flash with &lt;code&gt;avrdude -p m2560 -c wiring -P /dev/ttyUSB0 -b 115200 -v -U flash:r:printerbackup.hex:i&lt;/code&gt; and a backup of the &lt;span class="caps"&gt;EEPROM&lt;/span&gt; using &lt;code&gt;avrdude -p m2560 -c wiring -P /dev/ttyUSB0 -b 115200 -v -U eeprom:r:printereeprom.hex:i&lt;/code&gt;.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id="compiling-and-flashing"&gt;&lt;a class="toclink" href="#compiling-and-flashing"&gt;Compiling and&amp;nbsp;Flashing&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;Note that the Creality V2.2 board doesn&amp;#8217;t need any adapter to flash; it can be flashed directly over&amp;nbsp;&lt;span class="caps"&gt;USB&lt;/span&gt;.&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Follow &lt;a href="https://marlinfw.org/docs/basics/install_arduino.html"&gt;Installing Marlin (Arduino)&lt;/a&gt; to set up the Arduino &lt;span class="caps"&gt;IDE&lt;/span&gt;; also install your distro&amp;#8217;s &lt;code&gt;arduino-cli&lt;/code&gt; package. Launch the &lt;span class="caps"&gt;IDE&lt;/span&gt; and install the &lt;code&gt;U8glib-HAL&lt;/code&gt; library.&lt;/li&gt;
+&lt;li&gt;Clone the &lt;a href="https://github.com/MarlinFirmware/Marlin"&gt;Marlin GitHub repo&lt;/a&gt; and check out the &lt;code&gt;2.0.9.3&lt;/code&gt; tag (the latest release at this&amp;nbsp;time).&lt;/li&gt;
+&lt;li&gt;Set up a configuration file for your printer. I started with the &lt;a href="https://github.com/MarlinFirmware/Configurations/tree/2.0.9.3/config/examples/Creality/CR-10S/CrealityV1"&gt;Marlin &lt;span class="caps"&gt;CR&lt;/span&gt;-10S example configuration for 2.0.9.3&lt;/a&gt; and then made a few rounds of changes based on trial and error. You can see my current configurations &lt;a href="https://github.com/jantman/3d-printed-things/tree/master/my-cr10s/marlin-configs"&gt;here&lt;/a&gt; and the changes that I made from the examples &lt;a href="https://github.com/jantman/3d-printed-things/compare/f546693de8de80a013b9e9aaaf2cbdb52dbe1175..bea951bc1a23f3d135ab831b52a8c6f2d92a2efa"&gt;here&lt;/a&gt;.&lt;/li&gt;
+&lt;li&gt;Copy all of those configuration files to the Marlin source repo&amp;nbsp;clone.&lt;/li&gt;
+&lt;li&gt;Build the firmware with &lt;code&gt;arduino-cli compile --fqbn arduino:avr:mega --export-binaries --verbose --clean Marlin.ino&lt;/code&gt;; this should generate &lt;code&gt;build/arduino.avr.mega/Marlin.ino.hex&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;Copy that file to your OctoPrint&amp;nbsp;machine.&lt;/li&gt;
+&lt;li&gt;In OctoPrint, disconnect from the printer if&amp;nbsp;connected.&lt;/li&gt;
+&lt;li&gt;Flash that to the printer with: &lt;code&gt;avrdude -p m2560 -c wiring -P /dev/ttyUSB0 -b 115200 -v -U flash:w:Marlin.ino.mega.hex:i&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;When the printer reboots, connect&amp;nbsp;OctoPrint.&lt;/li&gt;
+&lt;li&gt;In OctoPrint terminal, reset the &lt;span class="caps"&gt;EEPROM&lt;/span&gt; to factory defaults with &lt;a href="https://marlinfw.org/docs/gcode/M502.html"&gt;M502&lt;/a&gt; and then write that to &lt;span class="caps"&gt;EEPROM&lt;/span&gt; with &lt;a href="https://marlinfw.org/docs/gcode/M500.html"&gt;M500&lt;/a&gt;.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;From there, we can go on to configure automatic bed leveling (see next&amp;nbsp;section).&lt;/p&gt;
+&lt;p&gt;Note that I had some issues because I accidentally swapped the X and Y endstop (limit switch) connectors during all of this. To troubleshoot that, &lt;a href="https://marlinfw.org/docs/gcode/M119.html"&gt;M119&lt;/a&gt; will log the current state of all endstop sensors to the&amp;nbsp;terminal.&lt;/p&gt;
+&lt;h3 id="leveling-and-finishing-touches"&gt;&lt;a class="toclink" href="#leveling-and-finishing-touches"&gt;Leveling and Finishing&amp;nbsp;Touches&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;The rest of the bed leveling configuration was done according to the Marlin &lt;a href="https://marlinfw.org/docs/features/auto_bed_leveling.html"&gt;Automatic Bed Leveling&lt;/a&gt; documentation. In&amp;nbsp;short:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Send &lt;a href="https://marlinfw.org/docs/gcode/M420.html"&gt;M420&lt;/a&gt; to turn off bed&amp;nbsp;leveling.&lt;/li&gt;
+&lt;li&gt;Send &lt;a href="https://marlinfw.org/docs/gcode/M111.html"&gt;M111 247&lt;/a&gt; to turn on debug logging via the&amp;nbsp;terminal.&lt;/li&gt;
+&lt;li&gt;Send &lt;a href="https://marlinfw.org/docs/gcode/G028.html"&gt;G28&lt;/a&gt; to&amp;nbsp;auto-home.&lt;/li&gt;
+&lt;li&gt;Send &lt;a href="https://marlinfw.org/docs/gcode/G029.html"&gt;G29&lt;/a&gt; to begin bed&amp;nbsp;leveling.&lt;/li&gt;
+&lt;li&gt;Send &lt;a href="https://marlinfw.org/docs/gcode/G029.html"&gt;G29 P0&lt;/a&gt; to zero the mesh data and then &lt;a href="https://marlinfw.org/docs/gcode/G029.html"&gt;G29 P1&lt;/a&gt; to start Phase 1 bed leveling; this may take a while, as it probes up to 100&amp;nbsp;points.&lt;/li&gt;
+&lt;li&gt;Send &lt;a href="https://marlinfw.org/docs/gcode/G029.html"&gt;G29 P3&lt;/a&gt; to interpolate the rest of the points. Repeat as needed until the mesh is&amp;nbsp;complete.&lt;/li&gt;
+&lt;li&gt;Set the Z Offset using the Probe Offset Wizard in Marlin:&lt;ol&gt;
+&lt;li&gt;Heat build plate to 55 and nozzle to 210 (about average temperatures for&amp;nbsp;me).&lt;/li&gt;
+&lt;li&gt;Use the Probe Offset Wizard on the &lt;span class="caps"&gt;LCD&lt;/span&gt;:&lt;ol&gt;
+&lt;li&gt;Go to Configuration – Advanced Settings – Probe Offsets – Z Prob&amp;nbsp;Wizard&lt;/li&gt;
+&lt;li&gt;Select Move&amp;nbsp;0.1mm&lt;/li&gt;
+&lt;li&gt;Lower the z-axis by 0.1mm until you get to paper height from the build&amp;nbsp;plate&lt;/li&gt;
+&lt;li&gt;Closeout of that Move 0.1mm&amp;nbsp;window&lt;/li&gt;
+&lt;li&gt;Select&amp;nbsp;Done&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;li&gt;That gets me to a probe offset of -3.72. Running &lt;code&gt;M503&lt;/code&gt; confirms that: &lt;code&gt;Recv: echo:  M851 X-44.00 Y-9.00 Z-3.72 ; (mm)&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;Ok, let&amp;#8217;s save those settings: &lt;a href="https://marlinfw.org/docs/gcode/M500.html"&gt;M500&lt;/a&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;li&gt;Home the machine (&lt;a href="https://marlinfw.org/docs/gcode/G028.html"&gt;G28&lt;/a&gt;), set it back to relative positioning (&lt;a href="https://marlinfw.org/docs/gcode/G091.html"&gt;G91&lt;/a&gt;), and try a test print. Maybe the best print to do is the Marlin built-in Mesh Validation pattern, which can be printed with &lt;a href="https://marlinfw.org/docs/gcode/G026.html"&gt;G26&lt;/a&gt;.&lt;/li&gt;
+&lt;li&gt;Update OctoPrint and Cura scripts (see below). Install the &lt;a href="https://plugins.octoprint.org/plugins/bedlevelvisualizer/"&gt;Bed Visualizer&lt;/a&gt; plugin in OctoPrint, update its GCode as shown below, and run it to see what your bed mesh looks&amp;nbsp;like.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Note that I experienced an issue where after homing, the print would start with the middle of the build plate as the origin. I fixed this in my slicer (Cura) as shown&amp;nbsp;below.&lt;/p&gt;
+&lt;h3 id="cura-updates"&gt;&lt;a class="toclink" href="#cura-updates"&gt;Cura&amp;nbsp;Updates&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;My printer profile in Cura had the following near the middle of its Start&amp;nbsp;G-Code:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;G28 ;Home
+
+G92 E0 ;Reset Extruder
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;This just needs to be changed to enable Automatic Bed Leveling after&amp;nbsp;homing:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;G28 ;Home
+G29 A ; enable &lt;span class="caps"&gt;UBL&lt;/span&gt;
+G92 E0 ;Reset Extruder
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h3 id="octoprint-updates"&gt;&lt;a class="toclink" href="#octoprint-updates"&gt;OctoPrint&amp;nbsp;Updates&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;In OctoPrint Settings -&amp;gt; Printer -&amp;gt; &lt;span class="caps"&gt;GCODE&lt;/span&gt; Scripts set the &amp;#8220;Before print job starts&amp;#8221; script to load the mesh from slot 0 and enable automatic&amp;nbsp;leveling:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;G29 L0 ; load &lt;span class="caps"&gt;UBL&lt;/span&gt; mesh from slot 0
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;In the Bed Visualizer plugin, we want it to just show the existing mesh, not re-calculate anything. Set its GCode&amp;nbsp;to:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;M155 S30  ; reduce temperature reporting rate to reduce output pollution
+@&lt;span class="caps"&gt;BEDLEVELVISUALIZER&lt;/span&gt;    ; tell the plugin to watch for reported mesh
+G29 T           ; View the Z compensation values.
+M155 S3   ; reset temperature reporting
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h3 id="re-calculating-the-mesh"&gt;&lt;a class="toclink" href="#re-calculating-the-mesh"&gt;Re-Calculating the&amp;nbsp;Mesh&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;You&amp;#8217;ll want to re-calculate the bed mesh from time to time to make sure it&amp;#8217;s accurate. To do this, use the following&amp;nbsp;GCode:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;G28       ; home all axes
+M420 S0   ; Turning off bed leveling while probing, if firmware is set to restore after G28
+M190 S55  ; (optional) wait for the bed to get up to temperature
+G29 P1    ; automatically populate mesh with all reachable points
+G29 P3 T   ; infer the rest of the mesh values
+G29 P3 T  ; infer the rest of the mesh values again, keep running until mesh complete
+
+G29 S0 ; enabled leveling and report the new mesh, saving it to slot 0
+G29 F 10.0 ; Set Fade Height for correction at 10.0 mm.
+G29 A     ; Activate the &lt;span class="caps"&gt;UBL&lt;/span&gt; System.
+M420 S1 ; enable bed leveling
+M500      ; save the current setup to &lt;span class="caps"&gt;EEPROM&lt;/span&gt;
+M140 S0   ; cooling down the bed
+&lt;/pre&gt;&lt;/div&gt;</content><category term="printing"></category><category term="3d printing"></category><category term="octoprint"></category><category term="octopi"></category><category term="diy"></category><category term="creality"></category><category term="cr-10s"></category></entry><entry><title>OctoPrint Power Outage Handling</title><link href="https://blog.jasonantman.com/2021/03/octoprint-power-outage-handling/" rel="alternate"></link><published>2021-03-28T08:44:00-04:00</published><updated>2021-03-28T08:44:00-04:00</updated><author><name>Jason Antman</name></author><id>tag:blog.jasonantman.com,2021-03-28:/2021/03/octoprint-power-outage-handling/</id><summary type="html">&lt;p&gt;My simple method of handling power outages during OctoPrint 3d&amp;nbsp;printing.&lt;/p&gt;</summary><content type="html">&lt;p&gt;One of my recent interests has been 3D printing. A few months ago I obtained a used &lt;a href="https://www.creality.com/goods-detail/cr-10s-3d-printer"&gt;Creality &lt;span class="caps"&gt;CR&lt;/span&gt;-10S&lt;/a&gt; 3d printer and started doing some work with it. I even &lt;a href="https://www.thingiverse.com/jantman/designs"&gt;designed&lt;/a&gt; and &lt;a href="https://www.thingiverse.com/jantman/makes"&gt;printed&lt;/a&gt; some parts for it, and designed my new workbench around it. However, about eighteen hours into a twenty-hour print, my neighborhood suffered a power outage. It only lasted about twenty minutes, but the print was ruined and I had to start over. This was clearly a&amp;nbsp;problem.&lt;/p&gt;
 &lt;p&gt;I&amp;#8217;m using the absolutely wonderful &lt;a href="https://octoprint.org/"&gt;OctoPrint&lt;/a&gt; project to drive my printer, running on a RaspberryPi-based &lt;a href="https://github.com/guysoft/OctoPi"&gt;OctoPi&lt;/a&gt;. I did a bunch of research online, but it turns out that solving the general case of handling power outages is quite difficult, and not likely to be supported any time soon. However, I&amp;#8217;ve been able to come up with a workable solution made up of a few common tools. I thought I&amp;#8217;d share it with anyone else it may&amp;nbsp;benefit.&lt;/p&gt;
 &lt;p&gt;I had an extra &lt;span class="caps"&gt;UPS&lt;/span&gt; lying around - an &lt;span class="caps"&gt;APC&lt;/span&gt; BackUPS 1000 (&lt;span class="caps"&gt;1000VA&lt;/span&gt;) - so that seemed like an ideal solution to the problem. Unfortunately, when a print is in progress, the &lt;span class="caps"&gt;1000VA&lt;/span&gt; &lt;span class="caps"&gt;UPS&lt;/span&gt; will only power the OctoPi (Raspberry &lt;span class="caps"&gt;PI&lt;/span&gt; 4) and printer for about six minutes. This is mainly because of the immense power needs of the stepper motors and bed and extruder heaters. Luckily, there&amp;#8217;s a&amp;nbsp;solution.&lt;/p&gt;
 &lt;p&gt;After spending some time in the OctoPrint documentation and forums, I was able to come up with a pair of GCode scripts that move the hotend off the print and disable the heaters when a print is paused, and then revert those changes when the print is resumed. It&amp;#8217;s worth noting that this is far from foolproof, as disabling the heaters and moving the head around in the middle of a print can cause all sorts of problems&amp;#8230; but it&amp;#8217;s better than nothing. The following scripts are set in OctoPrint settings on the &lt;span class="caps"&gt;GCODE&lt;/span&gt; scripts&amp;nbsp;tab:&lt;/p&gt;

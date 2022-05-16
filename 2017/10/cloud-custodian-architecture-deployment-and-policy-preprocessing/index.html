@@ -287,35 +287,35 @@ individual policies but still keep some mandatory&nbsp;settings.</p>
 <p><a name="defaultsyml"></a>
 Our <code>defaults.yml</code> file currently looks like&nbsp;this:</p>
 <div class="highlight"><pre><span></span><span class="c1"># <span class="caps">IMPORTANT</span> <span class="caps">NOTE</span>: **<span class="caps">ALL</span>** policies will have an additional notification action for the Splunk <span class="caps">SQS</span> queue</span>
-<span class="nt">mode</span><span class="p">:</span>
-  <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">periodic</span>
+<span class="l l-Scalar l-Scalar-Plain">mode</span><span class="p p-Indicator">:</span>
+  <span class="l l-Scalar l-Scalar-Plain">type</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">periodic</span>
   <span class="c1"># This will trigger our rules at 15:20 <span class="caps">UTC</span> (11:20 <span class="caps">EDT</span> / 10:20 <span class="caps">EST</span>)</span>
   <span class="c1"># it might be better to spread them out over time a bit, but right now our</span>
   <span class="c1"># main concern is ensuring that policies run during work hours.</span>
-  <span class="nt">schedule</span><span class="p">:</span> <span class="s">&#39;cron(20</span><span class="nv"> </span><span class="s">15</span><span class="nv"> </span><span class="s">*</span><span class="nv"> </span><span class="s">*</span><span class="nv"> </span><span class="s">?</span><span class="nv"> </span><span class="s">*)&#39;</span>
-  <span class="nt">timeout</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">300</span>
-  <span class="nt">execution-options</span><span class="p">:</span>
-    <span class="nt">log_group</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">/cloud-custodian/123456789012/us-east-1</span>
-    <span class="nt">output_dir</span><span class="p">:</span> <span class="s">&#39;s3://<span class="caps">SOME</span>-<span class="caps">BUCKET</span>-<span class="caps">NAME</span>/logs&#39;</span>
-  <span class="nt">dead_letter_config</span><span class="p">:</span>
-    <span class="nt">TargetArn</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">arn:aws:sqs:us-east-1:123456789012:cloud-custodian-123456789012-deadletter</span>
-  <span class="nt">role</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">arn:aws:iam::123456789012:role/cloud-custodian-123456789012</span>
-  <span class="nt">tags</span><span class="p">:</span>
-    <span class="nt">Project</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">cloud-custodian</span>
-    <span class="nt">Environment</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">dev</span>
-    <span class="nt">OwnerEmail</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">us@example.com</span>
-<span class="nt">actions</span><span class="p">:</span>
-  <span class="p p-Indicator">-</span> <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">notify</span>
-    <span class="nt">questions_email</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">us@example.com</span>
-    <span class="nt">questions_slack</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">ourChannelName</span>
-    <span class="nt">template</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">redefault.html</span>
-    <span class="nt">to</span><span class="p">:</span>
+  <span class="l l-Scalar l-Scalar-Plain">schedule</span><span class="p p-Indicator">:</span> <span class="s">&#39;cron(20</span><span class="nv"> </span><span class="s">15</span><span class="nv"> </span><span class="s">*</span><span class="nv"> </span><span class="s">*</span><span class="nv"> </span><span class="s">?</span><span class="nv"> </span><span class="s">*)&#39;</span>
+  <span class="l l-Scalar l-Scalar-Plain">timeout</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">300</span>
+  <span class="l l-Scalar l-Scalar-Plain">execution-options</span><span class="p p-Indicator">:</span>
+    <span class="l l-Scalar l-Scalar-Plain">log_group</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">/cloud-custodian/123456789012/us-east-1</span>
+    <span class="l l-Scalar l-Scalar-Plain">output_dir</span><span class="p p-Indicator">:</span> <span class="s">&#39;s3://<span class="caps">SOME</span>-<span class="caps">BUCKET</span>-<span class="caps">NAME</span>/logs&#39;</span>
+  <span class="l l-Scalar l-Scalar-Plain">dead_letter_config</span><span class="p p-Indicator">:</span>
+    <span class="l l-Scalar l-Scalar-Plain">TargetArn</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">arn:aws:sqs:us-east-1:123456789012:cloud-custodian-123456789012-deadletter</span>
+  <span class="l l-Scalar l-Scalar-Plain">role</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">arn:aws:iam::123456789012:role/cloud-custodian-123456789012</span>
+  <span class="l l-Scalar l-Scalar-Plain">tags</span><span class="p p-Indicator">:</span>
+    <span class="l l-Scalar l-Scalar-Plain">Project</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">cloud-custodian</span>
+    <span class="l l-Scalar l-Scalar-Plain">Environment</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">dev</span>
+    <span class="l l-Scalar l-Scalar-Plain">OwnerEmail</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">us@example.com</span>
+<span class="l l-Scalar l-Scalar-Plain">actions</span><span class="p p-Indicator">:</span>
+  <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">type</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">notify</span>
+    <span class="l l-Scalar l-Scalar-Plain">questions_email</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">us@example.com</span>
+    <span class="l l-Scalar l-Scalar-Plain">questions_slack</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">ourChannelName</span>
+    <span class="l l-Scalar l-Scalar-Plain">template</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">redefault.html</span>
+    <span class="l l-Scalar l-Scalar-Plain">to</span><span class="p p-Indicator">:</span>
       <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">resource-owner</span>
       <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">us@example.com</span>
       <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">awsusers@example.com</span>
-    <span class="nt">transport</span><span class="p">:</span>
-      <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">sqs</span>
-      <span class="nt">queue</span><span class="p">:</span> <span class="s">&#39;https://sqs.us-east-1.amazonaws.com/123456789012/cloud-custodian-123456789012&#39;</span>
+    <span class="l l-Scalar l-Scalar-Plain">transport</span><span class="p p-Indicator">:</span>
+      <span class="l l-Scalar l-Scalar-Plain">type</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">sqs</span>
+      <span class="l l-Scalar l-Scalar-Plain">queue</span><span class="p p-Indicator">:</span> <span class="s">&#39;https://sqs.us-east-1.amazonaws.com/123456789012/cloud-custodian-123456789012&#39;</span>
 </pre></div>
 
 
@@ -328,21 +328,21 @@ using <span class="caps">SQS</span> to&nbsp;c7n-mailer.</p>
 policy that emails us about any <span class="caps">VPC</span> Peering Connections in a state other than
 &#8220;active&#8221; would look&nbsp;like:</p>
 <div class="highlight"><pre><span></span><span class="c1"># <span class="caps">REMINDER</span>: defaults.yml will be merged in to this. See the <span class="caps">README</span>.</span>
-<span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">inactive-vpc-peers</span>
-<span class="nt">comment</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Notify <span class="caps">RE</span> of any <span class="caps">VPC</span> Peering Connections not in Active state (i.e. pending-acceptance, failed, etc.)</span>
-<span class="nt">resource</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">peering-connection</span>
-<span class="nt">filters</span><span class="p">:</span>
+<span class="l l-Scalar l-Scalar-Plain">name</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">inactive-vpc-peers</span>
+<span class="l l-Scalar l-Scalar-Plain">comment</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">Notify <span class="caps">RE</span> of any <span class="caps">VPC</span> Peering Connections not in Active state (i.e. pending-acceptance, failed, etc.)</span>
+<span class="l l-Scalar l-Scalar-Plain">resource</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">peering-connection</span>
+<span class="l l-Scalar l-Scalar-Plain">filters</span><span class="p p-Indicator">:</span>
   <span class="c1"># Peering Connection not in &quot;active&quot; state</span>
-  <span class="p p-Indicator">-</span> <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">value</span>
-    <span class="nt">key</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Status.Code</span>
-    <span class="nt">op</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">ne</span>
-    <span class="nt">value</span><span class="p">:</span> <span class="s">&quot;active&quot;</span>
-<span class="nt">actions</span><span class="p">:</span>
-  <span class="p p-Indicator">-</span> <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">notify</span>
-    <span class="nt">violation_desc</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">The following <span class="caps">VPC</span> Peering Connections are in a state other than &quot;active&quot;</span>
-    <span class="nt">action_desc</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">likely need to be accepted, deleted, or investigated.</span>
-    <span class="nt">subject</span><span class="p">:</span> <span class="s">&#39;[cloud-custodian</span><span class="nv"> </span><span class="s">{{</span><span class="nv"> </span><span class="s">account</span><span class="nv"> </span><span class="s">}}]</span><span class="nv"> </span><span class="s"><span class="caps">VPC</span></span><span class="nv"> </span><span class="s">Peering</span><span class="nv"> </span><span class="s">Connections</span><span class="nv"> </span><span class="s">not</span><span class="nv"> </span><span class="s">in</span><span class="nv"> </span><span class="s">Active</span><span class="nv"> </span><span class="s">state</span><span class="nv"> </span><span class="s">{{</span><span class="nv"> </span><span class="s">region</span><span class="nv"> </span><span class="s">}}&#39;</span>
-    <span class="nt">to</span><span class="p">:</span>
+  <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">type</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">value</span>
+    <span class="l l-Scalar l-Scalar-Plain">key</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">Status.Code</span>
+    <span class="l l-Scalar l-Scalar-Plain">op</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">ne</span>
+    <span class="l l-Scalar l-Scalar-Plain">value</span><span class="p p-Indicator">:</span> <span class="s">&quot;active&quot;</span>
+<span class="l l-Scalar l-Scalar-Plain">actions</span><span class="p p-Indicator">:</span>
+  <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">type</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">notify</span>
+    <span class="l l-Scalar l-Scalar-Plain">violation_desc</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">The following <span class="caps">VPC</span> Peering Connections are in a state other than &quot;active&quot;</span>
+    <span class="l l-Scalar l-Scalar-Plain">action_desc</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">likely need to be accepted, deleted, or investigated.</span>
+    <span class="l l-Scalar l-Scalar-Plain">subject</span><span class="p p-Indicator">:</span> <span class="s">&#39;[cloud-custodian</span><span class="nv"> </span><span class="s">{{</span><span class="nv"> </span><span class="s">account</span><span class="nv"> </span><span class="s">}}]</span><span class="nv"> </span><span class="s"><span class="caps">VPC</span></span><span class="nv"> </span><span class="s">Peering</span><span class="nv"> </span><span class="s">Connections</span><span class="nv"> </span><span class="s">not</span><span class="nv"> </span><span class="s">in</span><span class="nv"> </span><span class="s">Active</span><span class="nv"> </span><span class="s">state</span><span class="nv"> </span><span class="s">{{</span><span class="nv"> </span><span class="s">region</span><span class="nv"> </span><span class="s">}}&#39;</span>
+    <span class="l l-Scalar l-Scalar-Plain">to</span><span class="p p-Indicator">:</span>
       <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">us@example.com</span>
 </pre></div>
 
@@ -494,7 +494,7 @@ am not the authoritative source for, so I&#8217;m just going to leave it inline&
 
 <span class="c">{# This macro creates a row in the table #}</span>
 <span class="cp">{%</span> <span class="k">macro</span> <span class="nv">tableRow</span><span class="o">(</span><span class="nv">resource</span><span class="o">,</span> <span class="nv">columnNames</span><span class="o">,</span> <span class="nv">loop_idx</span><span class="o">,</span> <span class="nv">res_len</span><span class="o">)</span> <span class="cp">%}</span>
-    <span class="cp">{%</span> <span class="k">if</span> <span class="nv">loop_idx</span> <span class="o">%</span> <span class="m">2</span> <span class="o">==</span> <span class="m">0</span> <span class="cp">%}</span>
+    <span class="cp">{%</span> <span class="k">if</span> <span class="nv">loop_idx</span> <span class="p">%</span> <span class="m">2</span> <span class="o">==</span> <span class="m">0</span> <span class="cp">%}</span>
     <span class="p">&lt;</span><span class="nt">tr</span> <span class="na">style</span><span class="o">=</span><span class="s">&quot;background-color: #f2f2f2;&quot;</span><span class="p">&gt;</span>
     <span class="cp">{%</span> <span class="k">else</span> <span class="cp">%}</span>
     <span class="p">&lt;</span><span class="nt">tr</span><span class="p">&gt;</span>
@@ -505,10 +505,10 @@ am not the authoritative source for, so I&#8217;m just going to leave it inline&
         <span class="c">{# last row in table #}</span>
         <span class="cp">{%</span> <span class="k">if</span> <span class="nb">loop</span><span class="nv">.index</span> <span class="o">==</span> <span class="m">1</span> <span class="cp">%}</span>
           <span class="c">{# first td in row #}</span>
-          <span class="cp">{%</span> <span class="k">set</span> <span class="nv">tdpart</span> <span class="o">=</span> <span class="s2">&quot;%s border-bottom-left-radius: 7px;&quot;</span> <span class="o">%</span> <span class="nv">tdpart</span> <span class="cp">%}</span>
+          <span class="cp">{%</span> <span class="k">set</span> <span class="nv">tdpart</span> <span class="o">=</span> <span class="s2">&quot;%s border-bottom-left-radius: 7px;&quot;</span> <span class="p">%</span> <span class="nv">tdpart</span> <span class="cp">%}</span>
         <span class="cp">{%</span> <span class="k">elif</span> <span class="nb">loop</span><span class="nv">.index</span> <span class="o">==</span> <span class="nv">columnNames</span><span class="o">|</span><span class="nf">length</span> <span class="cp">%}</span>
           <span class="c">{# last td in row #}</span>
-          <span class="cp">{%</span> <span class="k">set</span> <span class="nv">tdpart</span> <span class="o">=</span> <span class="s2">&quot;%s border-bottom-right-radius: 7px;&quot;</span> <span class="o">%</span> <span class="nv">tdpart</span> <span class="cp">%}</span>
+          <span class="cp">{%</span> <span class="k">set</span> <span class="nv">tdpart</span> <span class="o">=</span> <span class="s2">&quot;%s border-bottom-right-radius: 7px;&quot;</span> <span class="p">%</span> <span class="nv">tdpart</span> <span class="cp">%}</span>
         <span class="cp">{%</span> <span class="k">endif</span> <span class="cp">%}</span>
       <span class="cp">{%</span> <span class="k">endif</span> <span class="cp">%}</span>
       <span class="cp">{%</span> <span class="k">if</span> <span class="nv">columnName</span> <span class="k">in</span> <span class="nv">requiredTags</span> <span class="cp">%}</span>
@@ -1011,17 +1011,17 @@ am not the authoritative source for, so I&#8217;m just going to leave it inline&
             <span class="n">result</span><span class="p">[</span><span class="s1">&#39;policies&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_apply_defaults</span><span class="p">(</span><span class="n">defaults</span><span class="p">,</span> <span class="n">policies</span><span class="p">[</span><span class="n">k</span><span class="p">])</span>
             <span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Generating c7n cleanup policies...&#39;</span><span class="p">)</span>
+        <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Generating c7n cleanup policies...&#39;</span><span class="p">)</span>
         <span class="c1"># add c7n lambda/<span class="caps">CW</span> Even cleanup policies</span>
         <span class="k">for</span> <span class="n">pol</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_generate_cleanup_policies</span><span class="p">(</span>
             <span class="n">deepcopy</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="s1">&#39;policies&#39;</span><span class="p">])</span>
         <span class="p">):</span>
             <span class="n">result</span><span class="p">[</span><span class="s1">&#39;policies&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_apply_defaults</span><span class="p">(</span><span class="n">defaults</span><span class="p">,</span> <span class="n">pol</span><span class="p">))</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Checking policies for sanity and safety...&#39;</span><span class="p">)</span>
+        <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Checking policies for sanity and safety...&#39;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_check_policies</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="s1">&#39;policies&#39;</span><span class="p">])</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Writing policies to custodian.yml...&#39;</span><span class="p">)</span>
+        <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Writing policies to custodian.yml...&#39;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_write_file</span><span class="p">(</span><span class="s1">&#39;custodian.yml&#39;</span><span class="p">,</span> <span class="n">yaml</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">result</span><span class="p">))</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Writing policy descriptions to policies.rst...&#39;</span><span class="p">)</span>
+        <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Writing policy descriptions to policies.rst...&#39;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_write_file</span><span class="p">(</span><span class="s1">&#39;policies.rst&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_policy_rst</span><span class="p">(</span><span class="n">policies</span><span class="p">))</span>
 
     <span class="k">def</span> <span class="nf">_check_policies</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">policies</span><span class="p">):</span>
@@ -1040,7 +1040,7 @@ am not the authoritative source for, so I&#8217;m just going to leave it inline&
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">policy_checks</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">dir</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-            <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;_check_policy_&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">callable</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">)):</span>
+            <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;_check_policy_&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">callable</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">)):</span>
                 <span class="n">policy_checks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">))</span>
         <span class="n">failures</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">pol</span> <span class="ow">in</span> <span class="n">policies</span><span class="p">:</span>
@@ -1048,30 +1048,30 @@ am not the authoritative source for, so I&#8217;m just going to leave it inline&
                 <span class="k">if</span> <span class="ow">not</span> <span class="n">chk</span><span class="p">(</span><span class="n">pol</span><span class="p">):</span>
                     <span class="n">failures</span><span class="p">[</span><span class="n">pol</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">strip_doc</span><span class="p">(</span><span class="n">chk</span><span class="p">))</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">failures</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;<span class="caps">ERROR</span>: Some policies failed sanity/safety checks:&#39;</span><span class="p">)</span>
+            <span class="k">print</span><span class="p">(</span><span class="s1">&#39;<span class="caps">ERROR</span>: Some policies failed sanity/safety checks:&#39;</span><span class="p">)</span>
             <span class="k">for</span> <span class="n">pol_name</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">failures</span><span class="o">.</span><span class="n">keys</span><span class="p">()):</span>
-                <span class="nb">print</span><span class="p">(</span><span class="n">pol_name</span><span class="p">)</span>
+                <span class="k">print</span><span class="p">(</span><span class="n">pol_name</span><span class="p">)</span>
                 <span class="k">for</span> <span class="n">chk_str</span> <span class="ow">in</span> <span class="n">failures</span><span class="p">[</span><span class="n">pol_name</span><span class="p">]:</span>
-                    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="n">chk_str</span><span class="p">)</span>
+                    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="n">chk_str</span><span class="p">)</span>
             <span class="k">raise</span> <span class="ne">SystemExit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;<span class="caps">OK</span>: All policies passed sanity/safety checks.&#39;</span><span class="p">)</span>
+        <span class="k">print</span><span class="p">(</span><span class="s1">&#39;<span class="caps">OK</span>: All policies passed sanity/safety checks.&#39;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_check_policy_marked_for_op_first</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">policy</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Policy includes a marked-for-op filter, but it is not the first filter.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="s1">&#39;filters&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">policy</span><span class="p">:</span>
-            <span class="k">return</span> <span class="kc">True</span>
+            <span class="k">return</span> <span class="bp">True</span>
         <span class="k">if</span> <span class="s2">&quot;&#39;type&#39;: &#39;marked-for-op&#39;&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="nb">str</span><span class="p">(</span><span class="n">policy</span><span class="p">[</span><span class="s1">&#39;filters&#39;</span><span class="p">]):</span>
-            <span class="k">return</span> <span class="kc">True</span>
+            <span class="k">return</span> <span class="bp">True</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">policy</span><span class="p">[</span><span class="s1">&#39;filters&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;type&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="s1">&#39;marked-for-op&#39;</span><span class="p">:</span>
-                <span class="k">return</span> <span class="kc">True</span>
+                <span class="k">return</span> <span class="bp">True</span>
         <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
             <span class="c1"># first filter isn&#39;t even a dict; that&#39;s a failure</span>
             <span class="k">pass</span>
         <span class="c1"># fail - first filter isn&#39;t marked-for-op</span>
-        <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="bp">False</span>
 
     <span class="k">def</span> <span class="nf">_check_policy_mark_but_no_tag_filter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">policy</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -1079,9 +1079,9 @@ am not the authoritative source for, so I&#8217;m just going to leave it inline&
 <span class="sd">        marked with that tag.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="s1">&#39;filters&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">policy</span><span class="p">:</span>
-            <span class="k">return</span> <span class="kc">True</span>
+            <span class="k">return</span> <span class="bp">True</span>
         <span class="k">if</span> <span class="s1">&#39;actions&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">policy</span><span class="p">:</span>
-            <span class="k">return</span> <span class="kc">True</span>
+            <span class="k">return</span> <span class="bp">True</span>
         <span class="n">mark_tags</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">policy</span><span class="p">[</span><span class="s1">&#39;actions&#39;</span><span class="p">]:</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="nb">type</span><span class="p">({})):</span>
@@ -1093,8 +1093,8 @@ am not the authoritative source for, so I&#8217;m just going to leave it inline&
         <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">mark_tags</span><span class="p">:</span>
             <span class="n">tag_filter</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;tag:</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">t</span><span class="p">:</span> <span class="s1">&#39;absent&#39;</span><span class="p">}</span>
             <span class="k">if</span> <span class="n">tag_filter</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">policy</span><span class="p">[</span><span class="s1">&#39;filters&#39;</span><span class="p">]:</span>
-                <span class="k">return</span> <span class="kc">False</span>
-        <span class="k">return</span> <span class="kc">True</span>
+                <span class="k">return</span> <span class="bp">False</span>
+        <span class="k">return</span> <span class="bp">True</span>
 
     <span class="k">def</span> <span class="nf">_generate_cleanup_policies</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">policies</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -1259,7 +1259,7 @@ am not the authoritative source for, so I&#8217;m just going to leave it inline&
     <span class="k">def</span> <span class="nf">_array_merge</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">base</span><span class="p">,</span> <span class="n">update</span><span class="p">,</span> <span class="n">policy_name</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;this starts with update, and adds things from base&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">base</span><span class="p">,</span> <span class="nb">type</span><span class="p">([])):</span>
-            <span class="nb">print</span><span class="p">(</span>
+            <span class="k">print</span><span class="p">(</span>
                 <span class="s1">&#39;<span class="caps">ERROR</span>: policy has an array but defaults does not; cannot merge&#39;</span>
             <span class="p">)</span>
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
@@ -1274,8 +1274,8 @@ am not the authoritative source for, so I&#8217;m just going to leave it inline&
                 <span class="k">if</span> <span class="n">v</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">update</span><span class="p">:</span>
                     <span class="n">update</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
                 <span class="k">continue</span>
-            <span class="n">t</span> <span class="o">=</span> <span class="n">v</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;type&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">t</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">t</span> <span class="o">=</span> <span class="n">v</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;type&#39;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">t</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;Do not know how to handle a defaults &#39;</span>
                                    <span class="s1">&#39;dict without a &quot;type&quot; key.&#39;</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">def_dicts</span><span class="p">:</span>
@@ -1287,8 +1287,8 @@ am not the authoritative source for, so I&#8217;m just going to leave it inline&
             <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="nb">type</span><span class="p">({})):</span>
                 <span class="k">continue</span>
             <span class="c1"># else it&#39;s a dict, update from defaults if present</span>
-            <span class="n">t</span> <span class="o">=</span> <span class="n">i</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;type&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">t</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">t</span> <span class="o">=</span> <span class="n">i</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;type&#39;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">t</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
                 <span class="k">continue</span>
             <span class="k">if</span> <span class="n">t</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">def_dicts</span><span class="p">:</span>
                 <span class="c1"># no defaults for this</span>
@@ -1351,7 +1351,7 @@ am not the authoritative source for, so I&#8217;m just going to leave it inline&
                         <span class="n">f</span><span class="p">,</span> <span class="n">y</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
                     <span class="p">)</span>
                 <span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Loaded </span><span class="si">%d</span><span class="s1"> policies: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">res</span><span class="p">),</span> <span class="n">res</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span>
+        <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Loaded </span><span class="si">%d</span><span class="s1"> policies: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">res</span><span class="p">),</span> <span class="n">res</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span>
         <span class="k">return</span> <span class="n">res</span>
 
     <span class="k">def</span> <span class="nf">_read_file_yaml</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
@@ -1417,7 +1417,7 @@ am not the authoritative source for, so I&#8217;m just going to leave it inline&
         <span class="bp">self</span><span class="o">.</span><span class="n">cls</span><span class="o">.</span><span class="n">SPLUNK_SQS</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;Splunk&#39;</span><span class="p">:</span> <span class="s1">&#39;<span class="caps">SQS</span>&#39;</span><span class="p">}</span>
 
     <span class="k">def</span> <span class="nf">test_init</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">with</span> <span class="n">patch</span><span class="p">(</span><span class="s1">&#39;policygen.PolicyGen._read_file_yaml&#39;</span><span class="p">,</span> <span class="n">autospec</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="k">as</span> <span class="n">m</span><span class="p">:</span>
+        <span class="k">with</span> <span class="n">patch</span><span class="p">(</span><span class="s1">&#39;policygen.PolicyGen._read_file_yaml&#39;</span><span class="p">,</span> <span class="n">autospec</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span> <span class="k">as</span> <span class="n">m</span><span class="p">:</span>
             <span class="n">m</span><span class="o">.</span><span class="n">return_value</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;queue_url&#39;</span><span class="p">:</span> <span class="s1">&#39;myurl&#39;</span><span class="p">}</span>
             <span class="bp">cls</span> <span class="o">=</span> <span class="n">policygen</span><span class="o">.</span><span class="n">PolicyGen</span><span class="p">()</span>
         <span class="k">assert</span> <span class="bp">cls</span><span class="o">.</span><span class="n">SPLUNK_SQS</span><span class="p">[</span><span class="s1">&#39;transport&#39;</span><span class="p">][</span><span class="s1">&#39;queue&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;myurl&#39;</span>
@@ -1688,7 +1688,7 @@ am not the authoritative source for, so I&#8217;m just going to leave it inline&
         <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">cls</span><span class="o">.</span><span class="n">_apply_defaults</span><span class="p">(</span><span class="n">defaults</span><span class="p">,</span> <span class="n">policy</span><span class="p">)</span> <span class="o">==</span> <span class="n">expected</span>
 
     <span class="k">def</span> <span class="nf">test_apply_defaults_merge_call</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">with</span> <span class="n">patch</span><span class="p">(</span><span class="s1">&#39;policygen.PolicyGen._merge_conf&#39;</span><span class="p">,</span> <span class="n">autospec</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="k">as</span> <span class="n">m</span><span class="p">:</span>
+        <span class="k">with</span> <span class="n">patch</span><span class="p">(</span><span class="s1">&#39;policygen.PolicyGen._merge_conf&#39;</span><span class="p">,</span> <span class="n">autospec</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span> <span class="k">as</span> <span class="n">m</span><span class="p">:</span>
             <span class="n">m</span><span class="o">.</span><span class="n">return_value</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;mode&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;foo&#39;</span><span class="p">}}</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">cls</span><span class="o">.</span><span class="n">_apply_defaults</span><span class="p">({},</span> <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;pname&#39;</span><span class="p">})</span>
         <span class="k">assert</span> <span class="n">m</span><span class="o">.</span><span class="n">mock_calls</span> <span class="o">==</span> <span class="p">[</span>
@@ -1839,13 +1839,13 @@ am not the authoritative source for, so I&#8217;m just going to leave it inline&
         <span class="bp">self</span><span class="o">.</span><span class="n">cls</span> <span class="o">=</span> <span class="n">policygen</span><span class="o">.</span><span class="n">PolicyGen</span><span class="p">()</span>
 
     <span class="k">def</span> <span class="nf">test_write</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">with</span> <span class="n">patch</span><span class="p">(</span><span class="s1">&#39;policygen.open&#39;</span><span class="p">,</span> <span class="n">mock_open</span><span class="p">(),</span> <span class="n">create</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="k">as</span> <span class="n">m_open</span><span class="p">:</span>
+        <span class="k">with</span> <span class="n">patch</span><span class="p">(</span><span class="s1">&#39;policygen.open&#39;</span><span class="p">,</span> <span class="n">mock_open</span><span class="p">(),</span> <span class="n">create</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span> <span class="k">as</span> <span class="n">m_open</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">cls</span><span class="o">.</span><span class="n">_write_file</span><span class="p">(</span><span class="s1">&#39;fpath&#39;</span><span class="p">,</span> <span class="s1">&#39;fcontent&#39;</span><span class="p">)</span>
         <span class="k">assert</span> <span class="n">m_open</span><span class="o">.</span><span class="n">mock_calls</span> <span class="o">==</span> <span class="p">[</span>
             <span class="n">call</span><span class="p">(</span><span class="s1">&#39;fpath&#39;</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">),</span>
             <span class="n">call</span><span class="p">()</span><span class="o">.</span><span class="fm">__enter__</span><span class="p">(),</span>
             <span class="n">call</span><span class="p">()</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;fcontent&#39;</span><span class="p">),</span>
-            <span class="n">call</span><span class="p">()</span><span class="o">.</span><span class="fm">__exit__</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="n">call</span><span class="p">()</span><span class="o">.</span><span class="fm">__exit__</span><span class="p">(</span><span class="bp">None</span><span class="p">,</span> <span class="bp">None</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
         <span class="p">]</span>
 
 
@@ -1866,7 +1866,7 @@ am not the authoritative source for, so I&#8217;m just going to leave it inline&
         <span class="p">}</span>
         <span class="k">with</span> <span class="n">patch</span><span class="o">.</span><span class="n">multiple</span><span class="p">(</span>
             <span class="s1">&#39;policygen.PolicyGen&#39;</span><span class="p">,</span>
-            <span class="n">autospec</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">autospec</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
             <span class="n">_read_policies</span><span class="o">=</span><span class="n"><span class="caps">DEFAULT</span></span><span class="p">,</span>
             <span class="n">_apply_defaults</span><span class="o">=</span><span class="n"><span class="caps">DEFAULT</span></span><span class="p">,</span>
             <span class="n">_policy_rst</span><span class="o">=</span><span class="n"><span class="caps">DEFAULT</span></span><span class="p">,</span>
@@ -1930,10 +1930,10 @@ am not the authoritative source for, so I&#8217;m just going to leave it inline&
         <span class="p">]</span>
         <span class="k">with</span> <span class="n">patch</span><span class="o">.</span><span class="n">multiple</span><span class="p">(</span>
             <span class="s1">&#39;policygen.PolicyGen&#39;</span><span class="p">,</span>
-            <span class="n">autospec</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">autospec</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
             <span class="n">_check_policy_marked_for_op_first</span><span class="o">=</span><span class="n"><span class="caps">DEFAULT</span></span>
         <span class="p">)</span> <span class="k">as</span> <span class="n">mocks</span><span class="p">:</span>
-            <span class="n">mocks</span><span class="p">[</span><span class="s1">&#39;_check_policy_marked_for_op_first&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">return_value</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="n">mocks</span><span class="p">[</span><span class="s1">&#39;_check_policy_marked_for_op_first&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">return_value</span> <span class="o">=</span> <span class="bp">True</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">cls</span><span class="o">.</span><span class="n">_check_policies</span><span class="p">(</span><span class="n">policies</span><span class="p">)</span>
         <span class="k">assert</span> <span class="n">mocks</span><span class="p">[</span><span class="s1">&#39;_check_policy_marked_for_op_first&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">mock_calls</span> <span class="o">==</span> <span class="p">[</span>
             <span class="n">call</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cls</span><span class="p">,</span> <span class="n">policies</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span>
@@ -1954,13 +1954,13 @@ am not the authoritative source for, so I&#8217;m just going to leave it inline&
         <span class="p">]</span>
         <span class="k">with</span> <span class="n">patch</span><span class="o">.</span><span class="n">multiple</span><span class="p">(</span>
             <span class="s1">&#39;policygen.PolicyGen&#39;</span><span class="p">,</span>
-            <span class="n">autospec</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">autospec</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
             <span class="n">_check_policy_marked_for_op_first</span><span class="o">=</span><span class="n"><span class="caps">DEFAULT</span></span><span class="p">,</span>
         <span class="p">)</span> <span class="k">as</span> <span class="n">mocks</span><span class="p">:</span>
             <span class="k">with</span> <span class="n">patch</span><span class="p">(</span><span class="s1">&#39;policygen.strip_doc&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">mock_sd</span><span class="p">:</span>
                 <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">mocks</span><span class="p">:</span>
                     <span class="nb">setattr</span><span class="p">(</span><span class="n">mocks</span><span class="p">[</span><span class="n">x</span><span class="p">],</span> <span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
-                <span class="n">mocks</span><span class="p">[</span><span class="s1">&#39;_check_policy_marked_for_op_first&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">return_value</span> <span class="o">=</span> <span class="kc">False</span>
+                <span class="n">mocks</span><span class="p">[</span><span class="s1">&#39;_check_policy_marked_for_op_first&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">return_value</span> <span class="o">=</span> <span class="bp">False</span>
                 <span class="n">mock_sd</span><span class="o">.</span><span class="n">side_effect</span> <span class="o">=</span> <span class="n">se_strip_doc</span>
                 <span class="k">with</span> <span class="n">pytest</span><span class="o">.</span><span class="n">raises</span><span class="p">(</span><span class="ne">SystemExit</span><span class="p">)</span> <span class="k">as</span> <span class="n">ex</span><span class="p">:</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">cls</span><span class="o">.</span><span class="n">_check_policies</span><span class="p">(</span><span class="n">policies</span><span class="p">)</span>
@@ -1987,7 +1987,7 @@ am not the authoritative source for, so I&#8217;m just going to leave it inline&
 
     <span class="k">def</span> <span class="nf">test_no_filters</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">policy</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;foo&#39;</span><span class="p">,</span> <span class="s1">&#39;actions&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;mark&#39;</span><span class="p">]}</span>
-        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">cls</span><span class="o">.</span><span class="n">_check_policy_marked_for_op_first</span><span class="p">(</span><span class="n">policy</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">True</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">cls</span><span class="o">.</span><span class="n">_check_policy_marked_for_op_first</span><span class="p">(</span><span class="n">policy</span><span class="p">)</span> <span class="ow">is</span> <span class="bp">True</span>
 
     <span class="k">def</span> <span class="nf">test_no_marked_for_op</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">policy</span> <span class="o">=</span> <span class="p">{</span>
@@ -1998,7 +1998,7 @@ am not the authoritative source for, so I&#8217;m just going to leave it inline&
                 <span class="p">{</span><span class="s1">&#39;tag:foo&#39;</span><span class="p">:</span> <span class="s1">&#39;present&#39;</span><span class="p">}</span>
             <span class="p">]</span>
         <span class="p">}</span>
-        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">cls</span><span class="o">.</span><span class="n">_check_policy_marked_for_op_first</span><span class="p">(</span><span class="n">policy</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">True</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">cls</span><span class="o">.</span><span class="n">_check_policy_marked_for_op_first</span><span class="p">(</span><span class="n">policy</span><span class="p">)</span> <span class="ow">is</span> <span class="bp">True</span>
 
     <span class="k">def</span> <span class="nf">test_marked_for_op_first</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">policy</span> <span class="o">=</span> <span class="p">{</span>
@@ -2014,7 +2014,7 @@ am not the authoritative source for, so I&#8217;m just going to leave it inline&
                 <span class="p">{</span><span class="s1">&#39;tag:foo&#39;</span><span class="p">:</span> <span class="s1">&#39;present&#39;</span><span class="p">}</span>
             <span class="p">]</span>
         <span class="p">}</span>
-        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">cls</span><span class="o">.</span><span class="n">_check_policy_marked_for_op_first</span><span class="p">(</span><span class="n">policy</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">True</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">cls</span><span class="o">.</span><span class="n">_check_policy_marked_for_op_first</span><span class="p">(</span><span class="n">policy</span><span class="p">)</span> <span class="ow">is</span> <span class="bp">True</span>
 
     <span class="k">def</span> <span class="nf">test_marked_for_op_not_first</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">policy</span> <span class="o">=</span> <span class="p">{</span>
@@ -2030,7 +2030,7 @@ am not the authoritative source for, so I&#8217;m just going to leave it inline&
                 <span class="p">}</span>
             <span class="p">]</span>
         <span class="p">}</span>
-        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">cls</span><span class="o">.</span><span class="n">_check_policy_marked_for_op_first</span><span class="p">(</span><span class="n">policy</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">False</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">cls</span><span class="o">.</span><span class="n">_check_policy_marked_for_op_first</span><span class="p">(</span><span class="n">policy</span><span class="p">)</span> <span class="ow">is</span> <span class="bp">False</span>
 
     <span class="k">def</span> <span class="nf">test_marked_for_op_nested</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">policy</span> <span class="o">=</span> <span class="p">{</span>
@@ -2050,7 +2050,7 @@ am not the authoritative source for, so I&#8217;m just going to leave it inline&
                 <span class="p">}</span>
             <span class="p">]</span>
         <span class="p">}</span>
-        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">cls</span><span class="o">.</span><span class="n">_check_policy_marked_for_op_first</span><span class="p">(</span><span class="n">policy</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">False</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">cls</span><span class="o">.</span><span class="n">_check_policy_marked_for_op_first</span><span class="p">(</span><span class="n">policy</span><span class="p">)</span> <span class="ow">is</span> <span class="bp">False</span>
 
 
 <span class="k">class</span> <span class="nc">TestCheckPolicyMarkButNoTagFilter</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
@@ -2060,15 +2060,15 @@ am not the authoritative source for, so I&#8217;m just going to leave it inline&
 
     <span class="k">def</span> <span class="nf">test_no_filters</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">policy</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;foo&#39;</span><span class="p">,</span> <span class="s1">&#39;actions&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;mark&#39;</span><span class="p">]}</span>
-        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">cls</span><span class="o">.</span><span class="n">_check_policy_mark_but_no_tag_filter</span><span class="p">(</span><span class="n">policy</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">True</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">cls</span><span class="o">.</span><span class="n">_check_policy_mark_but_no_tag_filter</span><span class="p">(</span><span class="n">policy</span><span class="p">)</span> <span class="ow">is</span> <span class="bp">True</span>
 
     <span class="k">def</span> <span class="nf">test_no_actions</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">policy</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;foo&#39;</span><span class="p">}</span>
-        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">cls</span><span class="o">.</span><span class="n">_check_policy_mark_but_no_tag_filter</span><span class="p">(</span><span class="n">policy</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">True</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">cls</span><span class="o">.</span><span class="n">_check_policy_mark_but_no_tag_filter</span><span class="p">(</span><span class="n">policy</span><span class="p">)</span> <span class="ow">is</span> <span class="bp">True</span>
 
     <span class="k">def</span> <span class="nf">test_no_mark_actions</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">policy</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;foo&#39;</span><span class="p">,</span> <span class="s1">&#39;actions&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;stop&#39;</span><span class="p">]}</span>
-        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">cls</span><span class="o">.</span><span class="n">_check_policy_mark_but_no_tag_filter</span><span class="p">(</span><span class="n">policy</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">True</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">cls</span><span class="o">.</span><span class="n">_check_policy_mark_but_no_tag_filter</span><span class="p">(</span><span class="n">policy</span><span class="p">)</span> <span class="ow">is</span> <span class="bp">True</span>
 
     <span class="k">def</span> <span class="nf">test_one_mark_action_ok</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">policy</span> <span class="o">=</span> <span class="p">{</span>
@@ -2078,7 +2078,7 @@ am not the authoritative source for, so I&#8217;m just going to leave it inline&
                     <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;mark-for-op&#39;</span><span class="p">,</span>
                     <span class="s1">&#39;tag&#39;</span><span class="p">:</span> <span class="s1">&#39;c7n-mytag&#39;</span><span class="p">,</span>
                     <span class="s1">&#39;op&#39;</span><span class="p">:</span> <span class="s1">&#39;stop&#39;</span><span class="p">,</span>
-                    <span class="s1">&#39;message&#39;</span><span class="p">:</span> <span class="s1">&#39;foo-mark </span><span class="si">{op}</span><span class="s1">@</span><span class="si">{action_date}</span><span class="s1">&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;message&#39;</span><span class="p">:</span> <span class="s1">&#39;foo-mark {op}@{action_date}&#39;</span><span class="p">,</span>
                     <span class="s1">&#39;days&#39;</span><span class="p">:</span> <span class="mi">7</span>
                 <span class="p">}</span>
             <span class="p">],</span>
@@ -2095,7 +2095,7 @@ am not the authoritative source for, so I&#8217;m just going to leave it inline&
                 <span class="p">}</span>
             <span class="p">]</span>
         <span class="p">}</span>
-        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">cls</span><span class="o">.</span><span class="n">_check_policy_mark_but_no_tag_filter</span><span class="p">(</span><span class="n">policy</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">True</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">cls</span><span class="o">.</span><span class="n">_check_policy_mark_but_no_tag_filter</span><span class="p">(</span><span class="n">policy</span><span class="p">)</span> <span class="ow">is</span> <span class="bp">True</span>
 
     <span class="k">def</span> <span class="nf">test_two_mark_actions_ok</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">policy</span> <span class="o">=</span> <span class="p">{</span>
@@ -2105,7 +2105,7 @@ am not the authoritative source for, so I&#8217;m just going to leave it inline&
                     <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;mark-for-op&#39;</span><span class="p">,</span>
                     <span class="s1">&#39;tag&#39;</span><span class="p">:</span> <span class="s1">&#39;c7n-mytag&#39;</span><span class="p">,</span>
                     <span class="s1">&#39;op&#39;</span><span class="p">:</span> <span class="s1">&#39;stop&#39;</span><span class="p">,</span>
-                    <span class="s1">&#39;message&#39;</span><span class="p">:</span> <span class="s1">&#39;foo-mark </span><span class="si">{op}</span><span class="s1">@</span><span class="si">{action_date}</span><span class="s1">&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;message&#39;</span><span class="p">:</span> <span class="s1">&#39;foo-mark {op}@{action_date}&#39;</span><span class="p">,</span>
                     <span class="s1">&#39;days&#39;</span><span class="p">:</span> <span class="mi">7</span>
                 <span class="p">},</span>
                 <span class="s1">&#39;stop&#39;</span><span class="p">,</span>
@@ -2113,7 +2113,7 @@ am not the authoritative source for, so I&#8217;m just going to leave it inline&
                     <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;mark-for-op&#39;</span><span class="p">,</span>
                     <span class="s1">&#39;tag&#39;</span><span class="p">:</span> <span class="s1">&#39;c7n-foobar&#39;</span><span class="p">,</span>
                     <span class="s1">&#39;op&#39;</span><span class="p">:</span> <span class="s1">&#39;delete&#39;</span><span class="p">,</span>
-                    <span class="s1">&#39;message&#39;</span><span class="p">:</span> <span class="s1">&#39;foobar-mark </span><span class="si">{op}</span><span class="s1">@</span><span class="si">{action_date}</span><span class="s1">&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;message&#39;</span><span class="p">:</span> <span class="s1">&#39;foobar-mark {op}@{action_date}&#39;</span><span class="p">,</span>
                     <span class="s1">&#39;days&#39;</span><span class="p">:</span> <span class="mi">14</span>
                 <span class="p">}</span>
             <span class="p">],</span>
@@ -2133,7 +2133,7 @@ am not the authoritative source for, so I&#8217;m just going to leave it inline&
                 <span class="p">}</span>
             <span class="p">]</span>
         <span class="p">}</span>
-        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">cls</span><span class="o">.</span><span class="n">_check_policy_mark_but_no_tag_filter</span><span class="p">(</span><span class="n">policy</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">True</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">cls</span><span class="o">.</span><span class="n">_check_policy_mark_but_no_tag_filter</span><span class="p">(</span><span class="n">policy</span><span class="p">)</span> <span class="ow">is</span> <span class="bp">True</span>
 
     <span class="k">def</span> <span class="nf">test_one_mark_action_no_filter</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">policy</span> <span class="o">=</span> <span class="p">{</span>
@@ -2143,7 +2143,7 @@ am not the authoritative source for, so I&#8217;m just going to leave it inline&
                     <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;mark-for-op&#39;</span><span class="p">,</span>
                     <span class="s1">&#39;tag&#39;</span><span class="p">:</span> <span class="s1">&#39;c7n-mytag&#39;</span><span class="p">,</span>
                     <span class="s1">&#39;op&#39;</span><span class="p">:</span> <span class="s1">&#39;stop&#39;</span><span class="p">,</span>
-                    <span class="s1">&#39;message&#39;</span><span class="p">:</span> <span class="s1">&#39;foo-mark </span><span class="si">{op}</span><span class="s1">@</span><span class="si">{action_date}</span><span class="s1">&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;message&#39;</span><span class="p">:</span> <span class="s1">&#39;foo-mark {op}@{action_date}&#39;</span><span class="p">,</span>
                     <span class="s1">&#39;days&#39;</span><span class="p">:</span> <span class="mi">7</span>
                 <span class="p">}</span>
             <span class="p">],</span>
@@ -2160,7 +2160,7 @@ am not the authoritative source for, so I&#8217;m just going to leave it inline&
                 <span class="p">}</span>
             <span class="p">]</span>
         <span class="p">}</span>
-        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">cls</span><span class="o">.</span><span class="n">_check_policy_mark_but_no_tag_filter</span><span class="p">(</span><span class="n">policy</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">False</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">cls</span><span class="o">.</span><span class="n">_check_policy_mark_but_no_tag_filter</span><span class="p">(</span><span class="n">policy</span><span class="p">)</span> <span class="ow">is</span> <span class="bp">False</span>
 
     <span class="k">def</span> <span class="nf">test_two_mark_actions_one_filter</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">policy</span> <span class="o">=</span> <span class="p">{</span>
@@ -2170,7 +2170,7 @@ am not the authoritative source for, so I&#8217;m just going to leave it inline&
                     <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;mark-for-op&#39;</span><span class="p">,</span>
                     <span class="s1">&#39;tag&#39;</span><span class="p">:</span> <span class="s1">&#39;c7n-mytag&#39;</span><span class="p">,</span>
                     <span class="s1">&#39;op&#39;</span><span class="p">:</span> <span class="s1">&#39;stop&#39;</span><span class="p">,</span>
-                    <span class="s1">&#39;message&#39;</span><span class="p">:</span> <span class="s1">&#39;foo-mark </span><span class="si">{op}</span><span class="s1">@</span><span class="si">{action_date}</span><span class="s1">&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;message&#39;</span><span class="p">:</span> <span class="s1">&#39;foo-mark {op}@{action_date}&#39;</span><span class="p">,</span>
                     <span class="s1">&#39;days&#39;</span><span class="p">:</span> <span class="mi">7</span>
                 <span class="p">},</span>
                 <span class="s1">&#39;stop&#39;</span><span class="p">,</span>
@@ -2178,7 +2178,7 @@ am not the authoritative source for, so I&#8217;m just going to leave it inline&
                     <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;mark-for-op&#39;</span><span class="p">,</span>
                     <span class="s1">&#39;tag&#39;</span><span class="p">:</span> <span class="s1">&#39;c7n-foobar&#39;</span><span class="p">,</span>
                     <span class="s1">&#39;op&#39;</span><span class="p">:</span> <span class="s1">&#39;delete&#39;</span><span class="p">,</span>
-                    <span class="s1">&#39;message&#39;</span><span class="p">:</span> <span class="s1">&#39;foobar-mark </span><span class="si">{op}</span><span class="s1">@</span><span class="si">{action_date}</span><span class="s1">&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;message&#39;</span><span class="p">:</span> <span class="s1">&#39;foobar-mark {op}@{action_date}&#39;</span><span class="p">,</span>
                     <span class="s1">&#39;days&#39;</span><span class="p">:</span> <span class="mi">14</span>
                 <span class="p">}</span>
             <span class="p">],</span>
@@ -2198,7 +2198,7 @@ am not the authoritative source for, so I&#8217;m just going to leave it inline&
                 <span class="p">}</span>
             <span class="p">]</span>
         <span class="p">}</span>
-        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">cls</span><span class="o">.</span><span class="n">_check_policy_mark_but_no_tag_filter</span><span class="p">(</span><span class="n">policy</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">False</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">cls</span><span class="o">.</span><span class="n">_check_policy_mark_but_no_tag_filter</span><span class="p">(</span><span class="n">policy</span><span class="p">)</span> <span class="ow">is</span> <span class="bp">False</span>
 
     <span class="k">def</span> <span class="nf">test_two_mark_actions_no_filters</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">policy</span> <span class="o">=</span> <span class="p">{</span>
@@ -2208,7 +2208,7 @@ am not the authoritative source for, so I&#8217;m just going to leave it inline&
                     <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;mark-for-op&#39;</span><span class="p">,</span>
                     <span class="s1">&#39;tag&#39;</span><span class="p">:</span> <span class="s1">&#39;c7n-mytag&#39;</span><span class="p">,</span>
                     <span class="s1">&#39;op&#39;</span><span class="p">:</span> <span class="s1">&#39;stop&#39;</span><span class="p">,</span>
-                    <span class="s1">&#39;message&#39;</span><span class="p">:</span> <span class="s1">&#39;foo-mark </span><span class="si">{op}</span><span class="s1">@</span><span class="si">{action_date}</span><span class="s1">&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;message&#39;</span><span class="p">:</span> <span class="s1">&#39;foo-mark {op}@{action_date}&#39;</span><span class="p">,</span>
                     <span class="s1">&#39;days&#39;</span><span class="p">:</span> <span class="mi">7</span>
                 <span class="p">},</span>
                 <span class="s1">&#39;stop&#39;</span><span class="p">,</span>
@@ -2216,7 +2216,7 @@ am not the authoritative source for, so I&#8217;m just going to leave it inline&
                     <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;mark-for-op&#39;</span><span class="p">,</span>
                     <span class="s1">&#39;tag&#39;</span><span class="p">:</span> <span class="s1">&#39;c7n-foobar&#39;</span><span class="p">,</span>
                     <span class="s1">&#39;op&#39;</span><span class="p">:</span> <span class="s1">&#39;delete&#39;</span><span class="p">,</span>
-                    <span class="s1">&#39;message&#39;</span><span class="p">:</span> <span class="s1">&#39;foobar-mark </span><span class="si">{op}</span><span class="s1">@</span><span class="si">{action_date}</span><span class="s1">&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;message&#39;</span><span class="p">:</span> <span class="s1">&#39;foobar-mark {op}@{action_date}&#39;</span><span class="p">,</span>
                     <span class="s1">&#39;days&#39;</span><span class="p">:</span> <span class="mi">14</span>
                 <span class="p">}</span>
             <span class="p">],</span>
@@ -2233,7 +2233,7 @@ am not the authoritative source for, so I&#8217;m just going to leave it inline&
                 <span class="p">}</span>
             <span class="p">]</span>
         <span class="p">}</span>
-        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">cls</span><span class="o">.</span><span class="n">_check_policy_mark_but_no_tag_filter</span><span class="p">(</span><span class="n">policy</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">False</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">cls</span><span class="o">.</span><span class="n">_check_policy_mark_but_no_tag_filter</span><span class="p">(</span><span class="n">policy</span><span class="p">)</span> <span class="ow">is</span> <span class="bp">False</span>
 
 
 <span class="k">class</span> <span class="nc">TestGenerateCleanupPolicies</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
@@ -2385,14 +2385,14 @@ am not the authoritative source for, so I&#8217;m just going to leave it inline&
                 <span class="n">gitlink</span><span class="p">,</span> <span class="n">timestr</span>
             <span class="p">)</span>
         <span class="n">expected</span> <span class="o">+=</span> <span class="s2">&quot;tableHere&quot;</span>
-        <span class="k">with</span> <span class="n">patch</span><span class="p">(</span><span class="s1">&#39;policygen.PolicyGen._policy_comment&#39;</span><span class="p">,</span> <span class="n">autospec</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="k">as</span> <span class="n">m</span><span class="p">:</span>
+        <span class="k">with</span> <span class="n">patch</span><span class="p">(</span><span class="s1">&#39;policygen.PolicyGen._policy_comment&#39;</span><span class="p">,</span> <span class="n">autospec</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span> <span class="k">as</span> <span class="n">m</span><span class="p">:</span>
             <span class="n">m</span><span class="o">.</span><span class="n">side_effect</span> <span class="o">=</span> <span class="n">se_comment</span>
             <span class="k">with</span> <span class="n">patch</span><span class="o">.</span><span class="n">dict</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">,</span> <span class="p">{</span>
                 <span class="s1">&#39;GIT_COMMIT&#39;</span><span class="p">:</span> <span class="s1">&#39;abcd1234&#39;</span><span class="p">,</span>
                 <span class="s1">&#39;BUILD_NUMBER&#39;</span><span class="p">:</span> <span class="s1">&#39;2&#39;</span><span class="p">,</span>
                 <span class="s1">&#39;JOB_NAME&#39;</span><span class="p">:</span> <span class="s1">&#39;custodian-config/foo&#39;</span><span class="p">,</span>
                 <span class="s1">&#39;BUILD_URL&#39;</span><span class="p">:</span> <span class="s1">&#39;https://jenkins/job/2&#39;</span>
-            <span class="p">},</span> <span class="n">clear</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+            <span class="p">},</span> <span class="n">clear</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
                 <span class="k">with</span> <span class="n">patch</span><span class="p">(</span><span class="s1">&#39;policygen.timestr&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">m_timestr</span><span class="p">:</span>
                     <span class="k">with</span> <span class="n">patch</span><span class="p">(</span><span class="s1">&#39;policygen.tabulate&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">m_tabulate</span><span class="p">:</span>
                         <span class="n">m_tabulate</span><span class="o">.</span><span class="n">return_value</span> <span class="o">=</span> <span class="s1">&#39;tableHere&#39;</span>
@@ -2430,11 +2430,11 @@ am not the authoritative source for, so I&#8217;m just going to leave it inline&
         <span class="n">expected</span> <span class="o">=</span> <span class="s2">&quot;this page built locally from `abcd1234 &lt;</span><span class="si">%s</span><span class="s2">&gt;`_ at </span><span class="si">%s</span><span class="s2">&quot;</span> \
             <span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">gitlink</span><span class="p">,</span> <span class="n">timestr</span><span class="p">)</span>
         <span class="n">expected</span> <span class="o">+=</span> <span class="s2">&quot;tableHere&quot;</span>
-        <span class="k">with</span> <span class="n">patch</span><span class="p">(</span><span class="s1">&#39;policygen.PolicyGen._policy_comment&#39;</span><span class="p">,</span> <span class="n">autospec</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="k">as</span> <span class="n">m</span><span class="p">:</span>
+        <span class="k">with</span> <span class="n">patch</span><span class="p">(</span><span class="s1">&#39;policygen.PolicyGen._policy_comment&#39;</span><span class="p">,</span> <span class="n">autospec</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span> <span class="k">as</span> <span class="n">m</span><span class="p">:</span>
             <span class="n">m</span><span class="o">.</span><span class="n">side_effect</span> <span class="o">=</span> <span class="n">se_comment</span>
             <span class="k">with</span> <span class="n">patch</span><span class="o">.</span><span class="n">dict</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">,</span> <span class="p">{</span>
                 <span class="s1">&#39;GIT_COMMIT&#39;</span><span class="p">:</span> <span class="s1">&#39;abcd1234&#39;</span>
-            <span class="p">},</span> <span class="n">clear</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+            <span class="p">},</span> <span class="n">clear</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
                 <span class="k">with</span> <span class="n">patch</span><span class="p">(</span><span class="s1">&#39;policygen.timestr&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">m_timestr</span><span class="p">:</span>
                     <span class="k">with</span> <span class="n">patch</span><span class="p">(</span><span class="s1">&#39;policygen.tabulate&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">m_tabulate</span><span class="p">:</span>
                         <span class="n">m_tabulate</span><span class="o">.</span><span class="n">return_value</span> <span class="o">=</span> <span class="s1">&#39;tableHere&#39;</span>
@@ -2501,9 +2501,9 @@ am not the authoritative source for, so I&#8217;m just going to leave it inline&
             <span class="n">name</span> <span class="o">=</span> <span class="n">fpath</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
             <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;file&#39;</span><span class="p">:</span> <span class="n">fpath</span><span class="p">,</span> <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="n">name</span><span class="p">}</span>
 
-        <span class="k">with</span> <span class="n">patch</span><span class="p">(</span><span class="s1">&#39;policygen.os.listdir&#39;</span><span class="p">,</span> <span class="n">autospec</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="k">as</span> <span class="n">mock_list</span><span class="p">:</span>
+        <span class="k">with</span> <span class="n">patch</span><span class="p">(</span><span class="s1">&#39;policygen.os.listdir&#39;</span><span class="p">,</span> <span class="n">autospec</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span> <span class="k">as</span> <span class="n">mock_list</span><span class="p">:</span>
             <span class="k">with</span> <span class="n">patch</span><span class="p">(</span>
-                <span class="s1">&#39;policygen.PolicyGen._read_file_yaml&#39;</span><span class="p">,</span> <span class="n">autospec</span><span class="o">=</span><span class="kc">True</span>
+                <span class="s1">&#39;policygen.PolicyGen._read_file_yaml&#39;</span><span class="p">,</span> <span class="n">autospec</span><span class="o">=</span><span class="bp">True</span>
             <span class="p">)</span> <span class="k">as</span> <span class="n">mock_read</span><span class="p">:</span>
                 <span class="n">mock_list</span><span class="o">.</span><span class="n">return_value</span> <span class="o">=</span> <span class="p">[</span>
                     <span class="s1">&#39;foo.yml&#39;</span><span class="p">,</span>
@@ -2527,9 +2527,9 @@ am not the authoritative source for, so I&#8217;m just going to leave it inline&
                 <span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;wrongName&#39;</span>
             <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;file&#39;</span><span class="p">:</span> <span class="n">fpath</span><span class="p">,</span> <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="n">name</span><span class="p">}</span>
 
-        <span class="k">with</span> <span class="n">patch</span><span class="p">(</span><span class="s1">&#39;policygen.os.listdir&#39;</span><span class="p">,</span> <span class="n">autospec</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="k">as</span> <span class="n">mock_list</span><span class="p">:</span>
+        <span class="k">with</span> <span class="n">patch</span><span class="p">(</span><span class="s1">&#39;policygen.os.listdir&#39;</span><span class="p">,</span> <span class="n">autospec</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span> <span class="k">as</span> <span class="n">mock_list</span><span class="p">:</span>
             <span class="k">with</span> <span class="n">patch</span><span class="p">(</span>
-                <span class="s1">&#39;policygen.PolicyGen._read_file_yaml&#39;</span><span class="p">,</span> <span class="n">autospec</span><span class="o">=</span><span class="kc">True</span>
+                <span class="s1">&#39;policygen.PolicyGen._read_file_yaml&#39;</span><span class="p">,</span> <span class="n">autospec</span><span class="o">=</span><span class="bp">True</span>
             <span class="p">)</span> <span class="k">as</span> <span class="n">mock_read</span><span class="p">:</span>
                 <span class="n">mock_list</span><span class="o">.</span><span class="n">return_value</span> <span class="o">=</span> <span class="p">[</span>
                     <span class="s1">&#39;foo.yml&#39;</span><span class="p">,</span>
@@ -2551,38 +2551,38 @@ am not the authoritative source for, so I&#8217;m just going to leave it inline&
 
     <span class="k">def</span> <span class="nf">test_read</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">m</span> <span class="o">=</span> <span class="n">mock_open</span><span class="p">(</span><span class="n">read_data</span><span class="o">=</span><span class="s2">&quot;- foo</span><span class="se">\n</span><span class="s2">- bar</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
-        <span class="k">with</span> <span class="n">patch</span><span class="p">(</span><span class="s1">&#39;policygen.open&#39;</span><span class="p">,</span> <span class="n">m</span><span class="p">,</span> <span class="n">create</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="k">as</span> <span class="n">m_open</span><span class="p">:</span>
+        <span class="k">with</span> <span class="n">patch</span><span class="p">(</span><span class="s1">&#39;policygen.open&#39;</span><span class="p">,</span> <span class="n">m</span><span class="p">,</span> <span class="n">create</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span> <span class="k">as</span> <span class="n">m_open</span><span class="p">:</span>
             <span class="n">res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cls</span><span class="o">.</span><span class="n">_read_file_yaml</span><span class="p">(</span><span class="s1">&#39;/foo/bar.yml&#39;</span><span class="p">)</span>
         <span class="k">assert</span> <span class="n">res</span> <span class="o">==</span> <span class="p">[</span><span class="s1">&#39;foo&#39;</span><span class="p">,</span> <span class="s1">&#39;bar&#39;</span><span class="p">]</span>
         <span class="k">assert</span> <span class="n">m_open</span><span class="o">.</span><span class="n">mock_calls</span> <span class="o">==</span> <span class="p">[</span>
             <span class="n">call</span><span class="p">(</span><span class="s1">&#39;/foo/bar.yml&#39;</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">),</span>
             <span class="n">call</span><span class="p">()</span><span class="o">.</span><span class="fm">__enter__</span><span class="p">(),</span>
             <span class="n">call</span><span class="p">()</span><span class="o">.</span><span class="n">read</span><span class="p">(),</span>
-            <span class="n">call</span><span class="p">()</span><span class="o">.</span><span class="fm">__exit__</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="n">call</span><span class="p">()</span><span class="o">.</span><span class="fm">__exit__</span><span class="p">(</span><span class="bp">None</span><span class="p">,</span> <span class="bp">None</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
         <span class="p">]</span>
 
     <span class="k">def</span> <span class="nf">test_read</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">m</span> <span class="o">=</span> <span class="n">mock_open</span><span class="p">(</span><span class="n">read_data</span><span class="o">=</span><span class="s2">&quot;- foo</span><span class="se">\n</span><span class="s2">- bar</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
-        <span class="k">with</span> <span class="n">patch</span><span class="p">(</span><span class="s1">&#39;policygen.open&#39;</span><span class="p">,</span> <span class="n">m</span><span class="p">,</span> <span class="n">create</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="k">as</span> <span class="n">m_open</span><span class="p">:</span>
+        <span class="k">with</span> <span class="n">patch</span><span class="p">(</span><span class="s1">&#39;policygen.open&#39;</span><span class="p">,</span> <span class="n">m</span><span class="p">,</span> <span class="n">create</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span> <span class="k">as</span> <span class="n">m_open</span><span class="p">:</span>
             <span class="n">res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cls</span><span class="o">.</span><span class="n">_read_file_yaml</span><span class="p">(</span><span class="s1">&#39;/foo/bar.yml&#39;</span><span class="p">)</span>
         <span class="k">assert</span> <span class="n">res</span> <span class="o">==</span> <span class="p">[</span><span class="s1">&#39;foo&#39;</span><span class="p">,</span> <span class="s1">&#39;bar&#39;</span><span class="p">]</span>
         <span class="k">assert</span> <span class="n">m_open</span><span class="o">.</span><span class="n">mock_calls</span> <span class="o">==</span> <span class="p">[</span>
             <span class="n">call</span><span class="p">(</span><span class="s1">&#39;/foo/bar.yml&#39;</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">),</span>
             <span class="n">call</span><span class="p">()</span><span class="o">.</span><span class="fm">__enter__</span><span class="p">(),</span>
             <span class="n">call</span><span class="p">()</span><span class="o">.</span><span class="n">read</span><span class="p">(),</span>
-            <span class="n">call</span><span class="p">()</span><span class="o">.</span><span class="fm">__exit__</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="n">call</span><span class="p">()</span><span class="o">.</span><span class="fm">__exit__</span><span class="p">(</span><span class="bp">None</span><span class="p">,</span> <span class="bp">None</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
         <span class="p">]</span>
 
     <span class="k">def</span> <span class="nf">test_read_exception</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">m</span> <span class="o">=</span> <span class="n">mock_open</span><span class="p">(</span><span class="n">read_data</span><span class="o">=</span><span class="s2">&quot;  - foo:</span><span class="se">\n</span><span class="s2">- bar&quot;</span><span class="p">)</span>
-        <span class="k">with</span> <span class="n">patch</span><span class="p">(</span><span class="s1">&#39;policygen.open&#39;</span><span class="p">,</span> <span class="n">m</span><span class="p">,</span> <span class="n">create</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="k">as</span> <span class="n">m_open</span><span class="p">:</span>
+        <span class="k">with</span> <span class="n">patch</span><span class="p">(</span><span class="s1">&#39;policygen.open&#39;</span><span class="p">,</span> <span class="n">m</span><span class="p">,</span> <span class="n">create</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span> <span class="k">as</span> <span class="n">m_open</span><span class="p">:</span>
             <span class="k">with</span> <span class="n">pytest</span><span class="o">.</span><span class="n">raises</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">cls</span><span class="o">.</span><span class="n">_read_file_yaml</span><span class="p">(</span><span class="s1">&#39;/foo/bar.yml&#39;</span><span class="p">)</span>
         <span class="k">assert</span> <span class="n">m_open</span><span class="o">.</span><span class="n">mock_calls</span> <span class="o">==</span> <span class="p">[</span>
             <span class="n">call</span><span class="p">(</span><span class="s1">&#39;/foo/bar.yml&#39;</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">),</span>
             <span class="n">call</span><span class="p">()</span><span class="o">.</span><span class="fm">__enter__</span><span class="p">(),</span>
             <span class="n">call</span><span class="p">()</span><span class="o">.</span><span class="n">read</span><span class="p">(),</span>
-            <span class="n">call</span><span class="p">()</span><span class="o">.</span><span class="fm">__exit__</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="n">call</span><span class="p">()</span><span class="o">.</span><span class="fm">__exit__</span><span class="p">(</span><span class="bp">None</span><span class="p">,</span> <span class="bp">None</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
         <span class="p">]</span>
 </pre></div>
 
@@ -2608,18 +2608,18 @@ am not the authoritative source for, so I&#8217;m just going to leave it inline&
 <span class="kn">import</span> <span class="nn">os</span>
 
 <span class="n"><span class="caps">FORMAT</span></span> <span class="o">=</span> <span class="s2">&quot;[</span><span class="si">%(asctime)s</span><span class="s2"> </span><span class="si">%(levelname)s</span><span class="s2">] </span><span class="si">%(message)s</span><span class="s2">&quot;</span>
-<span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n"><span class="caps">WARNING</span></span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="n"><span class="caps">FORMAT</span></span><span class="p">)</span>
+<span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n"><span class="caps">WARNING</span></span><span class="p">,</span> <span class="n">format</span><span class="o">=</span><span class="n"><span class="caps">FORMAT</span></span><span class="p">)</span>
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">()</span>
 
 <span class="c1"># suppress boto3 internal logging below <span class="caps">WARNING</span> level</span>
 <span class="n">boto3_log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s2">&quot;boto3&quot;</span><span class="p">)</span>
 <span class="n">boto3_log</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n"><span class="caps">WARNING</span></span><span class="p">)</span>
-<span class="n">boto3_log</span><span class="o">.</span><span class="n">propagate</span> <span class="o">=</span> <span class="kc">True</span>
+<span class="n">boto3_log</span><span class="o">.</span><span class="n">propagate</span> <span class="o">=</span> <span class="bp">True</span>
 
 <span class="c1"># suppress botocore internal logging below <span class="caps">WARNING</span> level</span>
 <span class="n">botocore_log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s2">&quot;botocore&quot;</span><span class="p">)</span>
 <span class="n">botocore_log</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n"><span class="caps">WARNING</span></span><span class="p">)</span>
-<span class="n">botocore_log</span><span class="o">.</span><span class="n">propagate</span> <span class="o">=</span> <span class="kc">True</span>
+<span class="n">botocore_log</span><span class="o">.</span><span class="n">propagate</span> <span class="o">=</span> <span class="bp">True</span>
 
 <span class="c1"># Override max attempts for botocore retry configuration, to cope with</span>
 <span class="c1"># throttling. This  constant is used in two different places below...</span>
@@ -2667,10 +2667,10 @@ am not the authoritative source for, so I&#8217;m just going to leave it inline&
 
     <span class="n">req_id_re</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span>
         <span class="sa">r</span><span class="s1">&#39;^(<span class="caps">START</span>|<span class="caps">END</span>|<span class="caps">REPORT</span>|\S+\s\S+)\s&#39;</span>
-        <span class="sa">r</span><span class="s1">&#39;([0-9a-f]</span><span class="si">{8}</span><span class="s1">-[0-9a-f]</span><span class="si">{4}</span><span class="s1">-[0-9a-f]</span><span class="si">{4}</span><span class="s1">-[0-9a-f]</span><span class="si">{4}</span><span class="s1">-[0-9a-f]</span><span class="si">{12}</span><span class="s1">).*&#39;</span>
+        <span class="sa">r</span><span class="s1">&#39;([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}).*&#39;</span>
     <span class="p">)</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">func_name</span><span class="p">,</span> <span class="n">logs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">cw</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">func_name</span><span class="p">,</span> <span class="n">logs</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">cw</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initialize LambdaHealthChecker</span>
 
@@ -2682,19 +2682,19 @@ am not the authoritative source for, so I&#8217;m just going to leave it inline&
 <span class="sd">        :type cw: boto3.resource</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_func_name</span> <span class="o">=</span> <span class="n">func_name</span>
-        <span class="k">if</span> <span class="n">logs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">logs</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
             <span class="c1"># override default max_attempts from 5 to 10, for throttling</span>
             <span class="n">retry_conf</span> <span class="o">=</span> <span class="n">Config</span><span class="p">(</span><span class="n">retries</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;max_attempts&#39;</span><span class="p">:</span> <span class="n">BOTOCORE_MAX_ATTEMPTS</span><span class="p">})</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_logs</span> <span class="o">=</span> <span class="n">boto3</span><span class="o">.</span><span class="n">client</span><span class="p">(</span><span class="s1">&#39;logs&#39;</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="n">retry_conf</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_logs</span> <span class="o">=</span> <span class="n">logs</span>
-        <span class="k">if</span> <span class="n">cw</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">cw</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_cw</span> <span class="o">=</span> <span class="n">boto3</span><span class="o">.</span><span class="n">resource</span><span class="p">(</span><span class="s1">&#39;cloudwatch&#39;</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_cw</span> <span class="o">=</span> <span class="n">cw</span>
 
     <span class="k">def</span> <span class="nf">get_filtered_logs</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span> <span class="n">request_ids</span><span class="p">,</span> <span class="n">interval</span><span class="o">=</span><span class="mi">86400</span><span class="p">,</span> <span class="n">group_name</span><span class="o">=</span><span class="kc">None</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">request_ids</span><span class="p">,</span> <span class="n">interval</span><span class="o">=</span><span class="mi">86400</span><span class="p">,</span> <span class="n">group_name</span><span class="o">=</span><span class="bp">None</span>
     <span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Get CloudWatch logs for the last ``interval`` seconds and return only</span>
@@ -2713,13 +2713,13 @@ am not the authoritative source for, so I&#8217;m just going to leave it inline&
         <span class="n">logs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_cloudwatch_logs</span><span class="p">(</span>
             <span class="n">interval</span><span class="o">=</span><span class="n">interval</span><span class="p">,</span> <span class="n">group_name</span><span class="o">=</span><span class="n">group_name</span>
         <span class="p">)</span>
-        <span class="k">if</span> <span class="n">group_name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">group_name</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
             <span class="n">group_name</span> <span class="o">=</span> <span class="s1">&#39;/aws/lambda/</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">_func_name</span>
         <span class="n">result</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="n">matchcount</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="k">for</span> <span class="n">log</span> <span class="ow">in</span> <span class="n">logs</span><span class="p">:</span>
             <span class="n">m</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">req_id_re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">log</span><span class="p">[</span><span class="s1">&#39;message&#39;</span><span class="p">])</span>
-            <span class="k">if</span> <span class="n">m</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">m</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
                 <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
                     <span class="s1">&#39;Event </span><span class="si">%s</span><span class="s1"> in group </span><span class="si">%s</span><span class="s1"> stream </span><span class="si">%s</span><span class="s1"> does not match &#39;</span>
                     <span class="s1">&#39;RequestId regex: </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">log</span><span class="p">[</span><span class="s1">&#39;eventId&#39;</span><span class="p">],</span> <span class="n">group_name</span><span class="p">,</span>
@@ -2740,7 +2740,7 @@ am not the authoritative source for, so I&#8217;m just going to leave it inline&
         <span class="p">)</span>
         <span class="k">return</span> <span class="n">result</span>
 
-    <span class="k">def</span> <span class="nf">get_cloudwatch_logs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">interval</span><span class="o">=</span><span class="mi">86400</span><span class="p">,</span> <span class="n">group_name</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">get_cloudwatch_logs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">interval</span><span class="o">=</span><span class="mi">86400</span><span class="p">,</span> <span class="n">group_name</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Get CloudWatch logs for the last ``interval`` seconds. The log group</span>
 <span class="sd">        name defaults to ``/aws/lambda/{func_name}`` if left at the default of</span>
@@ -2757,14 +2757,14 @@ am not the authoritative source for, so I&#8217;m just going to leave it inline&
         <span class="n">interval</span> <span class="o">=</span> <span class="n">interval</span> <span class="o">*</span> <span class="mi">1000</span>  <span class="c1"># milliseconds</span>
         <span class="n">now</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">time</span><span class="p">())</span> <span class="o">*</span> <span class="mi">1000</span>
         <span class="n">cutoff</span> <span class="o">=</span> <span class="n">now</span> <span class="o">-</span> <span class="n">interval</span>
-        <span class="k">if</span> <span class="n">group_name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">group_name</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
             <span class="n">group_name</span> <span class="o">=</span> <span class="s1">&#39;/aws/lambda/</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">_func_name</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Finding streams in <span class="caps">CW</span> Log Group: </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">group_name</span><span class="p">)</span>
         <span class="n">paginator</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_logs</span><span class="o">.</span><span class="n">get_paginator</span><span class="p">(</span><span class="s1">&#39;describe_log_streams&#39;</span><span class="p">)</span>
         <span class="n">stream_iterator</span> <span class="o">=</span> <span class="n">paginator</span><span class="o">.</span><span class="n">paginate</span><span class="p">(</span>
             <span class="n">logGroupName</span><span class="o">=</span><span class="n">group_name</span><span class="p">,</span>
             <span class="n">orderBy</span><span class="o">=</span><span class="s1">&#39;LastEventTime&#39;</span><span class="p">,</span>
-            <span class="n">descending</span><span class="o">=</span><span class="kc">True</span>
+            <span class="n">descending</span><span class="o">=</span><span class="bp">True</span>
         <span class="p">)</span>
         <span class="n">streams</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">try</span><span class="p">:</span>
@@ -2875,7 +2875,7 @@ am not the authoritative source for, so I&#8217;m just going to leave it inline&
         <span class="k">return</span> <span class="n">res</span>
 
     <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">find_matching_func_names</span><span class="p">(</span><span class="nb">filter</span><span class="p">,</span> <span class="n">client</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">find_matching_func_names</span><span class="p">(</span><span class="nb">filter</span><span class="p">,</span> <span class="n">client</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Return a list of all Lambda functions with names that either start</span>
 <span class="sd">        with ``filter`` (if ``filter`` is a string) or match ``filter`` (if</span>
@@ -2888,7 +2888,7 @@ am not the authoritative source for, so I&#8217;m just going to leave it inline&
 <span class="sd">        :return: list of matching Lambda function names</span>
 <span class="sd">        :rtype: list</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">client</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">client</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
             <span class="n">client</span> <span class="o">=</span> <span class="n">boto3</span><span class="o">.</span><span class="n">client</span><span class="p">(</span><span class="s1">&#39;lambda&#39;</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="nb">filter</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)):</span>
             <span class="nb">filter</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s1">&#39;^&#39;</span> <span class="o">+</span> <span class="n">re</span><span class="o">.</span><span class="n">escape</span><span class="p">(</span><span class="nb">filter</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;.*&#39;</span><span class="p">)</span>
@@ -2939,14 +2939,14 @@ am not the authoritative source for, so I&#8217;m just going to leave it inline&
 
     <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; collect and report on all cloud-custodian Lambda errors &quot;&quot;&quot;</span>
-        <span class="nb">print</span><span class="p">(</span>
+        <span class="k">print</span><span class="p">(</span>
             <span class="s1">&#39;Searching cloud-custodian Lambda functions for failed invocations&#39;</span>
         <span class="p">)</span>
         <span class="n">lambda_names</span> <span class="o">=</span> <span class="n">LambdaHealthChecker</span><span class="o">.</span><span class="n">find_matching_func_names</span><span class="p">(</span>
             <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;^(custodian-|cloud-custodian-).*&#39;</span><span class="p">)</span>
         <span class="p">)</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Custodian Lambda functions: </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">lambda_names</span><span class="p">)</span>
-        <span class="n">errors</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="n">errors</span> <span class="o">=</span> <span class="bp">False</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_get_sqs_dlq</span><span class="p">()</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
             <span class="s1">&#39;</span><span class="si">%d</span><span class="s1"> failed Lambda invocations: </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span>
@@ -2958,7 +2958,7 @@ am not the authoritative source for, so I&#8217;m just going to leave it inline&
                     <span class="s1">&#39;_check_function returned False (<span class="caps">NOT</span> <span class="caps">HEALTHY</span>) for: </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span>
                     <span class="n">fname</span>
                 <span class="p">)</span>
-                <span class="n">errors</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="n">errors</span> <span class="o">=</span> <span class="bp">True</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
                 <span class="s1">&#39;Sleeping </span><span class="si">%s</span><span class="s1"> seconds before checking next function&#39;</span><span class="p">,</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">INTER_FUNC_SLEEP</span>
@@ -2967,20 +2967,20 @@ am not the authoritative source for, so I&#8217;m just going to leave it inline&
         <span class="bp">self</span><span class="o">.</span><span class="n">_ack_sqs</span><span class="p">()</span>
         <span class="n">req_ids</span> <span class="o">=</span> <span class="p">[</span>
             <span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_failed_request_ids</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_failed_request_ids</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_failed_request_ids</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="ow">is</span> <span class="bp">None</span>
         <span class="p">]</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">req_ids</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span>
+            <span class="k">print</span><span class="p">(</span>
                 <span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">&quot;</span> <span class="o">+</span>
                 <span class="n">red</span><span class="p">(</span><span class="s1">&#39;<span class="caps">ERROR</span>: </span><span class="si">%d</span><span class="s1"> failed Lambda RequestIDs could not be tied &#39;</span>
                     <span class="s1">&#39;to their function names: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">req_ids</span><span class="p">),</span> <span class="n">req_ids</span><span class="p">))</span>
                 <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">&quot;</span>
             <span class="p">)</span>
         <span class="k">if</span> <span class="n">errors</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Some lambda functions had errors in the last &#39;</span>
+            <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Some lambda functions had errors in the last &#39;</span>
                   <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">INVL_DESC</span><span class="p">)</span>
             <span class="k">raise</span> <span class="ne">SystemExit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;No Lambda functions had errors in the last &#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">INVL_DESC</span><span class="p">)</span>
+        <span class="k">print</span><span class="p">(</span><span class="s1">&#39;No Lambda functions had errors in the last &#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">INVL_DESC</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_get_sqs_dlq</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -2989,7 +2989,7 @@ am not the authoritative source for, so I&#8217;m just going to leave it inline&
 <span class="sd">        to `self._sqs_rcpts`.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">count</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="n">msgs</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span>
+        <span class="n">msgs</span> <span class="o">=</span> <span class="p">[</span><span class="bp">None</span><span class="p">]</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Polling <span class="caps">SQS</span> queue: </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dlq_arn</span><span class="p">)</span>
         <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="n">msgs</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sqs</span><span class="o">.</span><span class="n">receive_message</span><span class="p">(</span>
@@ -3004,7 +3004,7 @@ am not the authoritative source for, so I&#8217;m just going to leave it inline&
             <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">msgs</span><span class="p">:</span>
                 <span class="n">count</span> <span class="o">+=</span> <span class="mi">1</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_failed_request_ids</span><span class="p">[</span>
-                    <span class="n">m</span><span class="p">[</span><span class="s1">&#39;MessageAttributes&#39;</span><span class="p">][</span><span class="s1">&#39;RequestID&#39;</span><span class="p">][</span><span class="s1">&#39;StringValue&#39;</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
+                    <span class="n">m</span><span class="p">[</span><span class="s1">&#39;MessageAttributes&#39;</span><span class="p">][</span><span class="s1">&#39;RequestID&#39;</span><span class="p">][</span><span class="s1">&#39;StringValue&#39;</span><span class="p">]]</span> <span class="o">=</span> <span class="bp">None</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_sqs_rcpts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">m</span><span class="p">[</span><span class="s1">&#39;ReceiptHandle&#39;</span><span class="p">])</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Received </span><span class="si">%d</span><span class="s1"> <span class="caps">SQS</span> messages in total&#39;</span><span class="p">,</span> <span class="n">count</span><span class="p">)</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;<span class="caps">SQS</span> Message Receipt Handles: </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sqs_rcpts</span><span class="p">)</span>
@@ -3032,7 +3032,7 @@ am not the authoritative source for, so I&#8217;m just going to leave it inline&
         <span class="n">c</span> <span class="o">=</span> <span class="n">LambdaHealthChecker</span><span class="p">(</span><span class="n">func_name</span><span class="p">,</span> <span class="n">logs</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_logs</span><span class="p">,</span> <span class="n">cw</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_cw</span><span class="p">)</span>
         <span class="n">req_ids</span> <span class="o">=</span> <span class="p">[</span>
             <span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_failed_request_ids</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_failed_request_ids</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_failed_request_ids</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="ow">is</span> <span class="bp">None</span>
         <span class="p">]</span>
         <span class="n">logs</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">get_filtered_logs</span><span class="p">(</span><span class="n">req_ids</span><span class="p">)</span>
         <span class="n">metrics</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">get_cloudwatch_metric_sums</span><span class="p">()</span>
@@ -3058,28 +3058,28 @@ am not the authoritative source for, so I&#8217;m just going to leave it inline&
                 <span class="p">)</span>
             <span class="p">)</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">logs</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">1</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="n">green</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">: <span class="caps">OK</span></span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">func_name</span><span class="p">))</span>
-            <span class="k">return</span> <span class="kc">True</span>
-        <span class="nb">print</span><span class="p">(</span><span class="n">red</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">: <span class="caps">ERRORS</span>&#39;</span> <span class="o">%</span> <span class="n">func_name</span><span class="p">))</span>
+            <span class="k">print</span><span class="p">(</span><span class="n">green</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">: <span class="caps">OK</span></span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">func_name</span><span class="p">))</span>
+            <span class="k">return</span> <span class="bp">True</span>
+        <span class="k">print</span><span class="p">(</span><span class="n">red</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">: <span class="caps">ERRORS</span>&#39;</span> <span class="o">%</span> <span class="n">func_name</span><span class="p">))</span>
         <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">msg</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\t</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">red</span><span class="p">(</span><span class="n">m</span><span class="p">))</span>
+            <span class="k">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\t</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">red</span><span class="p">(</span><span class="n">m</span><span class="p">))</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">logs</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="k">return</span> <span class="kc">True</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n\t</span><span class="s2">Logs For Failed Invocations:</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="bp">True</span>
+        <span class="k">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n\t</span><span class="s2">Logs For Failed Invocations:</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">req_id</span> <span class="ow">in</span> <span class="n">logs</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
             <span class="n">events</span> <span class="o">=</span> <span class="n">logs</span><span class="p">[</span><span class="n">req_id</span><span class="p">]</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_failed_request_ids</span><span class="p">[</span><span class="n">req_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">func_name</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="n">red</span><span class="p">(</span><span class="s1">&#39;RequestID=</span><span class="si">%s</span><span class="s1"> logGroupName=</span><span class="si">%s</span><span class="s1"> logStreamName=</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span>
+            <span class="k">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="n">red</span><span class="p">(</span><span class="s1">&#39;RequestID=</span><span class="si">%s</span><span class="s1"> logGroupName=</span><span class="si">%s</span><span class="s1"> logStreamName=</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span>
                 <span class="n">req_id</span><span class="p">,</span> <span class="n">events</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;logGroupName&#39;</span><span class="p">],</span> <span class="n">events</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;logStreamName&#39;</span><span class="p">]</span>
             <span class="p">)))</span>
             <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">events</span><span class="p">:</span>
-                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span>
+                <span class="k">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span>
                     <span class="s2">&quot;</span><span class="se">\t\t</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">l</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s1">&#39; &#39;</span><span class="p">)</span>
                     <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">e</span><span class="p">[</span><span class="s1">&#39;message&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
                     <span class="k">if</span> <span class="n">l</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">!=</span> <span class="s1">&#39;&#39;</span>
                 <span class="p">]))</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">print</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">False</span>
 
 
 <span class="k">def</span> <span class="nf">_name_value_dict</span><span class="p">(</span><span class="n">l</span><span class="p">):</span>
@@ -3118,7 +3118,7 @@ am not the authoritative source for, so I&#8217;m just going to leave it inline&
     <span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">set_log_level_format</span><span class="p">(</span><span class="n">level</span><span class="p">,</span> <span class="nb">format</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">set_log_level_format</span><span class="p">(</span><span class="n">level</span><span class="p">,</span> <span class="n">format</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Set logger level and format.</span>
 
@@ -3127,7 +3127,7 @@ am not the authoritative source for, so I&#8217;m just going to leave it inline&
 <span class="sd">    :param format: logging formatter format string</span>
 <span class="sd">    :type format: str</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">formatter</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">Formatter</span><span class="p">(</span><span class="n">fmt</span><span class="o">=</span><span class="nb">format</span><span class="p">)</span>
+    <span class="n">formatter</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">Formatter</span><span class="p">(</span><span class="n">fmt</span><span class="o">=</span><span class="n">format</span><span class="p">)</span>
     <span class="n">logger</span><span class="o">.</span><span class="n">handlers</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">setFormatter</span><span class="p">(</span><span class="n">formatter</span><span class="p">)</span>
     <span class="n">logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">level</span><span class="p">)</span>
 
@@ -3197,11 +3197,11 @@ am not the authoritative source for, so I&#8217;m just going to leave it inline&
 <li class="list-group-item">
   <h4><i class="fa fa-home fa-lg"></i><span class="icon-label">Recent Posts</span></h4>
   <ul class="list-group" id="recentposts">
+    <li class="list-group-item"><a href="https://blog.jasonantman.com/2022/05/adding-a-bltouch-to-a-creality-cr-10s-running-marlin-2-firmware/">Adding a BLTouch to a Creality <span class="caps">CR</span>-10S running Marlin 2&nbsp;Firmware</a></li>
     <li class="list-group-item"><a href="https://blog.jasonantman.com/2021/03/migrating-kodi-to-mariadb-with-locked-down-permissions-and-no-importexport/">Migrating Kodi to MariaDB, with locked-down permissions and no&nbsp;import/export</a></li>
     <li class="list-group-item"><a href="https://blog.jasonantman.com/2021/03/octoprint-power-outage-handling/">OctoPrint Power Outage&nbsp;Handling</a></li>
     <li class="list-group-item"><a href="https://blog.jasonantman.com/2020/11/on-the-creation-use-and-management-of-docker-images/">On The Creation, Use, and Management of Docker&nbsp;Images</a></li>
     <li class="list-group-item"><a href="https://blog.jasonantman.com/2019/04/galaxy-s10--android-9-alarm-app-broken-by-battery-optimization/">Galaxy S10 / Android 9 alarm app broken by battery&nbsp;optimization</a></li>
-    <li class="list-group-item"><a href="https://blog.jasonantman.com/2019/03/arch-linux-on-a-dell-precision-5530--xps-15-9570-laptop/">Arch Linux on a Dell Precision 5530 / <span class="caps">XPS</span> 15 9570&nbsp;Laptop</a></li>
   </ul>
 </li>
 <!-- End Sidebar/Recent Posts -->
@@ -3248,7 +3248,7 @@ am not the authoritative source for, so I&#8217;m just going to leave it inline&
    <div class="container">
       <hr>
       <div class="row">
-         <div class="col-xs-10">&copy; 2021 Jason Antman
+         <div class="col-xs-10">&copy; 2022 Jason Antman
             &middot; Powered by <a href="https://github.com/getpelican/pelican-themes/tree/master/pelican-bootstrap3" target="_blank">pelican-bootstrap3</a>,
             <a href="http://docs.getpelican.com/" target="_blank">Pelican</a>,
             <a href="http://getbootstrap.com" target="_blank">Bootstrap</a>         </div>

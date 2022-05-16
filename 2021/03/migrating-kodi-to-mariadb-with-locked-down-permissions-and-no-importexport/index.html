@@ -184,7 +184,7 @@ Jason Antman's Blog            </a>
 <span class="kn">import</span> <span class="nn">sqlite3</span>
 
 <span class="n"><span class="caps">FORMAT</span></span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;[</span><span class="si">%(asctime)s</span><span class="s2"> </span><span class="si">%(levelname)s</span><span class="s2">] </span><span class="si">%(message)s</span><span class="s2">&quot;</span>
-<span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n"><span class="caps">WARNING</span></span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="n"><span class="caps">FORMAT</span></span><span class="p">)</span>
+<span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n"><span class="caps">WARNING</span></span><span class="p">,</span> <span class="n">format</span><span class="o">=</span><span class="n"><span class="caps">FORMAT</span></span><span class="p">)</span>
 <span class="n">logger</span><span class="p">:</span> <span class="n">logging</span><span class="o">.</span><span class="n">Logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">()</span>
 
 
@@ -192,7 +192,7 @@ Jason Antman's Blog            </a>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">host</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">port</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">user</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">passwd</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-        <span class="n">dry_run</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="n">dry_run</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="bp">False</span>
     <span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">dry_run</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">dry_run</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
@@ -218,13 +218,13 @@ Jason Antman's Blog            </a>
         <span class="bp">self</span><span class="o">.</span><span class="n">mysql</span><span class="o">.</span><span class="n">select_db</span><span class="p">(</span><span class="n">dbname</span><span class="p">)</span>
         <span class="n">mysql_tables</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mysql_table_names</span><span class="p">()</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;SQLite3 open </span><span class="si">%s</span><span class="s1">.db&#39;</span><span class="p">,</span> <span class="n">dbname</span><span class="p">)</span>
-        <span class="n">local</span><span class="p">:</span> <span class="n">sqlite3</span><span class="o">.</span><span class="n">Connection</span> <span class="o">=</span> <span class="n">sqlite3</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{dbname}</span><span class="s1">.db&#39;</span><span class="p">)</span>
+        <span class="n">local</span><span class="p">:</span> <span class="n">sqlite3</span><span class="o">.</span><span class="n">Connection</span> <span class="o">=</span> <span class="n">sqlite3</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;{dbname}.db&#39;</span><span class="p">)</span>
         <span class="n">sqlite_tables</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sqlite_table_names</span><span class="p">(</span><span class="n">local</span><span class="p">)</span>
         <span class="n">local</span><span class="o">.</span><span class="n">row_factory</span> <span class="o">=</span> <span class="n">sqlite3</span><span class="o">.</span><span class="n">Row</span>
         <span class="k">if</span> <span class="n">mysql_tables</span> <span class="o">!=</span> <span class="n">sqlite_tables</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s1">&#39;<span class="caps">ERROR</span>: MySQL table names in </span><span class="si">{dbname}</span><span class="s1"> (</span><span class="si">{mysql_tables}</span><span class="s1">) do &#39;</span>
-                <span class="sa">f</span><span class="s1">&#39;not match SQLite table names (</span><span class="si">{sqlite_tables}</span><span class="s1">)!&#39;</span>
+                <span class="n">f</span><span class="s1">&#39;<span class="caps">ERROR</span>: MySQL table names in {dbname} ({mysql_tables}) do &#39;</span>
+                <span class="n">f</span><span class="s1">&#39;not match SQLite table names ({sqlite_tables})!&#39;</span>
             <span class="p">)</span>
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">mysql</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span> <span class="k">as</span> <span class="n">cursor</span><span class="p">:</span>
             <span class="n">cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s1">&#39;set FOREIGN_KEY_CHECKS = 0;&#39;</span><span class="p">)</span>
@@ -247,9 +247,9 @@ Jason Antman's Blog            </a>
         <span class="n">table_name</span><span class="p">:</span> <span class="nb">str</span>
     <span class="p">):</span>
         <span class="c1"># first empty the MySQL table</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_mysql_execute</span><span class="p">(</span><span class="n">cur</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;<span class="caps">DELETE</span> <span class="caps">FROM</span> </span><span class="si">{table_name}</span><span class="s1">;&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_mysql_execute</span><span class="p">(</span><span class="n">cur</span><span class="p">,</span> <span class="n">f</span><span class="s1">&#39;<span class="caps">DELETE</span> <span class="caps">FROM</span> {table_name};&#39;</span><span class="p">)</span>
         <span class="c1"># now get the data from SQLite and copy it over</span>
-        <span class="n">sql</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;<span class="caps">SELECT</span> * <span class="caps">FROM</span> </span><span class="si">{table_name}</span><span class="s1">;&#39;</span>
+        <span class="n">sql</span> <span class="o">=</span> <span class="n">f</span><span class="s1">&#39;<span class="caps">SELECT</span> * <span class="caps">FROM</span> {table_name};&#39;</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;SQLite execute: </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">sql</span><span class="p">)</span>
         <span class="n">local_cur</span><span class="p">:</span> <span class="n">sqlite3</span><span class="o">.</span><span class="n">Cursor</span> <span class="o">=</span> <span class="n">local</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
         <span class="n">local_cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">sql</span><span class="p">)</span>
@@ -270,8 +270,8 @@ Jason Antman's Blog            </a>
         <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">dict</span><span class="p">(</span><span class="n">row</span><span class="p">)</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="n">keys</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
             <span class="n">values</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
-        <span class="n">sql</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;<span class="caps">INSERT</span> <span class="caps">INTO</span> </span><span class="si">{tname}</span><span class="s1"> ({&quot;, &quot;.join(keys)}) <span class="caps">VALUES</span> (&#39;</span> \
-              <span class="sa">f</span><span class="s1">&#39;{&quot;, &quot;.join([&quot;</span><span class="si">%s</span><span class="s1">&quot; for x in values])});&#39;</span>
+        <span class="n">sql</span> <span class="o">=</span> <span class="n">f</span><span class="s1">&#39;<span class="caps">INSERT</span> <span class="caps">INTO</span> {tname} ({&quot;, &quot;.join(keys)}) <span class="caps">VALUES</span> (&#39;</span> \
+              <span class="n">f</span><span class="s1">&#39;{&quot;, &quot;.join([&quot;</span><span class="si">%s</span><span class="s1">&quot; for x in values])});&#39;</span>
         <span class="k">return</span> <span class="n">sql</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">values</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_mysql_execute</span><span class="p">(</span>
@@ -315,11 +315,11 @@ Jason Antman's Blog            </a>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">p</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s1">&#39;Migrate Kodi SQLite to MySQL&#39;</span><span class="p">)</span>
     <span class="n">p</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;-d&#39;</span><span class="p">,</span> <span class="s1">&#39;--dry-run&#39;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s1">&#39;dry_run&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s1">&#39;store_true&#39;</span><span class="p">,</span>
-                   <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                   <span class="n">default</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
                    <span class="n">help</span><span class="o">=</span><span class="s2">&quot;dry-run - print <span class="caps">SQL</span> that would be sent to MySQL but &quot;</span>
                         <span class="s2">&quot;don&#39;t actually run it&quot;</span><span class="p">)</span>
     <span class="n">p</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;-v&#39;</span><span class="p">,</span> <span class="s1">&#39;--verbose&#39;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s1">&#39;verbose&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s1">&#39;store_true&#39;</span><span class="p">,</span>
-                   <span class="n">help</span><span class="o">=</span><span class="s1">&#39;debug-level output.&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+                   <span class="n">help</span><span class="o">=</span><span class="s1">&#39;debug-level output.&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
     <span class="n">p</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;-H&#39;</span><span class="p">,</span> <span class="s1">&#39;--host&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s1">&#39;host&#39;</span><span class="p">,</span>
                    <span class="n">help</span><span class="o">=</span><span class="s1">&#39;MySQL host (default: 127.0.0.1)&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s1">&#39;127.0.0.1&#39;</span><span class="p">)</span>
     <span class="n">p</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;-P&#39;</span><span class="p">,</span> <span class="s1">&#39;--port&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s1">&#39;port&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">3306</span><span class="p">,</span>
@@ -347,7 +347,7 @@ Jason Antman's Blog            </a>
     <span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">set_log_level_format</span><span class="p">(</span><span class="n">level</span><span class="p">,</span> <span class="nb">format</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">set_log_level_format</span><span class="p">(</span><span class="n">level</span><span class="p">,</span> <span class="n">format</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Set logger level and format.</span>
 
@@ -356,7 +356,7 @@ Jason Antman's Blog            </a>
 <span class="sd">    :param format: logging formatter format string</span>
 <span class="sd">    :type format: str</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">formatter</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">Formatter</span><span class="p">(</span><span class="n">fmt</span><span class="o">=</span><span class="nb">format</span><span class="p">)</span>
+    <span class="n">formatter</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">Formatter</span><span class="p">(</span><span class="n">fmt</span><span class="o">=</span><span class="n">format</span><span class="p">)</span>
     <span class="n">logger</span><span class="o">.</span><span class="n">handlers</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">setFormatter</span><span class="p">(</span><span class="n">formatter</span><span class="p">)</span>
     <span class="n">logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">level</span><span class="p">)</span>
 
@@ -428,11 +428,11 @@ Jason Antman's Blog            </a>
 <li class="list-group-item">
   <h4><i class="fa fa-home fa-lg"></i><span class="icon-label">Recent Posts</span></h4>
   <ul class="list-group" id="recentposts">
+    <li class="list-group-item"><a href="https://blog.jasonantman.com/2022/05/adding-a-bltouch-to-a-creality-cr-10s-running-marlin-2-firmware/">Adding a BLTouch to a Creality <span class="caps">CR</span>-10S running Marlin 2&nbsp;Firmware</a></li>
     <li class="list-group-item"><a href="https://blog.jasonantman.com/2021/03/migrating-kodi-to-mariadb-with-locked-down-permissions-and-no-importexport/">Migrating Kodi to MariaDB, with locked-down permissions and no&nbsp;import/export</a></li>
     <li class="list-group-item"><a href="https://blog.jasonantman.com/2021/03/octoprint-power-outage-handling/">OctoPrint Power Outage&nbsp;Handling</a></li>
     <li class="list-group-item"><a href="https://blog.jasonantman.com/2020/11/on-the-creation-use-and-management-of-docker-images/">On The Creation, Use, and Management of Docker&nbsp;Images</a></li>
     <li class="list-group-item"><a href="https://blog.jasonantman.com/2019/04/galaxy-s10--android-9-alarm-app-broken-by-battery-optimization/">Galaxy S10 / Android 9 alarm app broken by battery&nbsp;optimization</a></li>
-    <li class="list-group-item"><a href="https://blog.jasonantman.com/2019/03/arch-linux-on-a-dell-precision-5530--xps-15-9570-laptop/">Arch Linux on a Dell Precision 5530 / <span class="caps">XPS</span> 15 9570&nbsp;Laptop</a></li>
   </ul>
 </li>
 <!-- End Sidebar/Recent Posts -->
@@ -479,7 +479,7 @@ Jason Antman's Blog            </a>
    <div class="container">
       <hr>
       <div class="row">
-         <div class="col-xs-10">&copy; 2021 Jason Antman
+         <div class="col-xs-10">&copy; 2022 Jason Antman
             &middot; Powered by <a href="https://github.com/getpelican/pelican-themes/tree/master/pelican-bootstrap3" target="_blank">pelican-bootstrap3</a>,
             <a href="http://docs.getpelican.com/" target="_blank">Pelican</a>,
             <a href="http://getbootstrap.com" target="_blank">Bootstrap</a>         </div>
