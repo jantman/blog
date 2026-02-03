@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*- #
-from __future__ import unicode_literals
 import os
 
 #
@@ -87,6 +86,7 @@ MARKDOWN = {
 #
 FEED_ALL_ATOM = None # TODO
 CATEGORY_FEED_ATOM = None # TODO
+RSS_FEED_SUMMARY_ONLY = False
 
 #
 # Theme and Display Settings
@@ -153,8 +153,8 @@ TWITTER_WIDGET_ID = '429640274453594113'
 #
 # Plugins
 #
-PLUGINS = ['sitemap', 'i18n_subsites']
-PLUGIN_PATHS = ['/home/jantman/GIT/pelican-plugins']
+PLUGINS = ['sitemap', 'i18n_null']
+PLUGIN_PATHS = ['/home/jantman/GIT/pelican-plugins', 'plugins']
 PLUGIN_BRANCH = 'jantman'
 #W3C_SLEEP = 0
 W3C_VALIDATOR_URL = 'http://localhost/w3c-validator/check'
