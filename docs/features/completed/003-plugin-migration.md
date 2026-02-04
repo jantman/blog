@@ -80,7 +80,7 @@ git mv docs/features/003-plugin-migration.md docs/features/completed/
   - [x] Task 1.4: Update `fabfile.py` (removed PLUGIN_PATHS/PLUGIN_BRANCH import, removed monorepo validation)
   - [x] Task 1.5: Build verification (394 articles, no errors, sitemap.xml generated at 204KB)
   - [x] Task 1.6: Commit and human visual review
-- [ ] Milestone 2: Acceptance Criteria
-  - [ ] Task 2.1: Final verification checklist
-  - [ ] Task 2.2: Move feature doc to completed
-  - [ ] Task 2.3: Final commit and PR
+- [x] Milestone 2: Acceptance Criteria
+  - [x] Task 2.1: Final verification checklist (all passed)
+  - [x] Task 2.2: Move feature doc to completed
+  - [x] Task 2.3: Final commit and PR
