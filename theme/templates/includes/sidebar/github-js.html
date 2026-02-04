@@ -1,0 +1,56 @@
+{% if GITHUB_USER %}
+  {% if GITHUB_REPO_COUNT is not defined %}
+    {% set GITHUB_REPO_COUNT = 5 %}
+  {% endif %}
+  {% if GITHUB_SKIP_FORK is not defined %}
+    {% set GITHUB_SKIP_FORK = "false" %}
+  {% else %}
+    {% if GITHUB_SKIP_FORK %}
+      {% set GITHUB_SKIP_FORK = "true" %}
+    {% else %}
+      {% set GITHUB_SKIP_FORK = "false" %}
+    {% endif %}
+  {% endif %}
+
+  {% if GITHUB_REPOS_JSON is not defined %}
+    {% set GITHUB_REPOS_JSON = '' %}
+  {% endif %}
+
+  {% if GITHUB_REPOS_JSON != '' %}
+    <!-- GITHUB_REPOS_JSON (explicitly pinned repos ) -->
+  <script id="GithubReposJson" type="application/json">
+  {{ GITHUB_REPOS_JSON }}
+  </script>
+  {% endif %}
+
+<!-- GitHub JS Code -->
+<script type="text/javascript">
+$(document).ready(function () {
+  if (!window.jXHR) {
+    var jxhr = document.createElement('script');
+    jxhr.type = 'text/javascript';
+    jxhr.src = '{{ SITEURL }}/{{ THEME_STATIC_DIR }}/js/jXHR.js';
+    var s = document.getElementsByTagName('script')[0];
+    s.parentNode.insertBefore(jxhr, s);
+  }
+
+  {% if GITHUB_REPOS_JSON %}
+  console.log($('#GithubReposJson').html());
+  github.showSpecificRepos({
+    user: '{{ GITHUB_USER }}',
+    target: '#gh_repos',
+    repos: JSON.parse($('#GithubReposJson').html())
+  });
+  {% else %}
+  github.showRepos({
+    user: '{{ GITHUB_USER }}',
+    count: {{ GITHUB_REPO_COUNT }},
+    skip_forks: {{ GITHUB_SKIP_FORK }},
+    target: '#gh_repos'
+  });
+  {% endif %}
+});
+</script>
+<script src="{{ SITEURL }}/{{ THEME_STATIC_DIR }}/js/github.js" type="text/javascript"></script>
+<!-- End GitHub JS Code -->
+{% endif %}
