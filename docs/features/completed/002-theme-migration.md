@@ -93,4 +93,7 @@ git mv docs/features/002-theme-migration.md docs/features/completed/
   - [x] Task 1.5: Update fabfile.py (removed THEME_BRANCH import and branch check)
   - [x] Task 1.6: Build verification (394 articles, no errors, no template warnings)
   - [x] Task 1.7: Commit and human visual review
-- [ ] Milestone 2: Acceptance Criteria
+- [x] Milestone 2: Acceptance Criteria
+  - [x] Task 2.1: Final verification checklist (all passed)
+  - [x] Task 2.2: Move feature doc to completed
+  - [x] Task 2.3: Final commit and PR
