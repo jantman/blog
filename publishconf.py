@@ -1,7 +1,5 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*- #
-from __future__ import unicode_literals
-
 # This file is only used if you use `make publish` or
 # explicitly specify it as your config file.
 
@@ -19,10 +17,10 @@ FEED_ATOM = 'feeds/feed.atom.xml'
 FEED_RSS = 'feeds/feed.rss.xml'
 FEED_ALL_ATOM = 'feeds/all.atom.xml'
 FEED_ALL_RSS = 'feeds/all.rss.xml'
-CATEGORY_FEED_ATOM = 'feeds/categories/%s.atom.xml'
-CATEGORY_FEED_RSS = 'feeds/categories/%s.rss.xml'
-TAG_FEED_ATOM = 'feeds/tags/%s.atom.xml'
-TAG_FEED_RSS = 'feeds/tags/%s.rss.xml'
+CATEGORY_FEED_ATOM = 'feeds/categories/{slug}.atom.xml'
+CATEGORY_FEED_RSS = 'feeds/categories/{slug}.rss.xml'
+TAG_FEED_ATOM = 'feeds/tags/{slug}.atom.xml'
+TAG_FEED_RSS = 'feeds/tags/{slug}.rss.xml'
 FEED_MAX_ITEMS = 50
 
 DELETE_OUTPUT_DIRECTORY = True

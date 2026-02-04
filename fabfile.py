@@ -12,7 +12,7 @@ import time
 from pprint import pformat
 
 from pelicanconf import (
-    ARTICLE_PATHS, DEFAULT_CATEGORY, AUTHOR, OUTPUT_PATH, THEME, THEME_BRANCH,
+    ARTICLE_PATHS, DEFAULT_CATEGORY, AUTHOR, OUTPUT_PATH, THEME,
     PLUGIN_PATHS, PLUGIN_BRANCH, GITHUB_USER, MENUITEMS
 )
 
@@ -34,10 +34,6 @@ def prebuild():
     # check for themes
     if not os.path.exists(THEME):
         print("ERROR: theme directory %s does not exist." % THEME)
-        sys.exit(1)
-    branch = local("cd %s && git rev-parse --abbrev-ref HEAD" % THEME, capture=True).strip()
-    if branch != THEME_BRANCH:
-        print("ERROR: %s is on wrong branch (%s not %s)" % (THEME, branch, THEME_BRANCH))
         sys.exit(1)
     # check for plugins
     if not os.path.exists(os.path.join(PLUGIN_PATHS[0], 'LICENSE')):
