@@ -58,3 +58,10 @@ Replace `fabfile.py` and `develop_server.sh` with a Python 3 `tasks.py` using In
 - Added empty-result guard for pinned repos scraping (HTML selectors may be stale)
 - `develop_server.sh` replaced by `inv devserver` using `pelican --listen --autoreload`
 - Verified: `inv --list` (12 tasks), `inv clean`, `inv build` (394 articles), `inv categories`, `inv drafts` all work
+
+### Milestone 2: COMPLETE
+
+- Removed `fabfile.py` and `develop_server.sh` via `git rm`
+- Verified `inv build` still works (394 articles processed)
+- Blog visually confirmed rendering correctly at http://localhost:8000
+- Feature doc moved to `docs/features/completed/`
