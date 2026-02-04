@@ -13,7 +13,7 @@ from pprint import pformat
 
 from pelicanconf import (
     ARTICLE_PATHS, DEFAULT_CATEGORY, AUTHOR, OUTPUT_PATH, THEME,
-    PLUGIN_PATHS, PLUGIN_BRANCH, GITHUB_USER, MENUITEMS
+    GITHUB_USER, MENUITEMS
 )
 
 # Local path configuration (can be absolute or relative to fabfile)
@@ -34,14 +34,6 @@ def prebuild():
     # check for themes
     if not os.path.exists(THEME):
         print("ERROR: theme directory %s does not exist." % THEME)
-        sys.exit(1)
-    # check for plugins
-    if not os.path.exists(os.path.join(PLUGIN_PATHS[0], 'LICENSE')):
-        print("ERROR: plugin directory %s does not exist." % PLUGIN_PATHS[0])
-        sys.exit(1)
-    branch = local("cd %s && git rev-parse --abbrev-ref HEAD" % PLUGIN_PATHS[0], capture=True).strip()
-    if branch != PLUGIN_BRANCH:
-        print("ERROR: %s is on wrong branch (%s not %s)" % (PLUGIN_PATHS[0], branch, PLUGIN_BRANCH))
         sys.exit(1)
     cats = _get_categories()
     mitems = [x[0] for x in MENUITEMS]
