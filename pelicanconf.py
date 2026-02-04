@@ -91,9 +91,8 @@ RSS_FEED_SUMMARY_ONLY = False
 #
 # Theme and Display Settings
 #
-THEME = '/home/jantman/GIT/pelican-themes/pelican-bootstrap3'
+THEME = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'theme')
 BOOTSTRAP_THEME = 'flatly'
-THEME_BRANCH = 'jantman-bootstrap3'
 PYGMENTS_STYLE = 'default'
 
 DISPLAY_CATEGORIES_ON_MENU = False

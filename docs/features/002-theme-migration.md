@@ -85,5 +85,12 @@ git mv docs/features/002-theme-migration.md docs/features/completed/
 
 ## Progress
 
-- [ ] Milestone 1: Vendor Theme via Git Subtree
+- [x] Milestone 1: Vendor Theme via Git Subtree
+  - [x] Task 1.1: Push unpushed theme commit (already up-to-date)
+  - [x] Task 1.2: Create subtree split branch
+  - [x] Task 1.3: Add theme to blog repo via git subtree (squashed)
+  - [x] Task 1.4: Update pelicanconf.py (THEME path, removed THEME_BRANCH)
+  - [x] Task 1.5: Update fabfile.py (removed THEME_BRANCH import and branch check)
+  - [x] Task 1.6: Build verification (394 articles, no errors, no template warnings)
+  - [x] Task 1.7: Commit and human visual review
 - [ ] Milestone 2: Acceptance Criteria
