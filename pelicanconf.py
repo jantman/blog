@@ -153,8 +153,7 @@ TWITTER_WIDGET_ID = '429640274453594113'
 # Plugins
 #
 PLUGINS = ['sitemap', 'i18n_null']
-PLUGIN_PATHS = ['/home/jantman/GIT/pelican-plugins', 'plugins']
-PLUGIN_BRANCH = 'jantman'
+PLUGIN_PATHS = ['plugins']
 #W3C_SLEEP = 0
 W3C_VALIDATOR_URL = 'http://localhost/w3c-validator/check'
 
