@@ -6,6 +6,7 @@ The following guidelines MUST always be followed:
 
 * Features that are non-trivial in size (i.e. more than a few simple changes) should be broken down into Milestones and Tasks. Those will be given a prefix to be used in commit messages, formatted as `{Feature Name} - {Milestone number}.{Task number}`. Human approval must always be obtained to move from one Milestone to the next.
 * Before beginning a feature, you must be on a git branch other than `main`. If you are not, start a new branch named after the feature.
+* The first task of every feature must be writing your complete implementation plan to the original feature markdown document.
 * At the end of every Milestone and Feature you must (in order):
   1. Update the feature markdown document to indicate what progress has been made on the relevant Milestone or Feature.
   2. Commit that along with all changes to git, using a commit message beginning with the Milestone/Task prefix and a one-sentence concise summary of the changes followed by a detailed explanation of the changes.
