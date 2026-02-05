@@ -1,0 +1,56 @@
+# 005 - Deployment Modernization
+
+You must read, understand, and follow all instructions in `./README.md` when planning and implementing this feature.
+
+## Overview
+
+Replace the current manual deployment workflow (`ghp-import` output directory then `git push origin gh-pages`) with a GitHub Actions CI/CD pipeline that automatically builds and deploys the site to GitHub Pages on push to the main branch. This also replaces the need for local installation of `ghp-import` and ensures consistent, reproducible builds. Also replace the brittle HTML scraping in `_update_pinned_repos` with GitHub's GraphQL API.
+
+## Implementation Plan
+
+### Milestone 1: Create GitHub Actions CI/CD Workflow
+
+1. Create `.github/workflows/deploy.yml` with build and deploy jobs
+2. Build job: checkout, setup Python 3.14, install deps, fetch pinned repos via `gh api graphql`, run pelican, upload artifact
+3. Deploy job: deploy to GitHub Pages (only on push to master)
+4. Update feature doc, commit
+
+### Milestone 2: Clean Up Local Tooling
+
+1. Replace `_update_pinned_repos` HTML scraper with GitHub GraphQL API via `requests`
+2. Remove `ghp-import` and `beautifulsoup4` from `requirements.txt`
+3. Remove `publish` task from `tasks.py`
+4. Verify local build, update feature doc, commit
+
+### Milestone 3: Acceptance Criteria
+
+1. Verify CI pipeline (push triggers build+deploy, PR triggers build only)
+2. Move feature doc to `docs/features/completed/`
+3. Final commit
+
+## Progress
+
+### Milestone 1: COMPLETE
+
+- Created `.github/workflows/deploy.yml` with:
+  - Triggers on push to `master` and PRs targeting `master`
+  - Permissions: `contents: read`, `pages: write`, `id-token: write`
+  - Concurrency group `pages`, cancel-in-progress only for PRs
+  - Build job: checkout, Python 3.14, pip install, fetch pinned repos via `gh api graphql`, pelican build, upload artifact (push only), configure pages (push only)
+  - Deploy job: runs only on push to master, deploys to `github-pages` environment
+
+### Milestone 2: COMPLETE
+
+- Replaced `_update_pinned_repos` HTML scraper (BeautifulSoup) with GitHub GraphQL API via `requests`
+  - Requires `GITHUB_TOKEN` or `GH_TOKEN` env var (GraphQL API requires authentication)
+  - Graceful fallback with warning message when no token is available
+  - Maps GraphQL response to existing JSON format: `[{name, html_url, description}]`
+  - Preserves 24-hour cache, interactive confirmation, and non-interactive mode behavior
+- Removed `beautifulsoup4` and `ghp-import` from `requirements.txt`
+- Removed `publish` task from `tasks.py`
+- Verified: `inv --list` shows 11 tasks (publish removed), pinned repos JSON correctly populated via GraphQL
+
+### Milestone 3: COMPLETE
+
+- Feature doc moved to `docs/features/completed/`
+- Manual step required: Change GitHub Pages source in repo settings from "Deploy from a branch (gh-pages)" to "GitHub Actions"
