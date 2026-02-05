@@ -15,7 +15,6 @@ import datetime
 from pprint import pformat
 
 from invoke import task
-from bs4 import BeautifulSoup
 import requests
 
 from pelicanconf import (
@@ -102,7 +101,7 @@ def _prebuild(c):
 
 
 def _update_pinned_repos():
-    """Update github_pinned_repos.json from user's GitHub profile."""
+    """Update github_pinned_repos.json from user's GitHub profile via GraphQL API."""
     if not os.path.exists('github_pinned_repos.json'):
         fage = 999999999
     else:
@@ -114,21 +113,48 @@ def _update_pinned_repos():
         )
         return True
     print("Updating GitHub Pinned Repos for user %s" % GITHUB_USER)
-    result = []
-    r = requests.get('https://github.com/%s' % GITHUB_USER)
-    soup = BeautifulSoup(r.text, 'html.parser')
-    for div in soup.select('div.pinned-item-list-item-content'):
-        result.append({
-            'name': div.select('.repo')[0].string.strip(),
-            'html_url': (
-                'https://github.com%s'
-                % div.select('.repo')[0].parent.attrs['href'].strip()
-            ),
-            'description': div.select('.pinned-item-desc')[0].string.strip()
-        })
+    query = """
+    {
+      user(login: "%s") {
+        pinnedItems(first: 6, types: REPOSITORY) {
+          nodes {
+            ... on Repository {
+              name
+              url
+              description
+            }
+          }
+        }
+      }
+    }
+    """ % GITHUB_USER
+    token = os.environ.get('GITHUB_TOKEN') or os.environ.get('GH_TOKEN')
+    if not token:
+        print("WARNING: GITHUB_TOKEN or GH_TOKEN not set. "
+              "GitHub GraphQL API requires authentication. Skipping update.")
+        return False
+    headers = {'Authorization': 'bearer %s' % token}
+    r = requests.post(
+        'https://api.github.com/graphql',
+        json={'query': query},
+        headers=headers
+    )
+    r.raise_for_status()
+    data = r.json()
+    if 'errors' in data:
+        print("WARNING: GraphQL errors: %s. Skipping update." % data['errors'])
+        return False
+    nodes = data.get('data', {}).get('user', {}).get('pinnedItems', {}).get('nodes', [])
+    result = [
+        {
+            'name': node['name'],
+            'html_url': node['url'],
+            'description': node.get('description', '') or ''
+        }
+        for node in nodes
+    ]
     if not result:
-        print("WARNING: No pinned repos found (HTML selectors may be stale). "
-              "Skipping update.")
+        print("WARNING: No pinned repos found. Skipping update.")
         return False
     res = json.dumps(result)
     print("New pinned repos:\n%s" % pformat(result))
@@ -197,20 +223,6 @@ def preview(c):
     """Build with publishconf.py settings."""
     _prebuild(c)
     c.run('pelican -s publishconf.py')
-
-
-@task
-def publish(c):
-    """Rebuild and publish to GitHub Pages."""
-    resp = input(
-        "This will clean, build, and push to GH pages. Ok? [yes|No] "
-    )
-    if not re.match(r'(y|Y|yes|Yes|YES)', resp):
-        return False
-    clean(c)
-    preview(c)
-    c.run("ghp-import %s" % OUTPUT_PATH)
-    c.run("git push origin gh-pages")
 
 
 @task

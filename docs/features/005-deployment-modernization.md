@@ -38,3 +38,14 @@ Replace the current manual deployment workflow (`ghp-import` output directory th
   - Concurrency group `pages`, cancel-in-progress only for PRs
   - Build job: checkout, Python 3.14, pip install, fetch pinned repos via `gh api graphql`, pelican build, upload artifact (push only), configure pages (push only)
   - Deploy job: runs only on push to master, deploys to `github-pages` environment
+
+### Milestone 2: COMPLETE
+
+- Replaced `_update_pinned_repos` HTML scraper (BeautifulSoup) with GitHub GraphQL API via `requests`
+  - Requires `GITHUB_TOKEN` or `GH_TOKEN` env var (GraphQL API requires authentication)
+  - Graceful fallback with warning message when no token is available
+  - Maps GraphQL response to existing JSON format: `[{name, html_url, description}]`
+  - Preserves 24-hour cache, interactive confirmation, and non-interactive mode behavior
+- Removed `beautifulsoup4` and `ghp-import` from `requirements.txt`
+- Removed `publish` task from `tasks.py`
+- Verified: `inv --list` shows 11 tasks (publish removed), pinned repos JSON correctly populated via GraphQL
