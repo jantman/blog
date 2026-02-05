@@ -9,8 +9,7 @@ AUTHOR = u'Jason Antman'
 SITENAME = u"Jason Antman's Blog"
 #SITESUBTITLE = u"Subtitle here"
 DISQUS_SITENAME = 'jantman'
-GOOGLE_ANALYTICS_UNIVERSAL = 'UA-2718127-2'
-GOOGLE_ANALYTICS_UNIVERSAL_PROPERTY = 'jasonantman.com'
+GOOGLE_ANALYTICS = 'G-CXJFBDQ4FX'
 
 # Uncomment following line if you want document-relative URLs when developing
 RELATIVE_URLS = True
@@ -120,8 +119,6 @@ SHARIFF_LANG = 'en'
 SHARIFF_ORIENTATION = 'horizontal'
 _shariff_svcs = [
     'facebook',
-    'googleplus',
-    'twitter',
     'linkedin',
     'diaspora'
 ]
@@ -145,9 +142,6 @@ GITHUB_SHOW_USER_LINK = True
 if os.path.exists('github_pinned_repos.json'):
     with open('github_pinned_repos.json', 'r') as fh:
         GITHUB_REPOS_JSON = fh.read().strip()
-
-TWITTER_USERNAME = 'j_antman'
-TWITTER_WIDGET_ID = '429640274453594113'
 
 #
 # Plugins
