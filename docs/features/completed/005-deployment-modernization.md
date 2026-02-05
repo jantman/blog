@@ -49,3 +49,8 @@ Replace the current manual deployment workflow (`ghp-import` output directory th
 - Removed `beautifulsoup4` and `ghp-import` from `requirements.txt`
 - Removed `publish` task from `tasks.py`
 - Verified: `inv --list` shows 11 tasks (publish removed), pinned repos JSON correctly populated via GraphQL
+
+### Milestone 3: COMPLETE
+
+- Feature doc moved to `docs/features/completed/`
+- Manual step required: Change GitHub Pages source in repo settings from "Deploy from a branch (gh-pages)" to "GitHub Actions"
